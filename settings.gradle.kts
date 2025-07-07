@@ -21,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "Vonage Video Android"
 include(":app")
- 

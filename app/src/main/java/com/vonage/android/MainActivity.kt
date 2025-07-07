@@ -40,7 +40,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+internal fun GreetingPreview() {
     VonageVideoAndroidTheme {
         Greeting("Android")
     }
