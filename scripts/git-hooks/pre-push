@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Running detekt check..."
+./gradlew detekt
+DETEKT_EXIT_CODE=$?
+if [ $DETEKT_EXIT_CODE -ne 0 ]; then
+  echo "Detekt check failed. Please fix above issues before pushing"
+  exit 1
+fi
