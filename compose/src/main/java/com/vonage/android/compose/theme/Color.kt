@@ -1,6 +1,6 @@
 @file:Suppress("MagicNumber")
 
-package com.vonage.android.ui.theme
+package com.vonage.android.compose.theme
 
 import androidx.compose.ui.graphics.Color
 
