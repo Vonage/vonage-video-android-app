@@ -21,3 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Vonage Video Android"
 include(":app")
+include(":compose")
+include(":kotlin")
