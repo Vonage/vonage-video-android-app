@@ -16,58 +16,65 @@ import javax.inject.Inject
 @HiltViewModel
 class JoinMeetingRoomViewModel @Inject constructor(
     private val apiService: APIService,
+    private val roomNameGenerator: RoomNameGenerator,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<MainUiState>(MainUiState.Content())
-    val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<JoinMeetingRoomUiState>(JoinMeetingRoomUiState.Content())
+    val uiState: StateFlow<JoinMeetingRoomUiState> = _uiState.asStateFlow()
 
     fun updateName(roomName: String) {
-        roomName.trim()
         val roomNameError = roomName.isValidRoomName().not()
-        _uiState.value = MainUiState.Content(
+        _uiState.value = JoinMeetingRoomUiState.Content(
             roomName = roomName,
             isRoomNameWrong = roomNameError,
         )
     }
 
     fun createRoom() {
-        val roomNameGenerated = RoomNameGenerator.generateRoomName()
-        _uiState.value = MainUiState.Content(
+        val roomNameGenerated = roomNameGenerator.generateRoomName()
+        _uiState.value = JoinMeetingRoomUiState.Content(
             roomName = roomNameGenerated,
             isRoomNameWrong = false,
         )
     }
 
     fun joinRoom(roomName: String) {
-        _uiState.value = MainUiState.Loading
         viewModelScope.launch {
+            _uiState.emit(JoinMeetingRoomUiState.Loading)
             val response = apiService.getSession(roomName)
-            response.body()
-                ?.apply {
-                    _uiState.value = MainUiState.Success(
-                        apiKey = apiKey,
-                        sessionId = sessionId,
-                        token = token,
-                    )
-                }
+            if (response.isSuccessful) {
+                response.body()
+                    ?.apply {
+                        _uiState.value = JoinMeetingRoomUiState.Success(
+                            apiKey = apiKey,
+                            sessionId = sessionId,
+                            token = token,
+                        )
+                    }
+            } else {
+                _uiState.value = JoinMeetingRoomUiState.Content(
+                    roomName = roomName,
+                    isRoomNameWrong = true,
+                )
+            }
         }
     }
 }
 
 @Immutable
-sealed interface MainUiState {
+sealed interface JoinMeetingRoomUiState {
     @Immutable
     data class Content(
         val roomName: String = "",
         val isRoomNameWrong: Boolean = false,
-    ) : MainUiState
+    ) : JoinMeetingRoomUiState
 
-    data object Loading : MainUiState
+    data object Loading : JoinMeetingRoomUiState
 
     @Immutable
     data class Success(
         var apiKey: String = "",
         var sessionId: String = "",
         var token: String = "",
-    ) : MainUiState
+    ) : JoinMeetingRoomUiState
 }

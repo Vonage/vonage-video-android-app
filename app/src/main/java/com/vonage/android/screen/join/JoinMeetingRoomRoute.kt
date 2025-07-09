@@ -14,7 +14,7 @@ fun JoinMeetingRoomRoute(
     viewModel: JoinMeetingRoomViewModel = hiltViewModel(),
     navigateToRoom: (String, String, String) -> Unit,
 ) {
-    val mainUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val actions = remember {
         JoinMeetingRoomActions(
@@ -25,7 +25,7 @@ fun JoinMeetingRoomRoute(
     }
 
     JoinMeetingRoomScreen(
-        mainUiState = mainUiState,
+        uiState = uiState,
         actions = actions,
         modifier = modifier,
         navigateToRoom = navigateToRoom,

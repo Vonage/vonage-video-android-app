@@ -1,6 +1,8 @@
 package com.vonage.android.util
 
-object RoomNameGenerator {
+import javax.inject.Inject
+
+class RoomNameGenerator @Inject constructor() {
 
     val animals = listOf(
         "aardvark", "albatross", "alligator", "alpaca", "ant", "anteater", "antelope", "ape",

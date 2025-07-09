@@ -47,7 +47,7 @@ import com.vonage.android.screen.join.JoinMeetingRoomTestTags.SUBTITLE_TAG
 @Stable
 @Composable
 fun JoinMeetingRoomScreen(
-    mainUiState: MainUiState,
+    uiState: JoinMeetingRoomUiState,
     actions: JoinMeetingRoomActions,
     modifier: Modifier = Modifier,
     navigateToRoom: (String, String, String) -> Unit = { _, _, _ -> },
@@ -61,26 +61,26 @@ fun JoinMeetingRoomScreen(
     ) {
         JoinMeetingRoomHeader()
 
-        when (mainUiState) {
-            is MainUiState.Content -> {
+        when (uiState) {
+            is JoinMeetingRoomUiState.Content -> {
                 JoinMeetingRoomContent(
-                    roomName = mainUiState.roomName,
-                    isRoomNameWrong = mainUiState.isRoomNameWrong,
+                    roomName = uiState.roomName,
+                    isRoomNameWrong = uiState.isRoomNameWrong,
                     actions = actions,
                 )
             }
 
-            is MainUiState.Success -> {
-                LaunchedEffect(mainUiState) {
+            is JoinMeetingRoomUiState.Success -> {
+                LaunchedEffect(uiState) {
                     navigateToRoom(
-                        mainUiState.apiKey,
-                        mainUiState.sessionId,
-                        mainUiState.token
+                        uiState.apiKey,
+                        uiState.sessionId,
+                        uiState.token
                     )
                 }
             }
 
-            is MainUiState.Loading -> {
+            is JoinMeetingRoomUiState.Loading -> {
                 Column(
                     modifier = Modifier
                         .padding(64.dp)

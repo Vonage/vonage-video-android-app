@@ -7,8 +7,9 @@ class RoomNameGeneratorTest {
 
     @Test
     fun `should generate a correct random room name`() {
-        val (adjective, animal) = RoomNameGenerator.generateRoomName().split("-")
-        assertTrue(RoomNameGenerator.animals.contains(animal))
-        assertTrue(RoomNameGenerator.adjectives.contains(adjective))
+        val roomNameGenerator = RoomNameGenerator()
+        val (adjective, animal) = roomNameGenerator.generateRoomName().split("-")
+        assertTrue(roomNameGenerator.animals.contains(animal))
+        assertTrue(roomNameGenerator.adjectives.contains(adjective))
     }
 }

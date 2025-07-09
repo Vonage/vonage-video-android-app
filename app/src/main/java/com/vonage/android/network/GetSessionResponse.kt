@@ -4,14 +4,13 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-class GetSessionResponse {
-
+data class GetSessionResponse(
     @Json(name = "apiKey")
-    var apiKey: String = ""
+    var apiKey: String = "",
 
     @Json(name = "sessionId")
-    var sessionId: String = ""
+    var sessionId: String = "",
 
     @Json(name = "token")
-    var token: String = ""
-}
+    var token: String = "",
+)

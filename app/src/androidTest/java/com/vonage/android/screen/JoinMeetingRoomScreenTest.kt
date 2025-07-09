@@ -7,7 +7,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.join.JoinMeetingRoomActions
 import com.vonage.android.screen.join.JoinMeetingRoomScreen
-import com.vonage.android.screen.join.MainUiState
+import com.vonage.android.screen.join.JoinMeetingRoomTestTags.CREATE_ROOM_BUTTON_TAG
+import com.vonage.android.screen.join.JoinMeetingRoomTestTags.SUBTITLE_TAG
+import com.vonage.android.screen.join.JoinMeetingRoomUiState
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +25,7 @@ class JoinMeetingRoomScreenTest {
         composeTestRule.setContent {
             VonageVideoTheme {
                 JoinMeetingRoomScreen(
-                    mainUiState = MainUiState.Content(
+                    uiState = JoinMeetingRoomUiState.Content(
                         roomName = "hithere",
                         isRoomNameWrong = false,
                     ),
@@ -36,7 +38,7 @@ class JoinMeetingRoomScreenTest {
             }
         }
 
-        composeTestRule.onNodeWithTag("join_meeting_room_screen_subtitle").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("join_meeting_room_screen_create_room_button").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(SUBTITLE_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(CREATE_ROOM_BUTTON_TAG).assertIsDisplayed()
     }
 }
