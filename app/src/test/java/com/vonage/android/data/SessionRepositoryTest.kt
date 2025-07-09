@@ -40,6 +40,13 @@ class SessionRepositoryTest {
     }
 
     @Test
+    fun `given repository when api success with empty returns success`() = runTest {
+        coEvery { apiService.getSession(any()) } returns Response.success(null)
+        val response = sut.getSession("any-room-name")
+        assertTrue(response.isFailure)
+    }
+
+    @Test
     fun `given repository when api fails returns error`() = runTest {
         coEvery { apiService.getSession(any()) } returns Response.error(
             500, ResponseBody.EMPTY

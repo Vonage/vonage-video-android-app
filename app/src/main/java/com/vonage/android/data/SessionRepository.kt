@@ -9,17 +9,17 @@ class SessionRepository @Inject constructor(
 ) {
 
     @Suppress("TooGenericExceptionCaught")
-    suspend fun getSession(roomName: String): Result<SessionInfo> {
-        try {
+    suspend fun getSession(roomName: String): Result<SessionInfo> =
+        runCatching {
             val response = apiService.getSession(roomName)
-            if (response.isSuccessful) {
-                return Result.success(response.body()!!.toSessionInfo())
+            return if (response.isSuccessful) {
+                response.body()?.let {
+                    Result.success(it.toSessionInfo())
+                } ?: Result.failure(Exception("Empty response"))
+            } else {
+                Result.failure(Exception("Failed getting session"))
             }
-        } catch (throwable: Throwable) {
-            return Result.failure(throwable)
         }
-        return Result.failure(Exception("Failed getting session"))
-    }
 }
 
 fun GetSessionResponse.toSessionInfo() =
