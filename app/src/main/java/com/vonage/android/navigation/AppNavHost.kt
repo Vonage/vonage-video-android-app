@@ -21,9 +21,9 @@ fun AppNavHost(
     ) {
         composable(NavigationItem.JoinRoom.route) {
             JoinMeetingRoomRoute(
-                navigateToRoom = { apiKey, sessionId, token ->
+                navigateToRoom = { params ->
                     navController.navigate(NavigationItem.WaitingRoom.route)
-                }
+                },
             )
         }
         composable(NavigationItem.WaitingRoom.route) {

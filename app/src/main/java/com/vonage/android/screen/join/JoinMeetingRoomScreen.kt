@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.VideoCall
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -56,7 +55,7 @@ fun JoinMeetingRoomScreen(
     uiState: JoinMeetingRoomUiState,
     actions: JoinMeetingRoomActions,
     modifier: Modifier = Modifier,
-    navigateToRoom: (String, String, String) -> Unit = { _, _, _ -> },
+    navigateToRoom: (JoinMeetingRoomRouteParams) -> Unit = {},
 ) {
     val context = LocalContext.current
     val errorMessage = stringResource(R.string.landing_room_generic_error_message)
@@ -88,9 +87,11 @@ fun JoinMeetingRoomScreen(
             is JoinMeetingRoomUiState.Success -> {
                 LaunchedEffect(uiState) {
                     navigateToRoom(
-                        uiState.apiKey,
-                        uiState.sessionId,
-                        uiState.token
+                        JoinMeetingRoomRouteParams(
+                            apiKey = uiState.apiKey,
+                            sessionId = uiState.sessionId,
+                            token = uiState.token,
+                        )
                     )
                 }
             }

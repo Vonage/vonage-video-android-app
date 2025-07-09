@@ -12,7 +12,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun JoinMeetingRoomRoute(
     modifier: Modifier = Modifier,
     viewModel: JoinMeetingRoomViewModel = hiltViewModel(),
-    navigateToRoom: (String, String, String) -> Unit,
+    navigateToRoom: (JoinMeetingRoomRouteParams) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -43,4 +43,10 @@ data class JoinMeetingRoomActions(
     val onJoinRoomClick: (String) -> Unit,
     val onCreateRoomClick: () -> Unit,
     val onRoomNameChange: (String) -> Unit,
+)
+
+data class JoinMeetingRoomRouteParams(
+    val apiKey: String,
+    val sessionId: String,
+    val token: String,
 )
