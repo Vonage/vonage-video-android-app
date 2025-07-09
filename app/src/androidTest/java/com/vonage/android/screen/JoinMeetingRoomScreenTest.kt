@@ -4,7 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.vonage.android.compose.theme.VonageVideoAndroidTheme
+import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.join.JoinMeetingRoomActions
 import com.vonage.android.screen.join.JoinMeetingRoomScreen
 import com.vonage.android.screen.join.MainUiState
@@ -21,7 +21,7 @@ class JoinMeetingRoomScreenTest {
     @Test
     fun given_valid_state_THEN_components_are_displayed() {
         composeTestRule.setContent {
-            VonageVideoAndroidTheme {
+            VonageVideoTheme {
                 JoinMeetingRoomScreen(
                     mainUiState = MainUiState.Content(
                         roomName = "hithere",

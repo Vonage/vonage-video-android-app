@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.vonage.android.compose.theme.VonageVideoAndroidTheme
+import com.vonage.android.compose.theme.VonageVideoTheme
 
 @Composable
 fun WaitingRoomScreen(
@@ -31,7 +31,7 @@ fun WaitingRoomScreen(
 @Preview(showBackground = true)
 @Composable
 internal fun WaitingRoomScreenPreview() {
-    VonageVideoAndroidTheme {
+    VonageVideoTheme {
         WaitingRoomScreen()
     }
 }

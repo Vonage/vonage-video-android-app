@@ -15,7 +15,6 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.VideoCall
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -32,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -40,6 +38,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vonage.android.R
+import com.vonage.android.compose.icons.KeyboardIcon
+import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.screen.components.VonageIcon
+import com.vonage.android.screen.join.JoinMeetingRoomTestTags.CREATE_ROOM_BUTTON_TAG
+import com.vonage.android.screen.join.JoinMeetingRoomTestTags.SUBTITLE_TAG
 
 @Stable
 @Composable
@@ -88,18 +91,6 @@ fun JoinMeetingRoomScreen(
                     CircularProgressIndicator()
                 }
             }
-
-            is MainUiState.Error -> {
-                Column(
-                    modifier = Modifier
-                        .padding(64.dp)
-                        .fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text("ERROR")
-                }
-            }
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -117,11 +108,7 @@ fun JoinMeetingRoomHeader(
     ) {
         Spacer(modifier = Modifier.height(80.dp))
 
-        Icon(
-            painter = painterResource(R.drawable.ic_vonage),
-            contentDescription = null,
-            modifier = Modifier.size(80.dp)
-        )
+        VonageIcon()
 
         Spacer(modifier = Modifier.height(48.dp))
 
@@ -131,7 +118,7 @@ fun JoinMeetingRoomHeader(
             fontWeight = FontWeight.Bold,
             color = Color.Black,
             textAlign = TextAlign.Center,
-            lineHeight = 40.sp
+            lineHeight = 46.sp
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -151,10 +138,10 @@ fun JoinMeetingRoomContent(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            modifier = Modifier.testTag("join_meeting_room_screen_subtitle"),
+            modifier = Modifier.testTag(SUBTITLE_TAG),
             text = stringResource(R.string.landing_subtitle),
             fontSize = 16.sp,
-            color = Color.Gray,
+            color = VonageVideoTheme.colors.textPrimaryDisabled,
             textAlign = TextAlign.Center,
         )
 
@@ -166,16 +153,16 @@ fun JoinMeetingRoomContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
-                .testTag("join_meeting_room_screen_create_room_button"),
+                .testTag(CREATE_ROOM_BUTTON_TAG),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF2563EB) // Blue color
+                containerColor = VonageVideoTheme.colors.buttonPrimary,
             )
         ) {
             Icon(
                 imageVector = Icons.Default.VideoCall,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
@@ -190,7 +177,7 @@ fun JoinMeetingRoomContent(
 
         Text(
             text = stringResource(R.string.landing_or),
-            color = Color.Gray,
+            color = VonageVideoTheme.colors.textPrimaryDisabled,
             fontSize = 14.sp
         )
 
@@ -210,9 +197,10 @@ fun RoomInput(
     roomName: String,
     isRoomNameWrong: Boolean,
     actions: JoinMeetingRoomActions,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
     ) {
         OutlinedTextField(
@@ -223,20 +211,15 @@ fun RoomInput(
             placeholder = {
                 Text(
                     text = stringResource(R.string.landing_enter_room_name),
-                    color = Color.Gray
+                    color = VonageVideoTheme.colors.textPrimaryDisabled,
                 )
             },
             leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Keyboard,
-                    contentDescription = null,
-                    tint = Color.Gray,
-                    modifier = Modifier.size(20.dp)
-                )
+                KeyboardIcon()
             },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF2563EB),
-                unfocusedBorderColor = Color.LightGray
+                focusedBorderColor = VonageVideoTheme.colors.buttonPrimary,
+                unfocusedBorderColor = VonageVideoTheme.colors.buttonPrimaryDisabled,
             ),
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
@@ -245,7 +228,7 @@ fun RoomInput(
                     Text(
                         modifier = Modifier.padding(vertical = 8.dp),
                         text = stringResource(R.string.landing_room_name_error_message),
-                        color = Color.Red
+                        color = VonageVideoTheme.colors.textError,
                     )
                 }
             }
@@ -260,7 +243,9 @@ fun RoomInput(
         ) {
             Text(
                 text = stringResource(R.string.landing_join),
-                color = if (isRoomNameWrong.not()) Color(0xFF2563EB) else Color.Gray,
+                color = if (isRoomNameWrong.not()) {
+                    VonageVideoTheme.colors.textPrimary
+                } else VonageVideoTheme.colors.textPrimaryDisabled,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium
             )

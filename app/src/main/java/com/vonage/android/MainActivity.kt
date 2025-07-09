@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.rememberNavController
-import com.vonage.android.compose.theme.VonageVideoAndroidTheme
+import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.navigation.AppNavHost
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            VonageVideoAndroidTheme {
+            VonageVideoTheme {
                 AppNavHost(navController = rememberNavController())
             }
         }

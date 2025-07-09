@@ -63,7 +63,6 @@ sealed interface MainUiState {
     ) : MainUiState
 
     data object Loading : MainUiState
-    data object Error : MainUiState
 
     @Immutable
     data class Success(
