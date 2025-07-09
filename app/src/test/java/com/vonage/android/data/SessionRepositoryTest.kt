@@ -1,7 +1,7 @@
 package com.vonage.android.data
 
-import com.vonage.android.network.APIService
-import com.vonage.android.network.GetSessionResponse
+import com.vonage.android.data.network.APIService
+import com.vonage.android.data.network.GetSessionResponse
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest

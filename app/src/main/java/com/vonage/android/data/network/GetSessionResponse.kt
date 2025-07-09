@@ -1,4 +1,4 @@
-package com.vonage.android.network
+package com.vonage.android.data.network
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

@@ -1,4 +1,4 @@
-package com.vonage.android.network
+package com.vonage.android.data.network
 
 import retrofit2.Response
 import retrofit2.http.GET
