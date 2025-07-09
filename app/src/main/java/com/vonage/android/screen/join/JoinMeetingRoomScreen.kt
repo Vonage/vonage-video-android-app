@@ -1,5 +1,6 @@
 package com.vonage.android.screen.join
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -52,6 +54,8 @@ fun JoinMeetingRoomScreen(
     modifier: Modifier = Modifier,
     navigateToRoom: (String, String, String) -> Unit = { _, _, _ -> },
 ) {
+    val context = LocalContext.current
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -59,10 +63,18 @@ fun JoinMeetingRoomScreen(
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+
         JoinMeetingRoomHeader()
 
         when (uiState) {
             is JoinMeetingRoomUiState.Content -> {
+                if (uiState.isError) {
+                    Toast.makeText(
+                        context,
+                        stringResource(R.string.landing_room_generic_error_message),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
                 JoinMeetingRoomContent(
                     roomName = uiState.roomName,
                     isRoomNameWrong = uiState.isRoomNameWrong,

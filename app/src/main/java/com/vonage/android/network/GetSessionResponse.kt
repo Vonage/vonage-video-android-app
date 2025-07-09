@@ -5,12 +5,12 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class GetSessionResponse(
-    @Json(name = "apiKey")
-    var apiKey: String = "",
+    @field:Json(name = "apiKey")
+    val apiKey: String,
 
-    @Json(name = "sessionId")
-    var sessionId: String = "",
+    @field:Json(name = "sessionId")
+    val sessionId: String,
 
-    @Json(name = "token")
-    var token: String = "",
+    @field:Json(name = "token")
+    val token: String,
 )
