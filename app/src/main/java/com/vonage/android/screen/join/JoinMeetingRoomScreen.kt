@@ -1,0 +1,287 @@
+package com.vonage.android.screen.join
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.VideoCall
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.R
+
+@Composable
+fun JoinMeetingRoomRoute(
+    modifier: Modifier = Modifier,
+    viewModel: JoinMeetingRoomViewModel = hiltViewModel(),
+    navigateToRoom: (String, String, String) -> Unit,
+) {
+    val mainUiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    JoinMeetingRoomScreen(
+        mainUiState = mainUiState,
+        modifier = modifier,
+        navigateToRoom = navigateToRoom,
+        onJoinRoomClick = remember {{ roomName -> viewModel.joinRoom(roomName) }},
+        onCreateRoomClick = remember { { viewModel.createRoom() } },
+        onRoomNameChange = remember { { roomName -> viewModel.updateName(roomName) } },
+    )
+}
+
+@Composable
+fun JoinMeetingRoomScreen(
+    mainUiState: MainUiState,
+    modifier: Modifier = Modifier,
+    navigateToRoom: (String, String, String) -> Unit = { _, _, _ -> },
+    onJoinRoomClick: (String) -> Unit = {},
+    onRoomNameChange: (String) -> Unit = {},
+    onCreateRoomClick: () -> Unit = {},
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(horizontal = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        JoinMeetingRoomHeader()
+
+        when (mainUiState) {
+            is MainUiState.Content -> {
+                JoinMeetingRoomContent(
+                    roomName = mainUiState.roomName,
+                    isRoomNameWrong = mainUiState.isRoomNameWrong,
+                    onJoinRoomClick = onJoinRoomClick,
+                    onRoomNameChange = onRoomNameChange,
+                    onCreateRoomClick = onCreateRoomClick,
+                )
+            }
+
+            is MainUiState.Success -> navigateToRoom(
+                mainUiState.apiKey,
+                mainUiState.sessionId,
+                mainUiState.token
+            )
+
+            is MainUiState.Loading -> {
+                Column(
+                    modifier = Modifier
+                        .padding(64.dp)
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is MainUiState.Error -> {
+                Column(
+                    modifier = Modifier
+                        .padding(64.dp)
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text("ERROR")
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun JoinMeetingRoomHeader(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Spacer(modifier = Modifier.height(80.dp))
+
+        Text(
+            text = "V",
+            fontSize = 72.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+        Text(
+            text = stringResource(R.string.landing_title),
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            textAlign = TextAlign.Center,
+            lineHeight = 40.sp
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+fun JoinMeetingRoomContent(
+    roomName: String,
+    isRoomNameWrong: Boolean,
+    modifier: Modifier = Modifier,
+    onJoinRoomClick: (String) -> Unit = {},
+    onRoomNameChange: (String) -> Unit = {},
+    onCreateRoomClick: () -> Unit = {},
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            modifier = Modifier.testTag("join_meeting_room_screen_subtitle"),
+            text = stringResource(R.string.landing_subtitle),
+            fontSize = 16.sp,
+            color = Color.Gray,
+            textAlign = TextAlign.Center,
+        )
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+        Button(
+            onClick = remember { onCreateRoomClick },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .testTag("join_meeting_room_screen_create_room_button"),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF2563EB) // Blue color
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Default.VideoCall,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = stringResource(R.string.landing_create_room),
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = stringResource(R.string.landing_or),
+            color = Color.Gray,
+            fontSize = 14.sp
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        RoomInput(
+            roomName = roomName,
+            isRoomNameWrong = isRoomNameWrong,
+            onJoinRoomClick = onJoinRoomClick,
+            onRoomNameChange = onRoomNameChange,
+        )
+    }
+}
+
+@Composable
+fun RoomInput(
+    roomName: String,
+    isRoomNameWrong: Boolean,
+    onJoinRoomClick: (String) -> Unit = {},
+    onRoomNameChange: (String) -> Unit = {},
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        OutlinedTextField(
+            value = roomName,
+            onValueChange = { onRoomNameChange(it) },
+            modifier = Modifier.weight(1f),
+            isError = isRoomNameWrong,
+            placeholder = {
+                Text(
+                    text = stringResource(R.string.landing_enter_room_name),
+                    color = Color.Gray
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Keyboard,
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(20.dp)
+                )
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFF2563EB),
+                unfocusedBorderColor = Color.LightGray
+            ),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+            supportingText = {
+                if (isRoomNameWrong) {
+                    Text(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        text = stringResource(R.string.landing_room_name_error_message),
+                        color = Color.Red
+                    )
+                }
+            }
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        TextButton(
+            onClick = { onJoinRoomClick(roomName) },
+            enabled = isRoomNameWrong.not(),
+        ) {
+            Text(
+                text = stringResource(R.string.landing_join),
+                color = if (isRoomNameWrong.not()) Color(0xFF2563EB) else Color.Gray,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}
