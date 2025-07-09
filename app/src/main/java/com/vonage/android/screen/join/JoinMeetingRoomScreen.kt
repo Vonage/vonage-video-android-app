@@ -24,10 +24,10 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,25 +49,30 @@ fun JoinMeetingRoomRoute(
     navigateToRoom: (String, String, String) -> Unit,
 ) {
     val mainUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    
+    val actions = remember {
+        JoinMeetingRoomActions(
+            onJoinRoomClick = viewModel::joinRoom,
+            onCreateRoomClick = viewModel::createRoom,
+            onRoomNameChange = viewModel::updateName
+        )
+    }
 
     JoinMeetingRoomScreen(
         mainUiState = mainUiState,
+        actions = actions,
         modifier = modifier,
         navigateToRoom = navigateToRoom,
-        onJoinRoomClick = remember {{ roomName -> viewModel.joinRoom(roomName) }},
-        onCreateRoomClick = remember { { viewModel.createRoom() } },
-        onRoomNameChange = remember { { roomName -> viewModel.updateName(roomName) } },
     )
 }
 
+@Stable
 @Composable
 fun JoinMeetingRoomScreen(
     mainUiState: MainUiState,
+    actions: JoinMeetingRoomActions,
     modifier: Modifier = Modifier,
     navigateToRoom: (String, String, String) -> Unit = { _, _, _ -> },
-    onJoinRoomClick: (String) -> Unit = {},
-    onRoomNameChange: (String) -> Unit = {},
-    onCreateRoomClick: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -83,17 +88,19 @@ fun JoinMeetingRoomScreen(
                 JoinMeetingRoomContent(
                     roomName = mainUiState.roomName,
                     isRoomNameWrong = mainUiState.isRoomNameWrong,
-                    onJoinRoomClick = onJoinRoomClick,
-                    onRoomNameChange = onRoomNameChange,
-                    onCreateRoomClick = onCreateRoomClick,
+                    actions = actions,
                 )
             }
 
-            is MainUiState.Success -> navigateToRoom(
-                mainUiState.apiKey,
-                mainUiState.sessionId,
-                mainUiState.token
-            )
+            is MainUiState.Success -> {
+                LaunchedEffect(mainUiState) {
+                    navigateToRoom(
+                        mainUiState.apiKey,
+                        mainUiState.sessionId,
+                        mainUiState.token
+                    )
+                }
+            }
 
             is MainUiState.Loading -> {
                 Column(
@@ -124,6 +131,7 @@ fun JoinMeetingRoomScreen(
     }
 }
 
+@Stable
 @Composable
 fun JoinMeetingRoomHeader(
     modifier: Modifier = Modifier,
@@ -156,14 +164,13 @@ fun JoinMeetingRoomHeader(
     }
 }
 
+@Stable
 @Composable
 fun JoinMeetingRoomContent(
     roomName: String,
     isRoomNameWrong: Boolean,
+    actions: JoinMeetingRoomActions,
     modifier: Modifier = Modifier,
-    onJoinRoomClick: (String) -> Unit = {},
-    onRoomNameChange: (String) -> Unit = {},
-    onCreateRoomClick: () -> Unit = {},
 ) {
     Column(
         modifier = modifier,
@@ -180,7 +187,7 @@ fun JoinMeetingRoomContent(
         Spacer(modifier = Modifier.height(48.dp))
 
         Button(
-            onClick = remember { onCreateRoomClick },
+            onClick = actions.onCreateRoomClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
@@ -217,18 +224,17 @@ fun JoinMeetingRoomContent(
         RoomInput(
             roomName = roomName,
             isRoomNameWrong = isRoomNameWrong,
-            onJoinRoomClick = onJoinRoomClick,
-            onRoomNameChange = onRoomNameChange,
+            actions = actions,
         )
     }
 }
 
+@Stable
 @Composable
 fun RoomInput(
     roomName: String,
     isRoomNameWrong: Boolean,
-    onJoinRoomClick: (String) -> Unit = {},
-    onRoomNameChange: (String) -> Unit = {},
+    actions: JoinMeetingRoomActions,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -236,7 +242,7 @@ fun RoomInput(
     ) {
         OutlinedTextField(
             value = roomName,
-            onValueChange = { onRoomNameChange(it) },
+            onValueChange = actions.onRoomNameChange,
             modifier = Modifier.weight(1f),
             isError = isRoomNameWrong,
             placeholder = {
@@ -273,7 +279,7 @@ fun RoomInput(
         Spacer(modifier = Modifier.width(8.dp))
 
         TextButton(
-            onClick = { onJoinRoomClick(roomName) },
+            onClick = { actions.onJoinRoomClick(roomName) },
             enabled = isRoomNameWrong.not(),
         ) {
             Text(
@@ -285,3 +291,10 @@ fun RoomInput(
         }
     }
 }
+
+@Stable
+data class JoinMeetingRoomActions(
+    val onJoinRoomClick: (String) -> Unit,
+    val onCreateRoomClick: () -> Unit,
+    val onRoomNameChange: (String) -> Unit,
+)
