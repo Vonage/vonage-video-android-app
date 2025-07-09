@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.VideoCall
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -37,13 +38,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vonage.android.R
 import com.vonage.android.compose.icons.KeyboardIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.screen.components.OrSeparator
 import com.vonage.android.screen.components.VonageIcon
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.CREATE_ROOM_BUTTON_TAG
+import com.vonage.android.screen.join.JoinMeetingRoomTestTags.JOIN_BUTTON_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.SUBTITLE_TAG
 
 @Stable
@@ -55,6 +59,7 @@ fun JoinMeetingRoomScreen(
     navigateToRoom: (String, String, String) -> Unit = { _, _, _ -> },
 ) {
     val context = LocalContext.current
+    val errorMessage = stringResource(R.string.landing_room_generic_error_message)
 
     Column(
         modifier = modifier
@@ -68,12 +73,10 @@ fun JoinMeetingRoomScreen(
 
         when (uiState) {
             is JoinMeetingRoomUiState.Content -> {
-                if (uiState.isError) {
-                    Toast.makeText(
-                        context,
-                        stringResource(R.string.landing_room_generic_error_message),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                LaunchedEffect(uiState.isError) {
+                    if (uiState.isError) {
+                        Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                    }
                 }
                 JoinMeetingRoomContent(
                     roomName = uiState.roomName,
@@ -187,11 +190,7 @@ fun JoinMeetingRoomContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Text(
-            text = stringResource(R.string.landing_or),
-            color = VonageVideoTheme.colors.textPrimaryDisabled,
-            fontSize = 14.sp
-        )
+        OrSeparator()
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -239,7 +238,7 @@ fun RoomInput(
                 if (isRoomNameWrong) {
                     Text(
                         modifier = Modifier.padding(vertical = 8.dp),
-                        text = stringResource(R.string.landing_room_name_error_message),
+                        text = stringResource(R.string.landing_room_generic_error_message),
                         color = VonageVideoTheme.colors.textError,
                     )
                 }
@@ -249,7 +248,9 @@ fun RoomInput(
         Spacer(modifier = Modifier.width(8.dp))
 
         TextButton(
-            modifier = Modifier.padding(vertical = 6.dp),
+            modifier = Modifier
+                .padding(vertical = 6.dp)
+                .testTag(JOIN_BUTTON_TAG),
             onClick = { actions.onJoinRoomClick(roomName) },
             enabled = isRoomNameWrong.not(),
         ) {
@@ -262,5 +263,23 @@ fun RoomInput(
                 fontWeight = FontWeight.Medium
             )
         }
+    }
+}
+
+@Preview
+@Composable
+internal fun PreviewJoinRoomScreen() {
+    VonageVideoTheme {
+        JoinMeetingRoomScreen(
+            uiState = JoinMeetingRoomUiState.Content(
+                roomName = "hithere",
+                isRoomNameWrong = false,
+            ),
+            actions = JoinMeetingRoomActions(
+                onJoinRoomClick = {},
+                onCreateRoomClick = {},
+                onRoomNameChange = {},
+            ),
+        )
     }
 }

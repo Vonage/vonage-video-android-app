@@ -8,6 +8,7 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.join.JoinMeetingRoomActions
 import com.vonage.android.screen.join.JoinMeetingRoomScreen
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.CREATE_ROOM_BUTTON_TAG
+import com.vonage.android.screen.join.JoinMeetingRoomTestTags.JOIN_BUTTON_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.SUBTITLE_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomUiState
 import org.junit.Rule
@@ -40,5 +41,6 @@ class JoinMeetingRoomScreenTest {
 
         composeTestRule.onNodeWithTag(SUBTITLE_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(CREATE_ROOM_BUTTON_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(JOIN_BUTTON_TAG).assertIsDisplayed()
     }
 }

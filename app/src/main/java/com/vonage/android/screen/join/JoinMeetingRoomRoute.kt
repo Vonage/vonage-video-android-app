@@ -35,6 +35,7 @@ fun JoinMeetingRoomRoute(
 object JoinMeetingRoomTestTags {
     const val SUBTITLE_TAG = "join_meeting_room_screen_subtitle"
     const val CREATE_ROOM_BUTTON_TAG = "join_meeting_room_screen_create_room_button"
+    const val JOIN_BUTTON_TAG = "join_meeting_room_screen_join_button"
 }
 
 @Stable

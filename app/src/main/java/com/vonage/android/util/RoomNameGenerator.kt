@@ -10,7 +10,7 @@ class RoomNameGenerator @Inject constructor() {
         "bison", "boar", "buffalo", "butterfly", "camel", "capybara", "caribou", "cassowary",
         "cat", "caterpillar", "cattle", "chamois", "cheetah", "chicken", "chimpanzee", "chinchilla",
         "chough", "clam", "cobra", "cockroach", "cod", "cormorant", "coyote", "crab", "crane",
-        "crocodile", "crow", "curlew", "deer", "dinosaur", "dog", "dogfish", "dolphin", "donkey",
+        "crocodile", "crow", "curlew", "deer", "dinosaur", "dog", "dogfish", "dolphin",
         "dotterel", "dove", "dragonfly", "duck", "dugong", "dunlin", "eagle", "echidna", "eel",
         "eland", "elephant", "elephant-seal", "elk", "emu", "falcon", "ferret", "finch", "fish",
         "flamingo", "fly", "fox", "frog", "gaur", "gazelle", "gerbil", "giant-panda", "giraffe",

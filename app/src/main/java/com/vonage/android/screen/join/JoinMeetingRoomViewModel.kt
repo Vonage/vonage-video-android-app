@@ -73,8 +73,8 @@ sealed interface JoinMeetingRoomUiState {
 
     @Immutable
     data class Success(
-        var apiKey: String = "",
-        var sessionId: String = "",
-        var token: String = "",
+        val apiKey: String,
+        val sessionId: String,
+        val token: String,
     ) : JoinMeetingRoomUiState
 }
