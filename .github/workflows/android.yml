@@ -34,3 +34,9 @@ jobs:
       - name: Run tests
         run: |
           ./gradlew clean check detekt
+
+      - name: UI Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          script: ./gradlew connectedDebugAndroidTest
