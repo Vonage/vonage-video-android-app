@@ -33,9 +33,14 @@ fun JoinMeetingRoomRoute(
 }
 
 object JoinMeetingRoomTestTags {
+    const val TITLE_TAG = "join_meeting_room_screen_title"
+    const val VONAGE_ICON_TAG = "join_meeting_room_screen_icon"
     const val SUBTITLE_TAG = "join_meeting_room_screen_subtitle"
     const val CREATE_ROOM_BUTTON_TAG = "join_meeting_room_screen_create_room_button"
     const val JOIN_BUTTON_TAG = "join_meeting_room_screen_join_button"
+    const val ROOM_INPUT_TAG = "join_meeting_room_screen_room_input"
+    const val ROOM_INPUT_ERROR_TAG = "join_meeting_room_screen_room_error_label"
+    const val PROGRESS_INDICATOR_TAG = "join_meeting_room_screen_progress_indicator"
 }
 
 @Stable

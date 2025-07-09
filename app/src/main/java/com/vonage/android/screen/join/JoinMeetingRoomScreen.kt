@@ -47,7 +47,12 @@ import com.vonage.android.screen.components.OrSeparator
 import com.vonage.android.screen.components.VonageIcon
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.CREATE_ROOM_BUTTON_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.JOIN_BUTTON_TAG
+import com.vonage.android.screen.join.JoinMeetingRoomTestTags.PROGRESS_INDICATOR_TAG
+import com.vonage.android.screen.join.JoinMeetingRoomTestTags.ROOM_INPUT_ERROR_TAG
+import com.vonage.android.screen.join.JoinMeetingRoomTestTags.ROOM_INPUT_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.SUBTITLE_TAG
+import com.vonage.android.screen.join.JoinMeetingRoomTestTags.TITLE_TAG
+import com.vonage.android.screen.join.JoinMeetingRoomTestTags.VONAGE_ICON_TAG
 
 @Stable
 @Composable
@@ -104,7 +109,9 @@ fun JoinMeetingRoomScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(
+                        modifier = Modifier.testTag(PROGRESS_INDICATOR_TAG)
+                    )
                 }
             }
         }
@@ -124,11 +131,14 @@ fun JoinMeetingRoomHeader(
     ) {
         Spacer(modifier = Modifier.height(80.dp))
 
-        VonageIcon()
+        VonageIcon(
+            modifier = Modifier.testTag(VONAGE_ICON_TAG),
+        )
 
         Spacer(modifier = Modifier.height(48.dp))
 
         Text(
+            modifier = Modifier.testTag(TITLE_TAG),
             text = stringResource(R.string.landing_title),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
@@ -216,9 +226,11 @@ fun RoomInput(
         verticalAlignment = Alignment.Top,
     ) {
         OutlinedTextField(
+            modifier = Modifier
+                .weight(1f)
+                .testTag(ROOM_INPUT_TAG),
             value = roomName,
             onValueChange = actions.onRoomNameChange,
-            modifier = Modifier.weight(1f),
             isError = isRoomNameWrong,
             placeholder = {
                 Text(
@@ -238,8 +250,10 @@ fun RoomInput(
             supportingText = {
                 if (isRoomNameWrong) {
                     Text(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        text = stringResource(R.string.landing_room_generic_error_message),
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .testTag(ROOM_INPUT_ERROR_TAG),
+                        text = stringResource(R.string.landing_room_name_error_message),
                         color = VonageVideoTheme.colors.textError,
                     )
                 }
@@ -253,7 +267,7 @@ fun RoomInput(
                 .padding(vertical = 6.dp)
                 .testTag(JOIN_BUTTON_TAG),
             onClick = { actions.onJoinRoomClick(roomName) },
-            enabled = isRoomNameWrong.not(),
+            enabled = isRoomNameWrong.not() && roomName.isNotEmpty(),
         ) {
             Text(
                 text = stringResource(R.string.landing_join),
