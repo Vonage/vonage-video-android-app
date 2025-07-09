@@ -2,7 +2,7 @@
     <string name="app_name">Vonage Video Android</string>
 
     <!-- Landing Screen -->
-    <string name="landing_title">Welcome to the Vonage Video React App</string>
+    <string name="landing_title">Welcome to the Vonage Video Android App</string>
     <string name="landing_subtitle">Create a new room or join an existing one.</string>
     <string name="landing_enter_room_name">Enter room name</string>
     <string name="landing_join">Join</string>
