@@ -1,6 +1,5 @@
 package com.vonage.android.screen.join
 
-import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.SessionRepository
@@ -60,9 +59,8 @@ class JoinMeetingRoomViewModel @Inject constructor(
     }
 }
 
-@Immutable
 sealed interface JoinMeetingRoomUiState {
-    @Immutable
+
     data class Content(
         val roomName: String = "",
         val isRoomNameWrong: Boolean = false,
@@ -71,7 +69,6 @@ sealed interface JoinMeetingRoomUiState {
 
     data object Loading : JoinMeetingRoomUiState
 
-    @Immutable
     data class Success(
         val apiKey: String,
         val sessionId: String,
