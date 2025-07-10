@@ -688,7 +688,7 @@ style:
     active: false
   ReturnCount:
     active: true
-    max: 2
+    max: 3
     excludedFunctions:
       - 'equals'
     excludeLabeled: false
@@ -809,8 +809,7 @@ Compose:
     # treatAsLambda: MyLambdaType
   CompositionLocalAllowlist:
     active: true
-    # -- You can optionally define a list of CompositionLocals that are allowed here
-    # allowedCompositionLocals: LocalSomething,LocalSomethingElse
+    allowedCompositionLocals: LocalVonageColors
   CompositionLocalNaming:
     active: true
   ContentEmitterReturningValues:
@@ -838,7 +837,7 @@ Compose:
     # -- You can add composables here that you don't want to count as content emitters (e.g. custom dialogs or modals)
     # contentEmittersDenylist: MyNonEmitterComposable
   LambdaParameterInRestartableEffect:
-    active: true
+    active: false
     # -- You can optionally have a list of types to be treated as lambdas (e.g. typedefs or fun interfaces not picked up automatically)
     # treatAsLambda: MyLambdaType
   Material2:
