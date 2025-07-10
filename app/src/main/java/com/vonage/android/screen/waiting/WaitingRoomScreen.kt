@@ -17,12 +17,8 @@ import androidx.compose.material.icons.filled.BlurOff
 import androidx.compose.material.icons.filled.BlurOn
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.VideocamOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,7 +34,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vonage.android.R
+import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.components.VonageTextField
+import com.vonage.android.compose.icons.PersonIcon
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.CircularControlButton
@@ -218,31 +216,15 @@ fun JoinRoomSection(
             onValueChange = onUsernameChange,
             modifier = Modifier.fillMaxWidth(),
             leadingIcon = {
-                Icon(
-                    Icons.Default.Person,
-                    contentDescription = null,
-                    tint = Color.Gray,
-                )
+                PersonIcon()
             },
         )
 
-        Button(
+        VonageButton(
+            text = stringResource(R.string.waiting_room_join),
             onClick = onJoinRoom,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = VonageVideoTheme.colors.buttonPrimary,
-            ),
-            enabled = username.isNotEmpty()
-        ) {
-            Text(
-                text = stringResource(R.string.waiting_room_join),
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-            )
-        }
+            enabled = username.isNotEmpty(),
+        )
     }
 }
 
