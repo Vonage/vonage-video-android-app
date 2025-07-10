@@ -23,8 +23,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -40,10 +38,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vonage.android.R
+import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.icons.KeyboardIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.OrSeparator
@@ -134,9 +132,7 @@ fun JoinMeetingRoomHeader(
     ) {
         Spacer(modifier = Modifier.height(80.dp))
 
-        VonageIcon(
-            modifier = Modifier.testTag(VONAGE_ICON_TAG),
-        )
+        VonageIcon(modifier = Modifier.testTag(VONAGE_ICON_TAG))
 
         Spacer(modifier = Modifier.height(48.dp))
 
@@ -228,7 +224,7 @@ fun RoomInput(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
     ) {
-        OutlinedTextField(
+        VonageTextField(
             modifier = Modifier
                 .weight(1f)
                 .testTag(ROOM_INPUT_TAG),
@@ -244,11 +240,6 @@ fun RoomInput(
             leadingIcon = {
                 KeyboardIcon()
             },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = VonageVideoTheme.colors.buttonPrimary,
-                unfocusedBorderColor = VonageVideoTheme.colors.buttonPrimaryDisabled,
-            ),
-            singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
             supportingText = {
                 if (isRoomNameWrong) {
