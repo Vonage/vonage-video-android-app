@@ -36,7 +36,7 @@ class RoomNameGenerator @Inject constructor() {
     )
 
     val adjectives = listOf(
-        "red", "green", "blue", "orange", "purple", "green", "brown", "white", "black", "yellow",
+        "red", "green", "blue", "orange", "purple", "brown", "white", "black", "yellow",
         "wise", "gentle", "curious", "majestic", "graceful", "playful", "energetic", "regal",
         "mysterious", "fierce", "cunning", "vibrant", "cuddly", "dazzling", "loyal", "swift",
         "charming", "whimsical", "serene"
