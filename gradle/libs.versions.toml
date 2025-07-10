@@ -4,6 +4,8 @@ kotlin = "2.2.0"
 coreKtx = "1.16.0"
 junit = "5.13.3"
 junitVersion = "1.2.1"
+testRules = "1.6.1"
+testRunner = "1.6.2"
 espressoCore = "3.6.1"
 kotlinxCoroutinesTest = "1.10.2"
 lifecycleRuntimeKtx = "2.9.1"
@@ -32,6 +34,8 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 detekt-compose-rules = { module = "io.nlopez.compose.rules:detekt", version.ref = "detektCompose" }
 junit = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "testRules" }
+androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "testRunner" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -46,6 +50,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }

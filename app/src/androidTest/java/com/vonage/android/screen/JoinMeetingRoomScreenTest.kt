@@ -16,17 +16,29 @@ import com.vonage.android.screen.join.JoinMeetingRoomActions
 import com.vonage.android.screen.join.JoinMeetingRoomScreen
 import com.vonage.android.screen.join.JoinMeetingRoomUiState
 import com.vonage.android.util.hasText
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class JoinMeetingRoomScreenTest {
 
-    @get:Rule
+    @get:Rule(order = 0)
+    val hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
     val compose = createComposeRule()
 
     private val screen = JoinMeetingRoomScreenObject(compose)
+
+    @Before
+    fun setup() {
+        hiltRule.inject()
+    }
 
     @Test
     fun given_initial_state_THEN_components_are_displayed() {

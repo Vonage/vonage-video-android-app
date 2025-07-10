@@ -17,8 +17,8 @@ concurrency:
 
 jobs:
 
-  tests:
-    name: Tests
+  build-and-test:
+    name: Build and Unit Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -31,15 +31,93 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Run tests
-        run: |
-          ./gradlew clean check detekt
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
-      - name: UI Tests
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Run unit tests and code quality checks
+        run: |
+          ./gradlew clean check detekt --stacktrace
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: |
+            app/build/reports/
+            build/reports/
+
+  ui-tests:
+    name: UI Tests
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-29
+
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 35
-          profile: pixel
+          api-level: 29
+          target: default
           arch: x86_64
+          profile: Nexus 6
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedDebugAndroidTest
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Run UI Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          target: default
+          arch: x86_64
+          profile: Nexus 6
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: |
+            ./gradlew connectedDebugAndroidTest --stacktrace
+
+      - name: Upload UI test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-test-reports
+          path: |
+            app/build/reports/androidTests/
+            app/build/outputs/androidTest-results/
