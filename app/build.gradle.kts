@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.dagger.hilt)
 }
 
 android {
@@ -15,12 +17,18 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
     }
 
     buildTypes {
-        release {
+        debug {
+            isDebuggable = true
             isMinifyEnabled = false
+        }
+        release {
+            isDebuggable = false
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -34,6 +42,16 @@ android {
     buildFeatures {
         compose = true
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+        unitTests.all {
+            it.useJUnitPlatform()
+        }
+        animationsDisabled = true
+    }
 }
 
 dependencies {
@@ -46,13 +64,35 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.navigation.runtime.android)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.fragment)
+    implementation(libs.retrofit)
+    implementation(libs.okhttp)
+    implementation(libs.converter.moshi)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.logging.interceptor)
+    ksp(libs.hilt.android.compiler)
 
+    testImplementation(kotlin("test"))
     testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter.params)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
 
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.android.compiler)
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
