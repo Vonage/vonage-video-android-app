@@ -22,13 +22,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vonage.android.compose.theme.VonageVideoTheme
 
+/**
+ * Placeholder implementation
+ */
 @Composable
 fun DeviceSelectionPanel(
     onMicDeviceSelect: () -> Unit,
     onCameraDeviceSelect: () -> Unit,
     onSpeakerDeviceSelect: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(24.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -57,9 +62,10 @@ fun DeviceSelector(
     icon: ImageVector,
     label: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier.clickable { onClick() },
+        modifier = modifier.clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {

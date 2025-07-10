@@ -7,5 +7,7 @@ import androidx.compose.ui.Modifier
 fun WaitingRoomRoute(
     modifier: Modifier = Modifier,
 ) {
-    WaitingRoomScreen()
+    WaitingRoomScreen(
+        modifier = modifier,
+    )
 }

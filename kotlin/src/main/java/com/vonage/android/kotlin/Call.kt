@@ -32,6 +32,7 @@ class Call(
             publisher = Publisher.Builder(context)
                 .name("Testing")
                 .videoTrack(true)
+                .audioTrack(true)
                 .build().apply {
                     setPublisherListener(publisherListener)
                     renderer?.setStyle(
@@ -82,7 +83,10 @@ class Call(
     }
 
     fun setName(publisherName: String) {
-
+        publisher?.let {
+            // this doesn't work
+            it.name = publisherName
+        }
     }
 
     fun togglePublishVideo() {

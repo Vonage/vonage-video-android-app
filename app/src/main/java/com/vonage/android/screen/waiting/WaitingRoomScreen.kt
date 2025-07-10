@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BlurOff
 import androidx.compose.material.icons.filled.BlurOn
@@ -29,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -49,6 +47,7 @@ import com.vonage.android.screen.components.TopBanner
 
 @Composable
 fun WaitingRoomScreen(
+    modifier: Modifier = Modifier,
     roomName: String = "graceful-mouse",
     username: String = "",
     onUsernameChange: (String) -> Unit = {},
@@ -64,7 +63,7 @@ fun WaitingRoomScreen(
     isVideoEffectsEnabled: Boolean = false,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(VonageVideoTheme.colors.background),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -73,7 +72,6 @@ fun WaitingRoomScreen(
 
         VideoPreviewContainer(
             modifier = Modifier
-                .background(Color.Black)
                 .fillMaxWidth()
                 .height(300.dp),
             onMicToggle = onMicToggle,
@@ -105,22 +103,20 @@ fun WaitingRoomScreen(
 
 @Composable
 fun VideoPreviewContainer(
-    modifier: Modifier = Modifier,
     onMicToggle: () -> Unit,
     onCameraToggle: () -> Unit,
     onVideoEffectsToggle: () -> Unit,
     isMicEnabled: Boolean,
     isCameraEnabled: Boolean,
     isVideoEffectsEnabled: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.Black),
+        modifier = modifier,
         contentAlignment = Alignment.BottomCenter,
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_background),
+            painter = painterResource(id = R.drawable.person),
             contentDescription = "Video Preview",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
@@ -139,13 +135,13 @@ fun VideoPreviewContainer(
 
 @Composable
 fun VideoControlPanel(
-    modifier: Modifier = Modifier,
     onMicToggle: () -> Unit,
     onCameraToggle: () -> Unit,
     onVideoEffectsToggle: () -> Unit,
     isMicEnabled: Boolean,
     isCameraEnabled: Boolean,
     isVideoEffectsEnabled: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
@@ -184,10 +180,11 @@ fun JoinRoomSection(
     roomName: String,
     username: String,
     onUsernameChange: (String) -> Unit,
-    onJoinRoom: () -> Unit
+    onJoinRoom: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 32.dp),
         verticalArrangement = Arrangement.SpaceEvenly,
@@ -235,7 +232,7 @@ fun JoinRoomSection(
                 .fillMaxWidth()
                 .height(48.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF2563EB)
+                containerColor = VonageVideoTheme.colors.buttonPrimary,
             ),
             enabled = username.isNotEmpty()
         ) {

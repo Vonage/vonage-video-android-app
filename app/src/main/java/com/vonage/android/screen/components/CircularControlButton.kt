@@ -23,9 +23,9 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 
 @Composable
 fun CircularControlButton(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
     icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = Modifier

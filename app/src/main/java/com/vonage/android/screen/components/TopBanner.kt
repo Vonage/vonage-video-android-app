@@ -11,9 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun TopBanner() {
+fun TopBanner(
+    modifier: Modifier = Modifier,
+) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
