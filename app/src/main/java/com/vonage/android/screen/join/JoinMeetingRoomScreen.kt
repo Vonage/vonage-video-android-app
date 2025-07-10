@@ -1,5 +1,6 @@
 package com.vonage.android.screen.join
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -69,7 +71,7 @@ fun JoinMeetingRoomScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(VonageVideoTheme.colors.background)
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -143,9 +145,9 @@ fun JoinMeetingRoomHeader(
             text = stringResource(R.string.landing_title),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.inverseSurface,
             textAlign = TextAlign.Center,
-            lineHeight = 46.sp
+            lineHeight = 46.sp,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -282,8 +284,8 @@ fun RoomInput(
     }
 }
 
-@PreviewScreenSizes
 @Preview
+@Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable
 internal fun PreviewJoinRoomScreen() {
     VonageVideoTheme {

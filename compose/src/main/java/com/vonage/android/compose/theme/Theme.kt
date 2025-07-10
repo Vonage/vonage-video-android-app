@@ -27,9 +27,10 @@ fun VonageVideoTheme(
     }
 
     val extendedColors = VonageColors(
+        background = colorScheme.background,
         buttonPrimary = colorScheme.primary,
         buttonPrimaryDisabled = Color.LightGray,
-        textPrimary = colorScheme.primary,
+        textPrimary = colorScheme.surfaceTint,
         textPrimaryDisabled = Color.Gray,
         textError = Color.Red,
     )

@@ -20,7 +20,7 @@ val Pink40 = Color(0xFF7D5260)
 internal val DarkColorScheme = darkColorScheme(
     primary = Blue,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    tertiary = Pink80,
 )
 
 internal val LightColorScheme = lightColorScheme(
@@ -31,6 +31,7 @@ internal val LightColorScheme = lightColorScheme(
 
 internal val LocalVonageColors = staticCompositionLocalOf {
     VonageColors(
+        background = Color.Unspecified,
         buttonPrimary = Color.Unspecified,
         buttonPrimaryDisabled = Color.Unspecified,
         textPrimary = Color.Unspecified,
@@ -41,6 +42,8 @@ internal val LocalVonageColors = staticCompositionLocalOf {
 
 @Immutable
 data class VonageColors(
+    val background: Color,
+
     val textPrimary: Color,
     val textPrimaryDisabled: Color,
     val textError: Color,
