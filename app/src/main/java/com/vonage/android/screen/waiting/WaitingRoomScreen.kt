@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.VideocamOff
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,34 +60,31 @@ fun WaitingRoomScreen(
 
         when (uiState) {
             is WaitingRoomUiState.Content -> {
-                when (uiState.participant) {
-                    is ParticipantUiState.Available -> {
-                        VideoPreviewContainer(
-                            view = uiState.participant.view,
-                            name = uiState.participant.userName,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(300.dp),
-                            onMicToggle = actions.onMicToggle,
-                            onCameraToggle = actions.onCameraToggle,
-                            isMicEnabled = uiState.participant.isMicEnabled,
-                            isCameraEnabled = uiState.participant.isCameraEnabled,
-                        )
+                VideoPreviewContainer(
+                    view = uiState.view,
+                    name = uiState.userName,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp),
+                    onMicToggle = actions.onMicToggle,
+                    onCameraToggle = actions.onCameraToggle,
+                    isMicEnabled = uiState.isMicEnabled,
+                    isCameraEnabled = uiState.isCameraEnabled,
+                )
+                Spacer(modifier = Modifier.height(24.dp))
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                JoinRoomSection(
+                    roomName = roomName,
+                    username = uiState.userName,
+                    onUsernameChange = actions.onUserNameChange,
+                    onJoinRoom = actions.onJoinRoom,
+                )
+            }
 
-                        JoinRoomSection(
-                            roomName = roomName,
-                            username = uiState.participant.userName,
-                            onUsernameChange = actions.onUserNameChange,
-                            onJoinRoom = actions.onJoinRoom,
-                        )
-                    }
-
-                    is ParticipantUiState.Idle -> {
-                        Text("Initializing camera...")
-                    }
-                }
+            is WaitingRoomUiState.Idle -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.testTag("initializing_indicator")
+                )
             }
         }
     }
@@ -228,12 +227,10 @@ internal fun WaitingRoomScreenPreview() {
             roomName = "test-room-name",
             actions = WaitingRoomActions(),
             uiState = WaitingRoomUiState.Content(
-                participant = ParticipantUiState.Available(
-                    userName = "User Name",
-                    isMicEnabled = true,
-                    isCameraEnabled = false,
-                    view = previewCamera(),
-                ),
+                userName = "User Name",
+                isMicEnabled = true,
+                isCameraEnabled = false,
+                view = previewCamera(),
             ),
         )
     }
@@ -247,12 +244,10 @@ internal fun WaitingRoomScreenWithVideoPreview() {
             roomName = "test-room-name",
             actions = WaitingRoomActions(),
             uiState = WaitingRoomUiState.Content(
-                participant = ParticipantUiState.Available(
-                    userName = "John Doe",
-                    isMicEnabled = false,
-                    isCameraEnabled = true,
-                    view = previewCamera(),
-                ),
+                userName = "John Doe",
+                isMicEnabled = false,
+                isCameraEnabled = true,
+                view = previewCamera(),
             ),
         )
     }
