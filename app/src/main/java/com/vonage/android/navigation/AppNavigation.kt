@@ -7,8 +7,8 @@ enum class Screen {
 
 sealed class NavigationItem(val route: String) {
     data object JoinRoom : NavigationItem(Screen.JOIN_ROOM.name)
-    data object WaitingRoom : NavigationItem("waiting-room/{apiKey}/{sessionId}/{token}") {
-        fun createRoute(apiKey: String, sessionId: String, token: String) =
-            "waiting-room/$apiKey/$sessionId/$token"
+    data object WaitingRoom : NavigationItem("waiting-room/{roomName}/{apiKey}/{sessionId}/{token}") {
+        fun createRoute(roomName: String, apiKey: String, sessionId: String, token: String) =
+            "waiting-room/$roomName/$apiKey/$sessionId/$token"
     }
 }

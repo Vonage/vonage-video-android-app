@@ -1,9 +1,7 @@
 package com.vonage.android.screen.waiting
 
-import android.content.Context
 import android.view.View
 import android.widget.ImageView
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,10 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,54 +38,63 @@ import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.icons.PersonIcon
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.Participant
 import com.vonage.android.screen.components.AvatarInitials
 import com.vonage.android.screen.components.CircularControlButton
 import com.vonage.android.screen.components.TopBanner
 
 @Composable
 fun WaitingRoomScreen(
-    participant: Participant,
+    uiState: WaitingRoomUiState,
+    actions: WaitingRoomActions,
     roomName: String,
     modifier: Modifier = Modifier,
-    onUsernameChange: (String) -> Unit = {},
-    onJoinRoom: () -> Unit = {},
-    onMicToggle: () -> Unit = {},
-    onCameraToggle: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(VonageVideoTheme.colors.background),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         TopBanner()
 
-        VideoPreviewContainer(
-            participant = participant,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp),
-            onMicToggle = onMicToggle,
-            onCameraToggle = onCameraToggle,
-            isMicEnabled = participant.isMicEnabled,
-            isCameraEnabled = participant.isCameraEnabled,
-        )
+        when (uiState) {
+            is WaitingRoomUiState.Content -> {
+                when (uiState.participant) {
+                    is ParticipantUiState.Available -> {
+                        VideoPreviewContainer(
+                            view = uiState.participant.view,
+                            name = uiState.participant.userName,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(300.dp),
+                            onMicToggle = actions.onMicToggle,
+                            onCameraToggle = actions.onCameraToggle,
+                            isMicEnabled = uiState.participant.isMicEnabled,
+                            isCameraEnabled = uiState.participant.isCameraEnabled,
+                        )
 
-        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
 
-        JoinRoomSection(
-            roomName = roomName,
-            username = participant.getName(),
-            onUsernameChange = onUsernameChange,
-            onJoinRoom = onJoinRoom,
-        )
+                        JoinRoomSection(
+                            roomName = roomName,
+                            username = uiState.participant.userName,
+                            onUsernameChange = actions.onUserNameChange,
+                            onJoinRoom = actions.onJoinRoom,
+                        )
+                    }
+
+                    is ParticipantUiState.Idle -> {
+                        Text("Initializing camera...")
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
 fun VideoPreviewContainer(
-    participant: Participant,
+    view: View,
+    name: String,
     onMicToggle: () -> Unit,
     onCameraToggle: () -> Unit,
     isMicEnabled: Boolean,
@@ -103,26 +107,17 @@ fun VideoPreviewContainer(
         contentAlignment = Alignment.BottomCenter,
     ) {
         if (isCameraEnabled) {
-            if (LocalInspectionMode.current) {
-                Image(
-                    painter = painterResource(id = R.drawable.person),
-                    contentDescription = "Video Preview",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                )
-            } else {
-                VideoRenderer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp)
-                        .clipToBounds(),
-                    renderer = participant.getView(),
-                )
-            }
+            VideoRenderer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+                    .clipToBounds(),
+                view = view,
+            )
         } else {
             AvatarInitials(
                 modifier = Modifier.align(Alignment.Center),
-                userName = participant.getName(),
+                userName = name,
             )
         }
         VideoControlPanel(
@@ -231,10 +226,15 @@ internal fun WaitingRoomScreenPreview() {
     VonageVideoTheme {
         WaitingRoomScreen(
             roomName = "test-room-name",
-            participant = PreviewPublisher(
-                context = LocalContext.current,
-                isVideoEnabled = false,
-            )
+            actions = WaitingRoomActions(),
+            uiState = WaitingRoomUiState.Content(
+                participant = ParticipantUiState.Available(
+                    userName = "User Name",
+                    isMicEnabled = true,
+                    isCameraEnabled = false,
+                    view = previewCamera(),
+                ),
+            ),
         )
     }
 }
@@ -245,27 +245,22 @@ internal fun WaitingRoomScreenWithVideoPreview() {
     VonageVideoTheme {
         WaitingRoomScreen(
             roomName = "test-room-name",
-            participant = PreviewPublisher(LocalContext.current)
+            actions = WaitingRoomActions(),
+            uiState = WaitingRoomUiState.Content(
+                participant = ParticipantUiState.Available(
+                    userName = "John Doe",
+                    isMicEnabled = false,
+                    isCameraEnabled = true,
+                    view = previewCamera(),
+                ),
+            ),
         )
     }
 }
 
-private class PreviewPublisher(
-    val context: Context,
-    val userName: String = "Vera User",
-    val isAudioEnabled: Boolean = true,
-    val isVideoEnabled: Boolean = true,
-) : Participant {
-
-    override val isMicEnabled: Boolean = isAudioEnabled
-    override val isCameraEnabled: Boolean = isVideoEnabled
-
-    override fun getView(): View =
-        ImageView(context)
-            .apply {
-                setImageResource(R.drawable.person)
-                scaleType = ImageView.ScaleType.CENTER_CROP
-            }
-
-    override fun getName(): String = userName
-}
+@Composable
+private fun previewCamera(): View = ImageView(LocalContext.current)
+    .apply {
+        setImageResource(R.drawable.person)
+        scaleType = ImageView.ScaleType.CENTER_CROP
+    }

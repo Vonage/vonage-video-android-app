@@ -9,26 +9,45 @@ import javax.inject.Inject
 
 class CreatePublisherUseCase @Inject constructor() {
 
-    fun invoke(context: Context): Participant {
+    operator fun invoke(context: Context): Participant {
+        // determine if is an Application Context
         val publisher = Publisher.Builder(context)
-            .name("Testing")
             .videoTrack(true)
             .audioTrack(true)
             .build()
             .apply {
                 renderer?.setStyle(
                     BaseVideoRenderer.STYLE_VIDEO_SCALE,
-                    BaseVideoRenderer.STYLE_VIDEO_FILL
+                    BaseVideoRenderer.STYLE_VIDEO_FILL,
                 )
             }
-        return object : Participant {
-            override val isMicEnabled: Boolean = publisher.publishAudio
+        return VeraPublisher(publisher)
+    }
+}
 
-            override val isCameraEnabled: Boolean = publisher.publishVideo
+class VeraPublisher(
+    private val publisher: Publisher,
+) : Participant {
 
-            override fun getView(): View = publisher.view
+    override var name: String = "" // needed? better use optional?
 
-            override fun getName(): String = publisher.stream?.name.orEmpty()
-        }
+    override var isMicEnabled: Boolean = true
+        get() = publisher.publishAudio
+
+    override var isCameraEnabled: Boolean = true
+        get() = publisher.publishVideo
+
+    override val view: View = publisher.view
+
+    override fun toggleAudio(): Boolean {
+        val enableAudio = !publisher.publishAudio
+        publisher.publishAudio = enableAudio
+        return publisher.publishAudio
+    }
+
+    override fun toggleVideo(): Boolean {
+        val enableVideo = !publisher.publishVideo
+        publisher.publishVideo = enableVideo
+        return publisher.publishVideo
     }
 }

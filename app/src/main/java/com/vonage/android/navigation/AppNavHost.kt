@@ -26,6 +26,7 @@ fun AppNavHost(
                 navigateToRoom = { params ->
                     navController.navigate(
                         NavigationItem.WaitingRoom.createRoute(
+                            roomName = params.roomName,
                             apiKey = params.apiKey,
                             sessionId = params.sessionId,
                             token = params.token,
@@ -37,18 +38,15 @@ fun AppNavHost(
         composable(
             route = NavigationItem.WaitingRoom.route,
             arguments = listOf(
+                navArgument("roomName") { type = NavType.StringType },
                 navArgument("apiKey") { type = NavType.StringType },
                 navArgument("sessionId") { type = NavType.StringType },
                 navArgument("token") { type = NavType.StringType },
             ),
         ) { backStackEntry ->
-            val apikey = backStackEntry.arguments?.getString("apiKey")
-            val sessionId = backStackEntry.arguments?.getString("sessionId")
-            val token = backStackEntry.arguments?.getString("token")
+            val roomName = backStackEntry.arguments?.getString("roomName")
             WaitingRoomRoute(
-                apiKey = apikey.toString(),
-                sessionId = sessionId.toString(),
-                token = token.toString(),
+                roomName = roomName.toString(),
             )
         }
     }

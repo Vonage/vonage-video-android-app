@@ -51,6 +51,7 @@ data class JoinMeetingRoomActions(
 )
 
 data class JoinMeetingRoomRouteParams(
+    val roomName: String,
     val apiKey: String,
     val sessionId: String,
     val token: String,

@@ -43,6 +43,7 @@ class JoinMeetingRoomViewModel @Inject constructor(
             sessionRepository.getSession(roomName)
                 .onSuccess {
                     _uiState.value = JoinMeetingRoomUiState.Success(
+                        roomName = roomName,
                         apiKey = it.apiKey,
                         sessionId = it.sessionId,
                         token = it.token,
@@ -70,6 +71,7 @@ sealed interface JoinMeetingRoomUiState {
     data object Loading : JoinMeetingRoomUiState
 
     data class Success(
+        val roomName: String,
         val apiKey: String,
         val sessionId: String,
         val token: String,

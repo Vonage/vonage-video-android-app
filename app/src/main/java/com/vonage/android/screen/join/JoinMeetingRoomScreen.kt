@@ -87,6 +87,7 @@ fun JoinMeetingRoomScreen(
                 LaunchedEffect(uiState) {
                     navigateToRoom(
                         JoinMeetingRoomRouteParams(
+                            roomName = uiState.roomName,
                             apiKey = uiState.apiKey,
                             sessionId = uiState.sessionId,
                             token = uiState.token,

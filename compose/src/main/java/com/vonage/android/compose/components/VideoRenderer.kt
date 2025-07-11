@@ -7,15 +7,15 @@ import androidx.compose.ui.viewinterop.AndroidView
 
 @Composable
 fun VideoRenderer(
-    renderer: View,
+    view: View,
     modifier: Modifier = Modifier,
 ) {
     AndroidView(
         factory = { _ ->
-            renderer
+            view
         },
         update = { _ ->
-            renderer.refreshDrawableState()
+            view.refreshDrawableState()
         },
         modifier = modifier,
     )
