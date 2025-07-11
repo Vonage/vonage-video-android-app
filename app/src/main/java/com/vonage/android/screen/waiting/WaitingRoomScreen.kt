@@ -79,14 +79,6 @@ fun WaitingRoomScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-//        DeviceSelectionPanel(
-//            onMicDeviceSelect = onMicDeviceSelect,
-//            onCameraDeviceSelect = onCameraDeviceSelect,
-//            onSpeakerDeviceSelect = onSpeakerDeviceSelect,
-//        )
-//
-//        Spacer(modifier = Modifier.height(24.dp))
-
         JoinRoomSection(
             roomName = roomName,
             username = participant.getName(),
