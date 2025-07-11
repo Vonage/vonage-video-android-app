@@ -31,6 +31,7 @@ turbine = "1.2.1"
 opentokAndroidSdk = "2.30.1"
 kotlinxCollectionsImmutable = "0.4.0"
 runtimeAndroid = "1.8.3"
+accompanistPermissions = "0.37.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -73,6 +74,7 @@ turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 opentok-android-sdk = { module = "com.opentok.android:opentok-android-sdk", version.ref = "opentokAndroidSdk" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime-android", version.ref = "runtimeAndroid" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

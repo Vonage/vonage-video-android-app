@@ -1,21 +1,21 @@
 package com.vonage.android.compose.components
 
+import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
-import com.opentok.android.BaseVideoRenderer
 
 @Composable
 fun VideoRenderer(
-    renderer: BaseVideoRenderer,
+    renderer: View,
     modifier: Modifier = Modifier,
 ) {
     AndroidView(
         factory = { _ ->
-            renderer.view
+            renderer
         },
         update = { _ ->
-            renderer.view.refreshDrawableState()
+            renderer.refreshDrawableState()
         },
         modifier = modifier,
     )

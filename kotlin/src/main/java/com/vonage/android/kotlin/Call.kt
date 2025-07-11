@@ -86,6 +86,7 @@ class Call(
         publisher?.let {
             // this doesn't work
             it.name = publisherName
+
         }
     }
 

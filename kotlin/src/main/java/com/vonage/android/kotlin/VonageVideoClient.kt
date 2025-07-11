@@ -51,6 +51,6 @@ class VonageVideoClient(
     }
 
     private companion object {
-        const val TAG: String = "VonageWrapper"
+        const val TAG: String = "VonageVideoClient"
     }
 }
