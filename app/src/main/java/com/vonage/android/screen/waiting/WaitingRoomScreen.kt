@@ -176,7 +176,7 @@ fun JoinRoomSection(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 32.dp),
-        verticalArrangement = Arrangement.SpaceEvenly,
+        verticalArrangement = Arrangement.spacedBy(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
