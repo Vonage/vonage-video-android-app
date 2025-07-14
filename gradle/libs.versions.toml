@@ -1,5 +1,6 @@
 [versions]
 agp = "8.11.0"
+datastoreCore = "1.1.7"
 kotlin = "2.2.0"
 coreKtx = "1.16.0"
 junit = "5.13.3"
@@ -35,6 +36,7 @@ accompanistPermissions = "0.37.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences", version.ref = "datastoreCore" }
 detekt-compose-rules = { module = "io.nlopez.compose.rules:detekt", version.ref = "detektCompose" }
 junit = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

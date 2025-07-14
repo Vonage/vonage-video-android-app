@@ -3,16 +3,20 @@ package com.vonage.android.screen.waiting
 import android.content.Context
 import android.view.View
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.Participant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class WaitingRoomViewModel @Inject constructor(
     private val createPublisher: CreatePublisherUseCase,
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<WaitingRoomUiState>(WaitingRoomUiState.Idle)
@@ -24,13 +28,15 @@ class WaitingRoomViewModel @Inject constructor(
     fun init(context: Context, roomName: String) {
         this.roomName = roomName
         participant = createPublisher(context)
-        _uiState.value = WaitingRoomUiState.Content(
-            roomName = roomName,
-            isCameraEnabled = participant.isCameraEnabled,
-            isMicEnabled = participant.isMicEnabled,
-            userName = participant.name,
-            view = participant.view,
-        )
+        viewModelScope.launch {
+            _uiState.value = WaitingRoomUiState.Content(
+                roomName = roomName,
+                isCameraEnabled = participant.isCameraEnabled,
+                isMicEnabled = participant.isMicEnabled,
+                userName = userRepository.getUserName().orEmpty(),
+                view = participant.view,
+            )
+        }
     }
 
     fun updateUserName(userName: String) {
@@ -66,11 +72,13 @@ class WaitingRoomViewModel @Inject constructor(
         )
     }
 
-    fun joinRoom(roomName: String) {
-        // cache user name
-        _uiState.value = WaitingRoomUiState.Success(
-            roomName = roomName,
-        )
+    fun joinRoom(roomName: String, userName: String) {
+        viewModelScope.launch {
+            userRepository.saveUserName(userName)
+            _uiState.value = WaitingRoomUiState.Success(
+                roomName = roomName,
+            )
+        }
     }
 }
 

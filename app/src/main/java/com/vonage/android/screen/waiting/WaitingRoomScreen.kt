@@ -41,9 +41,9 @@ import com.vonage.android.compose.icons.PersonIcon
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.AvatarInitials
-import com.vonage.android.screen.components.permissions.CallPermissionHandler
 import com.vonage.android.screen.components.CircularControlButton
 import com.vonage.android.screen.components.TopBanner
+import com.vonage.android.screen.components.permissions.CallPermissionHandler
 
 @Composable
 fun WaitingRoomScreen(
@@ -183,7 +183,7 @@ fun JoinRoomSection(
     roomName: String,
     username: String,
     onUsernameChange: (String) -> Unit,
-    onJoinRoom: () -> Unit,
+    onJoinRoom: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -227,7 +227,7 @@ fun JoinRoomSection(
 
         VonageButton(
             text = stringResource(R.string.waiting_room_join),
-            onClick = onJoinRoom,
+            onClick = { onJoinRoom(username) },
             enabled = username.isNotEmpty(),
         )
     }

@@ -79,6 +79,7 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     implementation(libs.opentok.android.sdk)
     implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.datastore.preferences.core)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)

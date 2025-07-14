@@ -24,7 +24,7 @@ fun WaitingRoomRoute(
             onUserNameChange = viewModel::updateUserName,
             onMicToggle = viewModel::onMicToggle,
             onCameraToggle = viewModel::onCameraToggle,
-            onJoinRoom = { viewModel.joinRoom(roomName) },
+            onJoinRoom = { userName -> viewModel.joinRoom(roomName, userName) },
         )
     }
 
@@ -40,7 +40,7 @@ fun WaitingRoomRoute(
 
 data class WaitingRoomActions(
     val onUserNameChange: (String) -> Unit = {},
-    val onJoinRoom: () -> Unit = {},
+    val onJoinRoom: (String) -> Unit = {},
     val onMicToggle: () -> Unit = {},
     val onCameraToggle: () -> Unit = {},
 )
