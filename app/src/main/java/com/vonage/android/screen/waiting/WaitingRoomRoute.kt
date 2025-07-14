@@ -11,10 +11,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun WaitingRoomRoute(
     roomName: String,
-    modifier: Modifier = Modifier,
-    viewModel: WaitingRoomViewModel = hiltViewModel(),
     navigateToRoom: (String) -> Unit,
     navigateToPermissions: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: WaitingRoomViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -32,10 +32,9 @@ fun WaitingRoomRoute(
         uiState = uiState,
         actions = actions,
         modifier = modifier,
-        roomName = roomName,
         navigateToRoom = navigateToRoom,
         navigateToPermissions = navigateToPermissions,
-        onGrantPermissions = { viewModel.init(context) },
+        onGrantPermissions = { viewModel.init(context, roomName) },
     )
 }
 

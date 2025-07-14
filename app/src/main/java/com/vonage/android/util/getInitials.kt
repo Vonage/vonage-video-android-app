@@ -17,7 +17,7 @@ private fun CharSequence.splitName(): List<String?> {
     val names = trim().split(Regex("\\s+"))
     return when (names.size) {
         1 -> listOf(names.firstOrNull())
-        in (2..10) -> listOf(names.firstOrNull(), names.lastOrNull())
+        in (2..Int.MAX_VALUE) -> listOf(names.firstOrNull(), names.lastOrNull())
         else -> listOf(null)
     }
 }

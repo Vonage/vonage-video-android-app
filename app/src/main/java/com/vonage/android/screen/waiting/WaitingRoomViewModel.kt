@@ -19,10 +19,13 @@ class WaitingRoomViewModel @Inject constructor(
     val uiState: StateFlow<WaitingRoomUiState> = _uiState.asStateFlow()
 
     private lateinit var participant: Participant
+    private lateinit var roomName: String
 
-    fun init(context: Context) {
+    fun init(context: Context, roomName: String) {
+        this.roomName = roomName
         participant = createPublisher(context)
         _uiState.value = WaitingRoomUiState.Content(
+            roomName = roomName,
             isCameraEnabled = participant.isCameraEnabled,
             isMicEnabled = participant.isMicEnabled,
             userName = participant.name,
@@ -33,6 +36,7 @@ class WaitingRoomViewModel @Inject constructor(
     fun updateUserName(userName: String) {
         participant.name = userName
         _uiState.value = WaitingRoomUiState.Content(
+            roomName = roomName,
             isCameraEnabled = participant.isCameraEnabled,
             isMicEnabled = participant.isMicEnabled,
             userName = participant.name,
@@ -43,6 +47,7 @@ class WaitingRoomViewModel @Inject constructor(
     fun onMicToggle() {
         participant.toggleAudio()
         _uiState.value = WaitingRoomUiState.Content(
+            roomName = roomName,
             isCameraEnabled = participant.isCameraEnabled,
             isMicEnabled = participant.isMicEnabled,
             userName = participant.name,
@@ -53,6 +58,7 @@ class WaitingRoomViewModel @Inject constructor(
     fun onCameraToggle() {
         participant.toggleVideo()
         _uiState.value = WaitingRoomUiState.Content(
+            roomName = roomName,
             isCameraEnabled = participant.isCameraEnabled,
             isMicEnabled = participant.isMicEnabled,
             userName = participant.name,
@@ -66,32 +72,16 @@ class WaitingRoomViewModel @Inject constructor(
             roomName = roomName,
         )
     }
-
-    fun onPermissions(map: Map<String, Boolean>) {
-        val cameraPermissionGranted = map["android.permission.CAMERA"] ?: false
-        val microphonePermissionGranted = map["android.permission.RECORD_AUDIO"] ?: false
-        if (!cameraPermissionGranted || !microphonePermissionGranted) {
-            _uiState.value = WaitingRoomUiState.Content(
-                userName = "",
-                isMicEnabled = microphonePermissionGranted,
-                isCameraEnabled = cameraPermissionGranted,
-                isPermissionError = PermissionError(
-                    cameraPermissionGranted = cameraPermissionGranted,
-                    microphonePermissionGranted = microphonePermissionGranted,
-                ),
-            )
-        }
-    }
 }
 
 sealed interface WaitingRoomUiState {
 
     object Idle : WaitingRoomUiState
     data class Content(
+        val roomName: String,
         val userName: String,
         val isMicEnabled: Boolean,
         val isCameraEnabled: Boolean,
-        val isPermissionError: PermissionError? = null,
         val view: View? = null,
     ) : WaitingRoomUiState
 

@@ -49,7 +49,6 @@ import com.vonage.android.screen.components.TopBanner
 fun WaitingRoomScreen(
     uiState: WaitingRoomUiState,
     actions: WaitingRoomActions,
-    roomName: String,
     modifier: Modifier = Modifier,
     navigateToRoom: (String) -> Unit = {},
     onGrantPermissions: () -> Unit = {},
@@ -85,7 +84,7 @@ fun WaitingRoomScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 JoinRoomSection(
-                    roomName = roomName,
+                    roomName = uiState.roomName,
                     username = uiState.userName,
                     onUsernameChange = actions.onUserNameChange,
                     onJoinRoom = actions.onJoinRoom,
@@ -240,13 +239,13 @@ internal fun WaitingRoomScreenPreview() {
     VonageVideoTheme {
         WaitingRoomScreen(
             uiState = WaitingRoomUiState.Content(
+                roomName = "test-room-name",
                 userName = "User Name",
                 isMicEnabled = true,
                 isCameraEnabled = false,
                 view = previewCamera(),
             ),
             actions = WaitingRoomActions(),
-            roomName = "test-room-name",
         )
     }
 }
@@ -257,13 +256,13 @@ internal fun WaitingRoomScreenWithVideoPreview() {
     VonageVideoTheme {
         WaitingRoomScreen(
             uiState = WaitingRoomUiState.Content(
+                roomName = "test-room-name",
                 userName = "John Doe",
                 isMicEnabled = false,
                 isCameraEnabled = true,
                 view = previewCamera(),
             ),
             actions = WaitingRoomActions(),
-            roomName = "test-room-name",
         )
     }
 }

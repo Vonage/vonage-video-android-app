@@ -24,12 +24,13 @@ class WaitingRoomViewModelTest {
     fun `given viewmodel when initialize then returns correct state`() = runTest {
         every { createPublisherUseCase.invoke(any()) } returns buildMockParticipant()
 
-        sut.init(context)
+        sut.init(context, "roomName")
 
         verify { createPublisherUseCase.invoke(context) }
         sut.uiState.test {
             assertEquals(
                 WaitingRoomUiState.Content(
+                    roomName = "roomName",
                     isCameraEnabled = participant.isCameraEnabled,
                     isMicEnabled = participant.isMicEnabled,
                     userName = participant.name,
@@ -43,7 +44,7 @@ class WaitingRoomViewModelTest {
     fun `given viewmodel when update user name then returns correct state`() = runTest {
         every { createPublisherUseCase.invoke(any()) } returns buildMockParticipant()
 
-        sut.init(context)
+        sut.init(context, "roomName")
         sut.updateUserName("update")
 
         verify { participant.name = "update" }
@@ -51,6 +52,7 @@ class WaitingRoomViewModelTest {
         sut.uiState.test {
             assertEquals(
                 WaitingRoomUiState.Content(
+                    roomName = "roomName",
                     isCameraEnabled = participant.isCameraEnabled,
                     isMicEnabled = participant.isMicEnabled,
                     userName = participant.name,
@@ -64,7 +66,7 @@ class WaitingRoomViewModelTest {
     fun `given viewmodel when mic toggle then returns correct state`() = runTest {
         every { createPublisherUseCase.invoke(any()) } returns buildMockParticipant()
 
-        sut.init(context)
+        sut.init(context, "roomName")
         sut.onMicToggle()
 
         verify { participant.toggleAudio() }
@@ -72,6 +74,7 @@ class WaitingRoomViewModelTest {
         sut.uiState.test {
             assertEquals(
                 WaitingRoomUiState.Content(
+                    roomName = "roomName",
                     isCameraEnabled = participant.isCameraEnabled,
                     isMicEnabled = participant.isMicEnabled,
                     userName = participant.name,
@@ -85,7 +88,7 @@ class WaitingRoomViewModelTest {
     fun `given viewmodel when camera toggle then returns correct state`() = runTest {
         every { createPublisherUseCase.invoke(any()) } returns buildMockParticipant()
 
-        sut.init(context)
+        sut.init(context, "roomName")
         sut.onCameraToggle()
 
         verify { participant.toggleVideo() }
@@ -93,6 +96,7 @@ class WaitingRoomViewModelTest {
         sut.uiState.test {
             assertEquals(
                 WaitingRoomUiState.Content(
+                    roomName = "roomName",
                     isCameraEnabled = participant.isCameraEnabled,
                     isMicEnabled = participant.isMicEnabled,
                     userName = participant.name,

@@ -22,8 +22,8 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun PermissionsDialog(
-    modifier: Modifier = Modifier,
     multiplePermissionsState: MultiplePermissionsState,
+    modifier: Modifier = Modifier,
     navigateToPermissions: () -> Unit = {},
 ) {
     BasicAlertDialog(

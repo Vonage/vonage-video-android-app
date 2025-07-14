@@ -10,9 +10,10 @@ import androidx.compose.ui.Modifier
 @Composable
 fun RoomScreen(
     roomName: String,
+    modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         Text("ROOM $roomName SCREEN")

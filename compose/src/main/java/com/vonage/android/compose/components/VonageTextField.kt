@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.icons.KeyboardIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 
+@Suppress("LongParameterList")
 @Composable
 fun VonageTextField(
     value: String,
