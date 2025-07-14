@@ -5,12 +5,13 @@ import android.view.View
 import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.Publisher
 import com.vonage.android.kotlin.Participant
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class CreatePublisherUseCase @Inject constructor() {
-
-    operator fun invoke(context: Context): Participant {
-        // determine if is an Application Context
+class CreatePublisherUseCase @Inject constructor(
+    @ApplicationContext val context: Context,
+) {
+    operator fun invoke(): Participant {
         val publisher = Publisher.Builder(context)
             .videoTrack(true)
             .audioTrack(true)

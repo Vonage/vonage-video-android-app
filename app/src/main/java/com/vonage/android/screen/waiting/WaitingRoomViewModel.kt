@@ -25,9 +25,9 @@ class WaitingRoomViewModel @Inject constructor(
     private lateinit var participant: Participant
     private lateinit var roomName: String
 
-    fun init(context: Context, roomName: String) {
+    fun init(roomName: String) {
         this.roomName = roomName
-        participant = createPublisher(context)
+        participant = createPublisher()
         viewModelScope.launch {
             _uiState.value = WaitingRoomUiState.Content(
                 roomName = roomName,
