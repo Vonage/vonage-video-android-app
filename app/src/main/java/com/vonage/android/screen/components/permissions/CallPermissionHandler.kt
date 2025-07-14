@@ -1,4 +1,4 @@
-package com.vonage.android.screen.components
+package com.vonage.android.screen.components.permissions
 
 import android.Manifest
 import androidx.compose.material3.ExperimentalMaterial3Api

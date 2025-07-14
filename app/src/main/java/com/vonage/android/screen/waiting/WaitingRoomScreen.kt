@@ -41,7 +41,7 @@ import com.vonage.android.compose.icons.PersonIcon
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.AvatarInitials
-import com.vonage.android.screen.components.CallPermissionHandler
+import com.vonage.android.screen.components.permissions.CallPermissionHandler
 import com.vonage.android.screen.components.CircularControlButton
 import com.vonage.android.screen.components.TopBanner
 
