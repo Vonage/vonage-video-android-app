@@ -7,7 +7,7 @@ inline fun Modifier.conditional(
     ifTrue: Modifier.() -> Modifier,
     ifFalse: Modifier.() -> Modifier = { this },
 ): Modifier = if (condition) {
-    then(ifTrue(Modifier))
+    then(ifTrue(this))
 } else {
-    then(ifFalse(Modifier))
+    then(ifFalse(this))
 }

@@ -9,10 +9,10 @@ class VeraPublisher(
 
     override var name: String = "" // needed? better use optional?
 
-    override var isMicEnabled: Boolean = true
+    override val isMicEnabled: Boolean
         get() = publisher.publishAudio
 
-    override var isCameraEnabled: Boolean = true
+    override val isCameraEnabled: Boolean
         get() = publisher.publishVideo
 
     override val view: View = publisher.view

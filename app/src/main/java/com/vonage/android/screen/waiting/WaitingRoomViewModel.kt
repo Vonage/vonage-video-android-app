@@ -1,6 +1,5 @@
 package com.vonage.android.screen.waiting
 
-import android.content.Context
 import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -97,8 +96,3 @@ sealed interface WaitingRoomUiState {
         val roomName: String
     ) : WaitingRoomUiState
 }
-
-data class PermissionError(
-    val cameraPermissionGranted: Boolean,
-    val microphonePermissionGranted: Boolean,
-)

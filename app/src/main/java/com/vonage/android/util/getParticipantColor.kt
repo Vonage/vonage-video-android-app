@@ -18,5 +18,5 @@ fun String.getParticipantColor(): Color {
     )
 
     val asciiSum = this.sumOf { it.code }
-    return colorMap[asciiSum % 10]
+    return colorMap[asciiSum % colorMap.size]
 }
