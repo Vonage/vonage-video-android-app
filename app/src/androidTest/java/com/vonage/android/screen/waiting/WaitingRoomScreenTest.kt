@@ -123,6 +123,27 @@ class WaitingRoomScreenTest {
     }
 
     @Test
+    fun given_state_without_video_and_audio_THEN_components_are_displayed() {
+        compose.setContent {
+            VonageVideoTheme {
+                WaitingRoomScreen(
+                    uiState = WaitingRoomUiState.Content(
+                        roomName = "room-name",
+                        userName = "user name",
+                        isMicEnabled = false,
+                        isCameraEnabled = false,
+                        view = previewCamera(),
+                    ),
+                    actions = WaitingRoomActions(),
+                )
+            }
+        }
+        screen.micButtonDisabled.assertIsDisplayed()
+        screen.cameraButtonDisabled.assertIsDisplayed()
+        screen.initials.assertIsDisplayedWithText("UN")
+    }
+
+    @Test
     fun given_state_without_video_and_without_user_name_THEN_components_are_displayed() {
         compose.setContent {
             VonageVideoTheme {
@@ -139,6 +160,33 @@ class WaitingRoomScreenTest {
             }
         }
         screen.micButtonEnabled.assertIsDisplayed()
+        screen.cameraButtonDisabled.assertIsDisplayed()
+        screen.initials.assertIsDisplayedWithIcon()
+        screen.userNameInput
+            .assertIsDisplayed()
+            .assert(hasText(""))
+        screen.joinButton
+            .assertIsDisplayed()
+            .assertIsNotEnabled()
+    }
+
+    @Test
+    fun given_state_without_audio_and_without_user_name_THEN_components_are_displayed() {
+        compose.setContent {
+            VonageVideoTheme {
+                WaitingRoomScreen(
+                    uiState = WaitingRoomUiState.Content(
+                        roomName = "room-name",
+                        userName = "",
+                        isMicEnabled = false,
+                        isCameraEnabled = false,
+                        view = previewCamera(),
+                    ),
+                    actions = WaitingRoomActions(),
+                )
+            }
+        }
+        screen.micButtonDisabled.assertIsDisplayed()
         screen.cameraButtonDisabled.assertIsDisplayed()
         screen.initials.assertIsDisplayedWithIcon()
         screen.userNameInput
