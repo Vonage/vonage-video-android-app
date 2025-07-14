@@ -139,9 +139,9 @@ class WaitingRoomViewModelTest {
         coEvery { userRepository.saveUserName(any()) } returns Unit
         every { createPublisherUseCase.invoke() } returns buildMockParticipant()
 
-        sut.init("roomName")
-
         sut.uiState.test {
+            awaitItem() // initial state
+            sut.init("roomName")
             awaitItem()
             sut.joinRoom("roomName", "save user name")
             assertEquals(
