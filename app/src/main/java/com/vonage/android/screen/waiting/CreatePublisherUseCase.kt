@@ -9,7 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class CreatePublisherUseCase @Inject constructor(
-    @ApplicationContext val context: Context,
+    @param:ApplicationContext val context: Context,
 ) {
     operator fun invoke(): Participant {
         val publisher = Publisher.Builder(context)

@@ -44,6 +44,15 @@ import com.vonage.android.screen.components.AvatarInitials
 import com.vonage.android.screen.components.CircularControlButton
 import com.vonage.android.screen.components.TopBanner
 import com.vonage.android.screen.components.permissions.CallPermissionHandler
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BUTTON_TAG
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.JOIN_BUTTON_TAG
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.MIC_BUTTON_TAG
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.PREPARE_TO_JOIN_TEXT_TAG
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.ROOM_NAME_TEXT_TAG
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_INITIALS_TAG
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_NAME_INPUT_TAG
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.WHATS_YOU_NAME_TEXT_TAG
+import com.vonage.android.util.buildTestTag
 
 @Composable
 fun WaitingRoomScreen(
@@ -129,7 +138,9 @@ fun VideoPreviewContainer(
             )
         } else {
             AvatarInitials(
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .testTag(USER_INITIALS_TAG),
                 userName = name,
             )
         }
@@ -157,21 +168,25 @@ fun VideoControlPanel(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CircularControlButton(
-            modifier = Modifier.conditional(
-                isMicEnabled,
-                ifTrue = { background(Color.Unspecified) },
-                ifFalse = { background(Color.Red.copy(alpha = 0.7f)) }
-            ),
+            modifier = Modifier
+                .conditional(
+                    isMicEnabled,
+                    ifTrue = { background(Color.Unspecified) },
+                    ifFalse = { background(Color.Red.copy(alpha = 0.7f)) }
+                )
+                .testTag(MIC_BUTTON_TAG.buildTestTag(isMicEnabled)),
             onClick = onMicToggle,
             icon = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
         )
 
         CircularControlButton(
-            modifier = Modifier.conditional(
-                isCameraEnabled,
-                ifTrue = { background(Color.Unspecified) },
-                ifFalse = { background(Color.Red.copy(alpha = 0.7f)) }
-            ),
+            modifier = Modifier
+                .conditional(
+                    isCameraEnabled,
+                    ifTrue = { background(Color.Unspecified) },
+                    ifFalse = { background(Color.Red.copy(alpha = 0.7f)) }
+                )
+                .testTag(CAMERA_BUTTON_TAG.buildTestTag(isCameraEnabled)),
             onClick = onCameraToggle,
             icon = if (isCameraEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
         )
@@ -194,6 +209,7 @@ fun JoinRoomSection(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
+            modifier = Modifier.testTag(PREPARE_TO_JOIN_TEXT_TAG),
             text = stringResource(R.string.waiting_room_prepare_to_join),
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
@@ -202,6 +218,7 @@ fun JoinRoomSection(
         )
 
         Text(
+            modifier = Modifier.testTag(ROOM_NAME_TEXT_TAG),
             text = roomName,
             fontSize = 16.sp,
             color = Color.Gray,
@@ -209,6 +226,7 @@ fun JoinRoomSection(
         )
 
         Text(
+            modifier = Modifier.testTag(WHATS_YOU_NAME_TEXT_TAG),
             text = stringResource(R.string.waiting_room_whats_your_name),
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
@@ -217,15 +235,18 @@ fun JoinRoomSection(
         )
 
         VonageTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(USER_NAME_INPUT_TAG),
             value = username,
             onValueChange = onUsernameChange,
-            modifier = Modifier.fillMaxWidth(),
             leadingIcon = {
                 PersonIcon()
             },
         )
 
         VonageButton(
+            modifier = Modifier.testTag(JOIN_BUTTON_TAG),
             text = stringResource(R.string.waiting_room_join),
             onClick = { onJoinRoom(username) },
             enabled = username.isNotEmpty(),
@@ -268,7 +289,7 @@ internal fun WaitingRoomScreenWithVideoPreview() {
 }
 
 @Composable
-private fun previewCamera(): View = ImageView(LocalContext.current)
+fun previewCamera(): View = ImageView(LocalContext.current)
     .apply {
         setImageResource(R.drawable.person)
         scaleType = ImageView.ScaleType.CENTER_CROP
