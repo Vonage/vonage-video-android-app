@@ -1,6 +1,6 @@
 package com.vonage.android.util
 
-fun String.getInitials(): String =
+fun String.getInitials(limit: Int = 2): String =
     trim()
         .splitName()
         .filterNotNull()
@@ -8,7 +8,7 @@ fun String.getInitials(): String =
         .joinToString(
             separator = "",
             truncated = "",
-            limit = 2,
+            limit = limit,
         ) { s ->
             s.first().uppercase()
         }

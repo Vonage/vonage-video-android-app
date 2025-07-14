@@ -17,7 +17,7 @@ fun rememberCallPermissionsState(
             Manifest.permission.RECORD_AUDIO,
         ),
     onPermissionsResult: ((Map<String, Boolean>) -> Unit)? = null,
-    onAllPermissionsGranted: (suspend () -> Unit)? = null,
+    onGrantAllPermissions: (suspend () -> Unit)? = null,
 ): PermissionsState {
 
     val permissionState = rememberMultiplePermissionsState(permissions) {
@@ -27,7 +27,7 @@ fun rememberCallPermissionsState(
     val allPermissionsGranted = permissionState.allPermissionsGranted
     LaunchedEffect(key1 = allPermissionsGranted) {
         if (allPermissionsGranted) {
-            onAllPermissionsGranted?.invoke()
+            onGrantAllPermissions?.invoke()
         }
     }
 
@@ -54,7 +54,7 @@ fun LaunchVideoCallPermissions(
     val callPermissionsState = rememberCallPermissionsState(
         key = key,
         onPermissionsResult = onPermissionsResult,
-        onAllPermissionsGranted = onAllPermissionsGranted,
+        onGrantAllPermissions = onAllPermissionsGranted,
     )
     LaunchedEffect(key1 = key) { callPermissionsState.launchPermissionRequest() }
 }

@@ -50,11 +50,13 @@ fun WaitingRoomScreen(
     actions: WaitingRoomActions,
     roomName: String,
     modifier: Modifier = Modifier,
+    navigateToRoom: (String) -> Unit = {},
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(VonageVideoTheme.colors.background),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         TopBanner()
 
@@ -71,6 +73,7 @@ fun WaitingRoomScreen(
                     isMicEnabled = uiState.isMicEnabled,
                     isCameraEnabled = uiState.isCameraEnabled,
                 )
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 JoinRoomSection(
@@ -85,6 +88,10 @@ fun WaitingRoomScreen(
                 CircularProgressIndicator(
                     modifier = Modifier.testTag("initializing_indicator")
                 )
+            }
+
+            is WaitingRoomUiState.Success -> {
+                navigateToRoom(uiState.roomName)
             }
         }
     }

@@ -12,9 +12,10 @@ import com.vonage.android.compose.permissions.LaunchVideoCallPermissions
 
 @Composable
 fun WaitingRoomRoute(
+    roomName: String,
     modifier: Modifier = Modifier,
     viewModel: WaitingRoomViewModel = hiltViewModel(),
-    roomName: String,
+    navigateToRoom: (String) -> Unit,
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
@@ -27,6 +28,7 @@ fun WaitingRoomRoute(
             onUserNameChange = viewModel::updateUserName,
             onMicToggle = viewModel::onMicToggle,
             onCameraToggle = viewModel::onCameraToggle,
+            onJoinRoom = { viewModel.joinRoom(roomName) },
         )
     }
 
@@ -37,6 +39,7 @@ fun WaitingRoomRoute(
         actions = actions,
         modifier = modifier,
         roomName = roomName,
+        navigateToRoom = navigateToRoom,
     )
 }
 

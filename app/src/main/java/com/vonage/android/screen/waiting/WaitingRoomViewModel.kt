@@ -59,6 +59,13 @@ class WaitingRoomViewModel @Inject constructor(
             view = participant.view,
         )
     }
+
+    fun joinRoom(roomName: String) {
+        // cache user name
+        _uiState.value = WaitingRoomUiState.Success(
+            roomName = roomName,
+        )
+    }
 }
 
 sealed interface WaitingRoomUiState {
@@ -70,5 +77,7 @@ sealed interface WaitingRoomUiState {
         val isCameraEnabled: Boolean,
         val view: View,
     ) : WaitingRoomUiState
-
+    data class Success(
+        val roomName: String
+    ) : WaitingRoomUiState
 }

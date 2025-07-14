@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.vonage.android.screen.RoomScreen
 import com.vonage.android.screen.join.JoinMeetingRoomRoute
 import com.vonage.android.screen.waiting.WaitingRoomRoute
 
@@ -46,6 +47,24 @@ fun AppNavHost(
         ) { backStackEntry ->
             val roomName = backStackEntry.arguments?.getString("roomName")
             WaitingRoomRoute(
+                roomName = roomName.toString(),
+                navigateToRoom = { roomName ->
+                    navController.navigate(
+                        NavigationItem.Room.createRoute(
+                            roomName = roomName,
+                        )
+                    )
+                },
+            )
+        }
+        composable(
+            route = NavigationItem.Room.route,
+            arguments = listOf(
+                navArgument("roomName") { type = NavType.StringType },
+            ),
+        ) { backStackEntry ->
+            val roomName = backStackEntry.arguments?.getString("roomName")
+            RoomScreen(
                 roomName = roomName.toString(),
             )
         }

@@ -2,6 +2,7 @@ package com.vonage.android.util
 
 import androidx.compose.ui.graphics.Color
 
+@Suppress("MagicNumber")
 fun String.getParticipantColor(): Color {
     val colorMap = listOf(
         Color(0xFFf44336),
