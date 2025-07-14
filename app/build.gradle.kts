@@ -78,6 +78,7 @@ dependencies {
     implementation(libs.logging.interceptor)
     ksp(libs.hilt.android.compiler)
     implementation(libs.opentok.android.sdk)
+    implementation(libs.accompanist.permissions)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)

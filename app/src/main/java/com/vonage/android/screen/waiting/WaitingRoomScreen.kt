@@ -41,6 +41,7 @@ import com.vonage.android.compose.icons.PersonIcon
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.AvatarInitials
+import com.vonage.android.screen.components.CallPermissionHandler
 import com.vonage.android.screen.components.CircularControlButton
 import com.vonage.android.screen.components.TopBanner
 
@@ -51,6 +52,8 @@ fun WaitingRoomScreen(
     roomName: String,
     modifier: Modifier = Modifier,
     navigateToRoom: (String) -> Unit = {},
+    onGrantPermissions: () -> Unit = {},
+    navigateToPermissions: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -59,6 +62,11 @@ fun WaitingRoomScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         TopBanner()
+
+        CallPermissionHandler(
+            onGrantPermissions = onGrantPermissions,
+            navigateToPermissions = navigateToPermissions,
+        )
 
         when (uiState) {
             is WaitingRoomUiState.Content -> {
@@ -99,7 +107,7 @@ fun WaitingRoomScreen(
 
 @Composable
 fun VideoPreviewContainer(
-    view: View,
+    view: View?,
     name: String,
     onMicToggle: () -> Unit,
     onCameraToggle: () -> Unit,
@@ -112,7 +120,7 @@ fun VideoPreviewContainer(
             .background(Color.DarkGray),
         contentAlignment = Alignment.BottomCenter,
     ) {
-        if (isCameraEnabled) {
+        if (isCameraEnabled && view != null) {
             VideoRenderer(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -231,14 +239,14 @@ fun JoinRoomSection(
 internal fun WaitingRoomScreenPreview() {
     VonageVideoTheme {
         WaitingRoomScreen(
-            roomName = "test-room-name",
-            actions = WaitingRoomActions(),
             uiState = WaitingRoomUiState.Content(
                 userName = "User Name",
                 isMicEnabled = true,
                 isCameraEnabled = false,
                 view = previewCamera(),
             ),
+            actions = WaitingRoomActions(),
+            roomName = "test-room-name",
         )
     }
 }
@@ -248,14 +256,14 @@ internal fun WaitingRoomScreenPreview() {
 internal fun WaitingRoomScreenWithVideoPreview() {
     VonageVideoTheme {
         WaitingRoomScreen(
-            roomName = "test-room-name",
-            actions = WaitingRoomActions(),
             uiState = WaitingRoomUiState.Content(
                 userName = "John Doe",
                 isMicEnabled = false,
                 isCameraEnabled = true,
                 view = previewCamera(),
             ),
+            actions = WaitingRoomActions(),
+            roomName = "test-room-name",
         )
     }
 }

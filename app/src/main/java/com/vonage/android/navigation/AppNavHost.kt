@@ -2,6 +2,7 @@ package com.vonage.android.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -10,6 +11,7 @@ import androidx.navigation.navArgument
 import com.vonage.android.screen.RoomScreen
 import com.vonage.android.screen.join.JoinMeetingRoomRoute
 import com.vonage.android.screen.waiting.WaitingRoomRoute
+import com.vonage.android.util.navigateToSystemPermissions
 
 @Composable
 fun AppNavHost(
@@ -17,6 +19,7 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
     startDestination: String = NavigationItem.JoinRoom.route,
 ) {
+    val context = LocalContext.current
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -54,6 +57,9 @@ fun AppNavHost(
                             roomName = roomName,
                         )
                     )
+                },
+                navigateToPermissions = {
+                    navigateToSystemPermissions(context)
                 },
             )
         }

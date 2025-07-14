@@ -66,6 +66,22 @@ class WaitingRoomViewModel @Inject constructor(
             roomName = roomName,
         )
     }
+
+    fun onPermissions(map: Map<String, Boolean>) {
+        val cameraPermissionGranted = map["android.permission.CAMERA"] ?: false
+        val microphonePermissionGranted = map["android.permission.RECORD_AUDIO"] ?: false
+        if (!cameraPermissionGranted || !microphonePermissionGranted) {
+            _uiState.value = WaitingRoomUiState.Content(
+                userName = "",
+                isMicEnabled = microphonePermissionGranted,
+                isCameraEnabled = cameraPermissionGranted,
+                isPermissionError = PermissionError(
+                    cameraPermissionGranted = cameraPermissionGranted,
+                    microphonePermissionGranted = microphonePermissionGranted,
+                ),
+            )
+        }
+    }
 }
 
 sealed interface WaitingRoomUiState {
@@ -75,9 +91,16 @@ sealed interface WaitingRoomUiState {
         val userName: String,
         val isMicEnabled: Boolean,
         val isCameraEnabled: Boolean,
-        val view: View,
+        val isPermissionError: PermissionError? = null,
+        val view: View? = null,
     ) : WaitingRoomUiState
+
     data class Success(
         val roomName: String
     ) : WaitingRoomUiState
 }
+
+data class PermissionError(
+    val cameraPermissionGranted: Boolean,
+    val microphonePermissionGranted: Boolean,
+)
