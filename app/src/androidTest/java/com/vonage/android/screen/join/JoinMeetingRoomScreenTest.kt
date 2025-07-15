@@ -1,4 +1,4 @@
-package com.vonage.android.screen
+package com.vonage.android.screen.join
 
 import android.content.Context
 import androidx.compose.ui.test.assert
@@ -12,9 +12,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.join.JoinMeetingRoomActions
-import com.vonage.android.screen.join.JoinMeetingRoomScreen
-import com.vonage.android.screen.join.JoinMeetingRoomUiState
 import com.vonage.android.util.hasText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

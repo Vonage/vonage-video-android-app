@@ -8,14 +8,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun RoomScreen(
-    roomName: String,
+fun GoodbyeScreen(
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        Text("ROOM $roomName SCREEN")
+        Text("GOOD BYE SCREEN")
     }
 }

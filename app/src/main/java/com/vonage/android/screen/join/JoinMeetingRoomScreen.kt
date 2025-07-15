@@ -88,24 +88,7 @@ fun JoinMeetingRoomScreen(
                     navigateToRoom(
                         JoinMeetingRoomRouteParams(
                             roomName = uiState.roomName,
-                            apiKey = uiState.apiKey,
-                            sessionId = uiState.sessionId,
-                            token = uiState.token,
                         )
-                    )
-                }
-            }
-
-            is JoinMeetingRoomUiState.Loading -> {
-                Column(
-                    modifier = Modifier
-                        .padding(64.dp)
-                        .fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.testTag(PROGRESS_INDICATOR_TAG)
                     )
                 }
             }

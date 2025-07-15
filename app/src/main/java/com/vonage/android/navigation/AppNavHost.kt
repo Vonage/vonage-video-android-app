@@ -8,8 +8,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.vonage.android.screen.RoomScreen
+import com.vonage.android.screen.GoodbyeScreen
 import com.vonage.android.screen.join.JoinMeetingRoomRoute
+import com.vonage.android.screen.room.RoomScreenRoute
 import com.vonage.android.screen.waiting.WaitingRoomRoute
 import com.vonage.android.util.navigateToSystemPermissions
 
@@ -25,15 +26,12 @@ fun AppNavHost(
         navController = navController,
         startDestination = startDestination
     ) {
-        composable(NavigationItem.JoinRoom.route) {
+        composable(route = NavigationItem.JoinRoom.route) {
             JoinMeetingRoomRoute(
                 navigateToRoom = { params ->
                     navController.navigate(
                         NavigationItem.WaitingRoom.createRoute(
                             roomName = params.roomName,
-                            apiKey = params.apiKey,
-                            sessionId = params.sessionId,
-                            token = params.token,
                         )
                     )
                 },
@@ -43,9 +41,6 @@ fun AppNavHost(
             route = NavigationItem.WaitingRoom.route,
             arguments = listOf(
                 navArgument("roomName") { type = NavType.StringType },
-                navArgument("apiKey") { type = NavType.StringType },
-                navArgument("sessionId") { type = NavType.StringType },
-                navArgument("token") { type = NavType.StringType },
             ),
         ) { backStackEntry ->
             val roomName = backStackEntry.arguments?.getString("roomName")
@@ -70,9 +65,17 @@ fun AppNavHost(
             ),
         ) { backStackEntry ->
             val roomName = backStackEntry.arguments?.getString("roomName")
-            RoomScreen(
+            RoomScreenRoute(
                 roomName = roomName.toString(),
+                navigateToGoodBye = {
+                    navController.navigate(NavigationItem.GoodbyeRoom.route)
+                }
             )
+        }
+        composable(
+            route = NavigationItem.GoodbyeRoom.route,
+        ) { backStackEntry ->
+            GoodbyeScreen()
         }
     }
 }

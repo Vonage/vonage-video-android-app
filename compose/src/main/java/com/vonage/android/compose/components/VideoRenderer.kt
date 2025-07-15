@@ -15,7 +15,7 @@ fun VideoRenderer(
             view
         },
         update = { _ ->
-            view.refreshDrawableState()
+            view
         },
         modifier = modifier,
     )

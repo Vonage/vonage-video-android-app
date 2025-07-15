@@ -1,4 +1,4 @@
-package com.vonage.android.screen
+package com.vonage.android.screen.join
 
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.onNodeWithTag

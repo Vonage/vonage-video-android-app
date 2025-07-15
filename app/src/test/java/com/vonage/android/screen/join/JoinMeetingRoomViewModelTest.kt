@@ -1,10 +1,7 @@
 package com.vonage.android.screen.join
 
 import app.cash.turbine.test
-import com.vonage.android.data.SessionInfo
-import com.vonage.android.data.SessionRepository
 import com.vonage.android.util.RoomNameGenerator
-import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -13,10 +10,8 @@ import kotlin.test.assertEquals
 
 class JoinMeetingRoomViewModelTest {
 
-    val sessionRepository: SessionRepository = mockk()
     val roomNameGenerator: RoomNameGenerator = mockk()
     val sut = JoinMeetingRoomViewModel(
-        sessionRepository = sessionRepository,
         roomNameGenerator = roomNameGenerator,
     )
 
@@ -54,9 +49,8 @@ class JoinMeetingRoomViewModelTest {
         sut.createRoom()
         sut.uiState.test {
             assertEquals(
-                JoinMeetingRoomUiState.Content(
+                JoinMeetingRoomUiState.Success(
                     roomName = "vonage-rocks",
-                    isRoomNameWrong = false,
                 ),
                 awaitItem()
             )
@@ -65,44 +59,14 @@ class JoinMeetingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when join room success then state is correct`() = runTest {
-        coEvery { sessionRepository.getSession(any()) } returns Result.success(
-            SessionInfo(
-                apiKey = "apiKey",
-                sessionId = "sessionId",
-                token = "token",
-            )
-        )
-
         sut.uiState.test {
             awaitItem() // initial state
             sut.joinRoom("validname")
-            assertEquals(JoinMeetingRoomUiState.Loading, awaitItem())
             assertEquals(
                 JoinMeetingRoomUiState.Success(
                     roomName = "validname",
-                    apiKey = "apiKey",
-                    sessionId = "sessionId",
-                    token = "token",
                 ),
                 awaitItem()
-            )
-        }
-    }
-
-    @Test
-    fun `given viewmodel when join room failed then state is correct`() = runTest {
-        coEvery { sessionRepository.getSession(any()) } returns Result.failure(Exception("Failure!"))
-
-        sut.uiState.test {
-            awaitItem() // initial state
-            sut.joinRoom("validname")
-            assertEquals(JoinMeetingRoomUiState.Loading, awaitItem())
-            assertEquals(
-                JoinMeetingRoomUiState.Content(
-                    roomName = "validname",
-                    isRoomNameWrong = false,
-                    isError = true,
-                ), awaitItem()
             )
         }
     }
