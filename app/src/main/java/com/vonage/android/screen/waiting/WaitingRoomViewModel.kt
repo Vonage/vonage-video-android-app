@@ -28,46 +28,35 @@ class WaitingRoomViewModel @Inject constructor(
         this.roomName = roomName
         participant = createPublisher()
         viewModelScope.launch {
-            _uiState.value = WaitingRoomUiState.Content(
+            participant.name = userRepository.getUserName().orEmpty()
+            _uiState.value = buildContentUiState(
                 roomName = roomName,
-                isCameraEnabled = participant.isCameraEnabled,
-                isMicEnabled = participant.isMicEnabled,
-                userName = userRepository.getUserName().orEmpty(),
-                view = participant.view,
+                participant = participant,
             )
         }
     }
 
     fun updateUserName(userName: String) {
         participant.name = userName
-        _uiState.value = WaitingRoomUiState.Content(
+        _uiState.value = buildContentUiState(
             roomName = roomName,
-            isCameraEnabled = participant.isCameraEnabled,
-            isMicEnabled = participant.isMicEnabled,
-            userName = participant.name,
-            view = participant.view,
+            participant = participant,
         )
     }
 
     fun onMicToggle() {
         participant.toggleAudio()
-        _uiState.value = WaitingRoomUiState.Content(
+        _uiState.value = buildContentUiState(
             roomName = roomName,
-            isCameraEnabled = participant.isCameraEnabled,
-            isMicEnabled = participant.isMicEnabled,
-            userName = participant.name,
-            view = participant.view,
+            participant = participant,
         )
     }
 
     fun onCameraToggle() {
         participant.toggleVideo()
-        _uiState.value = WaitingRoomUiState.Content(
+        _uiState.value = buildContentUiState(
             roomName = roomName,
-            isCameraEnabled = participant.isCameraEnabled,
-            isMicEnabled = participant.isMicEnabled,
-            userName = participant.name,
-            view = participant.view,
+            participant = participant,
         )
     }
 
@@ -79,6 +68,15 @@ class WaitingRoomViewModel @Inject constructor(
             )
         }
     }
+
+    private fun buildContentUiState(roomName: String, participant: Participant) =
+        WaitingRoomUiState.Content(
+            roomName = roomName,
+            isCameraEnabled = participant.isCameraEnabled,
+            isMicEnabled = participant.isMicEnabled,
+            userName = participant.name,
+            view = participant.view,
+        )
 }
 
 sealed interface WaitingRoomUiState {

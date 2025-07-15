@@ -116,7 +116,9 @@ class WaitingRoomViewModelTest {
     @Test
     fun `given viewmodel with cached user name then returns correct state`() = runTest {
         coEvery { userRepository.getUserName() } returns "Cached user name"
-        every { createPublisherUseCase.invoke() } returns buildMockParticipant()
+        every { createPublisherUseCase.invoke() } returns buildMockParticipant(
+            userName = "Cached user name"
+        )
 
         sut.uiState.test {
             sut.init("roomName")
@@ -153,11 +155,13 @@ class WaitingRoomViewModelTest {
         coVerify { userRepository.saveUserName("save user name") }
     }
 
-    private fun buildMockParticipant(): Participant {
+    private fun buildMockParticipant(
+        userName: String = ""
+    ): Participant {
         every { participant.view } returns mockk()
         every { participant.isCameraEnabled } returns false
         every { participant.isMicEnabled } returns false
-        every { participant.name } returns ""
+        every { participant.name } returns userName
         every { participant.name = any() } returns Unit
         every { participant.toggleVideo() } returns true
         every { participant.toggleAudio() } returns true
