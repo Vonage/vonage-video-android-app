@@ -11,20 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.VideoCall
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -32,7 +22,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -40,11 +29,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vonage.android.R
+import com.vonage.android.compose.components.VonageButton
+import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.icons.KeyboardIcon
+import com.vonage.android.compose.icons.VideoCameraIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.OrSeparator
 import com.vonage.android.screen.components.VonageIcon
@@ -96,6 +87,7 @@ fun JoinMeetingRoomScreen(
                 LaunchedEffect(uiState) {
                     navigateToRoom(
                         JoinMeetingRoomRouteParams(
+                            roomName = uiState.roomName,
                             apiKey = uiState.apiKey,
                             sessionId = uiState.sessionId,
                             token = uiState.token,
@@ -134,9 +126,7 @@ fun JoinMeetingRoomHeader(
     ) {
         Spacer(modifier = Modifier.height(80.dp))
 
-        VonageIcon(
-            modifier = Modifier.testTag(VONAGE_ICON_TAG),
-        )
+        VonageIcon(modifier = Modifier.testTag(VONAGE_ICON_TAG))
 
         Spacer(modifier = Modifier.height(48.dp))
 
@@ -176,31 +166,15 @@ fun JoinMeetingRoomContent(
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        Button(
-            onClick = actions.onCreateRoomClick,
-            shape = RoundedCornerShape(corner = CornerSize(6.dp)),
+        VonageButton(
+            text = stringResource(R.string.landing_create_room),
             modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
                 .testTag(CREATE_ROOM_BUTTON_TAG),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = VonageVideoTheme.colors.buttonPrimary,
-            )
-        ) {
-            Icon(
-                imageVector = Icons.Default.VideoCall,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.landing_create_room),
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
-            )
-        }
+            onClick = actions.onCreateRoomClick,
+            leadingIcon = {
+                VideoCameraIcon()
+            }
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -228,7 +202,7 @@ fun RoomInput(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
     ) {
-        OutlinedTextField(
+        VonageTextField(
             modifier = Modifier
                 .weight(1f)
                 .testTag(ROOM_INPUT_TAG),
@@ -244,11 +218,6 @@ fun RoomInput(
             leadingIcon = {
                 KeyboardIcon()
             },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = VonageVideoTheme.colors.buttonPrimary,
-                unfocusedBorderColor = VonageVideoTheme.colors.buttonPrimaryDisabled,
-            ),
-            singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
             supportingText = {
                 if (isRoomNameWrong) {

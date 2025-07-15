@@ -10,4 +10,14 @@
     <string name="landing_or">or</string>
     <string name="landing_room_name_error_message">No spaces or special characters allowed</string>
     <string name="landing_room_generic_error_message">Unexpected error, please try again</string>
+
+    <!-- Waiting Screen -->
+    <string name="waiting_room_prepare_to_join">Prepare to join:</string>
+    <string name="waiting_room_whats_your_name">What is your name?</string>
+    <string name="waiting_room_join">Join</string>
+
+    <!-- Permissions -->
+    <string name="camera_and_microphone_permissions_are_needed">Camera and microphone permissions are needed</string>
+    <string name="request_permissions">Request permissions</string>
+    <string name="request_permissions_to_system">Request permissions to system</string>
 </resources>

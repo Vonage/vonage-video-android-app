@@ -56,6 +56,7 @@ android {
 
 dependencies {
     implementation(project(":compose"))
+    implementation(project(":kotlin"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -76,6 +77,8 @@ dependencies {
     implementation(libs.moshi.kotlin)
     implementation(libs.logging.interceptor)
     ksp(libs.hilt.android.compiler)
+    implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.datastore.preferences.core)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)

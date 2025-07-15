@@ -79,6 +79,7 @@ class JoinMeetingRoomViewModelTest {
             assertEquals(JoinMeetingRoomUiState.Loading, awaitItem())
             assertEquals(
                 JoinMeetingRoomUiState.Success(
+                    roomName = "validname",
                     apiKey = "apiKey",
                     sessionId = "sessionId",
                     token = "token",
