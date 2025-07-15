@@ -77,7 +77,6 @@ dependencies {
     implementation(libs.moshi.kotlin)
     implementation(libs.logging.interceptor)
     ksp(libs.hilt.android.compiler)
-    implementation(libs.opentok.android.sdk)
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.datastore.preferences.core)
 

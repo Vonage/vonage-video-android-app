@@ -1,7 +1,8 @@
-package com.vonage.android.data.network
+package com.vonage.android.di
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.vonage.android.data.network.APIService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
