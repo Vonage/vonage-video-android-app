@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,7 +42,7 @@ fun ParticipantVideoCard(
         modifier = modifier
             .aspectRatio(16f / 9f)
             .fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(8.dp),
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -69,14 +70,16 @@ fun ParticipantVideoCard(
                     .padding(4.dp)
                     .background(
                         Color.Black.copy(alpha = 0.6f),
-                        RoundedCornerShape(4.dp)
+                        RoundedCornerShape(8.dp)
                     )
                     .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
                 Text(
                     text = name,
                     color = Color.White,
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
                 )
             }
 
@@ -121,7 +124,7 @@ internal fun ParticipantVideoCardPreview() {
 internal fun ParticipantVideoCardPlaceholderPreview() {
     VonageVideoTheme {
         ParticipantVideoCard(
-            name = "Sample Name",
+            name = "Sample Name Name Name Name Name Name Name Name Name Name",
             isCameraEnabled = false,
             isMicEnabled = false,
             view = previewCamera(),

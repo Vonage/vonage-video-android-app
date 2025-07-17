@@ -1,6 +1,5 @@
 package com.vonage.android.screen.room
 
-import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,9 +10,15 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -23,9 +28,11 @@ import com.vonage.android.kotlin.Participant
 import com.vonage.android.kotlin.VeraPublisher
 import com.vonage.android.screen.room.components.BottomBar
 import com.vonage.android.screen.room.components.ParticipantVideoCard
+import com.vonage.android.screen.room.components.ParticipantsList
 import com.vonage.android.screen.room.components.TopBar
-import com.vonage.android.screen.waiting.previewCamera
+import kotlinx.collections.immutable.ImmutableList
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoCallScreen(
     uiState: RoomUiState,
@@ -41,8 +48,11 @@ fun VideoCallScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(VonageVideoTheme.colors.background) // Dark background
+            .background(VonageVideoTheme.colors.background)
     ) {
+
+        val sheetState = rememberModalBottomSheetState()
+        var showBottomSheet by remember { mutableStateOf(false) }
 
         when (uiState) {
             is RoomUiState.Content -> {
@@ -61,20 +71,31 @@ fun VideoCallScreen(
                         .padding(top = 64.dp)
                 )
 
+                if (showBottomSheet) {
+                    ModalBottomSheet(
+                        onDismissRequest = {
+                            showBottomSheet = false
+                        },
+                        sheetState = sheetState,
+                    ) {
+                        ParticipantsList(
+                            participants = participants,
+                        )
+                    }
+                }
+
                 BottomBar(
                     modifier = Modifier.align(Alignment.BottomCenter),
                     onToggleMic = {
-                        participants
-                            .filterIsInstance<VeraPublisher>()
-                            .firstOrNull { it.toggleAudio() }
+                        publisher?.toggleAudio()
                     },
                     onToggleCamera = {
-                        participants
-                            .filterIsInstance<VeraPublisher>()
-                            .firstOrNull { it.toggleVideo() }
+                        publisher?.toggleVideo()
                     },
                     onToggleChat = onToggleChat,
-                    onToggleParticipants = onToggleParticipants,
+                    onToggleParticipants = {
+                        showBottomSheet = !showBottomSheet
+                    },
                     onEndCall = onEndCall,
                     isMicEnabled = publisher?.isMicEnabled ?: false,
                     isCameraEnabled = publisher?.isCameraEnabled ?: false,
@@ -93,11 +114,11 @@ fun VideoCallScreen(
 
 @Composable
 fun VideoContent(
-    participants: List<Participant>,
+    participants: ImmutableList<Participant>,
     modifier: Modifier = Modifier,
 ) {
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 250.dp),
+        columns = GridCells.Adaptive(minSize = 200.dp),
         modifier = modifier,
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -105,7 +126,7 @@ fun VideoContent(
     ) {
         items(
             items = participants,
-            key = { participant -> participant.name },
+            key = { participant -> participant.id },
         ) { participant ->
             ParticipantVideoCard(
                 name = participant.name,
@@ -120,14 +141,14 @@ fun VideoContent(
 @PreviewLightDark
 @Composable
 fun VideoCallScreenPreview() {
-    object : Participant {
-        override var name: String = "John Doe"
-        override val isMicEnabled: Boolean = true
-        override val isCameraEnabled: Boolean = false
-        override val view: View = previewCamera()
-        override fun toggleAudio(): Boolean = true
-        override fun toggleVideo(): Boolean = true
-    }
+//    object : Participant {
+//        override var name: String = "John Doe"
+//        override val isMicEnabled: Boolean = true
+//        override val isCameraEnabled: Boolean = false
+//        override val view: View = previewCamera()
+//        override fun toggleAudio(): Boolean = true
+//        override fun toggleVideo(): Boolean = true
+//    }
     VonageVideoTheme {
 //        VideoCallScreen(
 //            uiState = RoomUiState.Content(

@@ -7,6 +7,8 @@ class VeraSubscriber(
     private val subscriber: Subscriber,
 ) : Participant {
 
+    override val id: String = subscriber.stream.streamId
+
     override var name: String = subscriber.stream.name // needed? better use optional?
 
     override val isMicEnabled: Boolean = subscriber.stream.hasAudio()

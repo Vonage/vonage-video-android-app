@@ -11,8 +11,14 @@ import com.opentok.android.PublisherKit.PublisherListener
 import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.callbackFlow
 
 @Stable
 class Call(
@@ -21,19 +27,16 @@ class Call(
     private val session: Session,
 ) {
 
-    private val _participantsStateFlow = MutableStateFlow<List<Participant>>(emptyList())
-    val participantsStateFlow: StateFlow<List<Participant>> = _participantsStateFlow
-
-    private val _publisherStateFlow = MutableStateFlow<PublisherState>(PublisherState.Offline)
-    val publisherStateFlow: StateFlow<PublisherState> = _publisherStateFlow
-
-    private val _subscriberStateFlow = MutableStateFlow<SubscriberState>(SubscriberState.Offline)
-    val subscriberStateFlow: StateFlow<SubscriberState> = _subscriberStateFlow
+    private val _participantsStateFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
+    val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
 
     private var publisher: Publisher? = null
 
     private val subscribers = ArrayList<Subscriber>()
-    private val subscriberStreams = HashMap<Stream, Subscriber>()
+    private val subscriberStreams = HashMap<String, Subscriber>()
+
+    private val participants = ArrayList<Participant>()
+    private val participantStreams = HashMap<String, Participant>()
 
     private val sessionListener: Session.SessionListener = object : Session.SessionListener {
         override fun onConnected(session: Session) {
@@ -41,7 +44,7 @@ class Call(
             Log.d(TAG, "onConnected: Connected to session: " + session.sessionId)
 
             publisher = Publisher.Builder(context)
-                .name("Testing")
+                .name("Vera Native")
                 .videoTrack(true)
                 .build().apply {
                     setPublisherListener(publisherListener)
@@ -51,8 +54,11 @@ class Call(
                     )
                 }
                 .also {
-                    _publisherStateFlow.value = PublisherState.Online(it)
-                    _participantsStateFlow.value += VeraPublisher(it)
+                    val pa = VeraPublisher(it)
+                    val id = it?.stream?.streamId ?: "publisher"
+                    participantStreams[id] = pa
+                    participants.add(pa)
+                    _participantsStateFlow.value = participants.toImmutableList()
                     session.publish(it)
                 }
         }
@@ -66,23 +72,28 @@ class Call(
             val subscriber = Subscriber.Builder(context, stream).build()
             session.subscribe(subscriber)
             subscribers.add(subscriber)
-            subscriberStreams[stream] = subscriber
-//            _subscriberStateFlow.value = SubscriberState.Online(subscribers.toImmutableList())
-            _subscriberStateFlow.value = SubscriberState.Online(subscribers.toParticipants())
-            _participantsStateFlow.value += VeraSubscriber(subscriber)
+            subscriberStreams[stream.streamId] = subscriber
+
+            participants.add(subscriber.toParticipant())
+            participantStreams[stream.streamId] = subscriber.toParticipant()
+            _participantsStateFlow.value = participantStreams.values.toImmutableList()
         }
 
         override fun onStreamDropped(session: Session, stream: Stream) {
             Log.d(TAG, "onStreamDropped: Stream Dropped: " + stream.streamId + " in session: " + session.sessionId)
-            val subscriber = subscriberStreams[stream] ?: return
+            Log.d("XXX", "DROP - " + participants.joinToString { it.id })
+
+            val subscriber = subscriberStreams[stream.streamId] ?: return
             subscribers.remove(subscriber)
-            subscriberStreams.remove(stream)
+            subscriberStreams.remove(stream.streamId)
 
-            subscriber.subscribeToAudio = true
+            val p = participantStreams[stream.streamId] ?: return
+            participants.remove(p)
+            participantStreams.remove(stream.streamId)
+            _participantsStateFlow.value = participantStreams.values.toImmutableList()
 
+            Log.d("XXX", "CALL - " + participantStreams.values.joinToString { it.id })
             session.unsubscribe(subscriber)
-//            _subscriberStateFlow.value = SubscriberState.Online(subscribers.toImmutableList())
-            _subscriberStateFlow.value = SubscriberState.Online(subscribers.toParticipants())
         }
 
         override fun onError(session: Session, opentokError: OpentokError) {
@@ -107,6 +118,33 @@ class Call(
     fun connect() {
         session.setSessionListener(sessionListener)
         session.connect(token)
+    }
+
+    fun observeConnect(): Flow<String> = callbackFlow {
+        val sessionListener = object : Session.SessionListener {
+            override fun onConnected(p0: Session?) {
+                trySend("Connected")
+            }
+
+            override fun onDisconnected(p0: Session?) {
+                trySend("Disconnected")
+            }
+
+            override fun onStreamReceived(p0: Session?, p1: Stream?) {
+                trySend("Stream received")
+            }
+
+            override fun onStreamDropped(p0: Session?, p1: Stream?) {
+                trySend("Stream dropped")
+            }
+
+            override fun onError(p0: Session?, p1: OpentokError?) {
+                trySend("Error $p1")
+            }
+        }
+        session.setSessionListener(sessionListener)
+        session.connect(token)
+        awaitClose { session.setSessionListener(null) }
     }
 
     fun end() {

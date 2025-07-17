@@ -1,8 +1,10 @@
 package com.vonage.android.screen.room
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.Call
 import com.vonage.android.kotlin.VonageVideoClient
@@ -25,17 +27,15 @@ class RoomScreenViewModel @Inject constructor(
 
     private lateinit var call: Call
 
+    fun createCallAndJoin() {
+
+    }
+
     fun init(context: Context, roomName: String) {
         viewModelScope.launch {
             sessionRepository.getSession(roomName)
                 .onSuccess { s ->
-                    val videoClient = VonageVideoClient(context)
-                    call = videoClient.initializeSession(
-                        apiKey = s.apiKey,
-                        sessionId = s.sessionId,
-                        token = s.token,
-                    )
-                    call.connect()
+                    connect(context, s)
                     _uiState.value = RoomUiState.Content(
                         roomName = roomName,
                         call = call,
@@ -45,6 +45,20 @@ class RoomScreenViewModel @Inject constructor(
                     // how to handle this error?
                 }
         }
+    }
+
+    suspend fun connect(context: Context, sessionInfo: SessionInfo) {
+        val videoClient = VonageVideoClient(context)
+        call = videoClient.initializeSession(
+            apiKey = sessionInfo.apiKey,
+            sessionId = sessionInfo.sessionId,
+            token = sessionInfo.token,
+        )
+        call.connect()
+//        call.observeConnect()
+//            .collect {
+//                Log.d("XXX", "ViewModel received $it")
+//            }
     }
 
     fun endCall() {

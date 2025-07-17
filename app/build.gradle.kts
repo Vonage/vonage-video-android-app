@@ -79,6 +79,7 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.datastore.preferences.core)
+    implementation(libs.kotlinx.collections.immutable)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)

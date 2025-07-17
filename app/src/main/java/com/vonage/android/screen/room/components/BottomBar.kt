@@ -81,7 +81,7 @@ fun BottomBar(
             BadgedBox(
                 badge = {
                     Badge(
-                        containerColor = Color.DarkGray,
+                        containerColor = Color.Gray,
                         contentColor = Color.White,
                     ) {
                         Text("$participantsCount")
@@ -91,7 +91,7 @@ fun BottomBar(
                 ControlButton(
                     onClick = onToggleParticipants,
                     icon = Icons.Default.Group,
-                    isActive = false,
+                    isActive = true,
                     contentDescription = "Participants"
                 )
             }

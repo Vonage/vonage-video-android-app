@@ -7,6 +7,8 @@ class VeraPublisher(
     private val publisher: Publisher,
 ) : Participant {
 
+    override val id: String = publisher?.stream?.streamId ?: "publisher"
+
     override var name: String = "Vera Native" // needed? better use optional?
 
     override val isMicEnabled: Boolean
