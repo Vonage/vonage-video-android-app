@@ -40,7 +40,6 @@ fun VideoCallScreen(
     onEndCall: () -> Unit = {},
     onToggleMic: () -> Unit = {},
     onToggleCamera: () -> Unit = {},
-    onToggleChat: () -> Unit = {},
     onToggleParticipants: () -> Unit = {},
     isMicEnabled: Boolean = false,
     isCameraEnabled: Boolean = true,
@@ -92,7 +91,6 @@ fun VideoCallScreen(
                     onToggleCamera = {
                         publisher?.toggleVideo()
                     },
-                    onToggleChat = onToggleChat,
                     onToggleParticipants = {
                         showBottomSheet = !showBottomSheet
                     },

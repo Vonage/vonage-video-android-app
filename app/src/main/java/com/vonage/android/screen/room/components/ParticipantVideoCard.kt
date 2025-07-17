@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -96,7 +97,26 @@ fun ParticipantVideoCard(
                 ) {
                     Icon(
                         Icons.Default.MicOff,
-                        contentDescription = "Muted",
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            } else {
+                // change this to voice indicator when is publisher
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(12.dp)
+                        .background(
+                            Color.Black.copy(alpha = 0.6f),
+                            CircleShape
+                        )
+                        .padding(6.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Mic,
+                        contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.size(16.dp)
                     )

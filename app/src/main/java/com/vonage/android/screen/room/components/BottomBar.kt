@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.CallEnd
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Mic
@@ -37,7 +36,6 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 fun BottomBar(
     onToggleMic: () -> Unit,
     onToggleCamera: () -> Unit,
-    onToggleChat: () -> Unit,
     onToggleParticipants: () -> Unit,
     onEndCall: () -> Unit,
     isMicEnabled: Boolean,
@@ -69,13 +67,6 @@ fun BottomBar(
                 icon = if (isCameraEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
                 isActive = isCameraEnabled,
                 contentDescription = if (isCameraEnabled) "Turn off camera" else "Turn on camera"
-            )
-
-            ControlButton(
-                onClick = onToggleChat,
-                icon = Icons.AutoMirrored.Filled.Chat,
-                isActive = false,
-                contentDescription = "Chat"
             )
 
             BadgedBox(
@@ -151,7 +142,6 @@ fun BottomBarPreview() {
         BottomBar(
             onToggleMic = {},
             onToggleCamera = {},
-            onToggleChat = {},
             onToggleParticipants = {},
             onEndCall = {},
             isMicEnabled = false,

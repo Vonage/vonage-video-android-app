@@ -54,12 +54,12 @@ class Call(
                     )
                 }
                 .also {
+                    session.publish(it)
                     val pa = VeraPublisher(it)
                     val id = it?.stream?.streamId ?: "publisher"
                     participantStreams[id] = pa
                     participants.add(pa)
                     _participantsStateFlow.value = participants.toImmutableList()
-                    session.publish(it)
                 }
         }
 
