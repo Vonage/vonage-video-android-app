@@ -1,13 +1,14 @@
 package com.vonage.android.screen.room
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.Call
 import com.vonage.android.kotlin.VonageVideoClient
-import com.vonage.android.screen.waiting.CreatePublisherUseCase
+import com.vonage.android.kotlin.model.SessionEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,8 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MeetingRoomScreenViewModel @Inject constructor(
-    private val createPublisherUseCase: CreatePublisherUseCase,
     private val sessionRepository: SessionRepository,
+    private val videoClient: VonageVideoClient,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<RoomUiState>(RoomUiState.Loading)
@@ -26,15 +27,11 @@ class MeetingRoomScreenViewModel @Inject constructor(
 
     private lateinit var call: Call
 
-    fun createCallAndJoin() {
-
-    }
-
-    fun init(context: Context, roomName: String) {
+    fun init(roomName: String) {
         viewModelScope.launch {
             sessionRepository.getSession(roomName)
-                .onSuccess { s ->
-                    connect(context, s)
+                .onSuccess { sessionInfo ->
+                    connect(sessionInfo)
                     _uiState.value = RoomUiState.Content(
                         roomName = roomName,
                         call = call,
@@ -46,18 +43,39 @@ class MeetingRoomScreenViewModel @Inject constructor(
         }
     }
 
-    suspend fun connect(context: Context, sessionInfo: SessionInfo) {
-        val videoClient = VonageVideoClient(context)
+    private fun connect(sessionInfo: SessionInfo) {
+        videoClient.buildPublisher()
         call = videoClient.initializeSession(
             apiKey = sessionInfo.apiKey,
             sessionId = sessionInfo.sessionId,
             token = sessionInfo.token,
         )
-        call.connect()
-//        call.observeConnect()
-//            .collect {
-//                Log.d("XXX", "ViewModel received $it")
-//            }
+//        call.connect()
+        viewModelScope.launch {
+            call.observeConnect()
+                .collect {
+                    when (it) {
+                        is SessionEvent.Connected -> {}
+                        is SessionEvent.Disconnected -> {}
+                        is SessionEvent.Error -> {}
+                        is SessionEvent.StreamDropped -> {}
+                        is SessionEvent.StreamReceived -> {}
+                    }
+                    Log.d("XXX", "ViewModel received $it")
+                }
+        }
+    }
+
+    fun onToggleMic() {
+
+    }
+
+    fun onToggleCamera() {
+
+    }
+
+    fun onToggleParticipants() {
+
     }
 
     fun endCall() {

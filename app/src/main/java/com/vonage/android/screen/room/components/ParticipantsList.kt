@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.Participant
+import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.components.AvatarInitials
 import com.vonage.android.screen.waiting.previewCamera
 import kotlinx.collections.immutable.ImmutableList
@@ -41,7 +41,7 @@ fun ParticipantsList(
     ) {
         item {
             Text(
-                modifier = Modifier.padding(bottom = 8.dp),
+                modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
                 text = "Participants",
                 color = MaterialTheme.colorScheme.inverseSurface,
                 style = MaterialTheme.typography.titleLarge,

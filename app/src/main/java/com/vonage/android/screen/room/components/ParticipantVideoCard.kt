@@ -133,7 +133,7 @@ internal fun ParticipantVideoCardPreview() {
         ParticipantVideoCard(
             name = "Sample Name",
             isCameraEnabled = true,
-            isMicEnabled = false,
+            isMicEnabled = true,
             view = previewCamera(),
         )
     }

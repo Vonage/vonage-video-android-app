@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -20,23 +21,32 @@ fun MeetingRoomScreenRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.init(context, roomName)
+        viewModel.init(roomName)
+    }
+
+    val actions = remember {
+        MeetingRoomActions(
+            onToggleMic = viewModel::onToggleMic,
+            onToggleCamera = viewModel::onToggleCamera,
+            onToggleParticipants = viewModel::onToggleParticipants,
+            onEndCall = {
+                viewModel.endCall()
+                navigateToGoodBye()
+            }
+        )
     }
 
     MeetingRoomScreen(
         modifier = modifier,
+        actions = actions,
         uiState = uiState,
-        onEndCall = {
-            viewModel.endCall()
-            navigateToGoodBye()
-        }
     )
 }
 
 @Stable
 data class MeetingRoomActions(
-    val onUserNameChange: (String) -> Unit = {},
-    val onJoinRoom: (String) -> Unit = {},
-    val onMicToggle: () -> Unit = {},
-    val onCameraToggle: () -> Unit = {},
+    val onToggleMic: () -> Unit,
+    val onToggleCamera: () -> Unit,
+    val onToggleParticipants: () -> Unit,
+    val onEndCall: () -> Unit,
 )

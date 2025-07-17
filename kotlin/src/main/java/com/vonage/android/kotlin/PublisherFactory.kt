@@ -3,6 +3,7 @@ package com.vonage.android.kotlin
 import android.content.Context
 import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.Publisher
+import com.vonage.android.kotlin.model.VeraPublisher
 
 class PublisherFactory {
 

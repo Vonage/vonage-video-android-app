@@ -23,11 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.Participant
-import com.vonage.android.kotlin.VeraPublisher
+import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.components.BottomBar
 import com.vonage.android.screen.room.components.ParticipantVideoCard
 import com.vonage.android.screen.room.components.ParticipantsList
@@ -38,11 +37,8 @@ import kotlinx.collections.immutable.ImmutableList
 @Composable
 fun MeetingRoomScreen(
     uiState: RoomUiState,
+    actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
-    onEndCall: () -> Unit = {},
-    onToggleMic: () -> Unit = {},
-    onToggleCamera: () -> Unit = {},
-    onToggleParticipants: () -> Unit = {},
 ) {
 
     val sheetState = rememberModalBottomSheetState()
@@ -54,11 +50,7 @@ fun MeetingRoomScreen(
             val publisher = participants.filterIsInstance<VeraPublisher>().firstOrNull()
 
             Scaffold(
-                topBar = {
-                    TopBar(
-                        roomName = uiState.roomName,
-                    )
-                },
+                topBar = { TopBar(roomName = uiState.roomName) },
             ) { contentPadding ->
                 Box(
                     modifier = modifier
@@ -75,29 +67,19 @@ fun MeetingRoomScreen(
 
                     if (showBottomSheet) {
                         ModalBottomSheet(
-                            onDismissRequest = {
-                                showBottomSheet = false
-                            },
+                            onDismissRequest = { showBottomSheet = false },
                             sheetState = sheetState,
                         ) {
-                            ParticipantsList(
-                                participants = participants,
-                            )
+                            ParticipantsList(participants = participants)
                         }
                     }
 
                     BottomBar(
                         modifier = Modifier.align(Alignment.BottomCenter),
-                        onToggleMic = {
-                            publisher?.toggleAudio()
-                        },
-                        onToggleCamera = {
-                            publisher?.toggleVideo()
-                        },
-                        onToggleParticipants = {
-                            showBottomSheet = !showBottomSheet
-                        },
-                        onEndCall = onEndCall,
+                        onToggleMic = actions.onToggleMic,
+                        onToggleCamera = actions.onToggleCamera,
+                        onToggleParticipants = { showBottomSheet = !showBottomSheet },
+                        onEndCall = actions.onEndCall,
                         isMicEnabled = publisher?.isMicEnabled ?: false,
                         isCameraEnabled = publisher?.isCameraEnabled ?: false,
                         participantsCount = participants.size,
@@ -143,26 +125,5 @@ fun VideoContent(
                 view = participant.view,
             )
         }
-    }
-}
-
-@PreviewLightDark
-@Composable
-fun VideoCallScreenPreview() {
-//    object : Participant {
-//        override var name: String = "John Doe"
-//        override val isMicEnabled: Boolean = true
-//        override val isCameraEnabled: Boolean = false
-//        override val view: View = previewCamera()
-//        override fun toggleAudio(): Boolean = true
-//        override fun toggleVideo(): Boolean = true
-//    }
-    VonageVideoTheme {
-//        VideoCallScreen(
-//            uiState = RoomUiState.Content(
-//                roomName = "sample-name",
-//                call =
-//            )
-//        )
     }
 }

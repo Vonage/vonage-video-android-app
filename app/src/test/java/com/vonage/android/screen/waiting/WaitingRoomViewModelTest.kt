@@ -2,7 +2,7 @@ package com.vonage.android.screen.waiting
 
 import app.cash.turbine.test
 import com.vonage.android.data.UserRepository
-import com.vonage.android.kotlin.Participant
+import com.vonage.android.kotlin.model.Participant
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
