@@ -36,7 +36,7 @@ import kotlinx.collections.immutable.ImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VideoCallScreen(
+fun MeetingRoomScreen(
     uiState: RoomUiState,
     modifier: Modifier = Modifier,
     onEndCall: () -> Unit = {},

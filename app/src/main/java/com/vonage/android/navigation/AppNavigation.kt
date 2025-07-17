@@ -12,7 +12,7 @@ sealed class NavigationItem(val route: String) {
     data object WaitingRoom : NavigationItem("waiting-room/{roomName}") {
         fun createRoute(roomName: String) = "waiting-room/$roomName"
     }
-    data object Room : NavigationItem("room/{roomName}") {
+    data object MeetingRoom : NavigationItem("room/{roomName}") {
         fun createRoute(roomName: String) = "room/$roomName"
     }
     data object GoodbyeRoom : NavigationItem(Screen.GOODBYE.name)

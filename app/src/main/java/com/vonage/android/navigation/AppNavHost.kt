@@ -10,7 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.vonage.android.screen.GoodbyeScreen
 import com.vonage.android.screen.join.JoinMeetingRoomRoute
-import com.vonage.android.screen.room.RoomScreenRoute
+import com.vonage.android.screen.room.MeetingRoomScreenRoute
 import com.vonage.android.screen.waiting.WaitingRoomRoute
 import com.vonage.android.util.navigateToSystemPermissions
 
@@ -48,7 +48,7 @@ fun AppNavHost(
                 roomName = roomName.toString(),
                 navigateToRoom = { roomName ->
                     navController.navigate(
-                        NavigationItem.Room.createRoute(
+                        NavigationItem.MeetingRoom.createRoute(
                             roomName = roomName,
                         )
                     )
@@ -59,13 +59,13 @@ fun AppNavHost(
             )
         }
         composable(
-            route = NavigationItem.Room.route,
+            route = NavigationItem.MeetingRoom.route,
             arguments = listOf(
                 navArgument("roomName") { type = NavType.StringType },
             ),
         ) { backStackEntry ->
             val roomName = backStackEntry.arguments?.getString("roomName")
-            RoomScreenRoute(
+            MeetingRoomScreenRoute(
                 roomName = roomName.toString(),
                 navigateToGoodBye = {
                     navController.navigate(NavigationItem.GoodbyeRoom.route)

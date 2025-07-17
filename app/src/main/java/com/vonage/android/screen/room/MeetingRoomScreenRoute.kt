@@ -10,10 +10,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun RoomScreenRoute(
+fun MeetingRoomScreenRoute(
     roomName: String,
     modifier: Modifier = Modifier,
-    viewModel: RoomScreenViewModel = hiltViewModel(),
+    viewModel: MeetingRoomScreenViewModel = hiltViewModel(),
     navigateToGoodBye: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -23,7 +23,7 @@ fun RoomScreenRoute(
         viewModel.init(context, roomName)
     }
 
-    VideoCallScreen(
+    MeetingRoomScreen(
         modifier = modifier,
         uiState = uiState,
         onEndCall = {
@@ -34,7 +34,7 @@ fun RoomScreenRoute(
 }
 
 @Stable
-data class RoomActions(
+data class MeetingRoomActions(
     val onUserNameChange: (String) -> Unit = {},
     val onJoinRoom: (String) -> Unit = {},
     val onMicToggle: () -> Unit = {},

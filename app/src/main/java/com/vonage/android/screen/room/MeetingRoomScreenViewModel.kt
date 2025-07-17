@@ -1,7 +1,6 @@
 package com.vonage.android.screen.room
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.SessionInfo
@@ -17,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RoomScreenViewModel @Inject constructor(
+class MeetingRoomScreenViewModel @Inject constructor(
     private val createPublisherUseCase: CreatePublisherUseCase,
     private val sessionRepository: SessionRepository,
 ) : ViewModel() {
