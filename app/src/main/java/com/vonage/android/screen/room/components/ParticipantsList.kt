@@ -4,7 +4,6 @@ import android.view.View
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -54,10 +53,10 @@ fun ParticipantsList(
         ) { participant ->
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 4.dp, end = 8.dp),
+                    .padding(bottom = 4.dp, end = 8.dp)
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
+                horizontalArrangement = Arrangement.Start,
             ) {
                 AvatarInitials(
                     modifier = Modifier
@@ -68,15 +67,14 @@ fun ParticipantsList(
                 )
                 Text(
                     modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
+                        .padding(end = 8.dp)
+                        .weight(1f),
                     text = participant.name,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.inverseSurface,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelLarge,
                 )
-                Spacer(modifier = Modifier.weight(1f))
                 if (!participant.isMicEnabled) {
                     Icon(
                         Icons.Default.MicOff,

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -12,6 +13,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -41,67 +43,75 @@ fun VideoCallScreen(
     onToggleMic: () -> Unit = {},
     onToggleCamera: () -> Unit = {},
     onToggleParticipants: () -> Unit = {},
-    isMicEnabled: Boolean = false,
-    isCameraEnabled: Boolean = true,
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(VonageVideoTheme.colors.background)
-    ) {
 
-        val sheetState = rememberModalBottomSheetState()
-        var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
 
-        when (uiState) {
-            is RoomUiState.Content -> {
-                TopBar(
-                    roomName = uiState.roomName,
-                    modifier = Modifier.align(Alignment.TopStart)
-                )
+    when (uiState) {
+        is RoomUiState.Content -> {
+            val participants by uiState.call.participantsStateFlow.collectAsState()
+            val publisher = participants.filterIsInstance<VeraPublisher>().firstOrNull()
 
-                val participants by uiState.call.participantsStateFlow.collectAsState()
-                val publisher = participants.filterIsInstance<VeraPublisher>().firstOrNull()
+            Scaffold(
+                topBar = {
+                    TopBar(
+                        roomName = uiState.roomName,
+                    )
+                },
+            ) { contentPadding ->
+                Box(
+                    modifier = modifier
+                        .padding(top = 24.dp)
+                        .consumeWindowInsets(contentPadding)
+                        .fillMaxSize()
+                ) {
+                    VideoContent(
+                        participants = participants,
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(top = 64.dp)
+                    )
 
-                VideoContent(
-                    participants = participants,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(top = 64.dp)
-                )
-
-                if (showBottomSheet) {
-                    ModalBottomSheet(
-                        onDismissRequest = {
-                            showBottomSheet = false
-                        },
-                        sheetState = sheetState,
-                    ) {
-                        ParticipantsList(
-                            participants = participants,
-                        )
+                    if (showBottomSheet) {
+                        ModalBottomSheet(
+                            onDismissRequest = {
+                                showBottomSheet = false
+                            },
+                            sheetState = sheetState,
+                        ) {
+                            ParticipantsList(
+                                participants = participants,
+                            )
+                        }
                     }
+
+                    BottomBar(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        onToggleMic = {
+                            publisher?.toggleAudio()
+                        },
+                        onToggleCamera = {
+                            publisher?.toggleVideo()
+                        },
+                        onToggleParticipants = {
+                            showBottomSheet = !showBottomSheet
+                        },
+                        onEndCall = onEndCall,
+                        isMicEnabled = publisher?.isMicEnabled ?: false,
+                        isCameraEnabled = publisher?.isCameraEnabled ?: false,
+                        participantsCount = participants.size,
+                    )
                 }
-
-                BottomBar(
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    onToggleMic = {
-                        publisher?.toggleAudio()
-                    },
-                    onToggleCamera = {
-                        publisher?.toggleVideo()
-                    },
-                    onToggleParticipants = {
-                        showBottomSheet = !showBottomSheet
-                    },
-                    onEndCall = onEndCall,
-                    isMicEnabled = publisher?.isMicEnabled ?: false,
-                    isCameraEnabled = publisher?.isCameraEnabled ?: false,
-                    participantsCount = participants.size,
-                )
             }
+        }
 
-            is RoomUiState.Loading -> {
+        is RoomUiState.Loading -> {
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(VonageVideoTheme.colors.background)
+            ) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center)
                 )
