@@ -4,6 +4,7 @@ import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,6 +25,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vonage.android.compose.components.VideoRenderer
@@ -37,12 +39,10 @@ fun ParticipantVideoCard(
     isMicEnabled: Boolean,
     name: String,
     view: View,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier
-            .aspectRatio(16f / 9f)
-            .fillMaxWidth(),
+        modifier = modifier,
         shape = RoundedCornerShape(8.dp),
     ) {
         Box(
@@ -52,8 +52,7 @@ fun ParticipantVideoCard(
             if (isCameraEnabled) {
                 VideoRenderer(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp)
+                        .fillMaxSize()
                         .clipToBounds(),
                     view = view,
                 )
@@ -131,6 +130,7 @@ fun ParticipantVideoCard(
 internal fun ParticipantVideoCardPreview() {
     VonageVideoTheme {
         ParticipantVideoCard(
+            modifier = Modifier.height(300.dp),
             name = "Sample Name",
             isCameraEnabled = true,
             isMicEnabled = true,
@@ -144,6 +144,7 @@ internal fun ParticipantVideoCardPreview() {
 internal fun ParticipantVideoCardPlaceholderPreview() {
     VonageVideoTheme {
         ParticipantVideoCard(
+            modifier = Modifier.height(300.dp),
             name = "Sample Name Name Name Name Name Name Name Name Name Name",
             isCameraEnabled = false,
             isMicEnabled = false,
