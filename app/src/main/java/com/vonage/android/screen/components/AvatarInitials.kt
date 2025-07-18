@@ -1,17 +1,18 @@
 package com.vonage.android.screen.components
 
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,22 +33,18 @@ fun AvatarInitials(
     size: Dp = 96.dp,
     textStyle: TextStyle = MaterialTheme.typography.displayMedium,
 ) {
+    val color = remember(userName) { userName.getParticipantColor() }
+    val initials = remember(userName) { mutableStateOf(userName.getInitials()) }
+
     Box(
-        modifier = modifier.size(size),
+        modifier = modifier
+            .size(size)
+            .clip(CircleShape)
+            .background(color)
+            .testTag(USER_INITIALS_CIRCLE_TAG),
         contentAlignment = Alignment.Center,
     ) {
-        val color = remember(userName) { userName.getParticipantColor() }
-        val initials = remember(userName) { userName.getInitials() }
-
-        Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .testTag(USER_INITIALS_CIRCLE_TAG),
-        ) {
-            drawCircle(SolidColor(color))
-        }
-
-        if (initials.isEmpty()) {
+        if (initials.value.isEmpty()) {
             PersonIcon(
                 modifier = Modifier.testTag(USER_INITIALS_ICON_TAG),
                 size = 56.dp,
@@ -56,7 +53,7 @@ fun AvatarInitials(
         } else {
             Text(
                 modifier = Modifier.testTag(USER_INITIALS_TEXT_TAG),
-                text = initials,
+                text = initials.value,
                 style = textStyle,
                 color = Color.White,
             )
