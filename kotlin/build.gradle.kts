@@ -29,10 +29,7 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    //implementation(libs.opentok.android.sdk)
-    implementation(files("libs/opentok-android-sdk-debug-2.32.0.aar"))
-    implementation("com.google.guava:guava:31.1-android")
-    implementation("com.vonage:webrtc:121.1.97")
+    implementation(libs.opentok.android.sdk)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.runtime.android)
     implementation(libs.kotlinx.collections.immutable)
