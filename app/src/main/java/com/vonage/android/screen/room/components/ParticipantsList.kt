@@ -1,6 +1,7 @@
 package com.vonage.android.screen.room.components
 
 import android.view.View
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,9 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.components.AvatarInitials
@@ -42,7 +45,7 @@ fun ParticipantsList(
         item {
             Text(
                 modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
-                text = "Participants",
+                text = stringResource(R.string.participants),
                 color = MaterialTheme.colorScheme.inverseSurface,
                 style = MaterialTheme.typography.titleLarge,
             )
@@ -95,10 +98,10 @@ fun ParticipantsList(
     }
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 internal fun ParticipantsListPreview() {
-    val p = object : Participant {
+    val sampleParticipant = object : Participant {
         override val id: String = Random(10).toString()
         override var name: String = "Name Sample"
         override val isMicEnabled: Boolean = false
@@ -107,9 +110,9 @@ internal fun ParticipantsListPreview() {
         override fun toggleAudio(): Boolean = true
         override fun toggleVideo(): Boolean = true
     }
-    val p2 = object : Participant {
+    val sampleParticipant2 = object : Participant {
         override val id: String = Random(10).toString()
-        override var name: String = "Name Sample Sample Sample Sample Sample Sample Sample Sample Sample Sample Sample"
+        override var name: String = "A Name Sample Sample Sample Sample Sample Sample Sample Sample Sample Sample Sample"
         override val isMicEnabled: Boolean = true
         override val isCameraEnabled: Boolean = true
         override val view: View = previewCamera()
@@ -119,9 +122,10 @@ internal fun ParticipantsListPreview() {
 
     VonageVideoTheme {
         ParticipantsList(
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface),
             participants = persistentListOf(
-                p,
-                p2,
+                sampleParticipant,
+                sampleParticipant2,
             )
         )
     }
