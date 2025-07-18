@@ -73,7 +73,7 @@ class MeetingRoomScreenViewModel @Inject constructor(
     }
 
     fun onToggleParticipants() {
-
+        // toggle participant list show flag
     }
 
     fun endCall() {

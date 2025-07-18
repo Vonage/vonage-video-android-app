@@ -27,11 +27,14 @@ import com.vonage.android.screen.components.AvatarInitials
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
+const val DEFAULT_OVERLAP_SPACE = -8
+
 @Composable
 fun ParticipantsPlaceholders(
     participantNames: ImmutableList<String>,
     modifier: Modifier = Modifier,
     maxVisiblePlaceholders: Int = 2,
+    spacedBy: Dp = DEFAULT_OVERLAP_SPACE.dp,
 ) {
     val visiblePlaceholders = participantNames.take(maxVisiblePlaceholders)
     val additionalCount = participantNames.size - maxVisiblePlaceholders
@@ -41,10 +44,10 @@ fun ParticipantsPlaceholders(
         shape = RoundedCornerShape(8.dp),
     ) {
         Row(
-            modifier = modifier
+            modifier = Modifier
                 .padding(8.dp)
                 .wrapContentSize(),
-            horizontalArrangement = Arrangement.spacedBy((-8).dp), // Overlap
+            horizontalArrangement = Arrangement.spacedBy(spacedBy), // Overlap
             verticalAlignment = Alignment.CenterVertically
         ) {
             visiblePlaceholders.forEachIndexed { index, participant ->
@@ -69,11 +72,12 @@ fun ParticipantsPlaceholders(
 @Composable
 fun AdditionalParticipantsAvatar(
     count: Int,
+    modifier: Modifier = Modifier,
     zIndex: Float = 0f,
-    size: Dp = 96.dp
+    size: Dp = 96.dp, // move to theme
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .zIndex(zIndex)
             .size(size)
             .background(Color.Gray, CircleShape)
@@ -90,7 +94,7 @@ fun AdditionalParticipantsAvatar(
 
 @PreviewLightDark
 @Composable
-fun ParticipantsPlaceholdersPreview() {
+internal fun ParticipantsPlaceholdersPreview() {
     VonageVideoTheme {
         ParticipantsPlaceholders(
             participantNames = persistentListOf(

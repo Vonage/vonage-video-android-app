@@ -3,10 +3,8 @@ package com.vonage.android.screen.room.components
 import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -25,7 +23,6 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vonage.android.compose.components.VideoRenderer
@@ -47,7 +44,7 @@ fun ParticipantVideoCard(
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             if (isCameraEnabled) {
                 VideoRenderer(
@@ -64,63 +61,79 @@ fun ParticipantVideoCard(
                 )
             }
 
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(4.dp)
-                    .background(
-                        Color.Black.copy(alpha = 0.6f),
-                        RoundedCornerShape(8.dp)
-                    )
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            ) {
-                Text(
-                    text = name,
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                )
-            }
+            ParticipantLabel(name)
 
-            if (!isMicEnabled) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(12.dp)
-                        .background(
-                            Color.Black.copy(alpha = 0.6f),
-                            CircleShape
-                        )
-                        .padding(6.dp)
-                ) {
-                    Icon(
-                        Icons.Default.MicOff,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            } else {
-                // change this to voice indicator when is publisher
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(12.dp)
-                        .background(
-                            Color.Black.copy(alpha = 0.6f),
-                            CircleShape
-                        )
-                        .padding(6.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Mic,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
+            MicrophoneIndicator(isMicEnabled)
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.ParticipantLabel(
+    name: String,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .align(Alignment.BottomStart)
+            .padding(4.dp)
+            .background(
+                Color.Black.copy(alpha = 0.6f),
+                RoundedCornerShape(8.dp)
+            )
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = name,
+            color = Color.White,
+            fontSize = 12.sp,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+        )
+    }
+}
+
+@Composable
+private fun BoxScope.MicrophoneIndicator(
+    isMicEnabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    if (!isMicEnabled) {
+        Box(
+            modifier = modifier
+                .align(Alignment.TopEnd)
+                .padding(12.dp)
+                .background(
+                    Color.Black.copy(alpha = 0.6f),
+                    CircleShape
+                )
+                .padding(6.dp)
+        ) {
+            Icon(
+                Icons.Default.MicOff,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+    } else {
+        // change this to voice indicator when is publisher
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(12.dp)
+                .background(
+                    Color.Black.copy(alpha = 0.6f),
+                    CircleShape
+                )
+                .padding(6.dp)
+        ) {
+            Icon(
+                Icons.Default.Mic,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }

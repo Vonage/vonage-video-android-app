@@ -1,6 +1,7 @@
 package com.vonage.android.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
@@ -15,6 +16,7 @@ import com.vonage.android.screen.waiting.WaitingRoomRoute
 import com.vonage.android.util.navigateToShare
 import com.vonage.android.util.navigateToSystemPermissions
 
+@Suppress("LongMethod") // will refactored in VIDSOL-104
 @Composable
 fun AppNavHost(
     navController: NavHostController,

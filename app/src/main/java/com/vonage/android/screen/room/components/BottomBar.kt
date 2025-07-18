@@ -27,13 +27,12 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.ControlButton
+import com.vonage.android.screen.room.MeetingRoomActions
 
 @Composable
 fun BottomBar(
-    onToggleMic: () -> Unit,
-    onToggleCamera: () -> Unit,
+    actions: MeetingRoomActions,
     onToggleParticipants: () -> Unit,
-    onEndCall: () -> Unit,
     isMicEnabled: Boolean,
     isCameraEnabled: Boolean,
     participantsCount: Int,
@@ -52,13 +51,13 @@ fun BottomBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ControlButton(
-                onClick = onToggleMic,
+                onClick = actions.onToggleMic,
                 icon = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
                 isActive = isMicEnabled,
             )
 
             ControlButton(
-                onClick = onToggleCamera,
+                onClick = actions.onToggleCamera,
                 icon = if (isCameraEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
                 isActive = isCameraEnabled,
             )
@@ -89,7 +88,7 @@ fun BottomBar(
             ControlButton(
                 modifier = Modifier
                     .background(Color.Red, CircleShape),
-                onClick = onEndCall,
+                onClick = actions.onEndCall,
                 icon = Icons.Default.CallEnd,
                 isActive = true,
             )
@@ -99,13 +98,17 @@ fun BottomBar(
 
 @PreviewLightDark
 @Composable
-fun BottomBarPreview() {
+internal fun BottomBarPreview() {
     VonageVideoTheme {
         BottomBar(
-            onToggleMic = {},
-            onToggleCamera = {},
+            actions = MeetingRoomActions(
+                onShare = { },
+                onToggleMic = { },
+                onToggleCamera = { },
+                onToggleParticipants = { },
+                onEndCall = { },
+            ),
             onToggleParticipants = {},
-            onEndCall = {},
             isMicEnabled = false,
             isCameraEnabled = true,
             participantsCount = 25,

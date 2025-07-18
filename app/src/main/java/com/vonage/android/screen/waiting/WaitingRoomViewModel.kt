@@ -66,7 +66,7 @@ class WaitingRoomViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.saveUserName(userName)
             videoClient.configurePublisher(PublisherConfig(
-                name = participant.name,
+                name = userName,
                 publishVideo = participant.isCameraEnabled,
                 publishAudio = participant.isMicEnabled,
             ))

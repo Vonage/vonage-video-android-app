@@ -54,52 +54,58 @@ fun ParticipantsList(
             items = participants,
             key = { participant -> participant.id }
         ) { participant ->
-            Row(
-                modifier = Modifier
-                    .padding(bottom = 4.dp, end = 8.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-            ) {
-                AvatarInitials(
-                    modifier = Modifier
-                        .padding(vertical = 4.dp, horizontal = 8.dp),
-                    size = 24.dp,
-                    userName = participant.name,
-                    textStyle = MaterialTheme.typography.labelSmall,
-                )
-                Text(
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .weight(1f),
-                    text = participant.name,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.inverseSurface,
-                    style = MaterialTheme.typography.labelLarge,
-                )
-                if (!participant.isMicEnabled) {
-                    Icon(
-                        Icons.Default.MicOff,
-                        contentDescription = "Muted",
-                        tint = MaterialTheme.colorScheme.inverseSurface,
-                        modifier = Modifier.size(16.dp)
-                    )
-                } else {
-                    Icon(
-                        Icons.Default.Mic,
-                        contentDescription = "Muted",
-                        tint = MaterialTheme.colorScheme.inverseSurface,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
+            ParticipantRow(participant)
+        }
+    }
+}
+
+@Composable
+private fun ParticipantRow(participant: Participant) {
+    Row(
+        modifier = Modifier
+            .padding(bottom = 4.dp, end = 8.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start,
+    ) {
+        AvatarInitials(
+            modifier = Modifier
+                .padding(vertical = 4.dp, horizontal = 8.dp),
+            size = 24.dp,
+            userName = participant.name,
+            textStyle = MaterialTheme.typography.labelSmall,
+        )
+        Text(
+            modifier = Modifier
+                .padding(end = 8.dp)
+                .weight(1f),
+            text = participant.name,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colorScheme.inverseSurface,
+            style = MaterialTheme.typography.labelLarge,
+        )
+        if (!participant.isMicEnabled) {
+            Icon(
+                Icons.Default.MicOff,
+                contentDescription = "Muted",
+                tint = MaterialTheme.colorScheme.inverseSurface,
+                modifier = Modifier.size(16.dp)
+            )
+        } else {
+            Icon(
+                Icons.Default.Mic,
+                contentDescription = "Muted",
+                tint = MaterialTheme.colorScheme.inverseSurface,
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }
 
 @PreviewLightDark
 @Composable
+@Suppress("MagicNumber")
 internal fun ParticipantsListPreview() {
     val sampleParticipant = object : Participant {
         override val id: String = Random(10).toString()
@@ -112,7 +118,7 @@ internal fun ParticipantsListPreview() {
     }
     val sampleParticipant2 = object : Participant {
         override val id: String = Random(10).toString()
-        override var name: String = "A Name Sample Sample Sample Sample Sample Sample Sample Sample Sample Sample Sample"
+        override var name: String = "A Name Sample Very Long"
         override val isMicEnabled: Boolean = true
         override val isCameraEnabled: Boolean = true
         override val view: View = previewCamera()
