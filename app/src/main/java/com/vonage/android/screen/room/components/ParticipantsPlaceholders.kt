@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,9 +38,13 @@ fun ParticipantsPlaceholders(
     val visiblePlaceholders = participantNames.take(maxVisiblePlaceholders)
     val additionalCount = participantNames.size - maxVisiblePlaceholders
 
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
+    Box(
+        modifier = modifier
+            .background(
+                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                shape = RoundedCornerShape(8.dp),
+            ),
+        contentAlignment = Alignment.Center,
     ) {
         Row(
             modifier = Modifier

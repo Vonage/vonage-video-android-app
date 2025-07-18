@@ -98,43 +98,22 @@ private fun BoxScope.MicrophoneIndicator(
     isMicEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    if (!isMicEnabled) {
-        Box(
-            modifier = modifier
-                .align(Alignment.TopEnd)
-                .padding(12.dp)
-                .background(
-                    Color.Black.copy(alpha = 0.6f),
-                    CircleShape
-                )
-                .padding(6.dp)
-        ) {
-            Icon(
-                Icons.Default.MicOff,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(16.dp)
+    Box(
+        modifier = modifier
+            .align(Alignment.TopEnd)
+            .padding(12.dp)
+            .background(
+                Color.Black.copy(alpha = 0.6f),
+                CircleShape
             )
-        }
-    } else {
-        // change this to voice indicator when is publisher
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(12.dp)
-                .background(
-                    Color.Black.copy(alpha = 0.6f),
-                    CircleShape
-                )
-                .padding(6.dp)
-        ) {
-            Icon(
-                Icons.Default.Mic,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(16.dp)
-            )
-        }
+            .padding(6.dp)
+    ) {
+        Icon(
+            imageVector = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(16.dp)
+        )
     }
 }
 
