@@ -17,12 +17,14 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.screen.room.MeetingRoomActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
     roomName: String,
-    modifier: Modifier = Modifier
+    actions: MeetingRoomActions,
+    modifier: Modifier = Modifier,
 ) {
     TopAppBar(
         modifier = modifier,
@@ -38,10 +40,14 @@ fun TopBar(
             )
         },
         actions = {
-            IconButton(onClick = { /* Handle copy room link */ }) {
+            IconButton(
+                onClick = {
+                    actions.onShare(roomName)
+                }
+            ) {
                 Icon(
                     Icons.Default.Share,
-                    contentDescription = "Copy room link",
+                    contentDescription = "Share room link",
                     tint = MaterialTheme.colorScheme.inverseSurface,
                     modifier = Modifier.size(20.dp)
                 )
@@ -55,7 +61,14 @@ fun TopBar(
 internal fun TopBarPreview() {
     VonageVideoTheme {
         TopBar(
-            roomName = "sample-name"
+            roomName = "sample-name",
+            actions = MeetingRoomActions(
+                onShare = { },
+                onToggleMic = { },
+                onToggleCamera = { },
+                onToggleParticipants = { },
+                onEndCall = { },
+            )
         )
     }
 }

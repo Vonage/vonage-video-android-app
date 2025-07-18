@@ -12,6 +12,7 @@ import com.vonage.android.screen.GoodbyeScreen
 import com.vonage.android.screen.join.JoinMeetingRoomRoute
 import com.vonage.android.screen.room.MeetingRoomScreenRoute
 import com.vonage.android.screen.waiting.WaitingRoomRoute
+import com.vonage.android.util.navigateToShare
 import com.vonage.android.util.navigateToSystemPermissions
 
 @Composable
@@ -54,7 +55,7 @@ fun AppNavHost(
                     )
                 },
                 navigateToPermissions = {
-                    navigateToSystemPermissions(context)
+                    context.navigateToSystemPermissions()
                 },
             )
         }
@@ -69,7 +70,10 @@ fun AppNavHost(
                 roomName = roomName.toString(),
                 navigateToGoodBye = {
                     navController.navigate(NavigationItem.GoodbyeRoom.route)
-                }
+                },
+                navigateToShare = { roomName ->
+                    context.navigateToShare(roomName)
+                },
             )
         }
         composable(
