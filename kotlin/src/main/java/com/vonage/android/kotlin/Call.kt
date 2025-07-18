@@ -1,12 +1,9 @@
 package com.vonage.android.kotlin
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.Stable
 import com.opentok.android.OpentokError
 import com.opentok.android.Publisher
-import com.opentok.android.PublisherKit
-import com.opentok.android.PublisherKit.PublisherListener
 import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
@@ -40,21 +37,7 @@ class Call(
     private val participants = ArrayList<Participant>()
     private val participantStreams = HashMap<String, Participant>()
 
-    private val publisherListener: PublisherListener = object : PublisherListener {
-        override fun onStreamCreated(publisherKit: PublisherKit, stream: Stream) {
-            Log.d(TAG, "onStreamCreated: Publisher Stream Created. Own stream " + stream.streamId)
-        }
-
-        override fun onStreamDestroyed(publisherKit: PublisherKit, stream: Stream) {
-            Log.d(TAG, "onStreamDestroyed: Publisher Stream Destroyed. Own stream " + stream.streamId)
-        }
-
-        override fun onError(publisherKit: PublisherKit, opentokError: OpentokError) {
-            Log.e(TAG, "PublisherKit onError: " + opentokError.message)
-        }
-    }
-
-    fun observeConnect(): Flow<SessionEvent> = callbackFlow {
+    fun connect(): Flow<SessionEvent> = callbackFlow {
         val sessionListener = object : Session.SessionListener {
             override fun onConnected(session: Session) {
                 val publisher = defaultPublisher()
@@ -122,6 +105,17 @@ class Call(
     fun end() {
         publisher.session?.disconnect()
         session.disconnect()
+    }
+
+    fun togglePublisherVideo() {
+//        publisher.publishVideo = !publisher.publishVideo
+//        val p = participantStreams["publisher-generated-uuid"]
+//        p?.toggleVideo()
+//        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+    }
+
+    fun togglePublisherAudio() {
+//        publisher.publishAudio = !publisher.publishAudio
     }
 
     private companion object {

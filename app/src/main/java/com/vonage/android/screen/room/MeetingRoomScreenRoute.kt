@@ -16,6 +16,7 @@ fun MeetingRoomScreenRoute(
     modifier: Modifier = Modifier,
     viewModel: MeetingRoomScreenViewModel = hiltViewModel(),
     navigateToGoodBye: () -> Unit,
+    navigateToShare: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -32,7 +33,8 @@ fun MeetingRoomScreenRoute(
             onEndCall = {
                 viewModel.endCall()
                 navigateToGoodBye()
-            }
+            },
+            onShare = navigateToShare,
         )
     }
 
@@ -45,6 +47,7 @@ fun MeetingRoomScreenRoute(
 
 @Stable
 data class MeetingRoomActions(
+    val onShare: (String) -> Unit,
     val onToggleMic: () -> Unit,
     val onToggleCamera: () -> Unit,
     val onToggleParticipants: () -> Unit,

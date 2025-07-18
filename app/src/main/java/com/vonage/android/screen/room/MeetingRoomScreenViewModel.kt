@@ -1,6 +1,5 @@
 package com.vonage.android.screen.room
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -50,9 +49,8 @@ class MeetingRoomScreenViewModel @Inject constructor(
             sessionId = sessionInfo.sessionId,
             token = sessionInfo.token,
         )
-//        call.connect()
         viewModelScope.launch {
-            call.observeConnect()
+            call.connect()
                 .collect {
                     when (it) {
                         is SessionEvent.Connected -> {}
@@ -67,11 +65,11 @@ class MeetingRoomScreenViewModel @Inject constructor(
     }
 
     fun onToggleMic() {
-
+        call.togglePublisherAudio()
     }
 
     fun onToggleCamera() {
-
+        call.togglePublisherVideo()
     }
 
     fun onToggleParticipants() {

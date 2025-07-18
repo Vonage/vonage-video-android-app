@@ -16,7 +16,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WaitingRoomViewModel @Inject constructor(
-    private val createPublisher: CreatePublisherUseCase,
     private val userRepository: UserRepository,
     private val videoClient: VonageVideoClient,
 ) : ViewModel() {
@@ -29,7 +28,7 @@ class WaitingRoomViewModel @Inject constructor(
 
     fun init(roomName: String) {
         this.roomName = roomName
-        participant = createPublisher()
+        participant = videoClient.buildPublisher()
         viewModelScope.launch {
             participant.name = userRepository.getUserName().orEmpty()
             _uiState.value = buildContentUiState(

@@ -2,6 +2,7 @@ package com.vonage.android.screen.waiting
 
 import app.cash.turbine.test
 import com.vonage.android.data.UserRepository
+import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.Participant
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -14,23 +15,23 @@ import kotlin.test.assertEquals
 
 class WaitingRoomViewModelTest {
 
-    val createPublisherUseCase: CreatePublisherUseCase = mockk()
+    val videoClient: VonageVideoClient = mockk()
     val userRepository: UserRepository = mockk()
     val sut = WaitingRoomViewModel(
-        createPublisher = createPublisherUseCase,
         userRepository = userRepository,
+        videoClient = videoClient,
     )
 
     val participant: Participant = mockk()
 
     @Test
     fun `given viewmodel when initialize then returns correct state`() = runTest {
-        every { createPublisherUseCase.invoke() } returns buildMockParticipant()
+//        every { createPublisherUseCase.invoke() } returns buildMockParticipant()
         coEvery { userRepository.getUserName() } returns ""
 
         sut.init("roomName")
 
-        verify { createPublisherUseCase.invoke() }
+//        verify { createPublisherUseCase.invoke() }
         sut.uiState.test {
             assertEquals(
                 WaitingRoomUiState.Content(
@@ -46,7 +47,7 @@ class WaitingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when update user name then returns correct state`() = runTest {
-        every { createPublisherUseCase.invoke() } returns buildMockParticipant()
+//        every { createPublisherUseCase.invoke() } returns buildMockParticipant()
         coEvery { userRepository.getUserName() } returns ""
 
         sut.init("roomName")
@@ -69,7 +70,7 @@ class WaitingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when mic toggle then returns correct state`() = runTest {
-        every { createPublisherUseCase.invoke() } returns buildMockParticipant()
+//        every { createPublisherUseCase.invoke() } returns buildMockParticipant()
         coEvery { userRepository.getUserName() } returns ""
 
         sut.init("roomName")
@@ -92,7 +93,7 @@ class WaitingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when camera toggle then returns correct state`() = runTest {
-        every { createPublisherUseCase.invoke() } returns buildMockParticipant()
+//        every { createPublisherUseCase.invoke() } returns buildMockParticipant()
         coEvery { userRepository.getUserName() } returns ""
 
         sut.init("roomName")
@@ -116,9 +117,9 @@ class WaitingRoomViewModelTest {
     @Test
     fun `given viewmodel with cached user name then returns correct state`() = runTest {
         coEvery { userRepository.getUserName() } returns "Cached user name"
-        every { createPublisherUseCase.invoke() } returns buildMockParticipant(
-            userName = "Cached user name"
-        )
+//        every { createPublisherUseCase.invoke() } returns buildMockParticipant(
+//            userName = "Cached user name"
+//        )
 
         sut.uiState.test {
             sut.init("roomName")
@@ -139,7 +140,7 @@ class WaitingRoomViewModelTest {
     fun `given viewmodel when join room then user name is cached`() = runTest {
         coEvery { userRepository.getUserName() } returns "initial"
         coEvery { userRepository.saveUserName(any()) } returns Unit
-        every { createPublisherUseCase.invoke() } returns buildMockParticipant()
+//        every { createPublisherUseCase.invoke() } returns buildMockParticipant()
 
         sut.uiState.test {
             awaitItem() // initial state

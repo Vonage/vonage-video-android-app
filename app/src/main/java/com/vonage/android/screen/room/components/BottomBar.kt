@@ -1,13 +1,10 @@
 package com.vonage.android.screen.room.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -17,20 +14,19 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.VideocamOff
+import androidx.compose.material.icons.filled.Window
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.screen.components.ControlButton
 
 @Composable
 fun BottomBar(
@@ -59,14 +55,18 @@ fun BottomBar(
                 onClick = onToggleMic,
                 icon = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
                 isActive = isMicEnabled,
-                contentDescription = if (isMicEnabled) "Mute" else "Unmute"
             )
 
             ControlButton(
                 onClick = onToggleCamera,
                 icon = if (isCameraEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
                 isActive = isCameraEnabled,
-                contentDescription = if (isCameraEnabled) "Turn off camera" else "Turn on camera"
+            )
+
+            ControlButton(
+                onClick = {},
+                icon = Icons.Default.Window,
+                isActive = false,
             )
 
             BadgedBox(
@@ -83,55 +83,17 @@ fun BottomBar(
                     onClick = onToggleParticipants,
                     icon = Icons.Default.Group,
                     isActive = true,
-                    contentDescription = "Participants"
                 )
             }
 
-            Box(
+            ControlButton(
                 modifier = Modifier
-                    .size(48.dp)
-                    .background(Color.Red, CircleShape)
-                    .clickable { onEndCall() },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    Icons.Default.CallEnd,
-                    contentDescription = "End call",
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun ControlButton(
-    onClick: () -> Unit,
-    icon: ImageVector,
-    isActive: Boolean,
-    contentDescription: String,
-    modifier: Modifier = Modifier
-) {
-    val iconColor = if (isActive) Color.White else Color.Gray
-
-    Box(
-        modifier = modifier
-            .size(48.dp)
-            .conditional(
-                isActive,
-                ifTrue = { background(Color.White.copy(alpha = 0.2f), CircleShape) },
-                ifFalse = { background(Color.Transparent, CircleShape) },
+                    .background(Color.Red, CircleShape),
+                onClick = onEndCall,
+                icon = Icons.Default.CallEnd,
+                isActive = true,
             )
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            tint = iconColor,
-            modifier = Modifier.size(24.dp),
-        )
+        }
     }
 }
 
