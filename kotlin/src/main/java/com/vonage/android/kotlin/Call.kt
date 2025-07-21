@@ -32,7 +32,6 @@ class Call internal constructor(
     private val _participantsStateFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
     val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
 
-    private val subscribers = ArrayList<Subscriber>()
     private val subscriberStreams = HashMap<String, Subscriber>()
     private val participantStreams = HashMap<String, Participant>()
 
@@ -89,9 +88,9 @@ class Call internal constructor(
             override fun onAudioDisabled(subscriber: SubscriberKit) {
                 Log.d(TAG, "Subscriber audio level changed - audio disabled")
                 subscriberStreams[subscriber.stream.streamId]?.let { subscriber ->
-                    val pa = participantStreams[subscriber.stream.streamId] as VeraSubscriber
-                    val paModified = pa.copy(isMicEnabled = false)
-                    participantStreams[subscriber.stream.streamId] = paModified
+                    val updatedParticipant = (participantStreams[subscriber.stream.streamId] as VeraSubscriber)
+                        .copy(isMicEnabled = false)
+                    participantStreams[subscriber.stream.streamId] = updatedParticipant
                     _participantsStateFlow.value = participantStreams.values.toImmutableList()
                 }
             }
@@ -100,9 +99,9 @@ class Call internal constructor(
                 Log.d(TAG, "Subscriber audio level changed - audio enabled")
                 val subs = subscriberStreams[subscriber.stream.streamId]
                 subs?.let {
-                    val pa = participantStreams[subs.stream.streamId] as VeraSubscriber
-                    val paModified = pa.copy(isMicEnabled = true)
-                    participantStreams[subs.stream.streamId] = paModified
+                    val updatedParticipant = (participantStreams[subs.stream.streamId] as VeraSubscriber)
+                        .copy(isMicEnabled = true)
+                    participantStreams[subs.stream.streamId] = updatedParticipant
                     _participantsStateFlow.value = participantStreams.values.toImmutableList()
                 }
             }
@@ -117,22 +116,20 @@ class Call internal constructor(
 
             override fun onVideoDisabled(subscriber: SubscriberKit, reason: String) {
                 Log.d(TAG, "Subscriber video disabled - reason $reason")
-                val subs = subscriberStreams[subscriber.stream.streamId]
-                subs?.let {
-                    val pa = participantStreams[subs.stream.streamId] as VeraSubscriber
-                    val paModified = pa.copy(isCameraEnabled = false)
-                    participantStreams[subs.stream.streamId] = paModified
+                subscriberStreams[subscriber.stream.streamId]?.let { subs ->
+                    val updatedParticipant = (participantStreams[subs.stream.streamId] as VeraSubscriber)
+                        .copy(isCameraEnabled = false)
+                    participantStreams[subs.stream.streamId] = updatedParticipant
                     _participantsStateFlow.value = participantStreams.values.toImmutableList()
                 }
             }
 
             override fun onVideoEnabled(subscriber: SubscriberKit, reason: String) {
                 Log.d(TAG, "Subscriber video disabled - reason $reason")
-                val subs = subscriberStreams[subscriber.stream.streamId]
-                subs?.let {
-                    val pa = participantStreams[subs.stream.streamId] as VeraSubscriber
-                    val paModified = pa.copy(isCameraEnabled = true)
-                    participantStreams[subs.stream.streamId] = paModified
+                subscriberStreams[subscriber.stream.streamId]?.let { subs ->
+                    val updatedParticipant = (participantStreams[subs.stream.streamId] as VeraSubscriber)
+                        .copy(isCameraEnabled = true)
+                    participantStreams[subs.stream.streamId] = updatedParticipant
                     _participantsStateFlow.value = participantStreams.values.toImmutableList()
                 }
             }
@@ -146,7 +143,6 @@ class Call internal constructor(
             }
         })
         session.subscribe(subscriber)
-        subscribers.add(subscriber)
         subscriberStreams[stream.streamId] = subscriber
 
         participantStreams[stream.streamId] = subscriber.toParticipant()
@@ -156,7 +152,6 @@ class Call internal constructor(
     private fun removeSubscriber(stream: Stream) {
         val subscriber = subscriberStreams[stream.streamId] ?: return
         subscriber.setVideoListener(null)
-        subscribers.remove(subscriber)
         subscriberStreams.remove(stream.streamId)
 
         participantStreams.remove(stream.streamId)
