@@ -13,9 +13,9 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 fun BasicAlertDialog(
     text: String,
     acceptLabel: String,
-    cancelLabel: String = stringResource(R.string.generic_cancel),
     onAccept: () -> Unit,
     onCancel: () -> Unit,
+    cancelLabel: String = stringResource(R.string.generic_cancel),
 ) {
     AlertDialog(
         text = {

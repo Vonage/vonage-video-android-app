@@ -9,10 +9,10 @@ import kotlin.random.Random
 @Composable
 fun buildParticipants(count: Int): List<Participant> {
     val participants = mutableListOf<Participant>()
-    (1..count).forEach {
+    for (i in 1..count) {
         val sampleParticipant = object : Participant {
-            override val id: String = Random(it).toString()
-            override var name: String = "Name Sample $it"
+            override val id: String = Random(i).toString()
+            override var name: String = "Name Sample $i"
             override val isMicEnabled: Boolean = false
             override val isCameraEnabled: Boolean = true
             override val view: View = previewCamera()

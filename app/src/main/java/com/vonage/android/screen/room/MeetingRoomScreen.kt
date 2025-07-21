@@ -162,6 +162,7 @@ internal fun MeetingRoomScreenSessionErrorPreview() {
     }
 }
 
+@Suppress("MagicNumber")
 @PreviewLightDark
 @Composable
 internal fun MeetingRoomScreenSessionPreview() {
