@@ -22,14 +22,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
+import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.components.AdaptiveGrid
-import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.screen.room.components.BottomBar
 import com.vonage.android.screen.room.components.ParticipantsList
 import com.vonage.android.screen.room.components.TopBar
+import com.vonage.android.util.preview.buildCallWithParticipants
 import kotlinx.collections.immutable.ImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -145,14 +146,7 @@ internal fun MeetingRoomScreenLoadingPreview() {
     VonageVideoTheme {
         MeetingRoomScreen(
             uiState = RoomUiState.Loading,
-            actions = MeetingRoomActions(
-                onShare = { },
-                onRetry = { },
-                onToggleMic = { },
-                onToggleCamera = { },
-                onToggleParticipants = { },
-                onEndCall = { }
-            ),
+            actions = MeetingRoomActions(),
         )
     }
 }
@@ -163,14 +157,21 @@ internal fun MeetingRoomScreenSessionErrorPreview() {
     VonageVideoTheme {
         MeetingRoomScreen(
             uiState = RoomUiState.SessionError,
-            actions = MeetingRoomActions(
-                onShare = { },
-                onRetry = { },
-                onToggleMic = { },
-                onToggleCamera = { },
-                onToggleParticipants = { },
-                onEndCall = { }
+            actions = MeetingRoomActions(),
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun MeetingRoomScreenSessionPreview() {
+    VonageVideoTheme {
+        MeetingRoomScreen(
+            uiState = RoomUiState.Content(
+                roomName = "sample-room-name",
+                call = buildCallWithParticipants(5),
             ),
+            actions = MeetingRoomActions(),
         )
     }
 }

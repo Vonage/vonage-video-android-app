@@ -101,14 +101,7 @@ fun BottomBar(
 internal fun BottomBarPreview() {
     VonageVideoTheme {
         BottomBar(
-            actions = MeetingRoomActions(
-                onShare = { },
-                onToggleMic = { },
-                onToggleCamera = { },
-                onToggleParticipants = { },
-                onEndCall = { },
-                onRetry = { },
-            ),
+            actions = MeetingRoomActions(),
             onToggleParticipants = {},
             isMicEnabled = false,
             isCameraEnabled = true,

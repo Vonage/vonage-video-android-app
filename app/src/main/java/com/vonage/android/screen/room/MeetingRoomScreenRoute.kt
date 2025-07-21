@@ -37,7 +37,6 @@ fun MeetingRoomScreenRoute(
         MeetingRoomActions(
             onToggleMic = viewModel::onToggleMic,
             onToggleCamera = viewModel::onToggleCamera,
-            onToggleParticipants = viewModel::onToggleParticipants,
             onEndCall = {
                 viewModel.endCall()
                 navigateToGoodBye()
@@ -58,10 +57,9 @@ fun MeetingRoomScreenRoute(
 
 @Stable
 data class MeetingRoomActions(
-    val onShare: (String) -> Unit,
-    val onRetry: () -> Unit,
-    val onToggleMic: () -> Unit,
-    val onToggleCamera: () -> Unit,
-    val onToggleParticipants: () -> Unit,
-    val onEndCall: () -> Unit,
+    val onShare: (String) -> Unit = {},
+    val onRetry: () -> Unit = {},
+    val onToggleMic: () -> Unit = {},
+    val onToggleCamera: () -> Unit = {},
+    val onEndCall: () -> Unit = {},
 )

@@ -2,16 +2,17 @@ package com.vonage.android.kotlin
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.Stable
 import com.opentok.android.OpentokError
 import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
+import com.vonage.android.kotlin.internal.VeraPublisherHolder
+import com.vonage.android.kotlin.internal.toParticipant
+import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VeraSubscriber
-import com.vonage.android.kotlin.model.toParticipant
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -21,21 +22,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 
-@Stable
 class Call internal constructor(
     private val context: Context,
     private val token: String,
     private val session: Session,
     private val publisherHolder: VeraPublisherHolder,
-) {
+) : CallFacade {
 
     private val _participantsStateFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
-    val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
+    override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
 
     private val subscriberStreams = HashMap<String, Subscriber>()
     private val participantStreams = HashMap<String, Participant>()
 
-    fun connect(): Flow<SessionEvent> = callbackFlow {
+    override fun connect(): Flow<SessionEvent> = callbackFlow {
         val sessionListener = object : Session.SessionListener {
             override fun onConnected(session: Session) {
                 publishToSession()
@@ -65,9 +65,37 @@ class Call internal constructor(
         awaitClose { session.setSessionListener(null) }
     }
 
+    override fun endSession() {
+        publisherHolder.publisher.session?.disconnect()
+        session.unpublish(publisherHolder.publisher)
+        session.disconnect()
+    }
+
+    override fun togglePublisherVideo() {
+        publisherHolder.publisher.publishVideo = !publisherHolder.publisher.publishVideo
+        participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
+        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+    }
+
+    override fun togglePublisherAudio() {
+        publisherHolder.publisher.publishAudio = !publisherHolder.publisher.publishAudio
+        participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
+        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+    }
+
+    override fun pauseSession() {
+        Log.d(TAG, "Session paused")
+        session.onPause()
+    }
+
+    override fun resumeSession() {
+        Log.d(TAG, "Session resumed")
+        session.onResume()
+    }
+
     private fun publishToSession() {
         publisherHolder.let { holder ->
-            val id = holder.publisher.stream?.streamId ?: PUBLISHER_ID
+            val id = PUBLISHER_ID
             participantStreams[id] = holder.participant
             _participantsStateFlow.value = participantStreams.values.toImmutableList()
             session.publish(holder.publisher)
@@ -151,40 +179,14 @@ class Call internal constructor(
     private fun removeSubscriber(stream: Stream) {
         val subscriber = subscriberStreams[stream.streamId] ?: return
         subscriber.setVideoListener(null)
+        subscriber.setStreamListener(null)
+        subscriber.setAudioLevelListener(null)
         subscriberStreams.remove(stream.streamId)
 
         participantStreams.remove(stream.streamId)
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
 
         session.unsubscribe(subscriber)
-    }
-
-    fun end() {
-        publisherHolder.publisher.session?.disconnect()
-        session.unpublish(publisherHolder.publisher)
-        session.disconnect()
-    }
-
-    fun togglePublisherVideo() {
-        publisherHolder.publisher.publishVideo = !publisherHolder.publisher.publishVideo
-        participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
-        _participantsStateFlow.value = participantStreams.values.toImmutableList()
-    }
-
-    fun togglePublisherAudio() {
-        publisherHolder.publisher.publishAudio = !publisherHolder.publisher.publishAudio
-        participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
-        _participantsStateFlow.value = participantStreams.values.toImmutableList()
-    }
-
-    fun pause() {
-        Log.d(TAG, "Session paused")
-        session.onPause()
-    }
-
-    fun resume() {
-        Log.d(TAG, "Session resumed")
-        session.onResume()
     }
 
     companion object {

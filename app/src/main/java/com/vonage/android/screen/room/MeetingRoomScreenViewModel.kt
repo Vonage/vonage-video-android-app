@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
-import com.vonage.android.kotlin.Call
 import com.vonage.android.kotlin.VonageVideoClient
+import com.vonage.android.kotlin.model.CallFacade
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,22 +23,34 @@ class MeetingRoomScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<RoomUiState>(RoomUiState.Loading)
     val uiState: StateFlow<RoomUiState> = _uiState.asStateFlow()
 
-    private var call: Call? = null
+    private var call: CallFacade? = null
 
     fun init(roomName: String) {
         viewModelScope.launch {
             _uiState.value = RoomUiState.Loading
             sessionRepository.getSession(roomName)
                 .onSuccess { sessionInfo ->
-                    connect(sessionInfo)
-                    _uiState.value = RoomUiState.Content(
+                    onSessionCreated(
                         roomName = roomName,
-                        call = call!!,
+                        sessionInfo = sessionInfo,
                     )
                 }
                 .onFailure {
                     _uiState.value = RoomUiState.SessionError
                 }
+        }
+    }
+
+    private fun onSessionCreated(
+        roomName: String,
+        sessionInfo: SessionInfo,
+    ) {
+        connect(sessionInfo)
+        call?.let {
+            _uiState.value = RoomUiState.Content(
+                roomName = roomName,
+                call = it,
+            )
         }
     }
 
@@ -52,6 +64,7 @@ class MeetingRoomScreenViewModel @Inject constructor(
         viewModelScope.launch {
             call?.connect()
                 ?.collect {
+                    // handle session events like session disconnected
                     Log.d(TAG, "SessionEvent received $it")
                 }
         }
@@ -65,20 +78,16 @@ class MeetingRoomScreenViewModel @Inject constructor(
         call?.togglePublisherVideo()
     }
 
-    fun onToggleParticipants() {
-        // toggle participant list show flag
-    }
-
     fun endCall() {
-        call?.end()
+        call?.endSession()
     }
 
     fun onPause() {
-        call?.pause()
+        call?.pauseSession()
     }
 
     fun onResume() {
-        call?.resume()
+        call?.resumeSession()
     }
 
     private companion object {
@@ -90,9 +99,9 @@ sealed interface RoomUiState {
 
     data class Content(
         val roomName: String = "",
-        val call: Call,
+        val call: CallFacade,
     ) : RoomUiState
 
     data object Loading : RoomUiState
-    data object SessionError: RoomUiState
+    data object SessionError : RoomUiState
 }

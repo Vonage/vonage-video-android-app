@@ -62,14 +62,7 @@ internal fun TopBarPreview() {
     VonageVideoTheme {
         TopBar(
             roomName = "sample-name",
-            actions = MeetingRoomActions(
-                onShare = { },
-                onToggleMic = { },
-                onToggleCamera = { },
-                onToggleParticipants = { },
-                onEndCall = { },
-                onRetry = { },
-            )
+            actions = MeetingRoomActions(),
         )
     }
 }

@@ -6,12 +6,14 @@ import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.Publisher
 import com.opentok.android.Session
 import com.opentok.android.Session.SessionOptions
+import com.vonage.android.kotlin.internal.VeraPublisherHolder
+import com.vonage.android.kotlin.internal.toParticipant
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
-import com.vonage.android.kotlin.model.toParticipant
 
 class VonageVideoClient(
     private val context: Context,
+    // configure log level of the entire SDK
 ) {
 
     private var session: Session? = null
@@ -46,8 +48,10 @@ class VonageVideoClient(
     }
 
     fun destroyPublisher() {
-        publisherHolder?.publisher?.destroy()
-        publisherHolder?.publisher?.onStop()
+        publisherHolder?.publisher?.let {
+            it.destroy()
+            it.onStop()
+        }
         publisherHolder = null
         Log.i(TAG, "Destroy publisher")
     }

@@ -1,4 +1,4 @@
-package com.vonage.android.kotlin
+package com.vonage.android.kotlin.internal
 
 import com.opentok.android.Publisher
 import com.vonage.android.kotlin.model.VeraPublisher
