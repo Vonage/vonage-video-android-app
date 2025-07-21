@@ -31,7 +31,7 @@ class WaitingRoomViewModel @Inject constructor(
         this.roomName = roomName
         publisher = videoClient.buildPublisher()
         viewModelScope.launch {
-            publisher.name = userRepository.getUserName().orEmpty()
+            publisher = publisher.copy(name = userRepository.getUserName().orEmpty())
             _uiState.value = buildContentUiState(
                 roomName = roomName,
                 participant = publisher,
@@ -40,7 +40,7 @@ class WaitingRoomViewModel @Inject constructor(
     }
 
     fun updateUserName(userName: String) {
-        publisher.name = userName
+        publisher = publisher.copy(name = userName)
         _uiState.value = buildContentUiState(
             roomName = roomName,
             participant = publisher,
@@ -49,7 +49,6 @@ class WaitingRoomViewModel @Inject constructor(
 
     fun onMicToggle() {
         publisher = publisher.copy(isMicEnabled = !publisher.isMicEnabled)
-//        publisher.toggleAudio()
         _uiState.value = buildContentUiState(
             roomName = roomName,
             participant = publisher,
@@ -58,7 +57,6 @@ class WaitingRoomViewModel @Inject constructor(
 
     fun onCameraToggle() {
         publisher = publisher.copy(isCameraEnabled = !publisher.isCameraEnabled)
-//        publisher.toggleVideo()
         _uiState.value = buildContentUiState(
             roomName = roomName,
             participant = publisher,

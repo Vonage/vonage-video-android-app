@@ -1,7 +1,5 @@
 package com.vonage.android.compose.components
 
-import android.content.res.Configuration.UI_MODE_NIGHT_NO
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,7 +9,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.icons.KeyboardIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -46,8 +44,7 @@ fun VonageTextField(
     )
 }
 
-@Preview(uiMode = UI_MODE_NIGHT_NO)
-@Preview(uiMode = UI_MODE_NIGHT_YES)
+@PreviewLightDark
 @Composable
 internal fun VonageTextFieldPreview() {
     VonageVideoTheme {

@@ -23,11 +23,10 @@ class WaitingRoomViewModelTest {
         videoClient = videoClient,
     )
 
-    val publisher: VeraPublisher = mockk()
-
     @Test
     fun `given viewmodel when initialize then returns correct state`() = runTest {
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        val publisher = buildMockPublisher()
+        every { videoClient.buildPublisher() } returns publisher
         coEvery { userRepository.getUserName() } returns ""
 
         sut.init("roomName")
@@ -48,21 +47,31 @@ class WaitingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when update user name then returns correct state`() = runTest {
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        val publisher = buildMockPublisher(
+            userName = "",
+        )
+        every { videoClient.buildPublisher() } returns publisher
         coEvery { userRepository.getUserName() } returns ""
 
-        sut.init("roomName")
-        sut.updateUserName("update")
-
-        verify { publisher.name = "update" }
-
         sut.uiState.test {
+            assertEquals(WaitingRoomUiState.Idle, awaitItem())
+            sut.init("roomName")
             assertEquals(
                 WaitingRoomUiState.Content(
                     roomName = "roomName",
                     isCameraEnabled = publisher.isCameraEnabled,
                     isMicEnabled = publisher.isMicEnabled,
-                    userName = publisher.name,
+                    userName = "",
+                    view = publisher.view,
+                ), awaitItem()
+            )
+            sut.updateUserName("update")
+            assertEquals(
+                WaitingRoomUiState.Content(
+                    roomName = "roomName",
+                    isCameraEnabled = publisher.isCameraEnabled,
+                    isMicEnabled = publisher.isMicEnabled,
+                    userName = "update",
                     view = publisher.view,
                 ), awaitItem()
             )
@@ -71,20 +80,30 @@ class WaitingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when mic toggle then returns correct state`() = runTest {
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        val publisher = buildMockPublisher(
+            isMicEnabled = false,
+        )
+        every { videoClient.buildPublisher() } returns publisher
         coEvery { userRepository.getUserName() } returns ""
 
-        sut.init("roomName")
-        sut.onMicToggle()
-
-        verify { publisher.toggleAudio() }
-
         sut.uiState.test {
+            assertEquals(WaitingRoomUiState.Idle, awaitItem())
+            sut.init("roomName")
             assertEquals(
                 WaitingRoomUiState.Content(
                     roomName = "roomName",
                     isCameraEnabled = publisher.isCameraEnabled,
-                    isMicEnabled = publisher.isMicEnabled,
+                    isMicEnabled = false,
+                    userName = publisher.name,
+                    view = publisher.view,
+                ), awaitItem()
+            )
+            sut.onMicToggle()
+            assertEquals(
+                WaitingRoomUiState.Content(
+                    roomName = "roomName",
+                    isCameraEnabled = publisher.isCameraEnabled,
+                    isMicEnabled = true,
                     userName = publisher.name,
                     view = publisher.view,
                 ), awaitItem()
@@ -94,19 +113,29 @@ class WaitingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when camera toggle then returns correct state`() = runTest {
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        val publisher = buildMockPublisher(
+            isCameraEnabled = true,
+        )
+        every { videoClient.buildPublisher() } returns publisher
         coEvery { userRepository.getUserName() } returns ""
 
-        sut.init("roomName")
-        sut.onCameraToggle()
-
-        verify { publisher.toggleVideo() }
-
         sut.uiState.test {
+            assertEquals(WaitingRoomUiState.Idle, awaitItem())
+            sut.init("roomName")
             assertEquals(
                 WaitingRoomUiState.Content(
                     roomName = "roomName",
                     isCameraEnabled = publisher.isCameraEnabled,
+                    isMicEnabled = true,
+                    userName = publisher.name,
+                    view = publisher.view,
+                ), awaitItem()
+            )
+            sut.onCameraToggle()
+            assertEquals(
+                WaitingRoomUiState.Content(
+                    roomName = "roomName",
+                    isCameraEnabled = false,
                     isMicEnabled = publisher.isMicEnabled,
                     userName = publisher.name,
                     view = publisher.view,
@@ -117,10 +146,11 @@ class WaitingRoomViewModelTest {
 
     @Test
     fun `given viewmodel with cached user name then returns correct state`() = runTest {
-        coEvery { userRepository.getUserName() } returns "Cached user name"
-        every { videoClient.buildPublisher() } returns buildMockPublisher(
+        val publisher = buildMockPublisher(
             userName = "Cached user name"
         )
+        coEvery { userRepository.getUserName() } returns "Cached user name"
+        every { videoClient.buildPublisher() } returns publisher
 
         sut.uiState.test {
             sut.init("roomName")
@@ -141,12 +171,15 @@ class WaitingRoomViewModelTest {
     fun `given viewmodel when join room then user name is cached`() = runTest {
         coEvery { userRepository.getUserName() } returns "initial"
         coEvery { userRepository.saveUserName(any()) } returns Unit
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.buildPublisher() } returns buildMockPublisher(
+            isCameraEnabled = false,
+            isMicEnabled = false,
+        )
         every { videoClient.configurePublisher(any()) } returns Unit
         every { videoClient.destroyPublisher() } returns Unit
 
         sut.uiState.test {
-            awaitItem() // initial state
+            assertEquals(WaitingRoomUiState.Idle, awaitItem())
             sut.init("roomName")
             awaitItem()
             sut.joinRoom("roomName", "save user name")
@@ -157,24 +190,27 @@ class WaitingRoomViewModelTest {
             )
         }
         coVerify { userRepository.saveUserName("save user name") }
-        verify { videoClient.configurePublisher(PublisherConfig(
-            name = "save user name",
-            publishVideo = false,
-            publishAudio = false,
-        ))}
+        verify {
+            videoClient.configurePublisher(
+                PublisherConfig(
+                    name = "save user name",
+                    publishVideo = false,
+                    publishAudio = false,
+                )
+            )
+        }
         verify { videoClient.destroyPublisher() }
     }
 
     private fun buildMockPublisher(
-        userName: String = ""
-    ): VeraPublisher {
-        every { publisher.view } returns mockk()
-        every { publisher.isCameraEnabled } returns false
-        every { publisher.isMicEnabled } returns false
-        every { publisher.name } returns userName
-        every { publisher.name = any() } returns Unit
-        every { publisher.toggleVideo() } returns true
-        every { publisher.toggleAudio() } returns true
-        return publisher
-    }
+        userName: String = "",
+        isCameraEnabled: Boolean = true,
+        isMicEnabled: Boolean = true,
+    ): VeraPublisher = VeraPublisher(
+        id = "ignored",
+        name = userName,
+        isMicEnabled = isMicEnabled,
+        isCameraEnabled = isCameraEnabled,
+        view = mockk(),
+    )
 }

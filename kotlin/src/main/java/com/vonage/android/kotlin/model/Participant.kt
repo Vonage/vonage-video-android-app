@@ -6,7 +6,7 @@ import com.opentok.android.Subscriber
 
 interface Participant {
     val id: String
-    var name: String
+    val name: String
     val isMicEnabled: Boolean
     val isCameraEnabled: Boolean
     val view: View

@@ -97,8 +97,7 @@ class Call internal constructor(
 
             override fun onAudioEnabled(subscriber: SubscriberKit) {
                 Log.d(TAG, "Subscriber audio level changed - audio enabled")
-                val subs = subscriberStreams[subscriber.stream.streamId]
-                subs?.let {
+                subscriberStreams[subscriber.stream.streamId]?.let { subs ->
                     val updatedParticipant = (participantStreams[subs.stream.streamId] as VeraSubscriber)
                         .copy(isMicEnabled = true)
                     participantStreams[subs.stream.streamId] = updatedParticipant

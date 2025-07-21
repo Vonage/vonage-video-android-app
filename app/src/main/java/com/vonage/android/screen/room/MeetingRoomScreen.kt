@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -134,6 +135,42 @@ private fun MeetingRoomLoading(
     ) {
         CircularProgressIndicator(
             modifier = Modifier.align(Alignment.Center)
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun MeetingRoomScreenLoadingPreview() {
+    VonageVideoTheme {
+        MeetingRoomScreen(
+            uiState = RoomUiState.Loading,
+            actions = MeetingRoomActions(
+                onShare = { },
+                onRetry = { },
+                onToggleMic = { },
+                onToggleCamera = { },
+                onToggleParticipants = { },
+                onEndCall = { }
+            ),
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun MeetingRoomScreenSessionErrorPreview() {
+    VonageVideoTheme {
+        MeetingRoomScreen(
+            uiState = RoomUiState.SessionError,
+            actions = MeetingRoomActions(
+                onShare = { },
+                onRetry = { },
+                onToggleMic = { },
+                onToggleCamera = { },
+                onToggleParticipants = { },
+                onEndCall = { }
+            ),
         )
     }
 }
