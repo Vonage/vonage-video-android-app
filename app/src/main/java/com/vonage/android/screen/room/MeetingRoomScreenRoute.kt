@@ -25,12 +25,13 @@ fun MeetingRoomScreenRoute(
         viewModel.init(roomName)
     }
 
-//    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
-//        viewModel.onPause()
-//    }
-//    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-//        viewModel.onResume()
-//    }
+    // wrap into a dedicated composable makes sense?
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
+        viewModel.onPause()
+    }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.onResume()
+    }
 
     val actions = remember {
         MeetingRoomActions(
@@ -42,6 +43,9 @@ fun MeetingRoomScreenRoute(
                 navigateToGoodBye()
             },
             onShare = navigateToShare,
+            onRetry = {
+                viewModel.init(roomName)
+            }
         )
     }
 
@@ -55,6 +59,7 @@ fun MeetingRoomScreenRoute(
 @Stable
 data class MeetingRoomActions(
     val onShare: (String) -> Unit,
+    val onRetry: () -> Unit,
     val onToggleMic: () -> Unit,
     val onToggleCamera: () -> Unit,
     val onToggleParticipants: () -> Unit,

@@ -107,6 +107,7 @@ internal fun BottomBarPreview() {
                 onToggleCamera = { },
                 onToggleParticipants = { },
                 onEndCall = { },
+                onRetry = { },
             ),
             onToggleParticipants = {},
             isMicEnabled = false,

@@ -179,10 +179,12 @@ class Call internal constructor(
     }
 
     fun pause() {
+        Log.d(TAG, "Session paused")
         session.onPause()
     }
 
     fun resume() {
+        Log.d(TAG, "Session resumed")
         session.onResume()
     }
 

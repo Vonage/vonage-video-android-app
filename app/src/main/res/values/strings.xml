@@ -18,10 +18,14 @@
 
     <!-- Meeting Screen -->
     <string name="participants">Participants</string>
+    <string name="meeting_screen_session_creation_error">Error while creating room, please try again</string>
 
     <!-- Permissions -->
     <string name="camera_and_microphone_permissions_are_needed">Camera and microphone permissions are needed</string>
     <string name="request_permissions">Request permissions</string>
     <string name="request_permissions_to_system">Request permissions to system</string>
+
+    <!-- Generic -->
+    <string name="generic_retry">Retry</string>
 
 </resources>

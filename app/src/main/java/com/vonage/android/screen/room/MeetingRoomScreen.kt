@@ -12,18 +12,20 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.components.AdaptiveGrid
+import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.screen.room.components.BottomBar
 import com.vonage.android.screen.room.components.ParticipantsList
 import com.vonage.android.screen.room.components.TopBar
@@ -75,6 +77,17 @@ fun MeetingRoomScreen(
 
         is RoomUiState.Loading -> {
             MeetingRoomLoading()
+        }
+
+        is RoomUiState.SessionError -> {
+            BasicAlertDialog(
+                text = stringResource(R.string.meeting_screen_session_creation_error),
+                acceptLabel = stringResource(R.string.generic_retry),
+                onAccept = { actions.onRetry() },
+                onCancel = {
+                    // navigate back to waiting room
+                },
+            )
         }
     }
 }

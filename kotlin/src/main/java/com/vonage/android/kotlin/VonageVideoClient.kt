@@ -12,26 +12,11 @@ import com.vonage.android.kotlin.model.toParticipant
 
 class VonageVideoClient(
     private val context: Context,
-//    lifecycle: Lifecycle,
 ) {
 
     private var session: Session? = null
     private var publisherConfig: PublisherConfig? = null
     private var publisherHolder: VeraPublisherHolder? = null
-
-    init {
-//        lifecycle.addObserver(object : DefaultLifecycleObserver {
-//            override fun onPause(owner: LifecycleOwner) {
-//                super.onPause(owner)
-//                session?.onPause()
-//            }
-//
-//            override fun onResume(owner: LifecycleOwner) {
-//                super.onResume(owner)
-//                session?.onResume()
-//            }
-//        })
-    }
 
     fun configurePublisher(publisherConfig: PublisherConfig) {
         this.publisherConfig = publisherConfig
@@ -52,7 +37,7 @@ class VonageVideoClient(
                 publishVideo = publisherConfig?.publishVideo ?: true
                 publishAudio = publisherConfig?.publishAudio ?: true
             }
-        val participant = publisher.toParticipant(resolvedName) as VeraPublisher
+        val participant = publisher.toParticipant(resolvedName)
         this.publisherHolder = VeraPublisherHolder(
             participant = participant,
             publisher = publisher,

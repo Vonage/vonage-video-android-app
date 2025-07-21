@@ -1,7 +1,6 @@
 package com.vonage.android.di
 
 import android.content.Context
-import com.vonage.android.kotlin.PublisherFactory
 import com.vonage.android.kotlin.VonageVideoClient
 import dagger.Module
 import dagger.Provides
@@ -13,9 +12,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object SdkModule {
-
-    @Provides
-    fun providePublisherFactory(): PublisherFactory = PublisherFactory()
 
     @Singleton
     @Provides

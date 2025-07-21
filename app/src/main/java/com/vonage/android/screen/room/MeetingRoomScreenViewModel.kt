@@ -7,7 +7,6 @@ import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.Call
 import com.vonage.android.kotlin.VonageVideoClient
-import com.vonage.android.kotlin.model.SessionEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,20 +23,21 @@ class MeetingRoomScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<RoomUiState>(RoomUiState.Loading)
     val uiState: StateFlow<RoomUiState> = _uiState.asStateFlow()
 
-    private lateinit var call: Call
+    private var call: Call? = null
 
     fun init(roomName: String) {
         viewModelScope.launch {
+            _uiState.value = RoomUiState.Loading
             sessionRepository.getSession(roomName)
                 .onSuccess { sessionInfo ->
                     connect(sessionInfo)
                     _uiState.value = RoomUiState.Content(
                         roomName = roomName,
-                        call = call,
+                        call = call!!,
                     )
                 }
                 .onFailure {
-                    // how to handle this error?
+                    _uiState.value = RoomUiState.SessionError
                 }
         }
     }
@@ -50,26 +50,19 @@ class MeetingRoomScreenViewModel @Inject constructor(
             token = sessionInfo.token,
         )
         viewModelScope.launch {
-            call.connect()
-                .collect {
-                    when (it) {
-                        is SessionEvent.Connected -> {}
-                        is SessionEvent.Disconnected -> {}
-                        is SessionEvent.Error -> {}
-                        is SessionEvent.StreamDropped -> {}
-                        is SessionEvent.StreamReceived -> {}
-                    }
-                    Log.d("XXX", "ViewModel received $it")
+            call?.connect()
+                ?.collect {
+                    Log.d(TAG, "SessionEvent received $it")
                 }
         }
     }
 
     fun onToggleMic() {
-        call.togglePublisherAudio()
+        call?.togglePublisherAudio()
     }
 
     fun onToggleCamera() {
-        call.togglePublisherVideo()
+        call?.togglePublisherVideo()
     }
 
     fun onToggleParticipants() {
@@ -77,24 +70,19 @@ class MeetingRoomScreenViewModel @Inject constructor(
     }
 
     fun endCall() {
-        // change this to a cancellation approach
-        if (::call.isInitialized) {
-            call.end()
-        }
+        call?.end()
     }
 
     fun onPause() {
-        // change this to a cancellation approach
-        if (::call.isInitialized) {
-            call.pause()
-        }
+        call?.pause()
     }
 
     fun onResume() {
-        // change this to a cancellation approach
-        if (::call.isInitialized) {
-            call.resume()
-        }
+        call?.resume()
+    }
+
+    private companion object {
+        const val TAG = "MeetingRoomScreenViewModel"
     }
 }
 
@@ -106,5 +94,5 @@ sealed interface RoomUiState {
     ) : RoomUiState
 
     data object Loading : RoomUiState
-
+    data object SessionError: RoomUiState
 }

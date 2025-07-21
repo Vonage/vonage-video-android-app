@@ -1,6 +1,5 @@
 package com.vonage.android.screen.room.components
 
-import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,10 +26,9 @@ import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.components.AvatarInitials
-import com.vonage.android.screen.waiting.previewCamera
+import com.vonage.android.util.preview.buildParticipants
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlin.random.Random
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun ParticipantsList(
@@ -90,14 +88,14 @@ private fun ParticipantRow(participant: Participant) {
                 Icons.Default.MicOff,
                 contentDescription = "Muted",
                 tint = MaterialTheme.colorScheme.inverseSurface,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(16.dp),
             )
         } else {
             Icon(
                 Icons.Default.Mic,
                 contentDescription = "Muted",
                 tint = MaterialTheme.colorScheme.inverseSurface,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(16.dp),
             )
         }
     }
@@ -107,28 +105,11 @@ private fun ParticipantRow(participant: Participant) {
 @Composable
 @Suppress("MagicNumber")
 internal fun ParticipantsListPreview() {
-    val sampleParticipant = object : Participant {
-        override val id: String = Random(10).toString()
-        override var name: String = "Name Sample"
-        override val isMicEnabled: Boolean = false
-        override val isCameraEnabled: Boolean = true
-        override val view: View = previewCamera()
-    }
-    val sampleParticipant2 = object : Participant {
-        override val id: String = Random(10).toString()
-        override var name: String = "A Name Sample Very Long"
-        override val isMicEnabled: Boolean = true
-        override val isCameraEnabled: Boolean = true
-        override val view: View = previewCamera()
-    }
-
+    val sampleParticipant = buildParticipants(5)
     VonageVideoTheme {
         ParticipantsList(
             modifier = Modifier.background(MaterialTheme.colorScheme.surface),
-            participants = persistentListOf(
-                sampleParticipant,
-                sampleParticipant2,
-            )
+            participants = sampleParticipant.toImmutableList(),
         )
     }
 }

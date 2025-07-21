@@ -13,9 +13,12 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.util.preview.buildParticipants
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -76,5 +79,15 @@ fun AdaptiveGrid(
                 }
             }
         }
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun AdaptiveGridPreview() {
+    VonageVideoTheme {
+        AdaptiveGrid(
+            participants = buildParticipants(10).toImmutableList()
+        )
     }
 }

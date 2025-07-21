@@ -68,6 +68,7 @@ internal fun TopBarPreview() {
                 onToggleCamera = { },
                 onToggleParticipants = { },
                 onEndCall = { },
+                onRetry = { },
             )
         )
     }

@@ -12,7 +12,9 @@ interface Participant {
     val view: View
 }
 
-internal fun Subscriber.toParticipant(): Participant = VeraSubscriber(
+internal fun Subscriber.toParticipant(
+
+): VeraSubscriber = VeraSubscriber(
     id = stream.streamId,
     name = stream.name,
     isMicEnabled = stream.hasAudio(),
@@ -22,7 +24,7 @@ internal fun Subscriber.toParticipant(): Participant = VeraSubscriber(
 
 internal fun Publisher.toParticipant(
     name: String? = null,
-): Participant = VeraPublisher(
+): VeraPublisher = VeraPublisher(
     id = stream?.streamId ?: "publisher",
     name = stream?.name ?: name.orEmpty(),
     isMicEnabled = publishAudio,

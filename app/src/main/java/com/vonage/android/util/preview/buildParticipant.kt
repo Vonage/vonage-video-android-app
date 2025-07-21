@@ -1,0 +1,23 @@
+package com.vonage.android.util.preview
+
+import android.view.View
+import androidx.compose.runtime.Composable
+import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.screen.waiting.previewCamera
+import kotlin.random.Random
+
+@Composable
+fun buildParticipants(count: Int): List<Participant> {
+    val participants = mutableListOf<Participant>()
+    (1..count).forEach {
+        val sampleParticipant = object : Participant {
+            override val id: String = Random(it).toString()
+            override var name: String = "Name Sample $it"
+            override val isMicEnabled: Boolean = false
+            override val isCameraEnabled: Boolean = true
+            override val view: View = previewCamera()
+        }
+        participants += sampleParticipant
+    }
+    return participants
+}
