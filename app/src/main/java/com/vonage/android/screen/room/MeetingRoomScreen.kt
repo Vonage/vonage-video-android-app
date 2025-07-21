@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VeraPublisher
@@ -41,7 +42,7 @@ fun MeetingRoomScreen(
 
     when (uiState) {
         is RoomUiState.Content -> {
-            val participants by uiState.call.participantsStateFlow.collectAsState()
+            val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
             val publisher = participants.filterIsInstance<VeraPublisher>().firstOrNull()
 
             Scaffold(

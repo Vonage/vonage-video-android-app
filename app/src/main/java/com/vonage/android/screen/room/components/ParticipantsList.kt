@@ -113,8 +113,6 @@ internal fun ParticipantsListPreview() {
         override val isMicEnabled: Boolean = false
         override val isCameraEnabled: Boolean = true
         override val view: View = previewCamera()
-        override fun toggleAudio(): Boolean = true
-        override fun toggleVideo(): Boolean = true
     }
     val sampleParticipant2 = object : Participant {
         override val id: String = Random(10).toString()
@@ -122,8 +120,6 @@ internal fun ParticipantsListPreview() {
         override val isMicEnabled: Boolean = true
         override val isCameraEnabled: Boolean = true
         override val view: View = previewCamera()
-        override fun toggleAudio(): Boolean = true
-        override fun toggleVideo(): Boolean = true
     }
 
     VonageVideoTheme {

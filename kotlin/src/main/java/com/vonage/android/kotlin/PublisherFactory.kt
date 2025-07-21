@@ -4,6 +4,7 @@ import android.content.Context
 import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.Publisher
 import com.vonage.android.kotlin.model.VeraPublisher
+import com.vonage.android.kotlin.model.toParticipant
 
 class PublisherFactory {
 
@@ -18,6 +19,6 @@ class PublisherFactory {
                     BaseVideoRenderer.STYLE_VIDEO_FILL,
                 )
             }
-        return VeraPublisher(publisher)
+        return publisher.toParticipant() as VeraPublisher
     }
 }

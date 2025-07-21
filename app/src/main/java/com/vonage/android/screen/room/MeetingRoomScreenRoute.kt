@@ -7,6 +7,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
@@ -22,6 +24,13 @@ fun MeetingRoomScreenRoute(
     LaunchedEffect(Unit) {
         viewModel.init(roomName)
     }
+
+//    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
+//        viewModel.onPause()
+//    }
+//    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+//        viewModel.onResume()
+//    }
 
     val actions = remember {
         MeetingRoomActions(

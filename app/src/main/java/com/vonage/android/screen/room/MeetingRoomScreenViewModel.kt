@@ -82,6 +82,20 @@ class MeetingRoomScreenViewModel @Inject constructor(
             call.end()
         }
     }
+
+    fun onPause() {
+        // change this to a cancellation approach
+        if (::call.isInitialized) {
+            call.pause()
+        }
+    }
+
+    fun onResume() {
+        // change this to a cancellation approach
+        if (::call.isInitialized) {
+            call.resume()
+        }
+    }
 }
 
 sealed interface RoomUiState {

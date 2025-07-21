@@ -8,6 +8,7 @@ import com.opentok.android.Session
 import com.opentok.android.Session.SessionOptions
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
+import com.vonage.android.kotlin.model.toParticipant
 
 class VonageVideoClient(
     private val context: Context,
@@ -16,6 +17,7 @@ class VonageVideoClient(
 
     private var session: Session? = null
     private var publisherConfig: PublisherConfig? = null
+    private var publisherHolder: VeraPublisherHolder? = null
 
     init {
 //        lifecycle.addObserver(object : DefaultLifecycleObserver {
@@ -31,30 +33,38 @@ class VonageVideoClient(
 //        })
     }
 
-    private lateinit var publisher: Publisher
-
     fun configurePublisher(publisherConfig: PublisherConfig) {
         this.publisherConfig = publisherConfig
     }
 
     fun buildPublisher(): VeraPublisher {
+        val resolvedName = publisherConfig?.name ?: ""
         val publisher = Publisher.Builder(context)
-            .name(publisherConfig?.name)
-            .videoTrack(publisherConfig?.publishVideo ?: true)
-            .audioTrack(publisherConfig?.publishAudio ?: true)
+            .name(resolvedName)
+            .videoTrack(true)
+            .audioTrack(true)
             .build()
             .apply {
                 renderer?.setStyle(
                     BaseVideoRenderer.STYLE_VIDEO_SCALE,
                     BaseVideoRenderer.STYLE_VIDEO_FIT,
                 )
+                publishVideo = publisherConfig?.publishVideo ?: true
+                publishAudio = publisherConfig?.publishAudio ?: true
             }
-        this.publisher = publisher
-        return VeraPublisher(publisher)
+        val participant = publisher.toParticipant(resolvedName) as VeraPublisher
+        this.publisherHolder = VeraPublisherHolder(
+            participant = participant,
+            publisher = publisher,
+        )
+        return participant
     }
 
     fun destroyPublisher() {
-        publisher.destroy()
+        publisherHolder?.publisher?.destroy()
+        publisherHolder?.publisher?.onStop()
+        publisherHolder = null
+        Log.i(TAG, "Destroy publisher")
     }
 
     fun initializeSession(apiKey: String, sessionId: String, token: String): Call {
@@ -73,7 +83,7 @@ class VonageVideoClient(
             context = context,
             token = token,
             session = session!!,
-            publisher = publisher,
+            publisherHolder = publisherHolder!!,
         )
     }
 

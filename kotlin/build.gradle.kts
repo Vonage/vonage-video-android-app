@@ -30,7 +30,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.opentok.android.sdk)
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.runtime.android)
     implementation(libs.kotlinx.collections.immutable)
 

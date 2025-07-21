@@ -7,6 +7,7 @@ import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.VonageVideoClient
+import com.vonage.android.kotlin.model.VeraPublisher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,42 +24,44 @@ class WaitingRoomViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<WaitingRoomUiState>(WaitingRoomUiState.Idle)
     val uiState: StateFlow<WaitingRoomUiState> = _uiState.asStateFlow()
 
-    private lateinit var participant: Participant
+    private lateinit var publisher: VeraPublisher
     private lateinit var roomName: String
 
     fun init(roomName: String) {
         this.roomName = roomName
-        participant = videoClient.buildPublisher()
+        publisher = videoClient.buildPublisher()
         viewModelScope.launch {
-            participant.name = userRepository.getUserName().orEmpty()
+            publisher.name = userRepository.getUserName().orEmpty()
             _uiState.value = buildContentUiState(
                 roomName = roomName,
-                participant = participant,
+                participant = publisher,
             )
         }
     }
 
     fun updateUserName(userName: String) {
-        participant.name = userName
+        publisher.name = userName
         _uiState.value = buildContentUiState(
             roomName = roomName,
-            participant = participant,
+            participant = publisher,
         )
     }
 
     fun onMicToggle() {
-        participant.toggleAudio()
+        publisher = publisher.copy(isMicEnabled = !publisher.isMicEnabled)
+//        publisher.toggleAudio()
         _uiState.value = buildContentUiState(
             roomName = roomName,
-            participant = participant,
+            participant = publisher,
         )
     }
 
     fun onCameraToggle() {
-        participant.toggleVideo()
+        publisher = publisher.copy(isCameraEnabled = !publisher.isCameraEnabled)
+//        publisher.toggleVideo()
         _uiState.value = buildContentUiState(
             roomName = roomName,
-            participant = participant,
+            participant = publisher,
         )
     }
 
@@ -67,8 +70,8 @@ class WaitingRoomViewModel @Inject constructor(
             userRepository.saveUserName(userName)
             videoClient.configurePublisher(PublisherConfig(
                 name = userName,
-                publishVideo = participant.isCameraEnabled,
-                publishAudio = participant.isMicEnabled,
+                publishVideo = publisher.isCameraEnabled,
+                publishAudio = publisher.isMicEnabled,
             ))
             videoClient.destroyPublisher()
             _uiState.value = WaitingRoomUiState.Success(
