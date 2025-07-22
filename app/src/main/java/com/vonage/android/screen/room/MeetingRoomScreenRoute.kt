@@ -25,7 +25,6 @@ fun MeetingRoomScreenRoute(
         viewModel.init(roomName)
     }
 
-    // wrap into a dedicated composable makes sense?
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
         viewModel.onPause()
     }
