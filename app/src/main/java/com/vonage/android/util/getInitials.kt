@@ -1,20 +1,22 @@
 package com.vonage.android.util
 
 fun String.getInitials(limit: Int = 2): String =
-    trim()
-        .splitName()
+    splitName()
         .filterNotNull()
-        .filter { it.isNotBlank() }
         .joinToString(
             separator = "",
             truncated = "",
             limit = limit,
         ) { s ->
-            s.first().uppercase()
+            s.uppercase()
         }
 
-private fun CharSequence.splitName(): List<String?> {
-    val names = trim().split(Regex("\\s+"))
+private fun CharSequence.splitName(): List<Char?> {
+    val names = trim()
+        .split(Regex("\\s+"))
+        .filter { it.isNotBlank() }
+        .map { it.first() }
+        .filter { it.isLetterOrDigit() }
     return when (names.size) {
         1 -> listOf(names.firstOrNull())
         in (2..Int.MAX_VALUE) -> listOf(names.firstOrNull(), names.lastOrNull())

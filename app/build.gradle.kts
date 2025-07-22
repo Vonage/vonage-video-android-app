@@ -33,11 +33,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -79,6 +79,7 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.datastore.preferences.core)
+    implementation(libs.kotlinx.collections.immutable)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)

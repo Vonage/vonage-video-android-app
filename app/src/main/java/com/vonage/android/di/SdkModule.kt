@@ -1,16 +1,23 @@
 package com.vonage.android.di
 
-import com.vonage.android.kotlin.PublisherFactory
+import android.content.Context
+import com.vonage.android.kotlin.VonageVideoClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object SdkModule {
 
+    @Singleton
     @Provides
-    fun providePublisherFactory(): PublisherFactory = PublisherFactory()
+    fun provideVonageVideoClient(
+        @ApplicationContext context: Context,
+    ): VonageVideoClient =
+        VonageVideoClient(context)
 
 }

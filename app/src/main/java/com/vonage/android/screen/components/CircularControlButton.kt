@@ -2,6 +2,7 @@ package com.vonage.android.screen.components
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
 
 @Composable
@@ -40,6 +42,36 @@ fun CircularControlButton(
             contentDescription = null,
             tint = Color.White,
             modifier = Modifier.size(24.dp)
+        )
+    }
+}
+
+@Composable
+fun ControlButton(
+    icon: ImageVector,
+    onClick: () -> Unit,
+    isActive: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val iconColor = if (isActive) Color.White else Color.Gray
+
+    Box(
+        modifier = modifier
+            .size(48.dp)
+            .clip(CircleShape)
+            .conditional(
+                isActive,
+                ifTrue = { background(Color.White.copy(alpha = 0.2f), CircleShape) },
+                ifFalse = { background(Color.Transparent, CircleShape) },
+            )
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = iconColor,
+            modifier = Modifier.size(24.dp),
         )
     }
 }

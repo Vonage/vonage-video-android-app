@@ -4,7 +4,11 @@ import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.UserRepository
-import com.vonage.android.kotlin.Participant
+import com.vonage.android.kotlin.VonageVideoClient
+import com.vonage.android.kotlin.ext.toggle
+import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.PublisherConfig
+import com.vonage.android.kotlin.model.VeraPublisher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,55 +18,63 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WaitingRoomViewModel @Inject constructor(
-    private val createPublisher: CreatePublisherUseCase,
     private val userRepository: UserRepository,
+    private val videoClient: VonageVideoClient,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<WaitingRoomUiState>(WaitingRoomUiState.Idle)
     val uiState: StateFlow<WaitingRoomUiState> = _uiState.asStateFlow()
 
-    private lateinit var participant: Participant
+    private lateinit var publisher: VeraPublisher
     private lateinit var roomName: String
 
     fun init(roomName: String) {
         this.roomName = roomName
-        participant = createPublisher()
+        publisher = videoClient.buildPublisher()
         viewModelScope.launch {
-            participant.name = userRepository.getUserName().orEmpty()
+            publisher = publisher.copy(name = userRepository.getUserName().orEmpty())
             _uiState.value = buildContentUiState(
                 roomName = roomName,
-                participant = participant,
+                participant = publisher,
             )
         }
     }
 
     fun updateUserName(userName: String) {
-        participant.name = userName
+        publisher = publisher.copy(name = userName)
         _uiState.value = buildContentUiState(
             roomName = roomName,
-            participant = participant,
+            participant = publisher,
         )
     }
 
     fun onMicToggle() {
-        participant.toggleAudio()
+        publisher = publisher.copy(isMicEnabled = publisher.isMicEnabled.toggle())
         _uiState.value = buildContentUiState(
             roomName = roomName,
-            participant = participant,
+            participant = publisher,
         )
     }
 
     fun onCameraToggle() {
-        participant.toggleVideo()
+        publisher = publisher.copy(isCameraEnabled = publisher.isCameraEnabled.toggle())
         _uiState.value = buildContentUiState(
             roomName = roomName,
-            participant = participant,
+            participant = publisher,
         )
     }
 
     fun joinRoom(roomName: String, userName: String) {
         viewModelScope.launch {
             userRepository.saveUserName(userName)
+            videoClient.configurePublisher(
+                PublisherConfig(
+                    name = userName,
+                    publishVideo = publisher.isCameraEnabled,
+                    publishAudio = publisher.isMicEnabled,
+                )
+            )
+            videoClient.destroyPublisher()
             _uiState.value = WaitingRoomUiState.Success(
                 roomName = roomName,
             )

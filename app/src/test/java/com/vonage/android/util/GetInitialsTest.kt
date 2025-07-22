@@ -22,7 +22,8 @@ class GetInitialsTest {
             Arguments.of("peter     parker", "PP"),
             Arguments.of("    ironman", "I"),
             Arguments.of("the amazing spiderman", "TS"),
-//            Arguments.of("🙈", "?"), // failing dunno why
+            Arguments.of("🙈", ""),
+            Arguments.of("? what happen?", "WH"),
         )
     }
 }
