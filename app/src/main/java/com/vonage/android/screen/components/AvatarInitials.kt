@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.icons.PersonIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.components.AvatarInitialsTestTags.USER_INITIALS_CIRCLE_TAG
 import com.vonage.android.screen.components.AvatarInitialsTestTags.USER_INITIALS_ICON_TAG
 import com.vonage.android.screen.components.AvatarInitialsTestTags.USER_INITIALS_TEXT_TAG
 import com.vonage.android.util.getInitials
@@ -40,8 +39,7 @@ fun AvatarInitials(
         modifier = modifier
             .size(size)
             .clip(CircleShape)
-            .background(color)
-            .testTag(USER_INITIALS_CIRCLE_TAG),
+            .background(color),
         contentAlignment = Alignment.Center,
     ) {
         if (initials.value.isEmpty()) {
@@ -62,7 +60,6 @@ fun AvatarInitials(
 }
 
 object AvatarInitialsTestTags {
-    const val USER_INITIALS_CIRCLE_TAG = "user_initials_view_circle"
     const val USER_INITIALS_ICON_TAG = "user_initials_view_icon"
     const val USER_INITIALS_TEXT_TAG = "user_initials_view_text"
 }
