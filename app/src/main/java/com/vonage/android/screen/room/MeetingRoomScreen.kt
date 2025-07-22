@@ -1,0 +1,151 @@
+package com.vonage.android.screen.room
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.R
+import com.vonage.android.compose.components.BasicAlertDialog
+import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.model.VeraPublisher
+import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
+import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
+import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
+import com.vonage.android.screen.room.components.BottomBar
+import com.vonage.android.screen.room.components.MeetingRoomContent
+import com.vonage.android.screen.room.components.TopBar
+import com.vonage.android.util.preview.buildCallWithParticipants
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MeetingRoomScreen(
+    uiState: MeetingRoomUiState,
+    actions: MeetingRoomActions,
+    modifier: Modifier = Modifier,
+) {
+
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    when (uiState) {
+        is MeetingRoomUiState.Content -> {
+            val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
+            val publisher = participants.filterIsInstance<VeraPublisher>().firstOrNull()
+
+            Scaffold(
+                modifier = modifier,
+                topBar = {
+                    TopBar(
+                        modifier = Modifier
+                            .testTag(MEETING_ROOM_TOP_BAR),
+                        roomName = uiState.roomName,
+                        actions = actions,
+                    )
+                },
+                bottomBar = {
+                    BottomBar(
+                        modifier = Modifier
+                            .testTag(MEETING_ROOM_BOTTOM_BAR),
+                        actions = actions,
+                        onToggleParticipants = { showBottomSheet = !showBottomSheet },
+                        isMicEnabled = publisher?.isMicEnabled ?: false,
+                        isCameraEnabled = publisher?.isCameraEnabled ?: false,
+                        participantsCount = participants.size,
+                    )
+                }
+            ) { contentPadding ->
+                MeetingRoomContent(
+                    modifier = Modifier
+                        .padding(contentPadding)
+                        .testTag(MEETING_ROOM_CONTENT),
+                    participants = participants,
+                    sheetState = sheetState,
+                    showBottomSheet = showBottomSheet,
+                    onDismissRequest = { showBottomSheet = false },
+                )
+            }
+        }
+
+        is MeetingRoomUiState.Loading -> {
+            MeetingRoomLoading()
+        }
+
+        is MeetingRoomUiState.SessionError -> {
+            BasicAlertDialog(
+                text = stringResource(R.string.meeting_screen_session_creation_error),
+                acceptLabel = stringResource(R.string.generic_retry),
+                onAccept = { actions.onRetry() },
+                onCancel = {
+                    // navigate back to waiting room
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun MeetingRoomLoading(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(VonageVideoTheme.colors.background)
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.align(Alignment.Center)
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun MeetingRoomScreenLoadingPreview() {
+    VonageVideoTheme {
+        MeetingRoomScreen(
+            uiState = MeetingRoomUiState.Loading,
+            actions = MeetingRoomActions(),
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun MeetingRoomScreenSessionErrorPreview() {
+    VonageVideoTheme {
+        MeetingRoomScreen(
+            uiState = MeetingRoomUiState.SessionError,
+            actions = MeetingRoomActions(),
+        )
+    }
+}
+
+@Suppress("MagicNumber")
+@PreviewLightDark
+@Composable
+internal fun MeetingRoomScreenSessionPreview() {
+    VonageVideoTheme {
+        MeetingRoomScreen(
+            uiState = MeetingRoomUiState.Content(
+                roomName = "sample-room-name",
+                call = buildCallWithParticipants(5),
+            ),
+            actions = MeetingRoomActions(),
+        )
+    }
+}

@@ -41,7 +41,6 @@ import com.vonage.android.screen.components.OrSeparator
 import com.vonage.android.screen.components.VonageIcon
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.CREATE_ROOM_BUTTON_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.JOIN_BUTTON_TAG
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.PROGRESS_INDICATOR_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.ROOM_INPUT_ERROR_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.ROOM_INPUT_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.SUBTITLE_TAG
@@ -88,24 +87,7 @@ fun JoinMeetingRoomScreen(
                     navigateToRoom(
                         JoinMeetingRoomRouteParams(
                             roomName = uiState.roomName,
-                            apiKey = uiState.apiKey,
-                            sessionId = uiState.sessionId,
-                            token = uiState.token,
                         )
-                    )
-                }
-            }
-
-            is JoinMeetingRoomUiState.Loading -> {
-                Column(
-                    modifier = Modifier
-                        .padding(64.dp)
-                        .fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.testTag(PROGRESS_INDICATOR_TAG)
                     )
                 }
             }

@@ -2,7 +2,6 @@ package com.vonage.android.screen.join
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vonage.android.data.SessionRepository
 import com.vonage.android.util.RoomNameGenerator
 import com.vonage.android.util.isValidRoomName
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +13,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class JoinMeetingRoomViewModel @Inject constructor(
-    private val sessionRepository: SessionRepository,
     private val roomNameGenerator: RoomNameGenerator,
 ) : ViewModel() {
 
@@ -31,31 +29,16 @@ class JoinMeetingRoomViewModel @Inject constructor(
 
     fun createRoom() {
         val roomNameGenerated = roomNameGenerator.generateRoomName()
-        _uiState.value = JoinMeetingRoomUiState.Content(
+        _uiState.value = JoinMeetingRoomUiState.Success(
             roomName = roomNameGenerated,
-            isRoomNameWrong = false,
         )
     }
 
     fun joinRoom(roomName: String) {
         viewModelScope.launch {
-            _uiState.emit(JoinMeetingRoomUiState.Loading)
-            sessionRepository.getSession(roomName)
-                .onSuccess {
-                    _uiState.value = JoinMeetingRoomUiState.Success(
-                        roomName = roomName,
-                        apiKey = it.apiKey,
-                        sessionId = it.sessionId,
-                        token = it.token,
-                    )
-                }
-                .onFailure {
-                    _uiState.value = JoinMeetingRoomUiState.Content(
-                        roomName = roomName,
-                        isRoomNameWrong = false,
-                        isError = true,
-                    )
-                }
+            _uiState.value = JoinMeetingRoomUiState.Success(
+                roomName = roomName,
+            )
         }
     }
 }
@@ -68,12 +51,7 @@ sealed interface JoinMeetingRoomUiState {
         val isError: Boolean = false,
     ) : JoinMeetingRoomUiState
 
-    data object Loading : JoinMeetingRoomUiState
-
     data class Success(
         val roomName: String,
-        val apiKey: String,
-        val sessionId: String,
-        val token: String,
     ) : JoinMeetingRoomUiState
 }

@@ -40,7 +40,6 @@ object JoinMeetingRoomTestTags {
     const val JOIN_BUTTON_TAG = "join_meeting_room_screen_join_button"
     const val ROOM_INPUT_TAG = "join_meeting_room_screen_room_input"
     const val ROOM_INPUT_ERROR_TAG = "join_meeting_room_screen_room_error_label"
-    const val PROGRESS_INDICATOR_TAG = "join_meeting_room_screen_progress_indicator"
 }
 
 @Stable
@@ -52,7 +51,4 @@ data class JoinMeetingRoomActions(
 
 data class JoinMeetingRoomRouteParams(
     val roomName: String,
-    val apiKey: String,
-    val sessionId: String,
-    val token: String,
 )

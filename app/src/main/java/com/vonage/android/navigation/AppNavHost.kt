@@ -1,6 +1,7 @@
 package com.vonage.android.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
@@ -8,11 +9,14 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.vonage.android.screen.RoomScreen
+import com.vonage.android.screen.GoodbyeScreen
 import com.vonage.android.screen.join.JoinMeetingRoomRoute
+import com.vonage.android.screen.room.MeetingRoomScreenRoute
 import com.vonage.android.screen.waiting.WaitingRoomRoute
+import com.vonage.android.util.navigateToShare
 import com.vonage.android.util.navigateToSystemPermissions
 
+@Suppress("LongMethod") // will refactored in VIDSOL-104
 @Composable
 fun AppNavHost(
     navController: NavHostController,
@@ -25,15 +29,12 @@ fun AppNavHost(
         navController = navController,
         startDestination = startDestination
     ) {
-        composable(NavigationItem.JoinRoom.route) {
+        composable(route = NavigationItem.JoinRoom.route) {
             JoinMeetingRoomRoute(
                 navigateToRoom = { params ->
                     navController.navigate(
                         NavigationItem.WaitingRoom.createRoute(
                             roomName = params.roomName,
-                            apiKey = params.apiKey,
-                            sessionId = params.sessionId,
-                            token = params.token,
                         )
                     )
                 },
@@ -43,9 +44,6 @@ fun AppNavHost(
             route = NavigationItem.WaitingRoom.route,
             arguments = listOf(
                 navArgument("roomName") { type = NavType.StringType },
-                navArgument("apiKey") { type = NavType.StringType },
-                navArgument("sessionId") { type = NavType.StringType },
-                navArgument("token") { type = NavType.StringType },
             ),
         ) { backStackEntry ->
             val roomName = backStackEntry.arguments?.getString("roomName")
@@ -53,26 +51,37 @@ fun AppNavHost(
                 roomName = roomName.toString(),
                 navigateToRoom = { roomName ->
                     navController.navigate(
-                        NavigationItem.Room.createRoute(
+                        NavigationItem.MeetingRoom.createRoute(
                             roomName = roomName,
                         )
                     )
                 },
                 navigateToPermissions = {
-                    navigateToSystemPermissions(context)
+                    context.navigateToSystemPermissions()
                 },
             )
         }
         composable(
-            route = NavigationItem.Room.route,
+            route = NavigationItem.MeetingRoom.route,
             arguments = listOf(
                 navArgument("roomName") { type = NavType.StringType },
             ),
         ) { backStackEntry ->
             val roomName = backStackEntry.arguments?.getString("roomName")
-            RoomScreen(
+            MeetingRoomScreenRoute(
                 roomName = roomName.toString(),
+                navigateToGoodBye = {
+                    navController.navigate(NavigationItem.GoodbyeRoom.route)
+                },
+                navigateToShare = { roomName ->
+                    context.navigateToShare(roomName)
+                },
             )
+        }
+        composable(
+            route = NavigationItem.GoodbyeRoom.route,
+        ) { backStackEntry ->
+            GoodbyeScreen()
         }
     }
 }
