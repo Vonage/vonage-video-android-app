@@ -31,24 +31,19 @@ fun AppNavHost(
     ) {
         composable<Landing> {
             JoinMeetingRoomRoute(
-                navigateToRoom = { params ->
-                    navController.navigate(Waiting(params.roomName))
-                },
+                navigateToRoom = { params -> navController.navigate(Waiting(params.roomName)) },
             )
         }
         composable<Waiting> { backStackEntry ->
             val params: Waiting = backStackEntry.toRoute()
             WaitingRoomRoute(
                 roomName = params.roomName,
-                navigateToRoom = { roomName ->
-                    navController.navigate(Meeting(roomName))
-                },
-                navigateToPermissions = {
-                    context.navigateToSystemPermissions()
-                },
+                navigateToRoom = { roomName -> navController.navigate(Meeting(roomName)) },
+                navigateToPermissions = { context.navigateToSystemPermissions() },
                 onBack = {
-                    navController.popBackStack(Landing, inclusive = true)
-                    navController.navigate(Landing)
+                    navController.navigate(Landing) {
+                        popUpTo(Landing) { inclusive = true }
+                    }
                 },
             )
         }
@@ -56,13 +51,12 @@ fun AppNavHost(
             val params: Meeting = backStackEntry.toRoute()
             MeetingRoomScreenRoute(
                 roomName = params.roomName,
-                navigateToGoodBye = {
-                    navController.navigate(Goodbye(roomName = params.roomName))
-                },
+                navigateToGoodBye = { navController.navigate(Goodbye(roomName = params.roomName)) },
                 navigateToShare = { roomName -> context.navigateToShare(roomName) },
                 onBack = {
-                    navController.popBackStack(Waiting(roomName = params.roomName), inclusive = true)
-                    navController.navigate(Waiting(roomName = params.roomName))
+                    navController.navigate(Waiting(roomName = params.roomName)) {
+                        popUpTo(Waiting(roomName = params.roomName)) { inclusive = true }
+                    }
                 }
             )
         }
@@ -70,12 +64,11 @@ fun AppNavHost(
             val params: Goodbye = backStackEntry.toRoute()
             GoodbyeScreenRoute(
                 roomName = params.roomName,
-                navigateToMeeting = { roomName ->
-                    navController.navigate(Meeting(roomName = params.roomName))
-                },
+                navigateToMeeting = { roomName -> navController.navigate(Meeting(roomName = params.roomName)) },
                 navigateToLanding = {
-                    navController.popBackStack(Landing, inclusive = true)
-                    navController.navigate(Landing)
+                    navController.navigate(Landing) {
+                        popUpTo(Landing) { inclusive = true }
+                    }
                 },
             )
         }

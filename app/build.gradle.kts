@@ -81,7 +81,7 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.kotlinx.collections.immutable)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
