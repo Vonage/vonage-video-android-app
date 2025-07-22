@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.VideocamOff
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -63,51 +64,60 @@ fun WaitingRoomScreen(
     onGrantPermissions: () -> Unit = {},
     navigateToPermissions: () -> Unit = {},
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(VonageVideoTheme.colors.background),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        TopBanner()
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            TopBanner(
+                onBack = actions.onBack,
+            )
+        }
+    ) { contentPadding ->
+        Column(
+            modifier = Modifier
+                .padding(contentPadding)
+                .fillMaxSize()
+                .background(VonageVideoTheme.colors.background),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
 
-        CallPermissionHandler(
-            onGrantPermissions = onGrantPermissions,
-            navigateToPermissions = navigateToPermissions,
-        )
+            CallPermissionHandler(
+                onGrantPermissions = onGrantPermissions,
+                navigateToPermissions = navigateToPermissions,
+            )
 
-        when (uiState) {
-            is WaitingRoomUiState.Content -> {
-                VideoPreviewContainer(
-                    view = uiState.view,
-                    name = uiState.userName,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp),
-                    onMicToggle = actions.onMicToggle,
-                    onCameraToggle = actions.onCameraToggle,
-                    isMicEnabled = uiState.isMicEnabled,
-                    isCameraEnabled = uiState.isCameraEnabled,
-                )
+            when (uiState) {
+                is WaitingRoomUiState.Content -> {
+                    VideoPreviewContainer(
+                        view = uiState.view,
+                        name = uiState.userName,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp),
+                        onMicToggle = actions.onMicToggle,
+                        onCameraToggle = actions.onCameraToggle,
+                        isMicEnabled = uiState.isMicEnabled,
+                        isCameraEnabled = uiState.isCameraEnabled,
+                    )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                JoinRoomSection(
-                    roomName = uiState.roomName,
-                    username = uiState.userName,
-                    onUsernameChange = actions.onUserNameChange,
-                    onJoinRoom = actions.onJoinRoom,
-                )
-            }
+                    JoinRoomSection(
+                        roomName = uiState.roomName,
+                        username = uiState.userName,
+                        onUsernameChange = actions.onUserNameChange,
+                        onJoinRoom = actions.onJoinRoom,
+                    )
+                }
 
-            is WaitingRoomUiState.Idle -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.testTag("initializing_indicator")
-                )
-            }
+                is WaitingRoomUiState.Idle -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.testTag("initializing_indicator")
+                    )
+                }
 
-            is WaitingRoomUiState.Success -> {
-                navigateToRoom(uiState.roomName)
+                is WaitingRoomUiState.Success -> {
+                    navigateToRoom(uiState.roomName)
+                }
             }
         }
     }

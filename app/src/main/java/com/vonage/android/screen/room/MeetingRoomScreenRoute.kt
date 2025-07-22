@@ -1,5 +1,6 @@
 package com.vonage.android.screen.room
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -16,6 +17,7 @@ fun MeetingRoomScreenRoute(
     roomName: String,
     navigateToGoodBye: () -> Unit,
     navigateToShare: (String) -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MeetingRoomScreenViewModel = hiltViewModel(),
 ) {
@@ -43,8 +45,17 @@ fun MeetingRoomScreenRoute(
             onShare = navigateToShare,
             onRetry = {
                 viewModel.init(roomName)
+            },
+            onBack = {
+                viewModel.endCall()
+                onBack()
             }
         )
+    }
+
+    BackHandler {
+        viewModel.endCall()
+        onBack()
     }
 
     MeetingRoomScreen(
@@ -67,4 +78,5 @@ data class MeetingRoomActions(
     val onToggleMic: () -> Unit = {},
     val onToggleCamera: () -> Unit = {},
     val onEndCall: () -> Unit = {},
+    val onBack: () -> Unit = {},
 )
