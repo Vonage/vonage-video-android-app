@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
+import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
@@ -48,7 +49,7 @@ class WaitingRoomViewModel @Inject constructor(
     }
 
     fun onMicToggle() {
-        publisher = publisher.copy(isMicEnabled = !publisher.isMicEnabled)
+        publisher = publisher.copy(isMicEnabled = publisher.isMicEnabled.toggle())
         _uiState.value = buildContentUiState(
             roomName = roomName,
             participant = publisher,
@@ -56,7 +57,7 @@ class WaitingRoomViewModel @Inject constructor(
     }
 
     fun onCameraToggle() {
-        publisher = publisher.copy(isCameraEnabled = !publisher.isCameraEnabled)
+        publisher = publisher.copy(isCameraEnabled = publisher.isCameraEnabled.toggle())
         _uiState.value = buildContentUiState(
             roomName = roomName,
             participant = publisher,
