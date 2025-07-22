@@ -1,6 +1,5 @@
 package com.vonage.android.screen.components
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -11,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -29,17 +27,13 @@ fun TopBanner(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
         navigationIcon = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            IconButton(
+                onClick = onBack,
             ) {
-                IconButton(
-                    onClick = onBack,
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = null,
-                    )
-                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                )
             }
         },
         title = {
