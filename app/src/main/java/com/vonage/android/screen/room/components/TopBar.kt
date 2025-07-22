@@ -1,10 +1,6 @@
 package com.vonage.android.screen.room.components
 
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -12,12 +8,17 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vonage.android.R
+import com.vonage.android.compose.icons.ShareIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.room.MeetingRoomActions
+import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_SHARE_ACTION
+import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_TITLE
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,6 +34,8 @@ fun TopBar(
         ),
         title = {
             Text(
+                modifier = Modifier
+                    .testTag(TOP_BAR_TITLE),
                 text = roomName,
                 color = MaterialTheme.colorScheme.inverseSurface,
                 fontSize = 16.sp,
@@ -41,19 +44,23 @@ fun TopBar(
         },
         actions = {
             IconButton(
+                modifier = Modifier
+                    .testTag(TOP_BAR_SHARE_ACTION),
                 onClick = {
                     actions.onShare(roomName)
                 }
             ) {
-                Icon(
-                    Icons.Default.Share,
-                    contentDescription = "Share room link",
-                    tint = MaterialTheme.colorScheme.inverseSurface,
-                    modifier = Modifier.size(20.dp)
+                ShareIcon(
+                    contentDescription = stringResource(R.string.meeting_room_share_room_link)
                 )
             }
         }
     )
+}
+
+object TopBarTestTags {
+    const val TOP_BAR_TITLE = "top_bar_title"
+    const val TOP_BAR_SHARE_ACTION = "top_bar_share_action"
 }
 
 @PreviewLightDark

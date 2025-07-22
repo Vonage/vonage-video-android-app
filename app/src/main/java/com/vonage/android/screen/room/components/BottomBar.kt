@@ -23,11 +23,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.ControlButton
 import com.vonage.android.screen.room.MeetingRoomActions
+import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CAMERA_BUTTON
+import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_END_CALL_BUTTON
+import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_GRID_BUTTON
+import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_MIC_BUTTON
+import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BADGE
+import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BUTTON
 
 @Composable
 fun BottomBar(
@@ -51,49 +58,82 @@ fun BottomBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ControlButton(
+                modifier = Modifier
+                    .testTag(BOTTOM_BAR_MIC_BUTTON),
                 onClick = actions.onToggleMic,
                 icon = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
                 isActive = isMicEnabled,
             )
 
             ControlButton(
+                modifier = Modifier
+                    .testTag(BOTTOM_BAR_CAMERA_BUTTON),
                 onClick = actions.onToggleCamera,
                 icon = if (isCameraEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
                 isActive = isCameraEnabled,
             )
 
             ControlButton(
+                modifier = Modifier
+                    .testTag(BOTTOM_BAR_GRID_BUTTON),
                 onClick = {},
                 icon = Icons.Default.Window,
                 isActive = false,
             )
 
-            BadgedBox(
-                badge = {
-                    Badge(
-                        containerColor = Color.Gray,
-                        contentColor = Color.White,
-                    ) {
-                        Text("$participantsCount")
-                    }
-                }
-            ) {
-                ControlButton(
-                    onClick = onToggleParticipants,
-                    icon = Icons.Default.Group,
-                    isActive = true,
-                )
-            }
+            ParticipantsBadgeButton(
+                participantsCount = participantsCount,
+                onToggleParticipants = onToggleParticipants,
+            )
 
             ControlButton(
                 modifier = Modifier
-                    .background(Color.Red, CircleShape),
+                    .background(Color.Red, CircleShape)
+                    .testTag(BOTTOM_BAR_END_CALL_BUTTON),
                 onClick = actions.onEndCall,
                 icon = Icons.Default.CallEnd,
                 isActive = true,
             )
         }
     }
+}
+
+@Composable
+private fun ParticipantsBadgeButton(
+    participantsCount: Int,
+    onToggleParticipants: () -> Unit,
+) {
+    BadgedBox(
+        badge = {
+            Badge(
+                containerColor = Color.Gray,
+                contentColor = Color.White,
+            ) {
+                Text(
+                    modifier = Modifier
+                        .testTag(BOTTOM_BAR_PARTICIPANTS_BADGE),
+                    text = "$participantsCount",
+                )
+            }
+        }
+    ) {
+        ControlButton(
+            modifier = Modifier
+                .testTag(BOTTOM_BAR_PARTICIPANTS_BUTTON),
+            onClick = onToggleParticipants,
+            icon = Icons.Default.Group,
+            isActive = true,
+        )
+    }
+}
+
+object BottomBarTestTags {
+    const val BOTTOM_BAR_PARTICIPANTS_BUTTON = "bottom_bar_participants_button"
+    const val BOTTOM_BAR_PARTICIPANTS_BADGE = "bottom_bar_participants_badge"
+    const val BOTTOM_BAR_END_CALL_BUTTON = "bottom_bar_end_call_button"
+    const val BOTTOM_BAR_GRID_BUTTON = "bottom_bar_grid_button"
+    const val BOTTOM_BAR_CAMERA_BUTTON = "bottom_bar_camera_button"
+    const val BOTTOM_BAR_MIC_BUTTON = "bottom_bar_mic_button"
 }
 
 @PreviewLightDark

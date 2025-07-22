@@ -2,14 +2,11 @@ package com.vonage.android.screen.room
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,25 +15,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VeraPublisher
-import com.vonage.android.screen.room.components.AdaptiveGrid
+import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
+import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
+import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
 import com.vonage.android.screen.room.components.BottomBar
-import com.vonage.android.screen.room.components.ParticipantsList
+import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.TopBar
 import com.vonage.android.util.preview.buildCallWithParticipants
-import kotlinx.collections.immutable.ImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeetingRoomScreen(
-    uiState: RoomUiState,
+    uiState: MeetingRoomUiState,
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
 ) {
@@ -45,7 +43,7 @@ fun MeetingRoomScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
 
     when (uiState) {
-        is RoomUiState.Content -> {
+        is MeetingRoomUiState.Content -> {
             val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
             val publisher = participants.filterIsInstance<VeraPublisher>().firstOrNull()
 
@@ -53,12 +51,16 @@ fun MeetingRoomScreen(
                 modifier = modifier,
                 topBar = {
                     TopBar(
+                        modifier = Modifier
+                            .testTag(MEETING_ROOM_TOP_BAR),
                         roomName = uiState.roomName,
                         actions = actions,
                     )
                 },
                 bottomBar = {
                     BottomBar(
+                        modifier = Modifier
+                            .testTag(MEETING_ROOM_BOTTOM_BAR),
                         actions = actions,
                         onToggleParticipants = { showBottomSheet = !showBottomSheet },
                         isMicEnabled = publisher?.isMicEnabled ?: false,
@@ -68,7 +70,9 @@ fun MeetingRoomScreen(
                 }
             ) { contentPadding ->
                 MeetingRoomContent(
-                    contentPadding = contentPadding,
+                    modifier = Modifier
+                        .padding(contentPadding)
+                        .testTag(MEETING_ROOM_CONTENT),
                     participants = participants,
                     sheetState = sheetState,
                     showBottomSheet = showBottomSheet,
@@ -77,11 +81,11 @@ fun MeetingRoomScreen(
             }
         }
 
-        is RoomUiState.Loading -> {
+        is MeetingRoomUiState.Loading -> {
             MeetingRoomLoading()
         }
 
-        is RoomUiState.SessionError -> {
+        is MeetingRoomUiState.SessionError -> {
             BasicAlertDialog(
                 text = stringResource(R.string.meeting_screen_session_creation_error),
                 acceptLabel = stringResource(R.string.generic_retry),
@@ -90,37 +94,6 @@ fun MeetingRoomScreen(
                     // navigate back to waiting room
                 },
             )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun MeetingRoomContent(
-    contentPadding: PaddingValues,
-    participants: ImmutableList<Participant>,
-    sheetState: SheetState,
-    showBottomSheet: Boolean,
-    onDismissRequest: () -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .padding(contentPadding)
-            .fillMaxSize(),
-    ) {
-        AdaptiveGrid(
-            participants = participants,
-            modifier = Modifier
-                .fillMaxSize()
-        )
-
-        if (showBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = onDismissRequest,
-                sheetState = sheetState,
-            ) {
-                ParticipantsList(participants = participants)
-            }
         }
     }
 }
@@ -145,7 +118,7 @@ private fun MeetingRoomLoading(
 internal fun MeetingRoomScreenLoadingPreview() {
     VonageVideoTheme {
         MeetingRoomScreen(
-            uiState = RoomUiState.Loading,
+            uiState = MeetingRoomUiState.Loading,
             actions = MeetingRoomActions(),
         )
     }
@@ -156,7 +129,7 @@ internal fun MeetingRoomScreenLoadingPreview() {
 internal fun MeetingRoomScreenSessionErrorPreview() {
     VonageVideoTheme {
         MeetingRoomScreen(
-            uiState = RoomUiState.SessionError,
+            uiState = MeetingRoomUiState.SessionError,
             actions = MeetingRoomActions(),
         )
     }
@@ -168,7 +141,7 @@ internal fun MeetingRoomScreenSessionErrorPreview() {
 internal fun MeetingRoomScreenSessionPreview() {
     VonageVideoTheme {
         MeetingRoomScreen(
-            uiState = RoomUiState.Content(
+            uiState = MeetingRoomUiState.Content(
                 roomName = "sample-room-name",
                 call = buildCallWithParticipants(5),
             ),

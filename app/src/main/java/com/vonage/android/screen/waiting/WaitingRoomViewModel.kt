@@ -4,9 +4,9 @@ import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.UserRepository
+import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.PublisherConfig
-import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.VeraPublisher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,11 +66,13 @@ class WaitingRoomViewModel @Inject constructor(
     fun joinRoom(roomName: String, userName: String) {
         viewModelScope.launch {
             userRepository.saveUserName(userName)
-            videoClient.configurePublisher(PublisherConfig(
-                name = userName,
-                publishVideo = publisher.isCameraEnabled,
-                publishAudio = publisher.isMicEnabled,
-            ))
+            videoClient.configurePublisher(
+                PublisherConfig(
+                    name = userName,
+                    publishVideo = publisher.isCameraEnabled,
+                    publishAudio = publisher.isMicEnabled,
+                )
+            )
             videoClient.destroyPublisher()
             _uiState.value = WaitingRoomUiState.Success(
                 roomName = roomName,

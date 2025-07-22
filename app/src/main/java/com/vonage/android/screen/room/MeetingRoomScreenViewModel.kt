@@ -1,6 +1,5 @@
 package com.vonage.android.screen.room
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.SessionInfo
@@ -11,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,14 +20,14 @@ class MeetingRoomScreenViewModel @Inject constructor(
     private val videoClient: VonageVideoClient,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<RoomUiState>(RoomUiState.Loading)
-    val uiState: StateFlow<RoomUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<MeetingRoomUiState>(MeetingRoomUiState.Loading)
+    val uiState: StateFlow<MeetingRoomUiState> = _uiState.asStateFlow()
 
     private var call: CallFacade? = null
 
     fun init(roomName: String) {
         viewModelScope.launch {
-            _uiState.value = RoomUiState.Loading
+            _uiState.value = MeetingRoomUiState.Loading
             sessionRepository.getSession(roomName)
                 .onSuccess { sessionInfo ->
                     onSessionCreated(
@@ -36,7 +36,7 @@ class MeetingRoomScreenViewModel @Inject constructor(
                     )
                 }
                 .onFailure {
-                    _uiState.value = RoomUiState.SessionError
+                    _uiState.value = MeetingRoomUiState.SessionError
                 }
         }
     }
@@ -47,7 +47,7 @@ class MeetingRoomScreenViewModel @Inject constructor(
     ) {
         connect(sessionInfo)
         call?.let {
-            _uiState.value = RoomUiState.Content(
+            _uiState.value = MeetingRoomUiState.Content(
                 roomName = roomName,
                 call = it,
             )
@@ -62,11 +62,7 @@ class MeetingRoomScreenViewModel @Inject constructor(
             token = sessionInfo.token,
         )
         viewModelScope.launch {
-            call?.connect()
-                ?.collect {
-                    // handle session events like session disconnected
-                    Log.d(TAG, "SessionEvent received $it")
-                }
+            call?.connect()?.collect()
         }
     }
 
@@ -89,19 +85,14 @@ class MeetingRoomScreenViewModel @Inject constructor(
     fun onResume() {
         call?.resumeSession()
     }
-
-    private companion object {
-        const val TAG = "MeetingRoomScreenViewModel"
-    }
 }
 
-sealed interface RoomUiState {
-
+sealed interface MeetingRoomUiState {
     data class Content(
         val roomName: String = "",
         val call: CallFacade,
-    ) : RoomUiState
+    ) : MeetingRoomUiState
 
-    data object Loading : RoomUiState
-    data object SessionError : RoomUiState
+    data object Loading : MeetingRoomUiState
+    data object SessionError : MeetingRoomUiState
 }

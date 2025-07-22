@@ -43,7 +43,7 @@ fun ParticipantsList(
         item {
             Text(
                 modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
-                text = stringResource(R.string.participants),
+                text = stringResource(R.string.meeting_room_participants_list_title),
                 color = MaterialTheme.colorScheme.inverseSurface,
                 style = MaterialTheme.typography.titleLarge,
             )

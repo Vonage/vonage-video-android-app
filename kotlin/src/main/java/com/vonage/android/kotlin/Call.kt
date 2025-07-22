@@ -7,6 +7,7 @@ import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
+import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
 import com.vonage.android.kotlin.internal.toParticipant
 import com.vonage.android.kotlin.model.CallFacade
@@ -47,13 +48,13 @@ class Call internal constructor(
             }
 
             override fun onStreamReceived(session: Session, stream: Stream) {
-                trySend(SessionEvent.StreamReceived(stream.streamId))
                 addSubscriber(stream)
+                trySend(SessionEvent.StreamReceived(stream.streamId))
             }
 
             override fun onStreamDropped(session: Session, stream: Stream) {
-                trySend(SessionEvent.StreamDropped(stream.streamId))
                 removeSubscriber(stream)
+                trySend(SessionEvent.StreamDropped(stream.streamId))
             }
 
             override fun onError(session: Session, error: OpentokError) {
@@ -66,19 +67,19 @@ class Call internal constructor(
     }
 
     override fun endSession() {
-        publisherHolder.publisher.session?.disconnect()
+        // wait for PublisherListener#streamDestroyed before returning : VIDSOL-104
         session.unpublish(publisherHolder.publisher)
         session.disconnect()
     }
 
     override fun togglePublisherVideo() {
-        publisherHolder.publisher.publishVideo = !publisherHolder.publisher.publishVideo
+        publisherHolder.publisher.publishVideo = publisherHolder.publisher.publishVideo.toggle()
         participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
     }
 
     override fun togglePublisherAudio() {
-        publisherHolder.publisher.publishAudio = !publisherHolder.publisher.publishAudio
+        publisherHolder.publisher.publishAudio = publisherHolder.publisher.publishAudio.toggle()
         participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
     }
@@ -182,7 +183,6 @@ class Call internal constructor(
         subscriber.setStreamListener(null)
         subscriber.setAudioLevelListener(null)
         subscriberStreams.remove(stream.streamId)
-
         participantStreams.remove(stream.streamId)
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
 

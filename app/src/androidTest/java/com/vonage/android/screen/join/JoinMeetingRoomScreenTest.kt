@@ -116,25 +116,6 @@ class JoinMeetingRoomScreenTest {
             .assert(hasText(context, R.string.landing_room_name_error_message))
     }
 
-    @Test
-    fun given_loading_state_THEN_components_are_displayed() {
-        compose.setContent {
-            VonageVideoTheme {
-                JoinMeetingRoomScreen(
-                    uiState = JoinMeetingRoomUiState.Loading,
-                    actions = NO_OP_JOIN_MEETING_ROOM_ACTIONS,
-                )
-            }
-        }
-
-        screen.logo.assertIsDisplayed()
-        screen.title.assertIsDisplayed()
-        screen.progressIndicator.assertIsDisplayed()
-        screen.joinButton.assertIsNotDisplayed()
-        screen.roomInput.assertIsNotDisplayed()
-        screen.roomInputLabel.assertIsNotDisplayed()
-    }
-
     companion object {
         val NO_OP_JOIN_MEETING_ROOM_ACTIONS = JoinMeetingRoomActions(
             onJoinRoomClick = {},

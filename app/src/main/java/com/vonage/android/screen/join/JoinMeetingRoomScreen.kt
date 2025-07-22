@@ -41,7 +41,6 @@ import com.vonage.android.screen.components.OrSeparator
 import com.vonage.android.screen.components.VonageIcon
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.CREATE_ROOM_BUTTON_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.JOIN_BUTTON_TAG
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.PROGRESS_INDICATOR_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.ROOM_INPUT_ERROR_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.ROOM_INPUT_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.SUBTITLE_TAG

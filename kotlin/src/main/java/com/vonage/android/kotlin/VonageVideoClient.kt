@@ -8,6 +8,7 @@ import com.opentok.android.Session
 import com.opentok.android.Session.SessionOptions
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
 import com.vonage.android.kotlin.internal.toParticipant
+import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
 
@@ -56,7 +57,7 @@ class VonageVideoClient(
         Log.i(TAG, "Destroy publisher")
     }
 
-    fun initializeSession(apiKey: String, sessionId: String, token: String): Call {
+    fun initializeSession(apiKey: String, sessionId: String, token: String): CallFacade {
         Log.i(TAG, "apiKey: $apiKey")
         Log.i(TAG, "sessionId: $sessionId")
         Log.i(TAG, "token: $token")

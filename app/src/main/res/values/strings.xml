@@ -17,8 +17,9 @@
     <string name="waiting_room_join">Join</string>
 
     <!-- Meeting Screen -->
-    <string name="participants">Participants</string>
+    <string name="meeting_room_participants_list_title">Participants</string>
     <string name="meeting_screen_session_creation_error">Error while creating room, please try again</string>
+    <string name="meeting_room_share_room_link">Share room link</string>
 
     <!-- Permissions -->
     <string name="camera_and_microphone_permissions_are_needed">Camera and microphone permissions are needed</string>
