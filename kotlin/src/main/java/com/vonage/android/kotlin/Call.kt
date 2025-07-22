@@ -153,7 +153,7 @@ class Call internal constructor(
             }
 
             override fun onVideoEnabled(subscriber: SubscriberKit, reason: String) {
-                Log.d(TAG, "Subscriber video disabled - reason $reason")
+                Log.d(TAG, "Subscriber video enabled - reason $reason")
                 subscriberStreams[subscriber.stream.streamId]?.let { subs ->
                     val updatedParticipant = (participantStreams[subs.stream.streamId] as VeraSubscriber)
                         .copy(isCameraEnabled = true)

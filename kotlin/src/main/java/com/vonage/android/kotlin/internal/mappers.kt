@@ -2,6 +2,7 @@ package com.vonage.android.kotlin.internal
 
 import com.opentok.android.Publisher
 import com.opentok.android.Subscriber
+import com.vonage.android.kotlin.Call.Companion.PUBLISHER_ID
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.kotlin.model.VeraSubscriber
 
@@ -16,7 +17,7 @@ internal fun Subscriber.toParticipant(): VeraSubscriber = VeraSubscriber(
 internal fun Publisher.toParticipant(
     name: String? = null,
 ): VeraPublisher = VeraPublisher(
-    id = stream?.streamId ?: "publisher",
+    id = stream?.streamId ?: PUBLISHER_ID,
     name = stream?.name ?: name.orEmpty(),
     isMicEnabled = publishAudio,
     isCameraEnabled = publishVideo,
