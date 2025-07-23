@@ -89,6 +89,10 @@ class WaitingRoomViewModel @Inject constructor(
             userName = participant.name,
             view = participant.view,
         )
+
+    fun onStop() {
+        videoClient.destroyPublisher()
+    }
 }
 
 sealed interface WaitingRoomUiState {

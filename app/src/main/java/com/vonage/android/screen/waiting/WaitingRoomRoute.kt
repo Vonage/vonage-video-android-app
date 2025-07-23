@@ -1,5 +1,6 @@
 package com.vonage.android.screen.waiting
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -13,6 +14,7 @@ fun WaitingRoomRoute(
     roomName: String,
     navigateToRoom: (String) -> Unit,
     navigateToPermissions: () -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: WaitingRoomViewModel = hiltViewModel(),
 ) {
@@ -24,7 +26,16 @@ fun WaitingRoomRoute(
             onMicToggle = viewModel::onMicToggle,
             onCameraToggle = viewModel::onCameraToggle,
             onJoinRoom = { userName -> viewModel.joinRoom(roomName, userName) },
+            onBack = {
+                viewModel.onStop()
+                onBack()
+            },
         )
+    }
+
+    BackHandler {
+        viewModel.onStop()
+        onBack()
     }
 
     WaitingRoomScreen(
@@ -54,4 +65,5 @@ data class WaitingRoomActions(
     val onJoinRoom: (String) -> Unit = {},
     val onMicToggle: () -> Unit = {},
     val onCameraToggle: () -> Unit = {},
+    val onBack: () -> Unit = {},
 )

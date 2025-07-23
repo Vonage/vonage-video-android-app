@@ -1,6 +1,9 @@
 package com.vonage.android.screen.room.components
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,6 +35,16 @@ fun TopBar(
         colors = topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
+        navigationIcon = {
+            IconButton(
+                onClick = actions.onBack,
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                )
+            }
+        },
         title = {
             Text(
                 modifier = Modifier
