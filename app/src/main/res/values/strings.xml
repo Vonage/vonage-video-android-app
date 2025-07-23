@@ -21,6 +21,12 @@
     <string name="meeting_screen_session_creation_error">Error while creating room, please try again</string>
     <string name="meeting_room_share_room_link">Share room link</string>
 
+    <!-- Goodbye Screen -->
+    <string name="goodbye_title">You left the room</string>
+    <string name="goodbye_subtitle">We hope you had fun</string>
+    <string name="goodbye_rejoin_button_label">Re-enter</string>
+    <string name="goodbye_return_home_button_label">Return to landing page</string>
+
     <!-- Permissions -->
     <string name="camera_and_microphone_permissions_are_needed">Camera and microphone permissions are needed</string>
     <string name="request_permissions">Request permissions</string>

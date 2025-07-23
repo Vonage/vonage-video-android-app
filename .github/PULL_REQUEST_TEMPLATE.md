@@ -1,19 +1,12 @@
-### :goal_net: What's the goal?
-_Provide a description of the overall goal. The description in the Jira ticket may help._
+#### What is this PR doing?
 
-### :construction: How do we do it?
-_Provide a description of the implementation. A list of steps would be ideal._
-* _Step 1_
-* _Step 2_
-* _Step 3_
 
-### ☑️ Checks
-- [ ] I updated the documentation, including readmes and wikis.
-- [ ] Tested with dark mode.
-- [ ] Sync done with iOS team for this feature to ensure alignment, if applies.
-- [ ] Accessibility considerations.
+#### How should this be manually tested?
 
-### :test_tube: How can I test this?
-_If it cannot be tested explain why._
-- [ ] 🖼️ Screenshots/Videos
-- [ ] ...
+
+#### What are the relevant tickets?
+
+[VIDSOL-](https://jira.vonage.com/browse/VIDSOL-)
+
+
+#### Justification for skipping ci, if applied?
