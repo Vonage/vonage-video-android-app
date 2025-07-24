@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.ext.toggle
-import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +27,8 @@ class WaitingRoomViewModel @Inject constructor(
 
     private lateinit var publisher: VeraPublisher
     private lateinit var roomName: String
+
+    private var currentBlurIndex: Int = 0
 
     fun init(roomName: String) {
         this.roomName = roomName
@@ -64,6 +66,21 @@ class WaitingRoomViewModel @Inject constructor(
         )
     }
 
+    fun onCameraSwitch() {
+        publisher.cycleCamera()
+    }
+
+    fun setBlur() {
+        val blurLevel = BlurLevel.entries[currentBlurIndex % BlurLevel.entries.size]
+        currentBlurIndex += 1
+        publisher = publisher.copy(blurLevel = blurLevel)
+        publisher.setCameraBlur(blurLevel)
+        _uiState.value = buildContentUiState(
+            roomName = roomName,
+            participant = publisher,
+        )
+    }
+
     fun joinRoom(roomName: String, userName: String) {
         viewModelScope.launch {
             userRepository.saveUserName(userName)
@@ -72,6 +89,7 @@ class WaitingRoomViewModel @Inject constructor(
                     name = userName,
                     publishVideo = publisher.isCameraEnabled,
                     publishAudio = publisher.isMicEnabled,
+                    blurLevel = publisher.blurLevel,
                 )
             )
             videoClient.destroyPublisher()
@@ -81,12 +99,13 @@ class WaitingRoomViewModel @Inject constructor(
         }
     }
 
-    private fun buildContentUiState(roomName: String, participant: Participant) =
+    private fun buildContentUiState(roomName: String, participant: VeraPublisher) =
         WaitingRoomUiState.Content(
             roomName = roomName,
             isCameraEnabled = participant.isCameraEnabled,
             isMicEnabled = participant.isMicEnabled,
             userName = participant.name,
+            blurLevel = participant.blurLevel,
             view = participant.view,
         )
 
@@ -103,6 +122,7 @@ sealed interface WaitingRoomUiState {
         val userName: String,
         val isMicEnabled: Boolean,
         val isCameraEnabled: Boolean,
+        val blurLevel: BlurLevel,
         val view: View? = null,
     ) : WaitingRoomUiState
 

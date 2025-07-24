@@ -3,6 +3,7 @@ package com.vonage.android.screen.waiting
 import app.cash.turbine.test
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
+import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
 import io.mockk.coEvery
@@ -40,6 +41,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = publisher.isMicEnabled,
                     userName = publisher.name,
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
         }
@@ -63,6 +65,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = publisher.isMicEnabled,
                     userName = "",
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
             sut.updateUserName("update")
@@ -73,6 +76,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = publisher.isMicEnabled,
                     userName = "update",
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
         }
@@ -96,6 +100,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = false,
                     userName = publisher.name,
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
             sut.onMicToggle()
@@ -106,6 +111,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = true,
                     userName = publisher.name,
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
         }
@@ -129,6 +135,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = true,
                     userName = publisher.name,
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
             sut.onCameraToggle()
@@ -139,6 +146,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = publisher.isMicEnabled,
                     userName = publisher.name,
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
         }
@@ -162,6 +170,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = publisher.isMicEnabled,
                     userName = "Cached user name",
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
         }
@@ -211,6 +220,9 @@ class WaitingRoomViewModelTest {
         name = userName,
         isMicEnabled = isMicEnabled,
         isCameraEnabled = isCameraEnabled,
+        blurLevel = BlurLevel.NONE,
         view = mockk(),
+        cycleCamera = { },
+        setCameraBlur = { },
     )
 }

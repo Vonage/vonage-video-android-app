@@ -3,6 +3,9 @@ package com.vonage.android.kotlin.internal
 import com.opentok.android.Publisher
 import com.opentok.android.Subscriber
 import com.vonage.android.kotlin.Call.Companion.PUBLISHER_ID
+import com.vonage.android.kotlin.model.BackgroundBlur.KEY
+import com.vonage.android.kotlin.model.BackgroundBlur.params
+import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.kotlin.model.VeraSubscriber
 
@@ -22,4 +25,17 @@ internal fun Publisher.toParticipant(
     isMicEnabled = publishAudio,
     isCameraEnabled = publishVideo,
     view = view,
+    cycleCamera = { cycleCamera() },
+    blurLevel = BlurLevel.NONE,
+    setCameraBlur = { blurLevel ->
+        when (blurLevel) {
+            BlurLevel.NONE -> arrayListOf()
+            BlurLevel.LOW,
+            BlurLevel.HIGH -> {
+                arrayListOf(VideoTransformer(KEY, params(blurLevel)))
+            }
+        }.let {
+            setVideoTransformers(it)
+        }
+    },
 )

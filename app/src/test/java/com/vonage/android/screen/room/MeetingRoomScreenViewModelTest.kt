@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
+import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.VeraPublisher
 import io.mockk.coEvery
@@ -176,6 +177,9 @@ class MeetingRoomScreenViewModelTest {
         isMicEnabled = true,
         isCameraEnabled = true,
         view = mockk(),
+        blurLevel = BlurLevel.NONE,
+        cycleCamera = {},
+        setCameraBlur = {},
     )
 
     private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true)

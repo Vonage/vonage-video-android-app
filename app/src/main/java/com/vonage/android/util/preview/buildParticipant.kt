@@ -3,7 +3,6 @@ package com.vonage.android.util.preview
 import android.view.View
 import androidx.compose.runtime.Composable
 import com.vonage.android.kotlin.model.Participant
-import com.vonage.android.screen.waiting.previewCamera
 import kotlin.random.Random
 
 @Composable

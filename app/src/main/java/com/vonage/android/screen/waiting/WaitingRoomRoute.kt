@@ -26,6 +26,8 @@ fun WaitingRoomRoute(
             onMicToggle = viewModel::onMicToggle,
             onCameraToggle = viewModel::onCameraToggle,
             onJoinRoom = { userName -> viewModel.joinRoom(roomName, userName) },
+            onCameraSwitch = viewModel::onCameraSwitch,
+            onCameraBlur = viewModel::setBlur,
             onBack = {
                 viewModel.onStop()
                 onBack()
@@ -65,5 +67,8 @@ data class WaitingRoomActions(
     val onJoinRoom: (String) -> Unit = {},
     val onMicToggle: () -> Unit = {},
     val onCameraToggle: () -> Unit = {},
+    val onCameraBlur: () -> Unit = {},
+    val onCameraSwitch: () -> Unit = {},
+    val onAudioSwitch: () -> Unit = {},
     val onBack: () -> Unit = {},
 )
