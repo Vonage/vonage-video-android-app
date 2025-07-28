@@ -67,6 +67,8 @@ class WaitingRoomViewModel @Inject constructor(
     }
 
     fun onCameraSwitch() {
+        val currentCameraIndex = 1 - publisher.cameraIndex
+        publisher = publisher.copy(cameraIndex = currentCameraIndex)
         publisher.cycleCamera()
     }
 
@@ -90,6 +92,7 @@ class WaitingRoomViewModel @Inject constructor(
                     publishVideo = publisher.isCameraEnabled,
                     publishAudio = publisher.isMicEnabled,
                     blurLevel = publisher.blurLevel,
+                    cameraIndex = publisher.cameraIndex,
                 )
             )
             videoClient.destroyPublisher()

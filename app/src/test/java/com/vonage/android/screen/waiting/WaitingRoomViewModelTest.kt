@@ -205,6 +205,8 @@ class WaitingRoomViewModelTest {
                     name = "save user name",
                     publishVideo = false,
                     publishAudio = false,
+                    blurLevel = BlurLevel.NONE,
+                    cameraIndex = 0,
                 )
             )
         }
@@ -224,5 +226,6 @@ class WaitingRoomViewModelTest {
         view = mockk(),
         cycleCamera = { },
         setCameraBlur = { },
+        cameraIndex = 0,
     )
 }

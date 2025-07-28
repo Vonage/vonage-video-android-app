@@ -2,7 +2,6 @@ package com.vonage.android.screen.waiting
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -105,39 +104,43 @@ fun WaitingRoomScreen(
 }
 
 @Composable
-fun ColumnScope.WaitingRoomBody(
+fun WaitingRoomBody(
     uiState: WaitingRoomUiState.Content,
     actions: WaitingRoomActions,
     onMicDeviceSelect: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    VideoPreviewContainer(
-        view = uiState.view,
-        name = uiState.userName,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(300.dp),
-        isMicEnabled = uiState.isMicEnabled,
-        isCameraEnabled = uiState.isCameraEnabled,
-        blurLevel = uiState.blurLevel,
-        actions = actions,
-    )
+    Column(
+        modifier = modifier,
+    ) {
+        VideoPreviewContainer(
+            view = uiState.view,
+            name = uiState.userName,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp),
+            isMicEnabled = uiState.isMicEnabled,
+            isCameraEnabled = uiState.isCameraEnabled,
+            blurLevel = uiState.blurLevel,
+            actions = actions,
+        )
 
-    Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-    DeviceSelectionPanel(
-        onMicDeviceSelect = onMicDeviceSelect,
-        onCameraDeviceSelect = actions.onCameraSwitch,
-    )
+        DeviceSelectionPanel(
+            onMicDeviceSelect = onMicDeviceSelect,
+            onCameraDeviceSelect = actions.onCameraSwitch,
+        )
 
-    Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-    JoinRoomSection(
-        roomName = uiState.roomName,
-        username = uiState.userName,
-        onUsernameChange = actions.onUserNameChange,
-        onJoinRoom = actions.onJoinRoom,
-    )
+        JoinRoomSection(
+            roomName = uiState.roomName,
+            username = uiState.userName,
+            onUsernameChange = actions.onUserNameChange,
+            onJoinRoom = actions.onJoinRoom,
+        )
+    }
 }
 
 @PreviewLightDark

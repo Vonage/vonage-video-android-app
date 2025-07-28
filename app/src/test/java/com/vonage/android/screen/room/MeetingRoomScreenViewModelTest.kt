@@ -180,6 +180,7 @@ class MeetingRoomScreenViewModelTest {
         blurLevel = BlurLevel.NONE,
         cycleCamera = {},
         setCameraBlur = {},
+        cameraIndex = 0,
     )
 
     private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true)

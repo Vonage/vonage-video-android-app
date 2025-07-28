@@ -53,7 +53,6 @@ class AudioDeviceSelector(
                 type = device.type,
                 audioDeviceInfo = device.audioDeviceInfo,
             )
-            //populateAvailableDevices()
         } else {
             when (device.type) {
                 AudioDeviceType.EARPIECE,

@@ -4,16 +4,16 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-object BackgroundBlur {
+internal object BackgroundBlur {
 
-    fun params(blurLevel: BlurLevel) =
+    internal fun params(blurLevel: BlurLevel) =
         Json.encodeToString(Radius(blurLevel))
 
-    const val KEY = "BackgroundBlur"
+    internal const val KEY = "BackgroundBlur"
 }
 
 @Serializable
-data class Radius(
+internal data class Radius(
     val radius: BlurLevel,
 )
 

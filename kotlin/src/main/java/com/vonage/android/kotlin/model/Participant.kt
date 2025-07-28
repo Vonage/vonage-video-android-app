@@ -16,6 +16,7 @@ data class VeraPublisher(
     override val isMicEnabled: Boolean,
     override val isCameraEnabled: Boolean,
     override val view: View,
+    val cameraIndex: Int,
     val cycleCamera: () -> Unit,
     val blurLevel: BlurLevel,
     val setCameraBlur: (BlurLevel) -> Unit,
