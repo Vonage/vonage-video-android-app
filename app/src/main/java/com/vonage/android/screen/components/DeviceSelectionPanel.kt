@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Cameraswitch
-import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,7 +40,7 @@ fun DeviceSelectionPanel(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         DeviceSelector(
-            icon = Icons.Default.Mic,
+            icon = Icons.AutoMirrored.Default.VolumeUp,
             label = stringResource(R.string.waiting_room_audio_output),
             onClick = onMicDeviceSelect,
             showIndicator = true,

@@ -112,6 +112,7 @@ fun WaitingRoomBody(
 ) {
     Column(
         modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         VideoPreviewContainer(
             view = uiState.view,

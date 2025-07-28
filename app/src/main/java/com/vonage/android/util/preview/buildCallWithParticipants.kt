@@ -20,6 +20,7 @@ fun buildCallWithParticipants(count: Int): CallFacade {
 
         override fun connect(): Flow<SessionEvent> = flowOf()
         override fun togglePublisherVideo() {}
+        override fun togglePublisherCamera() {}
         override fun togglePublisherAudio() {}
         override fun pauseSession() {}
         override fun resumeSession() {}

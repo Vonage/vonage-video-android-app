@@ -74,6 +74,10 @@ class MeetingRoomScreenViewModel @Inject constructor(
         call?.togglePublisherVideo()
     }
 
+    fun onSwitchCamera() {
+        call?.togglePublisherCamera()
+    }
+
     fun endCall() {
         call?.endSession()
     }

@@ -78,6 +78,10 @@ class Call internal constructor(
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
     }
 
+    override fun togglePublisherCamera() {
+        publisherHolder.publisher.cycleCamera()
+    }
+
     override fun togglePublisherAudio() {
         publisherHolder.publisher.publishAudio = publisherHolder.publisher.publishAudio.toggle()
         participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
