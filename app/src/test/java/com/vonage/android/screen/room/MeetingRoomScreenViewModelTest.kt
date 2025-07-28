@@ -163,6 +163,27 @@ class MeetingRoomScreenViewModelTest {
         }
     }
 
+    @Test
+    fun `given viewmodel when onSwitchCamera then delegate to call`() = runTest {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession("room-name") } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+
+        sut.uiState.test {
+            sut.init("room-name")
+            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(
+                MeetingRoomUiState.Content(
+                    roomName = "room-name",
+                    call = mockCall,
+                ), awaitItem()
+            )
+            sut.onSwitchCamera()
+            verify { mockCall.togglePublisherCamera() }
+        }
+    }
+
     private fun buildSuccessSessionResponse() = Result.success(
         SessionInfo(
             apiKey = "api-key",

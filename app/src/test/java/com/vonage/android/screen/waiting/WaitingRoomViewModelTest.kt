@@ -213,19 +213,65 @@ class WaitingRoomViewModelTest {
         verify { videoClient.destroyPublisher() }
     }
 
+    @Test
+    fun `given viewmodel when onCameraSwitch then publisher cycle camera`() = runTest {
+        val publisher = buildMockPublisher(
+            cycleCamera = mockk(relaxed = true),
+        )
+        every { videoClient.buildPublisher() } returns publisher
+        coEvery { userRepository.getUserName() } returns "not relevant"
+
+        sut.init("any-room")
+        sut.onCameraSwitch()
+
+        verify(exactly = 1) { publisher.cycleCamera() }
+    }
+
+    @Test
+    fun `given viewmodel when setBlur then publisher set camera blur`() = runTest {
+        val publisher = buildMockPublisher(
+            setCameraBlur = mockk(relaxed = true),
+        )
+        every { videoClient.buildPublisher() } returns publisher
+        coEvery { userRepository.getUserName() } returns "not relevant"
+
+        sut.init("any-room")
+        sut.setBlur()
+        verify(exactly = 1) { publisher.setCameraBlur(BlurLevel.LOW) }
+
+        sut.setBlur()
+        verify(exactly = 1) { publisher.setCameraBlur(BlurLevel.HIGH) }
+
+        sut.setBlur()
+        verify(exactly = 1) { publisher.setCameraBlur(BlurLevel.NONE) }
+    }
+
+    @Test
+    fun `given viewmodel when stop then destroy publisher`() = runTest {
+        every { videoClient.destroyPublisher() } returns Unit
+
+        sut.onStop()
+
+        verify { videoClient.destroyPublisher() }
+    }
+
     private fun buildMockPublisher(
         userName: String = "",
         isCameraEnabled: Boolean = true,
         isMicEnabled: Boolean = true,
+        cameraIndex: Int = 0,
+        cycleCamera: () -> Unit = {},
+        blurLevel: BlurLevel = BlurLevel.NONE,
+        setCameraBlur: (BlurLevel) -> Unit = {},
     ): VeraPublisher = VeraPublisher(
         id = "ignored",
         name = userName,
         isMicEnabled = isMicEnabled,
         isCameraEnabled = isCameraEnabled,
-        blurLevel = BlurLevel.NONE,
-        view = mockk(),
-        cycleCamera = { },
-        setCameraBlur = { },
-        cameraIndex = 0,
+        blurLevel = blurLevel,
+        view = mockk(relaxed = true),
+        cycleCamera = cycleCamera,
+        setCameraBlur = setCameraBlur,
+        cameraIndex = cameraIndex,
     )
 }
