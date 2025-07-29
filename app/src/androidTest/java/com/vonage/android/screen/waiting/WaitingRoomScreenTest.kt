@@ -8,6 +8,7 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -66,9 +67,11 @@ class WaitingRoomScreenTest {
             .assertTextEquals("room-name")
         screen.whatsYourNameText.assertIsDisplayed()
         screen.userNameInput
+            .performScrollTo()
             .assertIsDisplayed()
             .assert(hasText(""))
         screen.joinButton
+            .performScrollTo()
             .assertIsDisplayed()
             .assertIsNotEnabled()
     }
@@ -98,9 +101,11 @@ class WaitingRoomScreenTest {
             .assertTextEquals("room-name")
         screen.whatsYourNameText.assertIsDisplayed()
         screen.userNameInput
+            .performScrollTo()
             .assertIsDisplayed()
             .assert(hasText("user name"))
         screen.joinButton
+            .performScrollTo()
             .assertIsDisplayed()
             .assertIsEnabled()
     }
@@ -170,9 +175,11 @@ class WaitingRoomScreenTest {
         screen.cameraButtonDisabled.assertIsDisplayed()
         screen.initials.assertIsDisplayedWithIcon()
         screen.userNameInput
+            .performScrollTo()
             .assertIsDisplayed()
             .assert(hasText(""))
         screen.joinButton
+            .performScrollTo()
             .assertIsDisplayed()
             .assertIsNotEnabled()
     }
@@ -198,9 +205,11 @@ class WaitingRoomScreenTest {
         screen.cameraButtonDisabled.assertIsDisplayed()
         screen.initials.assertIsDisplayedWithIcon()
         screen.userNameInput
+            .performScrollTo()
             .assertIsDisplayed()
             .assert(hasText(""))
         screen.joinButton
+            .performScrollTo()
             .assertIsDisplayed()
             .assertIsNotEnabled()
     }

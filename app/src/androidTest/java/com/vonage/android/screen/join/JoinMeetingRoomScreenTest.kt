@@ -8,6 +8,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.vonage.android.R
@@ -109,9 +110,11 @@ class JoinMeetingRoomScreenTest {
             .assertIsDisplayed()
             .assertIsNotEnabled()
         screen.roomInput
+            .performScrollTo()
             .assertIsDisplayed()
             .assert(hasText("hi@there"))
         screen.roomInputLabel
+            .performScrollTo()
             .assertIsDisplayed()
             .assert(hasText(context, R.string.landing_room_name_error_message))
     }
