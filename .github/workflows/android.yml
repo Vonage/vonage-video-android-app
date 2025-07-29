@@ -85,11 +85,9 @@ jobs:
       - name: Create AVD and generate snapshot for caching
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
-          target: default
+          api-level: 34
           arch: x86_64
-          profile: Nexus 6
-          force-avd-creation: false
+          profile: pixel
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: echo "Generated AVD snapshot for caching."
@@ -97,11 +95,9 @@ jobs:
       - name: Run UI Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
-          target: default
+          api-level: 34
           arch: x86_64
-          profile: Nexus 6
-          force-avd-creation: false
+          profile: pixel
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: |

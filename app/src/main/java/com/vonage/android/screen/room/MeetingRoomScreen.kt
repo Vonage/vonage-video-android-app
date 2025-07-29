@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
@@ -38,9 +39,10 @@ fun MeetingRoomScreen(
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
 ) {
-
-    val sheetState = rememberModalBottomSheetState()
-    var showBottomSheet by remember { mutableStateOf(false) }
+    val participantsSheetState = rememberModalBottomSheetState()
+    val audioDeviceSelectorSheetState = rememberModalBottomSheetState()
+    var showParticipants by remember { mutableStateOf(false) }
+    var showAudioDeviceSelector by remember { mutableStateOf(false) }
 
     when (uiState) {
         is MeetingRoomUiState.Content -> {
@@ -55,6 +57,7 @@ fun MeetingRoomScreen(
                             .testTag(MEETING_ROOM_TOP_BAR),
                         roomName = uiState.roomName,
                         actions = actions,
+                        onToggleAudioDeviceSelector = { showAudioDeviceSelector = showAudioDeviceSelector.toggle() },
                     )
                 },
                 bottomBar = {
@@ -62,7 +65,7 @@ fun MeetingRoomScreen(
                         modifier = Modifier
                             .testTag(MEETING_ROOM_BOTTOM_BAR),
                         actions = actions,
-                        onToggleParticipants = { showBottomSheet = !showBottomSheet },
+                        onToggleParticipants = { showParticipants = showParticipants.toggle() },
                         isMicEnabled = publisher?.isMicEnabled ?: false,
                         isCameraEnabled = publisher?.isCameraEnabled ?: false,
                         participantsCount = participants.size,
@@ -74,9 +77,12 @@ fun MeetingRoomScreen(
                         .padding(contentPadding)
                         .testTag(MEETING_ROOM_CONTENT),
                     participants = participants,
-                    sheetState = sheetState,
-                    showBottomSheet = showBottomSheet,
-                    onDismissRequest = { showBottomSheet = false },
+                    showParticipants = showParticipants,
+                    onDismissParticipants = { showParticipants = false },
+                    participantsSheetState = participantsSheetState,
+                    audioDeviceSelectorSheetState = audioDeviceSelectorSheetState,
+                    showAudioDeviceSelector = showAudioDeviceSelector,
+                    onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
                 )
             }
         }
@@ -89,10 +95,8 @@ fun MeetingRoomScreen(
             BasicAlertDialog(
                 text = stringResource(R.string.meeting_screen_session_creation_error),
                 acceptLabel = stringResource(R.string.generic_retry),
-                onAccept = { actions.onRetry() },
-                onCancel = {
-                    // navigate back to waiting room
-                },
+                onAccept = actions.onRetry,
+                onCancel = actions.onBack,
             )
         }
     }

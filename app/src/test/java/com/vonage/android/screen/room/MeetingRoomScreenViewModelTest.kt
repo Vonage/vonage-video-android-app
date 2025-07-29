@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
+import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.VeraPublisher
 import io.mockk.coEvery
@@ -162,6 +163,27 @@ class MeetingRoomScreenViewModelTest {
         }
     }
 
+    @Test
+    fun `given viewmodel when onSwitchCamera then delegate to call`() = runTest {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession("room-name") } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+
+        sut.uiState.test {
+            sut.init("room-name")
+            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(
+                MeetingRoomUiState.Content(
+                    roomName = "room-name",
+                    call = mockCall,
+                ), awaitItem()
+            )
+            sut.onSwitchCamera()
+            verify { mockCall.togglePublisherCamera() }
+        }
+    }
+
     private fun buildSuccessSessionResponse() = Result.success(
         SessionInfo(
             apiKey = "api-key",
@@ -176,6 +198,10 @@ class MeetingRoomScreenViewModelTest {
         isMicEnabled = true,
         isCameraEnabled = true,
         view = mockk(),
+        blurLevel = BlurLevel.NONE,
+        cycleCamera = {},
+        setCameraBlur = {},
+        cameraIndex = 0,
     )
 
     private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true)

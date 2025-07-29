@@ -15,7 +15,17 @@ data class VeraPublisher(
     override val name: String,
     override val isMicEnabled: Boolean,
     override val isCameraEnabled: Boolean,
-    override val view: View
+    override val view: View,
+    val cameraIndex: Int,
+    val cycleCamera: () -> Unit,
+    val blurLevel: BlurLevel,
+    val setCameraBlur: (BlurLevel) -> Unit,
 ) : Participant
 
-typealias VeraSubscriber = VeraPublisher
+data class VeraSubscriber(
+    override val id: String,
+    override val name: String,
+    override val isMicEnabled: Boolean,
+    override val isCameraEnabled: Boolean,
+    override val view: View,
+) : Participant
