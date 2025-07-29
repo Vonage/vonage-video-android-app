@@ -104,6 +104,10 @@ class Call internal constructor(
             participantStreams[id] = holder.participant
             _participantsStateFlow.value = participantStreams.values.toImmutableList()
             session.publish(holder.publisher)
+
+            holder.publisher.setAudioLevelListener { publisher, audioLevel ->
+                Log.d("AudioLevelListener", "Publisher audio level changed - audioLevel $audioLevel")
+            }
         }
     }
 

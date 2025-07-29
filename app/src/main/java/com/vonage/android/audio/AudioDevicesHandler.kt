@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.audio.ui.AudioDeviceList
 
 @ExperimentalMaterial3Api
@@ -18,11 +18,11 @@ fun AudioDevicesHandler(
     val context = LocalContext.current.applicationContext
     val audioDeviceSelector = rememberAudioDeviceSelector(context)
     LaunchedEffect(audioDeviceSelector) {
-        audioDeviceSelector.bind()
+        audioDeviceSelector.init()
     }
 
-    val availableDevices by audioDeviceSelector.availableDevices.collectAsState()
-    val activeDevice by audioDeviceSelector.activeDevice.collectAsState()
+    val availableDevices by audioDeviceSelector.availableDevices.collectAsStateWithLifecycle()
+    val activeDevice by audioDeviceSelector.activeDevice.collectAsStateWithLifecycle()
 
     AudioDeviceList(
         availableDevices = availableDevices,

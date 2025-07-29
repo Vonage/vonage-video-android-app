@@ -11,6 +11,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.model.BlurLevel
+import com.vonage.android.util.preview.previewCamera
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
@@ -50,6 +52,7 @@ class WaitingRoomScreenTest {
                         isMicEnabled = true,
                         isCameraEnabled = true,
                         view = previewCamera(),
+                        blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
                 )
@@ -81,6 +84,7 @@ class WaitingRoomScreenTest {
                         isMicEnabled = true,
                         isCameraEnabled = true,
                         view = previewCamera(),
+                        blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
                 )
@@ -112,6 +116,7 @@ class WaitingRoomScreenTest {
                         isMicEnabled = true,
                         isCameraEnabled = false,
                         view = previewCamera(),
+                        blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
                 )
@@ -133,6 +138,7 @@ class WaitingRoomScreenTest {
                         isMicEnabled = false,
                         isCameraEnabled = false,
                         view = previewCamera(),
+                        blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
                 )
@@ -154,6 +160,7 @@ class WaitingRoomScreenTest {
                         isMicEnabled = true,
                         isCameraEnabled = false,
                         view = previewCamera(),
+                        blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
                 )
@@ -181,6 +188,7 @@ class WaitingRoomScreenTest {
                         isMicEnabled = false,
                         isCameraEnabled = false,
                         view = previewCamera(),
+                        blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
                 )

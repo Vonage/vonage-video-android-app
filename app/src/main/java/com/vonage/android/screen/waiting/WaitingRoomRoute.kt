@@ -58,6 +58,7 @@ object WaitingRoomTestTags {
     const val USER_NAME_INPUT_TAG = "waiting_room_user_name_input"
     const val MIC_BUTTON_TAG = "waiting_room_mic_button"
     const val CAMERA_BUTTON_TAG = "waiting_room_camera_button"
+    const val CAMERA_BLUR_BUTTON_TAG = "waiting_room_camera_blur_button"
     const val USER_INITIALS_TAG = "user_initials_view"
 }
 

@@ -33,6 +33,7 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.screen.components.AvatarInitials
 import com.vonage.android.screen.components.CircularControlButton
 import com.vonage.android.screen.waiting.WaitingRoomActions
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BLUR_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.MIC_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_INITIALS_TAG
@@ -123,7 +124,7 @@ fun VideoControlPanel(
 
         CircularControlButton(
             modifier = Modifier
-                .testTag(CAMERA_BUTTON_TAG.buildTestTag(isCameraEnabled)),
+                .testTag(CAMERA_BLUR_BUTTON_TAG),
             onClick = onCameraBlur,
             icon = rememberBlurIcon(blurLevel),
         )
