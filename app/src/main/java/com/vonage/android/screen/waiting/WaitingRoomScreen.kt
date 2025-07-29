@@ -84,7 +84,7 @@ fun WaitingRoomScreen(
                         actions = actions,
                         onMicDeviceSelect = {
                             showAudioDeviceSelector = true
-                            actions.onAudioSwitch
+                            actions.onAudioSwitch()
                         }
                     )
                 }

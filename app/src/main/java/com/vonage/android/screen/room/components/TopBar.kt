@@ -92,7 +92,7 @@ object TopBarTestTags {
     const val TOP_BAR_TITLE = "top_bar_title"
     const val TOP_BAR_SHARE_ACTION = "top_bar_share_action"
     const val TOP_BAR_CAMERA_SWITCH_ACTION = "top_bar_camera_switch_action"
-    const val TOP_BAR_AUDIO_SELECTOR_ACTION = "top_bar_camera_switch_action"
+    const val TOP_BAR_AUDIO_SELECTOR_ACTION = "top_bar_audio_selector_action"
 }
 
 @PreviewLightDark

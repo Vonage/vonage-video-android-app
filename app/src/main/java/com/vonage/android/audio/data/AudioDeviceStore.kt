@@ -81,7 +81,7 @@ class AudioDeviceStore(
 
     private fun getActiveDeviceDeprecated(): AudioDevice? =
         when {
-            audioManager.isSpeakerphoneOn or audioManager.isMicrophoneMute.not() -> {
+            audioManager.isSpeakerphoneOn -> {
                 AudioDevice(
                     id = AudioDeviceInfo.TYPE_BUILTIN_SPEAKER,
                     type = AudioDeviceInfo.TYPE_BUILTIN_SPEAKER.toAudioDeviceType(),
