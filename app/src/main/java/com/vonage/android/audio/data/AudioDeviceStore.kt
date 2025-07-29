@@ -34,12 +34,16 @@ class AudioDeviceStore(
             getActiveDeviceDeprecated()
         }
 
+    @SuppressLint("NewApi")
     fun selectDevice(device: AudioDevice): Boolean {
         if (BuildConfigWrapper.sdkVersion() >= Build.VERSION_CODES.S) {
             selectedDevice = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
                 .firstOrNull { it.id == device.id }
             return selectedDevice?.let {
                 audioManager.setCommunicationDevice(it)
+                    .also {
+                        audioManager.clearCommunicationDevice()
+                    }
             } ?: false
         } else {
             when (device.type) {

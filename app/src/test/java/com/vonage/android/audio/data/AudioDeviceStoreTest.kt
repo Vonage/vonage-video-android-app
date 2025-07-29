@@ -74,6 +74,7 @@ class AudioDeviceStoreTest {
         val ret = sut.selectDevice(earpiece)
 
         verify { audioManager.setCommunicationDevice(earpieceDeviceInfo) }
+        verify { audioManager.clearCommunicationDevice() }
         assertTrue(ret)
     }
 
