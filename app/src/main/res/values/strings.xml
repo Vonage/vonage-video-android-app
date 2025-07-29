@@ -15,6 +15,9 @@
     <string name="waiting_room_prepare_to_join">Prepare to join:</string>
     <string name="waiting_room_whats_your_name">What is your name?</string>
     <string name="waiting_room_join">Join</string>
+    <string name="waiting_room_switch_camera">Switch camera</string>
+    <string name="waiting_room_audio_output">Audio output</string>
+    <string name="waiting_room_available_audio_outputs">Available Audio Outputs</string>
 
     <!-- Meeting Screen -->
     <string name="meeting_room_participants_list_title">Participants</string>
@@ -31,6 +34,12 @@
     <string name="camera_and_microphone_permissions_are_needed">Camera and microphone permissions are needed</string>
     <string name="request_permissions">Request permissions</string>
     <string name="request_permissions_to_system">Request permissions to system</string>
+
+    <!-- Audio device selector -->
+    <string name="audio_device_selector_earpiece_audio_device">Earpiece</string>
+    <string name="audio_device_selector_bluetooth_audio_device">Bluetooth</string>
+    <string name="audio_device_selector_speaker_audio_device">Speaker</string>
+    <string name="audio_device_selector_headset_audio_device">Headset</string>
 
     <!-- Generic -->
     <string name="generic_retry">Retry</string>

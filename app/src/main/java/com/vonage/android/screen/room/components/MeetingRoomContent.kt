@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import com.vonage.android.audio.AudioDevicesHandler
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
@@ -18,12 +19,16 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Suppress("LongParameterList")
 @Composable
 fun MeetingRoomContent(
     participants: ImmutableList<Participant>,
-    sheetState: SheetState,
-    showBottomSheet: Boolean,
-    onDismissRequest: () -> Unit,
+    participantsSheetState: SheetState,
+    audioDeviceSelectorSheetState: SheetState,
+    showParticipants: Boolean,
+    showAudioDeviceSelector: Boolean,
+    onDismissParticipants: () -> Unit,
+    onDismissAudioDeviceSelector: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -36,12 +41,22 @@ fun MeetingRoomContent(
                 .fillMaxSize()
                 .testTag(MEETING_ROOM_PARTICIPANTS_GRID)
         )
-        if (showBottomSheet) {
+        if (showParticipants) {
             ModalBottomSheet(
-                onDismissRequest = onDismissRequest,
-                sheetState = sheetState,
+                onDismissRequest = onDismissParticipants,
+                sheetState = participantsSheetState,
             ) {
                 ParticipantsList(participants = participants)
+            }
+        }
+        if (showAudioDeviceSelector) {
+            ModalBottomSheet(
+                onDismissRequest = onDismissAudioDeviceSelector,
+                sheetState = audioDeviceSelectorSheetState,
+            ) {
+                AudioDevicesHandler(
+                    onDismissRequest = onDismissAudioDeviceSelector,
+                )
             }
         }
     }
@@ -60,9 +75,12 @@ internal fun MeetingRoomContentPreview() {
         val sheetState = rememberModalBottomSheetState()
         MeetingRoomContent(
             participants = buildParticipants(5).toImmutableList(),
-            sheetState = sheetState,
-            showBottomSheet = false,
-            onDismissRequest = { },
+            showParticipants = false,
+            onDismissParticipants = { },
+            participantsSheetState = sheetState,
+            audioDeviceSelectorSheetState = sheetState,
+            showAudioDeviceSelector = false,
+            onDismissAudioDeviceSelector = {},
         )
     }
 }

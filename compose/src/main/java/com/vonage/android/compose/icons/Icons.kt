@@ -2,6 +2,8 @@ package com.vonage.android.compose.icons
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
@@ -11,7 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -62,6 +63,32 @@ fun ShareIcon(
         imageVector = Icons.Default.Share,
         contentDescription = contentDescription,
         tint = MaterialTheme.colorScheme.inverseSurface,
-        modifier = modifier.size(20.dp)
+        modifier = modifier.size(24.dp)
+    )
+}
+
+@Composable
+fun AudioSelectorIcon(
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null
+) {
+    Icon(
+        imageVector = Icons.AutoMirrored.Default.VolumeUp,
+        contentDescription = contentDescription,
+        tint = MaterialTheme.colorScheme.inverseSurface,
+        modifier = modifier.size(24.dp)
+    )
+}
+
+@Composable
+fun CameraSwitchIcon(
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null
+) {
+    Icon(
+        imageVector = Icons.Default.Cameraswitch,
+        contentDescription = contentDescription,
+        tint = MaterialTheme.colorScheme.inverseSurface,
+        modifier = modifier.size(24.dp)
     )
 }

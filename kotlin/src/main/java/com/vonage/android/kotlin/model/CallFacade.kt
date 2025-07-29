@@ -10,6 +10,7 @@ interface CallFacade {
     val participantsStateFlow: StateFlow<ImmutableList<Participant>>
     fun connect(): Flow<SessionEvent>
     fun togglePublisherVideo()
+    fun togglePublisherCamera()
     fun togglePublisherAudio()
     fun pauseSession()
     fun resumeSession()

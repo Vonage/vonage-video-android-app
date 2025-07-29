@@ -38,6 +38,7 @@ fun MeetingRoomScreenRoute(
         MeetingRoomActions(
             onToggleMic = viewModel::onToggleMic,
             onToggleCamera = viewModel::onToggleCamera,
+            onCameraSwitch = viewModel::onSwitchCamera,
             onEndCall = {
                 viewModel.endCall()
                 navigateToGoodBye()
@@ -79,4 +80,6 @@ data class MeetingRoomActions(
     val onToggleCamera: () -> Unit = {},
     val onEndCall: () -> Unit = {},
     val onBack: () -> Unit = {},
+    val onCameraSwitch: () -> Unit = {},
+    val onAudioSwitch: () -> Unit = {},
 )

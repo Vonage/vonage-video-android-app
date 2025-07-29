@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.vonage.android.compose.components.VideoRenderer
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.AvatarInitials
-import com.vonage.android.screen.waiting.previewCamera
+import com.vonage.android.util.preview.previewCamera
 
 @Composable
 fun ParticipantVideoCard(

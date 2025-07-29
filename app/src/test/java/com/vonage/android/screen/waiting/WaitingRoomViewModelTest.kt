@@ -3,6 +3,7 @@ package com.vonage.android.screen.waiting
 import app.cash.turbine.test
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
+import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
 import io.mockk.coEvery
@@ -40,6 +41,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = publisher.isMicEnabled,
                     userName = publisher.name,
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
         }
@@ -63,6 +65,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = publisher.isMicEnabled,
                     userName = "",
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
             sut.updateUserName("update")
@@ -73,6 +76,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = publisher.isMicEnabled,
                     userName = "update",
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
         }
@@ -96,6 +100,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = false,
                     userName = publisher.name,
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
             sut.onMicToggle()
@@ -106,6 +111,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = true,
                     userName = publisher.name,
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
         }
@@ -129,6 +135,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = true,
                     userName = publisher.name,
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
             sut.onCameraToggle()
@@ -139,6 +146,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = publisher.isMicEnabled,
                     userName = publisher.name,
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
         }
@@ -162,6 +170,7 @@ class WaitingRoomViewModelTest {
                     isMicEnabled = publisher.isMicEnabled,
                     userName = "Cached user name",
                     view = publisher.view,
+                    blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
         }
@@ -196,9 +205,53 @@ class WaitingRoomViewModelTest {
                     name = "save user name",
                     publishVideo = false,
                     publishAudio = false,
+                    blurLevel = BlurLevel.NONE,
+                    cameraIndex = 0,
                 )
             )
         }
+        verify { videoClient.destroyPublisher() }
+    }
+
+    @Test
+    fun `given viewmodel when onCameraSwitch then publisher cycle camera`() = runTest {
+        val publisher = buildMockPublisher(
+            cycleCamera = mockk(relaxed = true),
+        )
+        every { videoClient.buildPublisher() } returns publisher
+        coEvery { userRepository.getUserName() } returns "not relevant"
+
+        sut.init("any-room")
+        sut.onCameraSwitch()
+
+        verify(exactly = 1) { publisher.cycleCamera() }
+    }
+
+    @Test
+    fun `given viewmodel when setBlur then publisher set camera blur`() = runTest {
+        val publisher = buildMockPublisher(
+            setCameraBlur = mockk(relaxed = true),
+        )
+        every { videoClient.buildPublisher() } returns publisher
+        coEvery { userRepository.getUserName() } returns "not relevant"
+
+        sut.init("any-room")
+        sut.setBlur()
+        verify(exactly = 1) { publisher.setCameraBlur(BlurLevel.LOW) }
+
+        sut.setBlur()
+        verify(exactly = 1) { publisher.setCameraBlur(BlurLevel.HIGH) }
+
+        sut.setBlur()
+        verify(exactly = 1) { publisher.setCameraBlur(BlurLevel.NONE) }
+    }
+
+    @Test
+    fun `given viewmodel when stop then destroy publisher`() = runTest {
+        every { videoClient.destroyPublisher() } returns Unit
+
+        sut.onStop()
+
         verify { videoClient.destroyPublisher() }
     }
 
@@ -206,11 +259,19 @@ class WaitingRoomViewModelTest {
         userName: String = "",
         isCameraEnabled: Boolean = true,
         isMicEnabled: Boolean = true,
+        cameraIndex: Int = 0,
+        cycleCamera: () -> Unit = {},
+        blurLevel: BlurLevel = BlurLevel.NONE,
+        setCameraBlur: (BlurLevel) -> Unit = {},
     ): VeraPublisher = VeraPublisher(
         id = "ignored",
         name = userName,
         isMicEnabled = isMicEnabled,
         isCameraEnabled = isCameraEnabled,
-        view = mockk(),
+        blurLevel = blurLevel,
+        view = mockk(relaxed = true),
+        cycleCamera = cycleCamera,
+        setCameraBlur = setCameraBlur,
+        cameraIndex = cameraIndex,
     )
 }

@@ -6,6 +6,8 @@ import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.Publisher
 import com.opentok.android.Session
 import com.opentok.android.Session.SessionOptions
+import com.opentok.android.VeraCameraCapturer
+import com.vonage.android.kotlin.ext.applyVideoBlur
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
 import com.vonage.android.kotlin.internal.toParticipant
 import com.vonage.android.kotlin.model.CallFacade
@@ -26,21 +28,36 @@ class VonageVideoClient(
     }
 
     fun buildPublisher(): VeraPublisher {
-        val resolvedName = publisherConfig?.name ?: ""
+        Log.d(TAG, "build publisher with $publisherConfig")
+        val resolvedName = publisherConfig?.name ?: Default.PUBLISHER_NAME
         val publisher = Publisher.Builder(context)
             .name(resolvedName)
             .videoTrack(true)
             .audioTrack(true)
+            .capturer(
+                VeraCameraCapturer(
+                    context = context,
+                    resolution = Default.PUBLISHER_RESOLUTION,
+                    frameRate = Default.PUBLISHER_FRAME_RATE,
+                    initialCameraIndex = publisherConfig?.cameraIndex ?: Default.PUBLISHER_CAMERA_INDEX,
+                )
+            )
             .build()
             .apply {
                 renderer?.setStyle(
                     BaseVideoRenderer.STYLE_VIDEO_SCALE,
                     BaseVideoRenderer.STYLE_VIDEO_FIT,
                 )
-                publishVideo = publisherConfig?.publishVideo ?: true
-                publishAudio = publisherConfig?.publishAudio ?: true
+                publisherConfig?.let { config ->
+                    publishVideo = config.publishVideo
+                    publishAudio = config.publishAudio
+                    applyVideoBlur(config.blurLevel)
+                }
             }
-        val participant = publisher.toParticipant(resolvedName)
+        val participant = publisher.toParticipant(
+            name = resolvedName,
+            camera = publisherConfig?.cameraIndex ?: 0,
+        )
         this.publisherHolder = VeraPublisherHolder(
             participant = participant,
             publisher = publisher,
@@ -79,5 +96,12 @@ class VonageVideoClient(
 
     private companion object {
         const val TAG: String = "VonageVideoClient"
+    }
+
+    object Default {
+        val PUBLISHER_RESOLUTION = Publisher.CameraCaptureResolution.MEDIUM
+        val PUBLISHER_FRAME_RATE = Publisher.CameraCaptureFrameRate.FPS_30
+        const val PUBLISHER_CAMERA_INDEX = 0
+        const val PUBLISHER_NAME = ""
     }
 }
