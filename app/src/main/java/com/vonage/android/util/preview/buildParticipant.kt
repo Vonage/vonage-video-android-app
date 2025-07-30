@@ -2,6 +2,7 @@ package com.vonage.android.util.preview
 
 import android.view.View
 import androidx.compose.runtime.Composable
+import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.kotlin.model.Participant
 import kotlin.random.Random
 

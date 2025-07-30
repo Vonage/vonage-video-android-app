@@ -5,7 +5,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
@@ -13,9 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.sp
 import com.vonage.android.R
 import com.vonage.android.compose.icons.AudioSelectorIcon
 import com.vonage.android.compose.icons.CameraSwitchIcon
@@ -38,7 +35,7 @@ fun TopBar(
     TopAppBar(
         modifier = modifier,
         colors = topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = VonageVideoTheme.colors.surface,
         ),
         navigationIcon = {
             IconButton(
@@ -55,9 +52,8 @@ fun TopBar(
                 modifier = Modifier
                     .testTag(TOP_BAR_TITLE),
                 text = roomName,
-                color = MaterialTheme.colorScheme.inverseSurface,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
+                style = VonageVideoTheme.typography.body,
+                color = VonageVideoTheme.colors.inverseSurface,
             )
         },
         actions = {
