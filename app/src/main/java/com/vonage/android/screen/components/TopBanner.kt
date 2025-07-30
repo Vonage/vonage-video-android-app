@@ -10,9 +10,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.screen.join.JoinMeetingRoomTestTags.VONAGE_ICON_TAG
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +41,9 @@ fun TopBanner(
         },
         title = {
             VonageIcon(
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier
+                    .size(32.dp)
+                    .testTag(VONAGE_ICON_TAG)
             )
         }
     )
