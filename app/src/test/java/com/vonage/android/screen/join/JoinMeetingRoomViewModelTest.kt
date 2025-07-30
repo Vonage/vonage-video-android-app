@@ -49,8 +49,9 @@ class JoinMeetingRoomViewModelTest {
         sut.createRoom()
         sut.uiState.test {
             assertEquals(
-                JoinMeetingRoomUiState.Success(
+                JoinMeetingRoomUiState.Content(
                     roomName = "vonage-rocks",
+                    isSuccess = true,
                 ),
                 awaitItem()
             )
@@ -63,8 +64,9 @@ class JoinMeetingRoomViewModelTest {
             awaitItem() // initial state
             sut.joinRoom("validname")
             assertEquals(
-                JoinMeetingRoomUiState.Success(
+                JoinMeetingRoomUiState.Content(
                     roomName = "validname",
+                    isSuccess = true,
                 ),
                 awaitItem()
             )

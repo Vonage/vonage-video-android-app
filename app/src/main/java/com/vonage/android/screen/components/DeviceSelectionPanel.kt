@@ -99,7 +99,7 @@ internal fun DeviceSelectorPreview() {
     VonageVideoTheme {
         DeviceSelectionPanel(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
+                .background(VonageVideoTheme.colors.background)
                 .padding(8.dp),
             onMicDeviceSelect = { },
             onCameraDeviceSelect = { },

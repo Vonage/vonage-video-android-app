@@ -5,18 +5,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.vonage.android.R
 import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.components.VonageOutlinedButton
@@ -50,16 +47,14 @@ fun GoodbyeScreen(
             ) {
                 Text(
                     text = stringResource(R.string.goodbye_title),
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.inverseSurface,
+                    style = VonageVideoTheme.typography.titleLarge,
+                    color = VonageVideoTheme.colors.inverseSurface,
                     textAlign = TextAlign.Center,
-                    lineHeight = 46.sp,
                 )
 
                 Text(
                     text = stringResource(R.string.goodbye_subtitle),
-                    fontSize = 16.sp,
+                    style = VonageVideoTheme.typography.body,
                     color = VonageVideoTheme.colors.textPrimaryDisabled,
                     textAlign = TextAlign.Center,
                 )

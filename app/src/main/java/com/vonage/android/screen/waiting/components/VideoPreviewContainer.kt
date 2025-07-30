@@ -38,7 +38,7 @@ import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.MIC_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_INITIALS_TAG
 import com.vonage.android.util.buildTestTag
-import com.vonage.android.util.preview.previewCamera
+import com.vonage.android.compose.preview.previewCamera
 
 @Composable
 fun VideoPreviewContainer(

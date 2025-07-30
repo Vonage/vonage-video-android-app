@@ -59,8 +59,8 @@ fun AudioDeviceList(
                 modifier = Modifier
                     .padding(start = 8.dp, bottom = 8.dp),
                 text = stringResource(R.string.waiting_room_available_audio_outputs),
-                color = MaterialTheme.colorScheme.inverseSurface,
-                style = MaterialTheme.typography.titleLarge,
+                color = VonageVideoTheme.colors.inverseSurface,
+                style = VonageVideoTheme.typography.title,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -86,8 +86,8 @@ private fun AudioDeviceCell(
     isSelected: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val defaultColor = MaterialTheme.colorScheme.inverseSurface
-    val selectedColor = MaterialTheme.colorScheme.surface
+    val defaultColor = VonageVideoTheme.colors.inverseSurface
+    val selectedColor = VonageVideoTheme.colors.surface
 
     Column(
         modifier = modifier
@@ -96,7 +96,7 @@ private fun AudioDeviceCell(
             .conditional(
                 isSelected,
                 ifTrue = {
-                    background(MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp))
+                    background(VonageVideoTheme.colors.primary, RoundedCornerShape(8.dp))
                 },
                 ifFalse = {
                     border(1.dp, MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(8.dp))
@@ -116,7 +116,7 @@ private fun AudioDeviceCell(
         Text(
             text = audioDevice.type.toLabel(),
             color = if (isSelected) selectedColor else defaultColor,
-            style = MaterialTheme.typography.bodyLarge,
+            style = VonageVideoTheme.typography.body,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -149,7 +149,7 @@ private fun AudioDeviceType.toImageVector(): ImageVector =
 internal fun AudioDeviceListPreview() {
     VonageVideoTheme {
         AudioDeviceList(
-            modifier = Modifier.background(MaterialTheme.colorScheme.surface),
+            modifier = Modifier.background(VonageVideoTheme.colors.surface),
             availableDevices = listOf(
                 AudioDevice(1, AudioDeviceType.BLUETOOTH),
                 AudioDevice(2, AudioDeviceType.EARPIECE),

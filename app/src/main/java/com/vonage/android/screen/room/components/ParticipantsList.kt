@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -44,13 +43,13 @@ fun ParticipantsList(
             Text(
                 modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
                 text = stringResource(R.string.meeting_room_participants_list_title),
-                color = MaterialTheme.colorScheme.inverseSurface,
-                style = MaterialTheme.typography.titleLarge,
+                color = VonageVideoTheme.colors.inverseSurface,
+                style = VonageVideoTheme.typography.title,
             )
         }
         items(
             items = participants,
-            key = { participant -> participant.id }
+            key = { participant -> participant.id },
         ) { participant ->
             ParticipantRow(participant)
         }
@@ -71,7 +70,7 @@ private fun ParticipantRow(participant: Participant) {
                 .padding(vertical = 4.dp, horizontal = 8.dp),
             size = 24.dp,
             userName = participant.name,
-            textStyle = MaterialTheme.typography.labelSmall,
+            textStyle = VonageVideoTheme.typography.label,
         )
         Text(
             modifier = Modifier
@@ -80,22 +79,22 @@ private fun ParticipantRow(participant: Participant) {
             text = participant.name,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            color = MaterialTheme.colorScheme.inverseSurface,
-            style = MaterialTheme.typography.labelLarge,
+            color = VonageVideoTheme.colors.inverseSurface,
+            style = VonageVideoTheme.typography.body,
         )
         if (!participant.isMicEnabled) {
             Icon(
-                Icons.Default.MicOff,
-                contentDescription = "Muted",
-                tint = MaterialTheme.colorScheme.inverseSurface,
                 modifier = Modifier.size(16.dp),
+                imageVector = Icons.Default.MicOff,
+                contentDescription = null,
+                tint = VonageVideoTheme.colors.inverseSurface,
             )
         } else {
             Icon(
-                Icons.Default.Mic,
-                contentDescription = "Muted",
-                tint = MaterialTheme.colorScheme.inverseSurface,
                 modifier = Modifier.size(16.dp),
+                imageVector = Icons.Default.Mic,
+                contentDescription = null,
+                tint = VonageVideoTheme.colors.inverseSurface,
             )
         }
     }
@@ -108,7 +107,7 @@ internal fun ParticipantsListPreview() {
     val sampleParticipant = buildParticipants(5)
     VonageVideoTheme {
         ParticipantsList(
-            modifier = Modifier.background(MaterialTheme.colorScheme.surface),
+            modifier = Modifier.background(VonageVideoTheme.colors.surface),
             participants = sampleParticipant.toImmutableList(),
         )
     }
