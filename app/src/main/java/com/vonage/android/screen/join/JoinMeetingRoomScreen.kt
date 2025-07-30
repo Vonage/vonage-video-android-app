@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -60,19 +62,19 @@ fun JoinMeetingRoomScreen(
     ) { contentPadding ->
         FlowRow(
             verticalArrangement = Arrangement.Center,
-            horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally),
+            horizontalArrangement = Arrangement.spacedBy(48.dp, Alignment.CenterHorizontally),
             modifier = Modifier
-                .fillMaxHeight()
+                .fillMaxSize()
                 .background(VonageVideoTheme.colors.background)
                 .verticalScroll(rememberScrollState())
-                .padding(contentPadding)
+                .consumeWindowInsets(contentPadding)
                 .padding(horizontal = 24.dp),
         ) {
 
             JoinMeetingRoomHeader(
                 modifier = Modifier
                     .padding(top = 80.dp)
-                    .weight(1f)
+                    .widthIn(0.dp, 380.dp)
             )
 
             when (uiState) {
@@ -92,7 +94,7 @@ fun JoinMeetingRoomScreen(
                     JoinMeetingRoomContent(
                         modifier = Modifier
                             .padding(top = 48.dp)
-                            .weight(1f),
+                            .widthIn(0.dp, 320.dp),
                         roomName = uiState.roomName,
                         isRoomNameWrong = uiState.isRoomNameWrong,
                         actions = actions,
