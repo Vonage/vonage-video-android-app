@@ -14,8 +14,9 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = WaitingRoomViewModelFactory::class)
@@ -26,7 +27,11 @@ class WaitingRoomViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<WaitingRoomUiState>(WaitingRoomUiState.Idle)
-    val uiState: StateFlow<WaitingRoomUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<WaitingRoomUiState> = _uiState.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
+        initialValue = WaitingRoomUiState.Idle,
+    )
 
     private lateinit var publisher: VeraPublisher
     private var currentBlurIndex: Int = 0
@@ -116,6 +121,10 @@ class WaitingRoomViewModel @AssistedInject constructor(
 
     fun onStop() {
         videoClient.destroyPublisher()
+    }
+
+    private companion object {
+        const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
     }
 }
 

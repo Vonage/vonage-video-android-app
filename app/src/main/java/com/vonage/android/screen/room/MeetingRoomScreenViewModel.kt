@@ -11,9 +11,10 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = MeetingRoomViewModelFactory::class)
@@ -24,15 +25,21 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<MeetingRoomUiState>(MeetingRoomUiState.Loading)
-    val uiState: StateFlow<MeetingRoomUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<MeetingRoomUiState> = _uiState.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
+        initialValue = MeetingRoomUiState.Loading,
+    )
 
-    private lateinit var call: CallFacade
+    private var call: CallFacade? = null
 
-    fun init() {
-        // todo: find better way to avoid multiple calls to this method on configuration changes
-        if (this::call.isInitialized) return
+    init {
+        setup()
+    }
+
+    fun setup() {
+        _uiState.value = MeetingRoomUiState.Loading
         viewModelScope.launch {
-            _uiState.value = MeetingRoomUiState.Loading
             sessionRepository.getSession(roomName)
                 .onSuccess { sessionInfo ->
                     onSessionCreated(
@@ -51,10 +58,12 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         sessionInfo: SessionInfo,
     ) {
         connect(sessionInfo)
-        _uiState.value = MeetingRoomUiState.Content(
-            roomName = roomName,
-            call = call,
-        )
+        call?.let {
+            _uiState.value = MeetingRoomUiState.Content(
+                roomName = roomName,
+                call = it,
+            )
+        }
     }
 
     private fun connect(sessionInfo: SessionInfo) {
@@ -65,34 +74,36 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             token = sessionInfo.token,
         )
         viewModelScope.launch {
-            call.connect().collect()
+            call?.connect()?.collect()
         }
     }
 
     fun onToggleMic() {
-        call.togglePublisherAudio()
+        call?.togglePublisherAudio()
     }
 
     fun onToggleCamera() {
-        call.togglePublisherVideo()
+        call?.togglePublisherVideo()
     }
 
     fun onSwitchCamera() {
-        call.togglePublisherCamera()
+        call?.togglePublisherCamera()
     }
 
     fun endCall() {
-        call.endSession()
+        call?.endSession()
     }
 
     fun onPause() {
-        call.pauseSession()
+        call?.pauseSession()
     }
 
     fun onResume() {
-        if (this::call.isInitialized) {
-            call.resumeSession()
-        }
+        call?.resumeSession()
+    }
+
+    private companion object {
+        const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
     }
 }
 

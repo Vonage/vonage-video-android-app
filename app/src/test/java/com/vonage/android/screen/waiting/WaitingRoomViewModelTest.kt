@@ -35,6 +35,7 @@ class WaitingRoomViewModelTest {
 
         verify { videoClient.buildPublisher() }
         sut.uiState.test {
+            assertEquals(WaitingRoomUiState.Idle, awaitItem())
             assertEquals(
                 WaitingRoomUiState.Content(
                     roomName = ANY_ROOM_NAME,
