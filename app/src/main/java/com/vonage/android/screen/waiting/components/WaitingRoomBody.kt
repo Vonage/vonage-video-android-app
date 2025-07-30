@@ -2,8 +2,11 @@ package com.vonage.android.screen.waiting.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,27 +27,38 @@ fun WaitingRoomBody(
     onMicDeviceSelect: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+    FlowRow(
+        modifier = modifier
+            .fillMaxSize(),
+        horizontalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
     ) {
-        VideoPreviewContainer(
-            view = uiState.view,
-            name = uiState.userName,
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp),
-            isMicEnabled = uiState.isMicEnabled,
-            isCameraEnabled = uiState.isCameraEnabled,
-            blurLevel = uiState.blurLevel,
-            actions = actions,
-        )
-        DeviceSelectionPanel(
-            onMicDeviceSelect = onMicDeviceSelect,
-            onCameraDeviceSelect = actions.onCameraSwitch,
-        )
+                .widthIn(0.dp, 380.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            VideoPreviewContainer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .requiredHeight(225.dp),
+                view = uiState.view,
+                name = uiState.userName,
+                isMicEnabled = uiState.isMicEnabled,
+                isCameraEnabled = uiState.isCameraEnabled,
+                blurLevel = uiState.blurLevel,
+                actions = actions,
+            )
+            DeviceSelectionPanel(
+                onMicDeviceSelect = onMicDeviceSelect,
+                onCameraDeviceSelect = actions.onCameraSwitch,
+            )
+        }
+
         JoinRoomSection(
+            modifier = Modifier
+                .widthIn(0.dp, 320.dp),
             roomName = uiState.roomName,
             username = uiState.userName,
             onUsernameChange = actions.onUserNameChange,

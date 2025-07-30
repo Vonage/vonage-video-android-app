@@ -19,9 +19,10 @@ fun MeetingRoomScreenRoute(
     navigateToShare: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MeetingRoomScreenViewModel = hiltViewModel<MeetingRoomScreenViewModel, MeetingRoomViewModelFactory> { factory ->
-        factory.create(roomName)
-    },
+    viewModel: MeetingRoomScreenViewModel =
+        hiltViewModel<MeetingRoomScreenViewModel, MeetingRoomViewModelFactory> { factory ->
+            factory.create(roomName)
+        },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

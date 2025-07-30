@@ -1,6 +1,7 @@
 package com.vonage.android.screen.waiting
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -48,11 +49,12 @@ fun WaitingRoomScreen(
     ) { contentPadding ->
         Column(
             modifier = Modifier
-                .padding(contentPadding)
                 .fillMaxSize()
+                .background(VonageVideoTheme.colors.background)
                 .verticalScroll(rememberScrollState())
-                .background(VonageVideoTheme.colors.background),
+                .padding(contentPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
 
             CallPermissionHandler(
