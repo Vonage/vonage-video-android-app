@@ -9,15 +9,18 @@ import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class WaitingRoomViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = WaitingRoomViewModelFactory::class)
+class WaitingRoomViewModel @AssistedInject constructor(
+    @Assisted val roomName: String,
     private val userRepository: UserRepository,
     private val videoClient: VonageVideoClient,
 ) : ViewModel() {
@@ -26,12 +29,11 @@ class WaitingRoomViewModel @Inject constructor(
     val uiState: StateFlow<WaitingRoomUiState> = _uiState.asStateFlow()
 
     private lateinit var publisher: VeraPublisher
-    private lateinit var roomName: String
-
     private var currentBlurIndex: Int = 0
 
-    fun init(roomName: String) {
-        this.roomName = roomName
+    fun init() {
+        // todo: find better way to avoid multiple calls to this method on configuration changes
+        if (this::publisher.isInitialized) return
         publisher = videoClient.buildPublisher()
         viewModelScope.launch {
             publisher = publisher.copy(name = userRepository.getUserName().orEmpty())
@@ -115,6 +117,11 @@ class WaitingRoomViewModel @Inject constructor(
     fun onStop() {
         videoClient.destroyPublisher()
     }
+}
+
+@AssistedFactory
+interface WaitingRoomViewModelFactory {
+    fun create(roomName: String): WaitingRoomViewModel
 }
 
 sealed interface WaitingRoomUiState {

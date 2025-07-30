@@ -16,7 +16,9 @@ fun WaitingRoomRoute(
     navigateToPermissions: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: WaitingRoomViewModel = hiltViewModel(),
+    viewModel: WaitingRoomViewModel = hiltViewModel<WaitingRoomViewModel, WaitingRoomViewModelFactory> { factory ->
+        factory.create(roomName)
+    },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -46,7 +48,7 @@ fun WaitingRoomRoute(
         modifier = modifier,
         navigateToRoom = navigateToRoom,
         navigateToPermissions = navigateToPermissions,
-        onGrantPermissions = { viewModel.init(roomName) },
+        onGrantPermissions = { viewModel.init() },
     )
 }
 

@@ -19,12 +19,14 @@ fun MeetingRoomScreenRoute(
     navigateToShare: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MeetingRoomScreenViewModel = hiltViewModel(),
+    viewModel: MeetingRoomScreenViewModel = hiltViewModel<MeetingRoomScreenViewModel, MeetingRoomViewModelFactory> { factory ->
+        factory.create(roomName)
+    },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.init(roomName)
+        viewModel.init()
     }
 
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
@@ -45,7 +47,7 @@ fun MeetingRoomScreenRoute(
             },
             onShare = navigateToShare,
             onRetry = {
-                viewModel.init(roomName)
+                viewModel.init()
             },
             onBack = {
                 viewModel.endCall()

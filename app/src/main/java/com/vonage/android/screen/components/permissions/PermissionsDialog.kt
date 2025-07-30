@@ -13,9 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 
@@ -47,5 +49,18 @@ fun PermissionsDialog(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+@PreviewLightDark
+internal fun PermissionsDialogPreview() {
+    VonageVideoTheme {
+        PermissionsDialog(
+            multiplePermissionsState = rememberMultiplePermissionsState(
+                mutableListOf()
+            )
+        )
     }
 }
