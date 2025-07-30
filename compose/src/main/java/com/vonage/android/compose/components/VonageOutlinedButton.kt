@@ -37,7 +37,7 @@ fun VonageOutlinedButton(
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = VonageVideoTheme.colors.buttonPrimary,
         ),
-        contentPadding = PaddingValues(4.dp),
+        contentPadding = PaddingValues(12.dp),
         border = BorderStroke(1.dp, VonageVideoTheme.colors.buttonPrimary),
         enabled = enabled,
     ) {

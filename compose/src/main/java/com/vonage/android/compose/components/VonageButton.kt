@@ -39,7 +39,7 @@ fun VonageButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = VonageVideoTheme.colors.buttonPrimary,
         ),
-        contentPadding = PaddingValues(4.dp),
+        contentPadding = PaddingValues(12.dp),
         enabled = enabled,
     ) {
         leadingIcon?.let {
