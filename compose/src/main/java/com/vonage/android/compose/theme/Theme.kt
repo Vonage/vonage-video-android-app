@@ -27,20 +27,25 @@ fun VonageVideoTheme(
     }
 
     val extendedColors = VonageColors(
+        primary = colorScheme.primary,
         background = colorScheme.background,
         buttonPrimary = colorScheme.primary,
         buttonPrimaryDisabled = Color.LightGray,
         textPrimary = colorScheme.surfaceTint,
         textPrimaryDisabled = Color.Gray,
         textError = Color.Red,
+        surface = colorScheme.surface,
+        inverseSurface = colorScheme.inverseSurface,
     )
 
+    val extendedTypography = VonageTypography()
+
     CompositionLocalProvider(
-        LocalVonageColors provides extendedColors
+        LocalVonageColors provides extendedColors,
+        LocalVonageTypography provides extendedTypography,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = Typography,
             content = content,
         )
     }
@@ -50,4 +55,7 @@ object VonageVideoTheme {
     val colors: VonageColors
         @Composable
         get() = LocalVonageColors.current
+    val typography: VonageTypography
+        @Composable
+        get() = LocalVonageTypography.current
 }

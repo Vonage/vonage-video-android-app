@@ -9,39 +9,32 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 val Blue = Color(0xFF2563EB)
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
 
 internal val DarkColorScheme = darkColorScheme(
     primary = Blue,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
 )
 
 internal val LightColorScheme = lightColorScheme(
     primary = Blue,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
 )
 
 internal val LocalVonageColors = staticCompositionLocalOf {
     VonageColors(
+        primary = Color.Unspecified,
         background = Color.Unspecified,
         buttonPrimary = Color.Unspecified,
         buttonPrimaryDisabled = Color.Unspecified,
+        inverseSurface = Color.Unspecified,
         textPrimary = Color.Unspecified,
         textPrimaryDisabled = Color.Unspecified,
         textError = Color.Unspecified,
+        surface = Color.Unspecified,
     )
 }
 
 @Immutable
 data class VonageColors(
+    val primary: Color,
     val background: Color,
 
     val textPrimary: Color,
@@ -50,4 +43,7 @@ data class VonageColors(
 
     val buttonPrimary: Color,
     val buttonPrimaryDisabled: Color,
+
+    val surface: Color,
+    val inverseSurface: Color,
 )

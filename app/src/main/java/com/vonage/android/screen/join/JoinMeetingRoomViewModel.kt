@@ -1,14 +1,12 @@
 package com.vonage.android.screen.join
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.vonage.android.util.RoomNameGenerator
 import com.vonage.android.util.isValidRoomName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,29 +27,25 @@ class JoinMeetingRoomViewModel @Inject constructor(
 
     fun createRoom() {
         val roomNameGenerated = roomNameGenerator.generateRoomName()
-        _uiState.value = JoinMeetingRoomUiState.Success(
+        _uiState.value = JoinMeetingRoomUiState.Content(
             roomName = roomNameGenerated,
+            isSuccess = true,
         )
     }
 
     fun joinRoom(roomName: String) {
-        viewModelScope.launch {
-            _uiState.value = JoinMeetingRoomUiState.Success(
-                roomName = roomName,
-            )
-        }
+        _uiState.value = JoinMeetingRoomUiState.Content(
+            roomName = roomName,
+            isSuccess = true,
+        )
     }
 }
 
 sealed interface JoinMeetingRoomUiState {
-
     data class Content(
         val roomName: String = "",
         val isRoomNameWrong: Boolean = false,
         val isError: Boolean = false,
-    ) : JoinMeetingRoomUiState
-
-    data class Success(
-        val roomName: String,
+        val isSuccess: Boolean = false,
     ) : JoinMeetingRoomUiState
 }

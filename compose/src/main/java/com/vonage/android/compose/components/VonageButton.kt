@@ -15,10 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.vonage.android.compose.icons.VideoCameraIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 
@@ -48,8 +46,7 @@ fun VonageButton(
         Text(
             text = text,
             color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
+            style = VonageVideoTheme.typography.body,
         )
     }
 }
