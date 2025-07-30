@@ -4,10 +4,14 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.screen.components.permissions.CallPermissionHandler
 
 @Composable
 fun WaitingRoomRoute(
@@ -21,6 +25,7 @@ fun WaitingRoomRoute(
     },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var permissionsAlreadyGranted by rememberSaveable { mutableStateOf(true) }
 
     val actions = remember {
         WaitingRoomActions(
@@ -42,13 +47,19 @@ fun WaitingRoomRoute(
         onBack()
     }
 
+    CallPermissionHandler(
+        onGrantPermissions = {
+            if (permissionsAlreadyGranted) { viewModel.init() }
+            permissionsAlreadyGranted = false
+        },
+        navigateToPermissions = navigateToPermissions,
+    )
+
     WaitingRoomScreen(
         uiState = uiState,
         actions = actions,
         modifier = modifier,
         navigateToRoom = navigateToRoom,
-        navigateToPermissions = navigateToPermissions,
-        onGrantPermissions = { viewModel.init() },
     )
 }
 

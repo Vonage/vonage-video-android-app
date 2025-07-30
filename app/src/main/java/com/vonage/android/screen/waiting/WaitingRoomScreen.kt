@@ -27,7 +27,6 @@ import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.screen.components.TopBanner
-import com.vonage.android.screen.components.permissions.CallPermissionHandler
 import com.vonage.android.screen.waiting.components.WaitingRoomBody
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,8 +36,6 @@ fun WaitingRoomScreen(
     actions: WaitingRoomActions,
     modifier: Modifier = Modifier,
     navigateToRoom: (String) -> Unit = {},
-    onGrantPermissions: () -> Unit = {},
-    navigateToPermissions: () -> Unit = {},
 ) {
     val sheetState = rememberModalBottomSheetState()
     var showAudioDeviceSelector by remember { mutableStateOf(false) }
@@ -56,11 +53,6 @@ fun WaitingRoomScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-
-            CallPermissionHandler(
-                onGrantPermissions = onGrantPermissions,
-                navigateToPermissions = navigateToPermissions,
-            )
 
             if (showAudioDeviceSelector) {
                 ModalBottomSheet(

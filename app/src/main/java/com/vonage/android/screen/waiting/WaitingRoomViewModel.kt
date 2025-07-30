@@ -37,8 +37,6 @@ class WaitingRoomViewModel @AssistedInject constructor(
     private var currentBlurIndex: Int = 0
 
     fun init() {
-        // todo: find better way to avoid multiple calls to this method on configuration changes
-        if (this::publisher.isInitialized) return
         publisher = videoClient.buildPublisher()
         viewModelScope.launch {
             publisher = publisher.copy(name = userRepository.getUserName().orEmpty())
