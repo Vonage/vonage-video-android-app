@@ -20,6 +20,7 @@ class WaitingRoomViewModelTest {
     val videoClient: VonageVideoClient = mockk()
     val userRepository: UserRepository = mockk()
     val sut = WaitingRoomViewModel(
+        roomName = ANY_ROOM_NAME,
         userRepository = userRepository,
         videoClient = videoClient,
     )
@@ -30,13 +31,13 @@ class WaitingRoomViewModelTest {
         every { videoClient.buildPublisher() } returns publisher
         coEvery { userRepository.getUserName() } returns ""
 
-        sut.init("roomName")
+        sut.init()
 
         verify { videoClient.buildPublisher() }
         sut.uiState.test {
             assertEquals(
                 WaitingRoomUiState.Content(
-                    roomName = "roomName",
+                    roomName = ANY_ROOM_NAME,
                     isCameraEnabled = publisher.isCameraEnabled,
                     isMicEnabled = publisher.isMicEnabled,
                     userName = publisher.name,
@@ -57,10 +58,10 @@ class WaitingRoomViewModelTest {
 
         sut.uiState.test {
             assertEquals(WaitingRoomUiState.Idle, awaitItem())
-            sut.init("roomName")
+            sut.init()
             assertEquals(
                 WaitingRoomUiState.Content(
-                    roomName = "roomName",
+                    roomName = ANY_ROOM_NAME,
                     isCameraEnabled = publisher.isCameraEnabled,
                     isMicEnabled = publisher.isMicEnabled,
                     userName = "",
@@ -71,7 +72,7 @@ class WaitingRoomViewModelTest {
             sut.updateUserName("update")
             assertEquals(
                 WaitingRoomUiState.Content(
-                    roomName = "roomName",
+                    roomName = ANY_ROOM_NAME,
                     isCameraEnabled = publisher.isCameraEnabled,
                     isMicEnabled = publisher.isMicEnabled,
                     userName = "update",
@@ -92,10 +93,10 @@ class WaitingRoomViewModelTest {
 
         sut.uiState.test {
             assertEquals(WaitingRoomUiState.Idle, awaitItem())
-            sut.init("roomName")
+            sut.init()
             assertEquals(
                 WaitingRoomUiState.Content(
-                    roomName = "roomName",
+                    roomName = ANY_ROOM_NAME,
                     isCameraEnabled = publisher.isCameraEnabled,
                     isMicEnabled = false,
                     userName = publisher.name,
@@ -106,7 +107,7 @@ class WaitingRoomViewModelTest {
             sut.onMicToggle()
             assertEquals(
                 WaitingRoomUiState.Content(
-                    roomName = "roomName",
+                    roomName = ANY_ROOM_NAME,
                     isCameraEnabled = publisher.isCameraEnabled,
                     isMicEnabled = true,
                     userName = publisher.name,
@@ -127,10 +128,10 @@ class WaitingRoomViewModelTest {
 
         sut.uiState.test {
             assertEquals(WaitingRoomUiState.Idle, awaitItem())
-            sut.init("roomName")
+            sut.init()
             assertEquals(
                 WaitingRoomUiState.Content(
-                    roomName = "roomName",
+                    roomName = ANY_ROOM_NAME,
                     isCameraEnabled = publisher.isCameraEnabled,
                     isMicEnabled = true,
                     userName = publisher.name,
@@ -141,7 +142,7 @@ class WaitingRoomViewModelTest {
             sut.onCameraToggle()
             assertEquals(
                 WaitingRoomUiState.Content(
-                    roomName = "roomName",
+                    roomName = ANY_ROOM_NAME,
                     isCameraEnabled = false,
                     isMicEnabled = publisher.isMicEnabled,
                     userName = publisher.name,
@@ -161,11 +162,11 @@ class WaitingRoomViewModelTest {
         every { videoClient.buildPublisher() } returns publisher
 
         sut.uiState.test {
-            sut.init("roomName")
+            sut.init()
             awaitItem()
             assertEquals(
                 WaitingRoomUiState.Content(
-                    roomName = "roomName",
+                    roomName = ANY_ROOM_NAME,
                     isCameraEnabled = publisher.isCameraEnabled,
                     isMicEnabled = publisher.isMicEnabled,
                     userName = "Cached user name",
@@ -189,12 +190,12 @@ class WaitingRoomViewModelTest {
 
         sut.uiState.test {
             assertEquals(WaitingRoomUiState.Idle, awaitItem())
-            sut.init("roomName")
+            sut.init()
             awaitItem()
-            sut.joinRoom("roomName", "save user name")
+            sut.joinRoom(ANY_ROOM_NAME, "save user name")
             assertEquals(
                 WaitingRoomUiState.Success(
-                    roomName = "roomName",
+                    roomName = ANY_ROOM_NAME,
                 ), awaitItem()
             )
         }
@@ -221,7 +222,7 @@ class WaitingRoomViewModelTest {
         every { videoClient.buildPublisher() } returns publisher
         coEvery { userRepository.getUserName() } returns "not relevant"
 
-        sut.init("any-room")
+        sut.init()
         sut.onCameraSwitch()
 
         verify(exactly = 1) { publisher.cycleCamera() }
@@ -235,7 +236,7 @@ class WaitingRoomViewModelTest {
         every { videoClient.buildPublisher() } returns publisher
         coEvery { userRepository.getUserName() } returns "not relevant"
 
-        sut.init("any-room")
+        sut.init()
         sut.setBlur()
         verify(exactly = 1) { publisher.setCameraBlur(BlurLevel.LOW) }
 
@@ -274,4 +275,8 @@ class WaitingRoomViewModelTest {
         setCameraBlur = setCameraBlur,
         cameraIndex = cameraIndex,
     )
+
+    private companion object {
+        const val ANY_ROOM_NAME = "room-name"
+    }
 }
