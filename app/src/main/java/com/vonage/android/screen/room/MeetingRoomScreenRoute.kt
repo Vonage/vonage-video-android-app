@@ -24,6 +24,7 @@ fun MeetingRoomScreenRoute(
         },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val audioLevel by viewModel.audioLevel.collectAsStateWithLifecycle()
 
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
         viewModel.onPause()
@@ -61,6 +62,7 @@ fun MeetingRoomScreenRoute(
         modifier = modifier,
         actions = actions,
         uiState = uiState,
+        audioLevel = audioLevel,
     )
 }
 

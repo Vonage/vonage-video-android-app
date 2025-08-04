@@ -16,6 +16,7 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.compose.preview.previewCamera
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -54,8 +55,10 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = true,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
+                        audioLevel = flowOf(0.5f),
                     ),
                     actions = WaitingRoomActions(),
+                    audioLevel = 0.5f,
                 )
             }
         }
@@ -88,8 +91,10 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = true,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
+                        audioLevel = flowOf(0.5f),
                     ),
                     actions = WaitingRoomActions(),
+                    audioLevel = 0.5f,
                 )
             }
         }
@@ -122,8 +127,10 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = false,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
+                        audioLevel = flowOf(0.5f),
                     ),
                     actions = WaitingRoomActions(),
+                    audioLevel = 0.5f,
                 )
             }
         }
@@ -144,8 +151,10 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = false,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
+                        audioLevel = flowOf(0.5f),
                     ),
                     actions = WaitingRoomActions(),
+                    audioLevel = 0.5f,
                 )
             }
         }
@@ -166,8 +175,10 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = false,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
+                        audioLevel = flowOf(0.5f),
                     ),
                     actions = WaitingRoomActions(),
+                    audioLevel = 0.5f,
                 )
             }
         }
@@ -196,8 +207,10 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = false,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
+                        audioLevel = flowOf(0.5f),
                     ),
                     actions = WaitingRoomActions(),
+                    audioLevel = 0.5f,
                 )
             }
         }

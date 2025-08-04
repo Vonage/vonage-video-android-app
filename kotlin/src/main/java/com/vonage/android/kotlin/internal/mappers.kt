@@ -7,6 +7,7 @@ import com.vonage.android.kotlin.ext.applyVideoBlur
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.kotlin.model.VeraSubscriber
+import kotlinx.coroutines.flow.flowOf
 
 internal fun Subscriber.toParticipant(): VeraSubscriber = VeraSubscriber(
     id = stream.streamId,
@@ -14,11 +15,14 @@ internal fun Subscriber.toParticipant(): VeraSubscriber = VeraSubscriber(
     isMicEnabled = stream.hasAudio(),
     isCameraEnabled = stream.hasVideo(),
     view = view,
+    isSpeaking = false,
 )
 
 internal fun Publisher.toParticipant(
     name: String? = null,
     camera: Int = 0,
+    audioLevel: Float = 0f,
+    isSpeaking: Boolean = false,
 ): VeraPublisher = VeraPublisher(
     id = PUBLISHER_ID,
     name = stream?.name ?: name.orEmpty(),
@@ -29,4 +33,6 @@ internal fun Publisher.toParticipant(
     cycleCamera = { cycleCamera() },
     blurLevel = BlurLevel.NONE,
     setCameraBlur = { blurLevel -> applyVideoBlur(blurLevel) },
+    audioLevel = flowOf(audioLevel),
+    isSpeaking = isSpeaking,
 )

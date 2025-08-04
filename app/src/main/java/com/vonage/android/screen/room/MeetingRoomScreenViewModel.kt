@@ -14,6 +14,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -30,6 +33,9 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         started = SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
         initialValue = MeetingRoomUiState.Loading,
     )
+
+    private val _audioLevel = MutableStateFlow(0F)
+    val audioLevel: StateFlow<Float> = _audioLevel
 
     private var call: CallFacade? = null
 
@@ -75,6 +81,17 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         )
         viewModelScope.launch {
             call?.connect()?.collect()
+        }
+        viewModelScope.launch {
+            call?.let {
+                it.observePublisherAudio()
+                    .distinctUntilChanged()
+                    .debounce(36L)
+                    .onEach { audioLevel ->
+                        _audioLevel.value = audioLevel
+                    }
+                    .collect()
+            }
         }
     }
 

@@ -16,6 +16,7 @@ fun buildParticipants(count: Int): List<Participant> {
             override val isMicEnabled: Boolean = false
             override val isCameraEnabled: Boolean = true
             override val view: View = previewCamera()
+            override val isSpeaking: Boolean = false
         }
         participants += sampleParticipant
     }

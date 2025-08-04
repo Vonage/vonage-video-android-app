@@ -3,10 +3,12 @@ package com.vonage.android.kotlin
 import android.content.Context
 import android.util.Log
 import com.opentok.android.OpentokError
+import com.opentok.android.PublisherKit.AudioLevelListener
 import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
+import com.vonage.android.kotlin.ext.observeSubscriberAudio
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
 import com.vonage.android.kotlin.internal.toParticipant
@@ -17,21 +19,33 @@ import com.vonage.android.kotlin.model.VeraSubscriber
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class Call internal constructor(
     private val context: Context,
     private val token: String,
     private val session: Session,
     private val publisherHolder: VeraPublisherHolder,
+    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : CallFacade {
 
     private val _participantsStateFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
+
+    private val _publisherAudioLevelStateFlow = MutableStateFlow(0F)
+    override val publisherAudioLevelStateFlow: StateFlow<Float> = _publisherAudioLevelStateFlow
 
     private val subscriberStreams = HashMap<String, Subscriber>()
     private val participantStreams = HashMap<String, Participant>()
@@ -104,10 +118,25 @@ class Call internal constructor(
             participantStreams[id] = holder.participant
             _participantsStateFlow.value = participantStreams.values.toImmutableList()
             session.publish(holder.publisher)
+        }
+    }
 
-            holder.publisher.setAudioLevelListener { publisher, audioLevel ->
-                Log.d("AudioLevelListener", "Publisher audio level changed - audioLevel $audioLevel")
-            }
+    override fun observePublisherAudio(): Flow<Float> = callbackFlow {
+        val audioLevelListener = AudioLevelListener { publisher, audioLevel ->
+            val a = "%.4f".format(audioLevel)
+            Log.d("XXX", "audio level listener $a")
+
+            participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant(isSpeaking = (audioLevel > 0F))
+            _participantsStateFlow.value = participantStreams.values.toImmutableList()
+
+            trySend(a.toFloat())
+        }
+
+        publisherHolder.publisher.setAudioLevelListener(audioLevelListener)
+
+        awaitClose {
+            publisherHolder.publisher.setAudioLevelListener(null)
+            Log.d("XXX", "observePublisherAudio AWAIT CLOSE")
         }
     }
 
@@ -142,9 +171,22 @@ class Call internal constructor(
                 }
             }
         })
-        subscriber.setAudioLevelListener { subscriber, audioLevel ->
-            Log.d("AudioLevelListener", "Subscriber audio level changed - audioLevel $audioLevel")
+
+        CoroutineScope(coroutineDispatcher).launch {
+            subscriber.observeSubscriberAudio()
+                .distinctUntilChanged()
+                .debounce(50L)
+                .onEach { audioLevel ->
+                    subscriberStreams[subscriber.stream.streamId]?.let { subs ->
+                        val updatedParticipant = (participantStreams[subs.stream.streamId] as VeraSubscriber)
+                            .copy(isSpeaking = (audioLevel > 0F))
+                        participantStreams[subs.stream.streamId] = updatedParticipant
+                        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+                    }
+                }
+                .collect()
         }
+
         subscriber.setVideoListener(object : SubscriberKit.VideoListener {
             override fun onVideoDataReceived(subscriber: SubscriberKit) {
                 // not implemented yet

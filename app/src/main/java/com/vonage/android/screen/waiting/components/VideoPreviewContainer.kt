@@ -39,11 +39,13 @@ import com.vonage.android.screen.waiting.WaitingRoomTestTags.MIC_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_INITIALS_TAG
 import com.vonage.android.util.buildTestTag
 import com.vonage.android.compose.preview.previewCamera
+import com.vonage.android.audio.ui.AudioVolumeIndicator
 
 @Composable
 fun VideoPreviewContainer(
     view: View?,
     name: String,
+    audioLevels: Float,
     actions: WaitingRoomActions,
     blurLevel: BlurLevel,
     isMicEnabled: Boolean,
@@ -79,12 +81,14 @@ fun VideoPreviewContainer(
             isMicEnabled = isMicEnabled,
             blurLevel = blurLevel,
             isCameraEnabled = isCameraEnabled,
+            audioLevels = audioLevels,
         )
     }
 }
 
 @Composable
 fun VideoControlPanel(
+    audioLevels: Float,
     onMicToggle: () -> Unit,
     onCameraToggle: () -> Unit,
     onCameraBlur: () -> Unit,
@@ -98,6 +102,18 @@ fun VideoControlPanel(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        if (isMicEnabled) {
+            AudioVolumeIndicator(
+                audioLevels = audioLevels,
+            )
+//            AudioLevelIndicator(
+//                modifier = Modifier
+//                    .height(20.dp)
+//                    .width(50.dp),
+//                level = audioLevels,
+//            )
+        }
+
         CircularControlButton(
             modifier = Modifier
                 .conditional(
@@ -151,6 +167,7 @@ internal fun VideoPreviewContainerPreview() {
             blurLevel = BlurLevel.LOW,
             isMicEnabled = true,
             isCameraEnabled = true,
+            audioLevels = 0.6f,
         )
     }
 }

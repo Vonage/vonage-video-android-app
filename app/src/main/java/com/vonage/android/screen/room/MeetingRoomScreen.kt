@@ -38,6 +38,7 @@ fun MeetingRoomScreen(
     uiState: MeetingRoomUiState,
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
+    audioLevel: Float,
 ) {
     val participantsSheetState = rememberModalBottomSheetState()
     val audioDeviceSelectorSheetState = rememberModalBottomSheetState()
@@ -77,6 +78,7 @@ fun MeetingRoomScreen(
                         .padding(contentPadding)
                         .testTag(MEETING_ROOM_CONTENT),
                     participants = participants,
+                    audioLevel = audioLevel,
                     showParticipants = showParticipants,
                     onDismissParticipants = { showParticipants = false },
                     participantsSheetState = participantsSheetState,
@@ -124,6 +126,7 @@ internal fun MeetingRoomScreenLoadingPreview() {
         MeetingRoomScreen(
             uiState = MeetingRoomUiState.Loading,
             actions = MeetingRoomActions(),
+            audioLevel = 0.5f,
         )
     }
 }
@@ -135,6 +138,7 @@ internal fun MeetingRoomScreenSessionErrorPreview() {
         MeetingRoomScreen(
             uiState = MeetingRoomUiState.SessionError,
             actions = MeetingRoomActions(),
+            audioLevel = 0.5f,
         )
     }
 }
@@ -150,6 +154,7 @@ internal fun MeetingRoomScreenSessionPreview() {
                 call = buildCallWithParticipants(5),
             ),
             actions = MeetingRoomActions(),
+            audioLevel = 0.5f,
         )
     }
 }

@@ -26,6 +26,7 @@ import kotlinx.collections.immutable.toImmutableList
 @Composable
 fun AdaptiveGrid(
     participants: ImmutableList<Participant>,
+    audioLevel: Float,
     modifier: Modifier = Modifier,
     itemHeight: Dp = 225.dp,
     minItemWidth: Dp = 300.dp,
@@ -62,6 +63,8 @@ fun AdaptiveGrid(
                     isCameraEnabled = participant.isCameraEnabled,
                     isMicEnabled = participant.isMicEnabled,
                     view = participant.view,
+                    audioLevel = audioLevel,
+                    isSpeaking = participant.isSpeaking,
                 )
             }
 
@@ -88,7 +91,8 @@ fun AdaptiveGrid(
 internal fun AdaptiveGridPreview() {
     VonageVideoTheme {
         AdaptiveGrid(
-            participants = buildParticipants(10).toImmutableList()
+            participants = buildParticipants(10).toImmutableList(),
+            audioLevel = 0.6f,
         )
     }
 }

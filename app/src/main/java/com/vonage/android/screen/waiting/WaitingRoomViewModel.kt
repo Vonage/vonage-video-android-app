@@ -1,8 +1,10 @@
 package com.vonage.android.screen.waiting
 
+import android.annotation.SuppressLint
 import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vonage.android.audio.MicVolume
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.ext.toggle
@@ -13,9 +15,13 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -33,9 +39,17 @@ class WaitingRoomViewModel @AssistedInject constructor(
         initialValue = WaitingRoomUiState.Idle,
     )
 
+    private val _audioLevel = MutableStateFlow(0F)
+    val audioLevel: StateFlow<Float> = _audioLevel.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(1000),
+        initialValue = 0.5F,
+    )
+
     private lateinit var publisher: VeraPublisher
     private var currentBlurIndex: Int = 0
 
+    @SuppressLint("MissingPermission")
     fun init() {
         publisher = videoClient.buildPublisher()
         viewModelScope.launch {
@@ -44,6 +58,14 @@ class WaitingRoomViewModel @AssistedInject constructor(
                 roomName = roomName,
                 participant = publisher,
             )
+        }
+        viewModelScope.launch {
+            MicVolume().volume()
+                .distinctUntilChanged()
+                .onEach {
+                    _audioLevel.value = it
+                }
+                .collect()
         }
     }
 
@@ -75,6 +97,10 @@ class WaitingRoomViewModel @AssistedInject constructor(
         val currentCameraIndex = 1 - publisher.cameraIndex
         publisher = publisher.copy(cameraIndex = currentCameraIndex)
         publisher.cycleCamera()
+        _uiState.value = buildContentUiState(
+            roomName = roomName,
+            participant = publisher,
+        )
     }
 
     fun setBlur() {
@@ -114,6 +140,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
             isMicEnabled = participant.isMicEnabled,
             userName = participant.name,
             blurLevel = participant.blurLevel,
+            audioLevel = participant.audioLevel,
             view = participant.view,
         )
 
@@ -140,6 +167,7 @@ sealed interface WaitingRoomUiState {
         val isMicEnabled: Boolean,
         val isCameraEnabled: Boolean,
         val blurLevel: BlurLevel,
+        val audioLevel: Flow<Float>,
         val view: View? = null,
     ) : WaitingRoomUiState
 
