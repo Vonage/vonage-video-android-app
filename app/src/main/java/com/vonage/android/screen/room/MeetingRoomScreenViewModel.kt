@@ -38,8 +38,8 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     }
 
     fun setup() {
-        _uiState.value = MeetingRoomUiState.Loading
         viewModelScope.launch {
+            _uiState.value = MeetingRoomUiState.Loading
             sessionRepository.getSession(roomName)
                 .onSuccess { sessionInfo ->
                     onSessionCreated(
