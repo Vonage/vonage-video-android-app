@@ -2,7 +2,6 @@ package com.vonage.android.screen.room
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -19,13 +18,12 @@ fun MeetingRoomScreenRoute(
     navigateToShare: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MeetingRoomScreenViewModel = hiltViewModel(),
+    viewModel: MeetingRoomScreenViewModel =
+        hiltViewModel<MeetingRoomScreenViewModel, MeetingRoomViewModelFactory> { factory ->
+            factory.create(roomName)
+        },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.init(roomName)
-    }
 
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
         viewModel.onPause()
@@ -45,7 +43,7 @@ fun MeetingRoomScreenRoute(
             },
             onShare = navigateToShare,
             onRetry = {
-                viewModel.init(roomName)
+                viewModel.setup()
             },
             onBack = {
                 viewModel.endCall()

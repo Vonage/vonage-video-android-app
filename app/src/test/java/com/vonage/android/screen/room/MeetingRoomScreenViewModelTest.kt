@@ -19,24 +19,20 @@ class MeetingRoomScreenViewModelTest {
 
     val sessionRepository: SessionRepository = mockk()
     val videoClient: VonageVideoClient = mockk()
-    val sut = MeetingRoomScreenViewModel(
-        sessionRepository = sessionRepository,
-        videoClient = videoClient,
-    )
 
     @Test
     fun `given viewmodel when initialize then returns correct state`() = runTest {
         val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession("room-name") } returns buildSuccessSessionResponse()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val sut = sut()
 
         sut.uiState.test {
-            sut.init("room-name")
             assertEquals(MeetingRoomUiState.Loading, awaitItem())
             assertEquals(
                 MeetingRoomUiState.Content(
-                    roomName = "room-name",
+                    roomName = ANY_ROOM_NAME,
                     call = mockCall,
                 ), awaitItem()
             )
@@ -46,13 +42,9 @@ class MeetingRoomScreenViewModelTest {
 
     @Test
     fun `given viewmodel when initialize fails then returns error state`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession("room-name") } returns Result.failure(Exception("Empty response"))
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns Result.failure(Exception("Empty response"))
 
-        sut.uiState.test {
-            sut.init("room-name")
+        sut().uiState.test {
             assertEquals(MeetingRoomUiState.Loading, awaitItem())
             assertEquals(MeetingRoomUiState.SessionError, awaitItem())
         }
@@ -61,16 +53,16 @@ class MeetingRoomScreenViewModelTest {
     @Test
     fun `given viewmodel when onToggleMic then delegate to call`() = runTest {
         val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession("room-name") } returns buildSuccessSessionResponse()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val sut = sut()
 
         sut.uiState.test {
-            sut.init("room-name")
             assertEquals(MeetingRoomUiState.Loading, awaitItem())
             assertEquals(
                 MeetingRoomUiState.Content(
-                    roomName = "room-name",
+                    roomName = ANY_ROOM_NAME,
                     call = mockCall,
                 ), awaitItem()
             )
@@ -82,16 +74,16 @@ class MeetingRoomScreenViewModelTest {
     @Test
     fun `given viewmodel when onToggleCamera then delegate to call`() = runTest {
         val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession("room-name") } returns buildSuccessSessionResponse()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val sut = sut()
 
         sut.uiState.test {
-            sut.init("room-name")
             assertEquals(MeetingRoomUiState.Loading, awaitItem())
             assertEquals(
                 MeetingRoomUiState.Content(
-                    roomName = "room-name",
+                    roomName = ANY_ROOM_NAME,
                     call = mockCall,
                 ), awaitItem()
             )
@@ -103,16 +95,16 @@ class MeetingRoomScreenViewModelTest {
     @Test
     fun `given viewmodel when endCall then delegate to call`() = runTest {
         val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession("room-name") } returns buildSuccessSessionResponse()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val sut = sut()
 
         sut.uiState.test {
-            sut.init("room-name")
             assertEquals(MeetingRoomUiState.Loading, awaitItem())
             assertEquals(
                 MeetingRoomUiState.Content(
-                    roomName = "room-name",
+                    roomName = ANY_ROOM_NAME,
                     call = mockCall,
                 ), awaitItem()
             )
@@ -124,16 +116,16 @@ class MeetingRoomScreenViewModelTest {
     @Test
     fun `given viewmodel when onPause then delegate to call`() = runTest {
         val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession("room-name") } returns buildSuccessSessionResponse()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val sut = sut()
 
         sut.uiState.test {
-            sut.init("room-name")
             assertEquals(MeetingRoomUiState.Loading, awaitItem())
             assertEquals(
                 MeetingRoomUiState.Content(
-                    roomName = "room-name",
+                    roomName = ANY_ROOM_NAME,
                     call = mockCall,
                 ), awaitItem()
             )
@@ -145,16 +137,16 @@ class MeetingRoomScreenViewModelTest {
     @Test
     fun `given viewmodel when onResume then delegate to call`() = runTest {
         val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession("room-name") } returns buildSuccessSessionResponse()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val sut = sut()
 
         sut.uiState.test {
-            sut.init("room-name")
             assertEquals(MeetingRoomUiState.Loading, awaitItem())
             assertEquals(
                 MeetingRoomUiState.Content(
-                    roomName = "room-name",
+                    roomName = ANY_ROOM_NAME,
                     call = mockCall,
                 ), awaitItem()
             )
@@ -166,16 +158,16 @@ class MeetingRoomScreenViewModelTest {
     @Test
     fun `given viewmodel when onSwitchCamera then delegate to call`() = runTest {
         val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession("room-name") } returns buildSuccessSessionResponse()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val sut = sut()
 
         sut.uiState.test {
-            sut.init("room-name")
             assertEquals(MeetingRoomUiState.Loading, awaitItem())
             assertEquals(
                 MeetingRoomUiState.Content(
-                    roomName = "room-name",
+                    roomName = ANY_ROOM_NAME,
                     call = mockCall,
                 ), awaitItem()
             )
@@ -183,6 +175,13 @@ class MeetingRoomScreenViewModelTest {
             verify { mockCall.togglePublisherCamera() }
         }
     }
+
+    private fun sut(): MeetingRoomScreenViewModel =
+        MeetingRoomScreenViewModel(
+            roomName = ANY_ROOM_NAME,
+            sessionRepository = sessionRepository,
+            videoClient = videoClient,
+        )
 
     private fun buildSuccessSessionResponse() = Result.success(
         SessionInfo(
@@ -206,4 +205,7 @@ class MeetingRoomScreenViewModelTest {
 
     private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true)
 
+    private companion object {
+        const val ANY_ROOM_NAME = "room-name"
+    }
 }

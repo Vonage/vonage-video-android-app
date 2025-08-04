@@ -9,29 +9,34 @@ import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class WaitingRoomViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = WaitingRoomViewModelFactory::class)
+class WaitingRoomViewModel @AssistedInject constructor(
+    @Assisted val roomName: String,
     private val userRepository: UserRepository,
     private val videoClient: VonageVideoClient,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<WaitingRoomUiState>(WaitingRoomUiState.Idle)
-    val uiState: StateFlow<WaitingRoomUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<WaitingRoomUiState> = _uiState.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
+        initialValue = WaitingRoomUiState.Idle,
+    )
 
     private lateinit var publisher: VeraPublisher
-    private lateinit var roomName: String
-
     private var currentBlurIndex: Int = 0
 
-    fun init(roomName: String) {
-        this.roomName = roomName
+    fun init() {
         publisher = videoClient.buildPublisher()
         viewModelScope.launch {
             publisher = publisher.copy(name = userRepository.getUserName().orEmpty())
@@ -115,6 +120,15 @@ class WaitingRoomViewModel @Inject constructor(
     fun onStop() {
         videoClient.destroyPublisher()
     }
+
+    private companion object {
+        const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
+    }
+}
+
+@AssistedFactory
+interface WaitingRoomViewModelFactory {
+    fun create(roomName: String): WaitingRoomViewModel
 }
 
 sealed interface WaitingRoomUiState {

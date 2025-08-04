@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,16 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
-import androidx.compose.ui.unit.dp
 import com.vonage.android.audio.AudioDevicesHandler
 import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.BlurLevel
-import com.vonage.android.screen.components.DeviceSelectionPanel
 import com.vonage.android.screen.components.TopBanner
-import com.vonage.android.screen.components.permissions.CallPermissionHandler
-import com.vonage.android.screen.waiting.components.JoinRoomSection
-import com.vonage.android.screen.waiting.components.VideoPreviewContainer
+import com.vonage.android.screen.waiting.components.WaitingRoomBody
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,8 +36,6 @@ fun WaitingRoomScreen(
     actions: WaitingRoomActions,
     modifier: Modifier = Modifier,
     navigateToRoom: (String) -> Unit = {},
-    onGrantPermissions: () -> Unit = {},
-    navigateToPermissions: () -> Unit = {},
 ) {
     val sheetState = rememberModalBottomSheetState()
     var showAudioDeviceSelector by remember { mutableStateOf(false) }
@@ -54,17 +46,13 @@ fun WaitingRoomScreen(
     ) { contentPadding ->
         Column(
             modifier = Modifier
-                .padding(contentPadding)
                 .fillMaxSize()
+                .background(VonageVideoTheme.colors.background)
                 .verticalScroll(rememberScrollState())
-                .background(VonageVideoTheme.colors.background),
+                .padding(contentPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
-
-            CallPermissionHandler(
-                onGrantPermissions = onGrantPermissions,
-                navigateToPermissions = navigateToPermissions,
-            )
 
             if (showAudioDeviceSelector) {
                 ModalBottomSheet(
@@ -98,42 +86,6 @@ fun WaitingRoomScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun WaitingRoomBody(
-    uiState: WaitingRoomUiState.Content,
-    actions: WaitingRoomActions,
-    onMicDeviceSelect: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-    ) {
-        VideoPreviewContainer(
-            view = uiState.view,
-            name = uiState.userName,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp),
-            isMicEnabled = uiState.isMicEnabled,
-            isCameraEnabled = uiState.isCameraEnabled,
-            blurLevel = uiState.blurLevel,
-            actions = actions,
-        )
-        DeviceSelectionPanel(
-            onMicDeviceSelect = onMicDeviceSelect,
-            onCameraDeviceSelect = actions.onCameraSwitch,
-        )
-        JoinRoomSection(
-            roomName = uiState.roomName,
-            username = uiState.userName,
-            onUsernameChange = actions.onUserNameChange,
-            onJoinRoom = actions.onJoinRoom,
-        )
     }
 }
 
