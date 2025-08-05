@@ -201,6 +201,7 @@ class MeetingRoomScreenViewModelTest {
         cycleCamera = {},
         setCameraBlur = {},
         cameraIndex = 0,
+        isSpeaking = false,
     )
 
     private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true)

@@ -1,6 +1,7 @@
 package com.vonage.android.screen.waiting
 
 import app.cash.turbine.test
+import com.vonage.android.audio.MicVolume
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.BlurLevel
@@ -19,10 +20,12 @@ class WaitingRoomViewModelTest {
 
     val videoClient: VonageVideoClient = mockk()
     val userRepository: UserRepository = mockk()
+    val micVolume: MicVolume = mockk(relaxed = true)
     val sut = WaitingRoomViewModel(
         roomName = ANY_ROOM_NAME,
         userRepository = userRepository,
         videoClient = videoClient,
+        micVolume = micVolume,
     )
 
     @Test
@@ -254,6 +257,7 @@ class WaitingRoomViewModelTest {
 
         sut.onStop()
 
+        verify { micVolume.stop() }
         verify { videoClient.destroyPublisher() }
     }
 
@@ -275,6 +279,7 @@ class WaitingRoomViewModelTest {
         cycleCamera = cycleCamera,
         setCameraBlur = setCameraBlur,
         cameraIndex = cameraIndex,
+        isSpeaking = false,
     )
 
     private companion object {

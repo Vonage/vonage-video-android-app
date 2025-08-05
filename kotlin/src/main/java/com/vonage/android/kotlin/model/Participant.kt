@@ -1,7 +1,6 @@
 package com.vonage.android.kotlin.model
 
 import android.view.View
-import kotlinx.coroutines.flow.Flow
 
 interface Participant {
     val id: String
@@ -19,7 +18,6 @@ data class VeraPublisher(
     override val isCameraEnabled: Boolean,
     override val view: View,
     override val isSpeaking: Boolean,
-    val audioLevel: Flow<Float>,
     val cameraIndex: Int,
     val cycleCamera: () -> Unit,
     val blurLevel: BlurLevel,

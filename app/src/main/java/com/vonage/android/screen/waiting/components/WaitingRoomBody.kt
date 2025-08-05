@@ -19,7 +19,6 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.screen.components.DeviceSelectionPanel
 import com.vonage.android.screen.waiting.WaitingRoomActions
 import com.vonage.android.screen.waiting.WaitingRoomUiState
-import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun WaitingRoomBody(
@@ -82,7 +81,6 @@ internal fun WaitingRoomBodyPreview() {
                 isMicEnabled = true,
                 isCameraEnabled = false,
                 blurLevel = BlurLevel.NONE,
-                audioLevel = flowOf(0.5f),
                 view = previewCamera(),
             ),
             audioLevel = 0.5f,
@@ -104,7 +102,6 @@ internal fun WaitingRoomBodyWithVideoPreview() {
                 isMicEnabled = false,
                 isCameraEnabled = true,
                 blurLevel = BlurLevel.NONE,
-                audioLevel = flowOf(),
                 view = previewCamera(),
             ),
             audioLevel = 0.5f,

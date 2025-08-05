@@ -14,7 +14,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -128,8 +127,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
                     cameraIndex = publisher.cameraIndex,
                 )
             )
-            videoClient.destroyPublisher()
-            micVolume.stop()
+            onStop()
             _uiState.value = WaitingRoomUiState.Success(
                 roomName = roomName,
             )
@@ -143,11 +141,11 @@ class WaitingRoomViewModel @AssistedInject constructor(
             isMicEnabled = participant.isMicEnabled,
             userName = participant.name,
             blurLevel = participant.blurLevel,
-            audioLevel = participant.audioLevel,
             view = participant.view,
         )
 
     fun onStop() {
+        micVolume.stop()
         videoClient.destroyPublisher()
     }
 
@@ -170,7 +168,6 @@ sealed interface WaitingRoomUiState {
         val isMicEnabled: Boolean,
         val isCameraEnabled: Boolean,
         val blurLevel: BlurLevel,
-        val audioLevel: Flow<Float>,
         val view: View? = null,
     ) : WaitingRoomUiState
 

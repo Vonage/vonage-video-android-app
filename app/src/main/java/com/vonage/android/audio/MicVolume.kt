@@ -15,26 +15,37 @@ import kotlin.math.sqrt
 @SuppressLint("MissingPermission")
 class MicVolume @Inject constructor() {
 
-    private var audioRecord: AudioRecord = AudioRecord(
-        MediaRecorder.AudioSource.MIC,
-        SAMPLE_RATE_HZ,
-        CHANNEL_CONFIG,
-        AUDIO_FORMAT,
-        BUFFER_SIZE,
-    )
+    private val bufferSize by lazy {
+        AudioRecord.getMinBufferSize(
+            SAMPLE_RATE_HZ,
+            CHANNEL_CONFIG,
+            AUDIO_FORMAT
+        )
+    }
+
+    private val audioRecord: AudioRecord by lazy {
+        AudioRecord(
+            MediaRecorder.AudioSource.MIC,
+            SAMPLE_RATE_HZ,
+            CHANNEL_CONFIG,
+            AUDIO_FORMAT,
+            bufferSize,
+        )
+    }
 
     fun start() {
         audioRecord.startRecording()
     }
 
     fun volume(samplingMillis: Long = 60): Flow<Float> = flow {
-        val buffer = ShortArray(BUFFER_SIZE)
+        val buffer = ShortArray(bufferSize)
         var bufferReadSize: Int
 
         while (audioRecord.recordingState == RECORDSTATE_RECORDING) {
             // READ_NON_BLOCKING can cause problems in Samsung Devices
             bufferReadSize = audioRecord.read(
-                buffer, 0, BUFFER_SIZE, AudioRecord.READ_BLOCKING)
+                buffer, 0, bufferSize, AudioRecord.READ_BLOCKING
+            )
             if (bufferReadSize <= 0) continue
             val rms = normalizeAudioLevel(buffer, bufferReadSize)
             Log.d(TAG, "mic volume RMS $rms")
@@ -65,10 +76,5 @@ class MicVolume @Inject constructor() {
         const val CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_STEREO
         const val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
         const val SAMPLE_RATE_HZ = 44100
-        val BUFFER_SIZE = AudioRecord.getMinBufferSize(
-            SAMPLE_RATE_HZ,
-            CHANNEL_CONFIG,
-            AUDIO_FORMAT
-        )
     }
 }
