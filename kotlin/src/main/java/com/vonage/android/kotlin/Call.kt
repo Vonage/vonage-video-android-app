@@ -22,6 +22,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,10 +44,13 @@ class Call internal constructor(
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : CallFacade {
 
+    private val coroutineScope = CoroutineScope(coroutineDispatcher)
+
     private val _participantsStateFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
 
     private val subscriberStreams = HashMap<String, Subscriber>()
+    private val subscriberJobs = HashMap<String, Job>()
     private val participantStreams = HashMap<String, Participant>()
 
     override fun connect(): Flow<SessionEvent> = callbackFlow {
@@ -160,7 +164,7 @@ class Call internal constructor(
             }
         })
 
-        CoroutineScope(coroutineDispatcher).launch {
+        coroutineScope.launch {
             subscriber.observeAudioLevel()
                 .distinctUntilChanged()
                 .debounce(SUBSCRIBER_AUDIO_LEVEL_SAMPLING_MS)
@@ -173,6 +177,8 @@ class Call internal constructor(
                     }
                 }
                 .collect()
+        }.also {
+            subscriberJobs[subscriber.stream.streamId] = it
         }
 
         subscriber.setVideoListener(object : SubscriberKit.VideoListener {
@@ -220,6 +226,8 @@ class Call internal constructor(
         subscriber.setVideoListener(null)
         subscriber.setStreamListener(null)
         subscriber.setAudioLevelListener(null)
+        subscriberJobs[stream.streamId]?.cancel()
+        subscriberJobs.remove(stream.streamId)
         subscriberStreams.remove(stream.streamId)
         participantStreams.remove(stream.streamId)
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
