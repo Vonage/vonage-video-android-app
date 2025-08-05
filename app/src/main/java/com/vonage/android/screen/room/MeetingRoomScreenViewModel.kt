@@ -10,6 +10,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -72,6 +73,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         }
     }
 
+    @OptIn(FlowPreview::class)
     private fun connect(sessionInfo: SessionInfo) {
         videoClient.buildPublisher()
         call = videoClient.initializeSession(
@@ -86,11 +88,10 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             call?.let {
                 it.observePublisherAudio()
                     .distinctUntilChanged()
-                    .debounce(36L)
+                    .debounce(PUBLISHER_AUDIO_LEVEL_DEBOUNCE_MS)
                     .onEach { audioLevel ->
                         _audioLevel.value = audioLevel
-                    }
-                    .collect()
+                    }.collect()
             }
         }
     }
@@ -121,6 +122,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
     private companion object {
         const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
+        const val PUBLISHER_AUDIO_LEVEL_DEBOUNCE_MS = 36L
     }
 }
 

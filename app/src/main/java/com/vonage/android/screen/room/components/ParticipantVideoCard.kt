@@ -113,7 +113,7 @@ private fun BoxScope.MicrophoneIndicator(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(12.dp),
-            audioLevels = audioLevel,
+            audioLevel = audioLevel,
         )
     } else {
         Box(

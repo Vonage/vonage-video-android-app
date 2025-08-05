@@ -104,7 +104,7 @@ internal fun WaitingRoomBodyWithVideoPreview() {
                 isMicEnabled = false,
                 isCameraEnabled = true,
                 blurLevel = BlurLevel.NONE,
-                audioLevel = flowOf(0.5f),
+                audioLevel = flowOf(),
                 view = previewCamera(),
             ),
             audioLevel = 0.5f,

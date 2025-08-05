@@ -6,52 +6,45 @@ import android.media.AudioRecord
 import android.media.AudioRecord.RECORDSTATE_RECORDING
 import android.media.MediaRecorder
 import android.util.Log
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 import kotlin.math.sqrt
 
-class MicVolume() {
+@SuppressLint("MissingPermission")
+class MicVolume @Inject constructor() {
 
-    @SuppressLint("MissingPermission")
-    fun volume(samplingMillis: Long = 60): Flow<Float> = callbackFlow {
-        val audioRecord = AudioRecord(
-            MediaRecorder.AudioSource.MIC,
-            SAMPLE_RATE,
-            CHANNEL_CONFIG,
-            AUDIO_FORMAT,
-            BUFFER_SIZE,
-        )
+    private var audioRecord: AudioRecord = AudioRecord(
+        MediaRecorder.AudioSource.MIC,
+        SAMPLE_RATE_HZ,
+        CHANNEL_CONFIG,
+        AUDIO_FORMAT,
+        BUFFER_SIZE,
+    )
+
+    fun start() {
         audioRecord.startRecording()
+    }
 
+    fun volume(samplingMillis: Long = 60): Flow<Float> = flow {
         val buffer = ShortArray(BUFFER_SIZE)
         var bufferReadSize: Int
 
-        audioRecord.setRecordPositionUpdateListener(object : AudioRecord.OnRecordPositionUpdateListener {
-            override fun onMarkerReached(recorder: AudioRecord?) {
-                Log.d("MicVolume", "onMarkerReached -------------")
-            }
-
-            override fun onPeriodicNotification(recorder: AudioRecord?) {
-                Log.d("MicVolume", "onPeriodicNotification -------------")
-            }
-        })
-
         while (audioRecord.recordingState == RECORDSTATE_RECORDING) {
             // READ_NON_BLOCKING can cause problems in Samsung Devices
-            bufferReadSize = audioRecord.read(buffer, 0, BUFFER_SIZE, AudioRecord.READ_BLOCKING)
+            bufferReadSize = audioRecord.read(
+                buffer, 0, BUFFER_SIZE, AudioRecord.READ_BLOCKING)
             if (bufferReadSize <= 0) continue
             val rms = normalizeAudioLevel(buffer, bufferReadSize)
-            Log.d("MicVolume", "mic volume RMS $rms")
-            trySend(rms)
+            Log.d(TAG, "mic volume RMS $rms")
+            emit(rms)
             delay(samplingMillis)
         }
+    }
 
-        awaitClose {
-            Log.d("MicVolume", "recording STOPPED")
-            audioRecord.stop()
-        }
+    fun stop() {
+        audioRecord.stop()
     }
 
     private fun normalizeAudioLevel(buffer: ShortArray, length: Int): Float {
@@ -63,15 +56,17 @@ class MicVolume() {
         }
 
         val rms = sqrt(sum.toDouble() / length).toFloat()
-        return (rms / Short.MAX_VALUE).coerceIn(0f, 1f) * 10
+        return (rms / Short.MAX_VALUE).coerceIn(0f, 1f) * SCALE
     }
 
     companion object {
+        const val TAG = "MicVolume"
+        const val SCALE = 10
         const val CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_STEREO
         const val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
-        const val SAMPLE_RATE = 44100
+        const val SAMPLE_RATE_HZ = 44100
         val BUFFER_SIZE = AudioRecord.getMinBufferSize(
-            SAMPLE_RATE,
+            SAMPLE_RATE_HZ,
             CHANNEL_CONFIG,
             AUDIO_FORMAT
         )

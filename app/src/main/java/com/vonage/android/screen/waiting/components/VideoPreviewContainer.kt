@@ -41,6 +41,7 @@ import com.vonage.android.util.buildTestTag
 import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.audio.ui.AudioVolumeIndicator
 
+@Suppress("LongParameterList")
 @Composable
 fun VideoPreviewContainer(
     view: View?,
@@ -81,14 +82,15 @@ fun VideoPreviewContainer(
             isMicEnabled = isMicEnabled,
             blurLevel = blurLevel,
             isCameraEnabled = isCameraEnabled,
-            audioLevels = audioLevels,
+            audioLevel = audioLevels,
         )
     }
 }
 
+@Suppress("LongParameterList")
 @Composable
 fun VideoControlPanel(
-    audioLevels: Float,
+    audioLevel: Float,
     onMicToggle: () -> Unit,
     onCameraToggle: () -> Unit,
     onCameraBlur: () -> Unit,
@@ -104,14 +106,8 @@ fun VideoControlPanel(
     ) {
         if (isMicEnabled) {
             AudioVolumeIndicator(
-                audioLevels = audioLevels,
+                audioLevel = audioLevel,
             )
-//            AudioLevelIndicator(
-//                modifier = Modifier
-//                    .height(20.dp)
-//                    .width(50.dp),
-//                level = audioLevels,
-//            )
         }
 
         CircularControlButton(

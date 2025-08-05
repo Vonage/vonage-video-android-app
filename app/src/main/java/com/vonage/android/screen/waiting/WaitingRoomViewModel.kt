@@ -1,6 +1,5 @@
 package com.vonage.android.screen.waiting
 
-import android.annotation.SuppressLint
 import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -30,6 +29,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
     private val userRepository: UserRepository,
     private val videoClient: VonageVideoClient,
+    private val micVolume: MicVolume,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<WaitingRoomUiState>(WaitingRoomUiState.Idle)
@@ -42,14 +42,13 @@ class WaitingRoomViewModel @AssistedInject constructor(
     private val _audioLevel = MutableStateFlow(0F)
     val audioLevel: StateFlow<Float> = _audioLevel.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(1000),
+        started = SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
         initialValue = 0.5F,
     )
 
     private lateinit var publisher: VeraPublisher
     private var currentBlurIndex: Int = 0
 
-    @SuppressLint("MissingPermission")
     fun init() {
         publisher = videoClient.buildPublisher()
         viewModelScope.launch {
@@ -60,7 +59,8 @@ class WaitingRoomViewModel @AssistedInject constructor(
             )
         }
         viewModelScope.launch {
-            MicVolume().volume()
+            micVolume.start()
+            micVolume.volume()
                 .distinctUntilChanged()
                 .onEach {
                     _audioLevel.value = it
@@ -94,9 +94,11 @@ class WaitingRoomViewModel @AssistedInject constructor(
     }
 
     fun onCameraSwitch() {
+        micVolume.stop()
         val currentCameraIndex = 1 - publisher.cameraIndex
         publisher = publisher.copy(cameraIndex = currentCameraIndex)
         publisher.cycleCamera()
+        micVolume.start()
         _uiState.value = buildContentUiState(
             roomName = roomName,
             participant = publisher,
@@ -127,6 +129,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
                 )
             )
             videoClient.destroyPublisher()
+            micVolume.stop()
             _uiState.value = WaitingRoomUiState.Success(
                 roomName = roomName,
             )

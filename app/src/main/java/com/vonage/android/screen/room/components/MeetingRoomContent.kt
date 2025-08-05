@@ -69,7 +69,6 @@ object MeetingRoomContentTestTags {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Suppress("MagicNumber")
 @PreviewLightDark
 @Composable
 internal fun MeetingRoomContentPreview() {

@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,13 +22,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 
+@Suppress("MagicNumber")
 @Composable
 fun AudioVolumeIndicator(
-    audioLevels: Float,
+    audioLevel: Float,
     modifier: Modifier = Modifier,
+    defaultBarHeight: Float = 0.1f,
     color: Color = Color.White,
 ) {
-    val defaultBarHeight = 0.1f
+    val bars by remember(audioLevel) {
+        derivedStateOf {
+            arrayOf(
+                audioLevel * 0.6f,
+                audioLevel * 0.85f,
+                audioLevel * 0.6f,
+            )
+        }
+    }
     Row(
         modifier = modifier
             .padding(horizontal = 8.dp)
@@ -34,26 +47,12 @@ fun AudioVolumeIndicator(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
     ) {
-        repeat(3) { index ->
-            val audioLevel =
-                when (index) {
-                    0, 2 -> {
-                        audioLevels * 0.6f
-                    }
-
-                    else -> {
-                        audioLevels * 0.9f
-                    }
-                }
+        bars.forEach { audioLevel ->
             Spacer(
                 modifier = Modifier
                     .width(4.dp)
                     .fillMaxHeight(
-                        if (audioLevel == 0f) {
-                            defaultBarHeight
-                        } else {
-                            (audioLevel + defaultBarHeight).coerceAtMost(1f)
-                        },
+                        (defaultBarHeight + audioLevel).coerceAtMost(0.9f),
                     )
                     .background(
                         color = color,
@@ -71,8 +70,8 @@ internal fun ActiveSoundLevelsPreview() {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            AudioVolumeIndicator(audioLevels = 0f)
-            AudioVolumeIndicator(audioLevels = 0.8f)
+            AudioVolumeIndicator(audioLevel = 0f)
+            AudioVolumeIndicator(audioLevel = 0.8f)
         }
     }
 }

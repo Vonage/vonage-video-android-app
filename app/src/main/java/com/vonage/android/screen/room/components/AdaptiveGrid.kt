@@ -85,7 +85,6 @@ fun AdaptiveGrid(
     }
 }
 
-@Suppress("MagicNumber")
 @PreviewLightDark
 @Composable
 internal fun AdaptiveGridPreview() {

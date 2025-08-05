@@ -35,9 +35,9 @@ import kotlinx.coroutines.flow.flowOf
 fun WaitingRoomScreen(
     uiState: WaitingRoomUiState,
     actions: WaitingRoomActions,
+    audioLevel: Float,
     modifier: Modifier = Modifier,
     navigateToRoom: (String) -> Unit = {},
-    audioLevel: Float,
 ) {
     val sheetState = rememberModalBottomSheetState()
     var showAudioDeviceSelector by remember { mutableStateOf(false) }
@@ -104,7 +104,7 @@ internal fun WaitingRoomScreenPreview() {
                 isMicEnabled = true,
                 isCameraEnabled = false,
                 blurLevel = BlurLevel.NONE,
-                audioLevel = flowOf(0.6f),
+                audioLevel = flowOf(),
                 view = previewCamera(),
             ),
             audioLevel = 0.6f,
@@ -125,7 +125,7 @@ internal fun WaitingRoomScreenWithVideoPreview() {
                 isMicEnabled = false,
                 isCameraEnabled = true,
                 blurLevel = BlurLevel.NONE,
-                audioLevel = flowOf(0.6f),
+                audioLevel = flowOf(),
                 view = previewCamera(),
             ),
             audioLevel = 0.6f,

@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.StateFlow
 @Stable
 interface CallFacade {
     val participantsStateFlow: StateFlow<ImmutableList<Participant>>
-    val publisherAudioLevelStateFlow: StateFlow<Float>
-
     fun connect(): Flow<SessionEvent>
     fun observePublisherAudio(): Flow<Float>
     fun togglePublisherVideo()

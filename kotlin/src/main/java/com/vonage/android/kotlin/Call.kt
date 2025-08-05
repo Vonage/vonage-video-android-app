@@ -3,12 +3,11 @@ package com.vonage.android.kotlin
 import android.content.Context
 import android.util.Log
 import com.opentok.android.OpentokError
-import com.opentok.android.PublisherKit.AudioLevelListener
 import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
-import com.vonage.android.kotlin.ext.observeSubscriberAudio
+import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
 import com.vonage.android.kotlin.internal.toParticipant
@@ -22,6 +21,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +33,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
+@Suppress("TooManyFunctions")
+@OptIn(FlowPreview::class)
 class Call internal constructor(
     private val context: Context,
     private val token: String,
@@ -43,9 +45,6 @@ class Call internal constructor(
 
     private val _participantsStateFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
-
-    private val _publisherAudioLevelStateFlow = MutableStateFlow(0F)
-    override val publisherAudioLevelStateFlow: StateFlow<Float> = _publisherAudioLevelStateFlow
 
     private val subscriberStreams = HashMap<String, Subscriber>()
     private val participantStreams = HashMap<String, Participant>()
@@ -121,23 +120,12 @@ class Call internal constructor(
         }
     }
 
-    override fun observePublisherAudio(): Flow<Float> = callbackFlow {
-        val audioLevelListener = AudioLevelListener { publisher, audioLevel ->
-            val a = "%.4f".format(audioLevel)
-            Log.d("XXX", "audio level listener $a")
+    override fun observePublisherAudio(): Flow<Float> = publisherHolder.publisher.observeAudioLevel { audioLevel ->
+        Log.d(TAG, "publisher audio level listener changed to $audioLevel")
 
-            participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant(isSpeaking = (audioLevel > 0F))
-            _participantsStateFlow.value = participantStreams.values.toImmutableList()
-
-            trySend(a.toFloat())
-        }
-
-        publisherHolder.publisher.setAudioLevelListener(audioLevelListener)
-
-        awaitClose {
-            publisherHolder.publisher.setAudioLevelListener(null)
-            Log.d("XXX", "observePublisherAudio AWAIT CLOSE")
-        }
+        participantStreams[PUBLISHER_ID] = publisherHolder.publisher
+            .toParticipant(isSpeaking = (audioLevel > SPEAKING_AUDIO_LEVEL_THRESHOLD))
+        _participantsStateFlow.value = participantStreams.values.toImmutableList()
     }
 
     private fun addSubscriber(stream: Stream) {
@@ -173,13 +161,13 @@ class Call internal constructor(
         })
 
         CoroutineScope(coroutineDispatcher).launch {
-            subscriber.observeSubscriberAudio()
+            subscriber.observeAudioLevel()
                 .distinctUntilChanged()
-                .debounce(50L)
+                .debounce(SUBSCRIBER_AUDIO_LEVEL_SAMPLING_MS)
                 .onEach { audioLevel ->
                     subscriberStreams[subscriber.stream.streamId]?.let { subs ->
                         val updatedParticipant = (participantStreams[subs.stream.streamId] as VeraSubscriber)
-                            .copy(isSpeaking = (audioLevel > 0F))
+                            .copy(isSpeaking = (audioLevel > SPEAKING_AUDIO_LEVEL_THRESHOLD))
                         participantStreams[subs.stream.streamId] = updatedParticipant
                         _participantsStateFlow.value = participantStreams.values.toImmutableList()
                     }
@@ -242,5 +230,8 @@ class Call internal constructor(
     companion object {
         const val TAG: String = "Call"
         const val PUBLISHER_ID: String = "publisher"
+
+        const val SUBSCRIBER_AUDIO_LEVEL_SAMPLING_MS = 50L
+        const val SPEAKING_AUDIO_LEVEL_THRESHOLD = 0.2F // add as a configuration parameter
     }
 }
