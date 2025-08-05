@@ -1,5 +1,6 @@
 package com.vonage.android.navigation
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 sealed interface AppRoute {
@@ -7,7 +8,10 @@ sealed interface AppRoute {
     object Landing : AppRoute
 
     @Serializable
-    data class Waiting(val roomName: String) : AppRoute
+    data class Waiting(
+        @SerialName("roomName")
+        val roomName: String
+    ) : AppRoute
 
     @Serializable
     data class Meeting(val roomName: String) : AppRoute

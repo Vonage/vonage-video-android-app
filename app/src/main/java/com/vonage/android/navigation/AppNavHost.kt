@@ -6,7 +6,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
+import com.vonage.android.di.RetrofitModule.BASE_URL
 import com.vonage.android.navigation.AppRoute.Goodbye
 import com.vonage.android.navigation.AppRoute.Landing
 import com.vonage.android.navigation.AppRoute.Meeting
@@ -34,10 +36,15 @@ fun AppNavHost(
                 navigateToRoom = { params -> navController.navigate(Waiting(params.roomName)) },
             )
         }
-        composable<Waiting> { backStackEntry ->
-            val params: Waiting = backStackEntry.toRoute()
+        composable<Waiting>(
+            deepLinks = listOf(
+                navDeepLink<Waiting>("$BASE_URL/waiting-room"),
+                navDeepLink<Waiting>("$BASE_URL/room"),
+            )
+        ) { backStackEntry ->
+            val roomName = backStackEntry.toRoute<Waiting>().roomName
             WaitingRoomRoute(
-                roomName = params.roomName,
+                roomName = roomName,
                 navigateToRoom = { roomName -> navController.navigate(Meeting(roomName)) },
                 navigateToPermissions = { context.navigateToSystemPermissions() },
                 onBack = {
@@ -48,23 +55,23 @@ fun AppNavHost(
             )
         }
         composable<Meeting> { backStackEntry ->
-            val params: Meeting = backStackEntry.toRoute()
+            val roomName = backStackEntry.toRoute<Meeting>().roomName
             MeetingRoomScreenRoute(
-                roomName = params.roomName,
-                navigateToGoodBye = { navController.navigate(Goodbye(roomName = params.roomName)) },
+                roomName = roomName,
+                navigateToGoodBye = { navController.navigate(Goodbye(roomName = roomName)) },
                 navigateToShare = { roomName -> context.navigateToShare(roomName) },
                 onBack = {
-                    navController.navigate(Waiting(roomName = params.roomName)) {
-                        popUpTo(Waiting(roomName = params.roomName)) { inclusive = true }
+                    navController.navigate(Waiting(roomName = roomName)) {
+                        popUpTo(Waiting(roomName = roomName)) { inclusive = true }
                     }
                 }
             )
         }
         composable<Goodbye> { backStackEntry ->
-            val params: Goodbye = backStackEntry.toRoute()
+            val roomName = backStackEntry.toRoute<Goodbye>().roomName
             GoodbyeScreenRoute(
-                roomName = params.roomName,
-                navigateToMeeting = { roomName -> navController.navigate(Meeting(roomName = params.roomName)) },
+                roomName = roomName,
+                navigateToMeeting = { roomName -> navController.navigate(Meeting(roomName = roomName)) },
                 navigateToLanding = {
                     navController.navigate(Landing) {
                         popUpTo(Landing) { inclusive = true }
