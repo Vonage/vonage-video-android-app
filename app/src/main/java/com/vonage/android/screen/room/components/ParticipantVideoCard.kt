@@ -26,11 +26,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vonage.android.audio.ui.AudioVolumeIndicator
 import com.vonage.android.compose.components.VideoRenderer
+import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.AvatarInitials
-import com.vonage.android.compose.preview.previewCamera
-import com.vonage.android.audio.ui.AudioVolumeIndicator
 
 @Composable
 fun ParticipantVideoCard(
@@ -45,7 +45,6 @@ fun ParticipantVideoCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
-//        border = if (audioLevel > 0.1) BorderStroke(1.dp, VonageVideoTheme.colors.primary) else null,
         border = if (isSpeaking) BorderStroke(1.dp, VonageVideoTheme.colors.primary) else null,
     ) {
         Box(
