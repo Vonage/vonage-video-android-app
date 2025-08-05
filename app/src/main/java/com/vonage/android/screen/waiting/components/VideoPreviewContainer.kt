@@ -40,6 +40,7 @@ import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_INITIALS_TAG
 import com.vonage.android.util.buildTestTag
 import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.audio.ui.AudioVolumeIndicator
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.VOLUME_INDICATOR_TAG
 
 @Suppress("LongParameterList")
 @Composable
@@ -106,6 +107,8 @@ fun VideoControlPanel(
     ) {
         if (isMicEnabled) {
             AudioVolumeIndicator(
+                modifier = Modifier
+                    .testTag(VOLUME_INDICATOR_TAG),
                 audioLevel = audioLevel,
             )
         }

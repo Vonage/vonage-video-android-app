@@ -4,6 +4,7 @@ import android.Manifest
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
@@ -16,7 +17,6 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.compose.preview.previewCamera
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -55,7 +55,6 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = true,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
-                        audioLevel = flowOf(0.5f),
                     ),
                     actions = WaitingRoomActions(),
                     audioLevel = 0.5f,
@@ -63,6 +62,7 @@ class WaitingRoomScreenTest {
             }
         }
         screen.micButtonEnabled.assertIsDisplayed()
+        screen.volumeIndicator.assertIsDisplayed()
         screen.cameraButtonEnabled.assertIsDisplayed()
         screen.prepareToJoinText.assertIsDisplayed()
         screen.roomNameText
@@ -91,7 +91,6 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = true,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
-                        audioLevel = flowOf(0.5f),
                     ),
                     actions = WaitingRoomActions(),
                     audioLevel = 0.5f,
@@ -99,6 +98,7 @@ class WaitingRoomScreenTest {
             }
         }
         screen.micButtonEnabled.assertIsDisplayed()
+        screen.volumeIndicator.assertIsDisplayed()
         screen.cameraButtonEnabled.assertIsDisplayed()
         screen.prepareToJoinText.assertIsDisplayed()
         screen.roomNameText
@@ -127,7 +127,6 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = false,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
-                        audioLevel = flowOf(0.5f),
                     ),
                     actions = WaitingRoomActions(),
                     audioLevel = 0.5f,
@@ -135,6 +134,7 @@ class WaitingRoomScreenTest {
             }
         }
         screen.micButtonEnabled.assertIsDisplayed()
+        screen.volumeIndicator.assertIsDisplayed()
         screen.cameraButtonDisabled.assertIsDisplayed()
         screen.initials.assertIsDisplayedWithText("UN")
     }
@@ -151,7 +151,6 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = false,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
-                        audioLevel = flowOf(0.5f),
                     ),
                     actions = WaitingRoomActions(),
                     audioLevel = 0.5f,
@@ -159,6 +158,7 @@ class WaitingRoomScreenTest {
             }
         }
         screen.micButtonDisabled.assertIsDisplayed()
+        screen.volumeIndicator.assertIsNotDisplayed()
         screen.cameraButtonDisabled.assertIsDisplayed()
         screen.initials.assertIsDisplayedWithText("UN")
     }
@@ -175,7 +175,6 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = false,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
-                        audioLevel = flowOf(0.5f),
                     ),
                     actions = WaitingRoomActions(),
                     audioLevel = 0.5f,
@@ -183,6 +182,7 @@ class WaitingRoomScreenTest {
             }
         }
         screen.micButtonEnabled.assertIsDisplayed()
+        screen.volumeIndicator.assertIsDisplayed()
         screen.cameraButtonDisabled.assertIsDisplayed()
         screen.initials.assertIsDisplayedWithIcon()
         screen.userNameInput
@@ -207,7 +207,6 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = false,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
-                        audioLevel = flowOf(0.5f),
                     ),
                     actions = WaitingRoomActions(),
                     audioLevel = 0.5f,
@@ -215,6 +214,7 @@ class WaitingRoomScreenTest {
             }
         }
         screen.micButtonDisabled.assertIsDisplayed()
+        screen.volumeIndicator.assertIsNotDisplayed()
         screen.cameraButtonDisabled.assertIsDisplayed()
         screen.initials.assertIsDisplayedWithIcon()
         screen.userNameInput
