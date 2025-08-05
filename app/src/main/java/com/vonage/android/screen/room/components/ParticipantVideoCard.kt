@@ -32,9 +32,11 @@ import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.AvatarInitials
 
+@Suppress("LongParameterList")
 @Composable
 fun ParticipantVideoCard(
     isCameraEnabled: Boolean,
+    isShowVolumeIndicator: Boolean,
     isMicEnabled: Boolean,
     isSpeaking: Boolean,
     audioLevel: Float,
@@ -70,7 +72,8 @@ fun ParticipantVideoCard(
 
             MicrophoneIndicator(
                 audioLevel = audioLevel,
-                isMicEnabled = isMicEnabled
+                isMicEnabled = isMicEnabled,
+                isShowVolumeIndicator = isShowVolumeIndicator,
             )
         }
     }
@@ -103,15 +106,17 @@ private fun BoxScope.ParticipantLabel(
 
 @Composable
 private fun BoxScope.MicrophoneIndicator(
+    isShowVolumeIndicator: Boolean,
     isMicEnabled: Boolean,
     audioLevel: Float,
     modifier: Modifier = Modifier,
 ) {
-    if (isMicEnabled) {
+    if (isMicEnabled && isShowVolumeIndicator) {
         AudioVolumeIndicator(
+            size = 32.dp,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(12.dp),
+                .padding(vertical = 12.dp),
             audioLevel = audioLevel,
         )
     } else {
@@ -146,6 +151,7 @@ internal fun ParticipantVideoCardPreview() {
             isMicEnabled = true,
             audioLevel = 0.6f,
             isSpeaking = false,
+            isShowVolumeIndicator = true,
             view = previewCamera(),
         )
     }
@@ -159,9 +165,10 @@ internal fun ParticipantVideoCardPlaceholderPreview() {
             modifier = Modifier.height(300.dp),
             name = "Sample Name Name Name Name Name Name Name Name Name Name",
             isCameraEnabled = false,
-            isMicEnabled = false,
+            isMicEnabled = true,
             audioLevel = 0.6f,
             isSpeaking = false,
+            isShowVolumeIndicator = false,
             view = previewCamera(),
         )
     }

@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.util.preview.buildParticipants
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -65,6 +66,7 @@ fun AdaptiveGrid(
                     view = participant.view,
                     audioLevel = audioLevel,
                     isSpeaking = participant.isSpeaking,
+                    isShowVolumeIndicator = participant is VeraPublisher,
                 )
             }
 

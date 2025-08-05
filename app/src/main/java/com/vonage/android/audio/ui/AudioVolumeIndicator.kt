@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 
@@ -27,6 +28,7 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 fun AudioVolumeIndicator(
     audioLevel: Float,
     modifier: Modifier = Modifier,
+    size: Dp = 32.dp,
     defaultBarHeight: Float = 0.1f,
     color: Color = Color.White,
 ) {
@@ -43,7 +45,7 @@ fun AudioVolumeIndicator(
         modifier = modifier
             .padding(horizontal = 8.dp)
             .background(VonageVideoTheme.colors.primary, CircleShape)
-            .size(32.dp),
+            .size(size),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
     ) {
