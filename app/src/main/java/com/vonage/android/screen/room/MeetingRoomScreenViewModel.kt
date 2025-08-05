@@ -36,7 +36,11 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     )
 
     private val _audioLevel = MutableStateFlow(0F)
-    val audioLevel: StateFlow<Float> = _audioLevel
+    val audioLevel: StateFlow<Float> = _audioLevel.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
+        initialValue = 0F,
+    )
 
     private var call: CallFacade? = null
 

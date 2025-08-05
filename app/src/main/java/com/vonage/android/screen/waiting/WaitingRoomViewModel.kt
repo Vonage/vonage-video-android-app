@@ -42,7 +42,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     val audioLevel: StateFlow<Float> = _audioLevel.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
-        initialValue = 0.5F,
+        initialValue = 0F,
     )
 
     private lateinit var publisher: VeraPublisher
@@ -51,7 +51,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     fun init() {
         publisher = videoClient.buildPublisher()
         viewModelScope.launch {
-            publisher = publisher.copy(name = userRepository.getUserName().orEmpty())
+            publisher = publisher.copy(name = userRepository.getUserName())
             _uiState.value = buildContentUiState(
                 roomName = roomName,
                 participant = publisher,

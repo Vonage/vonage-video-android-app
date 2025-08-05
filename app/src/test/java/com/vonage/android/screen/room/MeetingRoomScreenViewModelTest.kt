@@ -11,6 +11,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -26,6 +27,7 @@ class MeetingRoomScreenViewModelTest {
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        every { mockCall.observePublisherAudio() } returns flowOf(0.4f)
         val sut = sut()
 
         sut.uiState.test {
@@ -36,8 +38,13 @@ class MeetingRoomScreenViewModelTest {
                     call = mockCall,
                 ), awaitItem()
             )
-            verify { mockCall.connect() }
         }
+        sut.audioLevel.test {
+            assertEquals(0.0f, awaitItem()) // initial value
+            assertEquals(0.4f, awaitItem())
+        }
+        verify { mockCall.connect() }
+        verify { mockCall.observePublisherAudio() }
     }
 
     @Test

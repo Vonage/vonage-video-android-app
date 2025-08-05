@@ -12,6 +12,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -33,6 +34,7 @@ class WaitingRoomViewModelTest {
         val publisher = buildMockPublisher()
         every { videoClient.buildPublisher() } returns publisher
         coEvery { userRepository.getUserName() } returns ""
+        every { micVolume.volume() } returns flowOf(0.5f)
 
         sut.init()
 
@@ -50,6 +52,12 @@ class WaitingRoomViewModelTest {
                 ), awaitItem()
             )
         }
+        sut.audioLevel.test {
+            assertEquals(0.0f, awaitItem()) // initial value
+            assertEquals(0.5f, awaitItem())
+        }
+        verify { micVolume.start() }
+        verify { micVolume.volume() }
     }
 
     @Test
