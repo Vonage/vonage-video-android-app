@@ -92,6 +92,7 @@ class WaitingRoomViewModelTest {
                     blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -127,6 +128,7 @@ class WaitingRoomViewModelTest {
                     blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -162,6 +164,7 @@ class WaitingRoomViewModelTest {
                     blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -186,6 +189,7 @@ class WaitingRoomViewModelTest {
                     blurLevel = BlurLevel.NONE,
                 ), awaitItem()
             )
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -210,6 +214,7 @@ class WaitingRoomViewModelTest {
                     roomName = ANY_ROOM_NAME,
                 ), awaitItem()
             )
+            cancelAndIgnoreRemainingEvents()
         }
         coVerify { userRepository.saveUserName("save user name") }
         verify {
