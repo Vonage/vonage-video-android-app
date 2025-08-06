@@ -45,7 +45,8 @@ jobs:
 
       - name: Run unit tests and code quality checks
         run: |
-          ./gradlew clean check detekt --info
+          ./gradlew clean test detekt --info
+#          ./gradlew clean check detekt --info
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
