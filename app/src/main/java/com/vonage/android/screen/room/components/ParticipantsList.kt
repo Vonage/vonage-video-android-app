@@ -102,7 +102,6 @@ private fun ParticipantRow(participant: Participant) {
 
 @PreviewLightDark
 @Composable
-@Suppress("MagicNumber")
 internal fun ParticipantsListPreview() {
     val sampleParticipant = buildParticipants(5)
     VonageVideoTheme {

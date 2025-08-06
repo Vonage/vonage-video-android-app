@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.util.preview.buildParticipants
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -26,6 +27,7 @@ import kotlinx.collections.immutable.toImmutableList
 @Composable
 fun AdaptiveGrid(
     participants: ImmutableList<Participant>,
+    audioLevel: Float,
     modifier: Modifier = Modifier,
     itemHeight: Dp = 225.dp,
     minItemWidth: Dp = 300.dp,
@@ -62,6 +64,9 @@ fun AdaptiveGrid(
                     isCameraEnabled = participant.isCameraEnabled,
                     isMicEnabled = participant.isMicEnabled,
                     view = participant.view,
+                    audioLevel = audioLevel,
+                    isSpeaking = participant.isSpeaking,
+                    isShowVolumeIndicator = participant is VeraPublisher,
                 )
             }
 
@@ -82,13 +87,13 @@ fun AdaptiveGrid(
     }
 }
 
-@Suppress("MagicNumber")
 @PreviewLightDark
 @Composable
 internal fun AdaptiveGridPreview() {
     VonageVideoTheme {
         AdaptiveGrid(
-            participants = buildParticipants(10).toImmutableList()
+            participants = buildParticipants(10).toImmutableList(),
+            audioLevel = 0.6f,
         )
     }
 }

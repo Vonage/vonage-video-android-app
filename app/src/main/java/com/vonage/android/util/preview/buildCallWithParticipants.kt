@@ -19,6 +19,8 @@ fun buildCallWithParticipants(count: Int): CallFacade {
             MutableStateFlow(buildParticipants(count).toImmutableList())
 
         override fun connect(): Flow<SessionEvent> = flowOf()
+        override fun observePublisherAudio(): Flow<Float> = flowOf()
+
         override fun togglePublisherVideo() {}
         override fun togglePublisherCamera() {}
         override fun togglePublisherAudio() {}

@@ -1,6 +1,7 @@
 package com.vonage.android.screen.room.components
 
 import android.view.View
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -25,15 +26,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vonage.android.audio.ui.AudioVolumeIndicator
 import com.vonage.android.compose.components.VideoRenderer
+import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.AvatarInitials
-import com.vonage.android.compose.preview.previewCamera
 
+@Suppress("LongParameterList")
 @Composable
 fun ParticipantVideoCard(
     isCameraEnabled: Boolean,
+    isShowVolumeIndicator: Boolean,
     isMicEnabled: Boolean,
+    isSpeaking: Boolean,
+    audioLevel: Float,
     name: String,
     view: View,
     modifier: Modifier = Modifier,
@@ -41,6 +47,7 @@ fun ParticipantVideoCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
+        border = if (isSpeaking) BorderStroke(1.dp, VonageVideoTheme.colors.primary) else null,
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -63,7 +70,11 @@ fun ParticipantVideoCard(
 
             ParticipantLabel(name)
 
-            MicrophoneIndicator(isMicEnabled)
+            MicrophoneIndicator(
+                audioLevel = audioLevel,
+                isMicEnabled = isMicEnabled,
+                isShowVolumeIndicator = isShowVolumeIndicator,
+            )
         }
     }
 }
@@ -95,25 +106,37 @@ private fun BoxScope.ParticipantLabel(
 
 @Composable
 private fun BoxScope.MicrophoneIndicator(
+    isShowVolumeIndicator: Boolean,
     isMicEnabled: Boolean,
+    audioLevel: Float,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = modifier
-            .align(Alignment.TopEnd)
-            .padding(12.dp)
-            .background(
-                Color.Black.copy(alpha = 0.6f),
-                CircleShape
-            )
-            .padding(6.dp)
-    ) {
-        Icon(
-            imageVector = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(16.dp)
+    if (isMicEnabled && isShowVolumeIndicator) {
+        AudioVolumeIndicator(
+            size = 32.dp,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(vertical = 12.dp),
+            audioLevel = audioLevel,
         )
+    } else {
+        Box(
+            modifier = modifier
+                .align(Alignment.TopEnd)
+                .padding(12.dp)
+                .background(
+                    Color.Black.copy(alpha = 0.6f),
+                    CircleShape
+                )
+                .padding(6.dp)
+        ) {
+            Icon(
+                imageVector = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(16.dp)
+            )
+        }
     }
 }
 
@@ -126,6 +149,9 @@ internal fun ParticipantVideoCardPreview() {
             name = "Sample Name",
             isCameraEnabled = true,
             isMicEnabled = true,
+            audioLevel = 0.6f,
+            isSpeaking = false,
+            isShowVolumeIndicator = true,
             view = previewCamera(),
         )
     }
@@ -139,7 +165,10 @@ internal fun ParticipantVideoCardPlaceholderPreview() {
             modifier = Modifier.height(300.dp),
             name = "Sample Name Name Name Name Name Name Name Name Name Name",
             isCameraEnabled = false,
-            isMicEnabled = false,
+            isMicEnabled = true,
+            audioLevel = 0.6f,
+            isSpeaking = false,
+            isShowVolumeIndicator = false,
             view = previewCamera(),
         )
     }
