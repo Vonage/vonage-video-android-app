@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.util.concurrent.ConcurrentHashMap
 
 @Suppress("TooManyFunctions")
 @OptIn(FlowPreview::class)
@@ -50,7 +51,7 @@ class Call internal constructor(
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
 
     private val subscriberStreams = HashMap<String, Subscriber>()
-    private val subscriberJobs = HashMap<String, Job>()
+    private val subscriberJobs = ConcurrentHashMap<String, Job>()
     private val participantStreams = HashMap<String, Participant>()
 
     override fun connect(): Flow<SessionEvent> = callbackFlow {
