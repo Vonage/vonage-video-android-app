@@ -4,6 +4,7 @@ import android.Manifest
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
@@ -56,10 +57,12 @@ class WaitingRoomScreenTest {
                         blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
+                    audioLevel = 0.5f,
                 )
             }
         }
         screen.micButtonEnabled.assertIsDisplayed()
+        screen.volumeIndicator.assertIsDisplayed()
         screen.cameraButtonEnabled.assertIsDisplayed()
         screen.prepareToJoinText.assertIsDisplayed()
         screen.roomNameText
@@ -90,10 +93,12 @@ class WaitingRoomScreenTest {
                         blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
+                    audioLevel = 0.5f,
                 )
             }
         }
         screen.micButtonEnabled.assertIsDisplayed()
+        screen.volumeIndicator.assertIsDisplayed()
         screen.cameraButtonEnabled.assertIsDisplayed()
         screen.prepareToJoinText.assertIsDisplayed()
         screen.roomNameText
@@ -124,10 +129,12 @@ class WaitingRoomScreenTest {
                         blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
+                    audioLevel = 0.5f,
                 )
             }
         }
         screen.micButtonEnabled.assertIsDisplayed()
+        screen.volumeIndicator.assertIsDisplayed()
         screen.cameraButtonDisabled.assertIsDisplayed()
         screen.initials.assertIsDisplayedWithText("UN")
     }
@@ -146,10 +153,12 @@ class WaitingRoomScreenTest {
                         blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
+                    audioLevel = 0.5f,
                 )
             }
         }
         screen.micButtonDisabled.assertIsDisplayed()
+        screen.volumeIndicator.assertIsNotDisplayed()
         screen.cameraButtonDisabled.assertIsDisplayed()
         screen.initials.assertIsDisplayedWithText("UN")
     }
@@ -168,10 +177,12 @@ class WaitingRoomScreenTest {
                         blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
+                    audioLevel = 0.5f,
                 )
             }
         }
         screen.micButtonEnabled.assertIsDisplayed()
+        screen.volumeIndicator.assertIsDisplayed()
         screen.cameraButtonDisabled.assertIsDisplayed()
         screen.initials.assertIsDisplayedWithIcon()
         screen.userNameInput
@@ -198,10 +209,12 @@ class WaitingRoomScreenTest {
                         blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
+                    audioLevel = 0.5f,
                 )
             }
         }
         screen.micButtonDisabled.assertIsDisplayed()
+        screen.volumeIndicator.assertIsNotDisplayed()
         screen.cameraButtonDisabled.assertIsDisplayed()
         screen.initials.assertIsDisplayedWithIcon()
         screen.userNameInput

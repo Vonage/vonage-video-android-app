@@ -38,6 +38,7 @@ class MeetingRoomScreenTest {
                         call = buildCallWithParticipants(5),
                     ),
                     actions = MeetingRoomActions(),
+                    audioLevel = 0.4f,
                 )
             }
         }

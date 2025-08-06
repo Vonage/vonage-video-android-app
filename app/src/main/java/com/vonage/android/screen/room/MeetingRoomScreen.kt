@@ -37,6 +37,7 @@ import com.vonage.android.util.preview.buildCallWithParticipants
 fun MeetingRoomScreen(
     uiState: MeetingRoomUiState,
     actions: MeetingRoomActions,
+    audioLevel: Float,
     modifier: Modifier = Modifier,
 ) {
     val participantsSheetState = rememberModalBottomSheetState()
@@ -77,6 +78,7 @@ fun MeetingRoomScreen(
                         .padding(contentPadding)
                         .testTag(MEETING_ROOM_CONTENT),
                     participants = participants,
+                    audioLevel = audioLevel,
                     showParticipants = showParticipants,
                     onDismissParticipants = { showParticipants = false },
                     participantsSheetState = participantsSheetState,
@@ -124,6 +126,7 @@ internal fun MeetingRoomScreenLoadingPreview() {
         MeetingRoomScreen(
             uiState = MeetingRoomUiState.Loading,
             actions = MeetingRoomActions(),
+            audioLevel = 0.5f,
         )
     }
 }
@@ -135,11 +138,11 @@ internal fun MeetingRoomScreenSessionErrorPreview() {
         MeetingRoomScreen(
             uiState = MeetingRoomUiState.SessionError,
             actions = MeetingRoomActions(),
+            audioLevel = 0.5f,
         )
     }
 }
 
-@Suppress("MagicNumber")
 @PreviewLightDark
 @Composable
 internal fun MeetingRoomScreenSessionPreview() {
@@ -150,6 +153,7 @@ internal fun MeetingRoomScreenSessionPreview() {
                 call = buildCallWithParticipants(5),
             ),
             actions = MeetingRoomActions(),
+            audioLevel = 0.5f,
         )
     }
 }

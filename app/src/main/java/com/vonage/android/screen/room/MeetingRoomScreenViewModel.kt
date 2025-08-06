@@ -10,10 +10,14 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -29,6 +33,13 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
         initialValue = MeetingRoomUiState.Loading,
+    )
+
+    private val _audioLevel = MutableStateFlow(0F)
+    val audioLevel: StateFlow<Float> = _audioLevel.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
+        initialValue = 0F,
     )
 
     private var call: CallFacade? = null
@@ -66,6 +77,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         }
     }
 
+    @OptIn(FlowPreview::class)
     private fun connect(sessionInfo: SessionInfo) {
         videoClient.buildPublisher()
         call = videoClient.initializeSession(
@@ -75,6 +87,16 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         )
         viewModelScope.launch {
             call?.connect()?.collect()
+        }
+        viewModelScope.launch {
+            call?.let {
+                it.observePublisherAudio()
+                    .distinctUntilChanged()
+                    .debounce(PUBLISHER_AUDIO_LEVEL_DEBOUNCE_MS)
+                    .onEach { audioLevel ->
+                        _audioLevel.value = audioLevel
+                    }.collect()
+            }
         }
     }
 
@@ -104,6 +126,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
     private companion object {
         const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
+        const val PUBLISHER_AUDIO_LEVEL_DEBOUNCE_MS = 36L
     }
 }
 

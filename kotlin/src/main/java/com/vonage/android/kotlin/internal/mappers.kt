@@ -14,11 +14,13 @@ internal fun Subscriber.toParticipant(): VeraSubscriber = VeraSubscriber(
     isMicEnabled = stream.hasAudio(),
     isCameraEnabled = stream.hasVideo(),
     view = view,
+    isSpeaking = false,
 )
 
 internal fun Publisher.toParticipant(
     name: String? = null,
     camera: Int = 0,
+    isSpeaking: Boolean = false,
 ): VeraPublisher = VeraPublisher(
     id = PUBLISHER_ID,
     name = stream?.name ?: name.orEmpty(),
@@ -29,4 +31,5 @@ internal fun Publisher.toParticipant(
     cycleCamera = { cycleCamera() },
     blurLevel = BlurLevel.NONE,
     setCameraBlur = { blurLevel -> applyVideoBlur(blurLevel) },
+    isSpeaking = isSpeaking,
 )
