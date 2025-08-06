@@ -73,7 +73,7 @@ internal fun ActiveSoundLevelsPreview() {
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             AudioVolumeIndicator(audioLevel = 0f)
-            AudioVolumeIndicator(audioLevel = 0.8f)
+            AudioVolumeIndicator(audioLevel = 1f)
         }
     }
 }

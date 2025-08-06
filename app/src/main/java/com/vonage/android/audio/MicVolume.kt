@@ -49,7 +49,7 @@ class MicVolume @Inject constructor() {
             if (bufferReadSize <= 0) continue
             val rms = normalizeAudioLevel(buffer, bufferReadSize)
             Log.d(TAG, "mic volume RMS $rms")
-            emit(rms)
+            emit(rms.coerceIn(0f, 1f))
             delay(samplingMillis)
         }
     }
