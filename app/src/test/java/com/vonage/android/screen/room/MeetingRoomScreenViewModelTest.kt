@@ -54,6 +54,7 @@ class MeetingRoomScreenViewModelTest {
         sut().uiState.test {
             assertEquals(MeetingRoomUiState.Loading, awaitItem())
             assertEquals(MeetingRoomUiState.SessionError, awaitItem())
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -75,6 +76,7 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onToggleMic()
             verify { mockCall.togglePublisherAudio() }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -96,6 +98,7 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onToggleCamera()
             verify { mockCall.togglePublisherVideo() }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -117,6 +120,7 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.endCall()
             verify { mockCall.endSession() }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -138,6 +142,7 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onPause()
             verify { mockCall.pauseSession() }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -159,6 +164,7 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onResume()
             verify { mockCall.resumeSession() }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -180,6 +186,7 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onSwitchCamera()
             verify { mockCall.togglePublisherCamera() }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
