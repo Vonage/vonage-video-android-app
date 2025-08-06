@@ -23,6 +23,7 @@ import kotlinx.collections.immutable.toImmutableList
 @Composable
 fun MeetingRoomContent(
     participants: ImmutableList<Participant>,
+    audioLevel: Float,
     participantsSheetState: SheetState,
     audioDeviceSelectorSheetState: SheetState,
     showParticipants: Boolean,
@@ -39,7 +40,8 @@ fun MeetingRoomContent(
             participants = participants,
             modifier = Modifier
                 .fillMaxSize()
-                .testTag(MEETING_ROOM_PARTICIPANTS_GRID)
+                .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
+            audioLevel = audioLevel,
         )
         if (showParticipants) {
             ModalBottomSheet(
@@ -67,7 +69,6 @@ object MeetingRoomContentTestTags {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Suppress("MagicNumber")
 @PreviewLightDark
 @Composable
 internal fun MeetingRoomContentPreview() {
@@ -81,6 +82,7 @@ internal fun MeetingRoomContentPreview() {
             audioDeviceSelectorSheetState = sheetState,
             showAudioDeviceSelector = false,
             onDismissAudioDeviceSelector = {},
+            audioLevel = 0.5f,
         )
     }
 }

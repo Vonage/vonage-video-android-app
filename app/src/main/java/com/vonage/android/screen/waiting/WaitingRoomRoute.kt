@@ -25,6 +25,7 @@ fun WaitingRoomRoute(
     },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val audioLevelState by viewModel.audioLevel.collectAsStateWithLifecycle()
     var permissionsAlreadyGranted by rememberSaveable { mutableStateOf(true) }
 
     val actions = remember {
@@ -57,6 +58,7 @@ fun WaitingRoomRoute(
 
     WaitingRoomScreen(
         uiState = uiState,
+        audioLevel = audioLevelState,
         actions = actions,
         modifier = modifier,
         navigateToRoom = navigateToRoom,
@@ -70,6 +72,7 @@ object WaitingRoomTestTags {
     const val WHATS_YOU_NAME_TEXT_TAG = "waiting_room_whats_you_name_text"
     const val USER_NAME_INPUT_TAG = "waiting_room_user_name_input"
     const val MIC_BUTTON_TAG = "waiting_room_mic_button"
+    const val VOLUME_INDICATOR_TAG = "waiting_room_volume_indicator"
     const val CAMERA_BUTTON_TAG = "waiting_room_camera_button"
     const val CAMERA_BLUR_BUTTON_TAG = "waiting_room_camera_blur_button"
     const val USER_INITIALS_TAG = "user_initials_view"

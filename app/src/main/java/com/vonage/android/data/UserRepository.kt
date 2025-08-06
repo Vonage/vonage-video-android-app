@@ -10,6 +10,6 @@ class UserRepository @Inject constructor(
         userStorage.saveUserName(userName)
     }
 
-    suspend fun getUserName(): String? =
-        userStorage.getUserName()
+    suspend fun getUserName(): String =
+        userStorage.getUserName().orEmpty()
 }

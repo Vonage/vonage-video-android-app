@@ -143,7 +143,6 @@ private fun AudioDeviceType.toImageVector(): ImageVector =
     }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Suppress("MagicNumber")
 @PreviewLightDark
 @Composable
 internal fun AudioDeviceListPreview() {

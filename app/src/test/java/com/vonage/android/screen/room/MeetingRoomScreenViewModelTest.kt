@@ -11,6 +11,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -26,6 +27,7 @@ class MeetingRoomScreenViewModelTest {
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        every { mockCall.observePublisherAudio() } returns flowOf(0.4f)
         val sut = sut()
 
         sut.uiState.test {
@@ -36,8 +38,13 @@ class MeetingRoomScreenViewModelTest {
                     call = mockCall,
                 ), awaitItem()
             )
-            verify { mockCall.connect() }
         }
+        sut.audioLevel.test {
+            assertEquals(0.0f, awaitItem()) // initial value
+            assertEquals(0.4f, awaitItem())
+        }
+        verify { mockCall.connect() }
+        verify { mockCall.observePublisherAudio() }
     }
 
     @Test
@@ -47,6 +54,7 @@ class MeetingRoomScreenViewModelTest {
         sut().uiState.test {
             assertEquals(MeetingRoomUiState.Loading, awaitItem())
             assertEquals(MeetingRoomUiState.SessionError, awaitItem())
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -68,6 +76,7 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onToggleMic()
             verify { mockCall.togglePublisherAudio() }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -89,6 +98,7 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onToggleCamera()
             verify { mockCall.togglePublisherVideo() }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -110,6 +120,7 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.endCall()
             verify { mockCall.endSession() }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -131,6 +142,7 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onPause()
             verify { mockCall.pauseSession() }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -152,6 +164,7 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onResume()
             verify { mockCall.resumeSession() }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -173,6 +186,7 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onSwitchCamera()
             verify { mockCall.togglePublisherCamera() }
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -201,6 +215,7 @@ class MeetingRoomScreenViewModelTest {
         cycleCamera = {},
         setCameraBlur = {},
         cameraIndex = 0,
+        isSpeaking = false,
     )
 
     private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true)

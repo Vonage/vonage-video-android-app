@@ -8,6 +8,7 @@ interface Participant {
     val isMicEnabled: Boolean
     val isCameraEnabled: Boolean
     val view: View
+    val isSpeaking: Boolean
 }
 
 data class VeraPublisher(
@@ -16,6 +17,7 @@ data class VeraPublisher(
     override val isMicEnabled: Boolean,
     override val isCameraEnabled: Boolean,
     override val view: View,
+    override val isSpeaking: Boolean,
     val cameraIndex: Int,
     val cycleCamera: () -> Unit,
     val blurLevel: BlurLevel,
@@ -28,4 +30,5 @@ data class VeraSubscriber(
     override val isMicEnabled: Boolean,
     override val isCameraEnabled: Boolean,
     override val view: View,
+    override val isSpeaking: Boolean,
 ) : Participant
