@@ -14,8 +14,10 @@ import com.vonage.android.kotlin.internal.toParticipant
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.ChatMessage
 import com.vonage.android.kotlin.model.ChatSignal
+import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
+import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VeraSubscriber
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -36,9 +38,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToJsonElement
 import java.util.Date
-import java.util.SortedMap
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
@@ -57,9 +57,11 @@ class Call internal constructor(
     private val _participantsStateFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
 
-    private val _chatStateFlow = MutableStateFlow<ImmutableList<ChatMessage>>(persistentListOf())
-    override val chatStateFlow: StateFlow<ImmutableList<ChatMessage>> = _chatStateFlow
+    private val _chatStateFlow = MutableStateFlow<ChatState>(ChatState())
+    override val chatStateFlow: StateFlow<ChatState> = _chatStateFlow
     private val chatMessages: MutableList<ChatMessage> = mutableListOf()
+    private var chatMessagesUnreadCount: Int = 0
+    private var listenUnread: Boolean = true
 
     private val subscriberStreams = HashMap<String, Subscriber>()
     private val subscriberJobs = ConcurrentHashMap<String, Job>()
@@ -100,7 +102,13 @@ class Call internal constructor(
                 text = chatSignal.text,
             )
             chatMessages.add(0, message)
-            _chatStateFlow.value = chatMessages.toImmutableList()
+            val unreadCount = if (listenUnread) {
+                ++chatMessagesUnreadCount
+            } else 0
+            _chatStateFlow.value = ChatState(
+                unreadCount = unreadCount,
+                messages = chatMessages.toImmutableList(),
+            )
         }
         session.connect(token)
         awaitClose { session.setSessionListener(null) }
@@ -111,7 +119,18 @@ class Call internal constructor(
             participantName = publisherHolder.publisher.name,
             text = message,
         ))
-        session.sendSignal("chat", signal)
+        session.sendSignal(SignalType.CHAT.signal, signal)
+    }
+
+    override fun listenUnreadChatMessages(enable: Boolean) {
+        listenUnread = enable
+        if (!enable) {
+            chatMessagesUnreadCount = 0
+            _chatStateFlow.value = ChatState(
+                unreadCount = 0,
+                messages = chatMessages.toImmutableList(),
+            )
+        }
     }
 
     override fun endSession() {

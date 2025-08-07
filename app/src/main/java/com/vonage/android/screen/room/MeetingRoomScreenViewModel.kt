@@ -128,6 +128,10 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         call?.sendChatMessage(message)
     }
 
+    fun listenUnread(enable: Boolean) {
+        call?.listenUnreadChatMessages(enable)
+    }
+
     private companion object {
         const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
         const val PUBLISHER_AUDIO_LEVEL_DEBOUNCE_MS = 36L

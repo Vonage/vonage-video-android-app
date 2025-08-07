@@ -17,6 +17,7 @@ import androidx.compose.material3.adaptive.layout.SupportingPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.rememberSupportingPaneScaffoldNavigator
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,20 +58,26 @@ fun MeetingRoomScreen(
     val audioDeviceSelectorSheetState = rememberModalBottomSheetState()
     var showParticipants by remember { mutableStateOf(false) }
     var showAudioDeviceSelector by remember { mutableStateOf(false) }
+    var showChat by remember { mutableStateOf(false) }
 
     val navigator = rememberSupportingPaneScaffoldNavigator()
     val scope = rememberCoroutineScope()
 
     BackHandler(navigator.canNavigateBack()) {
         scope.launch {
+            showChat = false
             navigator.navigateBack()
         }
+    }
+
+    LaunchedEffect(showChat) {
+        actions.onListenUnread(showChat.not())
     }
 
     when (uiState) {
         is MeetingRoomUiState.Content -> {
             val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
-            val chatSignals by uiState.call.chatStateFlow.collectAsStateWithLifecycle()
+            val chatState by uiState.call.chatStateFlow.collectAsStateWithLifecycle()
             val publisher = participants.filterIsInstance<VeraPublisher>().firstOrNull()
 
             Scaffold(
@@ -82,14 +89,22 @@ fun MeetingRoomScreen(
                         actions = actions,
                         onToggleParticipants = { showParticipants = showParticipants.toggle() },
                         onShowChat = {
-                            scope.launch {
-                                navigator.navigateTo(SupportingPaneScaffoldRole.Supporting)
+                            showChat = showChat.toggle()
+                            if (showChat) {
+                                scope.launch {
+                                    navigator.navigateTo(SupportingPaneScaffoldRole.Supporting)
+                                }
+                            } else {
+                                scope.launch {
+                                    navigator.navigateTo(SupportingPaneScaffoldRole.Main)
+                                }
                             }
                         },
                         isMicEnabled = publisher?.isMicEnabled ?: false,
                         isCameraEnabled = publisher?.isCameraEnabled ?: false,
+                        isChatShow = showChat,
                         participantsCount = participants.size,
-                        unreadCount = 4,
+                        unreadCount = chatState.unreadCount,
                     )
                 }
             ) { paddingValues ->
@@ -128,10 +143,11 @@ fun MeetingRoomScreen(
                     },
                     supportingPane = {
                         ChatPanel(
-                            messages = chatSignals,
+                            messages = chatState.messages,
                             onMessageSent = actions.onMessageSent,
                             onCloseChat = {
                                 scope.launch {
+                                    showChat = false
                                     navigator.navigateBack()
                                 }
                             }

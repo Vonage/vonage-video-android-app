@@ -20,6 +20,9 @@ import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,6 +45,7 @@ fun BottomBar(
     onShowChat: () -> Unit,
     isMicEnabled: Boolean,
     isCameraEnabled: Boolean,
+    isChatShow: Boolean,
     participantsCount: Int,
     unreadCount: Int,
     modifier: Modifier = Modifier
@@ -87,26 +91,11 @@ fun BottomBar(
                 onToggleParticipants = onToggleParticipants,
             )
 
-            BadgedBox(
-                badge = {
-                    Badge(
-                        containerColor = Color.Red,
-                        contentColor = Color.White,
-                    ) {
-                        Text(
-                            modifier = Modifier,
-                            text = "$unreadCount",
-                        )
-                    }
-                }
-            ) {
-                ControlButton(
-                    modifier = Modifier,
-                    onClick = onShowChat,
-                    icon = Icons.AutoMirrored.Default.Chat,
-                    isActive = true,
-                )
-            }
+            ChatBadgeButton(
+                unreadCount = unreadCount,
+                onShowChat = onShowChat,
+                isChatShow = isChatShow,
+            )
 
             ControlButton(
                 modifier = Modifier
@@ -117,6 +106,36 @@ fun BottomBar(
                 isActive = true,
             )
         }
+    }
+}
+
+@Composable
+private fun ChatBadgeButton(
+    unreadCount: Int,
+    onShowChat: () -> Unit,
+    isChatShow: Boolean,
+) {
+    val badgeVisible = unreadCount > 0
+    BadgedBox(
+        badge = {
+            if (badgeVisible) {
+                Badge(
+                    containerColor = VonageVideoTheme.colors.primary,
+                    contentColor = Color.White,
+                ) {
+                    Text(
+                        modifier = Modifier,
+                        text = "$unreadCount",
+                    )
+                }
+            }
+        },
+    ) {
+        ControlButton(
+            onClick = onShowChat,
+            icon = Icons.AutoMirrored.Default.Chat,
+            isActive = isChatShow,
+        )
     }
 }
 
@@ -144,7 +163,7 @@ private fun ParticipantsBadgeButton(
                 .testTag(BOTTOM_BAR_PARTICIPANTS_BUTTON),
             onClick = onToggleParticipants,
             icon = Icons.Default.Group,
-            isActive = true,
+            isActive = false,
         )
     }
 }
@@ -168,8 +187,9 @@ internal fun BottomBarPreview() {
             onShowChat = {},
             isMicEnabled = false,
             isCameraEnabled = true,
+            isChatShow = false,
             participantsCount = 25,
-            unreadCount = 4,
+            unreadCount = 10,
         )
     }
 }

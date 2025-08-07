@@ -2,7 +2,7 @@ package com.vonage.android.util.preview
 
 import androidx.compose.runtime.Composable
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.kotlin.model.ChatMessage
+import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.screen.room.components.buildChatMessages
@@ -15,11 +15,15 @@ import kotlinx.coroutines.flow.flowOf
 
 @Suppress("EmptyFunctionBlock")
 @Composable
-fun buildCallWithParticipants(count: Int): CallFacade {
+fun buildCallWithParticipants(
+    participantCount: Int,
+    unreadCount: Int = 1,
+    messagesCount: Int = 5,
+): CallFacade {
     return object : CallFacade {
         // Participants state
         override val participantsStateFlow: StateFlow<ImmutableList<Participant>> =
-            MutableStateFlow(buildParticipants(count).toImmutableList())
+            MutableStateFlow(buildParticipants(participantCount).toImmutableList())
 
         // Session related methods
         override fun connect(): Flow<SessionEvent> = flowOf()
@@ -34,8 +38,13 @@ fun buildCallWithParticipants(count: Int): CallFacade {
         override fun togglePublisherAudio() {}
 
         // Chat related methods
-        override val chatStateFlow: StateFlow<ImmutableList<ChatMessage>> =
-            MutableStateFlow(buildChatMessages(2).toImmutableList())
+        override val chatStateFlow: StateFlow<ChatState> = MutableStateFlow(
+            ChatState(
+                unreadCount = unreadCount,
+                messages = buildChatMessages(messagesCount).toImmutableList(),
+            )
+        )
         override fun sendChatMessage(message: String) {}
+        override fun listenUnreadChatMessages(enable: Boolean) {}
     }
 }
