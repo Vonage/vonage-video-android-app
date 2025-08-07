@@ -41,6 +41,10 @@
     <string name="audio_device_selector_speaker_audio_device">Speaker</string>
     <string name="audio_device_selector_headset_audio_device">Headset</string>
 
+    <!-- Chat -->
+    <string name="chat_panel_title">Chat</string>
+    <string name="chat_panel_input_text_placeholder">Send a message</string>
+
     <!-- Generic -->
     <string name="generic_retry">Retry</string>
 

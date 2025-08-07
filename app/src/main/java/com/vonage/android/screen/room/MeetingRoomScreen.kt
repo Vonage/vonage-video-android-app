@@ -129,6 +129,12 @@ fun MeetingRoomScreen(
                     supportingPane = {
                         ChatPanel(
                             messages = chatSignals,
+                            onMessageSent = actions.onMessageSent,
+                            onCloseChat = {
+                                scope.launch {
+                                    navigator.navigateBack()
+                                }
+                            }
                         )
                     },
                 )

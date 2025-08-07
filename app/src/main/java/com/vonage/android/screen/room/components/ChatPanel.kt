@@ -8,13 +8,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -26,21 +31,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.vonage.android.R
 import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.ChatMessage
-import com.vonage.android.screen.components.ControlButton
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import java.util.Date
+import java.util.UUID
 
 @Composable
 fun ChatPanel(
     messages: ImmutableList<ChatMessage>,
+    onCloseChat: () -> Unit,
+    onMessageSent: (String) -> Unit,
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -56,6 +65,29 @@ fun ChatPanel(
             .fillMaxSize()
             .background(VonageVideoTheme.colors.surface),
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                modifier = Modifier
+                    .weight(1f),
+                text = stringResource(R.string.chat_panel_title),
+                color = VonageVideoTheme.colors.inverseSurface,
+                style = VonageVideoTheme.typography.title,
+            )
+            IconButton(
+                onClick = onCloseChat,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    tint = VonageVideoTheme.colors.inverseSurface,
+                    contentDescription = null,
+                )
+            }
+        }
         ChatPanelMessages(
             modifier = Modifier
                 .fillMaxSize()
@@ -65,10 +97,9 @@ fun ChatPanel(
         )
         ChatPanelInput(
             modifier = Modifier
-                .navigationBarsPadding(),
-            onMessageSent = {
-
-            }
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .padding(8.dp),
+            onMessageSent = onMessageSent,
         )
     }
 }
@@ -137,20 +168,33 @@ fun ChatPanelInput(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         VonageTextField(
-            modifier = Modifier,
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 8.dp),
             value = chatInputValue,
             onValueChange = {
                 chatInputValue = it
             },
+            placeholder = {
+                Text(
+                    text = stringResource(R.string.chat_panel_input_text_placeholder),
+                    color = VonageVideoTheme.colors.textPrimaryDisabled,
+                )
+            },
         )
-        ControlButton(
-            modifier = Modifier,
+        IconButton(
             onClick = {
                 onMessageSent(chatInputValue)
+                chatInputValue = ""
             },
-            icon = Icons.AutoMirrored.Default.Send,
-            isActive = true,
-        )
+            enabled = chatInputValue.isNotBlank(),
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.Send,
+                tint = VonageVideoTheme.colors.inverseSurface,
+                contentDescription = null,
+            )
+        }
     }
 }
 
@@ -161,6 +205,8 @@ internal fun ChatPanelPreview() {
     VonageVideoTheme {
         ChatPanel(
             messages = buildChatMessages(20).reversed().toImmutableList(),
+            onMessageSent = {},
+            onCloseChat = {},
         )
     }
 }
@@ -170,7 +216,7 @@ fun buildChatMessages(count: Int): List<ChatMessage> {
     val messages = mutableListOf<ChatMessage>()
     for (i in 1..count) {
         messages += ChatMessage(
-            id = "id-$i",
+            id = UUID.randomUUID(),
             date = Date(),
             participantName = "name $i",
             text = "message $i"

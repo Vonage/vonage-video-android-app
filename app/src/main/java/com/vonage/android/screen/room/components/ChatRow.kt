@@ -29,7 +29,7 @@ fun ChatRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
     ) {
         AvatarInitials(
             userName = userName,

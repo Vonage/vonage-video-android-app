@@ -36,7 +36,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import java.util.Date
+import java.util.SortedMap
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
@@ -91,17 +93,25 @@ class Call internal constructor(
         session.setSessionListener(sessionListener)
         session.setSignalListener { session, type, data, conn ->
             val chatSignal = Json.decodeFromString<ChatSignal>(data)
-            chatMessages.add(ChatMessage(
-                id = UUID.randomUUID().toString(),
+            val message = ChatMessage(
+                id = UUID.randomUUID(),
                 date = Date(),
                 participantName = chatSignal.participantName,
                 text = chatSignal.text,
-            ))
-            chatMessages.reverse()
+            )
+            chatMessages.add(0, message)
             _chatStateFlow.value = chatMessages.toImmutableList()
         }
         session.connect(token)
         awaitClose { session.setSessionListener(null) }
+    }
+
+    override fun sendChatMessage(message: String) {
+        val signal = Json.encodeToString(ChatSignal(
+            participantName = publisherHolder.publisher.name,
+            text = message,
+        ))
+        session.sendSignal("chat", signal)
     }
 
     override fun endSession() {

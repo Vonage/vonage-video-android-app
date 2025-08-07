@@ -17,19 +17,25 @@ import kotlinx.coroutines.flow.flowOf
 @Composable
 fun buildCallWithParticipants(count: Int): CallFacade {
     return object : CallFacade {
+        // Participants state
         override val participantsStateFlow: StateFlow<ImmutableList<Participant>> =
             MutableStateFlow(buildParticipants(count).toImmutableList())
-        override val chatStateFlow: StateFlow<ImmutableList<ChatMessage>> =
-            MutableStateFlow(buildChatMessages(2).toImmutableList())
 
+        // Session related methods
         override fun connect(): Flow<SessionEvent> = flowOf()
-        override fun observePublisherAudio(): Flow<Float> = flowOf()
-
-        override fun togglePublisherVideo() {}
-        override fun togglePublisherCamera() {}
-        override fun togglePublisherAudio() {}
         override fun pauseSession() {}
         override fun resumeSession() {}
         override fun endSession() {}
+
+        // Publisher related methods
+        override fun observePublisherAudio(): Flow<Float> = flowOf()
+        override fun togglePublisherVideo() {}
+        override fun togglePublisherCamera() {}
+        override fun togglePublisherAudio() {}
+
+        // Chat related methods
+        override val chatStateFlow: StateFlow<ImmutableList<ChatMessage>> =
+            MutableStateFlow(buildChatMessages(2).toImmutableList())
+        override fun sendChatMessage(message: String) {}
     }
 }

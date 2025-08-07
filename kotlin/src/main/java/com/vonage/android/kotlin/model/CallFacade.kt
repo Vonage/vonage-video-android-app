@@ -6,11 +6,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 import java.util.Date
+import java.util.UUID
 
 @Stable
 interface CallFacade : SessionFacade, PublisherFacade {
     val participantsStateFlow: StateFlow<ImmutableList<Participant>>
     val chatStateFlow: StateFlow<ImmutableList<ChatMessage>>
+    fun sendChatMessage(message: String)
 
     //    fun <T> signalStateFlow(type: SignalType): Flow<T>
 //    fun signalStateFlow(): Flow<ImmutableList<ChatMessage>>
@@ -28,7 +30,7 @@ data class ChatSignal(
 )
 
 data class ChatMessage(
-    val id: String,
+    val id: UUID,
     val date: Date,
     val participantName: String,
     val text: String,
