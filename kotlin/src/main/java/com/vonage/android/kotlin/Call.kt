@@ -12,6 +12,8 @@ import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
 import com.vonage.android.kotlin.internal.toParticipant
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.ChatMessage
+import com.vonage.android.kotlin.model.ChatSignal
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VeraSubscriber
@@ -33,6 +35,9 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import java.util.Date
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 @Suppress("TooManyFunctions")
@@ -49,6 +54,10 @@ class Call internal constructor(
 
     private val _participantsStateFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
+
+    private val _chatStateFlow = MutableStateFlow<ImmutableList<ChatMessage>>(persistentListOf())
+    override val chatStateFlow: StateFlow<ImmutableList<ChatMessage>> = _chatStateFlow
+    private val chatMessages: MutableList<ChatMessage> = mutableListOf()
 
     private val subscriberStreams = HashMap<String, Subscriber>()
     private val subscriberJobs = ConcurrentHashMap<String, Job>()
@@ -80,6 +89,17 @@ class Call internal constructor(
             }
         }
         session.setSessionListener(sessionListener)
+        session.setSignalListener { session, type, data, conn ->
+            val chatSignal = Json.decodeFromString<ChatSignal>(data)
+            chatMessages.add(ChatMessage(
+                id = UUID.randomUUID().toString(),
+                date = Date(),
+                participantName = chatSignal.participantName,
+                text = chatSignal.text,
+            ))
+            chatMessages.reverse()
+            _chatStateFlow.value = chatMessages.toImmutableList()
+        }
         session.connect(token)
         awaitClose { session.setSessionListener(null) }
     }
@@ -87,6 +107,8 @@ class Call internal constructor(
     override fun endSession() {
         // wait for PublisherListener#streamDestroyed before returning : VIDSOL-104
         session.unpublish(publisherHolder.publisher)
+        session.setSessionListener(null)
+        session.setSignalListener(null)
         session.disconnect()
     }
 

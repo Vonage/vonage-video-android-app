@@ -34,6 +34,8 @@ runtimeAndroid = "1.8.3"
 testRules = "1.6.1"
 testRunner = "1.6.2"
 turbine = "1.2.1"
+adaptiveLayoutAndroid = "1.1.0"
+adaptiveNavigationAndroid = "1.1.0"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -80,6 +82,8 @@ opentok-android-sdk = { module = "com.opentok.android:opentok-android-sdk", vers
 opentok-android-video-transformers = { module = "com.vonage:client-sdk-video-transformers", version.ref = "opentokAndroidSdk" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+androidx-adaptive-layout-android = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout-android", version.ref = "adaptiveLayoutAndroid" }
+androidx-adaptive-navigation-android = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation-android", version.ref = "adaptiveNavigationAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

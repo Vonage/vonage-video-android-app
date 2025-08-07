@@ -2,8 +2,10 @@ package com.vonage.android.util.preview
 
 import androidx.compose.runtime.Composable
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.ChatMessage
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
+import com.vonage.android.screen.room.components.buildChatMessages
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +19,8 @@ fun buildCallWithParticipants(count: Int): CallFacade {
     return object : CallFacade {
         override val participantsStateFlow: StateFlow<ImmutableList<Participant>> =
             MutableStateFlow(buildParticipants(count).toImmutableList())
+        override val chatStateFlow: StateFlow<ImmutableList<ChatMessage>> =
+            MutableStateFlow(buildChatMessages(2).toImmutableList())
 
         override fun connect(): Flow<SessionEvent> = flowOf()
         override fun observePublisherAudio(): Flow<Float> = flowOf()

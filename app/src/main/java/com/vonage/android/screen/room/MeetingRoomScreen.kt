@@ -1,23 +1,34 @@
 package com.vonage.android.screen.room
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
+import androidx.compose.material3.adaptive.layout.SupportingPaneScaffoldRole
+import androidx.compose.material3.adaptive.navigation.rememberSupportingPaneScaffoldNavigator
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.compose.components.BasicAlertDialog
@@ -28,11 +39,13 @@ import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOT
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
 import com.vonage.android.screen.room.components.BottomBar
+import com.vonage.android.screen.room.components.ChatPanel
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.TopBar
 import com.vonage.android.util.preview.buildCallWithParticipants
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun MeetingRoomScreen(
     uiState: MeetingRoomUiState,
@@ -45,46 +58,79 @@ fun MeetingRoomScreen(
     var showParticipants by remember { mutableStateOf(false) }
     var showAudioDeviceSelector by remember { mutableStateOf(false) }
 
+    val navigator = rememberSupportingPaneScaffoldNavigator()
+    val scope = rememberCoroutineScope()
+
+    BackHandler(navigator.canNavigateBack()) {
+        scope.launch {
+            navigator.navigateBack()
+        }
+    }
+
     when (uiState) {
         is MeetingRoomUiState.Content -> {
             val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
+            val chatSignals by uiState.call.chatStateFlow.collectAsStateWithLifecycle()
             val publisher = participants.filterIsInstance<VeraPublisher>().firstOrNull()
 
             Scaffold(
                 modifier = modifier,
-                topBar = {
-                    TopBar(
-                        modifier = Modifier
-                            .testTag(MEETING_ROOM_TOP_BAR),
-                        roomName = uiState.roomName,
-                        actions = actions,
-                        onToggleAudioDeviceSelector = { showAudioDeviceSelector = showAudioDeviceSelector.toggle() },
-                    )
-                },
                 bottomBar = {
                     BottomBar(
                         modifier = Modifier
                             .testTag(MEETING_ROOM_BOTTOM_BAR),
                         actions = actions,
                         onToggleParticipants = { showParticipants = showParticipants.toggle() },
+                        onShowChat = {
+                            scope.launch {
+                                navigator.navigateTo(SupportingPaneScaffoldRole.Supporting)
+                            }
+                        },
                         isMicEnabled = publisher?.isMicEnabled ?: false,
                         isCameraEnabled = publisher?.isCameraEnabled ?: false,
                         participantsCount = participants.size,
+                        unreadCount = 4,
                     )
                 }
-            ) { contentPadding ->
-                MeetingRoomContent(
+            ) { paddingValues ->
+                SupportingPaneScaffold(
                     modifier = Modifier
-                        .padding(contentPadding)
-                        .testTag(MEETING_ROOM_CONTENT),
-                    participants = participants,
-                    audioLevel = audioLevel,
-                    showParticipants = showParticipants,
-                    onDismissParticipants = { showParticipants = false },
-                    participantsSheetState = participantsSheetState,
-                    audioDeviceSelectorSheetState = audioDeviceSelectorSheetState,
-                    showAudioDeviceSelector = showAudioDeviceSelector,
-                    onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
+                        .padding(paddingValues)
+                        .consumeWindowInsets(paddingValues)
+                        .fillMaxSize(),
+                    directive = navigator.scaffoldDirective,
+                    value = navigator.scaffoldValue,
+                    mainPane = {
+                        Column(
+                            verticalArrangement = Arrangement.Top,
+                        ) {
+                            TopBar(
+                                modifier = Modifier
+                                    .background(Color.Red)
+                                    .testTag(MEETING_ROOM_TOP_BAR),
+                                roomName = uiState.roomName,
+                                actions = actions,
+                                onToggleAudioDeviceSelector = { showAudioDeviceSelector = showAudioDeviceSelector.toggle() },
+                            )
+                            MeetingRoomContent(
+                                modifier = Modifier
+                                    .testTag(MEETING_ROOM_CONTENT),
+                                participants = participants,
+                                audioLevel = audioLevel,
+                                showParticipants = showParticipants,
+                                onDismissParticipants = { showParticipants = false },
+                                participantsSheetState = participantsSheetState,
+                                audioDeviceSelectorSheetState = audioDeviceSelectorSheetState,
+                                showAudioDeviceSelector = showAudioDeviceSelector,
+                                onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
+                            )
+                        }
+                    },
+                    supportingPane = {
+                        ChatPanel(
+                            messages = chatSignals,
+                        )
+                    },
                 )
             }
         }
@@ -144,13 +190,14 @@ internal fun MeetingRoomScreenSessionErrorPreview() {
 }
 
 @PreviewLightDark
+@PreviewScreenSizes
 @Composable
 internal fun MeetingRoomScreenSessionPreview() {
     VonageVideoTheme {
         MeetingRoomScreen(
             uiState = MeetingRoomUiState.Content(
                 roomName = "sample-room-name",
-                call = buildCallWithParticipants(5),
+                call = buildCallWithParticipants(1),
             ),
             actions = MeetingRoomActions(),
             audioLevel = 0.5f,

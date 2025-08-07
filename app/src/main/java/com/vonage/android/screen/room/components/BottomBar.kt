@@ -8,13 +8,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.CallEnd
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.VideocamOff
-import androidx.compose.material.icons.filled.Window
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Surface
@@ -31,7 +31,6 @@ import com.vonage.android.screen.components.ControlButton
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CAMERA_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_END_CALL_BUTTON
-import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_GRID_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_MIC_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BADGE
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BUTTON
@@ -40,9 +39,11 @@ import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PA
 fun BottomBar(
     actions: MeetingRoomActions,
     onToggleParticipants: () -> Unit,
+    onShowChat: () -> Unit,
     isMicEnabled: Boolean,
     isCameraEnabled: Boolean,
     participantsCount: Int,
+    unreadCount: Int,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -73,18 +74,39 @@ fun BottomBar(
                 isActive = isCameraEnabled,
             )
 
-            ControlButton(
-                modifier = Modifier
-                    .testTag(BOTTOM_BAR_GRID_BUTTON),
-                onClick = {},
-                icon = Icons.Default.Window,
-                isActive = false,
-            )
+//            ControlButton(
+//                modifier = Modifier
+//                    .testTag(BOTTOM_BAR_GRID_BUTTON),
+//                onClick = {},
+//                icon = Icons.Default.Window,
+//                isActive = false,
+//            )
 
             ParticipantsBadgeButton(
                 participantsCount = participantsCount,
                 onToggleParticipants = onToggleParticipants,
             )
+
+            BadgedBox(
+                badge = {
+                    Badge(
+                        containerColor = Color.Red,
+                        contentColor = Color.White,
+                    ) {
+                        Text(
+                            modifier = Modifier,
+                            text = "$unreadCount",
+                        )
+                    }
+                }
+            ) {
+                ControlButton(
+                    modifier = Modifier,
+                    onClick = onShowChat,
+                    icon = Icons.AutoMirrored.Default.Chat,
+                    isActive = true,
+                )
+            }
 
             ControlButton(
                 modifier = Modifier
@@ -143,9 +165,11 @@ internal fun BottomBarPreview() {
         BottomBar(
             actions = MeetingRoomActions(),
             onToggleParticipants = {},
+            onShowChat = {},
             isMicEnabled = false,
             isCameraEnabled = true,
             participantsCount = 25,
+            unreadCount = 4,
         )
     }
 }
