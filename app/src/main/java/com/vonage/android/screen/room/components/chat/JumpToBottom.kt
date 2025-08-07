@@ -1,4 +1,4 @@
-package com.vonage.android.screen.room.components
+package com.vonage.android.screen.room.components.chat
 
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition

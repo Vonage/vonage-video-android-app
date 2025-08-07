@@ -40,7 +40,7 @@ import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOT
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
 import com.vonage.android.screen.room.components.BottomBar
-import com.vonage.android.screen.room.components.ChatPanel
+import com.vonage.android.screen.room.components.chat.ChatPanel
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.TopBar
 import com.vonage.android.util.preview.buildCallWithParticipants

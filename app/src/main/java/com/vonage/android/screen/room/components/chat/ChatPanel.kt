@@ -1,4 +1,4 @@
-package com.vonage.android.screen.room.components
+package com.vonage.android.screen.room.components.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -39,11 +39,10 @@ import com.vonage.android.R
 import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.ChatMessage
+import com.vonage.android.util.preview.buildChatMessages
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
-import java.util.Date
-import java.util.UUID
 
 @Composable
 fun ChatPanel(
@@ -204,23 +203,9 @@ fun ChatPanelInput(
 internal fun ChatPanelPreview() {
     VonageVideoTheme {
         ChatPanel(
-            messages = buildChatMessages(20).reversed().toImmutableList(),
+            messages = buildChatMessages(20).toImmutableList(),
             onMessageSent = {},
             onCloseChat = {},
         )
     }
-}
-
-@Composable
-fun buildChatMessages(count: Int): List<ChatMessage> {
-    val messages = mutableListOf<ChatMessage>()
-    for (i in 1..count) {
-        messages += ChatMessage(
-            id = UUID.randomUUID(),
-            date = Date(),
-            participantName = "name $i",
-            text = "message $i"
-        )
-    }
-    return messages
 }

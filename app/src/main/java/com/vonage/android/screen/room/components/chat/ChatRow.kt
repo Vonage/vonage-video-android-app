@@ -1,4 +1,4 @@
-package com.vonage.android.screen.room.components
+package com.vonage.android.screen.room.components.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.AvatarInitials
+import com.vonage.android.screen.components.LinkifyText
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -57,10 +58,11 @@ fun ChatRow(
                     color = VonageVideoTheme.colors.buttonPrimaryDisabled, // change to a semantic color
                 )
             }
-            Text(
+//            Text(
+            LinkifyText(
                 text = message,
-                style = VonageVideoTheme.typography.body,
-                color = VonageVideoTheme.colors.inverseSurface,
+//                style = VonageVideoTheme.typography.body,
+//                color = VonageVideoTheme.colors.inverseSurface,
             )
         }
     }

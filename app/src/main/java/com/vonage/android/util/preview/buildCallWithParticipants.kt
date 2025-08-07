@@ -5,7 +5,6 @@ import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
-import com.vonage.android.screen.room.components.buildChatMessages
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
