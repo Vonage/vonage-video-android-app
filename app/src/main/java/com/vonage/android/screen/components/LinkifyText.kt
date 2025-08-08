@@ -8,8 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.UriHandler
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
@@ -56,22 +54,15 @@ fun LinkifyText(
         modifier = modifier
             .pointerInput(Unit) {
                 detectTapGestures { offset ->
-                    layout.value?.let {
+                    layout.value?.let { it ->
                         val position = it.getOffsetForPosition(offset)
                         annotatedString
                             .getStringAnnotations(position, position)
-                            .firstOrNull()?.click(uriHandler)
+                            .firstOrNull()?.let { uriHandler.openUri(it.item) }
                     }
                 }
             }
     )
-}
-
-private fun AnnotatedString.Range<String>.click(uriHandler: UriHandler) {
-    when (this.tag) {
-        Linkify.LinkInfoTag.EMAIL.name,
-        Linkify.LinkInfoTag.URL.name -> uriHandler.openUri(this.item)
-    }
 }
 
 @PreviewLightDark
