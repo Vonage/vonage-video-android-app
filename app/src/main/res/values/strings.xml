@@ -44,6 +44,7 @@
     <!-- Chat -->
     <string name="chat_panel_title">Chat</string>
     <string name="chat_panel_input_text_placeholder">Send a message</string>
+    <string name="chat_panel_jump_to_bottom">Jump to bottom</string>
 
     <!-- Generic -->
     <string name="generic_retry">Retry</string>

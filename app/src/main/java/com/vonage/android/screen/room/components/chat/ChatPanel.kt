@@ -48,7 +48,8 @@ import kotlinx.coroutines.launch
 fun ChatPanel(
     messages: ImmutableList<ChatMessage>,
     onCloseChat: () -> Unit,
-    onMessageSent: (String) -> Unit,
+    onSendMessage: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -60,7 +61,7 @@ fun ChatPanel(
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(VonageVideoTheme.colors.surface),
     ) {
@@ -98,7 +99,7 @@ fun ChatPanel(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceContainer)
                 .padding(8.dp),
-            onMessageSent = onMessageSent,
+            onSendMessage = onSendMessage,
         )
     }
 }
@@ -143,7 +144,7 @@ private fun ChatPanelMessages(
 
         JumpToBottom(
             enabled = jumpToBottomButtonEnabled,
-            onClicked = {
+            onClick = {
                 scope.launch {
                     scrollState.animateScrollToItem(0)
                 }
@@ -155,8 +156,8 @@ private fun ChatPanelMessages(
 
 @Composable
 fun ChatPanelInput(
+    onSendMessage: (String) -> Unit,
     modifier: Modifier = Modifier,
-    onMessageSent: (String) -> Unit,
 ) {
     var chatInputValue by remember { mutableStateOf("") }
     Row(
@@ -183,7 +184,7 @@ fun ChatPanelInput(
         )
         IconButton(
             onClick = {
-                onMessageSent(chatInputValue)
+                onSendMessage(chatInputValue)
                 chatInputValue = ""
             },
             enabled = chatInputValue.isNotBlank(),
@@ -204,7 +205,7 @@ internal fun ChatPanelPreview() {
     VonageVideoTheme {
         ChatPanel(
             messages = buildChatMessages(20).toImmutableList(),
-            onMessageSent = {},
+            onSendMessage = {},
             onCloseChat = {},
         )
     }

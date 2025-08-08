@@ -25,9 +25,10 @@ fun ChatRow(
     userName: String,
     message: String,
     date: Date,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
         verticalAlignment = Alignment.Top,
@@ -58,11 +59,8 @@ fun ChatRow(
                     color = VonageVideoTheme.colors.buttonPrimaryDisabled, // change to a semantic color
                 )
             }
-//            Text(
             LinkifyText(
                 text = message,
-//                style = VonageVideoTheme.typography.body,
-//                color = VonageVideoTheme.colors.inverseSurface,
             )
         }
     }

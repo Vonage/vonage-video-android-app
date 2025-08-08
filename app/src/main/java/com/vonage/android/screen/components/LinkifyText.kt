@@ -54,8 +54,8 @@ fun LinkifyText(
         modifier = modifier
             .pointerInput(Unit) {
                 detectTapGestures { offset ->
-                    layout.value?.let { it ->
-                        val position = it.getOffsetForPosition(offset)
+                    layout.value?.let { layoutResult ->
+                        val position = layoutResult.getOffsetForPosition(offset)
                         annotatedString
                             .getStringAnnotations(position, position)
                             .firstOrNull()?.let { uriHandler.openUri(it.item) }

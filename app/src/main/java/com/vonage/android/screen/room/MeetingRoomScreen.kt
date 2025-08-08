@@ -25,7 +25,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -40,12 +39,13 @@ import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOT
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
 import com.vonage.android.screen.room.components.BottomBar
-import com.vonage.android.screen.room.components.chat.ChatPanel
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.TopBar
+import com.vonage.android.screen.room.components.chat.ChatPanel
 import com.vonage.android.util.preview.buildCallWithParticipants
 import kotlinx.coroutines.launch
 
+@Suppress("LongMethod")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun MeetingRoomScreen(
@@ -84,18 +84,15 @@ fun MeetingRoomScreen(
                 modifier = modifier,
                 bottomBar = {
                     BottomBar(
-                        modifier = Modifier
-                            .testTag(MEETING_ROOM_BOTTOM_BAR),
+                        modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
                         actions = actions,
                         onToggleParticipants = { showParticipants = showParticipants.toggle() },
                         onShowChat = {
                             showChat = showChat.toggle()
-                            if (showChat) {
-                                scope.launch {
+                            scope.launch {
+                                if (showChat) {
                                     navigator.navigateTo(SupportingPaneScaffoldRole.Supporting)
-                                }
-                            } else {
-                                scope.launch {
+                                } else {
                                     navigator.navigateTo(SupportingPaneScaffoldRole.Main)
                                 }
                             }
@@ -116,20 +113,17 @@ fun MeetingRoomScreen(
                     directive = navigator.scaffoldDirective,
                     value = navigator.scaffoldValue,
                     mainPane = {
-                        Column(
-                            verticalArrangement = Arrangement.Top,
-                        ) {
+                        Column(verticalArrangement = Arrangement.Top) {
                             TopBar(
-                                modifier = Modifier
-                                    .background(Color.Red)
-                                    .testTag(MEETING_ROOM_TOP_BAR),
+                                modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
                                 roomName = uiState.roomName,
                                 actions = actions,
-                                onToggleAudioDeviceSelector = { showAudioDeviceSelector = showAudioDeviceSelector.toggle() },
+                                onToggleAudioDeviceSelector = {
+                                    showAudioDeviceSelector = showAudioDeviceSelector.toggle()
+                                },
                             )
                             MeetingRoomContent(
-                                modifier = Modifier
-                                    .testTag(MEETING_ROOM_CONTENT),
+                                modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
                                 participants = participants,
                                 audioLevel = audioLevel,
                                 showParticipants = showParticipants,
@@ -144,7 +138,7 @@ fun MeetingRoomScreen(
                     supportingPane = {
                         ChatPanel(
                             messages = chatState.messages,
-                            onMessageSent = actions.onMessageSent,
+                            onSendMessage = actions.onMessageSent,
                             onCloseChat = {
                                 scope.launch {
                                     showChat = false
@@ -157,9 +151,7 @@ fun MeetingRoomScreen(
             }
         }
 
-        is MeetingRoomUiState.Loading -> {
-            MeetingRoomLoading()
-        }
+        is MeetingRoomUiState.Loading -> MeetingRoomLoading()
 
         is MeetingRoomUiState.SessionError -> {
             BasicAlertDialog(
