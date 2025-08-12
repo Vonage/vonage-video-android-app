@@ -76,14 +76,6 @@ fun BottomBar(
                 isActive = isCameraEnabled,
             )
 
-//            ControlButton(
-//                modifier = Modifier
-//                    .testTag(BOTTOM_BAR_GRID_BUTTON),
-//                onClick = {},
-//                icon = Icons.Default.Window,
-//                isActive = false,
-//            )
-
             ParticipantsBadgeButton(
                 participantsCount = participantsCount,
                 onToggleParticipants = onToggleParticipants,

@@ -57,7 +57,7 @@ class Call internal constructor(
     private val _participantsStateFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
 
-    private val _chatStateFlow = MutableStateFlow<ChatState>(ChatState())
+    private val _chatStateFlow = MutableStateFlow(ChatState())
     override val chatStateFlow: StateFlow<ChatState> = _chatStateFlow
     private val chatMessages: MutableList<ChatMessage> = mutableListOf()
     private var chatMessagesUnreadCount: Int = 0
@@ -115,10 +115,12 @@ class Call internal constructor(
     }
 
     override fun sendChatMessage(message: String) {
-        val signal = Json.encodeToString(ChatSignal(
-            participantName = publisherHolder.publisher.name,
-            text = message,
-        ))
+        val signal = Json.encodeToString(
+            ChatSignal(
+                participantName = publisherHolder.publisher.name,
+                text = message,
+            )
+        )
         session.sendSignal(SignalType.CHAT.signal, signal)
     }
 
