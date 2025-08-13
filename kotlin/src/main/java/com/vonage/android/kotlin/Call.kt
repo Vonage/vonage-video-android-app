@@ -37,10 +37,12 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
 
 @Suppress("TooManyFunctions")
 @OptIn(FlowPreview::class)
@@ -59,7 +61,7 @@ class Call internal constructor(
 
     private val _chatStateFlow = MutableStateFlow(ChatState())
     override val chatStateFlow: StateFlow<ChatState> = _chatStateFlow
-    private val chatMessages: MutableList<ChatMessage> = mutableListOf()
+    private val chatMessages: MutableList<ChatMessage> = CopyOnWriteArrayList(mutableListOf<ChatMessage>())
     private var chatMessagesUnreadCount: Int = 0
     private var listenUnread: Boolean = true
 
@@ -94,7 +96,15 @@ class Call internal constructor(
         }
         session.setSessionListener(sessionListener)
         session.setSignalListener { session, type, data, conn ->
-            val chatSignal = Json.decodeFromString<ChatSignal>(data)
+            // handle only chat signals by now
+            if (type != SignalType.CHAT.signal) return@setSignalListener
+            val chatSignal = try {
+                Json.decodeFromString<ChatSignal>(data)
+            } catch (e: SerializationException) {
+                Log.e(TAG, "Can not serialize chat signal", e)
+                return@setSignalListener
+            }
+
             val message = ChatMessage(
                 id = UUID.randomUUID(),
                 date = Date(),

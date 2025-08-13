@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -18,7 +19,7 @@ import com.vonage.android.screen.components.AvatarInitials
 import com.vonage.android.screen.components.LinkifyText
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
+import java.util.Locale.getDefault
 
 @Composable
 fun ChatRow(
@@ -27,6 +28,7 @@ fun ChatRow(
     date: Date,
     modifier: Modifier = Modifier,
 ) {
+    val dateFormat = remember { SimpleDateFormat("hh:mm:ss", getDefault()) }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -52,9 +54,8 @@ fun ChatRow(
                     style = VonageVideoTheme.typography.title,
                     color = VonageVideoTheme.colors.inverseSurface,
                 )
-                val dt = SimpleDateFormat("hh:mm:ss", Locale.getDefault())
                 Text(
-                    text = dt.format(date),
+                    text = dateFormat.format(date),
                     style = VonageVideoTheme.typography.body,
                     color = VonageVideoTheme.colors.buttonPrimaryDisabled, // change to a semantic color
                 )
