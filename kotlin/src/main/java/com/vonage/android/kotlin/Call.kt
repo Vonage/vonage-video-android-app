@@ -290,7 +290,7 @@ class Call internal constructor(
     }
 
     companion object {
-        const val TAG: String = "Call"
+        const val TAG: String = "Call "
         const val PUBLISHER_ID: String = "publisher"
 
         const val SUBSCRIBER_AUDIO_LEVEL_SAMPLING_MS = 50L
