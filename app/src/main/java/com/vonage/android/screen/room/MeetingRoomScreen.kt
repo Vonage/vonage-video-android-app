@@ -1,29 +1,28 @@
 package com.vonage.android.screen.room
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
-import androidx.compose.material3.adaptive.layout.SupportingPaneScaffoldRole
+import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldPaneScope
 import androidx.compose.material3.adaptive.navigation.rememberSupportingPaneScaffoldNavigator
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -34,14 +33,18 @@ import com.vonage.android.R
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
+import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
 import com.vonage.android.screen.room.components.BottomBar
+import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.TopBar
 import com.vonage.android.screen.room.components.chat.ChatPanel
+import com.vonage.android.util.ext.isExtraPaneShow
+import com.vonage.android.util.ext.toggleChat
 import com.vonage.android.util.preview.buildCallWithParticipants
 import kotlinx.coroutines.launch
 
@@ -58,20 +61,20 @@ fun MeetingRoomScreen(
     val audioDeviceSelectorSheetState = rememberModalBottomSheetState()
     var showParticipants by remember { mutableStateOf(false) }
     var showAudioDeviceSelector by remember { mutableStateOf(false) }
-    var showChat by remember { mutableStateOf(false) }
 
     val navigator = rememberSupportingPaneScaffoldNavigator()
     val scope = rememberCoroutineScope()
 
     BackHandler(navigator.canNavigateBack()) {
-        scope.launch {
-            showChat = false
-            navigator.navigateBack()
-        }
+        scope.launch { navigator.navigateBack() }
     }
 
-    LaunchedEffect(showChat) {
-        actions.onListenUnread(showChat.not())
+    LaunchedEffect(navigator.scaffoldValue) {
+        actions.onListenUnread(navigator.isExtraPaneShow().not())
+    }
+
+    val isChatShow by remember(navigator.scaffoldValue) {
+        derivedStateOf { navigator.isExtraPaneShow() }
     }
 
     when (uiState) {
@@ -87,19 +90,10 @@ fun MeetingRoomScreen(
                         modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
                         actions = actions,
                         onToggleParticipants = { showParticipants = showParticipants.toggle() },
-                        onShowChat = {
-                            showChat = showChat.toggle()
-                            scope.launch {
-                                if (showChat) {
-                                    navigator.navigateTo(SupportingPaneScaffoldRole.Supporting)
-                                } else {
-                                    navigator.navigateTo(SupportingPaneScaffoldRole.Main)
-                                }
-                            }
-                        },
+                        onShowChat = { scope.launch { navigator.toggleChat() } },
                         isMicEnabled = publisher?.isMicEnabled ?: false,
                         isCameraEnabled = publisher?.isCameraEnabled ?: false,
-                        isChatShow = showChat,
+                        isChatShow = isChatShow,
                         participantsCount = participants.size,
                         unreadCount = chatState.unreadCount,
                     )
@@ -135,23 +129,19 @@ fun MeetingRoomScreen(
                             )
                         }
                     },
-                    supportingPane = {
-                        ChatPanel(
-                            messages = chatState.messages,
-                            onSendMessage = actions.onMessageSent,
-                            onCloseChat = {
-                                scope.launch {
-                                    showChat = false
-                                    navigator.navigateBack()
-                                }
-                            }
+                    supportingPane = { },
+                    extraPane = {
+                        ExtraPane(
+                            chatState = chatState,
+                            actions = actions,
+                            onCloseChat = { scope.launch { navigator.navigateBack() } }
                         )
-                    },
+                    }
                 )
             }
         }
 
-        is MeetingRoomUiState.Loading -> MeetingRoomLoading()
+        is MeetingRoomUiState.Loading -> GenericLoading()
 
         is MeetingRoomUiState.SessionError -> {
             BasicAlertDialog(
@@ -164,17 +154,22 @@ fun MeetingRoomScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-private fun MeetingRoomLoading(
+fun ThreePaneScaffoldPaneScope.ExtraPane(
+    chatState: ChatState,
+    actions: MeetingRoomActions,
+    onCloseChat: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    AnimatedPane(
         modifier = modifier
-            .fillMaxSize()
-            .background(VonageVideoTheme.colors.background)
+            .safeContentPadding()
     ) {
-        CircularProgressIndicator(
-            modifier = Modifier.align(Alignment.Center)
+        ChatPanel(
+            messages = chatState.messages,
+            onSendMessage = actions.onMessageSent,
+            onCloseChat = onCloseChat,
         )
     }
 }
