@@ -12,8 +12,12 @@ import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
 import com.vonage.android.kotlin.internal.toParticipant
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.ChatMessage
+import com.vonage.android.kotlin.model.ChatSignal
+import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
+import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VeraSubscriber
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -33,7 +37,12 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
+import java.util.Date
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
 
 @Suppress("TooManyFunctions")
 @OptIn(FlowPreview::class)
@@ -49,6 +58,12 @@ class Call internal constructor(
 
     private val _participantsStateFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
+
+    private val _chatStateFlow = MutableStateFlow(ChatState())
+    override val chatStateFlow: StateFlow<ChatState> = _chatStateFlow
+    private val chatMessages: MutableList<ChatMessage> = CopyOnWriteArrayList(mutableListOf<ChatMessage>())
+    private var chatMessagesUnreadCount: Int = 0
+    private var listenUnread: Boolean = true
 
     private val subscriberStreams = HashMap<String, Subscriber>()
     private val subscriberJobs = ConcurrentHashMap<String, Job>()
@@ -80,27 +95,75 @@ class Call internal constructor(
             }
         }
         session.setSessionListener(sessionListener)
+        session.setSignalListener { session, type, data, conn ->
+            // handle only chat signals by now
+            if (type != SignalType.CHAT.signal) return@setSignalListener
+            val chatSignal = try {
+                Json.decodeFromString<ChatSignal>(data)
+            } catch (e: SerializationException) {
+                Log.e(TAG, "Can not serialize chat signal", e)
+                return@setSignalListener
+            }
+
+            val message = ChatMessage(
+                id = UUID.randomUUID(),
+                date = Date(),
+                participantName = chatSignal.participantName,
+                text = chatSignal.text,
+            )
+            chatMessages.add(0, message)
+            val unreadCount = if (listenUnread) {
+                ++chatMessagesUnreadCount
+            } else 0
+            _chatStateFlow.value = ChatState(
+                unreadCount = unreadCount,
+                messages = chatMessages.toImmutableList(),
+            )
+        }
         session.connect(token)
         awaitClose { session.setSessionListener(null) }
+    }
+
+    override fun sendChatMessage(message: String) {
+        val signal = Json.encodeToString(
+            ChatSignal(
+                participantName = publisherHolder.publisher.name,
+                text = message,
+            )
+        )
+        session.sendSignal(SignalType.CHAT.signal, signal)
+    }
+
+    override fun listenUnreadChatMessages(enable: Boolean) {
+        listenUnread = enable
+        if (!enable) {
+            chatMessagesUnreadCount = 0
+            _chatStateFlow.value = ChatState(
+                unreadCount = 0,
+                messages = chatMessages.toImmutableList(),
+            )
+        }
     }
 
     override fun endSession() {
         // wait for PublisherListener#streamDestroyed before returning : VIDSOL-104
         session.unpublish(publisherHolder.publisher)
+        session.setSessionListener(null)
+        session.setSignalListener(null)
         session.disconnect()
     }
 
-    override fun togglePublisherVideo() {
+    override fun toggleLocalVideo() {
         publisherHolder.publisher.publishVideo = publisherHolder.publisher.publishVideo.toggle()
         participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
     }
 
-    override fun togglePublisherCamera() {
+    override fun toggleLocalCamera() {
         publisherHolder.publisher.cycleCamera()
     }
 
-    override fun togglePublisherAudio() {
+    override fun toggleLocalAudio() {
         publisherHolder.publisher.publishAudio = publisherHolder.publisher.publishAudio.toggle()
         participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
@@ -125,7 +188,7 @@ class Call internal constructor(
         }
     }
 
-    override fun observePublisherAudio(): Flow<Float> = publisherHolder.publisher.observeAudioLevel { audioLevel ->
+    override fun observeLocalAudioLevel(): Flow<Float> = publisherHolder.publisher.observeAudioLevel { audioLevel ->
         Log.d(TAG, "publisher audio level listener changed to $audioLevel")
 
         participantStreams[PUBLISHER_ID] = publisherHolder.publisher

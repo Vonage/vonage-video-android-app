@@ -35,7 +35,10 @@ class MeetingRoomScreenTest {
                 MeetingRoomScreen(
                     uiState = MeetingRoomUiState.Content(
                         roomName = "sample-name",
-                        call = buildCallWithParticipants(5),
+                        call = buildCallWithParticipants(
+                            participantCount = 5,
+                            unreadCount = 8,
+                        ),
                     ),
                     actions = MeetingRoomActions(),
                     audioLevel = 0.4f,
@@ -45,6 +48,9 @@ class MeetingRoomScreenTest {
 
         screen.topBar.assertIsDisplayedWithTitle("sample-name")
         screen.content.assertIsDisplayed()
-        screen.bottomBar.assertIsDisplayedWithParticipantBadge(5.toString())
+        screen.bottomBar
+            .assertIsDisplayed()
+            .assertIsDisplayedWithParticipantBadge(5.toString())
+            .assertIsDisplayedWithUnreadBadge(8.toString())
     }
 }

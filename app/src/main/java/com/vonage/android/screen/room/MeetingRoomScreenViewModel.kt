@@ -89,7 +89,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         }
         viewModelScope.launch {
             call?.let {
-                it.observePublisherAudio()
+                it.observeLocalAudioLevel()
                     .distinctUntilChanged()
                     .debounce(PUBLISHER_AUDIO_LEVEL_DEBOUNCE_MS)
                     .onEach { audioLevel ->
@@ -100,15 +100,15 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     }
 
     fun onToggleMic() {
-        call?.togglePublisherAudio()
+        call?.toggleLocalAudio()
     }
 
     fun onToggleCamera() {
-        call?.togglePublisherVideo()
+        call?.toggleLocalVideo()
     }
 
     fun onSwitchCamera() {
-        call?.togglePublisherCamera()
+        call?.toggleLocalCamera()
     }
 
     fun endCall() {
@@ -121,6 +121,14 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
     fun onResume() {
         call?.resumeSession()
+    }
+
+    fun sendMessage(message: String) {
+        call?.sendChatMessage(message)
+    }
+
+    fun listenUnread(enable: Boolean) {
+        call?.listenUnreadChatMessages(enable)
     }
 
     private companion object {
