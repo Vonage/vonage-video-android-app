@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -43,6 +44,7 @@ import com.vonage.android.util.preview.buildChatMessages
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 
 @Composable
 fun ChatPanel(
@@ -110,6 +112,8 @@ private fun ChatPanelMessages(
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
+    val dateFormat = remember { SimpleDateFormat("hh:mm:ss", Locale.current.platformLocale) }
+
     Box(
         modifier = modifier,
     ) {
@@ -127,6 +131,7 @@ private fun ChatPanelMessages(
                     userName = chatMessage.participantName,
                     message = chatMessage.text,
                     date = chatMessage.date,
+                    dateFormat = dateFormat,
                 )
             }
         }

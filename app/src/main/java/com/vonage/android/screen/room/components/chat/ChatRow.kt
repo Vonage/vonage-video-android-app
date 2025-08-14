@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -17,18 +16,19 @@ import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.AvatarInitials
 import com.vonage.android.screen.components.LinkifyText
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale.getDefault
+import java.util.Locale
 
 @Composable
 fun ChatRow(
     userName: String,
     message: String,
     date: Date,
+    dateFormat: DateFormat,
     modifier: Modifier = Modifier,
 ) {
-    val dateFormat = remember { SimpleDateFormat("hh:mm:ss", getDefault()) }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -78,6 +78,7 @@ internal fun ChatRowPreview() {
                 userName = "Doctor Strange",
                 message = "hi there!",
                 date = Date(),
+                dateFormat = SimpleDateFormat("hh:mm:ss", Locale.getDefault()),
             )
         }
     }
