@@ -57,7 +57,7 @@ fun ChatRow(
                 Text(
                     text = dateFormat.format(date),
                     style = VonageVideoTheme.typography.body,
-                    color = VonageVideoTheme.colors.buttonPrimaryDisabled, // change to a semantic color
+                    color = VonageVideoTheme.colors.textPrimaryDisabled,
                 )
             }
             LinkifyText(
