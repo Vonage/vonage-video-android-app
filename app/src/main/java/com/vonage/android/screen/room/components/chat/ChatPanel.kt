@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -67,8 +67,7 @@ fun ChatPanel(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 16.dp),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -163,7 +162,7 @@ fun ChatPanelInput(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(64.dp),
+            .wrapContentHeight(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -175,6 +174,8 @@ fun ChatPanelInput(
             onValueChange = {
                 chatInputValue = it
             },
+            singleLine = false,
+            maxLines = 3,
             placeholder = {
                 Text(
                     text = stringResource(R.string.chat_panel_input_text_placeholder),

@@ -22,6 +22,7 @@ fun VonageTextField(
     modifier: Modifier = Modifier,
     isError: Boolean = false,
     singleLine: Boolean = true,
+    maxLines: Int = 1,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     leadingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
@@ -39,6 +40,7 @@ fun VonageTextField(
             unfocusedBorderColor = VonageVideoTheme.colors.buttonPrimaryDisabled,
         ),
         singleLine = singleLine,
+        maxLines = maxLines,
         keyboardOptions = keyboardOptions,
         supportingText = supportingText,
     )
