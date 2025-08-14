@@ -23,6 +23,7 @@ fun VonageTextField(
     isError: Boolean = false,
     singleLine: Boolean = true,
     maxLines: Int = 1,
+    maxLength: Int = 1024,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     leadingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
@@ -31,7 +32,11 @@ fun VonageTextField(
     OutlinedTextField(
         modifier = modifier,
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = {
+            if (it.length <= maxLength) {
+                onValueChange(it)
+            }
+        },
         isError = isError,
         placeholder = placeholder,
         leadingIcon = leadingIcon,
