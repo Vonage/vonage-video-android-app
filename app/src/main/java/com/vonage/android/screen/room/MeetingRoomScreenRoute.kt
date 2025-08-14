@@ -49,6 +49,12 @@ fun MeetingRoomScreenRoute(
             onBack = {
                 viewModel.endCall()
                 onBack()
+            },
+            onMessageSent = {
+                viewModel.sendMessage(it)
+            },
+            onListenUnread = {
+                viewModel.listenUnread(it)
             }
         )
     }
@@ -82,4 +88,6 @@ data class MeetingRoomActions(
     val onBack: () -> Unit = {},
     val onCameraSwitch: () -> Unit = {},
     val onAudioSwitch: () -> Unit = {},
+    val onMessageSent: (String) -> Unit = {},
+    val onListenUnread: (Boolean) -> Unit = {},
 )
