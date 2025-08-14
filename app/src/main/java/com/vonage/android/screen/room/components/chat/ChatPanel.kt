@@ -46,6 +46,8 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
+val dateFormat = SimpleDateFormat("hh:mm a", Locale.current.platformLocale)
+
 @Composable
 fun ChatPanel(
     messages: ImmutableList<ChatMessage>,
@@ -112,7 +114,6 @@ private fun ChatPanelMessages(
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
-    val dateFormat = remember { SimpleDateFormat("hh:mm:ss", Locale.current.platformLocale) }
 
     Box(
         modifier = modifier,
