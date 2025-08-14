@@ -15,10 +15,10 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade {
 }
 
 interface PublisherFacade {
-    fun observePublisherAudio(): Flow<Float>
-    fun togglePublisherVideo()
-    fun togglePublisherCamera()
-    fun togglePublisherAudio()
+    fun observeLocalAudioLevel(): Flow<Float>
+    fun toggleLocalVideo()
+    fun toggleLocalCamera()
+    fun toggleLocalAudio()
 }
 
 interface SessionFacade {

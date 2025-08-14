@@ -31,10 +31,10 @@ fun buildCallWithParticipants(
         override fun endSession() {}
 
         // Publisher related methods
-        override fun observePublisherAudio(): Flow<Float> = flowOf()
-        override fun togglePublisherVideo() {}
-        override fun togglePublisherCamera() {}
-        override fun togglePublisherAudio() {}
+        override fun observeLocalAudioLevel(): Flow<Float> = flowOf()
+        override fun toggleLocalVideo() {}
+        override fun toggleLocalCamera() {}
+        override fun toggleLocalAudio() {}
 
         // Chat related methods
         override val chatStateFlow: StateFlow<ChatState> = MutableStateFlow(

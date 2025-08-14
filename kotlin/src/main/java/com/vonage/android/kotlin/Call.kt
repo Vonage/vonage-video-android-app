@@ -153,17 +153,17 @@ class Call internal constructor(
         session.disconnect()
     }
 
-    override fun togglePublisherVideo() {
+    override fun toggleLocalVideo() {
         publisherHolder.publisher.publishVideo = publisherHolder.publisher.publishVideo.toggle()
         participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
     }
 
-    override fun togglePublisherCamera() {
+    override fun toggleLocalCamera() {
         publisherHolder.publisher.cycleCamera()
     }
 
-    override fun togglePublisherAudio() {
+    override fun toggleLocalAudio() {
         publisherHolder.publisher.publishAudio = publisherHolder.publisher.publishAudio.toggle()
         participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
@@ -188,7 +188,7 @@ class Call internal constructor(
         }
     }
 
-    override fun observePublisherAudio(): Flow<Float> = publisherHolder.publisher.observeAudioLevel { audioLevel ->
+    override fun observeLocalAudioLevel(): Flow<Float> = publisherHolder.publisher.observeAudioLevel { audioLevel ->
         Log.d(TAG, "publisher audio level listener changed to $audioLevel")
 
         participantStreams[PUBLISHER_ID] = publisherHolder.publisher

@@ -27,7 +27,7 @@ class MeetingRoomScreenViewModelTest {
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
-        every { mockCall.observePublisherAudio() } returns flowOf(0.4f)
+        every { mockCall.observeLocalAudioLevel() } returns flowOf(0.4f)
         val sut = sut()
 
         sut.uiState.test {
@@ -44,7 +44,7 @@ class MeetingRoomScreenViewModelTest {
             assertEquals(0.4f, awaitItem())
         }
         verify { mockCall.connect() }
-        verify { mockCall.observePublisherAudio() }
+        verify { mockCall.observeLocalAudioLevel() }
     }
 
     @Test
@@ -75,7 +75,7 @@ class MeetingRoomScreenViewModelTest {
                 ), awaitItem()
             )
             sut.onToggleMic()
-            verify { mockCall.togglePublisherAudio() }
+            verify { mockCall.toggleLocalAudio() }
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -97,7 +97,7 @@ class MeetingRoomScreenViewModelTest {
                 ), awaitItem()
             )
             sut.onToggleCamera()
-            verify { mockCall.togglePublisherVideo() }
+            verify { mockCall.toggleLocalVideo() }
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -185,7 +185,7 @@ class MeetingRoomScreenViewModelTest {
                 ), awaitItem()
             )
             sut.onSwitchCamera()
-            verify { mockCall.togglePublisherCamera() }
+            verify { mockCall.toggleLocalCamera() }
             cancelAndIgnoreRemainingEvents()
         }
     }

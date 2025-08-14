@@ -90,7 +90,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         }
         viewModelScope.launch {
             call?.let {
-                it.observePublisherAudio()
+                it.observeLocalAudioLevel()
                     .distinctUntilChanged()
                     .debounce(PUBLISHER_AUDIO_LEVEL_DEBOUNCE_MS)
                     .onEach { audioLevel ->
@@ -101,15 +101,15 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     }
 
     fun onToggleMic() {
-        call?.togglePublisherAudio()
+        call?.toggleLocalAudio()
     }
 
     fun onToggleCamera() {
-        call?.togglePublisherVideo()
+        call?.toggleLocalVideo()
     }
 
     fun onSwitchCamera() {
-        call?.togglePublisherCamera()
+        call?.toggleLocalCamera()
     }
 
     fun endCall() {
