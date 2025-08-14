@@ -20,6 +20,7 @@ import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,17 +36,22 @@ import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_MI
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BADGE
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BUTTON
 
+@Stable
+data class BottomBarState(
+    val onToggleParticipants: () -> Unit,
+    val onShowChat: () -> Unit,
+    val isMicEnabled: Boolean,
+    val isCameraEnabled: Boolean,
+    val isChatShow: Boolean,
+    val participantsCount: Int,
+    val unreadCount: Int,
+)
+
 @Suppress("LongParameterList")
 @Composable
 fun BottomBar(
     actions: MeetingRoomActions,
-    onToggleParticipants: () -> Unit,
-    onShowChat: () -> Unit,
-    isMicEnabled: Boolean,
-    isCameraEnabled: Boolean,
-    isChatShow: Boolean,
-    participantsCount: Int,
-    unreadCount: Int,
+    bottomBarState: BottomBarState,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -64,27 +70,27 @@ fun BottomBar(
                 modifier = Modifier
                     .testTag(BOTTOM_BAR_MIC_BUTTON),
                 onClick = actions.onToggleMic,
-                icon = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
-                isActive = isMicEnabled,
+                icon = if (bottomBarState.isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
+                isActive = bottomBarState.isMicEnabled,
             )
 
             ControlButton(
                 modifier = Modifier
                     .testTag(BOTTOM_BAR_CAMERA_BUTTON),
                 onClick = actions.onToggleCamera,
-                icon = if (isCameraEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
-                isActive = isCameraEnabled,
+                icon = if (bottomBarState.isCameraEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
+                isActive = bottomBarState.isCameraEnabled,
             )
 
             ParticipantsBadgeButton(
-                participantsCount = participantsCount,
-                onToggleParticipants = onToggleParticipants,
+                participantsCount = bottomBarState.participantsCount,
+                onToggleParticipants = bottomBarState.onToggleParticipants,
             )
 
             ChatBadgeButton(
-                unreadCount = unreadCount,
-                onShowChat = onShowChat,
-                isChatShow = isChatShow,
+                unreadCount = bottomBarState.unreadCount,
+                onShowChat = bottomBarState.onShowChat,
+                isChatShow = bottomBarState.isChatShow,
             )
 
             ControlButton(
@@ -173,13 +179,15 @@ internal fun BottomBarPreview() {
     VonageVideoTheme {
         BottomBar(
             actions = MeetingRoomActions(),
-            onToggleParticipants = {},
-            onShowChat = {},
-            isMicEnabled = false,
-            isCameraEnabled = true,
-            isChatShow = false,
-            participantsCount = 25,
-            unreadCount = 10,
+            bottomBarState = BottomBarState(
+                onToggleParticipants = {},
+                onShowChat = {},
+                isMicEnabled = false,
+                isCameraEnabled = true,
+                isChatShow = false,
+                participantsCount = 25,
+                unreadCount = 10,
+            ),
         )
     }
 }

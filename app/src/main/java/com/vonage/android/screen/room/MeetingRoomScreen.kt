@@ -39,6 +39,7 @@ import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOT
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
 import com.vonage.android.screen.room.components.BottomBar
+import com.vonage.android.screen.room.components.BottomBarState
 import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.TopBar
@@ -89,13 +90,15 @@ fun MeetingRoomScreen(
                     BottomBar(
                         modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
                         actions = actions,
-                        onToggleParticipants = { showParticipants = showParticipants.toggle() },
-                        onShowChat = { scope.launch { navigator.toggleChat() } },
-                        isMicEnabled = publisher?.isMicEnabled ?: false,
-                        isCameraEnabled = publisher?.isCameraEnabled ?: false,
-                        isChatShow = isChatShow,
-                        participantsCount = participants.size,
-                        unreadCount = chatState.unreadCount,
+                        bottomBarState = BottomBarState(
+                            onToggleParticipants = { showParticipants = showParticipants.toggle() },
+                            onShowChat = { scope.launch { navigator.toggleChat() } },
+                            isMicEnabled = publisher?.isMicEnabled ?: false,
+                            isCameraEnabled = publisher?.isCameraEnabled ?: false,
+                            isChatShow = isChatShow,
+                            participantsCount = participants.size,
+                            unreadCount = chatState.unreadCount,
+                        ),
                     )
                 }
             ) { paddingValues ->
