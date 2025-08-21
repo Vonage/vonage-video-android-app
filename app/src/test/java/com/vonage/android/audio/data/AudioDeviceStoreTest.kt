@@ -5,6 +5,7 @@ import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import com.vonage.android.audio.AudioDeviceSelector.AudioDevice
 import com.vonage.android.audio.AudioDeviceSelector.AudioDeviceType
+import com.vonage.android.audio.data.bluetooth.VeraBluetoothManager
 import com.vonage.android.util.BuildConfigWrapper
 import io.mockk.every
 import io.mockk.mockk
@@ -19,10 +20,12 @@ import kotlin.test.assertFalse
 class AudioDeviceStoreTest {
 
     private val context: Context = mockk(relaxed = true)
+    private val bluetoothManager: VeraBluetoothManager = mockk(relaxed = true)
     private val audioManager = buildAudioManagerMock()
     private val sut = AudioDeviceStore(
         context = context,
         audioManager = audioManager,
+        bluetoothManager = bluetoothManager,
     )
 
     private val earpiece = AudioDevice(1, AudioDeviceType.EARPIECE)
@@ -74,7 +77,6 @@ class AudioDeviceStoreTest {
         val ret = sut.selectDevice(earpiece)
 
         verify { audioManager.setCommunicationDevice(earpieceDeviceInfo) }
-        verify { audioManager.clearCommunicationDevice() }
         assertTrue(ret)
     }
 

@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.vonage.android.audio.AudioDeviceSelector.AudioDevice
 import com.vonage.android.audio.AudioDeviceSelector.AudioDeviceType
 import com.vonage.android.audio.data.AudioDeviceStore
+import com.vonage.android.audio.util.AudioFocusRequester
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -14,33 +15,35 @@ import kotlin.test.assertEquals
 class AudioDeviceSelectorTest {
 
     private val context: Context = mockk(relaxed = true)
-    private val audioDeviceStore: AudioDeviceStore = mockk()
+    private val audioDeviceStore: AudioDeviceStore = mockk {
+        every { start() } returns Unit
+    }
+    private val audioFocusRequester: AudioFocusRequester = mockk(relaxed = true)
     private val sut = AudioDeviceSelector(
         context = context,
         audioDeviceStore = audioDeviceStore,
+        audioFocusRequester = audioFocusRequester,
     )
 
     private val headset = AudioDevice(1, AudioDeviceType.HEADSET)
     private val speaker = AudioDevice(2, AudioDeviceType.SPEAKER)
 
     @Test
-    fun `given audio selector when init then return available devices`() {
-        runTest {
-            val audioDevices = listOf(
-                headset,
-                speaker,
-            )
-            every { audioDeviceStore.getDevices() } returns audioDevices
-            every { audioDeviceStore.getActiveDevice() } returns null
+    fun `given audio selector when init then return available devices`() = runTest {
+        val audioDevices = listOf(
+            headset,
+            speaker,
+        )
+        every { audioDeviceStore.getDevices() } returns audioDevices
+        every { audioDeviceStore.getActiveDevice() } returns null
 
-            sut.availableDevices.test {
-                sut.start()
-                awaitItem() // initial state
-                assertEquals(
-                    audioDevices,
-                    awaitItem()
-                )
-            }
+        sut.availableDevices.test {
+            sut.start()
+            awaitItem() // initial state
+            assertEquals(
+                audioDevices,
+                awaitItem()
+            )
         }
     }
 

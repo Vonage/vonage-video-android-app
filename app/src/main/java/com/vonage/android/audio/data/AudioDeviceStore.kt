@@ -16,10 +16,10 @@ import javax.inject.Inject
 class AudioDeviceStore @Inject constructor(
     context: Context,
     private val bluetoothManager: VeraBluetoothManager,
+    private val audioManager: AudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 ) {
 
     private var selectedDevice: AudioDeviceInfo? = null
-    private val audioManager: AudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
     fun start() {
         bluetoothManager.onStart()
