@@ -1,13 +1,16 @@
 package com.vonage.android.screen.waiting.components
 
 import android.view.View
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BlurCircular
 import androidx.compose.material.icons.filled.BlurOff
@@ -120,6 +123,8 @@ fun VideoControlPanel(
                     ifTrue = { background(Color.Unspecified) },
                     ifFalse = { background(Color.Red.copy(alpha = 0.7f)) }
                 )
+                .conditional(isMicEnabled,
+                    ifTrue = { border(BorderStroke(1.dp, Color.White), CircleShape) })
                 .testTag(MIC_BUTTON_TAG.buildTestTag(isMicEnabled)),
             onClick = onMicToggle,
             icon = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
@@ -132,6 +137,8 @@ fun VideoControlPanel(
                     ifTrue = { background(Color.Unspecified) },
                     ifFalse = { background(Color.Red.copy(alpha = 0.7f)) }
                 )
+                .conditional(isCameraEnabled,
+                    ifTrue = { border(BorderStroke(1.dp, Color.White), CircleShape) })
                 .testTag(CAMERA_BUTTON_TAG.buildTestTag(isCameraEnabled)),
             onClick = onCameraToggle,
             icon = if (isCameraEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
@@ -139,6 +146,8 @@ fun VideoControlPanel(
 
         CircularControlButton(
             modifier = Modifier
+                .conditional(isCameraEnabled,
+                    ifTrue = { border(BorderStroke(1.dp, Color.White), CircleShape) })
                 .testTag(CAMERA_BLUR_BUTTON_TAG),
             onClick = onCameraBlur,
             icon = rememberBlurIcon(blurLevel),

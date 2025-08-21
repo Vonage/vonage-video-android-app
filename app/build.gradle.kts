@@ -80,6 +80,8 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
 
+    implementation(libs.opentok.android.sdk)
+
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.params)

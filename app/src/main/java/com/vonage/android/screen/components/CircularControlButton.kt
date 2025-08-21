@@ -32,7 +32,6 @@ fun CircularControlButton(
         modifier = Modifier
             .size(56.dp)
             .clip(CircleShape)
-            .border(BorderStroke(1.dp, Color.White), CircleShape)
             .then(modifier)
             .clickable { onClick() },
         contentAlignment = Alignment.Center,

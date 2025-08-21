@@ -2,6 +2,8 @@ package com.vonage.android.audio
 
 import android.content.Context
 import com.vonage.android.audio.data.AudioDeviceStore
+import com.vonage.android.audio.data.DefaultAudioDeviceStore
+import com.vonage.android.kotlin.internal.VeraAudioDevice
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -12,7 +14,8 @@ import javax.inject.Inject
 
 class AudioDeviceSelector @Inject constructor(
     private val context: Context,
-    private val audioDeviceStore: AudioDeviceStore = AudioDeviceStore(context),
+    private val veraAudioDevice: VeraAudioDevice,
+    private val audioDeviceStore: AudioDeviceStore = DefaultAudioDeviceStore(context, veraAudioDevice = veraAudioDevice),
 ) {
 
     data class AudioDevice(

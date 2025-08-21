@@ -20,7 +20,7 @@ class AudioDeviceStoreTest {
 
     private val context: Context = mockk(relaxed = true)
     private val audioManager = buildAudioManagerMock()
-    private val sut = AudioDeviceStore(
+    private val sut = DefaultAudioDeviceStore(
         context = context,
         audioManager = audioManager,
     )

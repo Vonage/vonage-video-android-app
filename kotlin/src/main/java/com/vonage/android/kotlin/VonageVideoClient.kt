@@ -2,12 +2,14 @@ package com.vonage.android.kotlin
 
 import android.content.Context
 import android.util.Log
+import com.opentok.android.AudioDeviceManager
 import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.Publisher
 import com.opentok.android.Session
 import com.opentok.android.Session.SessionOptions
 import com.opentok.android.VeraCameraCapturer
 import com.vonage.android.kotlin.ext.applyVideoBlur
+import com.vonage.android.kotlin.internal.VeraAudioDevice
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
 import com.vonage.android.kotlin.internal.toParticipant
 import com.vonage.android.kotlin.model.CallFacade
@@ -16,8 +18,13 @@ import com.vonage.android.kotlin.model.VeraPublisher
 
 class VonageVideoClient(
     private val context: Context,
+    baseAudioDevice: VeraAudioDevice,
     // configure log level of the entire SDK
 ) {
+
+    init {
+        AudioDeviceManager.setAudioDevice(baseAudioDevice)
+    }
 
     private var session: Session? = null
     private var publisherConfig: PublisherConfig? = null

@@ -9,13 +9,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.audio.ui.AudioDeviceList
+import com.vonage.android.di.VeraAudioDeviceEntryPoint
+import dagger.hilt.android.EntryPointAccessors
 
 @ExperimentalMaterial3Api
 @Composable
 fun AudioDevicesHandler(
     onDismissRequest: () -> Unit
 ) {
-    val context = LocalContext.current.applicationContext
+    val context = LocalContext.current
     val audioDeviceSelector = rememberAudioDeviceSelector(context)
     LaunchedEffect(audioDeviceSelector) {
         audioDeviceSelector.init()
@@ -36,5 +38,10 @@ fun AudioDevicesHandler(
 
 @Composable
 fun rememberAudioDeviceSelector(context: Context) = remember(Unit) {
-    AudioDeviceSelector(context)
+    val entryPoint = EntryPointAccessors.fromApplication(
+        context.applicationContext,
+        VeraAudioDeviceEntryPoint::class.java
+    )
+    val veraAudioDevice = entryPoint.veraAudioDevice()
+    AudioDeviceSelector(context, veraAudioDevice)
 }

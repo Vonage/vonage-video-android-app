@@ -133,7 +133,7 @@ private fun AudioDeviceType.toLabel(): String =
         else -> ""
     }
 
-private fun AudioDeviceType.toImageVector(): ImageVector =
+internal fun AudioDeviceType.toImageVector(): ImageVector =
     when (this) {
         AudioDeviceType.EARPIECE -> Icons.Default.Phone
         AudioDeviceType.BLUETOOTH -> Icons.Default.Bluetooth
