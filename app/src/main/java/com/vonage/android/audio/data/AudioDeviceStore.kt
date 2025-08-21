@@ -50,65 +50,73 @@ class AudioDeviceStore @Inject constructor(
     @SuppressLint("NewApi")
     fun selectDevice(device: AudioDevice): Boolean {
         Log.d("VeraAudioDeviceStore", "select device ${device.type}")
-        if (BuildConfigWrapper.sdkVersion() >= Build.VERSION_CODES.S) {
-            selectedDevice = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
-                .firstOrNull { it.id == device.id }
-            return selectedDevice?.let { deviceInfo ->
-                val result = audioManager.setCommunicationDevice(deviceInfo)
-                if (!result) {
-                    Log.e("VeraAudioDeviceStore", "error while changing to $deviceInfo")
-                    false
-                }
-                when (device.type) {
-                    AudioDeviceType.SPEAKER,
-                    AudioDeviceType.EARPIECE,
-                    AudioDeviceType.HEADSET -> this@AudioDeviceStore.bluetoothManager.userDisableBluetooth()
-
-                    AudioDeviceType.BLUETOOTH -> this@AudioDeviceStore.bluetoothManager.userEnableBluetooth()
-                    else -> {}
-                }
-                audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
-                true
-            } ?: false
+        return if (BuildConfigWrapper.sdkVersion() >= Build.VERSION_CODES.S) {
+            selectDeviceAndroidSOrHigher(device)
         } else {
+            selectDeviceFallback(device)
+        }
+    }
+
+    private fun selectDeviceAndroidSOrHigher(device: AudioDevice): Boolean {
+        selectedDevice = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
+            .firstOrNull { it.id == device.id }
+        return selectedDevice?.let { deviceInfo ->
+            val result = audioManager.setCommunicationDevice(deviceInfo)
+            if (!result) {
+                Log.e("VeraAudioDeviceStore", "error while changing to $deviceInfo")
+                false
+            }
             when (device.type) {
+                AudioDeviceType.SPEAKER,
                 AudioDeviceType.EARPIECE,
-                AudioDeviceType.HEADSET -> {
-                    bluetoothManager.userDisableBluetooth()
-                    audioManager.apply {
-                        if (isBluetoothScoOn) {
-                            stopBluetoothSco()
-                        }
-                        isBluetoothScoOn = false
-                        isSpeakerphoneOn = false
-                        mode = AudioManager.MODE_IN_COMMUNICATION
-                    }
-                }
+                AudioDeviceType.HEADSET -> this@AudioDeviceStore.bluetoothManager.userDisableBluetooth()
 
-                AudioDeviceType.BLUETOOTH -> {
-                    bluetoothManager.userEnableBluetooth()
-                    audioManager.apply {
-                        isBluetoothScoOn = true
-                        isSpeakerphoneOn = false
-                        mode = AudioManager.MODE_IN_COMMUNICATION
-                        startBluetoothSco()
-                    }
-                }
-
-                AudioDeviceType.SPEAKER -> {
-                    bluetoothManager.userDisableBluetooth()
-                    audioManager.apply {
-                        isBluetoothScoOn = false
-                        isSpeakerphoneOn = true
-                        if (isBluetoothScoOn) {
-                            stopBluetoothSco()
-                        }
-                        mode = AudioManager.MODE_IN_COMMUNICATION
-                    }
-                }
-
+                AudioDeviceType.BLUETOOTH -> this@AudioDeviceStore.bluetoothManager.userEnableBluetooth()
                 else -> {}
             }
+            audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+            true
+        } ?: false
+    }
+
+    private fun selectDeviceFallback(device: AudioDevice): Boolean {
+        when (device.type) {
+            AudioDeviceType.EARPIECE,
+            AudioDeviceType.HEADSET -> {
+                bluetoothManager.userDisableBluetooth()
+                audioManager.apply {
+                    if (isBluetoothScoOn) {
+                        stopBluetoothSco()
+                    }
+                    isBluetoothScoOn = false
+                    isSpeakerphoneOn = false
+                    mode = AudioManager.MODE_IN_COMMUNICATION
+                }
+            }
+
+            AudioDeviceType.BLUETOOTH -> {
+                bluetoothManager.userEnableBluetooth()
+                audioManager.apply {
+                    isBluetoothScoOn = true
+                    isSpeakerphoneOn = false
+                    mode = AudioManager.MODE_IN_COMMUNICATION
+                    startBluetoothSco()
+                }
+            }
+
+            AudioDeviceType.SPEAKER -> {
+                bluetoothManager.userDisableBluetooth()
+                audioManager.apply {
+                    isBluetoothScoOn = false
+                    isSpeakerphoneOn = true
+                    if (isBluetoothScoOn) {
+                        stopBluetoothSco()
+                    }
+                    mode = AudioManager.MODE_IN_COMMUNICATION
+                }
+            }
+
+            else -> {}
         }
         return true
     }

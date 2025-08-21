@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothHeadset
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
+import android.bluetooth.BluetoothProfile.ServiceListener
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -19,8 +20,8 @@ class VeraBluetoothManager @Inject constructor(
     private val context: Context,
 ) {
 
-    private val bluetoothManager: BluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-    private val audioManager: AudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+    private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
     private var bluetoothProfile: BluetoothProfile? = null
     private val bluetoothLock = Any()
@@ -85,7 +86,7 @@ class VeraBluetoothManager @Inject constructor(
     }
 
     @SuppressLint("MissingPermission")
-    private val bluetoothProfileServiceListener: BluetoothProfile.ServiceListener = object : BluetoothProfile.ServiceListener {
+    private val bluetoothProfileServiceListener: ServiceListener = object : ServiceListener {
         override fun onServiceConnected(type: Int, profile: BluetoothProfile) {
             Log.d(TAG, "BluetoothProfile.ServiceListener.onServiceConnected()")
             if (type == BluetoothProfile.HEADSET) {
@@ -169,7 +170,7 @@ class VeraBluetoothManager @Inject constructor(
     }
 
     private fun registerBtReceiver() {
-        Log.d(TAG, "registerBtReceiver() called .. isBluetoothHeadSetReceiverRegistered = $isBluetoothHeadSetReceiverRegistered")
+        Log.d(TAG, "registerBtReceiver() called .. isRegistered = $isBluetoothHeadSetReceiverRegistered")
         if (isBluetoothHeadSetReceiverRegistered) {
             return
         }
@@ -183,7 +184,7 @@ class VeraBluetoothManager @Inject constructor(
     }
 
     private fun unregisterBluetoothReceiver() {
-        Log.d(TAG, "unregisterBtReceiver() called .. bluetoothHeadSetReceiverRegistered = $isBluetoothHeadSetReceiverRegistered")
+        Log.d(TAG, "unregisterBtReceiver() called .. isRegistered = $isBluetoothHeadSetReceiverRegistered")
         if (!isBluetoothHeadSetReceiverRegistered) {
             return
         }
@@ -192,7 +193,7 @@ class VeraBluetoothManager @Inject constructor(
     }
 
     private fun registerHeadsetReceiver() {
-        Log.d(TAG, "registerHeadsetReceiver() called ... isHeadsetReceiverRegistered = $isHeadsetReceiverRegistered")
+        Log.d(TAG, "registerHeadsetReceiver() called ... isRegistered = $isHeadsetReceiverRegistered")
         if (isHeadsetReceiverRegistered) {
             return
         }

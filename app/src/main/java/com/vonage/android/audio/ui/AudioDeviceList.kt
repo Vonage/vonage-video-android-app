@@ -126,7 +126,10 @@ private fun AudioDeviceCell(
 private fun AudioDevice.toLabel(): String =
     when (this.type) {
         AudioDeviceType.EARPIECE -> stringResource(R.string.audio_device_selector_earpiece_audio_device)
-        AudioDeviceType.BLUETOOTH -> this.name.ifBlank { stringResource(R.string.audio_device_selector_bluetooth_audio_device) }
+        AudioDeviceType.BLUETOOTH -> this.name.ifBlank {
+            stringResource(R.string.audio_device_selector_bluetooth_audio_device)
+        }
+
         AudioDeviceType.SPEAKER -> stringResource(R.string.audio_device_selector_speaker_audio_device)
         AudioDeviceType.HEADSET -> stringResource(R.string.audio_device_selector_headset_audio_device)
         else -> ""

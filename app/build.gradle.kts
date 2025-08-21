@@ -80,6 +80,7 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
 
+    // to be removed when extracting to module all the audio stuff
     implementation(libs.opentok.android.sdk)
 
     testImplementation(kotlin("test"))

@@ -91,4 +91,4 @@ dagger-hilt = { id = "com.google.dagger.hilt.android", version = "2.57" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-kotlin-ksp = { id = "com.google.devtools.ksp", version = "2.2.0-2.0.2" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version = "2.2.10-2.0.2" }

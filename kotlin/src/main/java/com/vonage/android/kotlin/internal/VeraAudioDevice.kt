@@ -13,7 +13,9 @@ import android.os.Process
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import com.opentok.android.BaseAudioDevice
+import java.nio.BufferOverflowException
 import java.nio.ByteBuffer
+import java.nio.ReadOnlyBufferException
 import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.Volatile
@@ -22,6 +24,7 @@ import kotlin.concurrent.Volatile
  * From https://github.com/opentok/opentok-android-sdk-samples/blob/main/Advanced-Audio-Driver-Kotlin/app/src/main/java/com/tokbox/sample/advancedaudiodriver/AdvancedAudioDevice.java
  * Removing bluetooth and audio output management, only contains audio capturing and rendering logic
  */
+@Suppress("MagicNumber", "SwallowedException", "TooGenericExceptionThrown", "LoopWithTooManyJumpStatements")
 class VeraAudioDevice(
     context: Context,
 ) : BaseAudioDevice() {
@@ -80,7 +83,7 @@ class VeraAudioDevice(
 
         try {
             Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO)
-        } catch (e: Exception) {
+        } catch (e: SecurityException) {
             Log.e(TAG, "Process.setThreadPriority(): " + e.message)
         }
         while (!shutdownCaptureThread) {
@@ -101,14 +104,20 @@ class VeraAudioDevice(
                         samplesRead = (readBytes shr 1) / NUM_CHANNELS_CAPTURING
                     } else {
                         when (readBytes) {
-                            AudioRecord.ERROR_BAD_VALUE -> throw RuntimeException("captureThread(): AudioRecord.ERROR_BAD_VALUE")
-                            AudioRecord.ERROR_INVALID_OPERATION -> throw RuntimeException("captureThread(): AudioRecord.ERROR_INVALID_OPERATION")
+                            AudioRecord.ERROR_BAD_VALUE ->
+                                throw RuntimeException("captureThread(): AudioRecord.ERROR_BAD_VALUE")
+
+                            AudioRecord.ERROR_INVALID_OPERATION ->
+                                throw RuntimeException("captureThread(): AudioRecord.ERROR_INVALID_OPERATION")
+
                             AudioRecord.ERROR -> throw RuntimeException("captureThread(): AudioRecord.ERROR or default")
                             else -> throw RuntimeException("captureThread(): AudioRecord.ERROR or default")
                         }
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: BufferOverflowException) {
+                throw RuntimeException(e.message)
+            } catch (e: ReadOnlyBufferException) {
                 throw RuntimeException(e.message)
             } finally {
                 captureLock.unlock()
@@ -122,7 +131,7 @@ class VeraAudioDevice(
         val samplesToPlay = samplesPerBuffer
         try {
             Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO)
-        } catch (e: Exception) {
+        } catch (e: SecurityException) {
             Log.e(TAG, "Process.setThreadPriority(): " + e.message)
         }
         while (!shutdownRenderThread) {
@@ -164,14 +173,18 @@ class VeraAudioDevice(
                         estimatedRenderDelay = bufferedPlaySamples * 1000 / outputSamplingRate
                     } else {
                         when (bytesWritten) {
-                            AudioTrack.ERROR_BAD_VALUE -> throw RuntimeException("renderThread(): AudioTrack.ERROR_BAD_VALUE")
-                            AudioTrack.ERROR_INVALID_OPERATION -> throw RuntimeException("renderThread(): AudioTrack.ERROR_INVALID_OPERATION")
+                            AudioTrack.ERROR_BAD_VALUE ->
+                                throw RuntimeException("renderThread(): AudioTrack.ERROR_BAD_VALUE")
+
+                            AudioTrack.ERROR_INVALID_OPERATION ->
+                                throw RuntimeException("renderThread(): AudioTrack.ERROR_INVALID_OPERATION")
+
                             AudioTrack.ERROR -> throw RuntimeException("renderThread(): AudioTrack.ERROR or default")
                             else -> throw RuntimeException("renderThread(): AudioTrack.ERROR or default")
                         }
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: InterruptedException) {
                 throw RuntimeException(e.message)
             } finally {
                 rendererLock.unlock()
@@ -180,11 +193,7 @@ class VeraAudioDevice(
     }
 
     init {
-        try {
-            recBuffer = ByteBuffer.allocateDirect(DEFAULT_BUFFER_SIZE)
-        } catch (e: Exception) {
-            Log.e(TAG, e.message!!)
-        }
+        recBuffer = ByteBuffer.allocateDirect(DEFAULT_BUFFER_SIZE.coerceAtLeast(0))
         tempBufRec = ByteArray(DEFAULT_BUFFER_SIZE)
         audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
@@ -209,11 +218,7 @@ class VeraAudioDevice(
             }
         }
 
-        try {
-            playBuffer = ByteBuffer.allocateDirect(outputBufferSize)
-        } catch (e: Exception) {
-            Log.e(TAG, e.message!!)
-        }
+        playBuffer = ByteBuffer.allocateDirect(outputBufferSize.coerceAtLeast(0))
 
         tempBufPlay = ByteArray(outputBufferSize)
 
@@ -396,7 +401,7 @@ class VeraAudioDevice(
                 if (minPlayBufSize >= 6000) minPlayBufSize else minPlayBufSize * 2,
                 AudioTrack.MODE_STREAM
             )
-        } catch (e: Exception) {
+        } catch (e: IllegalArgumentException) {
             throw RuntimeException(e.message)
         }
 
