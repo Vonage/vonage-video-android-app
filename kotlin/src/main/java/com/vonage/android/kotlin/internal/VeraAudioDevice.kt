@@ -18,10 +18,12 @@ import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.Volatile
 
+/**
+ * From https://github.com/opentok/opentok-android-sdk-samples/blob/main/Advanced-Audio-Driver-Kotlin/app/src/main/java/com/tokbox/sample/advancedaudiodriver/AdvancedAudioDevice.java
+ * Removing bluetooth and audio output management, only contains audio capturing and rendering logic
+ */
 class VeraAudioDevice(
-    private val context: Context,
-    private val audioFocusRequester: AudioFocusRequester = AudioFocusRequester,
-    private val veraBluetoothManager: VeraBluetoothManager = VeraBluetoothManager(context),
+    context: Context,
 ) : BaseAudioDevice() {
 
     private var audioTrack: AudioTrack? = null
@@ -228,7 +230,6 @@ class VeraAudioDevice(
             AudioFormat.CHANNEL_IN_MONO,
             AudioFormat.ENCODING_PCM_16BIT
         )
-
         // double size to be more safe
         val recBufSize = minRecBufSize * 2
 
@@ -314,14 +315,7 @@ class VeraAudioDevice(
     //region Renderer
     override fun initRenderer(): Boolean {
         Log.d(TAG, "Init Renderer")
-        if (audioFocusRequester.request(audioManager)) {
-            Log.d(TAG, "Audio Focus request GRANTED !")
-        } else {
-            Log.e(TAG, "Audio Focus request DENIED !")
-        }
-
         createAudioTrack()
-
         bufferedPlaySamples = 0
         shutdownRenderThread = false
         Thread(renderThread).start()
@@ -330,8 +324,6 @@ class VeraAudioDevice(
 
     override fun startRenderer(): Boolean {
         Log.d(TAG, "Start Renderer")
-        veraBluetoothManager.onInitRenderer()
-
         checkNotNull(audioTrack) { "startRenderer(): play() called on uninitialized AudioTrack" }
         audioTrack?.play()
         rendererLock.lock()
@@ -351,15 +343,12 @@ class VeraAudioDevice(
         audioTrack?.flush()
         isRendering = false
         rendererLock.unlock()
-
-        veraBluetoothManager.onStopRenderer()
         return true
     }
 
     override fun destroyRenderer(): Boolean {
         Log.d(TAG, "Destroy Renderer")
         destroyAudioTrack()
-        veraBluetoothManager.onDestroyRenderer()
         return true
     }
     //endregion
@@ -372,43 +361,17 @@ class VeraAudioDevice(
 
     override fun getRenderSettings(): AudioSettings = rendererSettings
 
-    override fun getBluetoothState(): BluetoothState? = null
-
-    override fun setOutputMode(mode: OutputMode?): Boolean {
-        Log.d(TAG, "OutputMode set to : $mode")
-        return true
-    }
-
-    @Synchronized
     override fun onPause() {
-        veraBluetoothManager.onPause()
+        Log.d(TAG, "onPause() called")
         isPaused = true
     }
 
-    @Synchronized
     override fun onResume() {
         Log.d(TAG, "onResume() called")
         if (!isPaused) {
             return
         }
-        veraBluetoothManager.onResume()
         isPaused = false
-    }
-
-    /**
-     * Force stop Bluetooth and prevent automatic restart
-     * Called when user explicitly selects non-Bluetooth audio device
-     */
-    fun forceStopBluetooth() {
-        veraBluetoothManager.forceStopBluetooth()
-    }
-
-    /**
-     * Re-enable Bluetooth management and start it
-     * Called when user explicitly selects Bluetooth device
-     */
-    fun enableBluetoothManagement() {
-        veraBluetoothManager.enableBluetoothManagement()
     }
 
     private fun createAudioTrack() {
@@ -425,7 +388,6 @@ class VeraAudioDevice(
         }
 
         try {
-            // use AudioTrack.Builder
             audioTrack = AudioTrack(
                 AudioManager.STREAM_VOICE_CALL,
                 rendererSettings.getSampleRate(),

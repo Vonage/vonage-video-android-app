@@ -1,19 +1,25 @@
-package com.vonage.android.kotlin.internal
+package com.vonage.android.audio.util
 
+import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
-import android.media.AudioManager.AUDIOFOCUS_REQUEST_GRANTED
 import android.os.Build
+import javax.inject.Inject
 
 /**
  * Default audio focus requester
  * Using focus gain AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE
  * because the system shouldn't play any notifications and media playback should have paused
  */
-object AudioFocusRequester {
+class AudioFocusRequester @Inject constructor() {
 
     private var audioFocusRequest: AudioFocusRequest? = null
+
+    fun request(
+        context: Context
+    ): Boolean =
+        request(audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager)
 
     fun request(
         audioManager: AudioManager,
@@ -30,15 +36,14 @@ object AudioFocusRequester {
                 )
                 .setAcceptsDelayedFocusGain(false)
                 .build()
-
             audioFocusRequest?.let { focusRequest ->
-                audioManager.requestAudioFocus(focusRequest) == AUDIOFOCUS_REQUEST_GRANTED
+                audioManager.requestAudioFocus(focusRequest) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
             } ?: false
         } else {
             audioManager.requestAudioFocus(
                 null,
                 AudioManager.STREAM_VOICE_CALL,
                 AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE,
-            ) == AUDIOFOCUS_REQUEST_GRANTED
+            ) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
         }
 }

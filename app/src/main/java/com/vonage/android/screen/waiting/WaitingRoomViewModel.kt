@@ -3,7 +3,7 @@ package com.vonage.android.screen.waiting
 import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vonage.android.audio.MicVolume
+import com.vonage.android.audio.util.MicVolume
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.ext.toggle

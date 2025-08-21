@@ -4,7 +4,7 @@ import android.content.Context
 import app.cash.turbine.test
 import com.vonage.android.audio.AudioDeviceSelector.AudioDevice
 import com.vonage.android.audio.AudioDeviceSelector.AudioDeviceType
-import com.vonage.android.audio.data.DefaultAudioDeviceStore
+import com.vonage.android.audio.data.AudioDeviceStore
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -14,7 +14,7 @@ import kotlin.test.assertEquals
 class AudioDeviceSelectorTest {
 
     private val context: Context = mockk(relaxed = true)
-    private val audioDeviceStore: DefaultAudioDeviceStore = mockk()
+    private val audioDeviceStore: AudioDeviceStore = mockk()
     private val sut = AudioDeviceSelector(
         context = context,
         audioDeviceStore = audioDeviceStore,
@@ -34,7 +34,7 @@ class AudioDeviceSelectorTest {
             every { audioDeviceStore.getActiveDevice() } returns null
 
             sut.availableDevices.test {
-                sut.init()
+                sut.start()
                 awaitItem() // initial state
                 assertEquals(
                     audioDevices,
@@ -54,7 +54,7 @@ class AudioDeviceSelectorTest {
         every { audioDeviceStore.getActiveDevice() } returns speaker
 
         sut.activeDevice.test {
-            sut.init()
+            sut.start()
             awaitItem() // initial state
             assertEquals(
                 speaker,
@@ -77,7 +77,7 @@ class AudioDeviceSelectorTest {
         every { audioDeviceStore.selectDevice(headset) } returns true
 
         sut.activeDevice.test {
-            sut.init()
+            sut.start()
             awaitItem() // initial state
             assertEquals(
                 speaker,
@@ -102,7 +102,7 @@ class AudioDeviceSelectorTest {
         every { audioDeviceStore.selectDevice(headset) } returns false
 
         sut.activeDevice.test {
-            sut.init()
+            sut.start()
             awaitItem() // initial state
             awaitItem() // initial active device
             sut.selectDevice(headset)

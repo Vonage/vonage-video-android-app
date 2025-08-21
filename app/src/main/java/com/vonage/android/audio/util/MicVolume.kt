@@ -1,9 +1,8 @@
-package com.vonage.android.audio
+package com.vonage.android.audio.util
 
 import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
-import android.media.AudioRecord.RECORDSTATE_RECORDING
 import android.media.MediaRecorder
 import android.util.Log
 import kotlinx.coroutines.delay
@@ -12,6 +11,11 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import kotlin.math.sqrt
 
+/**
+ * Utility class to listen directly to the device microphone volume.
+ * It's used in waiting room to show the volume indicator,
+ * the conference room it's listening to the SDK AudioLevelListener
+ */
 @SuppressLint("MissingPermission")
 class MicVolume @Inject constructor() {
 
@@ -41,7 +45,7 @@ class MicVolume @Inject constructor() {
         val buffer = ShortArray(bufferSize)
         var bufferReadSize: Int
 
-        while (audioRecord.recordingState == RECORDSTATE_RECORDING) {
+        while (audioRecord.recordingState == AudioRecord.RECORDSTATE_RECORDING) {
             // READ_NON_BLOCKING can cause problems in Samsung Devices
             bufferReadSize = audioRecord.read(
                 buffer, 0, bufferSize, AudioRecord.READ_BLOCKING

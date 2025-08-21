@@ -15,12 +15,11 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Headset
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.QuestionMark
-import androidx.compose.material.icons.filled.Speaker
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -114,7 +113,7 @@ private fun AudioDeviceCell(
         )
 
         Text(
-            text = audioDevice.type.toLabel(),
+            text = audioDevice.toLabel(),
             color = if (isSelected) selectedColor else defaultColor,
             style = VonageVideoTheme.typography.body,
             maxLines = 1,
@@ -124,10 +123,10 @@ private fun AudioDeviceCell(
 }
 
 @Composable
-private fun AudioDeviceType.toLabel(): String =
-    when (this) {
+private fun AudioDevice.toLabel(): String =
+    when (this.type) {
         AudioDeviceType.EARPIECE -> stringResource(R.string.audio_device_selector_earpiece_audio_device)
-        AudioDeviceType.BLUETOOTH -> stringResource(R.string.audio_device_selector_bluetooth_audio_device)
+        AudioDeviceType.BLUETOOTH -> this.name.ifBlank { stringResource(R.string.audio_device_selector_bluetooth_audio_device) }
         AudioDeviceType.SPEAKER -> stringResource(R.string.audio_device_selector_speaker_audio_device)
         AudioDeviceType.HEADSET -> stringResource(R.string.audio_device_selector_headset_audio_device)
         else -> ""
@@ -137,12 +136,11 @@ internal fun AudioDeviceType.toImageVector(): ImageVector =
     when (this) {
         AudioDeviceType.EARPIECE -> Icons.Default.Phone
         AudioDeviceType.BLUETOOTH -> Icons.Default.Bluetooth
-        AudioDeviceType.SPEAKER -> Icons.Default.Speaker
+        AudioDeviceType.SPEAKER -> Icons.AutoMirrored.Default.VolumeUp
         AudioDeviceType.HEADSET -> Icons.Default.Headset
         else -> Icons.Default.QuestionMark
     }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @PreviewLightDark
 @Composable
 internal fun AudioDeviceListPreview() {
@@ -150,7 +148,7 @@ internal fun AudioDeviceListPreview() {
         AudioDeviceList(
             modifier = Modifier.background(VonageVideoTheme.colors.surface),
             availableDevices = listOf(
-                AudioDevice(1, AudioDeviceType.BLUETOOTH),
+                AudioDevice(1, AudioDeviceType.BLUETOOTH, "Sony XC3"),
                 AudioDevice(2, AudioDeviceType.EARPIECE),
                 AudioDevice(3, AudioDeviceType.SPEAKER),
                 AudioDevice(4, AudioDeviceType.HEADSET),

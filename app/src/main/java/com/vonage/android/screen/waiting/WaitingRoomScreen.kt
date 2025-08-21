@@ -60,7 +60,9 @@ fun WaitingRoomScreen(
                     onDismissRequest = { showAudioDeviceSelector = false },
                     sheetState = sheetState,
                 ) {
-                    AudioDevicesHandler { showAudioDeviceSelector = false }
+                    AudioDevicesHandler(
+                        onDismissRequest = { showAudioDeviceSelector = false },
+                    )
                 }
             }
 

@@ -1,12 +1,10 @@
-package com.vonage.android.kotlin.internal
+package com.vonage.android.audio.data.bluetooth
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothHeadset
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
-import android.bluetooth.BluetoothProfile.STATE_CONNECTED
-import android.bluetooth.BluetoothProfile.STATE_DISCONNECTED
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -15,25 +13,22 @@ import android.media.AudioManager
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import javax.inject.Inject
 
-class VeraBluetoothManager(
+class VeraBluetoothManager @Inject constructor(
     private val context: Context,
 ) {
-    private val bluetoothManager: BluetoothManager
-    private val audioManager: AudioManager
-    private val bluetoothAdapter: BluetoothAdapter?
-    private var bluetoothProfile: BluetoothProfile?
+
+    private val bluetoothManager: BluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+    private val audioManager: AudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    private val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
+    private var bluetoothProfile: BluetoothProfile? = null
     private val bluetoothLock = Any()
 
     private var isBluetoothHeadSetReceiverRegistered = false
     private var isHeadsetReceiverRegistered = false
 
-    init {
-        audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        bluetoothAdapter = bluetoothManager.adapter
-        bluetoothProfile = null
-    }
+    private val mainLooper = Handler(Looper.getMainLooper())
 
     private val wiredHeadsetBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -53,18 +48,18 @@ class VeraBluetoothManager(
     }
 
     private val bluetoothBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
+        override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
             if (action != null && action == BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED) {
                 intent.getIntExtra(BluetoothHeadset.EXTRA_STATE, -1).let { state ->
                     when (state) {
-                        STATE_CONNECTED -> {
+                        BluetoothProfile.STATE_CONNECTED -> {
                             Log.d(TAG, "bluetoothBroadcastReceiver.onReceive(): BluetoothHeadset.STATE_CONNECTED")
-                            Handler(Looper.getMainLooper())
+                            mainLooper
                                 .postDelayed(Runnable { startBluetooth() }, DEFAULT_BLUETOOTH_SCO_START_DELAY)
                         }
 
-                        STATE_DISCONNECTED -> {
+                        BluetoothProfile.STATE_DISCONNECTED -> {
                             Log.d(TAG, "bluetoothBroadcastReceiver.onReceive(): BluetoothHeadset.STATE_DISCONNECTED")
                             stopBluetooth()
                         }
@@ -72,7 +67,7 @@ class VeraBluetoothManager(
                         else -> {}
                     }
                 }
-            } else if (null != action && action == AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED) {
+            } else if (action != null && action == AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED) {
                 val state = intent.getIntExtra(AudioManager.EXTRA_SCO_AUDIO_STATE, -1)
                 when (state) {
                     AudioManager.SCO_AUDIO_STATE_CONNECTED -> {
@@ -81,7 +76,6 @@ class VeraBluetoothManager(
 
                     AudioManager.SCO_AUDIO_STATE_DISCONNECTED -> {
                         Log.d(TAG, "bluetoothBroadcastReceiver.onReceive(): AudioManager.SCO_AUDIO_STATE_DISCONNECTED")
-                        // restoreAudioAfterBluetoothDisconnect()
                     }
 
                     else -> {}
@@ -97,17 +91,15 @@ class VeraBluetoothManager(
             if (type == BluetoothProfile.HEADSET) {
                 bluetoothProfile = profile
                 val devices = profile.connectedDevices
-
                 devices.forEach { device ->
                     Log.d(TAG, "Bluetooth ${device.name} connected")
                 }
-
-                if (!devices.isEmpty() && profile.getConnectionState(devices[0]) == STATE_CONNECTED) {
+                if (!devices.isEmpty() && profile.getConnectionState(devices[0]) == BluetoothProfile.STATE_CONNECTED) {
                     // Force a init of bluetooth: the handler will not send a connected event if a
                     // device is already connected at the time of proxy connection request.
                     val intent = Intent(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
                         .apply {
-                            putExtra(BluetoothHeadset.EXTRA_STATE, STATE_CONNECTED)
+                            putExtra(BluetoothHeadset.EXTRA_STATE, BluetoothProfile.STATE_CONNECTED)
                         }
                     bluetoothBroadcastReceiver.onReceive(context, intent)
                 }
@@ -135,18 +127,18 @@ class VeraBluetoothManager(
      * Force stop Bluetooth and prevent automatic restart
      * Used when user explicitly selects non-Bluetooth audio device
      */
-    fun forceStopBluetooth() {
+    fun userDisableBluetooth() {
         Log.d(TAG, "forceStopBluetooth called - user selected non-Bluetooth device")
         stopBluetooth()
         // Unregister receivers temporarily to prevent automatic restart
-        unregisterBtReceiver()
+        unregisterBluetoothReceiver()
     }
 
     /**
      * Re-enable Bluetooth management after it was force stopped
      * Used when user explicitly selects Bluetooth device
      */
-    fun enableBluetoothManagement() {
+    fun userEnableBluetooth() {
         Log.d(TAG, "enableBluetoothManagement called - user selected Bluetooth device")
         registerBtReceiver()
         startBluetooth()
@@ -170,12 +162,9 @@ class VeraBluetoothManager(
         if (bluetoothProfile != null && bluetoothAdapter != null) {
             bluetoothAdapter.closeProfileProxy(BluetoothProfile.HEADSET, bluetoothProfile)
         }
-
-        unregisterBtReceiver()
-
         // Force a shutdown of bluetooth: when a call comes in, the handler is not invoked by system.
         val intent = Intent(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
-        intent.putExtra(BluetoothHeadset.EXTRA_STATE, STATE_DISCONNECTED)
+        intent.putExtra(BluetoothHeadset.EXTRA_STATE, BluetoothProfile.STATE_DISCONNECTED)
         bluetoothBroadcastReceiver.onReceive(context, intent)
     }
 
@@ -193,7 +182,7 @@ class VeraBluetoothManager(
         isBluetoothHeadSetReceiverRegistered = true
     }
 
-    private fun unregisterBtReceiver() {
+    private fun unregisterBluetoothReceiver() {
         Log.d(TAG, "unregisterBtReceiver() called .. bluetoothHeadSetReceiverRegistered = $isBluetoothHeadSetReceiverRegistered")
         if (!isBluetoothHeadSetReceiverRegistered) {
             return
@@ -204,11 +193,9 @@ class VeraBluetoothManager(
 
     private fun registerHeadsetReceiver() {
         Log.d(TAG, "registerHeadsetReceiver() called ... isHeadsetReceiverRegistered = $isHeadsetReceiverRegistered")
-
         if (isHeadsetReceiverRegistered) {
             return
         }
-
         context.registerReceiver(wiredHeadsetBroadcastReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
         isHeadsetReceiverRegistered = true
     }
@@ -222,34 +209,17 @@ class VeraBluetoothManager(
         isHeadsetReceiverRegistered = false
     }
 
-    fun onPause() {
-        Log.d(TAG, "onPause")
-        unregisterBtReceiver()
-        unregisterHeadsetReceiver()
-    }
-
-    fun onResume() {
-        Log.d(TAG, "onResume")
-        registerBtReceiver()
-        registerHeadsetReceiver()
-    }
-
-    fun onStopRenderer() {
-        unregisterHeadsetReceiver()
-        unregisterBtReceiver()
-    }
-
-    fun onDestroyRenderer() {
-        disableBluetoothEvents()
-        unregisterHeadsetReceiver()
-        audioManager.setSpeakerphoneOn(false)
-    }
-
-    fun onInitRenderer() {
+    fun onStart() {
         if (audioManager.isBluetoothScoAvailableOffCall) {
             registerBtReceiver()
             registerHeadsetReceiver()
         }
+    }
+
+    fun onStop() {
+        unregisterBluetoothReceiver()
+        unregisterHeadsetReceiver()
+        disableBluetoothEvents()
     }
 
     companion object {

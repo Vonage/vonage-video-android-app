@@ -1,7 +1,7 @@
 package com.vonage.android.screen.waiting
 
 import app.cash.turbine.test
-import com.vonage.android.audio.MicVolume
+import com.vonage.android.audio.util.MicVolume
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.BlurLevel

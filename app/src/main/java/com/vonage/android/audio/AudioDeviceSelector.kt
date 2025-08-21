@@ -1,9 +1,10 @@
 package com.vonage.android.audio
 
 import android.content.Context
+import android.util.Log
 import com.vonage.android.audio.data.AudioDeviceStore
-import com.vonage.android.audio.data.DefaultAudioDeviceStore
-import com.vonage.android.kotlin.internal.VeraAudioDevice
+import com.vonage.android.audio.util.AudioFocusRequester
+import com.vonage.android.kotlin.internal.VeraAudioDevice.Companion.TAG
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -14,13 +15,14 @@ import javax.inject.Inject
 
 class AudioDeviceSelector @Inject constructor(
     private val context: Context,
-    private val veraAudioDevice: VeraAudioDevice,
-    private val audioDeviceStore: AudioDeviceStore = DefaultAudioDeviceStore(context, veraAudioDevice = veraAudioDevice),
+    private val audioDeviceStore: AudioDeviceStore,
+    private val audioFocusRequester: AudioFocusRequester,
 ) {
 
     data class AudioDevice(
         val id: Int,
         val type: AudioDeviceType,
+        val name: String = "",
     )
 
     enum class AudioDeviceType {
@@ -37,9 +39,20 @@ class AudioDeviceSelector @Inject constructor(
     private val _activeDevice = MutableStateFlow<AudioDevice?>(null)
     val activeDevice: StateFlow<AudioDevice?> = _activeDevice.asStateFlow()
 
-    fun init() {
+    fun start() {
+        if (audioFocusRequester.request(context)) {
+            Log.d(TAG, "Audio Focus request GRANTED !")
+        } else {
+            Log.e(TAG, "Audio Focus request DENIED !")
+        }
+        audioDeviceStore.start()
+
         populateAvailableDevices()
         setActiveDevice()
+    }
+
+    fun stop() {
+        audioDeviceStore.stop()
     }
 
     fun selectDevice(device: AudioDevice) {
