@@ -16,8 +16,7 @@ import com.vonage.android.di.VeraAudioEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 
 @Composable
-fun AudioDevicesHandler(
-    onDismissRequest: () -> Unit,
+fun AudioDevicesEffect(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
     val context = LocalContext.current
@@ -36,6 +35,14 @@ fun AudioDevicesHandler(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
+}
+
+@Composable
+fun AudioDevices(
+    onDismissRequest: () -> Unit,
+) {
+    val context = LocalContext.current
+    val audioDeviceSelector = rememberAudioDeviceSelector(context)
 
     val availableDevices by audioDeviceSelector.availableDevices.collectAsStateWithLifecycle()
     val activeDevice by audioDeviceSelector.activeDevice.collectAsStateWithLifecycle()

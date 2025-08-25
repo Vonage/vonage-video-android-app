@@ -30,7 +30,7 @@ class AudioDeviceStoreTest {
 
     private val earpiece = AudioDevice(1, AudioDeviceType.EARPIECE)
     private val speaker = AudioDevice(2, AudioDeviceType.SPEAKER)
-    private val headset = AudioDevice(3, AudioDeviceType.HEADSET)
+    private val headset = AudioDevice(3, AudioDeviceType.WIRED_HEADSET)
     private val bluetooth = AudioDevice(7, AudioDeviceType.BLUETOOTH)
 
     @Test

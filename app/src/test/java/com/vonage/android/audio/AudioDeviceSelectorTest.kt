@@ -4,7 +4,6 @@ import android.content.Context
 import app.cash.turbine.test
 import com.vonage.android.audio.AudioDeviceSelector.AudioDevice
 import com.vonage.android.audio.AudioDeviceSelector.AudioDeviceType
-import com.vonage.android.audio.data.AudioDeviceStore
 import com.vonage.android.audio.util.AudioFocusRequester
 import io.mockk.every
 import io.mockk.mockk
@@ -25,7 +24,7 @@ class AudioDeviceSelectorTest {
         audioFocusRequester = audioFocusRequester,
     )
 
-    private val headset = AudioDevice(1, AudioDeviceType.HEADSET)
+    private val headset = AudioDevice(1, AudioDeviceType.WIRED_HEADSET)
     private val speaker = AudioDevice(2, AudioDeviceType.SPEAKER)
 
     @Test

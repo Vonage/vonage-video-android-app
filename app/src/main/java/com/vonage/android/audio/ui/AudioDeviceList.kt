@@ -19,7 +19,6 @@ import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Headset
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -126,13 +125,9 @@ private fun AudioDeviceCell(
 private fun AudioDevice.toLabel(): String =
     when (this.type) {
         AudioDeviceType.EARPIECE -> stringResource(R.string.audio_device_selector_earpiece_audio_device)
-        AudioDeviceType.BLUETOOTH -> this.name.ifBlank {
-            stringResource(R.string.audio_device_selector_bluetooth_audio_device)
-        }
-
+        AudioDeviceType.BLUETOOTH -> stringResource(R.string.audio_device_selector_bluetooth_audio_device)
         AudioDeviceType.SPEAKER -> stringResource(R.string.audio_device_selector_speaker_audio_device)
-        AudioDeviceType.HEADSET -> stringResource(R.string.audio_device_selector_headset_audio_device)
-        else -> ""
+        AudioDeviceType.WIRED_HEADSET -> stringResource(R.string.audio_device_selector_headset_audio_device)
     }
 
 internal fun AudioDeviceType.toImageVector(): ImageVector =
@@ -140,8 +135,7 @@ internal fun AudioDeviceType.toImageVector(): ImageVector =
         AudioDeviceType.EARPIECE -> Icons.Default.Phone
         AudioDeviceType.BLUETOOTH -> Icons.Default.Bluetooth
         AudioDeviceType.SPEAKER -> Icons.AutoMirrored.Default.VolumeUp
-        AudioDeviceType.HEADSET -> Icons.Default.Headset
-        else -> Icons.Default.QuestionMark
+        AudioDeviceType.WIRED_HEADSET -> Icons.Default.Headset
     }
 
 @PreviewLightDark
@@ -151,10 +145,10 @@ internal fun AudioDeviceListPreview() {
         AudioDeviceList(
             modifier = Modifier.background(VonageVideoTheme.colors.surface),
             availableDevices = listOf(
-                AudioDevice(1, AudioDeviceType.BLUETOOTH, "Sony XC3"),
+                AudioDevice(1, AudioDeviceType.BLUETOOTH),
                 AudioDevice(2, AudioDeviceType.EARPIECE),
                 AudioDevice(3, AudioDeviceType.SPEAKER),
-                AudioDevice(4, AudioDeviceType.HEADSET),
+                AudioDevice(4, AudioDeviceType.WIRED_HEADSET),
             ),
             activeDevice = AudioDevice(3, AudioDeviceType.SPEAKER),
             selectDevice = {},

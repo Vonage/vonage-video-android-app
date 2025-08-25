@@ -22,7 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
-import com.vonage.android.audio.AudioDevicesHandler
+import com.vonage.android.audio.AudioDevices
+import com.vonage.android.audio.AudioDevicesEffect
 import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.BlurLevel
@@ -40,6 +41,8 @@ fun WaitingRoomScreen(
 ) {
     val sheetState = rememberModalBottomSheetState()
     var showAudioDeviceSelector by remember { mutableStateOf(false) }
+
+    AudioDevicesEffect()
 
     Scaffold(
         modifier = modifier,
@@ -60,7 +63,7 @@ fun WaitingRoomScreen(
                     onDismissRequest = { showAudioDeviceSelector = false },
                     sheetState = sheetState,
                 ) {
-                    AudioDevicesHandler(
+                    AudioDevices(
                         onDismissRequest = { showAudioDeviceSelector = false },
                     )
                 }

@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
+import com.vonage.android.audio.AudioDevicesEffect
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
@@ -73,6 +74,8 @@ fun MeetingRoomScreen(
     LaunchedEffect(navigator.scaffoldValue) {
         actions.onListenUnread(navigator.isExtraPaneShow().not())
     }
+
+    AudioDevicesEffect()
 
     val isChatShow by remember(navigator.scaffoldValue) {
         derivedStateOf { navigator.isExtraPaneShow() }
