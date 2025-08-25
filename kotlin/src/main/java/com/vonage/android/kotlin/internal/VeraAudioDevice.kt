@@ -210,7 +210,7 @@ class VeraAudioDevice(
             samplesPerBuffer = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER).toInt()
             outputBufferSize = (SAMPLE_SIZE_IN_BYTES * samplesPerBuffer * NUM_CHANNELS_RENDERING)
         } catch (numberFormatException: NumberFormatException) {
-            Log.e(TAG, "DefaultAudioDevice(): " + numberFormatException.message)
+            Log.e(TAG, "VeraAudioDevice(): " + numberFormatException.message)
         } finally {
             if (outputBufferSize == 0) {
                 outputBufferSize = DEFAULT_BUFFER_SIZE

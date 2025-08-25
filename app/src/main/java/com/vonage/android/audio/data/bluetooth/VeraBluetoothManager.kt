@@ -1,5 +1,6 @@
 package com.vonage.android.audio.data.bluetooth
 
+import android.Manifest.permission
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothHeadset
@@ -10,7 +11,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.media.AudioManager
+import android.os.Build
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -119,11 +122,13 @@ class VeraBluetoothManager @Inject constructor(
     }
 
     init {
-        bluetoothAdapter.getProfileProxy(
-            context,
-            bluetoothProfileServiceListener,
-            BluetoothProfile.HEADSET,
-        )
+        if (checkPermission()) {
+            bluetoothAdapter.getProfileProxy(
+                context,
+                bluetoothProfileServiceListener,
+                BluetoothProfile.HEADSET,
+            )
+        }
     }
 
     fun startBluetooth() {
@@ -197,13 +202,17 @@ class VeraBluetoothManager @Inject constructor(
     private fun closeBluetoothProfile() {
         Log.d(TAG, "disable bluetooth events")
         bluetoothProfile?.let {
-            bluetoothAdapter.closeProfileProxy(BluetoothProfile.HEADSET, bluetoothProfile)
+            bluetoothAdapter.closeProfileProxy(BluetoothProfile.HEADSET, it)
         }
         // Force a shutdown of bluetooth: when a call comes in, the handler is not invoked by system.
         val intent = Intent(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
         intent.putExtra(BluetoothHeadset.EXTRA_STATE, BluetoothProfile.STATE_DISCONNECTED)
         bluetoothBroadcastReceiver.onReceive(context, intent)
     }
+
+    private fun checkPermission(): Boolean =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+                context.checkSelfPermission(permission.BLUETOOTH_CONNECT) == PERMISSION_GRANTED
 
     companion object {
         const val TAG = "VeraBluetoothManager"

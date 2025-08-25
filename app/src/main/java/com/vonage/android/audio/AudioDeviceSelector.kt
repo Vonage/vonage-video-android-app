@@ -66,15 +66,9 @@ class AudioDeviceSelector @Inject constructor(
             setActiveDevice()
 
             bluetoothManager.bluetoothStates.collect { bluetoothState ->
-                when (bluetoothState) {
-                    is VeraBluetoothManager.BluetoothState.AudioConnected,
-                    is VeraBluetoothManager.BluetoothState.Connected,
-                    is VeraBluetoothManager.BluetoothState.Disconnected -> {
-                        currentDevice.reset()
-                        populateAvailableDevices()
-                        setActiveDevice()
-                    }
-                }
+                currentDevice.reset()
+                populateAvailableDevices()
+                setActiveDevice()
             }
         }
     }
