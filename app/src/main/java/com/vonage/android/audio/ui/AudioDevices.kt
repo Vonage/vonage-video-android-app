@@ -1,4 +1,4 @@
-package com.vonage.android.audio
+package com.vonage.android.audio.ui
 
 import android.content.Context
 import androidx.compose.runtime.Composable
@@ -11,7 +11,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.vonage.android.audio.ui.AudioDeviceList
 import com.vonage.android.di.VeraAudioEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 

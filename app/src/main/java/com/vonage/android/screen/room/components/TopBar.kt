@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
-import com.vonage.android.audio.rememberAudioDeviceSelector
+import com.vonage.android.audio.ui.rememberAudioDeviceSelector
 import com.vonage.android.audio.ui.toImageVector
 import com.vonage.android.compose.icons.AudioSelectorIcon
 import com.vonage.android.compose.icons.CameraSwitchIcon

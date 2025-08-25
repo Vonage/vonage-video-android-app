@@ -1,17 +1,16 @@
 package com.vonage.android.audio
 
-import android.content.Context
 import android.util.Log
+import com.vonage.android.audio.data.CurrentDevice
 import com.vonage.android.audio.data.GetDevices
-import com.vonage.android.audio.data.SelectDevice
 import com.vonage.android.audio.data.bluetooth.VeraBluetoothManager
 import com.vonage.android.audio.util.AudioFocusRequester
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.vonage.android.di.DefaultDispatcher
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,14 +21,14 @@ import javax.inject.Singleton
 
 @Singleton
 class AudioDeviceSelector @Inject constructor(
-    @param:ApplicationContext private val context: Context,
     private val audioFocusRequester: AudioFocusRequester,
     private val bluetoothManager: VeraBluetoothManager,
     private val getDevicesCommand: GetDevices,
-    private val currentDevice: SelectDevice,
+    private val currentDevice: CurrentDevice,
+    @param:DefaultDispatcher private val dispatcher: CoroutineDispatcher,
 ) {
 
-    val coroutineScope = CoroutineScope(Dispatchers.Default)
+    val coroutineScope = CoroutineScope(dispatcher)
 
     data class AudioDevice(
         val id: Int,
@@ -58,9 +57,9 @@ class AudioDeviceSelector @Inject constructor(
     )
 
     fun start() {
-        Log.d("AudioDeviceSelector", "start")
+        Log.d(TAG, "start")
         coroutineScope.launch {
-            audioFocusRequester.request(context)
+            audioFocusRequester.request()
             bluetoothManager.onStart()
 
             populateAvailableDevices()
@@ -81,40 +80,28 @@ class AudioDeviceSelector @Inject constructor(
     }
 
     fun stop() {
-        Log.d("AudioDeviceSelector", "stop")
-        coroutineScope.launch {
-            bluetoothManager.onStop()
-        }
+        Log.d(TAG, "stop")
+        bluetoothManager.onStop()
     }
 
     fun selectDevice(device: AudioDevice) {
-        coroutineScope.launch {
-            currentDevice.userSelectDevice(device)
-                .takeIf { it }
-                ?.let {
-                    _activeDevice.value = AudioDevice(
-                        id = device.id,
-                        type = device.type,
-                    )
-                }
-        }
+        currentDevice.userSelectDevice(device)
+            .takeIf { it }
+            ?.let { _activeDevice.value = device }
     }
 
     private fun populateAvailableDevices() {
-        coroutineScope.launch {
-            getDevicesCommand()
-                .let { _availableDevices.value = it.toImmutableList() }
-        }
+        getDevicesCommand()
+            .let { _availableDevices.value = it.toImmutableList() }
     }
 
     private fun setActiveDevice() {
-        coroutineScope.launch {
-            currentDevice.activeDevice()
-                ?.let { device -> _activeDevice.value = device }
-        }
+        currentDevice.getCurrentActiveDevice()
+            ?.let { device -> _activeDevice.value = device }
     }
 
     private companion object {
+        const val TAG = "AudioDeviceSelector"
         const val STOP_TIMEOUT_MILLIS = 2000L
     }
 }

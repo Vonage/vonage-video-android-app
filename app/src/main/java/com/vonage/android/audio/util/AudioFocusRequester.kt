@@ -1,6 +1,5 @@
 package com.vonage.android.audio.util
 
-import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
@@ -12,17 +11,13 @@ import javax.inject.Inject
  * Using focus gain AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE by default
  * because the system shouldn't play any notifications and media playback should have paused
  */
-class AudioFocusRequester @Inject constructor() {
+class AudioFocusRequester @Inject constructor(
+    private val audioManager: AudioManager,
+) {
 
     private var audioFocusRequest: AudioFocusRequest? = null
 
     fun request(
-        context: Context
-    ): Boolean =
-        request(audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager)
-
-    fun request(
-        audioManager: AudioManager,
         focusGain: Int = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE,
     ): Boolean =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

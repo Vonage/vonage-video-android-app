@@ -42,10 +42,10 @@ class GetDevices @Inject constructor(
         return devices
     }
 
-    fun hasEarpiece(): Boolean =
+    private fun hasEarpiece(): Boolean =
         context.packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)
 
-    fun hasSpeaker(): Boolean =
+    private fun hasSpeaker(): Boolean =
         if (BuildConfigWrapper.sdkVersion() >= Build.VERSION_CODES.M
             && context.packageManager.hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT)
         ) {

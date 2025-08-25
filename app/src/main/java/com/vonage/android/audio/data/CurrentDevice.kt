@@ -6,7 +6,7 @@ import com.vonage.android.audio.AudioDeviceSelector.AudioDeviceType
 import com.vonage.android.audio.data.bluetooth.VeraBluetoothManager
 import javax.inject.Inject
 
-class SelectDevice @Inject constructor(
+class CurrentDevice @Inject constructor(
     private val bluetoothManager: VeraBluetoothManager,
     private val audioManager: AudioManager,
     private val getDevices: GetDevices,
@@ -20,13 +20,16 @@ class SelectDevice @Inject constructor(
         return true
     }
 
-    fun activeDevice(): AudioDevice? {
+    fun getCurrentActiveDevice(): AudioDevice? {
         if (userSelectedDevice != null) {
             return userSelectedDevice
         } else {
             val availableDevices = getDevices()
-            performSwitchTo(availableDevices[0])
-            return availableDevices[0]
+            availableDevices.firstOrNull()?.let { firstDevice ->
+                performSwitchTo(firstDevice)
+                return firstDevice
+            }
+            return null
         }
     }
 
@@ -36,10 +39,6 @@ class SelectDevice @Inject constructor(
             AudioDeviceType.WIRED_HEADSET -> {
                 bluetoothManager.stopBluetooth()
                 audioManager.apply {
-                    if (isBluetoothScoOn) {
-                        stopBluetoothSco()
-                    }
-                    isBluetoothScoOn = false
                     isSpeakerphoneOn = false
                     mode = AudioManager.MODE_IN_COMMUNICATION
                 }
@@ -48,21 +47,15 @@ class SelectDevice @Inject constructor(
             AudioDeviceType.BLUETOOTH -> {
                 bluetoothManager.startBluetooth()
                 audioManager.apply {
-                    isBluetoothScoOn = true
                     isSpeakerphoneOn = false
                     mode = AudioManager.MODE_IN_COMMUNICATION
-                    startBluetoothSco()
                 }
             }
 
             AudioDeviceType.SPEAKER -> {
                 bluetoothManager.stopBluetooth()
                 audioManager.apply {
-                    isBluetoothScoOn = false
                     isSpeakerphoneOn = true
-                    if (isBluetoothScoOn) {
-                        stopBluetoothSco()
-                    }
                     mode = AudioManager.MODE_IN_COMMUNICATION
                 }
             }

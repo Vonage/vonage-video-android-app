@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
-import com.vonage.android.audio.AudioDevicesEffect
+import com.vonage.android.audio.ui.AudioDevicesEffect
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
