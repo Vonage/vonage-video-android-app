@@ -18,10 +18,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun RecordingIndicator() {
+fun RecordingIndicator(
+    modifier: Modifier = Modifier,
+) {
     Pulsating {
         Icon(
-            modifier = Modifier
+            modifier = modifier
                 .padding(end = 4.dp),
             imageVector = Icons.Default.FiberManualRecord,
             tint = Color.Red,
@@ -31,19 +33,24 @@ fun RecordingIndicator() {
 }
 
 @Composable
-fun Pulsating(pulseFraction: Float = 1.2f, content: @Composable () -> Unit) {
+fun Pulsating(
+    modifier: Modifier = Modifier,
+    pulseFraction: Float = 1.2f,
+    durationMillis: Int = 1000,
+    content: @Composable () -> Unit,
+) {
     val infiniteTransition = rememberInfiniteTransition()
 
     val scale by infiniteTransition.animateFloat(
         initialValue = 1f,
         targetValue = pulseFraction,
         animationSpec = infiniteRepeatable(
-            animation = tween(1000),
+            animation = tween(durationMillis),
             repeatMode = RepeatMode.Reverse
         )
     )
 
-    Box(modifier = Modifier.scale(scale)) {
+    Box(modifier = modifier.scale(scale)) {
         content()
     }
 }

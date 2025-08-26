@@ -30,13 +30,6 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.screen.room.MeetingRoomActions
 
-data class ExtraAction(
-    val id: Int,
-    val icon: ImageVector,
-    val label: String,
-    val onClick: () -> Unit,
-)
-
 @Composable
 fun MoreActionsGrid(
     isRecording: Boolean,
@@ -128,6 +121,13 @@ private fun ActionCell(
         )
     }
 }
+
+data class ExtraAction(
+    val id: Int,
+    val icon: ImageVector,
+    val label: String,
+    val onClick: () -> Unit,
+)
 
 @PreviewLightDark
 @Composable

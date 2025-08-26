@@ -30,8 +30,8 @@ import kotlinx.collections.immutable.persistentListOf
 @Composable
 fun GoodbyeScreen(
     actions: GoodbyeScreenActions,
-    modifier: Modifier = Modifier,
     uiState: GoodbyeScreenUiState,
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier,

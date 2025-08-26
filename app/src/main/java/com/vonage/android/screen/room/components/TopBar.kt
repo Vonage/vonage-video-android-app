@@ -1,7 +1,5 @@
 package com.vonage.android.screen.room.components
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.animateBounds
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack

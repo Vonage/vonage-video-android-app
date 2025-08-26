@@ -6,7 +6,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.data.Archive
@@ -17,9 +16,10 @@ fun GoodbyeScreenRoute(
     navigateToMeeting: (String) -> Unit,
     navigateToLanding: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: GoodbyeScreenViewModel = hiltViewModel<GoodbyeScreenViewModel, GoodbyeScreenViewModelFactory> { factory ->
-        factory.create(roomName)
-    },
+    viewModel: GoodbyeScreenViewModel =
+        hiltViewModel<GoodbyeScreenViewModel, GoodbyeScreenViewModelFactory> { factory ->
+            factory.create(roomName)
+        },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

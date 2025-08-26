@@ -31,7 +31,7 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
     private val _uiState = MutableStateFlow<GoodbyeScreenUiState>(GoodbyeScreenUiState.Idle)
     val uiState: StateFlow<GoodbyeScreenUiState> = _uiState.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
         initialValue = GoodbyeScreenUiState.Idle,
     )
 
@@ -50,7 +50,7 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
                             )
                         }
                 },
-            ).poll(2000).collect()
+            ).poll(POLLING_DELAY).collect()
         }
     }
 
@@ -60,6 +60,11 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
                 url = archive.url,
             )
         }
+    }
+
+    private companion object {
+        const val POLLING_DELAY = 2000L
+        const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
     }
 }
 

@@ -2,7 +2,6 @@ package com.vonage.android.screen.room
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vonage.android.data.ArchiveRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
