@@ -1,7 +1,5 @@
 package com.vonage.android.kotlin.signal
 
-import android.util.Log
-import androidx.compose.runtime.internal.illegalDecoyCallException
 import com.opentok.android.Session
 import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.SignalStateContent
@@ -16,7 +14,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.random.Random
 
 class ReactionSignalPlugin(
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
@@ -28,7 +25,7 @@ class ReactionSignalPlugin(
 
     override fun canHandle(signalType: String): Boolean = signalType == SignalType.REACTION.signal
 
-    override fun handleSignal(type: String, data: String, callback: (SignalStateContent) -> Unit): EmojiState? {
+    override fun handleSignal(type: String, data: String, senderName: String, isYou: Boolean, callback: (SignalStateContent) -> Unit): SignalStateContent? {
         if (!canHandle(type)) return null
 
         val reactionSignal = try {
@@ -37,12 +34,15 @@ class ReactionSignalPlugin(
             return null
         }
 
-        Log.d("XXX", reactionSignal.emoji)
-        reactions.add(0, EmojiReaction(
-            id = reactionSignal.time,
-            emoji = reactionSignal.emoji,
-            startTime = reactionSignal.time,
-        ))
+        reactions.add(
+            0, EmojiReaction(
+                id = reactionSignal.time,
+                emoji = reactionSignal.emoji,
+                startTime = reactionSignal.time,
+                sender = senderName,
+                isYou = isYou,
+            )
+        )
 
         // remove reaction after 3 seconds
         coroutineScope.launch {
@@ -70,6 +70,8 @@ class ReactionSignalPlugin(
 data class EmojiReaction(
     val id: Long,
     val emoji: String,
+    val sender: String,
+    val isYou: Boolean,
     val startTime: Long,
 )
 

@@ -7,6 +7,7 @@ import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
+import com.vonage.android.kotlin.ext.extractSenderName
 import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
@@ -93,7 +94,14 @@ class Call internal constructor(
         session.setSessionListener(sessionListener)
         session.setSignalListener { session, type, data, conn ->
             signalPlugins.forEach { plugin ->
-                plugin.handleSignal(type, data) { state ->
+                val isYou = publisherHolder.publisher.stream.connection == conn
+                val senderName = if (!isYou) {
+                    conn.extractSenderName(subscriberStreams.values)
+                } else {
+                    ""
+                }
+
+                plugin.handleSignal(type, data, senderName, isYou) { state ->
                     updateSignals(type, state)
                 }?.let { state ->
                     updateSignals(type, state)

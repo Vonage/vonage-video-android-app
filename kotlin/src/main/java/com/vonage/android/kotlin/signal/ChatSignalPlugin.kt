@@ -20,7 +20,7 @@ class ChatSignalPlugin : SignalPlugin {
 
     override fun canHandle(signalType: String): Boolean = signalType == SignalType.CHAT.signal
 
-    override fun handleSignal(type: String, data: String, callback: (SignalStateContent) -> Unit): ChatState? {
+    override fun handleSignal(type: String, data: String, senderName: String, isYou: Boolean, callback: (SignalStateContent) -> Unit): SignalStateContent? {
         if (!canHandle(type)) return null
 
         val chatSignal = try {

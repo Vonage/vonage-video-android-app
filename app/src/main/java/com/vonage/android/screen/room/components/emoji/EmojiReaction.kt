@@ -1,6 +1,5 @@
 package com.vonage.android.screen.room.components.emoji
 
-import android.util.Log
 import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntOffsetAsState
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.signal.EmojiReaction
 import kotlin.random.Random
@@ -44,24 +46,19 @@ fun EmojiReactionOverlay(
     reactions: List<EmojiReaction>,
     modifier: Modifier = Modifier,
 ) {
-    Log.d("EmojiReaction", "EmojiReactionOverlay called with ${reactions.size} reactions")
-
     var size by remember { mutableStateOf(IntSize.Zero) }
 
     Box(
         modifier = modifier
             .zIndex(9F)
             .fillMaxSize()
-            .onSizeChanged {
-                size = it
-            },
+            .onSizeChanged { size = it },
         contentAlignment = Alignment.BottomStart,
     ) {
         reactions.forEach { reaction ->
-            Log.d("EmojiReaction", "Rendering reaction: ${reaction.emoji} with id: ${reaction.id}")
             key(reaction.id) {
                 EmojiAnimationItem(
-                    emoji = reaction.emoji,
+                    emojiReaction = reaction,
                     size = size,
                 )
             }
@@ -73,7 +70,7 @@ private const val ANIMATION_DURATION = 5000
 
 @Composable
 private fun EmojiAnimationItem(
-    emoji: String,
+    emojiReaction: EmojiReaction,
     size: IntSize,
 ) {
     var moved by remember { mutableStateOf(false) }
@@ -120,52 +117,65 @@ private fun EmojiAnimationItem(
                 this.alpha = alpha
             },
     ) {
-        Column(
+        EmojiItem(
+            emojiReaction = emojiReaction,
+        )
+    }
+}
+
+@Composable
+private fun EmojiItem(
+    emojiReaction: EmojiReaction,
+) {
+    Column(
+        modifier = Modifier
+            .widthIn(max = 160.dp)
+            .padding(start = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = emojiReaction.emoji,
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier
-                .padding(start = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(8.dp)
+        )
+        Box(
+            modifier = Modifier
+                .padding(4.dp)
+                .background(
+                    Color.Black.copy(alpha = 0.6f),
+                    RoundedCornerShape(8.dp)
+                )
+                .padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
             Text(
-                text = emoji,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .padding(8.dp)
+                text = if (emojiReaction.isYou) {
+                    stringResource(R.string.emoji_panel_you)
+                } else {
+                    emojiReaction.sender
+                },
+                color = Color.White,
+                fontSize = 12.sp,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
             )
-            Box(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .background(
-                        Color.Black.copy(alpha = 0.6f),
-                        RoundedCornerShape(8.dp)
-                    )
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            ) {
-                Text(
-                    text = "You",
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                )
-            }
         }
     }
 }
 
 @Preview
 @Composable
-internal fun EmojiAnimationItemPreview() {
+internal fun EmojiItemPreview() {
     VonageVideoTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Gray)
-        ) {
-            EmojiAnimationItem(
+        EmojiItem(
+            emojiReaction = EmojiReaction(
+                id = 1L,
                 emoji = "🙈",
-                size = IntSize(300, 300),
-            )
-        }
+                sender = "John Doe Doe Doe Doe Doe Doe",
+                isYou = false,
+                startTime = 1231,
+            ),
+        )
     }
 }
