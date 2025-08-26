@@ -20,12 +20,17 @@ class ReactionSignalPlugin(
 ) : SignalPlugin {
 
     private val coroutineScope = CoroutineScope(coroutineDispatcher)
-
     private val reactions: MutableList<EmojiReaction> = CopyOnWriteArrayList(mutableListOf<EmojiReaction>())
 
     override fun canHandle(signalType: String): Boolean = signalType == SignalType.REACTION.signal
 
-    override fun handleSignal(type: String, data: String, senderName: String, isYou: Boolean, callback: (SignalStateContent) -> Unit): SignalStateContent? {
+    override fun handleSignal(
+        type: String,
+        data: String,
+        senderName: String,
+        isYou: Boolean,
+        callback: (SignalStateContent) -> Unit,
+    ): SignalStateContent? {
         if (!canHandle(type)) return null
 
         val reactionSignal = try {
@@ -44,9 +49,9 @@ class ReactionSignalPlugin(
             )
         )
 
-        // remove reaction after 3 seconds
+        // remove reaction after 5 seconds
         coroutineScope.launch {
-            delay(5000)
+            delay(EMOJI_LIFETIME_MILLIS)
             if (reactions.isNotEmpty()) {
                 reactions.removeAt(reactions.size - 1)
             }
@@ -66,6 +71,8 @@ class ReactionSignalPlugin(
         session.sendSignal(SignalType.REACTION.signal, signal)
     }
 }
+
+const val EMOJI_LIFETIME_MILLIS = 5000L
 
 data class EmojiReaction(
     val id: Long,

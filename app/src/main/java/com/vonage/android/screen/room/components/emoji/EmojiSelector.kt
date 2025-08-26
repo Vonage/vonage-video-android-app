@@ -1,6 +1,5 @@
 package com.vonage.android.screen.room.components.emoji
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -14,11 +13,16 @@ import androidx.compose.ui.unit.sp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.util.ext.debouncedClickable
 
+private const val DEBOUNCE_CLICK_MILLIS = 500L
+
 @Composable
 fun EmojiSelector(
     onEmojiClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    LazyRow {
+    LazyRow(
+        modifier = modifier,
+    ) {
         items(
             items = EmojiData.emojis,
             key = { emoji -> emoji },
@@ -30,7 +34,7 @@ fun EmojiSelector(
                 modifier = Modifier
                     .padding(8.dp)
                     .debouncedClickable(
-                        debounceTime = 500, // debounce 500 milliseconds
+                        debounceTime = DEBOUNCE_CLICK_MILLIS, // debounce 500 milliseconds
                     ) { onEmojiClick(emoji) }
             )
         }

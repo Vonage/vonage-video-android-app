@@ -38,8 +38,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.signal.EMOJI_LIFETIME_MILLIS
 import com.vonage.android.kotlin.signal.EmojiReaction
 import kotlin.random.Random
+
+private const val ANIMATION_DURATION = EMOJI_LIFETIME_MILLIS.toInt()
+private const val OVERLAY_ZINDEX = 9F
 
 @Composable
 fun EmojiReactionOverlay(
@@ -50,7 +54,7 @@ fun EmojiReactionOverlay(
 
     Box(
         modifier = modifier
-            .zIndex(9F)
+            .zIndex(OVERLAY_ZINDEX)
             .fillMaxSize()
             .onSizeChanged { size = it },
         contentAlignment = Alignment.BottomStart,
@@ -66,8 +70,7 @@ fun EmojiReactionOverlay(
     }
 }
 
-private const val ANIMATION_DURATION = 5000
-
+@Suppress("MagicNumber")
 @Composable
 private fun EmojiAnimationItem(
     emojiReaction: EmojiReaction,
