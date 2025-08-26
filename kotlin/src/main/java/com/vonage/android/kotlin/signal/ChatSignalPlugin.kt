@@ -14,7 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 class ChatSignalPlugin : SignalPlugin {
 
-    private val chatMessages: MutableList<ChatMessage> = CopyOnWriteArrayList(mutableListOf<ChatMessage>())
+    private val chatMessages: MutableList<ChatMessage> = CopyOnWriteArrayList()
     private var chatMessagesUnreadCount: Int = 0
     private var listenUnread: Boolean = true
 

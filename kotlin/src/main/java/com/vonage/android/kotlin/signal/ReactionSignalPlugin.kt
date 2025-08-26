@@ -20,7 +20,7 @@ class ReactionSignalPlugin(
 ) : SignalPlugin {
 
     private val coroutineScope = CoroutineScope(coroutineDispatcher)
-    private val reactions: MutableList<EmojiReaction> = CopyOnWriteArrayList(mutableListOf<EmojiReaction>())
+    private val reactions: MutableList<EmojiReaction> = CopyOnWriteArrayList()
 
     override fun canHandle(signalType: String): Boolean = signalType == SignalType.REACTION.signal
 
@@ -38,23 +38,20 @@ class ReactionSignalPlugin(
         } catch (_: SerializationException) {
             return null
         }
-
-        reactions.add(
-            0, EmojiReaction(
-                id = reactionSignal.time,
-                emoji = reactionSignal.emoji,
-                startTime = reactionSignal.time,
-                sender = senderName,
-                isYou = isYou,
-            )
+        
+        val emojiReaction = EmojiReaction(
+            id = reactionSignal.time,
+            emoji = reactionSignal.emoji,
+            startTime = reactionSignal.time,
+            sender = senderName,
+            isYou = isYou,
         )
+        reactions.add(0, emojiReaction)
 
         // remove reaction after 5 seconds
         coroutineScope.launch {
             delay(EMOJI_LIFETIME_MILLIS)
-            if (reactions.isNotEmpty()) {
-                reactions.removeAt(reactions.size - 1)
-            }
+            reactions.removeAll { it.id == emojiReaction.id }
             callback(EmojiState(reactions = reactions.toImmutableList()))
         }
 

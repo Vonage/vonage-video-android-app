@@ -61,10 +61,10 @@ class Call internal constructor(
     private val _signalStateFlow = MutableStateFlow<SignalState?>(null)
     override val signalStateFlow: StateFlow<SignalState?> = _signalStateFlow
 
-    private val signals = HashMap<String, SignalStateContent>()
-    private val subscriberStreams = HashMap<String, Subscriber>()
+    private val signals = ConcurrentHashMap<String, SignalStateContent>()
+    private val subscriberStreams = ConcurrentHashMap<String, Subscriber>()
     private val subscriberJobs = ConcurrentHashMap<String, Job>()
-    private val participantStreams = HashMap<String, Participant>()
+    private val participantStreams = ConcurrentHashMap<String, Participant>()
 
     override fun connect(): Flow<SessionEvent> = callbackFlow {
         val sessionListener = object : Session.SessionListener {
@@ -139,8 +139,8 @@ class Call internal constructor(
 
     override fun listenUnreadChatMessages(enable: Boolean) {
         signalPlugins
-            .filter { it.canHandle(SignalType.CHAT.signal) }
-            .mapNotNull { (it as ChatSignalPlugin).listenUnread(enable) }
+            .filterIsInstance<ChatSignalPlugin>()
+            .mapNotNull { it.listenUnread(enable) }
             .forEach { state ->
                 signals[SignalType.CHAT.signal] = state
                 _signalStateFlow.value = SignalState(
