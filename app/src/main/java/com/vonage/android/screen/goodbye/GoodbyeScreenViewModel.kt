@@ -5,15 +5,19 @@ import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.Archive
 import com.vonage.android.data.ArchiveRepository
 import com.vonage.android.data.ArchiveStatus
+import com.vonage.android.util.coroutines.CoroutinePoller
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -33,12 +37,20 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            archiveRepository.getRecordings(roomName)
-                .onSuccess {
-                    _uiState.value = GoodbyeScreenUiState.Content(
-                        archives = it.toImmutableList()
-                    )
-                }
+            CoroutinePoller<Unit>(
+                dispatcher = Dispatchers.IO,
+                fetchData = {
+                    archiveRepository.getRecordings(roomName)
+                        .onSuccess { archives ->
+                            archives
+                                .count { archive -> archive.status == ArchiveStatus.PENDING }
+                                .let { if (it == 0) cancel() }
+                            _uiState.value = GoodbyeScreenUiState.Content(
+                                archives = archives.toImmutableList()
+                            )
+                        }
+                },
+            ).poll(2000).collect()
         }
     }
 

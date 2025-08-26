@@ -20,6 +20,28 @@ class ArchiveRepository @Inject constructor(
                 Result.failure(Exception("Failed getting archives"))
             }
         }
+
+    suspend fun startArchive(roomName: String): Result<String> =
+        runCatching {
+            val response = apiService.startArchiving(roomName)
+            return if (response.isSuccessful) {
+                response.body()?.let {
+                    Result.success(it.archiveId)
+                } ?: Result.failure(Exception("Empty response"))
+            } else {
+                Result.failure(Exception("Failed to start archiving"))
+            }
+        }
+
+    suspend fun stopArchive(roomName: String, archiveId: String): Result<Boolean> =
+        runCatching {
+            val response = apiService.stopArchiving(roomName, archiveId)
+            return if (response.isSuccessful) {
+                Result.success(true)
+            } else {
+                Result.failure(Exception("Failed to start archiving"))
+            }
+        }
 }
 
 fun ServerArchive.toModel() =

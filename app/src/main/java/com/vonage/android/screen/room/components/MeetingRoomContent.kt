@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.audio.AudioDevicesHandler
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
 import com.vonage.android.screen.room.components.emoji.EmojiSelector
 import com.vonage.android.util.preview.buildParticipants
@@ -24,6 +25,8 @@ import kotlinx.collections.immutable.toImmutableList
 @Composable
 fun MeetingRoomContent(
     participants: ImmutableList<Participant>,
+    actions: MeetingRoomActions,
+    isRecording: Boolean,
     audioLevel: Float,
     participantsSheetState: SheetState,
     audioDeviceSelectorSheetState: SheetState,
@@ -76,7 +79,10 @@ fun MeetingRoomContent(
                         onEmojiClick(it)
                     },
                 )
-                MoreActionsGrid()
+                MoreActionsGrid(
+                    isRecording = isRecording,
+                    actions = actions
+                )
             }
         }
     }
@@ -105,6 +111,8 @@ internal fun MeetingRoomContentPreview() {
             onDismissAudioDeviceSelector = {},
             onDismissMoreActions = {},
             onEmojiClick = {},
+            isRecording = false,
+            actions = MeetingRoomActions()
         )
     }
 }

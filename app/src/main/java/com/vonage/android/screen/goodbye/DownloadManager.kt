@@ -14,10 +14,14 @@ class DownloadManager @Inject constructor(
     fun downloadByUrl(url: String) {
         val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
         val uri = url.toUri()
-        val request = DownloadManager.Request(uri)
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "vonage recording")
-        request.setMimeType("video/mp4")
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-        manager?.enqueue(request)
+        DownloadManager.Request(uri)
+            .apply {
+                setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "vonage recording")
+                setMimeType("video/mp4")
+                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+            }
+            .let { request ->
+                manager?.enqueue(request)
+            }
     }
 }

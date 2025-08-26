@@ -2,6 +2,8 @@ package com.vonage.android.screen.room
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.vonage.android.data.ArchiveRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
@@ -25,6 +27,7 @@ import kotlinx.coroutines.launch
 class MeetingRoomScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
     private val sessionRepository: SessionRepository,
+    private val archiveRepository: ArchiveRepository,
     private val videoClient: VonageVideoClient,
 ) : ViewModel() {
 
@@ -72,6 +75,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             _uiState.value = MeetingRoomUiState.Content(
                 roomName = roomName,
                 call = it,
+                isRecording = false,
             )
         }
     }
@@ -135,6 +139,30 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         call?.sendEmoji(emoji)
     }
 
+    fun archiveCall(enable: Boolean, roomName: String, archiveId: String) {
+        viewModelScope.launch {
+            if (enable) {
+                archiveRepository.startArchive(roomName)
+                    .onSuccess {
+                        _uiState.value = MeetingRoomUiState.Content(
+                            roomName = roomName,
+                            call = call!!, // watch out!
+                            isRecording = true,
+                        )
+                    }
+            } else {
+                archiveRepository.stopArchive(roomName, archiveId)
+                    .onSuccess {
+                        _uiState.value = MeetingRoomUiState.Content(
+                            roomName = roomName,
+                            call = call!!, // watch out!
+                            isRecording = false,
+                        )
+                    }
+            }
+        }
+    }
+
     private companion object {
         const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
         const val PUBLISHER_AUDIO_LEVEL_DEBOUNCE_MS = 36L
@@ -149,6 +177,7 @@ interface MeetingRoomViewModelFactory {
 sealed interface MeetingRoomUiState {
     data class Content(
         val roomName: String,
+        val isRecording: Boolean,
         val call: CallFacade,
     ) : MeetingRoomUiState
 

@@ -25,6 +25,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.ext.toggle
+import com.vonage.android.screen.room.MeetingRoomActions
 
 data class ExtraAction(
     val id: Int,
@@ -35,6 +37,8 @@ data class ExtraAction(
 
 @Composable
 fun MoreActionsGrid(
+    isRecording: Boolean,
+    actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
 ) {
     val actions = listOf(
@@ -42,7 +46,10 @@ fun MoreActionsGrid(
             id = 1,
             icon = Icons.Default.Archive,
             label = "Record",
-            onClick = {},
+            onClick = {
+                //actions.onToggleRecording(isRecording.toggle(), "")
+                actions.onToggleRecording(true, "")
+            },
         ),
         ExtraAction(
             id = 2,
@@ -78,6 +85,7 @@ fun MoreActionsGrid(
             ActionCell(
                 icon = action.icon,
                 label = action.label,
+                onClickCell = action.onClick,
             )
         }
     }
@@ -87,6 +95,7 @@ fun MoreActionsGrid(
 private fun ActionCell(
     icon: ImageVector,
     label: String,
+    onClickCell: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val defaultColor = VonageVideoTheme.colors.inverseSurface
@@ -94,7 +103,7 @@ private fun ActionCell(
     Column(
         modifier = modifier
             .height(96.dp)
-            .clickable { }
+            .clickable(onClick = onClickCell)
             .padding(vertical = 8.dp, horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
@@ -120,6 +129,9 @@ private fun ActionCell(
 @Composable
 internal fun MoreActionsGridPreview() {
     VonageVideoTheme {
-        MoreActionsGrid()
+        MoreActionsGrid(
+            isRecording = false,
+            actions = MeetingRoomActions(),
+        )
     }
 }

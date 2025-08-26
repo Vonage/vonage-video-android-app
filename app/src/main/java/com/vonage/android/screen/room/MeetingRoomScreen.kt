@@ -128,6 +128,7 @@ fun MeetingRoomScreen(
                                 TopBar(
                                     modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
                                     roomName = uiState.roomName,
+                                    isRecording = uiState.isRecording,
                                     actions = actions,
                                     onToggleAudioDeviceSelector = {
                                         showAudioDeviceSelector = showAudioDeviceSelector.toggle()
@@ -135,6 +136,7 @@ fun MeetingRoomScreen(
                                 )
                                 MeetingRoomContent(
                                     modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
+                                    actions = actions,
                                     participants = participants,
                                     audioLevel = audioLevel,
                                     showParticipants = showParticipants,
@@ -146,7 +148,8 @@ fun MeetingRoomScreen(
                                     onDismissParticipants = { showParticipants = false },
                                     onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
                                     onDismissMoreActions = { showMoreActions = false },
-                                    onEmojiClick = actions.onEmojiSent
+                                    isRecording = uiState.isRecording,
+                                    onEmojiClick = actions.onEmojiSent,
                                 )
                             }
                         }
@@ -228,6 +231,7 @@ internal fun MeetingRoomScreenSessionPreview() {
         MeetingRoomScreen(
             uiState = MeetingRoomUiState.Content(
                 roomName = "sample-room-name",
+                isRecording = true,
                 call = buildCallWithParticipants(1),
             ),
             actions = MeetingRoomActions(),

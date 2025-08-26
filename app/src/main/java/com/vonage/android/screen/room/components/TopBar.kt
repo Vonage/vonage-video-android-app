@@ -30,6 +30,7 @@ import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_TITLE
 @Composable
 fun TopBar(
     roomName: String,
+    isRecording: Boolean,
     actions: MeetingRoomActions,
     onToggleAudioDeviceSelector: () -> Unit,
     modifier: Modifier = Modifier,
@@ -53,7 +54,9 @@ fun TopBar(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                RecordingIndicator()
+                if (isRecording) {
+                    RecordingIndicator()
+                }
                 Text(
                     modifier = Modifier
                         .testTag(TOP_BAR_TITLE),
@@ -104,6 +107,7 @@ internal fun TopBarPreview() {
     VonageVideoTheme {
         TopBar(
             roomName = "sample-name",
+            isRecording = true,
             actions = MeetingRoomActions(),
             onToggleAudioDeviceSelector = { },
         )
