@@ -2,6 +2,7 @@ package com.vonage.android.screen.room
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +35,8 @@ import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.ChatState
+import com.vonage.android.kotlin.model.EmojiState
+import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
@@ -44,9 +47,12 @@ import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.TopBar
 import com.vonage.android.screen.room.components.chat.ChatPanel
+import com.vonage.android.screen.room.components.emoji.EmojiReactionOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
 import com.vonage.android.util.preview.buildCallWithParticipants
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @Suppress("LongMethod")
@@ -81,7 +87,9 @@ fun MeetingRoomScreen(
     when (uiState) {
         is MeetingRoomUiState.Content -> {
             val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
-            val chatState by uiState.call.chatStateFlow.collectAsStateWithLifecycle()
+            val signalState by uiState.call.signalStateFlow.collectAsStateWithLifecycle(null)
+            val chatState = signalState?.signals[SignalType.CHAT.signal] as? ChatState
+            val emojiState = signalState?.signals[SignalType.REACTION.signal] as? EmojiState
             val publisher = participants.filterIsInstance<VeraPublisher>().firstOrNull()
 
             Scaffold(
@@ -97,7 +105,7 @@ fun MeetingRoomScreen(
                             isCameraEnabled = publisher?.isCameraEnabled ?: false,
                             isChatShow = isChatShow,
                             participantsCount = participants.size,
-                            unreadCount = chatState.unreadCount,
+                            unreadCount = chatState?.unreadCount ?: 0,
                         ),
                     )
                 }
@@ -110,26 +118,31 @@ fun MeetingRoomScreen(
                     directive = navigator.scaffoldDirective,
                     value = navigator.scaffoldValue,
                     mainPane = {
-                        Column(verticalArrangement = Arrangement.Top) {
-                            TopBar(
-                                modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
-                                roomName = uiState.roomName,
-                                actions = actions,
-                                onToggleAudioDeviceSelector = {
-                                    showAudioDeviceSelector = showAudioDeviceSelector.toggle()
-                                },
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            EmojiReactionOverlay(
+                                reactions = emojiState?.reactions.orEmpty(),
                             )
-                            MeetingRoomContent(
-                                modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
-                                participants = participants,
-                                audioLevel = audioLevel,
-                                showParticipants = showParticipants,
-                                onDismissParticipants = { showParticipants = false },
-                                participantsSheetState = participantsSheetState,
-                                audioDeviceSelectorSheetState = audioDeviceSelectorSheetState,
-                                showAudioDeviceSelector = showAudioDeviceSelector,
-                                onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
-                            )
+                            Column(verticalArrangement = Arrangement.Top) {
+                                TopBar(
+                                    modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
+                                    roomName = uiState.roomName,
+                                    actions = actions,
+                                    onToggleAudioDeviceSelector = {
+                                        showAudioDeviceSelector = showAudioDeviceSelector.toggle()
+                                    },
+                                )
+                                MeetingRoomContent(
+                                    modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
+                                    participants = participants,
+                                    audioLevel = audioLevel,
+                                    showParticipants = showParticipants,
+                                    onDismissParticipants = { showParticipants = false },
+                                    participantsSheetState = participantsSheetState,
+                                    audioDeviceSelectorSheetState = audioDeviceSelectorSheetState,
+                                    showAudioDeviceSelector = showAudioDeviceSelector,
+                                    onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
+                                )
+                            }
                         }
                     },
                     supportingPane = { },
@@ -160,7 +173,7 @@ fun MeetingRoomScreen(
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun ThreePaneScaffoldPaneScope.ExtraPane(
-    chatState: ChatState,
+    chatState: ChatState?,
     actions: MeetingRoomActions,
     onCloseChat: () -> Unit,
     modifier: Modifier = Modifier,
@@ -170,7 +183,7 @@ fun ThreePaneScaffoldPaneScope.ExtraPane(
             .safeContentPadding()
     ) {
         ChatPanel(
-            messages = chatState.messages,
+            messages = chatState?.messages.orEmpty().toImmutableList(),
             onSendMessage = actions.onMessageSent,
             onCloseChat = onCloseChat,
         )
