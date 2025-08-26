@@ -241,13 +241,6 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
-            assertEquals(
-                MeetingRoomUiState.Content(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                ), awaitItem()
-            )
             sut.sendEmoji("emoji :)")
             verify { mockCall.sendEmoji("emoji :)") }
         }

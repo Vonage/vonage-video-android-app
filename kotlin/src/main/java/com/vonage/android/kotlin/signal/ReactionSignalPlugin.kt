@@ -38,7 +38,7 @@ class ReactionSignalPlugin(
         } catch (_: SerializationException) {
             return null
         }
-        
+
         val emojiReaction = EmojiReaction(
             id = reactionSignal.time,
             emoji = reactionSignal.emoji,
