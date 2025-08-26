@@ -7,13 +7,9 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.serialization.Serializable
-import java.util.Date
-import java.util.UUID
-import kotlin.random.Random
 
 @Stable
-interface CallFacade : SessionFacade, PublisherFacade, ChatFacade {
+interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade {
     val participantsStateFlow: StateFlow<ImmutableList<Participant>>
     val signalStateFlow: StateFlow<SignalState?>
 }
@@ -35,6 +31,10 @@ interface SessionFacade {
 interface ChatFacade {
     fun sendChatMessage(message: String)
     fun listenUnreadChatMessages(enable: Boolean)
+}
+
+interface EmojiFacade {
+    fun sendEmoji(emoji: String)
 }
 
 enum class SignalType(val signal: String) {

@@ -109,6 +109,14 @@ class Call internal constructor(
         _signalStateFlow.value = SignalState(signals = signals)
     }
 
+    override fun sendEmoji(emoji: String) {
+        signalPlugins
+            .filter { it.canHandle(SignalType.REACTION.signal) }
+            .forEach { plugin ->
+                plugin.sendSignal(session, emoji)
+            }
+    }
+
     override fun sendChatMessage(message: String) {
         signalPlugins
             .filter { it.canHandle(SignalType.CHAT.signal) }

@@ -131,6 +131,10 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         call?.listenUnreadChatMessages(enable)
     }
 
+    fun sendEmoji(emoji: String) {
+        call?.sendEmoji(emoji)
+    }
+
     private companion object {
         const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
         const val PUBLISHER_AUDIO_LEVEL_DEBOUNCE_MS = 36L

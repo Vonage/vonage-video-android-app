@@ -52,5 +52,8 @@ fun buildCallWithParticipants(
 
         override fun sendChatMessage(message: String) {}
         override fun listenUnreadChatMessages(enable: Boolean) {}
+
+        // Reactions related methods
+        override fun sendEmoji(emoji: String) {}
     }
 }

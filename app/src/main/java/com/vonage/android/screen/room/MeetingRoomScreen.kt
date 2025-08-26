@@ -52,7 +52,6 @@ import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
 import com.vonage.android.util.preview.buildCallWithParticipants
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @Suppress("LongMethod")
@@ -66,8 +65,10 @@ fun MeetingRoomScreen(
 ) {
     val participantsSheetState = rememberModalBottomSheetState()
     val audioDeviceSelectorSheetState = rememberModalBottomSheetState()
+    val moreActionsSheetState = rememberModalBottomSheetState()
     var showParticipants by remember { mutableStateOf(false) }
     var showAudioDeviceSelector by remember { mutableStateOf(false) }
+    var showMoreActions by remember { mutableStateOf(false) }
 
     val navigator = rememberSupportingPaneScaffoldNavigator()
     val scope = rememberCoroutineScope()
@@ -100,6 +101,7 @@ fun MeetingRoomScreen(
                         actions = actions,
                         bottomBarState = BottomBarState(
                             onToggleParticipants = { showParticipants = showParticipants.toggle() },
+                            onToggleMoreActions = { showMoreActions = showMoreActions.toggle() },
                             onShowChat = { scope.launch { navigator.toggleChat() } },
                             isMicEnabled = publisher?.isMicEnabled ?: false,
                             isCameraEnabled = publisher?.isCameraEnabled ?: false,
@@ -136,11 +138,15 @@ fun MeetingRoomScreen(
                                     participants = participants,
                                     audioLevel = audioLevel,
                                     showParticipants = showParticipants,
-                                    onDismissParticipants = { showParticipants = false },
+                                    showMoreActions = showMoreActions,
+                                    showAudioDeviceSelector = showAudioDeviceSelector,
                                     participantsSheetState = participantsSheetState,
                                     audioDeviceSelectorSheetState = audioDeviceSelectorSheetState,
-                                    showAudioDeviceSelector = showAudioDeviceSelector,
+                                    moreActionsSheetState = moreActionsSheetState,
+                                    onDismissParticipants = { showParticipants = false },
                                     onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
+                                    onDismissMoreActions = { showMoreActions = false },
+                                    onEmojiClick = actions.onEmojiSent
                                 )
                             }
                         }
