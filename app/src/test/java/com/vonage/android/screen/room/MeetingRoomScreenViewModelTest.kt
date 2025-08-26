@@ -232,6 +232,27 @@ class MeetingRoomScreenViewModelTest {
         }
     }
 
+    @Test
+    fun `given viewmodel when sendEmoji then delegate to call`() = runTest {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(
+                MeetingRoomUiState.Content(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                ), awaitItem()
+            )
+            sut.sendEmoji("emoji :)")
+            verify { mockCall.sendEmoji("emoji :)") }
+        }
+    }
+
     private fun sut(): MeetingRoomScreenViewModel =
         MeetingRoomScreenViewModel(
             roomName = ANY_ROOM_NAME,
