@@ -49,6 +49,9 @@
     <!-- Emoji reactions -->
     <string name="emoji_panel_you">You</string>
 
+    <!-- Recordings -->
+    <string name="recording_title">Recordings</string>
+
     <!-- Generic -->
     <string name="generic_retry">Retry</string>
 

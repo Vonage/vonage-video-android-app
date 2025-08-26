@@ -1,5 +1,6 @@
 package com.vonage.android.screen.room.components
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -9,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -48,13 +50,18 @@ fun TopBar(
             }
         },
         title = {
-            Text(
-                modifier = Modifier
-                    .testTag(TOP_BAR_TITLE),
-                text = roomName,
-                style = VonageVideoTheme.typography.body,
-                color = VonageVideoTheme.colors.inverseSurface,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RecordingIndicator()
+                Text(
+                    modifier = Modifier
+                        .testTag(TOP_BAR_TITLE),
+                    text = roomName,
+                    style = VonageVideoTheme.typography.body,
+                    color = VonageVideoTheme.colors.inverseSurface,
+                )
+            }
         },
         actions = {
             IconButton(

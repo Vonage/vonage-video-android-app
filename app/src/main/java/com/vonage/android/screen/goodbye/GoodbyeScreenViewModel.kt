@@ -1,0 +1,65 @@
+package com.vonage.android.screen.goodbye
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.vonage.android.data.Archive
+import com.vonage.android.data.ArchiveRepository
+import com.vonage.android.data.ArchiveStatus
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+
+@HiltViewModel(assistedFactory = GoodbyeScreenViewModelFactory::class)
+class GoodbyeScreenViewModel @AssistedInject constructor(
+    @Assisted val roomName: String,
+    private val archiveRepository: ArchiveRepository,
+    private val downloadManager: DownloadManager,
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow<GoodbyeScreenUiState>(GoodbyeScreenUiState.Idle)
+    val uiState: StateFlow<GoodbyeScreenUiState> = _uiState.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = GoodbyeScreenUiState.Idle,
+    )
+
+    init {
+        viewModelScope.launch {
+            archiveRepository.getRecordings(roomName)
+                .onSuccess {
+                    _uiState.value = GoodbyeScreenUiState.Content(
+                        archives = it.toImmutableList()
+                    )
+                }
+        }
+    }
+
+    fun downloadArchive(archive: Archive) {
+        if (archive.status == ArchiveStatus.AVAILABLE) {
+            downloadManager.downloadByUrl(
+                url = archive.url,
+            )
+        }
+    }
+}
+
+@AssistedFactory
+interface GoodbyeScreenViewModelFactory {
+    fun create(roomName: String): GoodbyeScreenViewModel
+}
+
+sealed interface GoodbyeScreenUiState {
+    data class Content(
+        val archives: ImmutableList<Archive>,
+    ) : GoodbyeScreenUiState
+
+    data object Idle : GoodbyeScreenUiState
+}

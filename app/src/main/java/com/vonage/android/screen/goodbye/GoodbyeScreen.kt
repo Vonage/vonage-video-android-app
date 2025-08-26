@@ -1,29 +1,37 @@
 package com.vonage.android.screen.goodbye
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement.spacedBy
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
-import com.vonage.android.R
-import com.vonage.android.compose.components.VonageButton
-import com.vonage.android.compose.components.VonageOutlinedButton
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.data.Archive
+import com.vonage.android.data.ArchiveStatus.AVAILABLE
+import com.vonage.android.data.ArchiveStatus.FAILED
+import com.vonage.android.data.ArchiveStatus.PENDING
 import com.vonage.android.screen.components.TopBanner
+import com.vonage.android.screen.goodbye.components.ArchivesContainer
+import com.vonage.android.screen.goodbye.components.GoodbyeScreenHeader
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun GoodbyeScreen(
     actions: GoodbyeScreenActions,
     modifier: Modifier = Modifier,
+    uiState: GoodbyeScreenUiState,
 ) {
     Scaffold(
         modifier = modifier,
@@ -33,52 +41,63 @@ fun GoodbyeScreen(
             )
         }
     ) { paddingValues ->
-        Box(
+        FlowRow(
+            verticalArrangement = Arrangement.Center,
+            horizontalArrangement = spacedBy(48.dp, Alignment.CenterHorizontally),
             modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center,
+                .fillMaxSize()
+                .background(VonageVideoTheme.colors.background)
+                .verticalScroll(rememberScrollState())
+                .consumeWindowInsets(paddingValues)
+                .padding(horizontal = 24.dp),
         ) {
-            Column(
+            GoodbyeScreenHeader(
                 modifier = Modifier
-                    .padding(horizontal = 32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                Text(
-                    text = stringResource(R.string.goodbye_title),
-                    style = VonageVideoTheme.typography.titleLarge,
-                    color = VonageVideoTheme.colors.inverseSurface,
-                    textAlign = TextAlign.Center,
-                )
-
-                Text(
-                    text = stringResource(R.string.goodbye_subtitle),
-                    style = VonageVideoTheme.typography.body,
-                    color = VonageVideoTheme.colors.textPrimaryDisabled,
-                    textAlign = TextAlign.Center,
-                )
-
-                VonageOutlinedButton(
-                    text = stringResource(R.string.goodbye_rejoin_button_label),
-                    onClick = actions.onReEnter,
-                )
-
-                VonageButton(
-                    text = stringResource(R.string.goodbye_return_home_button_label),
-                    onClick = actions.onGoHome,
-                )
-            }
+                    .widthIn(0.dp, 380.dp),
+                actions = actions,
+            )
+            ArchivesContainer(
+                modifier = Modifier
+                    .widthIn(0.dp, 320.dp),
+                actions = actions,
+                uiState = uiState,
+            )
         }
     }
 }
 
 @PreviewLightDark
+@PreviewScreenSizes
 @Composable
 internal fun GoodbyeScreenPreview() {
     VonageVideoTheme {
         GoodbyeScreen(
             actions = GoodbyeScreenActions(),
+            uiState = GoodbyeScreenUiState.Content(
+                archives = persistentListOf(
+                    Archive(
+                        id = "1",
+                        name = "Recording 1",
+                        url = "url",
+                        status = AVAILABLE,
+                        createdAt = 1231,
+                    ),
+                    Archive(
+                        id = "2",
+                        name = "Recording 2",
+                        url = "url",
+                        status = PENDING,
+                        createdAt = 1231,
+                    ),
+                    Archive(
+                        id = "3",
+                        name = "Recording 3",
+                        url = "url",
+                        status = FAILED,
+                        createdAt = 1231,
+                    ),
+                )
+            ),
         )
     }
 }

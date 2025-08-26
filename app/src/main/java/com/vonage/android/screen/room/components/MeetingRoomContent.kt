@@ -76,6 +76,7 @@ fun MeetingRoomContent(
                         onEmojiClick(it)
                     },
                 )
+                MoreActionsGrid()
             }
         }
     }
