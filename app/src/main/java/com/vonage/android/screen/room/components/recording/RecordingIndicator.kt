@@ -1,4 +1,4 @@
-package com.vonage.android.screen.room.components
+package com.vonage.android.screen.room.components.recording
 
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat

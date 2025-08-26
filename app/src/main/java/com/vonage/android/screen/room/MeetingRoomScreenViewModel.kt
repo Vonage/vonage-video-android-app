@@ -139,11 +139,14 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         call?.sendEmoji(emoji)
     }
 
-    fun archiveCall(enable: Boolean, roomName: String, archiveId: String) {
+    private var currentArchiveId: String? = null
+
+    fun archiveCall(enable: Boolean, roomName: String) {
         viewModelScope.launch {
             if (enable) {
                 archiveRepository.startArchive(roomName)
                     .onSuccess {
+                        currentArchiveId = it
                         _uiState.value = MeetingRoomUiState.Content(
                             roomName = roomName,
                             call = call!!, // watch out!
@@ -151,14 +154,16 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                         )
                     }
             } else {
-                archiveRepository.stopArchive(roomName, archiveId)
-                    .onSuccess {
-                        _uiState.value = MeetingRoomUiState.Content(
-                            roomName = roomName,
-                            call = call!!, // watch out!
-                            isRecording = false,
-                        )
-                    }
+                currentArchiveId?.let {
+                    archiveRepository.stopArchive(roomName, it)
+                        .onSuccess {
+                            _uiState.value = MeetingRoomUiState.Content(
+                                roomName = roomName,
+                                call = call!!, // watch out!
+                                isRecording = false,
+                            )
+                        }
+                }
             }
         }
     }

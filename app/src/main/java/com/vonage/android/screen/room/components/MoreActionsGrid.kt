@@ -21,9 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.screen.room.MeetingRoomActions
@@ -45,12 +47,14 @@ fun MoreActionsGrid(
         ExtraAction(
             id = 1,
             icon = Icons.Default.Archive,
-            label = "Record",
-            onClick = {
-                //actions.onToggleRecording(isRecording.toggle(), "")
-                actions.onToggleRecording(true, "")
+            label = if (isRecording) {
+                stringResource(R.string.recording_stop_recording)
+            } else {
+                stringResource(R.string.recording_start_recording)
             },
+            onClick = { actions.onToggleRecording(isRecording.toggle()) },
         ),
+        // rest of the actions are placeholders
         ExtraAction(
             id = 2,
             icon = Icons.AutoMirrored.Default.ScreenShare,

@@ -79,11 +79,15 @@ fun ArchivesList(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        archives.forEach { archive ->
-            ArchiveRow(
-                archive = archive,
-                actions = actions,
-            )
+        if (archives.isEmpty()) {
+            Text(stringResource(R.string.recording_empty_title))
+        } else {
+            archives.forEach { archive ->
+                ArchiveRow(
+                    archive = archive,
+                    actions = actions,
+                )
+            }
         }
     }
 }

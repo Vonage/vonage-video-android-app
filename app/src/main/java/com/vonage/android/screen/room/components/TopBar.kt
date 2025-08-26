@@ -1,5 +1,7 @@
 package com.vonage.android.screen.room.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateBounds
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -25,6 +27,7 @@ import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_AUDIO_SE
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_CAMERA_SWITCH_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_SHARE_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_TITLE
+import com.vonage.android.screen.room.components.recording.RecordingIndicator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
