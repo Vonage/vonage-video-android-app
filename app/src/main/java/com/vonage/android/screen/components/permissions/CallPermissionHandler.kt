@@ -21,6 +21,8 @@ fun CallPermissionHandler(
         mutableListOf(
             Manifest.permission.CAMERA,
             Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.FOREGROUND_SERVICE,
+            Manifest.permission.POST_NOTIFICATIONS,
         )
     )
     LaunchedEffect(state) {

@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA"/>
 
     <application
         android:name=".MainApplication"
@@ -33,6 +36,12 @@
                 <data android:host="meet.vonagenetworks.net" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".service.VeraForegroundService"
+            android:foregroundServiceType="camera|microphone"
+            android:exported="false"
+            tools:ignore="ForegroundServicePermission" />
     </application>
 
 </manifest>

@@ -39,13 +39,20 @@ fun AppNavHost(
         composable<Waiting>(
             deepLinks = listOf(
                 navDeepLink<Waiting>("$BASE_URL/waiting-room"),
-                navDeepLink<Waiting>("$BASE_URL/room"),
             )
         ) { backStackEntry ->
             val roomName = backStackEntry.toRoute<Waiting>().roomName
             WaitingRoomRoute(
                 roomName = roomName,
-                navigateToRoom = { roomName -> navController.navigate(Meeting(roomName)) },
+                navigateToRoom = { roomName ->
+                    navController.navigate(Meeting(roomName)) {
+                        popUpTo(Meeting(roomName)) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
                 navigateToPermissions = { context.navigateToSystemPermissions() },
                 onBack = {
                     navController.navigate(Landing) {
@@ -54,7 +61,11 @@ fun AppNavHost(
                 },
             )
         }
-        composable<Meeting> { backStackEntry ->
+        composable<Meeting>(
+            deepLinks = listOf(
+                navDeepLink<Meeting>("$BASE_URL/room"),
+            )
+        ) { backStackEntry ->
             val roomName = backStackEntry.toRoute<Meeting>().roomName
             MeetingRoomScreenRoute(
                 roomName = roomName,
