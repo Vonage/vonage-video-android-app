@@ -12,11 +12,14 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MeetingRoomScreenViewModelTest {
 
     val sessionRepository: SessionRepository = mockk()
@@ -213,7 +216,7 @@ class MeetingRoomScreenViewModelTest {
     }
 
     @Test
-    fun `given viewmodel when listenUnread then delegate to call`() = runTest {
+    fun `given viewmodel when listenUnread then delegate to call`() = runTest(UnconfinedTestDispatcher()) {
         val mockCall = buildMockCall()
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
