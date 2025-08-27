@@ -6,6 +6,7 @@ import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VeraPublisher
 import io.mockk.coEvery
 import io.mockk.every
@@ -281,7 +282,19 @@ class MeetingRoomScreenViewModelTest {
         isSpeaking = false,
     )
 
-    private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true)
+    private fun buildMockCall(): CallFacade = mockk<CallFacade> {
+        every { toggleLocalAudio() } returns Unit
+        every { toggleLocalVideo() } returns Unit
+        every { toggleLocalCamera() } returns Unit
+        every { observeLocalAudioLevel() } returns flowOf()
+        every { connect() } returns flowOf(SessionEvent.Connected)
+        every { sendEmoji(any()) } returns Unit
+        every { resumeSession() } returns Unit
+        every { pauseSession() } returns Unit
+        every { endSession() } returns Unit
+        every { listenUnreadChatMessages(any()) } returns Unit
+        every { sendChatMessage(any()) } returns Unit
+    }
 
     private companion object {
         const val ANY_ROOM_NAME = "room-name"
