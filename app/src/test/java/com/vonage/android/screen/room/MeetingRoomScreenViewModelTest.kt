@@ -230,7 +230,7 @@ class MeetingRoomScreenViewModelTest {
     }
 
     @Test
-    fun `given viewmodel when sendEmoji then delegate to call`() = runTest {
+    fun `given viewmodel when sendEmoji then delegate to call`() = runTest(UnconfinedTestDispatcher()) {
         val mockCall = buildMockCall()
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
