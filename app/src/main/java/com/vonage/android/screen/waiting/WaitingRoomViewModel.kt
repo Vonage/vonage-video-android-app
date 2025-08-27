@@ -49,6 +49,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     private var currentBlurIndex: Int = 0
 
     fun init() {
+        _uiState.value = WaitingRoomUiState.Idle
         publisher = videoClient.buildPublisher()
         viewModelScope.launch {
             publisher = publisher.copy(name = userRepository.getUserName())
