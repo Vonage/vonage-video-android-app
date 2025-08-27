@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.R
 import com.vonage.android.compose.icons.AudioSelectorIcon
@@ -62,6 +63,8 @@ fun TopBar(
                     modifier = Modifier
                         .testTag(TOP_BAR_TITLE),
                     text = roomName,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     style = VonageVideoTheme.typography.body,
                     color = VonageVideoTheme.colors.inverseSurface,
                 )

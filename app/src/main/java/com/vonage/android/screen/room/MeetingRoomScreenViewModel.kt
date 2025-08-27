@@ -45,6 +45,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     )
 
     private var call: CallFacade? = null
+    private var currentArchiveId: String? = null
 
     init {
         setup()
@@ -138,8 +139,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         call?.sendEmoji(emoji)
     }
 
-    private var currentArchiveId: String? = null
-
     fun archiveCall(enable: Boolean, roomName: String) {
         viewModelScope.launch {
             if (enable) {
@@ -153,9 +152,10 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                         )
                     }
             } else {
-                currentArchiveId?.let {
-                    archiveRepository.stopArchive(roomName, it)
+                currentArchiveId?.let { archiveId ->
+                    archiveRepository.stopArchive(roomName, archiveId)
                         .onSuccess {
+                            currentArchiveId = null
                             _uiState.value = MeetingRoomUiState.Content(
                                 roomName = roomName,
                                 call = call!!, // watch out!

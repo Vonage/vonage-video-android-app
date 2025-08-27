@@ -1,6 +1,7 @@
 package com.vonage.android.screen.room
 
 import app.cash.turbine.test
+import com.vonage.android.data.ArchiveRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
@@ -8,6 +9,7 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.VeraPublisher
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -19,6 +21,7 @@ import kotlin.test.assertEquals
 class MeetingRoomScreenViewModelTest {
 
     val sessionRepository: SessionRepository = mockk()
+    val archiveRepository: ArchiveRepository = mockk()
     val videoClient: VonageVideoClient = mockk()
 
     @Test
@@ -36,6 +39,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState.Content(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
+                    isRecording = false,
                 ), awaitItem()
             )
         }
@@ -72,6 +76,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState.Content(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
+                    isRecording = false,
                 ), awaitItem()
             )
             sut.onToggleMic()
@@ -94,6 +99,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState.Content(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
+                    isRecording = false,
                 ), awaitItem()
             )
             sut.onToggleCamera()
@@ -116,6 +122,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState.Content(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
+                    isRecording = false,
                 ), awaitItem()
             )
             sut.endCall()
@@ -138,6 +145,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState.Content(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
+                    isRecording = false,
                 ), awaitItem()
             )
             sut.onPause()
@@ -160,6 +168,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState.Content(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
+                    isRecording = false,
                 ), awaitItem()
             )
             sut.onResume()
@@ -182,6 +191,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState.Content(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
+                    isRecording = false,
                 ), awaitItem()
             )
             sut.onSwitchCamera()
@@ -204,6 +214,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState.Content(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
+                    isRecording = false,
                 ), awaitItem()
             )
             sut.sendMessage("hi there!")
@@ -225,6 +236,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState.Content(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
+                    isRecording = false,
                 ), awaitItem()
             )
             sut.listenUnread(false)
@@ -241,8 +253,85 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
+            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(
+                MeetingRoomUiState.Content(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    isRecording = false,
+                ), awaitItem()
+            )
             sut.sendEmoji("emoji :)")
             verify { mockCall.sendEmoji("emoji :)") }
+        }
+    }
+
+    @Test
+    fun `given viewmodel when archiveCall true then emit correct state`() = runTest {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        coEvery { archiveRepository.startArchive(ANY_ROOM_NAME) } returns Result.success("archiveId")
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(
+                MeetingRoomUiState.Content(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    isRecording = false,
+                ), awaitItem()
+            )
+            sut.archiveCall(true, ANY_ROOM_NAME)
+            coVerify { archiveRepository.startArchive(ANY_ROOM_NAME) }
+            assertEquals(
+                MeetingRoomUiState.Content(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    isRecording = true,
+                ), awaitItem()
+            )
+        }
+    }
+
+    @Test
+    fun `given viewmodel when archiveCall false then emit correct state`() = runTest {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        coEvery { archiveRepository.startArchive(ANY_ROOM_NAME) } returns Result.success("archiveId")
+        coEvery { archiveRepository.stopArchive(ANY_ROOM_NAME, "archiveId") } returns Result.success(true)
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(
+                MeetingRoomUiState.Content(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    isRecording = false,
+                ), awaitItem()
+            )
+            sut.archiveCall(true, ANY_ROOM_NAME)
+            assertEquals(
+                MeetingRoomUiState.Content(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    isRecording = true,
+                ), awaitItem()
+            )
+            sut.archiveCall(false, ANY_ROOM_NAME)
+            assertEquals(
+                MeetingRoomUiState.Content(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    isRecording = false,
+                ), awaitItem()
+            )
+            coVerify { archiveRepository.stopArchive(ANY_ROOM_NAME, "archiveId") }
         }
     }
 
@@ -250,6 +339,7 @@ class MeetingRoomScreenViewModelTest {
         MeetingRoomScreenViewModel(
             roomName = ANY_ROOM_NAME,
             sessionRepository = sessionRepository,
+            archiveRepository = archiveRepository,
             videoClient = videoClient,
         )
 
@@ -274,7 +364,10 @@ class MeetingRoomScreenViewModelTest {
         isSpeaking = false,
     )
 
-    private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true)
+    private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true) {
+        every { connect() } returns flowOf()
+        every { observeLocalAudioLevel() } returns flowOf()
+    }
 
     private companion object {
         const val ANY_ROOM_NAME = "room-name"

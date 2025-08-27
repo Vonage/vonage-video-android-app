@@ -1,4 +1,4 @@
-package com.vonage.android.screen.goodbye
+package com.vonage.android.util
 
 import android.app.DownloadManager
 import android.content.Context
@@ -12,16 +12,17 @@ class DownloadManager @Inject constructor(
 ) {
 
     fun downloadByUrl(url: String) {
-        val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
+        val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val uri = url.toUri()
         DownloadManager.Request(uri)
             .apply {
-                setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "vonage recording")
+                setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "vonage-recording")
                 setMimeType("video/mp4")
-                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE
+                        or DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             }
             .let { request ->
-                manager?.enqueue(request)
+                manager.enqueue(request)
             }
     }
 }

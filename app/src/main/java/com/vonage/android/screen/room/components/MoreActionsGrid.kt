@@ -1,5 +1,7 @@
 package com.vonage.android.screen.room.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,12 +12,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ScreenShare
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.ClosedCaption
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,6 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.R
+import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.screen.room.MeetingRoomActions
@@ -45,6 +50,7 @@ fun MoreActionsGrid(
             } else {
                 stringResource(R.string.recording_start_recording)
             },
+            isSelected = isRecording,
             onClick = { actions.onToggleRecording(isRecording.toggle()) },
         ),
         // rest of the actions are placeholders
@@ -52,18 +58,21 @@ fun MoreActionsGrid(
             id = 2,
             icon = Icons.AutoMirrored.Default.ScreenShare,
             label = "Screen share",
+            isSelected = false,
             onClick = {},
         ),
         ExtraAction(
             id = 3,
             icon = Icons.Default.ClosedCaption,
             label = "Captions",
+            isSelected = false,
             onClick = {},
         ),
         ExtraAction(
             id = 4,
             icon = Icons.Default.BugReport,
             label = "Report issue",
+            isSelected = false,
             onClick = {},
         ),
     )
@@ -82,6 +91,7 @@ fun MoreActionsGrid(
             ActionCell(
                 icon = action.icon,
                 label = action.label,
+                isSelected = action.isSelected,
                 onClickCell = action.onClick,
             )
         }
@@ -92,6 +102,7 @@ fun MoreActionsGrid(
 private fun ActionCell(
     icon: ImageVector,
     label: String,
+    isSelected: Boolean,
     onClickCell: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -101,6 +112,15 @@ private fun ActionCell(
         modifier = modifier
             .height(96.dp)
             .clickable(onClick = onClickCell)
+            .conditional(
+                isSelected,
+                ifTrue = {
+                    background(VonageVideoTheme.colors.primary, RoundedCornerShape(8.dp))
+                },
+                ifFalse = {
+                    border(1.dp, MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(8.dp))
+                },
+            )
             .padding(vertical = 8.dp, horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
@@ -126,6 +146,7 @@ data class ExtraAction(
     val id: Int,
     val icon: ImageVector,
     val label: String,
+    val isSelected: Boolean,
     val onClick: () -> Unit,
 )
 
@@ -134,7 +155,8 @@ data class ExtraAction(
 internal fun MoreActionsGridPreview() {
     VonageVideoTheme {
         MoreActionsGrid(
-            isRecording = false,
+            modifier = Modifier.background(VonageVideoTheme.colors.surface),
+            isRecording = true,
             actions = MeetingRoomActions(),
         )
     }

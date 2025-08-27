@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.Archive
 import com.vonage.android.data.ArchiveRepository
 import com.vonage.android.data.ArchiveStatus
+import com.vonage.android.di.IODispatcher
+import com.vonage.android.util.DownloadManager
 import com.vonage.android.util.coroutines.CoroutinePoller
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -12,7 +14,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,6 +28,7 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
     private val archiveRepository: ArchiveRepository,
     private val downloadManager: DownloadManager,
+    @param:IODispatcher private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<GoodbyeScreenUiState>(GoodbyeScreenUiState.Idle)
@@ -38,7 +41,7 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch {
             CoroutinePoller<Unit>(
-                dispatcher = Dispatchers.IO,
+                dispatcher = dispatcher,
                 fetchData = {
                     archiveRepository.getRecordings(roomName)
                         .onSuccess { archives ->
