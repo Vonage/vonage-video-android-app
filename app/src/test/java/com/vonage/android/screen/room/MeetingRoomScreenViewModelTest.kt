@@ -58,7 +58,6 @@ class MeetingRoomScreenViewModelTest {
         sut().uiState.test {
             assertEquals(MeetingRoomUiState.Loading, awaitItem())
             assertEquals(MeetingRoomUiState.SessionError, awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -80,7 +79,6 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onToggleMic()
             verify { mockCall.toggleLocalAudio() }
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -102,7 +100,6 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onToggleCamera()
             verify { mockCall.toggleLocalVideo() }
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -124,7 +121,6 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.endCall()
             verify { mockCall.endSession() }
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -146,7 +142,6 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onPause()
             verify { mockCall.pauseSession() }
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -168,7 +163,6 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onResume()
             verify { mockCall.resumeSession() }
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -181,15 +175,15 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
+            assertEquals(MeetingRoomUiState.Loading, awaitItem())
             assertEquals(
                 MeetingRoomUiState.Content(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                ), expectMostRecentItem()
+                ), awaitItem()
             )
             sut.onSwitchCamera()
             verify { mockCall.toggleLocalCamera() }
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
