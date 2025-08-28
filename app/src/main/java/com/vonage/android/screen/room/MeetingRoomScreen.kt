@@ -87,7 +87,7 @@ fun MeetingRoomScreen(
     }
 
     when {
-        (uiState.isError.not() && uiState.isLoading) -> {
+        (uiState.isError.not() && uiState.isLoading.not()) -> {
             val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle(persistentListOf())
             val signalState by uiState.call.signalStateFlow.collectAsStateWithLifecycle(null)
             val chatState = signalState?.signals[SignalType.CHAT.signal] as? ChatState
