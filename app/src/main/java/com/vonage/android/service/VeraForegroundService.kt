@@ -73,7 +73,7 @@ class VeraForegroundService : Service() {
             val hangupIntent = Intent(this, MainActivity::class.java)
             val hangupPendingIntent = PendingIntent.getBroadcast(
                 this,
-                123,
+                REQUEST_CODE,
                 hangupIntent,
                 FLAG_IMMUTABLE
             )
@@ -106,8 +106,9 @@ class VeraForegroundService : Service() {
                 .build()
         }
 
-    companion object {
-        const val NOTIFICATION_ID_MIC: Int = 1
+    private companion object {
+        const val NOTIFICATION_ID_MIC = 1
+        const val REQUEST_CODE = 999
         const val TAG: String = "VeraForegroundService"
     }
 }
