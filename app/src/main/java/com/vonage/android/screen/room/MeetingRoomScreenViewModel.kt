@@ -55,6 +55,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
     fun setup() {
         viewModelScope.launch {
+            _uiState.value = MeetingRoomUiState.Loading
             sessionRepository.getSession(roomName)
                 .onSuccess { sessionInfo ->
                     onSessionCreated(
@@ -135,6 +136,10 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
     fun listenUnread(enable: Boolean) {
         call?.listenUnreadChatMessages(enable)
+    }
+
+    fun sendEmoji(emoji: String) {
+        call?.sendEmoji(emoji)
     }
 
     private companion object {

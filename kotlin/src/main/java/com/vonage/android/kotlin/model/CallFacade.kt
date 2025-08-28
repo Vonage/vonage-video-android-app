@@ -1,17 +1,17 @@
 package com.vonage.android.kotlin.model
 
 import androidx.compose.runtime.Stable
+import com.vonage.android.kotlin.signal.ChatMessage
+import com.vonage.android.kotlin.signal.EmojiReaction
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.serialization.Serializable
-import java.util.Date
-import java.util.UUID
 
 @Stable
-interface CallFacade : SessionFacade, PublisherFacade, ChatFacade {
+interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade {
     val participantsStateFlow: StateFlow<ImmutableList<Participant>>
+    val signalStateFlow: StateFlow<SignalState?>
 }
 
 interface PublisherFacade {
@@ -29,30 +29,30 @@ interface SessionFacade {
 }
 
 interface ChatFacade {
-    val chatStateFlow: StateFlow<ChatState>
     fun sendChatMessage(message: String)
     fun listenUnreadChatMessages(enable: Boolean)
 }
 
-enum class SignalType(val signal: String) {
-    CHAT("chat"),
-    REACTION("reaction");
+interface EmojiFacade {
+    fun sendEmoji(emoji: String)
 }
 
-@Serializable
-internal data class ChatSignal(
-    val participantName: String,
-    val text: String,
+enum class SignalType(val signal: String) {
+    CHAT("chat"),
+    REACTION("emoji");
+}
+
+data class SignalState(
+    val signals: Map<String, SignalStateContent>
 )
+
+sealed interface SignalStateContent
 
 data class ChatState(
     val unreadCount: Int = 0,
     val messages: ImmutableList<ChatMessage> = persistentListOf(),
-)
+) : SignalStateContent
 
-data class ChatMessage(
-    val id: UUID,
-    val date: Date,
-    val participantName: String,
-    val text: String,
-)
+data class EmojiState(
+    val reactions: ImmutableList<EmojiReaction> = persistentListOf(),
+) : SignalStateContent
