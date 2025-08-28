@@ -80,8 +80,7 @@ class AudioDeviceSelector @Inject constructor(
 
     fun selectDevice(device: AudioDevice) {
         currentDevice.userSelectDevice(device)
-            .takeIf { it }
-            ?.let { _activeDevice.value = device }
+            .let { _activeDevice.value = device }
     }
 
     private fun populateAvailableDevices() {

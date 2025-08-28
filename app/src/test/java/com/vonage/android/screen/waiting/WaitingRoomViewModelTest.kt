@@ -1,7 +1,7 @@
 package com.vonage.android.screen.waiting
 
 import app.cash.turbine.test
-import com.vonage.android.audio.util.MicVolume
+import com.vonage.android.audio.util.MicVolumeListener
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.BlurLevel
@@ -21,12 +21,12 @@ class WaitingRoomViewModelTest {
 
     val videoClient: VonageVideoClient = mockk()
     val userRepository: UserRepository = mockk()
-    val micVolume: MicVolume = mockk(relaxed = true)
+    val micVolumeListener: MicVolumeListener = mockk(relaxed = true)
     val sut = WaitingRoomViewModel(
         roomName = ANY_ROOM_NAME,
         userRepository = userRepository,
         videoClient = videoClient,
-        micVolume = micVolume,
+        micVolumeListener = micVolumeListener,
     )
 
     @Test
@@ -34,7 +34,7 @@ class WaitingRoomViewModelTest {
         val publisher = buildMockPublisher()
         every { videoClient.buildPublisher() } returns publisher
         coEvery { userRepository.getUserName() } returns ""
-        every { micVolume.volume() } returns flowOf(0.5f)
+        every { micVolumeListener.volume() } returns flowOf(0.5f)
 
         sut.init()
 
@@ -56,8 +56,8 @@ class WaitingRoomViewModelTest {
             awaitItem() // initial value
             assertEquals(0.5f, awaitItem())
         }
-        verify { micVolume.start() }
-        verify { micVolume.volume() }
+        verify { micVolumeListener.start() }
+        verify { micVolumeListener.volume() }
     }
 
     @Test
@@ -270,7 +270,7 @@ class WaitingRoomViewModelTest {
 
         sut.onStop()
 
-        verify { micVolume.stop() }
+        verify { micVolumeListener.stop() }
         verify { videoClient.destroyPublisher() }
     }
 

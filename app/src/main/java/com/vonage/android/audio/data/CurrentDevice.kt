@@ -14,10 +14,9 @@ class CurrentDevice @Inject constructor(
 
     private var userSelectedDevice: AudioDevice? = null
 
-    fun userSelectDevice(device: AudioDevice): Boolean {
+    fun userSelectDevice(device: AudioDevice) {
         userSelectedDevice = device
         performSwitchTo(device)
-        return true
     }
 
     fun getCurrentActiveDevice(): AudioDevice? {

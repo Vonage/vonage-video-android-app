@@ -96,23 +96,12 @@ class AudioDeviceSelectorTest {
 
     @Test
     fun `given audio selector when select device then state is updated`() = runTest {
-        every { currentDevice.userSelectDevice(speaker) } returns true
+        every { currentDevice.userSelectDevice(speaker) } returns Unit
 
         sut.activeDevice.test {
             sut.selectDevice(speaker)
             awaitItem() // initial state
             assertEquals(speaker, awaitItem())
-        }
-    }
-
-    @Test
-    fun `given audio selector when select device fails then state is not updated`() = runTest {
-        every { currentDevice.userSelectDevice(speaker) } returns false
-
-        sut.activeDevice.test {
-            sut.selectDevice(speaker)
-            awaitItem() // initial state
-            expectNoEvents()
         }
     }
 

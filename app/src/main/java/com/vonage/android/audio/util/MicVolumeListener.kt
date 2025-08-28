@@ -17,7 +17,7 @@ import kotlin.math.sqrt
  * the conference room it's listening to the SDK AudioLevelListener
  */
 @SuppressLint("MissingPermission")
-class MicVolume @Inject constructor() {
+class MicVolumeListener @Inject constructor() {
 
     private val bufferSize by lazy {
         AudioRecord.getMinBufferSize(
@@ -75,7 +75,7 @@ class MicVolume @Inject constructor() {
     }
 
     companion object {
-        const val TAG = "MicVolume"
+        const val TAG = "MicVolumeListener"
         const val SCALE = 10
         const val CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_STEREO
         const val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
