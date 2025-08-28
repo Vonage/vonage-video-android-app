@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.CallEnd
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.VideocamOff
 import androidx.compose.material3.Badge
@@ -44,6 +45,7 @@ import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PA
 data class BottomBarState(
     val onToggleParticipants: () -> Unit,
     val onShowChat: () -> Unit,
+    val onToggleMoreActions: () -> Unit,
     val isMicEnabled: Boolean,
     val isCameraEnabled: Boolean,
     val isChatShow: Boolean,
@@ -95,6 +97,19 @@ fun BottomBar(
                 unreadCount = bottomBarState.unreadCount,
                 onShowChat = bottomBarState.onShowChat,
                 isChatShow = bottomBarState.isChatShow,
+            )
+
+            VerticalDivider(
+                modifier = Modifier
+                    .size(height = 36.dp, width = 1.dp),
+                thickness = 1.dp,
+            )
+
+            ControlButton(
+                modifier = Modifier,
+                onClick = bottomBarState.onToggleMoreActions,
+                icon = Icons.Default.MoreVert,
+                isActive = false,
             )
 
             VerticalDivider(
@@ -196,6 +211,7 @@ internal fun BottomBarPreview() {
             bottomBarState = BottomBarState(
                 onToggleParticipants = {},
                 onShowChat = {},
+                onToggleMoreActions = {},
                 isMicEnabled = false,
                 isCameraEnabled = true,
                 isChatShow = false,

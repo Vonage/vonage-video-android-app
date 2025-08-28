@@ -15,10 +15,17 @@ import com.vonage.android.kotlin.internal.toParticipant
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
+import com.vonage.android.kotlin.signal.ChatSignalPlugin
+import com.vonage.android.kotlin.signal.ReactionSignalPlugin
+import com.vonage.android.kotlin.signal.SignalPlugin
 
 class VonageVideoClient(
     private val context: Context,
     baseAudioDevice: VeraAudioDevice,
+    private val signalPlugins: List<SignalPlugin> = listOf(
+        ChatSignalPlugin(),
+        ReactionSignalPlugin(),
+    ),
     // configure log level of the entire SDK
 ) {
 
@@ -98,6 +105,7 @@ class VonageVideoClient(
             token = token,
             session = session!!,
             publisherHolder = publisherHolder!!,
+            signalPlugins = signalPlugins,
         )
     }
 

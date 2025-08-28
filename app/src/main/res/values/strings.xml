@@ -47,6 +47,9 @@
     <string name="chat_panel_input_text_placeholder">Send a message</string>
     <string name="chat_panel_jump_to_bottom">Jump to bottom</string>
 
+    <!-- Emoji reactions -->
+    <string name="emoji_panel_you">You</string>
+
     <!-- Generic -->
     <string name="generic_retry">Retry</string>
 

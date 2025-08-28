@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.vonage.android.R
 import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.ChatMessage
+import com.vonage.android.kotlin.signal.ChatMessage
 import com.vonage.android.util.preview.buildChatMessages
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList

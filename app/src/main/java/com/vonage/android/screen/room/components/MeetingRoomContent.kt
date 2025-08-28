@@ -14,6 +14,7 @@ import com.vonage.android.audio.ui.AudioDevices
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
+import com.vonage.android.screen.room.components.emoji.EmojiSelector
 import com.vonage.android.util.preview.buildParticipants
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -26,10 +27,14 @@ fun MeetingRoomContent(
     audioLevel: Float,
     participantsSheetState: SheetState,
     audioDeviceSelectorSheetState: SheetState,
+    moreActionsSheetState: SheetState,
     showParticipants: Boolean,
     showAudioDeviceSelector: Boolean,
+    showMoreActions: Boolean,
     onDismissParticipants: () -> Unit,
     onDismissAudioDeviceSelector: () -> Unit,
+    onDismissMoreActions: () -> Unit,
+    onEmojiClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -61,6 +66,18 @@ fun MeetingRoomContent(
                 )
             }
         }
+        if (showMoreActions) {
+            ModalBottomSheet(
+                onDismissRequest = onDismissMoreActions,
+                sheetState = moreActionsSheetState,
+            ) {
+                EmojiSelector(
+                    onEmojiClick = {
+                        onEmojiClick(it)
+                    },
+                )
+            }
+        }
     }
 }
 
@@ -76,13 +93,17 @@ internal fun MeetingRoomContentPreview() {
         val sheetState = rememberModalBottomSheetState()
         MeetingRoomContent(
             participants = buildParticipants(5).toImmutableList(),
-            showParticipants = false,
-            onDismissParticipants = { },
+            audioLevel = 0.5f,
             participantsSheetState = sheetState,
             audioDeviceSelectorSheetState = sheetState,
+            moreActionsSheetState = sheetState,
+            showParticipants = false,
             showAudioDeviceSelector = false,
+            showMoreActions = false,
+            onDismissParticipants = {},
             onDismissAudioDeviceSelector = {},
-            audioLevel = 0.5f,
+            onDismissMoreActions = {},
+            onEmojiClick = {},
         )
     }
 }

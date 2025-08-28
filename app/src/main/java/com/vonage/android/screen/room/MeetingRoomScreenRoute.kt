@@ -55,7 +55,10 @@ fun MeetingRoomScreenRoute(
             },
             onListenUnread = {
                 viewModel.listenUnread(it)
-            }
+            },
+            onEmojiSent = {
+                viewModel.sendEmoji(it)
+            },
         )
     }
 
@@ -82,6 +85,7 @@ object MeetingRoomScreenTestTags {
 data class MeetingRoomActions(
     val onShare: (String) -> Unit = {},
     val onRetry: () -> Unit = {},
+    val onEmojiSent: (String) -> Unit = {},
     val onToggleMic: () -> Unit = {},
     val onToggleCamera: () -> Unit = {},
     val onEndCall: () -> Unit = {},

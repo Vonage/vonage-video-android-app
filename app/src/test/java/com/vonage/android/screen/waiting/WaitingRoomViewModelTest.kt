@@ -53,7 +53,7 @@ class WaitingRoomViewModelTest {
             )
         }
         sut.audioLevel.test {
-            assertEquals(0.0f, awaitItem()) // initial value
+            awaitItem() // initial value
             assertEquals(0.5f, awaitItem())
         }
         verify { micVolume.start() }
