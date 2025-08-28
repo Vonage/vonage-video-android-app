@@ -7,18 +7,21 @@ import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
+import com.vonage.android.kotlin.ext.extractSenderName
 import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
 import com.vonage.android.kotlin.internal.toParticipant
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.kotlin.model.ChatMessage
-import com.vonage.android.kotlin.model.ChatSignal
-import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
+import com.vonage.android.kotlin.model.SignalState
+import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VeraSubscriber
+import com.vonage.android.kotlin.signal.ChatSignalPlugin
+import com.vonage.android.kotlin.signal.ChatSignalPlugin.Companion.PAYLOAD_PARTICIPANT_NAME_KEY
+import com.vonage.android.kotlin.signal.SignalPlugin
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -37,12 +40,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.Json
-import java.util.Date
-import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CopyOnWriteArrayList
 
 @Suppress("TooManyFunctions")
 @OptIn(FlowPreview::class)
@@ -51,7 +49,8 @@ class Call internal constructor(
     private val token: String,
     private val session: Session,
     private val publisherHolder: VeraPublisherHolder,
-    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
+    private val signalPlugins: List<SignalPlugin>,
+    coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : CallFacade {
 
     private val coroutineScope = CoroutineScope(coroutineDispatcher)
@@ -59,15 +58,13 @@ class Call internal constructor(
     private val _participantsStateFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
 
-    private val _chatStateFlow = MutableStateFlow(ChatState())
-    override val chatStateFlow: StateFlow<ChatState> = _chatStateFlow
-    private val chatMessages: MutableList<ChatMessage> = CopyOnWriteArrayList(mutableListOf<ChatMessage>())
-    private var chatMessagesUnreadCount: Int = 0
-    private var listenUnread: Boolean = true
+    private val _signalStateFlow = MutableStateFlow<SignalState?>(null)
+    override val signalStateFlow: StateFlow<SignalState?> = _signalStateFlow
 
-    private val subscriberStreams = HashMap<String, Subscriber>()
+    private val signals = ConcurrentHashMap<String, SignalStateContent>()
+    private val subscriberStreams = ConcurrentHashMap<String, Subscriber>()
     private val subscriberJobs = ConcurrentHashMap<String, Job>()
-    private val participantStreams = HashMap<String, Participant>()
+    private val participantStreams = ConcurrentHashMap<String, Participant>()
 
     override fun connect(): Flow<SessionEvent> = callbackFlow {
         val sessionListener = object : Session.SessionListener {
@@ -96,53 +93,60 @@ class Call internal constructor(
         }
         session.setSessionListener(sessionListener)
         session.setSignalListener { session, type, data, conn ->
-            // handle only chat signals by now
-            if (type != SignalType.CHAT.signal) return@setSignalListener
-            val chatSignal = try {
-                Json.decodeFromString<ChatSignal>(data)
-            } catch (e: SerializationException) {
-                Log.e(TAG, "Can not serialize chat signal", e)
-                return@setSignalListener
-            }
+            signalPlugins.forEach { plugin ->
+                val isYou = publisherHolder.publisher.stream.connection == conn
+                val senderName = if (!isYou) {
+                    conn.extractSenderName(subscriberStreams.values)
+                } else {
+                    ""
+                }
 
-            val message = ChatMessage(
-                id = UUID.randomUUID(),
-                date = Date(),
-                participantName = chatSignal.participantName,
-                text = chatSignal.text,
-            )
-            chatMessages.add(0, message)
-            val unreadCount = if (listenUnread) {
-                ++chatMessagesUnreadCount
-            } else 0
-            _chatStateFlow.value = ChatState(
-                unreadCount = unreadCount,
-                messages = chatMessages.toImmutableList(),
-            )
+                plugin.handleSignal(type, data, senderName, isYou) { state ->
+                    updateSignals(type, state)
+                }?.let { state ->
+                    updateSignals(type, state)
+                }
+            }
         }
         session.connect(token)
         awaitClose { session.setSessionListener(null) }
     }
 
+    private fun updateSignals(type: String, state: SignalStateContent) {
+        signals[type] = state
+        _signalStateFlow.value = SignalState(signals = signals)
+    }
+
+    override fun sendEmoji(emoji: String) {
+        signalPlugins
+            .filter { it.canHandle(SignalType.REACTION.signal) }
+            .forEach { plugin ->
+                plugin.sendSignal(session, emoji)
+            }
+    }
+
     override fun sendChatMessage(message: String) {
-        val signal = Json.encodeToString(
-            ChatSignal(
-                participantName = publisherHolder.publisher.name,
-                text = message,
-            )
-        )
-        session.sendSignal(SignalType.CHAT.signal, signal)
+        signalPlugins
+            .filter { it.canHandle(SignalType.CHAT.signal) }
+            .forEach { plugin ->
+                plugin.sendSignal(
+                    session, message, mapOf(
+                        PAYLOAD_PARTICIPANT_NAME_KEY to publisherHolder.publisher.name,
+                    )
+                )
+            }
     }
 
     override fun listenUnreadChatMessages(enable: Boolean) {
-        listenUnread = enable
-        if (!enable) {
-            chatMessagesUnreadCount = 0
-            _chatStateFlow.value = ChatState(
-                unreadCount = 0,
-                messages = chatMessages.toImmutableList(),
-            )
-        }
+        signalPlugins
+            .filterIsInstance<ChatSignalPlugin>()
+            .mapNotNull { it.listenUnread(enable) }
+            .forEach { state ->
+                signals[SignalType.CHAT.signal] = state
+                _signalStateFlow.value = SignalState(
+                    signals = signals
+                )
+            }
     }
 
     override fun endSession() {
