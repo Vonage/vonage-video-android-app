@@ -117,6 +117,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     }
 
     fun endCall() {
+        notificationManager.stopForegroundService()
         call?.endSession()
     }
 
@@ -125,7 +126,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     }
 
     fun onResume() {
-        //call?.resumeSession()
+        call?.resumeSession()
     }
 
     fun sendMessage(message: String) {

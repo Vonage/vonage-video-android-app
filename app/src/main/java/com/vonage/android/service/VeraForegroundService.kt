@@ -46,10 +46,26 @@ class VeraForegroundService : Service() {
 
         val roomName = intent.extras?.getString("room")
 
-        val notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val notification = buildInCallNotification(roomName.orEmpty())
+
+        ServiceCompat.startForeground(
+            this,
+            NOTIFICATION_ID_MIC,
+            notification,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                FOREGROUND_SERVICE_TYPE_MICROPHONE or FOREGROUND_SERVICE_TYPE_CAMERA
+            } else {
+                0
+            },
+        )
+        return START_STICKY
+    }
+
+    private fun buildInCallNotification(roomName: String) =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             // caller
             val caller = Person.Builder()
-                .setName("Vonage")
+                .setName(roomName)
                 .setImportant(true)
                 .build()
 
@@ -89,19 +105,6 @@ class VeraForegroundService : Service() {
                 .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
                 .build()
         }
-
-        ServiceCompat.startForeground(
-            this,
-            NOTIFICATION_ID_MIC,
-            notification,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                FOREGROUND_SERVICE_TYPE_MICROPHONE or FOREGROUND_SERVICE_TYPE_CAMERA
-            } else {
-                0
-            },
-        )
-        return START_STICKY
-    }
 
     companion object {
         const val NOTIFICATION_ID_MIC: Int = 1
