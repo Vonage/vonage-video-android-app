@@ -5,6 +5,8 @@ import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
+import com.vonage.android.kotlin.model.SignalState
+import com.vonage.android.kotlin.model.SignalType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
@@ -37,13 +39,21 @@ fun buildCallWithParticipants(
         override fun toggleLocalAudio() {}
 
         // Chat related methods
-        override val chatStateFlow: StateFlow<ChatState> = MutableStateFlow(
-            ChatState(
-                unreadCount = unreadCount,
-                messages = buildChatMessages(messagesCount).toImmutableList(),
+        override val signalStateFlow: StateFlow<SignalState> = MutableStateFlow(
+            SignalState(
+                signals = mapOf(
+                    SignalType.CHAT.signal to ChatState(
+                        unreadCount = unreadCount,
+                        messages = buildChatMessages(messagesCount).toImmutableList(),
+                    ),
+                )
             )
         )
+
         override fun sendChatMessage(message: String) {}
         override fun listenUnreadChatMessages(enable: Boolean) {}
+
+        // Reactions related methods
+        override fun sendEmoji(emoji: String) {}
     }
 }

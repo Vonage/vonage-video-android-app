@@ -6,6 +6,7 @@ import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VeraPublisher
 import io.mockk.coEvery
 import io.mockk.every
@@ -54,7 +55,6 @@ class MeetingRoomScreenViewModelTest {
         sut().uiState.test {
             assertEquals(MeetingRoomUiState.Loading, awaitItem())
             assertEquals(MeetingRoomUiState.SessionError, awaitItem())
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -76,7 +76,6 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onToggleMic()
             verify { mockCall.toggleLocalAudio() }
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -98,7 +97,6 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onToggleCamera()
             verify { mockCall.toggleLocalVideo() }
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -120,7 +118,6 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.endCall()
             verify { mockCall.endSession() }
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -133,7 +130,7 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            awaitItem()
             assertEquals(
                 MeetingRoomUiState.Content(
                     roomName = ANY_ROOM_NAME,
@@ -142,7 +139,6 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onPause()
             verify { mockCall.pauseSession() }
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -155,7 +151,7 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            awaitItem()
             assertEquals(
                 MeetingRoomUiState.Content(
                     roomName = ANY_ROOM_NAME,
@@ -164,7 +160,6 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onResume()
             verify { mockCall.resumeSession() }
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -186,7 +181,6 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.onSwitchCamera()
             verify { mockCall.toggleLocalCamera() }
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -232,6 +226,27 @@ class MeetingRoomScreenViewModelTest {
         }
     }
 
+    @Test
+    fun `given viewmodel when sendEmoji then delegate to call`() = runTest {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(
+                MeetingRoomUiState.Content(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                ), awaitItem()
+            )
+            sut.sendEmoji("emoji :)")
+            verify { mockCall.sendEmoji("emoji :)") }
+        }
+    }
+
     private fun sut(): MeetingRoomScreenViewModel =
         MeetingRoomScreenViewModel(
             roomName = ANY_ROOM_NAME,
@@ -260,7 +275,19 @@ class MeetingRoomScreenViewModelTest {
         isSpeaking = false,
     )
 
-    private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true)
+    private fun buildMockCall(): CallFacade = mockk<CallFacade> {
+        every { toggleLocalAudio() } returns Unit
+        every { toggleLocalVideo() } returns Unit
+        every { toggleLocalCamera() } returns Unit
+        every { observeLocalAudioLevel() } returns flowOf()
+        every { connect() } returns flowOf(SessionEvent.Connected)
+        every { sendEmoji(any()) } returns Unit
+        every { resumeSession() } returns Unit
+        every { pauseSession() } returns Unit
+        every { endSession() } returns Unit
+        every { listenUnreadChatMessages(any()) } returns Unit
+        every { sendChatMessage(any()) } returns Unit
+    }
 
     private companion object {
         const val ANY_ROOM_NAME = "room-name"

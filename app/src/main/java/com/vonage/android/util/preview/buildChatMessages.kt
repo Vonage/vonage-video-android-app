@@ -1,6 +1,6 @@
 package com.vonage.android.util.preview
 
-import com.vonage.android.kotlin.model.ChatMessage
+import com.vonage.android.kotlin.signal.ChatMessage
 import java.util.Date
 import java.util.UUID
 
