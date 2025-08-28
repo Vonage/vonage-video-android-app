@@ -33,7 +33,7 @@ class MeetingRoomScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 MeetingRoomScreen(
-                    uiState = MeetingRoomUiState.Content(
+                    uiState = MeetingRoomUiState(
                         roomName = "sample-name",
                         call = buildCallWithParticipants(
                             participantCount = 5,
