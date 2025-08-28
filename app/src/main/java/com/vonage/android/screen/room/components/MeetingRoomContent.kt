@@ -81,7 +81,7 @@ fun MeetingRoomContent(
                 )
                 MoreActionsGrid(
                     isRecording = isRecording,
-                    actions = actions
+                    actions = actions,
                 )
             }
         }
