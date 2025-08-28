@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -32,26 +33,19 @@ import androidx.compose.ui.unit.dp
 import com.vonage.android.R
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.screen.room.MeetingRoomActions
+import com.vonage.android.screen.room.RecordingState
 
 @Composable
 fun MoreActionsGrid(
-    isRecording: Boolean,
+    recordingState: RecordingState,
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
 ) {
     val actions = listOf(
-        ExtraAction(
-            id = 1,
-            icon = Icons.Default.Archive,
-            label = if (isRecording) {
-                stringResource(R.string.recording_stop_recording)
-            } else {
-                stringResource(R.string.recording_start_recording)
-            },
-            isSelected = isRecording,
-            onClick = { actions.onToggleRecording(isRecording.toggle()) },
+        recordingAction(
+            actions = actions,
+            recordingState = recordingState,
         ),
         // rest of the actions are placeholders
         ExtraAction(
@@ -97,6 +91,41 @@ fun MoreActionsGrid(
         }
     }
 }
+
+@Composable
+private fun recordingAction(
+    actions: MeetingRoomActions,
+    recordingState: RecordingState,
+): ExtraAction =
+    ExtraAction(
+        id = 1,
+        icon = Icons.Default.Archive,
+        label = when (recordingState) {
+            RecordingState.IDLE,
+            RecordingState.STARTING,
+            RecordingState.STOPPING -> stringResource(R.string.recording_start_recording)
+
+            RecordingState.RECORDING -> stringResource(R.string.recording_stop_recording)
+        },
+        isSelected = when (recordingState) {
+            RecordingState.IDLE,
+            RecordingState.STOPPING -> false
+
+            RecordingState.STARTING,
+            RecordingState.RECORDING -> true
+        },
+        onClick = remember {
+            {
+                when (recordingState) {
+                    RecordingState.IDLE -> actions.onToggleRecording(true)
+                    RecordingState.RECORDING -> actions.onToggleRecording(false)
+                    RecordingState.STARTING,
+                    RecordingState.STOPPING -> {
+                    }
+                }
+            }
+        },
+    )
 
 @Composable
 private fun ActionCell(
@@ -156,7 +185,7 @@ internal fun MoreActionsGridPreview() {
     VonageVideoTheme {
         MoreActionsGrid(
             modifier = Modifier.background(VonageVideoTheme.colors.surface),
-            isRecording = true,
+            recordingState = RecordingState.RECORDING,
             actions = MeetingRoomActions(),
         )
     }

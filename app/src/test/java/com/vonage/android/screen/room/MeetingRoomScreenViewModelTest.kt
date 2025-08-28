@@ -9,6 +9,7 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VeraPublisher
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -16,14 +17,20 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class MeetingRoomScreenViewModelTest {
 
-    val sessionRepository: SessionRepository = mockk()
-    val archiveRepository: ArchiveRepository = mockk()
-    val videoClient: VonageVideoClient = mockk()
+    val sessionRepository: SessionRepository = mockk(relaxed = true)
+    val archiveRepository: ArchiveRepository = mockk(relaxed = true)
+    val videoClient: VonageVideoClient = mockk(relaxed = true)
+
+    @BeforeEach
+    fun setup() {
+        MockKAnnotations.init()
+    }
 
     @Test
     fun `given viewmodel when initialize then returns correct state`() = runTest {
@@ -35,12 +42,12 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = false,
+                    recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
         }
@@ -57,8 +64,8 @@ class MeetingRoomScreenViewModelTest {
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns Result.failure(Exception("Empty response"))
 
         sut().uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
-            assertEquals(MeetingRoomUiState.SessionError, awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true, isError = false), awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true, isError = true), awaitItem())
         }
     }
 
@@ -71,12 +78,12 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = false,
+                    recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
             sut.onToggleMic()
@@ -93,12 +100,12 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = false,
+                    recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
             sut.onToggleCamera()
@@ -115,12 +122,12 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = false,
+                    recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
             sut.endCall()
@@ -139,10 +146,10 @@ class MeetingRoomScreenViewModelTest {
         sut.uiState.test {
             awaitItem()
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = false,
+                    recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
             sut.onPause()
@@ -161,10 +168,10 @@ class MeetingRoomScreenViewModelTest {
         sut.uiState.test {
             awaitItem()
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = false,
+                    recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
             sut.onResume()
@@ -181,12 +188,12 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = false,
+                    recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
             sut.onSwitchCamera()
@@ -203,12 +210,12 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = false,
+                    recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
             sut.sendMessage("hi there!")
@@ -225,12 +232,12 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = false,
+                    recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
             sut.listenUnread(false)
@@ -247,12 +254,12 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = false,
+                    recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
             sut.sendEmoji("emoji :)")
@@ -270,23 +277,30 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = false,
+                    recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
             sut.archiveCall(true, ANY_ROOM_NAME)
-            coVerify { archiveRepository.startArchive(ANY_ROOM_NAME) }
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = true,
+                    recordingState = RecordingState.STARTING,
                 ), awaitItem()
             )
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    recordingState = RecordingState.RECORDING,
+                ), awaitItem()
+            )
+            coVerify { archiveRepository.startArchive(ANY_ROOM_NAME) }
         }
     }
 
@@ -301,31 +315,46 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = false,
+                    recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
             sut.archiveCall(true, ANY_ROOM_NAME)
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = true,
+                    recordingState = RecordingState.STARTING,
+                ), awaitItem()
+            )
+            coVerify { archiveRepository.startArchive(ANY_ROOM_NAME) }
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    recordingState = RecordingState.RECORDING,
                 ), awaitItem()
             )
             sut.archiveCall(false, ANY_ROOM_NAME)
             assertEquals(
-                MeetingRoomUiState.Content(
+                MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    isRecording = false,
+                    recordingState = RecordingState.STOPPING,
                 ), awaitItem()
             )
             coVerify { archiveRepository.stopArchive(ANY_ROOM_NAME, "archiveId") }
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    recordingState = RecordingState.IDLE,
+                ), awaitItem()
+            )
         }
     }
 

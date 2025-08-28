@@ -6,7 +6,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material3.Icon
@@ -16,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 
 @Composable
 fun RecordingIndicator(
@@ -24,8 +22,7 @@ fun RecordingIndicator(
 ) {
     Pulsating {
         Icon(
-            modifier = modifier
-                .padding(end = 4.dp),
+            modifier = modifier,
             imageVector = Icons.Default.FiberManualRecord,
             tint = Color.Red,
             contentDescription = null,
