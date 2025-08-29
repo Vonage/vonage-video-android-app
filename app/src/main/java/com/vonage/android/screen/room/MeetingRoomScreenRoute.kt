@@ -10,7 +10,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.vonage.android.util.pip.PipEffect
+import com.vonage.android.util.pip.pipEffect
 import com.vonage.android.util.pip.rememberIsInPipMode
 
 @Composable
@@ -69,7 +69,7 @@ fun MeetingRoomScreenRoute(
         onBack()
     }
 
-    val pipModifier = PipEffect()
+    val pipModifier = pipEffect()
     val inPipMode = rememberIsInPipMode()
 
     if (inPipMode) {

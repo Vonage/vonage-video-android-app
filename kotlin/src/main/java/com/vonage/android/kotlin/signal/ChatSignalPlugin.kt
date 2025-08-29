@@ -6,9 +6,9 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat.checkSelfPermission
 import com.opentok.android.Session
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.SignalStateContent
@@ -79,7 +79,7 @@ class ChatSignalPlugin(
 
     @SuppressLint("MissingPermission")
     private fun showChatNotification(sender: String, message: String) {
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        if (checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             return
         }
         val chatNotification = NotificationCompat.Builder(context, "VeraNotificationManagerChat")
@@ -90,7 +90,7 @@ class ChatSignalPlugin(
             .build()
         val noti = NotificationManagerCompat.from(context)
         // add summary notification
-        noti.notify(123, chatNotification)
+        noti.notify(GROUP_ID, chatNotification)
     }
 
     override fun sendSignal(session: Session, message: String, payload: Map<String, String>) {
@@ -117,6 +117,7 @@ class ChatSignalPlugin(
 
     companion object {
         const val PAYLOAD_PARTICIPANT_NAME_KEY = "participantName"
+        const val GROUP_ID = 123
     }
 }
 

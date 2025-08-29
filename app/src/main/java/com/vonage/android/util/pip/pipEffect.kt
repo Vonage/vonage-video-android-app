@@ -19,7 +19,7 @@ import androidx.core.app.PictureInPictureModeChangedInfo
 import androidx.core.util.Consumer
 
 @Composable
-fun PipEffect(
+fun pipEffect(
     modifier: Modifier = Modifier,
 ): Modifier {
     val context = LocalContext.current
@@ -85,5 +85,5 @@ internal fun Context.findActivity(): ComponentActivity {
         if (context is ComponentActivity) return context
         context = context.baseContext
     }
-    throw IllegalStateException("Picture in picture should be called in the context of an Activity")
+    error("Picture in picture should be called in the context of an Activity")
 }

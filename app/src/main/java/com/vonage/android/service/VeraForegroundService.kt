@@ -17,7 +17,6 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
-import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.vonage.android.MainActivity
@@ -75,7 +74,7 @@ class VeraForegroundService : Service() {
         )
         val deepLinkPendingIntent: PendingIntent? = PendingIntent.getActivity(
             this,
-            998,
+            CHAT_REQUEST_CODE,
             deepLinkIntent,
             FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
         )
@@ -116,6 +115,7 @@ class VeraForegroundService : Service() {
     private companion object {
         const val NOTIFICATION_ID_MIC = 1
         const val REQUEST_CODE = 999
+        const val CHAT_REQUEST_CODE = 998
         const val TAG: String = "VeraForegroundService"
     }
 }
