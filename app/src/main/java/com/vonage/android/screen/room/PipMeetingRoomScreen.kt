@@ -1,19 +1,25 @@
 package com.vonage.android.screen.room
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.model.ChatState
+import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VeraPublisher
+import com.vonage.android.screen.room.components.ChatBadgeButton
 import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.ParticipantVideoCard
 import com.vonage.android.util.preview.buildCallWithParticipants
@@ -30,19 +36,32 @@ fun PipMeetingRoomScreen(
     when (uiState) {
         is MeetingRoomUiState.Content -> {
             val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
+            val signalState by uiState.call.signalStateFlow.collectAsStateWithLifecycle(null)
+            val chatState = signalState?.signals[SignalType.CHAT.signal] as? ChatState
             val participant = participants.last() // replace to active speaker when logic available
 
-            ParticipantVideoCard(
+            Box(
                 modifier = modifier
-                    .fillMaxWidth(),
-                name = participant.name,
-                isCameraEnabled = participant.isCameraEnabled,
-                isMicEnabled = participant.isMicEnabled,
-                view = participant.view,
-                audioLevel = audioLevel,
-                isSpeaking = participant.isSpeaking,
-                isShowVolumeIndicator = participant is VeraPublisher,
-            )
+                    .fillMaxWidth()
+            ) {
+                ParticipantVideoCard(
+                    name = participant.name,
+                    isCameraEnabled = participant.isCameraEnabled,
+                    isMicEnabled = participant.isMicEnabled,
+                    view = participant.view,
+                    audioLevel = audioLevel,
+                    isSpeaking = participant.isSpeaking,
+                    isShowVolumeIndicator = participant is VeraPublisher,
+                )
+                ChatBadgeButton(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp),
+                    unreadCount = chatState?.unreadCount ?: 0,
+                    onShowChat = {},
+                    isChatShow = true,
+                )
+            }
         }
 
         is MeetingRoomUiState.Loading -> GenericLoading()
@@ -63,7 +82,6 @@ fun PipMeetingRoomScreen(
 }
 
 @PreviewLightDark
-@PreviewScreenSizes
 @Composable
 internal fun PipMeetingRoomScreenSessionPreview() {
     VonageVideoTheme {

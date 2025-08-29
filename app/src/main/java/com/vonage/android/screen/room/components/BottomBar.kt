@@ -125,13 +125,15 @@ fun BottomBar(
 }
 
 @Composable
-private fun ChatBadgeButton(
+fun ChatBadgeButton(
     unreadCount: Int,
     onShowChat: () -> Unit,
     isChatShow: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val badgeVisible = unreadCount > 0
     BadgedBox(
+        modifier = modifier,
         badge = {
             if (badgeVisible) {
                 Badge(

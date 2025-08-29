@@ -1,6 +1,5 @@
 package com.vonage.android.screen.room
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.SessionInfo
@@ -14,7 +13,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,7 +27,6 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = MeetingRoomViewModelFactory::class)
 class MeetingRoomScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
-    @param:ApplicationContext val context: Context,
     private val sessionRepository: SessionRepository,
     private val videoClient: VonageVideoClient,
     private val notificationManager: VeraNotificationManager,
