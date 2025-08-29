@@ -29,7 +29,7 @@ class MeetingRoomScreenViewModelTest {
 
     @BeforeEach
     fun setup() {
-        MockKAnnotations.init()
+        MockKAnnotations.init(this)
     }
 
     @Test

@@ -18,8 +18,7 @@ class DownloadManager @Inject constructor(
             .apply {
                 setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "vonage-recording")
                 setMimeType("video/mp4")
-                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE
-                        or DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             }
             .let { request ->
                 manager.enqueue(request)

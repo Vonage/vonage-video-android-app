@@ -39,7 +39,7 @@ class ArchiveRepository @Inject constructor(
             return if (response.isSuccessful) {
                 Result.success(true)
             } else {
-                Result.failure(Exception("Failed to start archiving"))
+                Result.failure(Exception("Failed to stop archiving"))
             }
         }
 }
