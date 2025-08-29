@@ -73,10 +73,12 @@ class VeraForegroundService : Service() {
             this,
             MainActivity::class.java
         )
-        val deepLinkPendingIntent: PendingIntent? = TaskStackBuilder.create(this).run {
-            addNextIntentWithParentStack(deepLinkIntent)
-            getPendingIntent(0, FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE)
-        }
+        val deepLinkPendingIntent: PendingIntent? = PendingIntent.getActivity(
+            this,
+            998,
+            deepLinkIntent,
+            FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
+        )
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             // caller
             val caller = Person.Builder()

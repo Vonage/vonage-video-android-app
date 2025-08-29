@@ -25,7 +25,7 @@ object RetrofitModule {
     @Provides
     @Singleton
     fun provideHttpClient(): OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(HttpLoggingInterceptor().apply { level = Level.BASIC })
+        .addInterceptor(HttpLoggingInterceptor().apply { level = Level.BODY })
         .build()
 
     @Provides

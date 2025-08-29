@@ -19,6 +19,7 @@
         android:theme="@style/Theme.VonageVideoAndroid">
         <activity
             android:name=".MainActivity"
+            android:launchMode="singleTop"
             android:exported="true"
             android:theme="@style/Theme.VonageVideoAndroid">
             <intent-filter>

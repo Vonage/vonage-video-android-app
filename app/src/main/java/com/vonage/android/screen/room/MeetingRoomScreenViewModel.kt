@@ -1,6 +1,7 @@
 package com.vonage.android.screen.room
 
 import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.SessionInfo
@@ -34,6 +35,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private val videoClient: VonageVideoClient,
     private val notificationManager: VeraNotificationManager,
     private val callActionsListener: CallActionsListener,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<MeetingRoomUiState>(MeetingRoomUiState.Loading)
@@ -51,14 +53,21 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     )
 
     private var call: CallFacade? = null
+    private var initialized = false
 
     init {
-        setup()
+//        if (!initialized) {
+        if (savedStateHandle.get<Boolean>("initialized") == null) {
+            setup()
 
-        notificationManager
-            .createNotificationChannel()
-            .startForegroundService(roomName)
-            .listenCallActions()
+            notificationManager
+                .createNotificationChannel()
+                .startForegroundService(roomName)
+                .listenCallActions()
+        }
+
+        initialized = true
+        savedStateHandle["initialized"] = false
     }
 
     fun setup() {

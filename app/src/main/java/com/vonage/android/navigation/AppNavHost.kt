@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
@@ -45,13 +46,10 @@ fun AppNavHost(
             WaitingRoomRoute(
                 roomName = roomName,
                 navigateToRoom = { roomName ->
-                    navController.navigate(Meeting(roomName)) {
-                        popUpTo(Meeting(roomName)) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+                    navController.navigate(
+                        route = Meeting(roomName),
+                        navOptions = NavOptions.Builder().setLaunchSingleTop(true).build(),
+                    )
                 },
                 navigateToPermissions = { context.navigateToSystemPermissions() },
                 onBack = {
