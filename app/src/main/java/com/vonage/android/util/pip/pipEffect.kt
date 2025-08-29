@@ -42,7 +42,7 @@ fun pipEffect(
             }
         }
     } else {
-        Log.i("PiP info", "API does not support PiP")
+        Log.i("PiP", "API does not support PiP")
     }
 
     val pipModifier = modifier.onGloballyPositioned { layoutCoordinates ->

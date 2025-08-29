@@ -45,19 +45,7 @@ fun GoodbyeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                Text(
-                    text = stringResource(R.string.goodbye_title),
-                    style = VonageVideoTheme.typography.titleLarge,
-                    color = VonageVideoTheme.colors.inverseSurface,
-                    textAlign = TextAlign.Center,
-                )
-
-                Text(
-                    text = stringResource(R.string.goodbye_subtitle),
-                    style = VonageVideoTheme.typography.body,
-                    color = VonageVideoTheme.colors.textPrimaryDisabled,
-                    textAlign = TextAlign.Center,
-                )
+                GoodbyeScreenHeader()
 
                 VonageOutlinedButton(
                     text = stringResource(R.string.goodbye_rejoin_button_label),
@@ -70,6 +58,31 @@ fun GoodbyeScreen(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun GoodbyeScreenHeader(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.goodbye_title),
+            style = VonageVideoTheme.typography.titleLarge,
+            color = VonageVideoTheme.colors.inverseSurface,
+            textAlign = TextAlign.Center,
+        )
+
+        Text(
+            text = stringResource(R.string.goodbye_subtitle),
+            style = VonageVideoTheme.typography.body,
+            color = VonageVideoTheme.colors.textPrimaryDisabled,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
