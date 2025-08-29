@@ -19,7 +19,7 @@ fun MeetingRoomScreenRoute(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MeetingRoomScreenViewModel =
-        hiltViewModel<MeetingRoomScreenViewModel, MeetingRoomViewModelFactory> { factory ->
+        hiltViewModel<MeetingRoomScreenViewModel, MeetingRoomViewModelFactory>(key = roomName) { factory ->
             factory.create(roomName)
         },
 ) {

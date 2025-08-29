@@ -20,7 +20,7 @@ import com.vonage.android.kotlin.signal.SignalPlugin
 class VonageVideoClient(
     private val context: Context,
     private val signalPlugins: List<SignalPlugin> = listOf(
-        ChatSignalPlugin(),
+        ChatSignalPlugin(context),
         ReactionSignalPlugin(),
     ),
     // configure log level of the entire SDK

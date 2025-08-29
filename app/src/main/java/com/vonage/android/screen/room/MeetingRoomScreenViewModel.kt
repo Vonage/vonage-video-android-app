@@ -1,16 +1,20 @@
 package com.vonage.android.screen.room
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.service.CallAction
+import com.vonage.android.service.CallActionsListener
 import com.vonage.android.service.VeraNotificationManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,9 +29,11 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = MeetingRoomViewModelFactory::class)
 class MeetingRoomScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
+    @param:ApplicationContext val context: Context,
     private val sessionRepository: SessionRepository,
     private val videoClient: VonageVideoClient,
     private val notificationManager: VeraNotificationManager,
+    private val callActionsListener: CallActionsListener,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<MeetingRoomUiState>(MeetingRoomUiState.Loading)
@@ -49,8 +55,10 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     init {
         setup()
 
-        notificationManager.createNotificationChannel()
-        notificationManager.startForegroundService(roomName)
+        notificationManager
+            .createNotificationChannel()
+            .startForegroundService(roomName)
+            .listenCallActions()
     }
 
     fun setup() {
@@ -66,6 +74,17 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                 .onFailure {
                     _uiState.value = MeetingRoomUiState.SessionError
                 }
+        }
+        viewModelScope.launch {
+            callActionsListener.actions.collect { callAction ->
+                when (callAction) {
+                    CallAction.HangUp -> {
+                        _uiState.value = MeetingRoomUiState.EndCall
+                    }
+
+                    else -> {}
+                }
+            }
         }
     }
 
@@ -123,11 +142,11 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     }
 
     fun onPause() {
-        call?.pauseSession()
+//        call?.pauseSession()
     }
 
     fun onResume() {
-        call?.resumeSession()
+//        call?.resumeSession()
     }
 
     fun sendMessage(message: String) {
@@ -161,4 +180,5 @@ sealed interface MeetingRoomUiState {
 
     data object Loading : MeetingRoomUiState
     data object SessionError : MeetingRoomUiState
+    data object EndCall : MeetingRoomUiState
 }

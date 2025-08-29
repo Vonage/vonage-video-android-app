@@ -37,11 +37,15 @@ class VeraForegroundService : Service() {
         return null
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         if (ContextCompat.checkSelfPermission(this, permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             Log.e(TAG, "Cannot use microphone on background without RECORD_AUDIO permission")
             stopSelf()
+        }
+
+        if (intent == null) {
+            return START_REDELIVER_INTENT
         }
 
         val roomName = intent.extras?.getString("room")
@@ -61,8 +65,19 @@ class VeraForegroundService : Service() {
         return START_STICKY
     }
 
-    private fun buildInCallNotification(roomName: String) =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    private fun buildInCallNotification(roomName: String): Notification {
+        // deeplink intent
+        val deepLinkIntent = Intent(
+            Intent.ACTION_VIEW,
+            "$BASE_URL/room/$roomName".toUri(),
+            this,
+            MainActivity::class.java
+        )
+        val deepLinkPendingIntent: PendingIntent? = TaskStackBuilder.create(this).run {
+            addNextIntentWithParentStack(deepLinkIntent)
+            getPendingIntent(0, FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE)
+        }
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             // caller
             val caller = Person.Builder()
                 .setName(roomName)
@@ -70,7 +85,8 @@ class VeraForegroundService : Service() {
                 .build()
 
             // hangUp intent
-            val hangupIntent = Intent(this, MainActivity::class.java)
+            val hangupIntent = Intent(HANG_UP_ACTION)
+
             val hangupPendingIntent = PendingIntent.getBroadcast(
                 this,
                 REQUEST_CODE,
@@ -78,33 +94,22 @@ class VeraForegroundService : Service() {
                 FLAG_IMMUTABLE
             )
 
-            // deeplink intent
-            val deepLinkIntent = Intent(
-                Intent.ACTION_VIEW,
-                "$BASE_URL/room/$roomName".toUri(),
-                this,
-                MainActivity::class.java
-            )
-            val deepLinkPendingIntent: PendingIntent? = TaskStackBuilder.create(this).run {
-                addNextIntentWithParentStack(deepLinkIntent)
-                getPendingIntent(0, FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE)
-            }
-
             Notification.Builder(this, CHANNEL_ID)
                 .setContentIntent(deepLinkPendingIntent)
                 .setSmallIcon(R.drawable.ic_vonage)
-                .setContentTitle("Vonage Room in progress...")
                 .setStyle(CallStyle.forOngoingCall(caller, hangupPendingIntent))
                 .setOngoing(true)
+                .setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
                 .build()
         } else {
             NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Vonage Room in progress...")
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(deepLinkPendingIntent)
+                .setSmallIcon(R.drawable.ic_vonage)
                 .setOngoing(true)
                 .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
                 .build()
         }
+    }
 
     private companion object {
         const val NOTIFICATION_ID_MIC = 1

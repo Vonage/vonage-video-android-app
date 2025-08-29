@@ -173,6 +173,10 @@ fun MeetingRoomScreen(
                 onCancel = actions.onBack,
             )
         }
+
+        is MeetingRoomUiState.EndCall -> {
+            actions.onEndCall()
+        }
     }
 }
 
