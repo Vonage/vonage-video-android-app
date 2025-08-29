@@ -21,6 +21,8 @@
             android:name=".MainActivity"
             android:launchMode="singleTop"
             android:exported="true"
+            android:supportsPictureInPicture="true"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"
             android:theme="@style/Theme.VonageVideoAndroid">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
