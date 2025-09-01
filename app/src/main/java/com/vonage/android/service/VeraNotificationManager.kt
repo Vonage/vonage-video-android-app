@@ -14,6 +14,8 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.core.content.ContextCompat.registerReceiver
+import com.vonage.android.kotlin.signal.ChatSignalPlugin.Companion.NOTIFICATION_CHANNEL_ID
+import com.vonage.android.kotlin.signal.ChatSignalPlugin.Companion.NOTIFICATION_CHANNEL_NAME
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -45,8 +47,8 @@ class VeraNotificationManager @Inject constructor(
                 IMPORTANCE_HIGH,
             )
             val chatChannel = NotificationChannel(
-                "VeraNotificationManagerChat",
-                "Vera Chat",
+                NOTIFICATION_CHANNEL_ID,
+                NOTIFICATION_CHANNEL_NAME,
                 IMPORTANCE_DEFAULT,
             )
             manager.createNotificationChannel(channel)

@@ -14,7 +14,7 @@ fun GoodbyeScreenRoute(
     navigateToLanding: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val pipModifier = pipEffect(false)
+    val pipModifier = pipEffect(shouldEnterPipMode = false)
 
     val actions = remember {
         GoodbyeScreenActions(

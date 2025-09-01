@@ -15,7 +15,7 @@ fun JoinMeetingRoomRoute(
     viewModel: JoinMeetingRoomViewModel = hiltViewModel(),
     navigateToRoom: (JoinMeetingRoomRouteParams) -> Unit,
 ) {
-    val pipModifier = pipEffect(false)
+    val pipModifier = pipEffect(shouldEnterPipMode = false)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val actions = remember {

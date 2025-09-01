@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
@@ -25,6 +24,7 @@ class ChatSignalPlugin(
     private val context: Context,
 ) : SignalPlugin {
 
+    private val notificationManager = NotificationManagerCompat.from(context)
     private val chatMessages: MutableList<ChatMessage> = CopyOnWriteArrayList()
     private var chatMessagesUnreadCount: Int = 0
     private var listenUnread: Boolean = true
@@ -63,12 +63,8 @@ class ChatSignalPlugin(
                 ActivityManager.getMyMemoryState(appProcessInfo)
                 appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
             }
-        Log.d("XXX", "app is in foreground $isInForeground")
         if (!isInForeground) {
-            showChatNotification(
-                sender = chatSignal.participantName,
-                message = chatSignal.text,
-            )
+            showChatNotification(chatMessages.take(chatMessagesUnreadCount))
         }
 
         return ChatState(
@@ -78,19 +74,24 @@ class ChatSignalPlugin(
     }
 
     @SuppressLint("MissingPermission")
-    private fun showChatNotification(sender: String, message: String) {
+    private fun showChatNotification(messages: List<ChatMessage>) {
         if (checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             return
         }
-        val chatNotification = NotificationCompat.Builder(context, "VeraNotificationManagerChat")
+        val summary = NotificationCompat.MessagingStyle("Vonage")
+        messages.forEach { message ->
+            val notificationMessage = NotificationCompat.MessagingStyle.Message(
+                message.text,
+                message.date.time,
+                message.participantName
+            )
+            summary.addMessage(notificationMessage)
+        }
+        val chatNotification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.sym_action_chat)
-            .setContentTitle(sender)
-            .setContentText(message)
-            .setGroup("ChatSignal")
+            .setStyle(summary)
             .build()
-        val noti = NotificationManagerCompat.from(context)
-        // add summary notification
-        noti.notify(GROUP_ID, chatNotification)
+        notificationManager.notify(NOTIFICATION_ID, chatNotification)
     }
 
     override fun sendSignal(session: Session, message: String, payload: Map<String, String>) {
@@ -107,6 +108,7 @@ class ChatSignalPlugin(
         listenUnread = enable
         if (!enable) {
             chatMessagesUnreadCount = 0
+            notificationManager.cancel(NOTIFICATION_ID)
             return ChatState(
                 unreadCount = 0,
                 messages = chatMessages.toImmutableList(),
@@ -117,7 +119,9 @@ class ChatSignalPlugin(
 
     companion object {
         const val PAYLOAD_PARTICIPANT_NAME_KEY = "participantName"
-        const val GROUP_ID = 123
+        const val NOTIFICATION_CHANNEL_ID = "VeraNotificationManagerChat"
+        const val NOTIFICATION_CHANNEL_NAME = "Vonage Chat"
+        const val NOTIFICATION_ID = 123
     }
 }
 
