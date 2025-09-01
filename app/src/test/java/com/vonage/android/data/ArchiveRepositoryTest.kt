@@ -1,0 +1,201 @@
+package com.vonage.android.data
+
+import com.vonage.android.data.network.APIService
+import com.vonage.android.data.network.GetArchivesResponse
+import com.vonage.android.data.network.ServerArchive
+import com.vonage.android.data.network.StartArchivingResponse
+import com.vonage.android.data.network.StopArchivingResponse
+import io.mockk.coEvery
+import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody
+import org.junit.jupiter.api.Test
+import retrofit2.Response
+import kotlin.Result.Companion.success
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+
+class ArchiveRepositoryTest {
+
+    val apiService: APIService = mockk()
+    val sut = ArchiveRepository(
+        apiService = apiService,
+    )
+
+    @Test
+    fun `given repository when getRecordings api success returns success`() = runTest {
+        coEvery { apiService.getArchives("any-room-name") } returns Response<GetArchivesResponse>.success(
+            GetArchivesResponse(archives = serverArchives)
+        )
+        val response = sut.getRecordings("any-room-name")
+        assertEquals(success(archives), response)
+    }
+
+    @Test
+    fun `given repository when getRecordings api success with empty returns success`() = runTest {
+        coEvery { apiService.getArchives("any-room-name") } returns Response.success(null)
+        val response = sut.getRecordings("any-room-name")
+        assertTrue(response.isFailure)
+    }
+
+    @Test
+    fun `given repository when getRecordings api fails returns error`() = runTest {
+        coEvery { apiService.getArchives("any-room-name") } returns Response.error(
+            500, ResponseBody.EMPTY
+        )
+        val response = sut.getRecordings("any-room-name")
+        assertTrue(response.isFailure)
+    }
+
+    @Test
+    fun `given repository when getRecordings api fails with exception returns error`() = runTest {
+        coEvery { apiService.getArchives("any-room-name") } throws Exception("Network error")
+        val response = sut.getRecordings("any-room-name")
+        assertTrue(response.isFailure)
+    }
+
+    @Test
+    fun `given repository when startArchiving api success returns success`() = runTest {
+        coEvery { apiService.startArchiving("any-room-name") } returns Response<StartArchivingResponse>.success(
+            StartArchivingResponse(archiveId = "archive-id")
+        )
+        val response = sut.startArchive("any-room-name")
+        assertEquals(success("archive-id"), response)
+    }
+
+    @Test
+    fun `given repository when startArchiving api success with empty returns success`() = runTest {
+        coEvery { apiService.startArchiving("any-room-name") } returns Response.success(null)
+        val response = sut.startArchive("any-room-name")
+        assertTrue(response.isFailure)
+    }
+
+    @Test
+    fun `given repository when startArchiving api fails returns error`() = runTest {
+        coEvery { apiService.startArchiving("any-room-name") } returns Response.error(
+            500, ResponseBody.EMPTY
+        )
+        val response = sut.startArchive("any-room-name")
+        assertTrue(response.isFailure)
+    }
+
+    @Test
+    fun `given repository when startArchiving api fails with exception returns error`() = runTest {
+        coEvery { apiService.startArchiving("any-room-name") } throws Exception("Network error")
+        val response = sut.startArchive("any-room-name")
+        assertTrue(response.isFailure)
+    }
+
+    @Test
+    fun `given repository when stopArchiving api success returns success`() = runTest {
+        coEvery { apiService.stopArchiving("any-room-name", "archive-id") } returns
+                Response<StartArchivingResponse>.success(StopArchivingResponse(archiveId = "archive-id"))
+        val response = sut.stopArchive("any-room-name", "archive-id")
+        assertEquals(success(true), response)
+    }
+
+    @Test
+    fun `given repository when stopArchiving api fails returns error`() = runTest {
+        coEvery { apiService.stopArchiving("any-room-name", "archive-id") } returns Response.error(
+            500, ResponseBody.EMPTY
+        )
+        val response = sut.stopArchive("any-room-name", "archive-id")
+        assertTrue(response.isFailure)
+    }
+
+    @Test
+    fun `given repository when stopArchiving api fails with exception returns error`() = runTest {
+        coEvery { apiService.stopArchiving("any-room-name", "archive-id") } throws Exception("Network error")
+        val response = sut.stopArchive("any-room-name", "archive-id")
+        assertTrue(response.isFailure)
+    }
+
+    private val serverArchives = listOf(
+        ServerArchive(
+            id = "id",
+            name = "name",
+            url = "url",
+            status = "available",
+            createdAt = 123,
+        ),
+        ServerArchive(
+            id = "id",
+            name = "name",
+            url = "url",
+            status = "started",
+            createdAt = 123,
+        ),
+        ServerArchive(
+            id = "id",
+            name = "name",
+            url = "url",
+            status = "stopped",
+            createdAt = 123,
+        ),
+        ServerArchive(
+            id = "id",
+            name = "name",
+            url = "url",
+            status = "uploaded",
+            createdAt = 123,
+        ),
+        ServerArchive(
+            id = "id",
+            name = "name",
+            url = "url",
+            status = "paused",
+            createdAt = 123,
+        ),
+        ServerArchive(
+            id = "id",
+            name = "name",
+            url = "url",
+            status = "failed",
+            createdAt = 123,
+        ),
+    )
+    private val archives = listOf(
+        Archive(
+            id = "id",
+            name = "name",
+            url = "url",
+            status = ArchiveStatus.AVAILABLE,
+            createdAt = 123
+        ),
+        Archive(
+            id = "id",
+            name = "name",
+            url = "url",
+            status = ArchiveStatus.PENDING,
+            createdAt = 123
+        ),
+        Archive(
+            id = "id",
+            name = "name",
+            url = "url",
+            status = ArchiveStatus.PENDING,
+            createdAt = 123
+        ),
+        Archive(
+            id = "id",
+            name = "name",
+            url = "url",
+            status = ArchiveStatus.PENDING,
+            createdAt = 123
+        ),
+        Archive(
+            id = "id",
+            name = "name",
+            url = "url",
+            status = ArchiveStatus.PENDING,
+            createdAt = 123
+        ),
+        Archive(
+            id = "id",
+            name = "name",
+            url = "url",
+            status = ArchiveStatus.FAILED,
+            createdAt = 123
+        ),
+    )
+}
