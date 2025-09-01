@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -22,6 +23,7 @@ import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.components.ChatBadgeButton
 import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.ParticipantVideoCard
+import com.vonage.android.util.pip.findActivity
 import com.vonage.android.util.preview.buildCallWithParticipants
 
 @Suppress("LongMethod")
@@ -77,6 +79,7 @@ fun PipMeetingRoomScreen(
 
         is MeetingRoomUiState.EndCall -> {
             actions.onEndCall()
+            LocalContext.current.findActivity().finish()
         }
     }
 }

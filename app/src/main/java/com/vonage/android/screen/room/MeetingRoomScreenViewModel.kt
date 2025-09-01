@@ -139,11 +139,11 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     }
 
     fun onPause() {
-//        call?.pauseSession()
+        call?.pauseSession()
     }
 
     fun onResume() {
-//        call?.resumeSession()
+        call?.resumeSession()
     }
 
     fun sendMessage(message: String) {

@@ -11,6 +11,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -20,21 +21,25 @@ import androidx.core.util.Consumer
 
 @Composable
 fun pipEffect(
+    shouldEnterPipMode: Boolean = true,
     modifier: Modifier = Modifier,
 ): Modifier {
     val context = LocalContext.current
+    val currentShouldEnterPipMode by rememberUpdatedState(newValue = shouldEnterPipMode)
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
         Build.VERSION.SDK_INT < Build.VERSION_CODES.S
     ) {
         DisposableEffect(context) {
             val onUserLeaveBehavior = Runnable {
-                context.findActivity()
-                    .enterPictureInPictureMode(PictureInPictureParams.Builder().build())
+                if (currentShouldEnterPipMode) {
+                    context.findActivity()
+                        .enterPictureInPictureMode(PictureInPictureParams.Builder().build())
+                }
             }
-            context.findActivity().addOnUserLeaveHintListener(
+            context.findActivity().addOnUserLeaveHintListener {
                 onUserLeaveBehavior
-            )
+            }
             onDispose {
                 context.findActivity().removeOnUserLeaveHintListener(
                     onUserLeaveBehavior
@@ -50,7 +55,7 @@ fun pipEffect(
             val builder = PictureInPictureParams.Builder()
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                builder.setAutoEnterEnabled(true)
+                builder.setAutoEnterEnabled(shouldEnterPipMode)
             }
             context.findActivity().setPictureInPictureParams(builder.build())
         }

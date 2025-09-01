@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.util.pip.pipEffect
 import com.vonage.android.util.pip.rememberIsInPipMode
 
 @Composable
@@ -19,6 +20,8 @@ fun GoodbyeScreenRoute(
     navigateToLanding: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val pipModifier = pipEffect(false)
+
     val actions = remember {
         GoodbyeScreenActions(
             onReEnter = { navigateToMeeting(roomName) },
@@ -31,22 +34,10 @@ fun GoodbyeScreenRoute(
         navigateToMeeting(roomName)
     }
 
-    val inPipMode = rememberIsInPipMode()
-    if (inPipMode) {
-        Box(
-            modifier = Modifier
-                .background(VonageVideoTheme.colors.background)
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            GoodbyeScreenHeader()
-        }
-    } else {
-        GoodbyeScreen(
-            modifier = modifier,
-            actions = actions,
-        )
-    }
+    GoodbyeScreen(
+        modifier = modifier.then(pipModifier),
+        actions = actions,
+    )
 }
 
 @Stable
