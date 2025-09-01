@@ -15,17 +15,19 @@ import javax.inject.Singleton
 
 @Singleton
 class CallActionsListener @Inject constructor(
-    @ApplicationContext context: Context,
+    @ApplicationContext private val context: Context,
 ) : BroadcastReceiver() {
+
+    private val filter = IntentFilter()
+        .apply {
+            addAction(HANG_UP_ACTION)
+        }
 
     private val _actions = MutableStateFlow<CallAction?>(null)
     val actions: StateFlow<CallAction?> = _actions.asStateFlow()
 
     init {
-        val filter = IntentFilter()
-            .apply {
-                addAction(HANG_UP_ACTION)
-            }
+
         ContextCompat.registerReceiver(context, this, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
     }
 
@@ -40,6 +42,7 @@ class CallActionsListener @Inject constructor(
     }
 
     fun stop() {
+        ContextCompat.registerReceiver(context, null, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
         _actions.update { null }
     }
 }

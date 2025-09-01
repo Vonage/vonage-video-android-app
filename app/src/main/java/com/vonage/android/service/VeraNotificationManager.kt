@@ -25,16 +25,17 @@ class VeraNotificationManager @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val callActionsLister: CallActionsListener,
 ) {
+    private val filter = IntentFilter().apply { addAction(HANG_UP_ACTION) }
+    private val callActionsReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == HANG_UP_ACTION) {
+                callActionsLister.onHangUp()
+            }
+        }
+    }
 
     fun listenCallActions(): VeraNotificationManager {
-        val filter = IntentFilter().apply { addAction(HANG_UP_ACTION) }
-        registerReceiver(context, object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                if (intent.action == HANG_UP_ACTION) {
-                    callActionsLister.onHangUp()
-                }
-            }
-        }, filter, ContextCompat.RECEIVER_EXPORTED)
+        registerReceiver(context, callActionsReceiver, filter, ContextCompat.RECEIVER_EXPORTED)
         return this
     }
 
@@ -73,6 +74,7 @@ class VeraNotificationManager @Inject constructor(
 
     fun stopForegroundService(): VeraNotificationManager {
         callActionsLister.stop()
+        registerReceiver(context, null, filter, ContextCompat.RECEIVER_EXPORTED)
         val serviceIntent = Intent(context, VeraForegroundService::class.java)
         context.stopService(serviceIntent)
         return this

@@ -37,9 +37,9 @@ fun pipEffect(
                         .enterPictureInPictureMode(PictureInPictureParams.Builder().build())
                 }
             }
-            context.findActivity().addOnUserLeaveHintListener {
+            context.findActivity().addOnUserLeaveHintListener(
                 onUserLeaveBehavior
-            }
+            )
             onDispose {
                 context.findActivity().removeOnUserLeaveHintListener(
                     onUserLeaveBehavior

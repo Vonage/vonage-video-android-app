@@ -57,7 +57,15 @@ class ChatSignalPlugin(
             ++chatMessagesUnreadCount
         } else 0
 
-        // handle notification, only show notification when app is not in foreground
+        handleNotification()
+
+        return ChatState(
+            unreadCount = unreadCount,
+            messages = chatMessages.toImmutableList(),
+        )
+    }
+
+    private fun handleNotification() {
         val isInForeground = ActivityManager.RunningAppProcessInfo()
             .let { appProcessInfo ->
                 ActivityManager.getMyMemoryState(appProcessInfo)
@@ -66,11 +74,6 @@ class ChatSignalPlugin(
         if (!isInForeground) {
             showChatNotification(chatMessages.take(chatMessagesUnreadCount))
         }
-
-        return ChatState(
-            unreadCount = unreadCount,
-            messages = chatMessages.toImmutableList(),
-        )
     }
 
     @SuppressLint("MissingPermission")
