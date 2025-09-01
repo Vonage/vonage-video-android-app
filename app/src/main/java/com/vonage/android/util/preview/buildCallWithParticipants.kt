@@ -20,40 +20,38 @@ fun buildCallWithParticipants(
     participantCount: Int,
     unreadCount: Int = 1,
     messagesCount: Int = 5,
-): CallFacade {
-    return object : CallFacade {
-        // Participants state
-        override val participantsStateFlow: StateFlow<ImmutableList<Participant>> =
-            MutableStateFlow(buildParticipants(participantCount).toImmutableList())
+): CallFacade = object : CallFacade {
+    // Participants state
+    override val participantsStateFlow: StateFlow<ImmutableList<Participant>> =
+        MutableStateFlow(buildParticipants(participantCount).toImmutableList())
 
-        // Session related methods
-        override fun connect(): Flow<SessionEvent> = flowOf()
-        override fun pauseSession() {}
-        override fun resumeSession() {}
-        override fun endSession() {}
+    // Session related methods
+    override fun connect(): Flow<SessionEvent> = flowOf()
+    override fun pauseSession() {}
+    override fun resumeSession() {}
+    override fun endSession() {}
 
-        // Publisher related methods
-        override fun observeLocalAudioLevel(): Flow<Float> = flowOf()
-        override fun toggleLocalVideo() {}
-        override fun toggleLocalCamera() {}
-        override fun toggleLocalAudio() {}
+    // Publisher related methods
+    override fun observeLocalAudioLevel(): Flow<Float> = flowOf()
+    override fun toggleLocalVideo() {}
+    override fun toggleLocalCamera() {}
+    override fun toggleLocalAudio() {}
 
-        // Chat related methods
-        override val signalStateFlow: StateFlow<SignalState> = MutableStateFlow(
-            SignalState(
-                signals = mapOf(
-                    SignalType.CHAT.signal to ChatState(
-                        unreadCount = unreadCount,
-                        messages = buildChatMessages(messagesCount).toImmutableList(),
-                    ),
-                )
+    // Chat related methods
+    override val signalStateFlow: StateFlow<SignalState> = MutableStateFlow(
+        SignalState(
+            signals = mapOf(
+                SignalType.CHAT.signal to ChatState(
+                    unreadCount = unreadCount,
+                    messages = buildChatMessages(messagesCount).toImmutableList(),
+                ),
             )
         )
+    )
 
-        override fun sendChatMessage(message: String) {}
-        override fun listenUnreadChatMessages(enable: Boolean) {}
+    override fun sendChatMessage(message: String) {}
+    override fun listenUnreadChatMessages(enable: Boolean) {}
 
-        // Reactions related methods
-        override fun sendEmoji(emoji: String) {}
-    }
+    // Reactions related methods
+    override fun sendEmoji(emoji: String) {}
 }
