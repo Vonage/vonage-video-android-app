@@ -48,7 +48,7 @@ class WaitingRoomScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 WaitingRoomScreen(
-                    uiState = WaitingRoomUiState.Content(
+                    uiState = WaitingRoomUiState(
                         roomName = "room-name",
                         userName = "",
                         isMicEnabled = true,
@@ -84,7 +84,7 @@ class WaitingRoomScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 WaitingRoomScreen(
-                    uiState = WaitingRoomUiState.Content(
+                    uiState = WaitingRoomUiState(
                         roomName = "room-name",
                         userName = "user name",
                         isMicEnabled = true,
@@ -120,7 +120,7 @@ class WaitingRoomScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 WaitingRoomScreen(
-                    uiState = WaitingRoomUiState.Content(
+                    uiState = WaitingRoomUiState(
                         roomName = "room-name",
                         userName = "user name",
                         isMicEnabled = true,
@@ -144,7 +144,7 @@ class WaitingRoomScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 WaitingRoomScreen(
-                    uiState = WaitingRoomUiState.Content(
+                    uiState = WaitingRoomUiState(
                         roomName = "room-name",
                         userName = "user name",
                         isMicEnabled = false,
@@ -168,7 +168,7 @@ class WaitingRoomScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 WaitingRoomScreen(
-                    uiState = WaitingRoomUiState.Content(
+                    uiState = WaitingRoomUiState(
                         roomName = "room-name",
                         userName = "",
                         isMicEnabled = true,
@@ -200,7 +200,7 @@ class WaitingRoomScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 WaitingRoomScreen(
-                    uiState = WaitingRoomUiState.Content(
+                    uiState = WaitingRoomUiState(
                         roomName = "room-name",
                         userName = "",
                         isMicEnabled = false,

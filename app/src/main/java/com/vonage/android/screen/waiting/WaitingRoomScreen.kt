@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -19,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import com.vonage.android.audio.AudioDevicesHandler
@@ -64,8 +62,12 @@ fun WaitingRoomScreen(
                 }
             }
 
-            when (uiState) {
-                is WaitingRoomUiState.Content -> {
+            when {
+                uiState.isSuccess -> {
+                    navigateToRoom(uiState.roomName)
+                }
+
+                else -> {
                     WaitingRoomBody(
                         uiState = uiState,
                         actions = actions,
@@ -75,16 +77,6 @@ fun WaitingRoomScreen(
                             actions.onAudioSwitch()
                         }
                     )
-                }
-
-                is WaitingRoomUiState.Idle -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.testTag("initializing_indicator")
-                    )
-                }
-
-                is WaitingRoomUiState.Success -> {
-                    navigateToRoom(uiState.roomName)
                 }
             }
         }
@@ -97,7 +89,7 @@ fun WaitingRoomScreen(
 internal fun WaitingRoomScreenPreview() {
     VonageVideoTheme {
         WaitingRoomScreen(
-            uiState = WaitingRoomUiState.Content(
+            uiState = WaitingRoomUiState(
                 roomName = "test-room-name",
                 userName = "User Name",
                 isMicEnabled = true,
@@ -117,7 +109,7 @@ internal fun WaitingRoomScreenPreview() {
 internal fun WaitingRoomScreenWithVideoPreview() {
     VonageVideoTheme {
         WaitingRoomScreen(
-            uiState = WaitingRoomUiState.Content(
+            uiState = WaitingRoomUiState(
                 roomName = "test-room-name",
                 userName = "John Doe",
                 isMicEnabled = false,

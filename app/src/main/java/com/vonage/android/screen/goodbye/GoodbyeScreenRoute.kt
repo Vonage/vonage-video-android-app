@@ -3,9 +3,13 @@ package com.vonage.android.screen.goodbye
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.vonage.android.util.pip.pipEffect
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.data.Archive
 
 @Composable
 fun GoodbyeScreenRoute(
@@ -13,14 +17,23 @@ fun GoodbyeScreenRoute(
     navigateToMeeting: (String) -> Unit,
     navigateToLanding: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: GoodbyeScreenViewModel =
+        hiltViewModel<GoodbyeScreenViewModel, GoodbyeScreenViewModelFactory> { factory ->
+            factory.create(roomName)
+        },
 ) {
     val pipModifier = pipEffect(shouldEnterPipMode = false)
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val actions = remember {
         GoodbyeScreenActions(
             onReEnter = { navigateToMeeting(roomName) },
             onGoHome = navigateToLanding,
             onBack = { navigateToMeeting(roomName) },
+            onDownloadArchive = { archive ->
+                viewModel.downloadArchive(archive)
+            }
         )
     }
 
@@ -29,6 +42,8 @@ fun GoodbyeScreenRoute(
     }
 
     GoodbyeScreen(
+        uiState = uiState,
+        modifier = modifier,
         modifier = modifier.then(pipModifier),
         actions = actions,
     )
@@ -39,4 +54,5 @@ data class GoodbyeScreenActions(
     val onReEnter: () -> Unit = {},
     val onGoHome: () -> Unit = {},
     val onBack: () -> Unit = {},
+    val onDownloadArchive: (Archive) -> Unit = {}
 )

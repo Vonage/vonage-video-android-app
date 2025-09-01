@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = WaitingRoomViewModelFactory::class)
@@ -30,11 +31,11 @@ class WaitingRoomViewModel @AssistedInject constructor(
     private val micVolume: MicVolume,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<WaitingRoomUiState>(WaitingRoomUiState.Idle)
+    private val _uiState = MutableStateFlow(WaitingRoomUiState(roomName = roomName))
     val uiState: StateFlow<WaitingRoomUiState> = _uiState.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
-        initialValue = WaitingRoomUiState.Idle,
+        initialValue = WaitingRoomUiState(roomName = roomName),
     )
 
     private val _audioLevel = MutableStateFlow(0F)
@@ -48,14 +49,18 @@ class WaitingRoomViewModel @AssistedInject constructor(
     private var currentBlurIndex: Int = 0
 
     fun init() {
-        _uiState.value = WaitingRoomUiState.Idle
         publisher = videoClient.buildPublisher()
         viewModelScope.launch {
             publisher = publisher.copy(name = userRepository.getUserName())
-            _uiState.value = buildContentUiState(
-                roomName = roomName,
-                participant = publisher,
-            )
+            _uiState.update { uiState ->
+                uiState.copy(
+                    isCameraEnabled = publisher.isCameraEnabled,
+                    isMicEnabled = publisher.isMicEnabled,
+                    userName = publisher.name,
+                    blurLevel = publisher.blurLevel,
+                    view = publisher.view,
+                )
+            }
         }
         viewModelScope.launch {
             micVolume.start()
@@ -67,26 +72,17 @@ class WaitingRoomViewModel @AssistedInject constructor(
 
     fun updateUserName(userName: String) {
         publisher = publisher.copy(name = userName)
-        _uiState.value = buildContentUiState(
-            roomName = roomName,
-            participant = publisher,
-        )
+        _uiState.update { uiState -> uiState.copy(userName = userName) }
     }
 
     fun onMicToggle() {
         publisher = publisher.copy(isMicEnabled = publisher.isMicEnabled.toggle())
-        _uiState.value = buildContentUiState(
-            roomName = roomName,
-            participant = publisher,
-        )
+        _uiState.update { uiState -> uiState.copy(isMicEnabled = publisher.isMicEnabled) }
     }
 
     fun onCameraToggle() {
         publisher = publisher.copy(isCameraEnabled = publisher.isCameraEnabled.toggle())
-        _uiState.value = buildContentUiState(
-            roomName = roomName,
-            participant = publisher,
-        )
+        _uiState.update { uiState -> uiState.copy(isCameraEnabled = publisher.isCameraEnabled) }
     }
 
     fun onCameraSwitch() {
@@ -95,10 +91,6 @@ class WaitingRoomViewModel @AssistedInject constructor(
         publisher = publisher.copy(cameraIndex = currentCameraIndex)
         publisher.cycleCamera()
         micVolume.start()
-        _uiState.value = buildContentUiState(
-            roomName = roomName,
-            participant = publisher,
-        )
     }
 
     fun setBlur() {
@@ -106,13 +98,10 @@ class WaitingRoomViewModel @AssistedInject constructor(
         currentBlurIndex += 1
         publisher = publisher.copy(blurLevel = blurLevel)
         publisher.setCameraBlur(blurLevel)
-        _uiState.value = buildContentUiState(
-            roomName = roomName,
-            participant = publisher,
-        )
+        _uiState.update { uiState -> uiState.copy(blurLevel = blurLevel) }
     }
 
-    fun joinRoom(roomName: String, userName: String) {
+    fun joinRoom(userName: String) {
         viewModelScope.launch {
             userRepository.saveUserName(userName)
             videoClient.configurePublisher(
@@ -125,21 +114,9 @@ class WaitingRoomViewModel @AssistedInject constructor(
                 )
             )
             onStop()
-            _uiState.value = WaitingRoomUiState.Success(
-                roomName = roomName,
-            )
+            _uiState.update { uiState -> uiState.copy(isSuccess = true) }
         }
     }
-
-    private fun buildContentUiState(roomName: String, participant: VeraPublisher) =
-        WaitingRoomUiState.Content(
-            roomName = roomName,
-            isCameraEnabled = participant.isCameraEnabled,
-            isMicEnabled = participant.isMicEnabled,
-            userName = participant.name,
-            blurLevel = participant.blurLevel,
-            view = participant.view,
-        )
 
     fun onStop() {
         micVolume.stop()
@@ -156,19 +133,12 @@ interface WaitingRoomViewModelFactory {
     fun create(roomName: String): WaitingRoomViewModel
 }
 
-sealed interface WaitingRoomUiState {
-
-    object Idle : WaitingRoomUiState
-    data class Content(
-        val roomName: String,
-        val userName: String,
-        val isMicEnabled: Boolean,
-        val isCameraEnabled: Boolean,
-        val blurLevel: BlurLevel,
-        val view: View? = null,
-    ) : WaitingRoomUiState
-
-    data class Success(
-        val roomName: String
-    ) : WaitingRoomUiState
-}
+data class WaitingRoomUiState(
+    val roomName: String = "",
+    val userName: String = "",
+    val isMicEnabled: Boolean = true,
+    val isCameraEnabled: Boolean = true,
+    val blurLevel: BlurLevel = BlurLevel.NONE,
+    val view: View? = null,
+    val isSuccess: Boolean = false,
+)

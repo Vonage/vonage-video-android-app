@@ -22,7 +22,7 @@ import com.vonage.android.screen.waiting.WaitingRoomUiState
 
 @Composable
 fun WaitingRoomBody(
-    uiState: WaitingRoomUiState.Content,
+    uiState: WaitingRoomUiState,
     actions: WaitingRoomActions,
     audioLevel: Float,
     onMicDeviceSelect: () -> Unit,
@@ -75,7 +75,7 @@ fun WaitingRoomBody(
 internal fun WaitingRoomBodyPreview() {
     VonageVideoTheme {
         WaitingRoomBody(
-            uiState = WaitingRoomUiState.Content(
+            uiState = WaitingRoomUiState(
                 roomName = "test-room-name",
                 userName = "User Name",
                 isMicEnabled = true,
@@ -96,7 +96,7 @@ internal fun WaitingRoomBodyPreview() {
 internal fun WaitingRoomBodyWithVideoPreview() {
     VonageVideoTheme {
         WaitingRoomBody(
-            uiState = WaitingRoomUiState.Content(
+            uiState = WaitingRoomUiState(
                 roomName = "test-room-name",
                 userName = "John Doe",
                 isMicEnabled = false,

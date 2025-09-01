@@ -51,6 +51,7 @@ import com.vonage.android.screen.room.components.emoji.EmojiReactionOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
 import com.vonage.android.util.preview.buildCallWithParticipants
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
@@ -85,9 +86,9 @@ fun MeetingRoomScreen(
         derivedStateOf { navigator.isExtraPaneShow() }
     }
 
-    when (uiState) {
-        is MeetingRoomUiState.Content -> {
-            val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
+    when {
+        (uiState.isError.not() && uiState.isLoading.not()) -> {
+            val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle(persistentListOf())
             val signalState by uiState.call.signalStateFlow.collectAsStateWithLifecycle(null)
             val chatState = signalState?.signals[SignalType.CHAT.signal] as? ChatState
             val emojiState = signalState?.signals[SignalType.REACTION.signal] as? EmojiState
@@ -128,6 +129,7 @@ fun MeetingRoomScreen(
                                 TopBar(
                                     modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
                                     roomName = uiState.roomName,
+                                    recordingState = uiState.recordingState,
                                     actions = actions,
                                     onToggleAudioDeviceSelector = {
                                         showAudioDeviceSelector = showAudioDeviceSelector.toggle()
@@ -135,6 +137,7 @@ fun MeetingRoomScreen(
                                 )
                                 MeetingRoomContent(
                                     modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
+                                    actions = actions,
                                     participants = participants,
                                     audioLevel = audioLevel,
                                     showParticipants = showParticipants,
@@ -146,7 +149,8 @@ fun MeetingRoomScreen(
                                     onDismissParticipants = { showParticipants = false },
                                     onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
                                     onDismissMoreActions = { showMoreActions = false },
-                                    onEmojiClick = actions.onEmojiSent
+                                    recordingState = uiState.recordingState,
+                                    onEmojiClick = actions.onEmojiSent,
                                 )
                             }
                         }
@@ -163,9 +167,9 @@ fun MeetingRoomScreen(
             }
         }
 
-        is MeetingRoomUiState.Loading -> GenericLoading()
+        (uiState.isLoading) -> GenericLoading()
 
-        is MeetingRoomUiState.SessionError -> {
+        (uiState.isError) -> {
             BasicAlertDialog(
                 text = stringResource(R.string.meeting_screen_session_creation_error),
                 acceptLabel = stringResource(R.string.generic_retry),
@@ -205,7 +209,10 @@ fun ThreePaneScaffoldPaneScope.ExtraPane(
 internal fun MeetingRoomScreenLoadingPreview() {
     VonageVideoTheme {
         MeetingRoomScreen(
-            uiState = MeetingRoomUiState.Loading,
+            uiState = MeetingRoomUiState(
+                roomName = "room-name",
+                isLoading = true,
+            ),
             actions = MeetingRoomActions(),
             audioLevel = 0.5f,
         )
@@ -217,7 +224,10 @@ internal fun MeetingRoomScreenLoadingPreview() {
 internal fun MeetingRoomScreenSessionErrorPreview() {
     VonageVideoTheme {
         MeetingRoomScreen(
-            uiState = MeetingRoomUiState.SessionError,
+            uiState = MeetingRoomUiState(
+                roomName = "room-name",
+                isError = true,
+            ),
             actions = MeetingRoomActions(),
             audioLevel = 0.5f,
         )
@@ -230,9 +240,12 @@ internal fun MeetingRoomScreenSessionErrorPreview() {
 internal fun MeetingRoomScreenSessionPreview() {
     VonageVideoTheme {
         MeetingRoomScreen(
-            uiState = MeetingRoomUiState.Content(
+            uiState = MeetingRoomUiState(
                 roomName = "sample-room-name",
+                recordingState = RecordingState.RECORDING,
                 call = buildCallWithParticipants(1),
+                isLoading = false,
+                isError = false,
             ),
             actions = MeetingRoomActions(),
             audioLevel = 0.5f,
