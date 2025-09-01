@@ -285,7 +285,7 @@ class MeetingRoomScreenViewModelTest {
                     recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
-            sut.archiveCall(true, ANY_ROOM_NAME)
+            sut.archiveCall(true)
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -323,7 +323,7 @@ class MeetingRoomScreenViewModelTest {
                     recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
-            sut.archiveCall(true, ANY_ROOM_NAME)
+            sut.archiveCall(true)
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -339,7 +339,7 @@ class MeetingRoomScreenViewModelTest {
                     recordingState = RecordingState.RECORDING,
                 ), awaitItem()
             )
-            sut.archiveCall(false, ANY_ROOM_NAME)
+            sut.archiveCall(false)
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -371,6 +371,7 @@ class MeetingRoomScreenViewModelTest {
             apiKey = "api-key",
             sessionId = "session-id",
             token = "token",
+            captionsId = null,
         )
     )
 
