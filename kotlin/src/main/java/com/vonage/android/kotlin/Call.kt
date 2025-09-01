@@ -31,7 +31,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -214,10 +213,9 @@ class Call internal constructor(
         val subscriber = Subscriber.Builder(context, stream).build()
 
         subscriber.setCaptionsListener { subscriber, text, isFinal ->
-            Log.d("XXX", "captions received $text")
-            _captionsStateFlow.update { it -> text }
+            _captionsStateFlow.update { caption -> text }
             if (isFinal) {
-                _captionsStateFlow.update { it -> null }
+                _captionsStateFlow.update { caption -> null }
             }
         }
         subscriber.setStreamListener(object : SubscriberKit.StreamListener {
