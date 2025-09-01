@@ -178,7 +178,7 @@ fun MeetingRoomScreen(
             )
         }
 
-        is MeetingRoomUiState.EndCall -> {
+        (uiState.isEndCall) -> {
             actions.onEndCall()
         }
     }

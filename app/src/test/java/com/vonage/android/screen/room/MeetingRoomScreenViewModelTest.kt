@@ -9,10 +9,10 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VeraPublisher
-import io.mockk.MockKAnnotations
 import com.vonage.android.service.CallAction
 import com.vonage.android.service.CallActionsListener
 import com.vonage.android.service.VeraNotificationManager
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -30,16 +30,14 @@ class MeetingRoomScreenViewModelTest {
     val sessionRepository: SessionRepository = mockk(relaxed = true)
     val archiveRepository: ArchiveRepository = mockk(relaxed = true)
     val videoClient: VonageVideoClient = mockk(relaxed = true)
+    val notificationManager: VeraNotificationManager = mockk(relaxed = true)
+    val callActionsListener: CallActionsListener = mockk(relaxed = true) {
+        every { actions } returns MutableStateFlow(null)
+    }
 
     @BeforeEach
     fun setup() {
         MockKAnnotations.init(this)
-    }
-    val sessionRepository: SessionRepository = mockk()
-    val videoClient: VonageVideoClient = mockk()
-    val notificationManager: VeraNotificationManager = mockk(relaxed = true)
-    val callActionsListener: CallActionsListener = mockk(relaxed = true) {
-        every { actions } returns MutableStateFlow(null)
     }
 
     @Test
@@ -393,10 +391,14 @@ class MeetingRoomScreenViewModelTest {
         val sut = sut()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             awaitItem()
             callActionsFlow.value = CallAction.HangUp
-            assertEquals(MeetingRoomUiState.EndCall, awaitItem())
+            assertEquals(MeetingRoomUiState(
+                roomName = ANY_ROOM_NAME,
+                call = mockCall,
+                isEndCall = true
+            ), awaitItem())
         }
     }
 

@@ -94,9 +94,8 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             callActionsListener.actions.collectLatest { callAction ->
                 when (callAction) {
                     CallAction.HangUp -> {
-                        _uiState.value = MeetingRoomUiState.EndCall
+                        _uiState.update { uiState -> uiState.copy(isEndCall = true)}
                     }
-
                     else -> {}
                 }
             }
@@ -225,6 +224,7 @@ data class MeetingRoomUiState(
     val call: CallFacade = noOpCallFacade,
     val isLoading: Boolean = false,
     val isError: Boolean = false,
+    val isEndCall: Boolean = false,
 )
 
 enum class RecordingState {

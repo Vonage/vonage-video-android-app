@@ -43,7 +43,6 @@ fun GoodbyeScreenRoute(
 
     GoodbyeScreen(
         uiState = uiState,
-        modifier = modifier,
         modifier = modifier.then(pipModifier),
         actions = actions,
     )

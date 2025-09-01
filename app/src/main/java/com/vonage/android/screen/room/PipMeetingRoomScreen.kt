@@ -3,8 +3,6 @@ package com.vonage.android.screen.room
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -27,7 +25,6 @@ import com.vonage.android.util.pip.findActivity
 import com.vonage.android.util.preview.buildCallWithParticipants
 
 @Suppress("LongMethod")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun PipMeetingRoomScreen(
     uiState: MeetingRoomUiState,
@@ -35,8 +32,8 @@ fun PipMeetingRoomScreen(
     audioLevel: Float,
     modifier: Modifier = Modifier,
 ) {
-    when (uiState) {
-        is MeetingRoomUiState.Content -> {
+    when {
+        (uiState.isError.not() && uiState.isLoading.not()) -> {
             val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
             val signalState by uiState.call.signalStateFlow.collectAsStateWithLifecycle(null)
             val chatState = signalState?.signals[SignalType.CHAT.signal] as? ChatState
@@ -66,9 +63,9 @@ fun PipMeetingRoomScreen(
             }
         }
 
-        is MeetingRoomUiState.Loading -> GenericLoading()
+        (uiState.isLoading) -> GenericLoading()
 
-        is MeetingRoomUiState.SessionError -> {
+        (uiState.isError) -> {
             BasicAlertDialog(
                 text = stringResource(R.string.meeting_screen_session_creation_error),
                 acceptLabel = stringResource(R.string.generic_retry),
@@ -77,7 +74,7 @@ fun PipMeetingRoomScreen(
             )
         }
 
-        is MeetingRoomUiState.EndCall -> {
+        (uiState.isEndCall) -> {
             actions.onEndCall()
             LocalContext.current.findActivity().finish()
         }
@@ -89,7 +86,7 @@ fun PipMeetingRoomScreen(
 internal fun PipMeetingRoomScreenSessionPreview() {
     VonageVideoTheme {
         PipMeetingRoomScreen(
-            uiState = MeetingRoomUiState.Content(
+            uiState = MeetingRoomUiState(
                 roomName = "sample-room-name",
                 call = buildCallWithParticipants(1),
             ),
