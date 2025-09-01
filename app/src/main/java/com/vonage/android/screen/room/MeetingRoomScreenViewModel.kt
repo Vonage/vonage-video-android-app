@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
@@ -52,10 +53,11 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     init {
         setup()
 
-        notificationManager
-            .createNotificationChannel()
-            .startForegroundService(roomName)
-            .listenCallActions()
+        notificationManager.apply {
+            createNotificationChannel()
+            startForegroundService(roomName)
+            listenCallActions()
+        }
     }
 
     fun setup() {
@@ -73,7 +75,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                 }
         }
         viewModelScope.launch {
-            callActionsListener.actions.collect { callAction ->
+            callActionsListener.actions.collectLatest { callAction ->
                 when (callAction) {
                     CallAction.HangUp -> {
                         _uiState.value = MeetingRoomUiState.EndCall

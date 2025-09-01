@@ -8,10 +8,14 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VeraPublisher
+import com.vonage.android.service.CallAction
+import com.vonage.android.service.CallActionsListener
+import com.vonage.android.service.VeraNotificationManager
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
@@ -21,6 +25,10 @@ class MeetingRoomScreenViewModelTest {
 
     val sessionRepository: SessionRepository = mockk()
     val videoClient: VonageVideoClient = mockk()
+    val notificationManager: VeraNotificationManager = mockk(relaxed = true)
+    val callActionsListener: CallActionsListener = mockk(relaxed = true) {
+        every { actions } returns MutableStateFlow(null)
+    }
 
     @Test
     fun `given viewmodel when initialize then returns correct state`() = runTest {
@@ -247,11 +255,45 @@ class MeetingRoomScreenViewModelTest {
         }
     }
 
+    @Test
+    fun `given viewmodel when initialize then create foreground service`() {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+
+        sut()
+
+        verify { notificationManager.createNotificationChannel() }
+        verify { notificationManager.startForegroundService(ANY_ROOM_NAME) }
+        verify { notificationManager.listenCallActions() }
+    }
+
+    @Test
+    fun `given viewmodel when receive CallActionHangUp then update state`() = runTest {
+        val mockCall = buildMockCall()
+        val callActionsFlow = MutableStateFlow<CallAction?>(null)
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        every { callActionsListener.actions } returns callActionsFlow
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState.Loading, awaitItem())
+            awaitItem()
+            callActionsFlow.value = CallAction.HangUp
+            assertEquals(MeetingRoomUiState.EndCall, awaitItem())
+        }
+    }
+
     private fun sut(): MeetingRoomScreenViewModel =
         MeetingRoomScreenViewModel(
             roomName = ANY_ROOM_NAME,
             sessionRepository = sessionRepository,
             videoClient = videoClient,
+            notificationManager = notificationManager,
+            callActionsListener = callActionsListener,
         )
 
     private fun buildSuccessSessionResponse() = Result.success(
