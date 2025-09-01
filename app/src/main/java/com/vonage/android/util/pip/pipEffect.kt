@@ -21,8 +21,8 @@ import androidx.core.util.Consumer
 
 @Composable
 fun pipEffect(
-    shouldEnterPipMode: Boolean = true,
     modifier: Modifier = Modifier,
+    shouldEnterPipMode: Boolean = true,
 ): Modifier {
     val context = LocalContext.current
     val currentShouldEnterPipMode by rememberUpdatedState(newValue = shouldEnterPipMode)

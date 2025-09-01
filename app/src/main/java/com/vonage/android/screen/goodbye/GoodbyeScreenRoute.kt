@@ -1,17 +1,11 @@
 package com.vonage.android.screen.goodbye
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.util.pip.pipEffect
-import com.vonage.android.util.pip.rememberIsInPipMode
 
 @Composable
 fun GoodbyeScreenRoute(
