@@ -93,6 +93,11 @@ class VonageVideoClient(
                 }
             ).build()
 
+        session?.capabilities?.let { capabilities ->
+            Log.i(TAG, "Session capabilities:")
+            Log.i(TAG, capabilities.toString())
+        }
+
         return Call(
             context = context,
             token = token,

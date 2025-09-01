@@ -13,4 +13,7 @@ data class GetSessionResponse(
 
     @field:Json(name = "token")
     val token: String,
+
+    @field:Json(name = "captionsId")
+    val captionsId: String?,
 )

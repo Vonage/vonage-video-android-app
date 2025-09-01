@@ -31,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -39,6 +40,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 
@@ -60,6 +62,9 @@ class Call internal constructor(
 
     private val _signalStateFlow = MutableStateFlow<SignalState?>(null)
     override val signalStateFlow: StateFlow<SignalState?> = _signalStateFlow
+
+    private val _captionsStateFlow = MutableStateFlow<String?>(null)
+    override val captionsStateFlow: StateFlow<String?> = _captionsStateFlow
 
     private val signals = ConcurrentHashMap<String, SignalStateContent>()
     private val subscriberStreams = ConcurrentHashMap<String, Subscriber>()
@@ -200,8 +205,21 @@ class Call internal constructor(
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
     }
 
+    override fun enableCaptions(enable: Boolean) {
+        publisherHolder.publisher.publishCaptions = enable
+        subscriberStreams.values.forEach { it.subscribeToCaptions = enable }
+    }
+
     private fun addSubscriber(stream: Stream) {
         val subscriber = Subscriber.Builder(context, stream).build()
+
+        subscriber.setCaptionsListener { subscriber, text, isFinal ->
+            Log.d("XXX", "captions received $text")
+            _captionsStateFlow.update { it -> text }
+            if (isFinal) {
+                _captionsStateFlow.update { it -> null }
+            }
+        }
         subscriber.setStreamListener(object : SubscriberKit.StreamListener {
             override fun onReconnected(p0: SubscriberKit?) {
                 // not implemented yet
