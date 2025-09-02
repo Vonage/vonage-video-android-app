@@ -25,6 +25,7 @@ class SessionRepositoryTest {
                 apiKey = "apiKey",
                 sessionId = "sessionId",
                 token = "token",
+                captionsId = null,
             )
         )
         val response = sut.getSession("any-room-name")
@@ -34,6 +35,7 @@ class SessionRepositoryTest {
                     apiKey = "apiKey",
                     sessionId = "sessionId",
                     token = "token",
+                    captionsId = null,
                 )
             ), response
         )

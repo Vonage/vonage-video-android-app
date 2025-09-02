@@ -38,10 +38,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private val videoClient: VonageVideoClient,
 ) : ViewModel() {
 
-    private val initialUiState = MeetingRoomUiState(
-        roomName = roomName,
-        isLoading = true,
-    )
+    private val initialUiState = MeetingRoomUiState(roomName = roomName, isLoading = true)
     private val _uiState = MutableStateFlow(initialUiState)
     val uiState: StateFlow<MeetingRoomUiState> = _uiState.stateIn(
         scope = viewModelScope,
@@ -191,7 +188,12 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     fun captions(enable: Boolean) {
         call?.enableCaptions(enable)
         if (enable) {
-            viewModelScope.launch {
+            _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.ENABLING) }
+        } else {
+            _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.DISABLING) }
+        }
+        viewModelScope.launch {
+            if (enable) {
                 sessionRepository.enableCaptions(roomName)
                     .onSuccess {
                         currentCaptionsId = it
@@ -200,9 +202,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                     .onFailure {
                         _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.IDLE) }
                     }
-            }
-        } else {
-            viewModelScope.launch {
+            } else {
                 currentCaptionsId?.let {
                     sessionRepository.disableCaptions(roomName, it)
                         .onSuccess {
