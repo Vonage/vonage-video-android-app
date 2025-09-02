@@ -17,6 +17,5 @@ class GlobalDataStorage @Inject constructor(
 ) : DataStore<Preferences> by context.dataStore {
     companion object {
         val USER_NAME = stringPreferencesKey("user_name")
-        val CAPTIONS_ID = stringPreferencesKey("captions_id")
     }
 }
