@@ -213,7 +213,7 @@ class Call internal constructor(
         val subscriber = Subscriber.Builder(context, stream).build()
 
         subscriber.setCaptionsListener { subscriber, text, isFinal ->
-            _captionsStateFlow.update { caption -> text }
+            _captionsStateFlow.update { caption -> "${subscriber.stream.name}: $text" }
             if (isFinal) {
                 _captionsStateFlow.update { caption -> null }
             }
