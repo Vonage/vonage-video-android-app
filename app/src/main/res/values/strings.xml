@@ -50,6 +50,12 @@
     <!-- Emoji reactions -->
     <string name="emoji_panel_you">You</string>
 
+    <!-- Recordings -->
+    <string name="recording_title">Recordings</string>
+    <string name="recording_empty_title">There are no recordings for this meeting</string>
+    <string name="recording_stop_recording">Stop Recording</string>
+    <string name="recording_start_recording">Start Recording</string>
+
     <!-- Generic -->
     <string name="generic_retry">Retry</string>
 
