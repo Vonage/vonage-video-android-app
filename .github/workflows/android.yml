@@ -19,6 +19,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_PR_NUM: ${{ github.event.pull_request.number }}
+
 jobs:
 
   build-and-test:
@@ -44,7 +48,7 @@ jobs:
       - name: Run unit tests and code quality checks
         run: |
           ./gradlew clean :app:test detekt
-#          ./gradlew clean check detekt --info
+      #          ./gradlew clean check detekt --info
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
