@@ -15,7 +15,7 @@ import javax.inject.Singleton
 
 @Singleton
 class CallActionsListener @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) : BroadcastReceiver() {
 
     private val filter = IntentFilter()
