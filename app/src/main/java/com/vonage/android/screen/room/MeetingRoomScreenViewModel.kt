@@ -3,6 +3,7 @@ package com.vonage.android.screen.room
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.ArchiveRepository
+import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
@@ -35,6 +36,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
     private val sessionRepository: SessionRepository,
     private val archiveRepository: ArchiveRepository,
+    private val captionsRepository: CaptionsRepository,
     private val videoClient: VonageVideoClient,
 ) : ViewModel() {
 
@@ -82,9 +84,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         sessionInfo: SessionInfo,
     ) {
         currentCaptionsId = sessionInfo.captionsId
-        sessionInfo.captionsId?.let {
-            _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.ENABLED) }
-        }
         connect(sessionInfo)
         call?.let { call ->
             _uiState.update { uiState ->
@@ -92,6 +91,11 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                     roomName = roomName,
                     call = call,
                     recordingState = RecordingState.IDLE,
+                    captionsState = if (sessionInfo.captionsId.isNullOrBlank()) {
+                        CaptionsState.IDLE
+                    } else {
+                        CaptionsState.ENABLED
+                    },
                     isLoading = false,
                     isError = false,
                 )
@@ -186,34 +190,42 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     }
 
     fun captions(enable: Boolean) {
-        call?.enableCaptions(enable)
         if (enable) {
-            _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.ENABLING) }
-        } else {
-            _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.DISABLING) }
-        }
-        viewModelScope.launch {
-            if (enable) {
-                sessionRepository.enableCaptions(roomName)
-                    .onSuccess {
-                        currentCaptionsId = it
-                        _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.ENABLED) }
-                    }
-                    .onFailure {
-                        _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.IDLE) }
-                    }
-            } else {
-                currentCaptionsId?.let {
-                    sessionRepository.disableCaptions(roomName, it)
-                        .onSuccess {
-                            currentCaptionsId = null
-                            _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.IDLE) }
-                        }
-                        .onFailure {
-                            _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.ENABLED) }
-                        }
-                }
+            viewModelScope.launch {
+                enableCaptions()
             }
+        } else {
+            viewModelScope.launch {
+                disableCaptions()
+            }
+        }
+    }
+
+    private suspend fun enableCaptions() {
+        _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.ENABLING) }
+        captionsRepository.enableCaptions(roomName)
+            .onSuccess {
+                currentCaptionsId = it
+                call?.enableCaptions(true)
+                _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.ENABLED) }
+            }
+            .onFailure {
+                _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.IDLE) }
+            }
+    }
+
+    private suspend fun disableCaptions() {
+        _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.DISABLING) }
+        currentCaptionsId?.let {
+            captionsRepository.disableCaptions(roomName, it)
+                .onSuccess {
+                    currentCaptionsId = null
+                    call?.enableCaptions(false)
+                    _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.IDLE) }
+                }
+                .onFailure {
+                    _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.ENABLED) }
+                }
         }
     }
 
