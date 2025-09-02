@@ -8,6 +8,7 @@ import com.opentok.android.Stream
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
 import com.vonage.android.kotlin.ext.extractSenderName
+import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
@@ -213,7 +214,7 @@ class Call internal constructor(
         val subscriber = Subscriber.Builder(context, stream).build()
 
         subscriber.setCaptionsListener { subscriber, text, isFinal ->
-            _captionsStateFlow.update { caption -> "${subscriber.stream.name}: $text" }
+            _captionsStateFlow.update { caption -> "${subscriber.name()}: $text" }
             if (isFinal) {
                 _captionsStateFlow.update { caption -> null }
             }
