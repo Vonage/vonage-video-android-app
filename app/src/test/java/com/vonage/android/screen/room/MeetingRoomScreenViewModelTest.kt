@@ -1,6 +1,7 @@
 package com.vonage.android.screen.room
 
 import app.cash.turbine.test
+import com.vonage.android.CoroutineTest
 import com.vonage.android.data.ArchiveRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
@@ -12,7 +13,7 @@ import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.service.CallAction
 import com.vonage.android.service.CallActionsListener
 import com.vonage.android.service.VeraNotificationManager
-import io.mockk.MockKAnnotations
+import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -21,23 +22,35 @@ import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class MeetingRoomScreenViewModelTest {
+class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
-    val sessionRepository: SessionRepository = mockk(relaxed = true)
-    val archiveRepository: ArchiveRepository = mockk(relaxed = true)
-    val videoClient: VonageVideoClient = mockk(relaxed = true)
-    val notificationManager: VeraNotificationManager = mockk(relaxed = true)
-    val callActionsListener: CallActionsListener = mockk(relaxed = true) {
+    val sessionRepository: SessionRepository = mockk()
+    val archiveRepository: ArchiveRepository = mockk()
+    val videoClient: VonageVideoClient = mockk()
+    val notificationManager: VeraNotificationManager = mockk {
+        every { createNotificationChannel() } returns this
+        every { startForegroundService(any()) } returns this
+        every { listenCallActions() } returns this
+        every { stopForegroundService() } returns this
+    }
+    val callActionsListener: CallActionsListener = mockk {
         every { actions } returns MutableStateFlow(null)
     }
 
     @BeforeEach
-    fun setup() {
-        MockKAnnotations.init(this)
+    fun setUp() {
+        setMainDispatcherToTestDispatcher()
+    }
+
+    @AfterEach
+    fun tearDown() {
+        resetMain()
+        clearAllMocks()
     }
 
     @Test
@@ -394,11 +407,13 @@ class MeetingRoomScreenViewModelTest {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             awaitItem()
             callActionsFlow.value = CallAction.HangUp
-            assertEquals(MeetingRoomUiState(
-                roomName = ANY_ROOM_NAME,
-                call = mockCall,
-                isEndCall = true
-            ), awaitItem())
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    isEndCall = true
+                ), awaitItem()
+            )
         }
     }
 
