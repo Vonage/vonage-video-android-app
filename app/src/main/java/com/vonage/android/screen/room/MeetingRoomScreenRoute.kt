@@ -6,20 +6,16 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.vonage.android.screensharing.ScreenSharingEffect
 import kotlinx.coroutines.launch
 
 @Composable
@@ -50,8 +46,8 @@ fun MeetingRoomScreenRoute(
     val screenSharePermissionResult = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
         onResult = {
-            if (it.resultCode == Activity.RESULT_OK && it.data != null) {
-                viewModel.startScreenSharing(it.data!!)
+            if (it.resultCode == Activity.RESULT_OK) {
+                it.data?.let { data -> viewModel.startScreenSharing(data) }
             }
         },
     )
@@ -85,10 +81,14 @@ fun MeetingRoomScreenRoute(
             onToggleRecording = { enable ->
                 viewModel.archiveCall(enable, roomName)
             },
-            onToggleScreenSharing = {
-                scope.launch {
-                    val mediaProjectionManager = context.getSystemService(MediaProjectionManager::class.java)
-                    screenSharePermissionResult.launch(mediaProjectionManager.createScreenCaptureIntent())
+            onToggleScreenSharing = { enable ->
+                if (enable) {
+                    scope.launch {
+                        val mediaProjectionManager = context.getSystemService(MediaProjectionManager::class.java)
+                        screenSharePermissionResult.launch(mediaProjectionManager.createScreenCaptureIntent())
+                    }
+                } else {
+                    viewModel.stopScreenSharing()
                 }
             }
         )
@@ -127,5 +127,5 @@ data class MeetingRoomActions(
     val onMessageSent: (String) -> Unit = {},
     val onListenUnread: (Boolean) -> Unit = {},
     val onToggleRecording: (Boolean) -> Unit = {},
-    val onToggleScreenSharing: () -> Unit = {}
+    val onToggleScreenSharing: (Boolean) -> Unit = {},
 )

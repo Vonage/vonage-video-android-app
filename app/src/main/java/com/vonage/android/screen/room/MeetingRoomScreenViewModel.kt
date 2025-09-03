@@ -12,6 +12,7 @@ import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.SignalState
+import com.vonage.android.screensharing.ScreenSharingServiceListener
 import com.vonage.android.screensharing.VeraScreenSharingManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -135,6 +136,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     }
 
     fun endCall() {
+        screenSharingManager.stopSharingScreen()
         call?.endSession()
     }
 
@@ -188,7 +190,23 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     }
 
     fun startScreenSharing(data: Intent) {
-        screenSharingManager.startScreenSharing(data, call)
+        _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.STARTING) }
+        screenSharingManager.startScreenSharing(data, object : ScreenSharingServiceListener {
+            override fun onStarted(mediaProjection: MediaProjection) {
+                call?.startCapturingScreen(mediaProjection)
+                _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.SHARING) }
+            }
+
+            override fun onStopped() {
+                _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.IDLE) }
+            }
+        })
+    }
+
+    fun stopScreenSharing() {
+        _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.STOPPING) }
+        screenSharingManager.stopSharingScreen()
+        _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.IDLE) }
     }
 
     private companion object {
@@ -205,6 +223,7 @@ interface MeetingRoomViewModelFactory {
 data class MeetingRoomUiState(
     val roomName: String,
     val recordingState: RecordingState = RecordingState.IDLE,
+    val screenSharingState: ScreenSharingState = ScreenSharingState.IDLE,
     val call: CallFacade = noOpCallFacade,
     val isLoading: Boolean = false,
     val isError: Boolean = false,
@@ -214,6 +233,13 @@ enum class RecordingState {
     IDLE,
     STARTING,
     RECORDING,
+    STOPPING,
+}
+
+enum class ScreenSharingState {
+    IDLE,
+    STARTING,
+    SHARING,
     STOPPING,
 }
 

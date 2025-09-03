@@ -8,10 +8,10 @@ import android.media.projection.MediaProjection
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.WindowManager
 import com.opentok.android.BaseVideoCapturer
 
+@Suppress("EmptyFunctionBlock")
 class ScreenSharingCapturer(
     context: Context,
     private val mediaProjection: MediaProjection,
@@ -36,18 +36,20 @@ class ScreenSharingCapturer(
     }
 
     override fun startCapture(): Int {
-        Log.d("XXX", "startCapture")
         capturing = true
         return 0
     }
 
     override fun stopCapture(): Int {
-        Log.d("XXX", "stopCapture")
         capturing = false
         virtualDisplay?.release()
         mediaProjection.stop()
         stopBackgroundThread()
         return 0
+    }
+
+    override fun destroy() {
+
     }
 
     override fun isCaptureStarted(): Boolean = capturing
@@ -60,10 +62,8 @@ class ScreenSharingCapturer(
             format = SDK_PIXEL_FORMAT
         }
 
-    override fun destroy() {
-    }
-
     override fun onPause() {
+
     }
 
     override fun onResume() {
@@ -71,11 +71,10 @@ class ScreenSharingCapturer(
     }
 
     private fun createVirtualDisplay() {
-        mediaProjection.registerCallback(
-            object : MediaProjection.Callback() {},
-            backgroundHandler
-        )
-
+        // this register is empty intentionally
+        // having a MediaProjection.Callback is mandatory for creating virtual displays
+        mediaProjection.registerCallback(object : MediaProjection.Callback() {}, null)
+        // create a virtual display with default values
         virtualDisplay = mediaProjection.createVirtualDisplay(
             VIRTUAL_SCREEN_NAME,
             WIDTH,
@@ -86,10 +85,10 @@ class ScreenSharingCapturer(
             null,
             backgroundHandler
         )
-
+        // send to the SDK every frame
         imageReader.setOnImageAvailableListener({ reader: ImageReader ->
             reader.acquireLatestImage()?.let { frame ->
-                if (frame.planes.size > 0) {
+                if (frame.planes.isNotEmpty()) {
                     provideBufferFrame(
                         frame.planes[0].buffer,
                         SDK_PIXEL_FORMAT,
@@ -113,14 +112,10 @@ class ScreenSharingCapturer(
     }
 
     private fun stopBackgroundThread() {
-        try {
-            backgroundThread?.quitSafely()
-            backgroundThread?.join()
-            backgroundThread = null
-            backgroundHandler = null
-        } catch (e: InterruptedException) {
-            e.printStackTrace()
-        }
+        backgroundThread?.quitSafely()
+        backgroundThread?.join()
+        backgroundThread = null
+        backgroundHandler = null
     }
 
     private companion object {

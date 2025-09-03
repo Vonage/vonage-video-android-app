@@ -56,6 +56,10 @@
     <string name="recording_stop_recording">Stop Recording</string>
     <string name="recording_start_recording">Start Recording</string>
 
+    <!-- Screen Share -->
+    <string name="screen_share_start">Share screen</string>
+    <string name="screen_share_stop">Stop sharing screen</string>
+
     <!-- Generic -->
     <string name="generic_retry">Retry</string>
 

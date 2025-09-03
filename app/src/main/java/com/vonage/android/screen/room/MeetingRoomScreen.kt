@@ -153,6 +153,7 @@ fun MeetingRoomScreen(
                                     onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
                                     onDismissMoreActions = { showMoreActions = false },
                                     recordingState = uiState.recordingState,
+                                    screenSharingState = uiState.screenSharingState,
                                     onEmojiClick = actions.onEmojiSent,
                                 )
                             }
