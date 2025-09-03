@@ -29,7 +29,7 @@ fun AdaptiveGrid(
     participants: ImmutableList<Participant>,
     audioLevel: Float,
     modifier: Modifier = Modifier,
-    itemHeight: Dp = 225.dp,
+    itemHeight: Dp = 150.dp,
     minItemWidth: Dp = 300.dp,
     spacing: Dp = 8.dp
 ) {

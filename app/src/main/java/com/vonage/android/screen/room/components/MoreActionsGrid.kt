@@ -53,7 +53,7 @@ fun MoreActionsGrid(
             icon = Icons.AutoMirrored.Default.ScreenShare,
             label = "Screen share",
             isSelected = false,
-            onClick = {},
+            onClick = { actions.onToggleScreenSharing() },
         ),
         ExtraAction(
             id = 3,

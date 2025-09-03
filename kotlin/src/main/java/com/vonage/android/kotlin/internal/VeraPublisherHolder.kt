@@ -5,5 +5,5 @@ import com.vonage.android.kotlin.model.VeraPublisher
 
 internal data class VeraPublisherHolder(
     val participant: VeraPublisher,
-    val publisher: Publisher,
+    val publisher: MutableMap<String,Publisher>,
 )

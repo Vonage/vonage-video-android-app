@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"/>
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
@@ -37,6 +39,13 @@
                 <data android:host="meet.vonagenetworks.net" />
             </intent-filter>
         </activity>
+
+        <service
+            android:enabled="true"
+            android:name=".screensharing.ScreenSharingService"
+            android:foregroundServiceType="mediaProjection"
+            tools:ignore="ForegroundServicePermission"/>
+
     </application>
 
 </manifest>

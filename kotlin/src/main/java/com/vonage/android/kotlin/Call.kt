@@ -1,8 +1,12 @@
 package com.vonage.android.kotlin
 
 import android.content.Context
+import android.media.projection.MediaProjection
 import android.util.Log
+import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.OpentokError
+import com.opentok.android.Publisher
+import com.opentok.android.PublisherKit.PublisherKitVideoType
 import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
@@ -10,6 +14,7 @@ import com.opentok.android.SubscriberKit
 import com.vonage.android.kotlin.ext.extractSenderName
 import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.ext.toggle
+import com.vonage.android.kotlin.internal.ScreenSharingCapturer
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
 import com.vonage.android.kotlin.internal.toParticipant
 import com.vonage.android.kotlin.model.CallFacade
@@ -38,6 +43,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
@@ -94,7 +100,7 @@ class Call internal constructor(
         session.setSessionListener(sessionListener)
         session.setSignalListener { session, type, data, conn ->
             signalPlugins.forEach { plugin ->
-                val isYou = publisherHolder.publisher.stream.connection == conn
+                val isYou = publisherHolder.publisher["video"]?.stream?.connection == conn
                 val senderName = if (!isYou) {
                     conn.extractSenderName(subscriberStreams.values)
                 } else {
@@ -131,7 +137,7 @@ class Call internal constructor(
             .forEach { plugin ->
                 plugin.sendSignal(
                     session, message, mapOf(
-                        PAYLOAD_PARTICIPANT_NAME_KEY to publisherHolder.publisher.name,
+                        PAYLOAD_PARTICIPANT_NAME_KEY to publisherHolder.publisher["video"]?.name.orEmpty(),
                     )
                 )
             }
@@ -151,26 +157,33 @@ class Call internal constructor(
 
     override fun endSession() {
         // wait for PublisherListener#streamDestroyed before returning : VIDSOL-104
-        session.unpublish(publisherHolder.publisher)
+        publisherHolder.publisher.values.forEach {
+            session.unpublish(it)
+        }
+
         session.setSessionListener(null)
         session.setSignalListener(null)
         session.disconnect()
     }
 
     override fun toggleLocalVideo() {
-        publisherHolder.publisher.publishVideo = publisherHolder.publisher.publishVideo.toggle()
-        participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
-        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+        publisherHolder.publisher["video"]?.let { publisher ->
+            publisher.publishVideo = publisher.publishVideo.toggle()
+            participantStreams[PUBLISHER_ID] = publisher.toParticipant()
+            _participantsStateFlow.value = participantStreams.values.toImmutableList()
+        }
     }
 
     override fun toggleLocalCamera() {
-        publisherHolder.publisher.cycleCamera()
+        publisherHolder.publisher["video"]?.cycleCamera()
     }
 
     override fun toggleLocalAudio() {
-        publisherHolder.publisher.publishAudio = publisherHolder.publisher.publishAudio.toggle()
-        participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
-        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+        publisherHolder.publisher["video"]?.let { publisher ->
+            publisher.publishAudio = publisher.publishAudio.toggle()
+            participantStreams[PUBLISHER_ID] = publisher.toParticipant()
+            _participantsStateFlow.value = participantStreams.values.toImmutableList()
+        }
     }
 
     override fun pauseSession() {
@@ -188,16 +201,38 @@ class Call internal constructor(
             val id = PUBLISHER_ID
             participantStreams[id] = holder.participant
             _participantsStateFlow.value = participantStreams.values.toImmutableList()
-            session.publish(holder.publisher)
+            session.publish(holder.publisher["video"])
         }
     }
 
-    override fun observeLocalAudioLevel(): Flow<Float> = publisherHolder.publisher.observeAudioLevel { audioLevel ->
-        Log.d(TAG, "publisher audio level listener changed to $audioLevel")
+    override fun observeLocalAudioLevel(): Flow<Float> = flowOf(0F)
+//    override fun observeLocalAudioLevel(): Flow<Float> = publisherHolder.publisher["video"]?.observeAudioLevel { audioLevel ->
+//        Log.d(TAG, "publisher audio level listener changed to $audioLevel")
+//
+//        participantStreams[PUBLISHER_ID] = publisherHolder.publisher
+//            .toParticipant(isSpeaking = (audioLevel > SPEAKING_AUDIO_LEVEL_THRESHOLD))
+//        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+//    }
 
-        participantStreams[PUBLISHER_ID] = publisherHolder.publisher
-            .toParticipant(isSpeaking = (audioLevel > SPEAKING_AUDIO_LEVEL_THRESHOLD))
+    override fun startCapturingScreen(mediaProjection: MediaProjection) {
+        val screenPublisher = Publisher.Builder(context)
+            .name("Screen")
+            .capturer(ScreenSharingCapturer(context, mediaProjection))
+            .build()
+            .apply {
+                renderer?.setStyle(
+                    BaseVideoRenderer.STYLE_VIDEO_SCALE,
+                    BaseVideoRenderer.STYLE_VIDEO_FIT,
+                )
+                publishVideo = true
+                publishAudio = false
+                publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeScreen
+            }
+        publisherHolder.publisher["screen"] = screenPublisher
+        participantStreams["screen"] = screenPublisher.toParticipant()
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
+
+        session.publish(screenPublisher)
     }
 
     private fun addSubscriber(stream: Stream) {

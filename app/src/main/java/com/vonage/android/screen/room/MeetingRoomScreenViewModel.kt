@@ -1,5 +1,7 @@
 package com.vonage.android.screen.room
 
+import android.content.Intent
+import android.media.projection.MediaProjection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.ArchiveRepository
@@ -10,6 +12,7 @@ import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.SignalState
+import com.vonage.android.screensharing.VeraScreenSharingManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -36,6 +39,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private val sessionRepository: SessionRepository,
     private val archiveRepository: ArchiveRepository,
     private val videoClient: VonageVideoClient,
+    private val screenSharingManager: VeraScreenSharingManager,
 ) : ViewModel() {
 
     private val initialUiState = MeetingRoomUiState(
@@ -58,7 +62,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
     private var call: CallFacade? = null
     private var currentArchiveId: String? = null
-
 
     init {
         setup()
@@ -184,6 +187,10 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         }
     }
 
+    fun startScreenSharing(data: Intent) {
+        screenSharingManager.startScreenSharing(data, call)
+    }
+
     private companion object {
         const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
         const val PUBLISHER_AUDIO_LEVEL_DEBOUNCE_MS = 36L
@@ -225,4 +232,5 @@ private val noOpCallFacade = object : CallFacade {
     override fun sendChatMessage(message: String) {}
     override fun listenUnreadChatMessages(enable: Boolean) {}
     override fun sendEmoji(emoji: String) {}
+    override fun startCapturingScreen(mediaProjection: MediaProjection) {}
 }

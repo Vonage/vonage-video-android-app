@@ -5,6 +5,7 @@ import android.util.Log
 import com.opentok.android.AudioDeviceManager
 import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.Publisher
+import com.opentok.android.PublisherKit.PublisherKitVideoType
 import com.opentok.android.Session
 import com.opentok.android.Session.SessionOptions
 import com.opentok.android.VeraCameraCapturer
@@ -67,6 +68,7 @@ class VonageVideoClient(
                     publishAudio = config.publishAudio
                     applyVideoBlur(config.blurLevel)
                 }
+                publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeCamera
             }
         val participant = publisher.toParticipant(
             name = resolvedName,
@@ -74,16 +76,18 @@ class VonageVideoClient(
         )
         this.publisherHolder = VeraPublisherHolder(
             participant = participant,
-            publisher = publisher,
+            publisher = mutableMapOf(
+                "video" to publisher
+            ),
         )
         return participant
     }
 
     fun destroyPublisher() {
-        publisherHolder?.publisher?.let {
-            it.destroy()
-            it.onStop()
-        }
+//        publisherHolder?.publisher?.let {
+//            it.destroy()
+//            it.onStop()
+//        }
         publisherHolder = null
         Log.i(TAG, "Destroy publisher")
     }
