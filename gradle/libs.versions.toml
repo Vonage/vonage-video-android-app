@@ -1,17 +1,16 @@
 [versions]
 accompanistPermissions = "0.37.3"
 activityCompose = "1.10.1"
-agp = "8.12.1"
+agp = "8.12.2"
 appcompat = "1.7.1"
-composeBom = "2025.07.00"
+composeBom = "2025.08.01"
 converterMoshi = "3.0.0"
 coreKtx = "1.17.0"
 datastoreCore = "1.1.7"
 detekt = "1.23.8"
 detektCompose = "0.4.27"
 espressoCore = "3.7.0"
-hiltAndroid = "2.57"
-hiltAndroidCompiler = "2.57"
+hiltAndroid = "2.57.1"
 hiltNavigationCompose = "1.2.0"
 hiltNavigationFragment = "1.2.0"
 junit = "5.13.4"
@@ -21,7 +20,7 @@ kotlinxCollectionsImmutable = "0.4.0"
 kotlinxCoroutinesTest = "1.10.2"
 kotlinxSerializationJson = "1.9.0"
 leakcanaryAndroid = "2.14"
-lifecycleRuntimeKtx = "2.9.2"
+lifecycleRuntimeKtx = "2.9.3"
 loggingInterceptor = "5.1.0"
 mockk = "1.14.5"
 moshiKotlin = "1.15.2"
@@ -66,7 +65,7 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "converterMoshi" }
 detekt-compose-rules = { module = "io.nlopez.compose.rules:detekt", version.ref = "detektCompose" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroid" }
 junit = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
@@ -87,7 +86,7 @@ turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-dagger-hilt = { id = "com.google.dagger.hilt.android", version = "2.57" }
+dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
