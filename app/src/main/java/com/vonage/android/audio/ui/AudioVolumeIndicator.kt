@@ -29,7 +29,6 @@ fun AudioVolumeIndicator(
     audioLevel: Float,
     modifier: Modifier = Modifier,
     size: Dp = 32.dp,
-    defaultBarHeight: Float = 0.1f,
     color: Color = Color.White,
 ) {
     val bars by remember(audioLevel) {
@@ -53,9 +52,7 @@ fun AudioVolumeIndicator(
             Spacer(
                 modifier = Modifier
                     .width(4.dp)
-                    .fillMaxHeight(
-                        (defaultBarHeight + audioLevel).coerceAtMost(0.9f),
-                    )
+                    .fillMaxHeight(audioLevel.coerceIn(0.12f, 0.9f))
                     .background(
                         color = color,
                         shape = RoundedCornerShape(4.dp),

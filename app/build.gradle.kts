@@ -41,6 +41,7 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+            isReturnDefaultValues = true
         }
         unitTests.all {
             it.useJUnitPlatform()
@@ -79,6 +80,9 @@ dependencies {
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
+
+    // to be removed when extracting to module all the audio stuff
+    implementation(libs.opentok.android.sdk)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
