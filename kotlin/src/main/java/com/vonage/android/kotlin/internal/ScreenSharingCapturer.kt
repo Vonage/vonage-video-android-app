@@ -30,13 +30,16 @@ class ScreenSharingCapturer(
     }
 
     override fun init() {
-        imageReader = ImageReader.newInstance(WIDTH, HEIGHT, IMAGE_READER_PIXEL_FORMAT, 1)
-        createVirtualDisplay()
-        startBackgroundThread()
+
     }
 
     override fun startCapture(): Int {
         capturing = true
+
+        imageReader = ImageReader.newInstance(WIDTH, HEIGHT, IMAGE_READER_PIXEL_FORMAT, 1)
+        createVirtualDisplay()
+        startBackgroundThread()
+
         return 0
     }
 

@@ -14,11 +14,9 @@ import androidx.core.content.ContextCompat.startForegroundService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-
 class VeraScreenSharingManager @Inject constructor(
     @param:ApplicationContext private val context: Context,
 ) {
-
     private val serviceIntent = ScreenSharingService.intent(context)
     private val mediaProjectionManager: MediaProjectionManager =
         getSystemService(context, MediaProjectionManager::class.java) as MediaProjectionManager

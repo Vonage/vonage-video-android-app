@@ -198,6 +198,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             }
 
             override fun onStopped() {
+                call?.stopCapturingScreen()
                 _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.IDLE) }
             }
         })
@@ -259,4 +260,5 @@ private val noOpCallFacade = object : CallFacade {
     override fun listenUnreadChatMessages(enable: Boolean) {}
     override fun sendEmoji(emoji: String) {}
     override fun startCapturingScreen(mediaProjection: MediaProjection) {}
+    override fun stopCapturingScreen() {}
 }

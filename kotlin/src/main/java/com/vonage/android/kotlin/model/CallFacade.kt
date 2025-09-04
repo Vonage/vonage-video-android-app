@@ -10,9 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 @Stable
-interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade {
-    fun startCapturingScreen(mediaProjection: MediaProjection)
-
+interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, ScreenShareFacade {
     val participantsStateFlow: StateFlow<ImmutableList<Participant>>
     val signalStateFlow: StateFlow<SignalState?>
 }
@@ -38,6 +36,11 @@ interface ChatFacade {
 
 interface EmojiFacade {
     fun sendEmoji(emoji: String)
+}
+
+interface ScreenShareFacade {
+    fun startCapturingScreen(mediaProjection: MediaProjection)
+    fun stopCapturingScreen()
 }
 
 enum class SignalType(val signal: String) {

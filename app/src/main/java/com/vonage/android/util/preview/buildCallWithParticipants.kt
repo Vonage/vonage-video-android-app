@@ -59,4 +59,5 @@ fun buildCallWithParticipants(
 
     // Screen sharing related methods
     override fun startCapturingScreen(mediaProjection: MediaProjection) {}
+    override fun stopCapturingScreen() {}
 }

@@ -76,18 +76,16 @@ class VonageVideoClient(
         )
         this.publisherHolder = VeraPublisherHolder(
             participant = participant,
-            publisher = mutableMapOf(
-                "video" to publisher
-            ),
+            publisher = publisher,
         )
         return participant
     }
 
     fun destroyPublisher() {
-//        publisherHolder?.publisher?.let {
-//            it.destroy()
-//            it.onStop()
-//        }
+        publisherHolder?.publisher?.let {
+            it.destroy()
+            it.onStop()
+        }
         publisherHolder = null
         Log.i(TAG, "Destroy publisher")
     }

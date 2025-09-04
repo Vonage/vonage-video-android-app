@@ -37,7 +37,7 @@ fun MeetingRoomScreenRoute(
 //        viewModel.onPause()
     }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        viewModel.onResume()
+//        viewModel.onResume()
     }
 
     val scope = rememberCoroutineScope()
