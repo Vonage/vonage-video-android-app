@@ -47,7 +47,7 @@ jobs:
 
       - name: Run unit tests and code quality checks
         run: |
-          ./gradlew clean :app:test detekt
+          ./gradlew clean :app:testDebugUnitTest detekt --info
       #          ./gradlew clean check detekt --info
 
       - name: Upload test reports
