@@ -1,5 +1,7 @@
 package com.vonage.android.screen.room
 
+import android.content.Intent
+import android.media.projection.MediaProjection
 import app.cash.turbine.test
 import com.vonage.android.data.ArchiveRepository
 import com.vonage.android.data.SessionInfo
@@ -7,30 +9,28 @@ import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.ParticipantType
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VeraPublisher
-import io.mockk.MockKAnnotations
+import com.vonage.android.screensharing.ScreenSharingServiceListener
+import com.vonage.android.screensharing.VeraScreenSharingManager
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class MeetingRoomScreenViewModelTest {
 
-    val sessionRepository: SessionRepository = mockk(relaxed = true)
-    val archiveRepository: ArchiveRepository = mockk(relaxed = true)
-    val videoClient: VonageVideoClient = mockk(relaxed = true)
-
-    @BeforeEach
-    fun setup() {
-        MockKAnnotations.init(this)
-    }
+    val sessionRepository: SessionRepository = mockk()
+    val archiveRepository: ArchiveRepository = mockk()
+    val screenSharingManager: VeraScreenSharingManager = mockk()
+    val videoClient: VonageVideoClient = mockk()
 
     @Test
     fun `given viewmodel when initialize then returns correct state`() = runTest {
@@ -119,6 +119,7 @@ class MeetingRoomScreenViewModelTest {
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        every { screenSharingManager.stopSharingScreen() } returns Unit
         val sut = sut()
 
         sut.uiState.test {
@@ -132,6 +133,7 @@ class MeetingRoomScreenViewModelTest {
             )
             sut.endCall()
             verify { mockCall.endSession() }
+            verify { screenSharingManager.stopSharingScreen() }
         }
     }
 
@@ -358,11 +360,138 @@ class MeetingRoomScreenViewModelTest {
         }
     }
 
+    @Test
+    fun `given viewmodel when startScreenSharing started then emit correct state`() = runTest {
+        val mockCall = buildMockCall()
+        val mediaProjection: MediaProjection = mockk(relaxed = true)
+        val mockIntent: Intent = mockk(relaxed = true)
+        val listenerSpy = slot<ScreenSharingServiceListener>()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        every {
+            screenSharingManager.startScreenSharing(
+                mockIntent, capture<ScreenSharingServiceListener>(listenerSpy)
+            )
+        } returns Unit
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    screenSharingState = ScreenSharingState.IDLE,
+                ), awaitItem()
+            )
+            sut.startScreenSharing(mockIntent)
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    screenSharingState = ScreenSharingState.STARTING,
+                ), awaitItem()
+            )
+            listenerSpy.captured.onStarted(mediaProjection)
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    screenSharingState = ScreenSharingState.SHARING,
+                ), awaitItem()
+            )
+            verify { mockCall.startCapturingScreen(mediaProjection) }
+        }
+    }
+
+    @Test
+    fun `given viewmodel when startScreenSharing stopped then emit correct state`() = runTest {
+        val mockCall = buildMockCall()
+        val mockIntent: Intent = mockk(relaxed = true)
+        val listenerSpy = slot<ScreenSharingServiceListener>()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        every {
+            screenSharingManager.startScreenSharing(
+                mockIntent, capture<ScreenSharingServiceListener>(listenerSpy)
+            )
+        } returns Unit
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    screenSharingState = ScreenSharingState.IDLE,
+                ), awaitItem()
+            )
+            sut.startScreenSharing(mockIntent)
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    screenSharingState = ScreenSharingState.STARTING,
+                ), awaitItem()
+            )
+            listenerSpy.captured.onStopped()
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    screenSharingState = ScreenSharingState.IDLE,
+                ), awaitItem()
+            )
+            verify { mockCall.stopCapturingScreen() }
+        }
+    }
+
+    @Test
+    fun `given viewmodel when stopScreenSharing stopped then emit correct state`() = runTest {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        every { screenSharingManager.stopSharingScreen() } returns Unit
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    screenSharingState = ScreenSharingState.IDLE,
+                ), awaitItem()
+            )
+            sut.stopScreenSharing()
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    screenSharingState = ScreenSharingState.STOPPING,
+                ), awaitItem()
+            )
+            verify { screenSharingManager.stopSharingScreen() }
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    screenSharingState = ScreenSharingState.IDLE,
+                ), awaitItem()
+            )
+        }
+    }
+
     private fun sut(): MeetingRoomScreenViewModel =
         MeetingRoomScreenViewModel(
             roomName = ANY_ROOM_NAME,
             sessionRepository = sessionRepository,
             archiveRepository = archiveRepository,
+            screenSharingManager = screenSharingManager,
             videoClient = videoClient,
         )
 
@@ -374,8 +503,10 @@ class MeetingRoomScreenViewModelTest {
         )
     )
 
+    @Suppress("LongParameterList")
     private fun buildMockPublisher() = VeraPublisher(
         id = "publisher",
+        type = ParticipantType.CAMERA,
         name = "I am a publisher",
         isMicEnabled = true,
         isCameraEnabled = true,
@@ -399,6 +530,8 @@ class MeetingRoomScreenViewModelTest {
         every { endSession() } returns Unit
         every { listenUnreadChatMessages(any()) } returns Unit
         every { sendChatMessage(any()) } returns Unit
+        every { startCapturingScreen(any()) } returns Unit
+        every { stopCapturingScreen() } returns Unit
     }
 
     private companion object {
