@@ -23,15 +23,15 @@ class BottomBarElement(
 ) : ComposeTestElement(nodeInteractionsProvider, testTag) {
 
     val participantsButton: SemanticsNodeInteraction
-        get() = child(BOTTOM_BAR_PARTICIPANTS_BUTTON)
+        get() = element(BOTTOM_BAR_PARTICIPANTS_BUTTON)
     val participantsBadge: SemanticsNodeInteraction
-        get() = child(BOTTOM_BAR_PARTICIPANTS_BADGE)
+        get() = element(BOTTOM_BAR_PARTICIPANTS_BADGE)
     val endCallButton: SemanticsNodeInteraction
         get() = child(BOTTOM_BAR_END_CALL_BUTTON)
     val chatButton: SemanticsNodeInteraction
         get() = child(BOTTOM_BAR_CHAT_BUTTON)
     val chatUnreadBadge: SemanticsNodeInteraction
-        get() = child(BOTTOM_BAR_CHAT_BADGE)
+        get() = element(BOTTOM_BAR_CHAT_BADGE)
     val cameraButton: SemanticsNodeInteraction
         get() = child(BOTTOM_BAR_CAMERA_BUTTON)
     val micButton: SemanticsNodeInteraction
