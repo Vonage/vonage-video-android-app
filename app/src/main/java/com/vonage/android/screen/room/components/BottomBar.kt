@@ -99,6 +99,12 @@ fun BottomBar(
                 isChatShow = bottomBarState.isChatShow,
             )
 
+            VerticalDivider(
+                modifier = Modifier
+                    .size(height = 36.dp, width = 1.dp),
+                thickness = 1.dp,
+            )
+
             ControlButton(
                 modifier = Modifier,
                 onClick = bottomBarState.onToggleMoreActions,

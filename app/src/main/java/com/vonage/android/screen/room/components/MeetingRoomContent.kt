@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.vonage.android.audio.AudioDevicesHandler
+import com.vonage.android.audio.ui.AudioDevices
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.room.MeetingRoomActions
@@ -65,7 +65,7 @@ fun MeetingRoomContent(
                 onDismissRequest = onDismissAudioDeviceSelector,
                 sheetState = audioDeviceSelectorSheetState,
             ) {
-                AudioDevicesHandler(
+                AudioDevices(
                     onDismissRequest = onDismissAudioDeviceSelector,
                 )
             }

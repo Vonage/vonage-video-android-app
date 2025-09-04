@@ -3,7 +3,7 @@ package com.vonage.android.screen.waiting
 import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vonage.android.audio.MicVolume
+import com.vonage.android.audio.util.MicVolumeListener
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.ext.toggle
@@ -28,7 +28,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
     private val userRepository: UserRepository,
     private val videoClient: VonageVideoClient,
-    private val micVolume: MicVolume,
+    private val micVolumeListener: MicVolumeListener,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WaitingRoomUiState(roomName = roomName))
@@ -63,8 +63,8 @@ class WaitingRoomViewModel @AssistedInject constructor(
             }
         }
         viewModelScope.launch {
-            micVolume.start()
-            micVolume.volume()
+            micVolumeListener.start()
+            micVolumeListener.volume()
                 .distinctUntilChanged()
                 .collectLatest { _audioLevel.value = it }
         }
@@ -86,11 +86,11 @@ class WaitingRoomViewModel @AssistedInject constructor(
     }
 
     fun onCameraSwitch() {
-        micVolume.stop()
+        micVolumeListener.stop()
         val currentCameraIndex = 1 - publisher.cameraIndex
         publisher = publisher.copy(cameraIndex = currentCameraIndex)
         publisher.cycleCamera()
-        micVolume.start()
+        micVolumeListener.start()
     }
 
     fun setBlur() {
@@ -119,7 +119,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     }
 
     fun onStop() {
-        micVolume.stop()
+        micVolumeListener.stop()
         videoClient.destroyPublisher()
     }
 
