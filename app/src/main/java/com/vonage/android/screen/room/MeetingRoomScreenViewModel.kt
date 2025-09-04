@@ -207,7 +207,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     fun stopScreenSharing() {
         _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.STOPPING) }
         screenSharingManager.stopSharingScreen()
-        _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.IDLE) }
     }
 
     private companion object {

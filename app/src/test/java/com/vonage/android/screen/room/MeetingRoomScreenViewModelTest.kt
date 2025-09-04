@@ -10,7 +10,6 @@ import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.ParticipantType
-import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screensharing.ScreenSharingServiceListener
 import com.vonage.android.screensharing.VeraScreenSharingManager
@@ -476,13 +475,6 @@ class MeetingRoomScreenViewModelTest {
                 ), awaitItem()
             )
             verify { screenSharingManager.stopSharingScreen() }
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    screenSharingState = ScreenSharingState.IDLE,
-                ), awaitItem()
-            )
         }
     }
 
@@ -518,21 +510,7 @@ class MeetingRoomScreenViewModelTest {
         isSpeaking = false,
     )
 
-    private fun buildMockCall(): CallFacade = mockk<CallFacade> {
-        every { toggleLocalAudio() } returns Unit
-        every { toggleLocalVideo() } returns Unit
-        every { toggleLocalCamera() } returns Unit
-        every { observeLocalAudioLevel() } returns flowOf()
-        every { connect() } returns flowOf(SessionEvent.Connected)
-        every { sendEmoji(any()) } returns Unit
-        every { resumeSession() } returns Unit
-        every { pauseSession() } returns Unit
-        every { endSession() } returns Unit
-        every { listenUnreadChatMessages(any()) } returns Unit
-        every { sendChatMessage(any()) } returns Unit
-        every { startCapturingScreen(any()) } returns Unit
-        every { stopCapturingScreen() } returns Unit
-    }
+    private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true)
 
     private companion object {
         const val ANY_ROOM_NAME = "room-name"
