@@ -197,7 +197,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         call?.sendEmoji(emoji)
     }
 
-    fun archiveCall(enable: Boolean, roomName: String) {
+    fun archiveCall(enable: Boolean) {
         if (enable) {
             _uiState.update { uiState -> uiState.copy(recordingState = RecordingState.STARTING) }
         } else {

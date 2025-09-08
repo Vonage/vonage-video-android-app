@@ -19,16 +19,10 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import kotlin.test.Test
@@ -39,9 +33,6 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
     val sessionRepository: SessionRepository = mockk()
     val archiveRepository: ArchiveRepository = mockk()
     val captionsRepository: CaptionsRepository = mockk()
-    val videoClient: VonageVideoClient = mockk()
-    val sessionRepository: SessionRepository = mockk()
-    val archiveRepository: ArchiveRepository = mockk()
     val videoClient: VonageVideoClient = mockk()
     val foregroundServiceHandler: VeraForegroundServiceHandler = mockk {
         every { startForegroundService(any()) } returns Unit
@@ -313,7 +304,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
                     recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
-            sut.archiveCall(true, ANY_ROOM_NAME)
+            sut.archiveCall(true)
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
