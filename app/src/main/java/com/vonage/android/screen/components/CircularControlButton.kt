@@ -1,9 +1,7 @@
 package com.vonage.android.screen.components
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -32,7 +30,6 @@ fun CircularControlButton(
         modifier = Modifier
             .size(56.dp)
             .clip(CircleShape)
-            .border(BorderStroke(1.dp, Color.White), CircleShape)
             .then(modifier)
             .clickable { onClick() },
         contentAlignment = Alignment.Center,

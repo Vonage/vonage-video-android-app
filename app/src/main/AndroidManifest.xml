@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
@@ -20,7 +23,10 @@
         android:theme="@style/Theme.VonageVideoAndroid">
         <activity
             android:name=".MainActivity"
+            android:launchMode="singleTop"
             android:exported="true"
+            android:supportsPictureInPicture="true"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"
             android:theme="@style/Theme.VonageVideoAndroid">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,6 +43,12 @@
                 <data android:host="meet.vonagenetworks.net" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".service.VeraForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="camera|microphone"
+            tools:ignore="ForegroundServicePermission" />
     </application>
 
 </manifest>

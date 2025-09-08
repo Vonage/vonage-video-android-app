@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
+import com.vonage.android.audio.ui.AudioDevicesEffect
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
@@ -83,12 +84,14 @@ fun MeetingRoomScreen(
         actions.onListenUnread(navigator.isExtraPaneShow().not())
     }
 
+    AudioDevicesEffect()
+
     val isChatShow by remember(navigator.scaffoldValue) {
         derivedStateOf { navigator.isExtraPaneShow() }
     }
 
     when {
-        (uiState.isError.not() && uiState.isLoading.not()) -> {
+        (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
             val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle(persistentListOf())
             val signalState by uiState.call.signalStateFlow.collectAsStateWithLifecycle(null)
             val chatState = signalState?.signals[SignalType.CHAT.signal] as? ChatState
@@ -182,6 +185,12 @@ fun MeetingRoomScreen(
                 onAccept = actions.onRetry,
                 onCancel = actions.onBack,
             )
+        }
+
+        (uiState.isEndCall) -> {
+            LaunchedEffect(uiState) {
+                actions.onEndCall()
+            }
         }
     }
 }
