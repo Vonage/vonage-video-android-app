@@ -22,13 +22,14 @@ import androidx.core.net.toUri
 import com.vonage.android.MainActivity
 import com.vonage.android.R
 import com.vonage.android.di.RetrofitModule.BASE_URL
-import com.vonage.android.service.VeraNotificationManager.Companion.CHANNEL_ID
+import com.vonage.android.service.VeraForegroundServiceHandler.Companion.HANG_UP_ACTION
+import com.vonage.android.notifications.VeraNotificationManager.Companion.CHANNEL_ID
 
 class VeraForegroundService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        stopForeground(true)
+        stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
 

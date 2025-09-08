@@ -7,12 +7,11 @@ import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.service.CallAction
-import com.vonage.android.service.CallActionsListener
-import com.vonage.android.service.VeraNotificationManager
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.SignalState
+import com.vonage.android.service.VeraForegroundServiceHandler
+import com.vonage.android.notifications.VeraNotificationManager.CallAction
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -25,10 +24,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -40,13 +39,13 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private val sessionRepository: SessionRepository,
     private val archiveRepository: ArchiveRepository,
     private val videoClient: VonageVideoClient,
-    private val notificationManager: VeraNotificationManager,
-    private val callActionsListener: CallActionsListener,
+    private val foregroundServiceHandler: VeraForegroundServiceHandler,
 ) : ViewModel() {
 
     private val initialUiState = MeetingRoomUiState(
         roomName = roomName,
         isLoading = true,
+        isEndCall = false,
     )
     private val _uiState = MutableStateFlow(initialUiState)
     val uiState: StateFlow<MeetingRoomUiState> = _uiState.stateIn(
@@ -65,15 +64,11 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private var call: CallFacade? = null
     private var currentArchiveId: String? = null
 
-
     init {
         setup()
 
-        notificationManager.apply {
-            createNotificationChannel()
-            startForegroundService(roomName)
-            listenCallActions()
-        }
+        foregroundServiceHandler
+            .startForegroundService(roomName)
     }
 
     fun setup() {
@@ -90,16 +85,19 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                     _uiState.update { uiState -> uiState.copy(isError = true) }
                 }
         }
-        viewModelScope.launch {
-            callActionsListener.actions.collectLatest { callAction ->
+
+        foregroundServiceHandler
+            .actions
+            .onEach { callAction ->
                 when (callAction) {
                     CallAction.HangUp -> {
-                        _uiState.update { uiState -> uiState.copy(isEndCall = true)}
+                        _uiState.update { uiState -> uiState.copy(isEndCall = true) }
                     }
+
                     else -> {}
                 }
             }
-        }
+            .launchIn(viewModelScope)
     }
 
     private fun onSessionCreated(
@@ -129,7 +127,19 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             token = sessionInfo.token,
         )
         viewModelScope.launch {
-            call?.connect()?.collect()
+            call?.let {
+                it.connect()
+                    .onEach { sessionEvent ->
+                        when (sessionEvent) {
+                            is SessionEvent.Disconnected -> {
+                                endCall()
+                            }
+
+                            else -> {}
+                        }
+                    }
+                    .collect()
+            }
         }
         viewModelScope.launch {
             call?.let {
@@ -154,7 +164,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     }
 
     fun endCall() {
-        notificationManager.stopForegroundService()
+        foregroundServiceHandler.stopForegroundService()
         call?.endSession()
     }
 

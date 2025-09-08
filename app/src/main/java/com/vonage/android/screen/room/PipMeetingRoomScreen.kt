@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +34,7 @@ fun PipMeetingRoomScreen(
     modifier: Modifier = Modifier,
 ) {
     when {
-        (uiState.isError.not() && uiState.isLoading.not()) -> {
+        (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
             val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
             val signalState by uiState.call.signalStateFlow.collectAsStateWithLifecycle(null)
             val chatState = signalState?.signals[SignalType.CHAT.signal] as? ChatState
@@ -75,7 +76,9 @@ fun PipMeetingRoomScreen(
         }
 
         (uiState.isEndCall) -> {
-            actions.onEndCall()
+            LaunchedEffect(uiState) {
+                actions.onEndCall()
+            }
             LocalContext.current.findActivity().finish()
         }
     }

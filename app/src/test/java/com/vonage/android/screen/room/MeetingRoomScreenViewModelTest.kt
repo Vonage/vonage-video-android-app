@@ -10,15 +10,15 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VeraPublisher
-import com.vonage.android.service.CallAction
-import com.vonage.android.service.CallActionsListener
-import com.vonage.android.service.VeraNotificationManager
+import com.vonage.android.service.VeraForegroundServiceHandler
+import com.vonage.android.notifications.VeraNotificationManager.CallAction
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -32,14 +32,10 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
     val sessionRepository: SessionRepository = mockk()
     val archiveRepository: ArchiveRepository = mockk()
     val videoClient: VonageVideoClient = mockk()
-    val notificationManager: VeraNotificationManager = mockk {
-        every { createNotificationChannel() } returns this
-        every { startForegroundService(any()) } returns this
-        every { listenCallActions() } returns this
-        every { stopForegroundService() } returns this
-    }
-    val callActionsListener: CallActionsListener = mockk {
-        every { actions } returns MutableStateFlow(null)
+    val foregroundServiceHandler: VeraForegroundServiceHandler = mockk {
+        every { startForegroundService(any()) } returns Unit
+        every { stopForegroundService() } returns Unit
+        every { actions } returns MutableSharedFlow()
     }
 
     @BeforeEach
@@ -388,9 +384,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         sut()
 
-        verify { notificationManager.createNotificationChannel() }
-        verify { notificationManager.startForegroundService(ANY_ROOM_NAME) }
-        verify { notificationManager.listenCallActions() }
+        verify { foregroundServiceHandler.startForegroundService(ANY_ROOM_NAME) }
     }
 
     @Test
@@ -400,7 +394,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
-        every { callActionsListener.actions } returns callActionsFlow
+        every { foregroundServiceHandler.actions } returns callActionsFlow
         val sut = sut()
 
         sut.uiState.test {
@@ -423,8 +417,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
             sessionRepository = sessionRepository,
             archiveRepository = archiveRepository,
             videoClient = videoClient,
-            notificationManager = notificationManager,
-            callActionsListener = callActionsListener,
+            foregroundServiceHandler = foregroundServiceHandler,
         )
 
     private fun buildSuccessSessionResponse() = Result.success(
