@@ -411,13 +411,6 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             sut.captions(true)
-//            assertEquals(
-//                MeetingRoomUiState(
-//                    roomName = ANY_ROOM_NAME,
-//                    call = mockCall,
-//                    captionsState = CaptionsState.ENABLING,
-//                ), awaitItem()
-//            )
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -441,13 +434,6 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             sut.captions(true)
-//            assertEquals(
-//                MeetingRoomUiState(
-//                    roomName = ANY_ROOM_NAME,
-//                    call = mockCall,
-//                    captionsState = CaptionsState.ENABLING,
-//                ), awaitItem()
-//            )
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -472,13 +458,6 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             sut.captions(true)
-//            assertEquals(
-//                MeetingRoomUiState(
-//                    roomName = ANY_ROOM_NAME,
-//                    call = mockCall,
-//                    captionsState = CaptionsState.ENABLING,
-//                ), awaitItem()
-//            )
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -489,13 +468,6 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
             verify { mockCall.enableCaptions(true) }
             // disable captions
             sut.captions(false)
-//            assertEquals(
-//                MeetingRoomUiState(
-//                    roomName = ANY_ROOM_NAME,
-//                    call = mockCall,
-//                    captionsState = CaptionsState.DISABLING,
-//                ), awaitItem()
-//            )
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
