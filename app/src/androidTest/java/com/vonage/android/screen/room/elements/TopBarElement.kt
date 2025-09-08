@@ -18,9 +18,9 @@ class TopBarElement(
 ) : ComposeTestElement(nodeInteractionsProvider, testTag) {
 
     val title: SemanticsNodeInteraction
-        get() = child(TOP_BAR_TITLE)
+        get() = element(TOP_BAR_TITLE)
     val shareIcon: SemanticsNodeInteraction
-        get() = child(TOP_BAR_SHARE_ACTION)
+        get() = element(TOP_BAR_SHARE_ACTION)
 
     fun assertIsDisplayedWithTitle(expectedText: String) {
         title.assertIsDisplayed().assertTextEquals(expectedText)

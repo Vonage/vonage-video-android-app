@@ -99,12 +99,6 @@ fun BottomBar(
                 isChatShow = bottomBarState.isChatShow,
             )
 
-            VerticalDivider(
-                modifier = Modifier
-                    .size(height = 36.dp, width = 1.dp),
-                thickness = 1.dp,
-            )
-
             ControlButton(
                 modifier = Modifier,
                 onClick = bottomBarState.onToggleMoreActions,
@@ -131,13 +125,15 @@ fun BottomBar(
 }
 
 @Composable
-private fun ChatBadgeButton(
+fun ChatBadgeButton(
     unreadCount: Int,
     onShowChat: () -> Unit,
     isChatShow: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val badgeVisible = unreadCount > 0
     BadgedBox(
+        modifier = modifier,
         badge = {
             if (badgeVisible) {
                 Badge(
