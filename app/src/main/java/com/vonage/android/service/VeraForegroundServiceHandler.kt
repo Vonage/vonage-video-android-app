@@ -50,7 +50,7 @@ class VeraForegroundServiceHandler @Inject constructor(
     }
 
     fun stopForegroundService() {
-        registerReceiver(context, null, filter, ContextCompat.RECEIVER_EXPORTED)
+        context.unregisterReceiver(callActionsReceiver)
         val serviceIntent = Intent(context, VeraForegroundService::class.java)
         context.stopService(serviceIntent)
     }
