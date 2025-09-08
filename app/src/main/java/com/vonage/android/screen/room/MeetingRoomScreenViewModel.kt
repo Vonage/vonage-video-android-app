@@ -11,7 +11,7 @@ import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.service.VeraForegroundServiceHandler
-import com.vonage.android.notifications.VeraNotificationManager.CallAction
+import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

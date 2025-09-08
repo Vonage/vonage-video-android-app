@@ -23,7 +23,7 @@ import com.vonage.android.MainActivity
 import com.vonage.android.R
 import com.vonage.android.di.RetrofitModule.BASE_URL
 import com.vonage.android.service.VeraForegroundServiceHandler.Companion.HANG_UP_ACTION
-import com.vonage.android.notifications.VeraNotificationManager.Companion.CHANNEL_ID
+import com.vonage.android.notifications.VeraNotificationChannelRegistry.Companion.CHANNEL_ID
 
 class VeraForegroundService : Service() {
 

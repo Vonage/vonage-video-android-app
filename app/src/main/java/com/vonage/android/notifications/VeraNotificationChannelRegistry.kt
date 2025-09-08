@@ -10,7 +10,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class VeraNotificationManager @Inject constructor(
+class VeraNotificationChannelRegistry @Inject constructor(
     @param:ApplicationContext private val context: Context,
 ) {
 
@@ -32,8 +32,8 @@ class VeraNotificationManager @Inject constructor(
         }
     }
 
-    companion object {
-        const val CHANNEL_ID = "VeraNotificationManager"
+    companion object Companion {
+        const val CHANNEL_ID = "VeraNotificationChannelRegistry"
         const val CHANNEL_NAME = "Vonage Foreground Service"
     }
 

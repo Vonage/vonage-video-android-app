@@ -10,7 +10,7 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.core.content.ContextCompat.registerReceiver
-import com.vonage.android.notifications.VeraNotificationManager.CallAction
+import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

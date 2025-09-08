@@ -10,8 +10,8 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VeraPublisher
+import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import com.vonage.android.service.VeraForegroundServiceHandler
-import com.vonage.android.notifications.VeraNotificationManager.CallAction
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
