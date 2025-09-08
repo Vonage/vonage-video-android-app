@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.util.pip.pipEffect
 
 @Composable
 fun JoinMeetingRoomRoute(
@@ -14,6 +15,7 @@ fun JoinMeetingRoomRoute(
     viewModel: JoinMeetingRoomViewModel = hiltViewModel(),
     navigateToRoom: (JoinMeetingRoomRouteParams) -> Unit,
 ) {
+    val pipModifier = pipEffect(shouldEnterPipMode = false)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val actions = remember {
@@ -27,7 +29,7 @@ fun JoinMeetingRoomRoute(
     JoinMeetingRoomScreen(
         uiState = uiState,
         actions = actions,
-        modifier = modifier,
+        modifier = modifier.then(pipModifier),
         navigateToRoom = navigateToRoom,
     )
 }

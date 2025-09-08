@@ -1,6 +1,7 @@
 package com.vonage.android.screen.room
 
 import app.cash.turbine.test
+import com.vonage.android.CoroutineTest
 import com.vonage.android.data.ArchiveRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
@@ -9,27 +10,43 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VeraPublisher
-import io.mockk.MockKAnnotations
+import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
+import com.vonage.android.service.VeraForegroundServiceHandler
+import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class MeetingRoomScreenViewModelTest {
+class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
-    val sessionRepository: SessionRepository = mockk(relaxed = true)
-    val archiveRepository: ArchiveRepository = mockk(relaxed = true)
-    val videoClient: VonageVideoClient = mockk(relaxed = true)
+    val sessionRepository: SessionRepository = mockk()
+    val archiveRepository: ArchiveRepository = mockk()
+    val videoClient: VonageVideoClient = mockk()
+    val foregroundServiceHandler: VeraForegroundServiceHandler = mockk {
+        every { startForegroundService(any()) } returns Unit
+        every { stopForegroundService() } returns Unit
+        every { actions } returns MutableSharedFlow()
+    }
 
     @BeforeEach
-    fun setup() {
-        MockKAnnotations.init(this)
+    fun setUp() {
+        setMainDispatcherToTestDispatcher()
+    }
+
+    @AfterEach
+    fun tearDown() {
+        resetMain()
+        clearAllMocks()
     }
 
     @Test
@@ -358,12 +375,49 @@ class MeetingRoomScreenViewModelTest {
         }
     }
 
+    @Test
+    fun `given viewmodel when initialize then create foreground service`() {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+
+        sut()
+
+        verify { foregroundServiceHandler.startForegroundService(ANY_ROOM_NAME) }
+    }
+
+    @Test
+    fun `given viewmodel when receive CallActionHangUp then update state`() = runTest {
+        val mockCall = buildMockCall()
+        val callActionsFlow = MutableStateFlow<CallAction?>(null)
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        every { foregroundServiceHandler.actions } returns callActionsFlow
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            awaitItem()
+            callActionsFlow.value = CallAction.HangUp
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    isEndCall = true
+                ), awaitItem()
+            )
+        }
+    }
+
     private fun sut(): MeetingRoomScreenViewModel =
         MeetingRoomScreenViewModel(
             roomName = ANY_ROOM_NAME,
             sessionRepository = sessionRepository,
             archiveRepository = archiveRepository,
             videoClient = videoClient,
+            foregroundServiceHandler = foregroundServiceHandler,
         )
 
     private fun buildSuccessSessionResponse() = Result.success(

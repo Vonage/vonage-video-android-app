@@ -6,6 +6,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.vonage.android.util.pip.pipEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.data.Archive
@@ -21,6 +22,8 @@ fun GoodbyeScreenRoute(
             factory.create(roomName)
         },
 ) {
+    val pipModifier = pipEffect(shouldEnterPipMode = false)
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val actions = remember {
@@ -40,7 +43,7 @@ fun GoodbyeScreenRoute(
 
     GoodbyeScreen(
         uiState = uiState,
-        modifier = modifier,
+        modifier = modifier.then(pipModifier),
         actions = actions,
     )
 }
