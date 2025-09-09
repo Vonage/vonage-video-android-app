@@ -8,7 +8,6 @@ class SessionRepository @Inject constructor(
     private val apiService: APIService,
 ) {
 
-    @Suppress("TooGenericExceptionCaught")
     suspend fun getSession(roomName: String): Result<SessionInfo> =
         runCatching {
             val response = apiService.getSession(roomName)
@@ -27,10 +26,12 @@ fun GetSessionResponse.toSessionInfo() =
         apiKey = this.apiKey,
         sessionId = this.sessionId,
         token = this.token,
+        captionsId = this.captionsId,
     )
 
 data class SessionInfo(
     val apiKey: String,
     val sessionId: String,
     val token: String,
+    val captionsId: String?,
 )

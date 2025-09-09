@@ -48,6 +48,7 @@ import com.vonage.android.screen.room.components.BottomBarState
 import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.TopBar
+import com.vonage.android.screen.room.components.captions.CaptionsOverlay
 import com.vonage.android.screen.room.components.chat.ChatPanel
 import com.vonage.android.screen.room.components.emoji.EmojiReactionOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
@@ -96,6 +97,7 @@ fun MeetingRoomScreen(
             val signalState by uiState.call.signalStateFlow.collectAsStateWithLifecycle(null)
             val chatState = signalState?.signals[SignalType.CHAT.signal] as? ChatState
             val emojiState = signalState?.signals[SignalType.REACTION.signal] as? EmojiState
+            val captions by uiState.call.captionsStateFlow.collectAsStateWithLifecycle()
             val publisher = participants.filterIsInstance<VeraPublisher>().firstOrNull()
 
             Scaffold(
@@ -129,6 +131,9 @@ fun MeetingRoomScreen(
                             EmojiReactionOverlay(
                                 reactions = emojiState?.reactions.orEmpty(),
                             )
+                            CaptionsOverlay(
+                                captions = captions,
+                            )
                             Column(verticalArrangement = Arrangement.Top) {
                                 TopBar(
                                     modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
@@ -155,6 +160,7 @@ fun MeetingRoomScreen(
                                     onDismissMoreActions = { showMoreActions = false },
                                     recordingState = uiState.recordingState,
                                     screenSharingState = uiState.screenSharingState,
+                                    captionsState = uiState.captionsState,
                                     onEmojiClick = actions.onEmojiSent,
                                 )
                             }

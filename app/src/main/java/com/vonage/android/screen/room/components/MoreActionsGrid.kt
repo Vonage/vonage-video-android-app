@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.vonage.android.R
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.RecordingState
 import com.vonage.android.screen.room.ScreenSharingState
@@ -41,6 +42,7 @@ import com.vonage.android.screensharing.ui.screenSharingAction
 fun MoreActionsGrid(
     recordingState: RecordingState,
     screenSharingState: ScreenSharingState,
+    captionsState: CaptionsState,
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
 ) {
@@ -53,14 +55,11 @@ fun MoreActionsGrid(
             actions = actions,
             screenSharingState = screenSharingState,
         ),
-        // rest of the actions are placeholders
-        ExtraAction(
-            id = 3,
-            icon = Icons.Default.ClosedCaption,
-            label = "Captions",
-            isSelected = false,
-            onClick = {},
+        captionsAction(
+            actions = actions,
+            captionsState = captionsState,
         ),
+        // rest of the actions are placeholders
         ExtraAction(
             id = 4,
             icon = Icons.Default.BugReport,
@@ -127,6 +126,39 @@ private fun recordingAction(
     )
 
 @Composable
+private fun captionsAction(
+    actions: MeetingRoomActions,
+    captionsState: CaptionsState,
+): ExtraAction =
+    ExtraAction(
+        id = 3,
+        icon = Icons.Default.ClosedCaption,
+        label = when (captionsState) {
+            CaptionsState.IDLE,
+            CaptionsState.ENABLING,
+            CaptionsState.DISABLING -> stringResource(R.string.captions_start)
+
+            CaptionsState.ENABLED -> stringResource(R.string.captions_stop)
+        },
+        isSelected = when (captionsState) {
+            CaptionsState.IDLE,
+            CaptionsState.DISABLING -> false
+
+            CaptionsState.ENABLING,
+            CaptionsState.ENABLED -> true
+        },
+        onClick = {
+            when (captionsState) {
+                CaptionsState.IDLE -> actions.onToggleCaptions(true)
+                CaptionsState.ENABLED -> actions.onToggleCaptions(false)
+                CaptionsState.ENABLING,
+                CaptionsState.DISABLING -> {
+                }
+            }
+        },
+    )
+
+@Composable
 private fun ActionCell(
     icon: ImageVector,
     label: String,
@@ -186,6 +218,7 @@ internal fun MoreActionsGridPreview() {
             modifier = Modifier.background(VonageVideoTheme.colors.surface),
             recordingState = RecordingState.RECORDING,
             screenSharingState = ScreenSharingState.SHARING,
+            captionsState = CaptionsState.ENABLED,
             actions = MeetingRoomActions(),
         )
     }
