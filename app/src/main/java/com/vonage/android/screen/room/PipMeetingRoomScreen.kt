@@ -52,6 +52,7 @@ fun PipMeetingRoomScreen(
                     audioLevel = audioLevel,
                     isSpeaking = participant.isSpeaking,
                     isShowVolumeIndicator = participant is VeraPublisher,
+                    videoSource = participant.videoSource,
                 )
                 ChatBadgeButton(
                     modifier = Modifier

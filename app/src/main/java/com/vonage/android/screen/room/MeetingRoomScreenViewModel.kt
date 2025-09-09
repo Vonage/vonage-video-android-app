@@ -1,5 +1,7 @@
 package com.vonage.android.screen.room
 
+import android.content.Intent
+import android.media.projection.MediaProjection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.ArchiveRepository
@@ -11,6 +13,8 @@ import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.SignalState
+import com.vonage.android.screensharing.ScreenSharingServiceListener
+import com.vonage.android.screensharing.VeraScreenSharingManager
 import com.vonage.android.service.VeraForegroundServiceHandler
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import dagger.assisted.Assisted
@@ -41,6 +45,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private val archiveRepository: ArchiveRepository,
     private val captionsRepository: CaptionsRepository,
     private val videoClient: VonageVideoClient,
+    private val screenSharingManager: VeraScreenSharingManager,
     private val foregroundServiceHandler: VeraForegroundServiceHandler,
 ) : ViewModel() {
 
@@ -174,6 +179,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
     fun endCall() {
         foregroundServiceHandler.stopForegroundService()
+        screenSharingManager.stopSharingScreen()
         call?.endSession()
     }
 
@@ -266,6 +272,26 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         }
     }
 
+    fun startScreenSharing(data: Intent) {
+        _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.STARTING) }
+        screenSharingManager.startScreenSharing(data, object : ScreenSharingServiceListener {
+            override fun onStarted(mediaProjection: MediaProjection) {
+                call?.startCapturingScreen(mediaProjection)
+                _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.SHARING) }
+            }
+
+            override fun onStopped() {
+                call?.stopCapturingScreen()
+                _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.IDLE) }
+            }
+        })
+    }
+
+    fun stopScreenSharing() {
+        _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.STOPPING) }
+        screenSharingManager.stopSharingScreen()
+    }
+
     private companion object {
         const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
         const val PUBLISHER_AUDIO_LEVEL_DEBOUNCE_MS = 36L
@@ -281,6 +307,7 @@ data class MeetingRoomUiState(
     val roomName: String,
     val recordingState: RecordingState = RecordingState.IDLE,
     val captionsState: CaptionsState = CaptionsState.IDLE,
+    val screenSharingState: ScreenSharingState = ScreenSharingState.IDLE,
     val call: CallFacade = noOpCallFacade,
     val isLoading: Boolean = false,
     val isError: Boolean = false,
@@ -301,6 +328,13 @@ enum class CaptionsState {
     DISABLING,
 }
 
+enum class ScreenSharingState {
+    IDLE,
+    STARTING,
+    SHARING,
+    STOPPING,
+}
+
 @Suppress("EmptyFunctionBlock")
 private val noOpCallFacade = object : CallFacade {
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = MutableStateFlow(persistentListOf())
@@ -319,4 +353,6 @@ private val noOpCallFacade = object : CallFacade {
     override fun sendChatMessage(message: String) {}
     override fun listenUnreadChatMessages(enable: Boolean) {}
     override fun sendEmoji(emoji: String) {}
+    override fun startCapturingScreen(mediaProjection: MediaProjection) {}
+    override fun stopCapturingScreen() {}
 }

@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.androidx.adaptive)
     implementation(libs.androidx.adaptive.layout)
     implementation(libs.androidx.adaptive.navigation)
+    implementation(libs.androidx.material3)
     ksp(libs.hilt.android.compiler)
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.datastore.preferences.core)

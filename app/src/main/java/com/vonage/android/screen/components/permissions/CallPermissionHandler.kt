@@ -24,6 +24,7 @@ fun CallPermissionHandler(
             Manifest.permission.FOREGROUND_SERVICE,
             Manifest.permission.BLUETOOTH_CONNECT,
             Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION,
         )
     )
     LaunchedEffect(state) {

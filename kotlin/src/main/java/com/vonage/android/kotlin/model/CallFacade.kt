@@ -1,5 +1,6 @@
 package com.vonage.android.kotlin.model
 
+import android.media.projection.MediaProjection
 import androidx.compose.runtime.Stable
 import com.vonage.android.kotlin.signal.ChatMessage
 import com.vonage.android.kotlin.signal.EmojiReaction
@@ -9,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 @Stable
-interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade {
+interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, ScreenShareFacade {
     val participantsStateFlow: StateFlow<ImmutableList<Participant>>
     val signalStateFlow: StateFlow<SignalState?>
     val captionsStateFlow: StateFlow<String?>
@@ -37,6 +38,11 @@ interface ChatFacade {
 
 interface EmojiFacade {
     fun sendEmoji(emoji: String)
+}
+
+interface ScreenShareFacade {
+    fun startCapturingScreen(mediaProjection: MediaProjection)
+    fun stopCapturingScreen()
 }
 
 enum class SignalType(val signal: String) {

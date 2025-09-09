@@ -5,6 +5,7 @@ import android.util.Log
 import com.opentok.android.AudioDeviceManager
 import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.Publisher
+import com.opentok.android.PublisherKit.PublisherKitVideoType
 import com.opentok.android.Session
 import com.opentok.android.Session.SessionOptions
 import com.opentok.android.VeraCameraCapturer
@@ -67,6 +68,7 @@ class VonageVideoClient(
                     publishAudio = config.publishAudio
                     applyVideoBlur(config.blurLevel)
                 }
+                publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeCamera
             }
         val participant = publisher.toParticipant(
             name = resolvedName,

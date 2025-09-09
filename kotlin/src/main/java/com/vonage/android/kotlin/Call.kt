@@ -1,8 +1,12 @@
 package com.vonage.android.kotlin
 
 import android.content.Context
+import android.media.projection.MediaProjection
 import android.util.Log
+import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.OpentokError
+import com.opentok.android.Publisher
+import com.opentok.android.PublisherKit.PublisherKitVideoType
 import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
@@ -11,8 +15,10 @@ import com.vonage.android.kotlin.ext.extractSenderName
 import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.ext.toggle
+import com.vonage.android.kotlin.internal.ScreenSharingCapturer
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
 import com.vonage.android.kotlin.internal.toParticipant
+import com.vonage.android.kotlin.internal.toScreenParticipant
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
@@ -136,7 +142,7 @@ class Call internal constructor(
             .forEach { plugin ->
                 plugin.sendSignal(
                     session, message, mapOf(
-                        PAYLOAD_PARTICIPANT_NAME_KEY to publisherHolder.publisher.name,
+                        PAYLOAD_PARTICIPANT_NAME_KEY to publisherHolder.publisher.name.orEmpty(),
                     )
                 )
             }
@@ -157,15 +163,18 @@ class Call internal constructor(
     override fun endSession() {
         // wait for PublisherListener#streamDestroyed before returning : VIDSOL-104
         session.unpublish(publisherHolder.publisher)
+
         session.setSessionListener(null)
         session.setSignalListener(null)
         session.disconnect()
     }
 
     override fun toggleLocalVideo() {
-        publisherHolder.publisher.publishVideo = publisherHolder.publisher.publishVideo.toggle()
-        participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
-        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+        publisherHolder.publisher.let { publisher ->
+            publisher.publishVideo = publisher.publishVideo.toggle()
+            participantStreams[PUBLISHER_ID] = publisher.toParticipant()
+            _participantsStateFlow.value = participantStreams.values.toImmutableList()
+        }
     }
 
     override fun toggleLocalCamera() {
@@ -173,9 +182,11 @@ class Call internal constructor(
     }
 
     override fun toggleLocalAudio() {
-        publisherHolder.publisher.publishAudio = publisherHolder.publisher.publishAudio.toggle()
-        participantStreams[PUBLISHER_ID] = publisherHolder.publisher.toParticipant()
-        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+        publisherHolder.publisher.let { publisher ->
+            publisher.publishAudio = publisher.publishAudio.toggle()
+            participantStreams[PUBLISHER_ID] = publisher.toParticipant()
+            _participantsStateFlow.value = participantStreams.values.toImmutableList()
+        }
     }
 
     override fun pauseSession() {
@@ -202,6 +213,33 @@ class Call internal constructor(
 
         participantStreams[PUBLISHER_ID] = publisherHolder.publisher
             .toParticipant(isSpeaking = (audioLevel > SPEAKING_AUDIO_LEVEL_THRESHOLD))
+        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+    }
+
+    override fun startCapturingScreen(mediaProjection: MediaProjection) {
+        val name = "${publisherHolder.publisher.name}'s Screen"
+        val screenPublisher = Publisher.Builder(context)
+            .name(name)
+            .capturer(ScreenSharingCapturer(context, mediaProjection))
+            .build()
+            .apply {
+                renderer?.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FIT)
+                publishVideo = true
+                publishAudio = false
+                publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeScreen
+            }
+        publisherHolder.screenPublisher = screenPublisher
+        participantStreams[PUBLISHER_SCREEN_ID] = screenPublisher.toScreenParticipant()
+        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+
+        session.publish(screenPublisher)
+    }
+
+    override fun stopCapturingScreen() {
+        publisherHolder.screenPublisher?.let {
+            session.unpublish(it)
+        }
+        participantStreams.remove(PUBLISHER_SCREEN_ID)
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
     }
 
@@ -323,6 +361,7 @@ class Call internal constructor(
     companion object {
         const val TAG: String = "Call"
         const val PUBLISHER_ID: String = "publisher"
+        const val PUBLISHER_SCREEN_ID: String = "publisher-screen"
 
         const val SUBSCRIBER_AUDIO_LEVEL_SAMPLING_MS = 50L
         const val SPEAKING_AUDIO_LEVEL_THRESHOLD = 0.2F // add as a configuration parameter

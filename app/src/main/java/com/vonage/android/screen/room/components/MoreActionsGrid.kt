@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ScreenShare
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.ClosedCaption
@@ -36,10 +35,13 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.RecordingState
+import com.vonage.android.screen.room.ScreenSharingState
+import com.vonage.android.screensharing.ui.screenSharingAction
 
 @Composable
 fun MoreActionsGrid(
     recordingState: RecordingState,
+    screenSharingState: ScreenSharingState,
     captionsState: CaptionsState,
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
@@ -49,18 +51,15 @@ fun MoreActionsGrid(
             actions = actions,
             recordingState = recordingState,
         ),
-        // rest of the actions are placeholders
-        ExtraAction(
-            id = 2,
-            icon = Icons.AutoMirrored.Default.ScreenShare,
-            label = "Screen share",
-            isSelected = false,
-            onClick = {},
+        screenSharingAction(
+            actions = actions,
+            screenSharingState = screenSharingState,
         ),
         captionsAction(
             actions = actions,
             captionsState = captionsState,
         ),
+        // rest of the actions are placeholders
         ExtraAction(
             id = 4,
             icon = Icons.Default.BugReport,
@@ -218,6 +217,7 @@ internal fun MoreActionsGridPreview() {
         MoreActionsGrid(
             modifier = Modifier.background(VonageVideoTheme.colors.surface),
             recordingState = RecordingState.RECORDING,
+            screenSharingState = ScreenSharingState.SHARING,
             captionsState = CaptionsState.ENABLED,
             actions = MeetingRoomActions(),
         )

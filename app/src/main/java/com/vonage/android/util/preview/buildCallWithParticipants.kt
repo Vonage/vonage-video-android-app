@@ -1,5 +1,6 @@
 package com.vonage.android.util.preview
 
+import android.media.projection.MediaProjection
 import androidx.compose.runtime.Composable
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.ChatState
@@ -21,6 +22,7 @@ fun buildCallWithParticipants(
     unreadCount: Int = 1,
     messagesCount: Int = 5,
 ): CallFacade = object : CallFacade {
+
     // Participants state
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> =
         MutableStateFlow(buildParticipants(participantCount).toImmutableList())
@@ -56,4 +58,8 @@ fun buildCallWithParticipants(
 
     // Reactions related methods
     override fun sendEmoji(emoji: String) {}
+
+    // Screen sharing related methods
+    override fun startCapturingScreen(mediaProjection: MediaProjection) {}
+    override fun stopCapturingScreen() {}
 }
