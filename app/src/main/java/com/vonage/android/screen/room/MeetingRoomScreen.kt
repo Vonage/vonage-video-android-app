@@ -37,6 +37,7 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.EmojiState
+import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
@@ -112,7 +113,7 @@ fun MeetingRoomScreen(
                             isMicEnabled = publisher?.isMicEnabled ?: false,
                             isCameraEnabled = publisher?.isCameraEnabled ?: false,
                             isChatShow = isChatShow,
-                            participantsCount = participants.size,
+                            participantsCount = participants.filter { it.videoSource == VideoSource.CAMERA }.size,
                             unreadCount = chatState?.unreadCount ?: 0,
                         ),
                     )
@@ -158,6 +159,7 @@ fun MeetingRoomScreen(
                                     onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
                                     onDismissMoreActions = { showMoreActions = false },
                                     recordingState = uiState.recordingState,
+                                    screenSharingState = uiState.screenSharingState,
                                     captionsState = uiState.captionsState,
                                     onEmojiClick = actions.onEmojiSent,
                                 )

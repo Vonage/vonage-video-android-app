@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.screen.components.AvatarInitials
 import com.vonage.android.util.preview.buildParticipants
 import kotlinx.collections.immutable.ImmutableList
@@ -48,7 +49,7 @@ fun ParticipantsList(
             )
         }
         items(
-            items = participants,
+            items = participants.filter { it.videoSource == VideoSource.CAMERA },
             key = { participant -> participant.id },
         ) { participant ->
             ParticipantRow(participant)

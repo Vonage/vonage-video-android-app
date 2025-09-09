@@ -16,6 +16,7 @@ import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.RecordingState
+import com.vonage.android.screen.room.ScreenSharingState
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
 import com.vonage.android.screen.room.components.emoji.EmojiSelector
 import com.vonage.android.util.preview.buildParticipants
@@ -29,6 +30,7 @@ fun MeetingRoomContent(
     participants: ImmutableList<Participant>,
     actions: MeetingRoomActions,
     recordingState: RecordingState,
+    screenSharingState: ScreenSharingState,
     captionsState: CaptionsState,
     audioLevel: Float,
     participantsSheetState: SheetState,
@@ -84,6 +86,7 @@ fun MeetingRoomContent(
                 )
                 MoreActionsGrid(
                     recordingState = recordingState,
+                    screenSharingState = screenSharingState,
                     captionsState = captionsState,
                     actions = actions,
                 )
@@ -116,6 +119,7 @@ internal fun MeetingRoomContentPreview() {
             onDismissMoreActions = {},
             onEmojiClick = {},
             recordingState = RecordingState.IDLE,
+            screenSharingState = ScreenSharingState.IDLE,
             captionsState = CaptionsState.IDLE,
             actions = MeetingRoomActions()
         )

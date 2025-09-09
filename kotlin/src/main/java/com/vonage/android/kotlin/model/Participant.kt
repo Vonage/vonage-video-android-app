@@ -4,6 +4,7 @@ import android.view.View
 
 interface Participant {
     val id: String
+    val videoSource: VideoSource
     val name: String
     val isMicEnabled: Boolean
     val isCameraEnabled: Boolean
@@ -11,8 +12,14 @@ interface Participant {
     val isSpeaking: Boolean
 }
 
+enum class VideoSource {
+    CAMERA,
+    SCREEN
+}
+
 data class VeraPublisher(
     override val id: String,
+    override val videoSource: VideoSource,
     override val name: String,
     override val isMicEnabled: Boolean,
     override val isCameraEnabled: Boolean,
@@ -24,8 +31,19 @@ data class VeraPublisher(
     val setCameraBlur: (BlurLevel) -> Unit,
 ) : Participant
 
+data class VeraScreenPublisher(
+    override val id: String,
+    override val videoSource: VideoSource,
+    override val name: String,
+    override val isMicEnabled: Boolean,
+    override val isCameraEnabled: Boolean,
+    override val view: View,
+    override val isSpeaking: Boolean,
+) : Participant
+
 data class VeraSubscriber(
     override val id: String,
+    override val videoSource: VideoSource,
     override val name: String,
     override val isMicEnabled: Boolean,
     override val isCameraEnabled: Boolean,
