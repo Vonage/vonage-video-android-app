@@ -30,7 +30,7 @@ import com.vonage.android.audio.ui.AudioVolumeIndicator
 import com.vonage.android.compose.components.VideoRenderer
 import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.ParticipantType
+import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.screen.components.AvatarInitials
 
 @Suppress("LongParameterList")
@@ -40,7 +40,7 @@ fun ParticipantVideoCard(
     isShowVolumeIndicator: Boolean,
     isMicEnabled: Boolean,
     isSpeaking: Boolean,
-    participantType: ParticipantType,
+    videoSource: VideoSource,
     audioLevel: Float,
     name: String,
     view: View,
@@ -72,7 +72,7 @@ fun ParticipantVideoCard(
 
             ParticipantLabel(name)
 
-            if (participantType == ParticipantType.CAMERA) {
+            if (videoSource == VideoSource.CAMERA) {
                 MicrophoneIndicator(
                     audioLevel = audioLevel,
                     isMicEnabled = isMicEnabled,
@@ -156,7 +156,7 @@ internal fun ParticipantVideoCardPreview() {
             audioLevel = 0.6f,
             isSpeaking = false,
             isShowVolumeIndicator = true,
-            participantType = ParticipantType.CAMERA,
+            videoSource = VideoSource.CAMERA,
             view = previewCamera(),
         )
     }
@@ -174,7 +174,7 @@ internal fun ParticipantVideoCardPlaceholderPreview() {
             audioLevel = 0.6f,
             isSpeaking = false,
             isShowVolumeIndicator = false,
-            participantType = ParticipantType.SCREEN,
+            videoSource = VideoSource.SCREEN,
             view = previewCamera(),
         )
     }

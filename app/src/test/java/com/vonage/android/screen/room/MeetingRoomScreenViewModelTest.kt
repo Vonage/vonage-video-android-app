@@ -9,7 +9,7 @@ import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.kotlin.model.ParticipantType
+import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screensharing.ScreenSharingServiceListener
 import com.vonage.android.screensharing.VeraScreenSharingManager
@@ -498,7 +498,7 @@ class MeetingRoomScreenViewModelTest {
     @Suppress("LongParameterList")
     private fun buildMockPublisher() = VeraPublisher(
         id = "publisher",
-        type = ParticipantType.CAMERA,
+        videoSource = VideoSource.CAMERA,
         name = "I am a publisher",
         isMicEnabled = true,
         isCameraEnabled = true,

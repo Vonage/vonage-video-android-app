@@ -4,7 +4,7 @@ import android.view.View
 
 interface Participant {
     val id: String
-    val type: ParticipantType
+    val videoSource: VideoSource
     val name: String
     val isMicEnabled: Boolean
     val isCameraEnabled: Boolean
@@ -12,14 +12,14 @@ interface Participant {
     val isSpeaking: Boolean
 }
 
-enum class ParticipantType {
+enum class VideoSource {
     CAMERA,
     SCREEN
 }
 
 data class VeraPublisher(
     override val id: String,
-    override val type: ParticipantType,
+    override val videoSource: VideoSource,
     override val name: String,
     override val isMicEnabled: Boolean,
     override val isCameraEnabled: Boolean,
@@ -33,7 +33,7 @@ data class VeraPublisher(
 
 data class VeraScreenPublisher(
     override val id: String,
-    override val type: ParticipantType,
+    override val videoSource: VideoSource,
     override val name: String,
     override val isMicEnabled: Boolean,
     override val isCameraEnabled: Boolean,
@@ -43,7 +43,7 @@ data class VeraScreenPublisher(
 
 data class VeraSubscriber(
     override val id: String,
-    override val type: ParticipantType,
+    override val videoSource: VideoSource,
     override val name: String,
     override val isMicEnabled: Boolean,
     override val isCameraEnabled: Boolean,

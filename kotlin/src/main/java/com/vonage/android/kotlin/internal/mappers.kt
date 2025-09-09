@@ -7,14 +7,14 @@ import com.vonage.android.kotlin.Call.Companion.PUBLISHER_ID
 import com.vonage.android.kotlin.Call.Companion.PUBLISHER_SCREEN_ID
 import com.vonage.android.kotlin.ext.applyVideoBlur
 import com.vonage.android.kotlin.model.BlurLevel
-import com.vonage.android.kotlin.model.ParticipantType
+import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.kotlin.model.VeraScreenPublisher
 import com.vonage.android.kotlin.model.VeraSubscriber
 
 internal fun Subscriber.toParticipant(): VeraSubscriber = VeraSubscriber(
     id = stream.streamId,
-    type = toParticipantType(),
+    videoSource = toParticipantType(),
     name = stream.name,
     isMicEnabled = stream.hasAudio(),
     isCameraEnabled = stream.hasVideo(),
@@ -28,7 +28,7 @@ internal fun Publisher.toParticipant(
     isSpeaking: Boolean = false,
 ): VeraPublisher = VeraPublisher(
     id = PUBLISHER_ID,
-    type = ParticipantType.CAMERA,
+    videoSource = VideoSource.CAMERA,
     name = stream?.name ?: name.orEmpty(),
     isMicEnabled = publishAudio,
     isCameraEnabled = publishVideo,
@@ -42,7 +42,7 @@ internal fun Publisher.toParticipant(
 
 internal fun Publisher.toScreenParticipant(): VeraScreenPublisher = VeraScreenPublisher(
     id = PUBLISHER_SCREEN_ID,
-    type = ParticipantType.SCREEN,
+    videoSource = VideoSource.SCREEN,
     name = name,
     isMicEnabled = false,
     isCameraEnabled = true,
@@ -50,9 +50,9 @@ internal fun Publisher.toScreenParticipant(): VeraScreenPublisher = VeraScreenPu
     isSpeaking = false,
 )
 
-internal fun Subscriber.toParticipantType(): ParticipantType =
+internal fun Subscriber.toParticipantType(): VideoSource =
     when (stream.streamVideoType) {
-        Stream.StreamVideoType.StreamVideoTypeCamera -> ParticipantType.CAMERA
+        Stream.StreamVideoType.StreamVideoTypeCamera -> VideoSource.CAMERA
         Stream.StreamVideoType.StreamVideoTypeScreen,
-        Stream.StreamVideoType.StreamVideoTypeCustom -> ParticipantType.SCREEN
+        Stream.StreamVideoType.StreamVideoTypeCustom -> VideoSource.SCREEN
     }

@@ -67,7 +67,7 @@ fun AdaptiveGrid(
                     audioLevel = audioLevel,
                     isSpeaking = participant.isSpeaking,
                     isShowVolumeIndicator = participant is VeraPublisher,
-                    participantType = participant.type,
+                    videoSource = participant.videoSource,
                 )
             }
 

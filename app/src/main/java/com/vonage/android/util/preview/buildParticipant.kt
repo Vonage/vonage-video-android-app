@@ -4,7 +4,7 @@ import android.view.View
 import androidx.compose.runtime.Composable
 import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.kotlin.model.Participant
-import com.vonage.android.kotlin.model.ParticipantType
+import com.vonage.android.kotlin.model.VideoSource
 import kotlin.random.Random
 
 @Composable
@@ -13,7 +13,7 @@ fun buildParticipants(count: Int): List<Participant> {
     for (i in 1..count) {
         val sampleParticipant = object : Participant {
             override val id: String = Random(i).toString()
-            override val type: ParticipantType = ParticipantType.CAMERA
+            override val videoSource: VideoSource = VideoSource.CAMERA
             override var name: String = "Name Sample $i"
             override val isMicEnabled: Boolean = false
             override val isCameraEnabled: Boolean = true

@@ -5,7 +5,7 @@ import com.vonage.android.audio.util.MicVolumeListener
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.BlurLevel
-import com.vonage.android.kotlin.model.ParticipantType
+import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
 import io.mockk.coEvery
@@ -280,7 +280,7 @@ class WaitingRoomViewModelTest {
     @Suppress("LongParameterList")
     private fun buildMockPublisher(
         userName: String = "",
-        type: ParticipantType = ParticipantType.CAMERA,
+        type: VideoSource = VideoSource.CAMERA,
         isCameraEnabled: Boolean = true,
         isMicEnabled: Boolean = true,
         cameraIndex: Int = 0,
@@ -289,7 +289,7 @@ class WaitingRoomViewModelTest {
         setCameraBlur: (BlurLevel) -> Unit = {},
     ): VeraPublisher = VeraPublisher(
         id = "ignored",
-        type = type,
+        videoSource = type,
         name = userName,
         isMicEnabled = isMicEnabled,
         isCameraEnabled = isCameraEnabled,
