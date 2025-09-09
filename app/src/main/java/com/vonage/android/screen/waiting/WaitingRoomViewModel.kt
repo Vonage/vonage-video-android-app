@@ -17,9 +17,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -67,10 +66,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
             micVolumeListener.start()
             micVolumeListener.volume()
                 .distinctUntilChanged()
-                .onEach { micVolumeValue ->
-                    _audioLevel.update { micVolumeValue }
-                }
-                .collect()
+                .collectLatest { _audioLevel.value = it }
         }
     }
 

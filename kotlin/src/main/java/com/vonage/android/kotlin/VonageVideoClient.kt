@@ -24,7 +24,7 @@ class VonageVideoClient(
     private val context: Context,
     baseAudioDevice: VeraAudioDevice,
     private val signalPlugins: List<SignalPlugin> = listOf(
-        ChatSignalPlugin(),
+        ChatSignalPlugin(context),
         ReactionSignalPlugin(),
     ),
     // configure log level of the entire SDK

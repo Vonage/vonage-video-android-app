@@ -91,7 +91,7 @@ fun MeetingRoomScreen(
     }
 
     when {
-        (uiState.isError.not() && uiState.isLoading.not()) -> {
+        (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
             val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle(persistentListOf())
             val signalState by uiState.call.signalStateFlow.collectAsStateWithLifecycle(null)
             val chatState = signalState?.signals[SignalType.CHAT.signal] as? ChatState
@@ -181,6 +181,12 @@ fun MeetingRoomScreen(
                 onAccept = actions.onRetry,
                 onCancel = actions.onBack,
             )
+        }
+
+        (uiState.isEndCall) -> {
+            LaunchedEffect(uiState) {
+                actions.onEndCall()
+            }
         }
     }
 }

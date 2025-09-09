@@ -1,5 +1,9 @@
 name: Android CI
 
+permissions:
+  contents: read
+  actions: read
+
 on:
   push:
     branches:
@@ -15,6 +19,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_PR_NUM: ${{ github.event.pull_request.number }}
+
 jobs:
 
   build-and-test:
@@ -28,7 +36,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: 17
 
       - name: Setup Gradle
@@ -63,7 +71,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: 17
 
       - name: Setup Gradle

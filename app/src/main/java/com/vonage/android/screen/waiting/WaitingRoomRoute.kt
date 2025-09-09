@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.screen.components.permissions.CallPermissionHandler
+import com.vonage.android.util.pip.pipEffect
 
 @Composable
 fun WaitingRoomRoute(
@@ -27,6 +28,7 @@ fun WaitingRoomRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val audioLevelState by viewModel.audioLevel.collectAsStateWithLifecycle()
     var permissionsAlreadyGranted by rememberSaveable { mutableStateOf(true) }
+    val pipModifier = pipEffect(shouldEnterPipMode = false)
 
     val actions = remember {
         WaitingRoomActions(
@@ -60,7 +62,7 @@ fun WaitingRoomRoute(
         uiState = uiState,
         audioLevel = audioLevelState,
         actions = actions,
-        modifier = modifier,
+        modifier = modifier.then(pipModifier),
         navigateToRoom = navigateToRoom,
     )
 }
