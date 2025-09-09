@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.audio.ui.AudioDevices
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.RecordingState
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
@@ -28,6 +29,7 @@ fun MeetingRoomContent(
     participants: ImmutableList<Participant>,
     actions: MeetingRoomActions,
     recordingState: RecordingState,
+    captionsState: CaptionsState,
     audioLevel: Float,
     participantsSheetState: SheetState,
     audioDeviceSelectorSheetState: SheetState,
@@ -82,6 +84,7 @@ fun MeetingRoomContent(
                 )
                 MoreActionsGrid(
                     recordingState = recordingState,
+                    captionsState = captionsState,
                     actions = actions,
                 )
             }
@@ -113,6 +116,7 @@ internal fun MeetingRoomContentPreview() {
             onDismissMoreActions = {},
             onEmojiClick = {},
             recordingState = RecordingState.IDLE,
+            captionsState = CaptionsState.IDLE,
             actions = MeetingRoomActions()
         )
     }

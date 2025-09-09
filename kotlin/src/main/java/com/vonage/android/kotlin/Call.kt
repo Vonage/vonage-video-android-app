@@ -8,6 +8,7 @@ import com.opentok.android.Stream
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
 import com.vonage.android.kotlin.ext.extractSenderName
+import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
@@ -39,6 +40,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 
@@ -60,6 +62,9 @@ class Call internal constructor(
 
     private val _signalStateFlow = MutableStateFlow<SignalState?>(null)
     override val signalStateFlow: StateFlow<SignalState?> = _signalStateFlow
+
+    private val _captionsStateFlow = MutableStateFlow<String?>(null)
+    override val captionsStateFlow: StateFlow<String?> = _captionsStateFlow
 
     private val signals = ConcurrentHashMap<String, SignalStateContent>()
     private val subscriberStreams = ConcurrentHashMap<String, Subscriber>()
@@ -200,8 +205,20 @@ class Call internal constructor(
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
     }
 
+    override fun enableCaptions(enable: Boolean) {
+        publisherHolder.publisher.publishCaptions = enable
+        subscriberStreams.values.forEach { it.subscribeToCaptions = enable }
+    }
+
     private fun addSubscriber(stream: Stream) {
         val subscriber = Subscriber.Builder(context, stream).build()
+
+        subscriber.setCaptionsListener { subscriber, text, isFinal ->
+            _captionsStateFlow.update { caption -> "${subscriber.name()}: $text" }
+            if (isFinal) {
+                _captionsStateFlow.update { caption -> null }
+            }
+        }
         subscriber.setStreamListener(object : SubscriberKit.StreamListener {
             override fun onReconnected(p0: SubscriberKit?) {
                 // not implemented yet

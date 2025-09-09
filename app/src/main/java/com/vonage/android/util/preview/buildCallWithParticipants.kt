@@ -27,6 +27,7 @@ fun buildCallWithParticipants(
 
     // Session related methods
     override fun connect(): Flow<SessionEvent> = flowOf()
+    override fun enableCaptions(enable: Boolean) {}
     override fun pauseSession() {}
     override fun resumeSession() {}
     override fun endSession() {}
@@ -48,6 +49,7 @@ fun buildCallWithParticipants(
             )
         )
     )
+    override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
 
     override fun sendChatMessage(message: String) {}
     override fun listenUnreadChatMessages(enable: Boolean) {}

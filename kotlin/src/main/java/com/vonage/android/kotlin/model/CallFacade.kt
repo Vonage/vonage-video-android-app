@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade {
     val participantsStateFlow: StateFlow<ImmutableList<Participant>>
     val signalStateFlow: StateFlow<SignalState?>
+    val captionsStateFlow: StateFlow<String?>
 }
 
 interface PublisherFacade {
@@ -23,6 +24,7 @@ interface PublisherFacade {
 
 interface SessionFacade {
     fun connect(): Flow<SessionEvent>
+    fun enableCaptions(enable: Boolean)
     fun pauseSession()
     fun resumeSession()
     fun endSession()

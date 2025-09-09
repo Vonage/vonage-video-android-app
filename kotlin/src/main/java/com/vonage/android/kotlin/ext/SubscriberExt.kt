@@ -15,3 +15,6 @@ internal fun Subscriber.observeAudioLevel(): Flow<Float> = callbackFlow {
         setAudioLevelListener(null)
     }
 }
+
+internal fun Subscriber.name(): String = stream.name
+internal fun SubscriberKit.name(): String = stream.name

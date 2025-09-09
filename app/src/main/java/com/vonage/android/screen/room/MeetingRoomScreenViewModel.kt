@@ -3,6 +3,7 @@ package com.vonage.android.screen.room
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.ArchiveRepository
+import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
@@ -38,6 +39,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
     private val sessionRepository: SessionRepository,
     private val archiveRepository: ArchiveRepository,
+    private val captionsRepository: CaptionsRepository,
     private val videoClient: VonageVideoClient,
     private val foregroundServiceHandler: VeraForegroundServiceHandler,
 ) : ViewModel() {
@@ -63,6 +65,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
     private var call: CallFacade? = null
     private var currentArchiveId: String? = null
+    private var currentCaptionsId: String? = null
 
     init {
         setup()
@@ -104,6 +107,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         roomName: String,
         sessionInfo: SessionInfo,
     ) {
+        currentCaptionsId = sessionInfo.captionsId
         connect(sessionInfo)
         call?.let { call ->
             _uiState.update { uiState ->
@@ -111,6 +115,11 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                     roomName = roomName,
                     call = call,
                     recordingState = RecordingState.IDLE,
+                    captionsState = if (sessionInfo.captionsId.isNullOrBlank()) {
+                        CaptionsState.IDLE
+                    } else {
+                        CaptionsState.ENABLED
+                    },
                     isLoading = false,
                     isError = false,
                 )
@@ -188,7 +197,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         call?.sendEmoji(emoji)
     }
 
-    fun archiveCall(enable: Boolean, roomName: String) {
+    fun archiveCall(enable: Boolean) {
         if (enable) {
             _uiState.update { uiState -> uiState.copy(recordingState = RecordingState.STARTING) }
         } else {
@@ -217,6 +226,46 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         }
     }
 
+    fun captions(enable: Boolean) {
+        if (enable) {
+            viewModelScope.launch {
+                enableCaptions()
+            }
+        } else {
+            viewModelScope.launch {
+                disableCaptions()
+            }
+        }
+    }
+
+    private suspend fun enableCaptions() {
+        _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.ENABLING) }
+        captionsRepository.enableCaptions(roomName)
+            .onSuccess {
+                currentCaptionsId = it
+                call?.enableCaptions(true)
+                _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.ENABLED) }
+            }
+            .onFailure {
+                _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.IDLE) }
+            }
+    }
+
+    private suspend fun disableCaptions() {
+        _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.DISABLING) }
+        currentCaptionsId?.let {
+            captionsRepository.disableCaptions(roomName, it)
+                .onSuccess {
+                    currentCaptionsId = null
+                    call?.enableCaptions(false)
+                    _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.IDLE) }
+                }
+                .onFailure {
+                    _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.ENABLED) }
+                }
+        }
+    }
+
     private companion object {
         const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
         const val PUBLISHER_AUDIO_LEVEL_DEBOUNCE_MS = 36L
@@ -231,6 +280,7 @@ interface MeetingRoomViewModelFactory {
 data class MeetingRoomUiState(
     val roomName: String,
     val recordingState: RecordingState = RecordingState.IDLE,
+    val captionsState: CaptionsState = CaptionsState.IDLE,
     val call: CallFacade = noOpCallFacade,
     val isLoading: Boolean = false,
     val isError: Boolean = false,
@@ -244,11 +294,21 @@ enum class RecordingState {
     STOPPING,
 }
 
+enum class CaptionsState {
+    IDLE,
+    ENABLING,
+    ENABLED,
+    DISABLING,
+}
+
 @Suppress("EmptyFunctionBlock")
 private val noOpCallFacade = object : CallFacade {
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = MutableStateFlow(persistentListOf())
     override val signalStateFlow: StateFlow<SignalState?> = MutableStateFlow(null)
+    override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
+
     override fun connect(): Flow<SessionEvent> = flowOf()
+    override fun enableCaptions(enable: Boolean) {}
     override fun pauseSession() {}
     override fun resumeSession() {}
     override fun endSession() {}
