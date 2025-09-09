@@ -3,6 +3,7 @@ package com.vonage.android.screen.room
 import app.cash.turbine.test
 import com.vonage.android.CoroutineTest
 import com.vonage.android.data.ArchiveRepository
+import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
@@ -24,13 +25,14 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     val sessionRepository: SessionRepository = mockk()
     val archiveRepository: ArchiveRepository = mockk()
+    val captionsRepository: CaptionsRepository = mockk()
     val videoClient: VonageVideoClient = mockk()
     val foregroundServiceHandler: VeraForegroundServiceHandler = mockk {
         every { startForegroundService(any()) } returns Unit
@@ -302,7 +304,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
                     recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
-            sut.archiveCall(true, ANY_ROOM_NAME)
+            sut.archiveCall(true)
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -340,7 +342,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
                     recordingState = RecordingState.IDLE,
                 ), awaitItem()
             )
-            sut.archiveCall(true, ANY_ROOM_NAME)
+            sut.archiveCall(true)
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -356,7 +358,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
                     recordingState = RecordingState.RECORDING,
                 ), awaitItem()
             )
-            sut.archiveCall(false, ANY_ROOM_NAME)
+            sut.archiveCall(false)
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -373,6 +375,147 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
                 ), awaitItem()
             )
         }
+    }
+
+    @Test
+    fun `given viewmodel when init with captionsId then emit correct state`() = runTest {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse(
+            captionsId = "captionsId",
+        )
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    captionsState = CaptionsState.ENABLED,
+                ), awaitItem()
+            )
+        }
+    }
+
+    @Test
+    fun `given viewmodel when enable captions then emit correct state`() = runTest {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns Result.success("captionsId")
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            sut.captions(true)
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    captionsState = CaptionsState.ENABLED,
+                ), awaitItem()
+            )
+            verify { mockCall.enableCaptions(true) }
+        }
+    }
+
+    @Test
+    fun `given viewmodel when enable captions fails then emit correct state`() = runTest {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns Result.failure(Exception("KO"))
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            sut.captions(true)
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    captionsState = CaptionsState.IDLE,
+                ), awaitItem()
+            )
+            verify(exactly = 0) { mockCall.enableCaptions(true) }
+        }
+    }
+
+    @Test
+    fun `given viewmodel when disable captions then emit correct state`() = runTest {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns Result.success("captionsId")
+        coEvery { captionsRepository.disableCaptions(ANY_ROOM_NAME, "captionsId") } returns Result.success("OK")
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            sut.captions(true)
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    captionsState = CaptionsState.ENABLED,
+                ), awaitItem()
+            )
+            verify { mockCall.enableCaptions(true) }
+            // disable captions
+            sut.captions(false)
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    captionsState = CaptionsState.IDLE,
+                ), awaitItem()
+            )
+            verify { mockCall.enableCaptions(false) }
+        }
+    }
+
+    @Test
+    fun `given viewmodel when disable captions fails then emit correct state`() = runTest {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+
+        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns Result.success("captionsId")
+        coEvery { captionsRepository.disableCaptions(ANY_ROOM_NAME, "captionsId") } returns
+                Result.failure(Exception("KO"))
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            // enable captions
+            sut.captions(true)
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    captionsState = CaptionsState.ENABLED,
+                ), awaitItem()
+            )
+        }
+        sut.uiState.test {
+            // disable captions
+            sut.captions(false)
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    captionsState = CaptionsState.ENABLED,
+                ), awaitItem()
+            )
+        }
+        verify { mockCall.enableCaptions(true) }
+        verify(exactly = 0) { mockCall.enableCaptions(false) }
     }
 
     @Test
@@ -416,15 +559,22 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
             roomName = ANY_ROOM_NAME,
             sessionRepository = sessionRepository,
             archiveRepository = archiveRepository,
+            captionsRepository = captionsRepository,
             videoClient = videoClient,
             foregroundServiceHandler = foregroundServiceHandler,
         )
 
-    private fun buildSuccessSessionResponse() = Result.success(
+    private fun buildSuccessSessionResponse(
+        apiKey: String = "api-key",
+        sessionId: String = "session-id",
+        token: String = "token",
+        captionsId: String? = null,
+    ) = Result.success(
         SessionInfo(
-            apiKey = "api-key",
-            sessionId = "session-id",
-            token = "token",
+            apiKey = apiKey,
+            sessionId = sessionId,
+            token = token,
+            captionsId = captionsId,
         )
     )
 
@@ -453,6 +603,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
         every { endSession() } returns Unit
         every { listenUnreadChatMessages(any()) } returns Unit
         every { sendChatMessage(any()) } returns Unit
+        every { enableCaptions(any()) } returns Unit
     }
 
     private companion object {

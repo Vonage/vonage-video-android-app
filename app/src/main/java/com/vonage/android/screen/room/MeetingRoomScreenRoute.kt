@@ -74,7 +74,10 @@ fun MeetingRoomScreenRoute(
                 viewModel.sendEmoji(it)
             },
             onToggleRecording = { enable ->
-                viewModel.archiveCall(enable, roomName)
+                viewModel.archiveCall(enable)
+            },
+            onToggleCaptions = { enable ->
+                viewModel.captions(enable)
             }
         )
     }
@@ -121,4 +124,5 @@ data class MeetingRoomActions(
     val onMessageSent: (String) -> Unit = {},
     val onListenUnread: (Boolean) -> Unit = {},
     val onToggleRecording: (Boolean) -> Unit = {},
+    val onToggleCaptions: (Boolean) -> Unit = {},
 )
