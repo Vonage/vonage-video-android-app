@@ -96,7 +96,6 @@ fun MeetingRoomScreenRoute(
             },
             onToggleCaptions = { enable ->
                 viewModel.captions(enable)
-                viewModel.archiveCall(enable, roomName)
             },
             onToggleScreenSharing = { enable ->
                 if (enable) {
