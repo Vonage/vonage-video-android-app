@@ -10,11 +10,11 @@ import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.kotlin.model.VeraPublisher
+import com.vonage.android.kotlin.model.VideoSource
+import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import com.vonage.android.screensharing.ScreenSharingServiceListener
 import com.vonage.android.screensharing.VeraScreenSharingManager
-import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import com.vonage.android.service.VeraForegroundServiceHandler
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -36,6 +36,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     val sessionRepository: SessionRepository = mockk()
     val archiveRepository: ArchiveRepository = mockk()
+    val screenSharingManager: VeraScreenSharingManager = mockk()
     val videoClient: VonageVideoClient = mockk()
     val foregroundServiceHandler: VeraForegroundServiceHandler = mockk {
         every { startForegroundService(any()) } returns Unit
@@ -53,10 +54,6 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
         resetMain()
         clearAllMocks()
     }
-    val sessionRepository: SessionRepository = mockk()
-    val archiveRepository: ArchiveRepository = mockk()
-    val screenSharingManager: VeraScreenSharingManager = mockk()
-    val videoClient: VonageVideoClient = mockk()
 
     @Test
     fun `given viewmodel when initialize then returns correct state`() = runTest {
