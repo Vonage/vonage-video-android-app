@@ -70,9 +70,13 @@ fun MeetingRoomScreen(
     val participantsSheetState = rememberModalBottomSheetState()
     val audioDeviceSelectorSheetState = rememberModalBottomSheetState()
     val moreActionsSheetState = rememberModalBottomSheetState()
+    val reportSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
     var showParticipants by remember { mutableStateOf(false) }
     var showAudioDeviceSelector by remember { mutableStateOf(false) }
     var showMoreActions by remember { mutableStateOf(false) }
+    var showReporting by remember { mutableStateOf(false) }
 
     val navigator = rememberSupportingPaneScaffoldNavigator()
     val scope = rememberCoroutineScope()
@@ -151,13 +155,17 @@ fun MeetingRoomScreen(
                                     audioLevel = audioLevel,
                                     showParticipants = showParticipants,
                                     showMoreActions = showMoreActions,
+                                    showReporting = showReporting,
                                     showAudioDeviceSelector = showAudioDeviceSelector,
                                     participantsSheetState = participantsSheetState,
                                     audioDeviceSelectorSheetState = audioDeviceSelectorSheetState,
                                     moreActionsSheetState = moreActionsSheetState,
+                                    reportSheetState = reportSheetState,
                                     onDismissParticipants = { showParticipants = false },
                                     onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
                                     onDismissMoreActions = { showMoreActions = false },
+                                    onShowReporting = { showReporting = showReporting.toggle() },
+                                    onDismissReporting = { showReporting = false },
                                     recordingState = uiState.recordingState,
                                     screenSharingState = uiState.screenSharingState,
                                     captionsState = uiState.captionsState,

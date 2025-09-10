@@ -64,6 +64,18 @@
     <string name="captions_start">Enable captions</string>
     <string name="captions_stop">Disable captions</string>
 
+    <!-- Report -->
+    <string name="report_title">Report Issue</string>
+    <string name="report_capture_screenshot">Capture screenshot</string>
+    <string name="report_add_screenshot">Add screenshot</string>
+    <string name="report_advice">Please do not include any sensitive information.</string>
+    <string name="report_add_screenshot_advice">A screenshot will help us better understand the issue. (optional)</string>
+    <string name="report_screenshot_attached_title">Screenshot attached</string>
+    <string name="report_name_placeholder">Tell us your name</string>
+    <string name="report_issue_placeholder">Describe your issue</string>
+    <string name="report_title_placeholder">When you noticed this issue, what were you trying to do?</string>
+    <string name="report_send">Send</string>
+
     <!-- Generic -->
     <string name="generic_retry">Retry</string>
 

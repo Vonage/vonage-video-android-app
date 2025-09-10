@@ -7,6 +7,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -19,9 +20,11 @@ import com.vonage.android.screen.room.RecordingState
 import com.vonage.android.screen.room.ScreenSharingState
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
 import com.vonage.android.screen.room.components.emoji.EmojiSelector
+import com.vonage.android.screen.reporting.ReportIssueScreen
 import com.vonage.android.util.preview.buildParticipants
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("LongParameterList")
@@ -39,12 +42,18 @@ fun MeetingRoomContent(
     showParticipants: Boolean,
     showAudioDeviceSelector: Boolean,
     showMoreActions: Boolean,
+    showReporting: Boolean,
+    reportSheetState: SheetState,
+    onShowReporting: () -> Unit,
+    onDismissReporting: () -> Unit,
     onDismissParticipants: () -> Unit,
     onDismissAudioDeviceSelector: () -> Unit,
     onDismissMoreActions: () -> Unit,
     onEmojiClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val scope = rememberCoroutineScope()
+
     Box(
         modifier = modifier
             .fillMaxSize(),
@@ -80,15 +89,32 @@ fun MeetingRoomContent(
                 sheetState = moreActionsSheetState,
             ) {
                 EmojiSelector(
-                    onEmojiClick = {
-                        onEmojiClick(it)
-                    },
+                    onEmojiClick = { emoji -> onEmojiClick(emoji) },
                 )
                 MoreActionsGrid(
                     recordingState = recordingState,
                     screenSharingState = screenSharingState,
                     captionsState = captionsState,
+                    onShowReporting = {
+                        onDismissMoreActions()
+                        onShowReporting()
+                    },
                     actions = actions,
+                )
+            }
+        }
+        if (showReporting) {
+            ModalBottomSheet(
+                onDismissRequest = onDismissReporting,
+                sheetState = reportSheetState,
+            ) {
+                ReportIssueScreen(
+                    onClose = {
+                        scope.launch {
+                            reportSheetState.hide()
+                            onDismissReporting()
+                        }
+                    },
                 )
             }
         }
@@ -107,6 +133,10 @@ internal fun MeetingRoomContentPreview() {
         val sheetState = rememberModalBottomSheetState()
         MeetingRoomContent(
             participants = buildParticipants(5).toImmutableList(),
+            actions = MeetingRoomActions(),
+            recordingState = RecordingState.IDLE,
+            screenSharingState = ScreenSharingState.IDLE,
+            captionsState = CaptionsState.IDLE,
             audioLevel = 0.5f,
             participantsSheetState = sheetState,
             audioDeviceSelectorSheetState = sheetState,
@@ -114,14 +144,14 @@ internal fun MeetingRoomContentPreview() {
             showParticipants = false,
             showAudioDeviceSelector = false,
             showMoreActions = false,
+            showReporting = false,
+            reportSheetState = sheetState,
             onDismissParticipants = {},
             onDismissAudioDeviceSelector = {},
             onDismissMoreActions = {},
+            onShowReporting = {},
             onEmojiClick = {},
-            recordingState = RecordingState.IDLE,
-            screenSharingState = ScreenSharingState.IDLE,
-            captionsState = CaptionsState.IDLE,
-            actions = MeetingRoomActions()
+            onDismissReporting = {},
         )
     }
 }

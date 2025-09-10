@@ -2,7 +2,9 @@ package com.vonage.android.screen.goodbye.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -42,6 +44,9 @@ fun GoodbyeScreenHeader(
         )
 
         VonageOutlinedButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
             text = stringResource(R.string.goodbye_rejoin_button_label),
             onClick = actions.onReEnter,
         )

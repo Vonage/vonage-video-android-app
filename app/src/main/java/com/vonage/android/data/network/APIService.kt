@@ -1,6 +1,7 @@
 package com.vonage.android.data.network
 
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -30,5 +31,8 @@ interface APIService {
         @Path("room") room: String,
         @Path("captionsId") captionsId: String,
     ): Response<DisableCaptionsResponse>
+
+    @POST("feedback/report")
+    suspend fun report(@Body feedbackData: FeedbackData): Response<ReportResponse>
 
 }
