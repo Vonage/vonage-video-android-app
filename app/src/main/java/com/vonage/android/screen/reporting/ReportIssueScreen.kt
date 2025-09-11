@@ -28,9 +28,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -70,6 +67,15 @@ fun ReportIssueScreen(
         onRemoveAttachment = {
             viewModel.onRemoveAttachment()
         },
+        onTitleChange = {
+            viewModel.updateTitle(it)
+        },
+        onUsernameChange = {
+            viewModel.updateUsername(it)
+        },
+        onDescriptionChange = { 
+            viewModel.updateDescription(it)
+        },
         onClose = {
             onClose()
             viewModel.reset()
@@ -85,6 +91,9 @@ private fun ReportingContent(
     onCaptureScreenshot: (Window) -> Unit,
     onRemoveAttachment: () -> Unit,
     onClose: () -> Unit,
+    onTitleChange: (String) -> Unit,
+    onUsernameChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -121,6 +130,9 @@ private fun ReportingContent(
                 onPickImage = onPickImage,
                 onCaptureScreenshot = onCaptureScreenshot,
                 onRemoveAttachment = onRemoveAttachment,
+                onTitleChange = onTitleChange,
+                onUsernameChange = onUsernameChange,
+                onDescriptionChange = onDescriptionChange,
             )
         }
     }
@@ -133,53 +145,40 @@ private fun ColumnScope.ReportIssueContent(
     onPickImage: (Uri) -> Unit,
     onCaptureScreenshot: (Window) -> Unit,
     onRemoveAttachment: () -> Unit,
+    onTitleChange: (String) -> Unit,
+    onUsernameChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
 ) {
-    var title by remember { mutableStateOf("") }
-    var titleIsValid by remember { mutableStateOf(true) }
-    var userName by remember { mutableStateOf("") }
-    var userNameIsValid by remember { mutableStateOf(true) }
-    var description by remember { mutableStateOf("") }
-    var descriptionIsValid by remember { mutableStateOf(true) }
-
     VonageTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = title,
+        value = uiState.title,
         maxLength = 100,
-        onValueChange = {
-            title = it
-            titleIsValid = title.isNotEmpty() && title.length <= 100
-        },
+        onValueChange = { onTitleChange(it) },
         placeholder = { Text(stringResource(R.string.report_title_placeholder)) },
-        supportingText = { Text("${title.length}/100") },
-        isError = !titleIsValid || uiState.isError,
+        supportingText = { Text("${uiState.title.length}/100") },
+        isError = uiState.isTitleValid.not(),
     )
 
     VonageTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = userName,
+        value = uiState.userName,
         maxLength = 100,
-        onValueChange = {
-            userName = it
-            userNameIsValid = userName.isNotEmpty() && userName.length <= 100
-        },
+        onValueChange = { onUsernameChange(it) },
         placeholder = { Text(stringResource(R.string.report_name_placeholder)) },
-        supportingText = { Text("${userName.length}/100") },
-        isError = !userNameIsValid || uiState.isError,
+        supportingText = { Text("${uiState.userName.length}/100") },
+        isError = uiState.isUsernameValid.not(),
     )
 
     VonageTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = description,
-        onValueChange = {
-            description = it
-            descriptionIsValid = description.isNotEmpty() && description.length <= 1000
-        },
+        value = uiState.description,
+        onValueChange = { onDescriptionChange(it) },
         singleLine = false,
         maxLines = 4,
         maxLength = 1000,
         placeholder = { Text(stringResource(R.string.report_issue_placeholder)) },
-        supportingText = { Text("${description.length}/1000") },
-        isError = !descriptionIsValid || uiState.isError,
+        supportingText = { Text("${uiState.description.length}/1000") },
+        isError = uiState.isDescriptionValid.not(),
     )
 
     Text(
@@ -199,7 +198,7 @@ private fun ColumnScope.ReportIssueContent(
         text = stringResource(R.string.report_send),
         enabled = !uiState.isProcessingScreenshot || !uiState.isSending || !uiState.isError,
         onClick = {
-            onSend(title, userName, description, uiState.attachment)
+            onSend(uiState.title, uiState.userName, uiState.description, uiState.attachment)
         },
         leadingIcon = {
             if (uiState.isSending) {
@@ -290,10 +289,13 @@ internal fun ReportingContentPreview() {
             ReportingContent(
                 uiState = ReportIssueScreenUiState(),
                 onSend = { _, _, _, _ -> },
-                onPickImage = {},
+                onPickImage = { },
                 onCaptureScreenshot = { },
-                onRemoveAttachment = {},
-                onClose = {},
+                onRemoveAttachment = { },
+                onClose = { },
+                onTitleChange = { },
+                onUsernameChange = { },
+                onDescriptionChange = { },
             )
         }
     }

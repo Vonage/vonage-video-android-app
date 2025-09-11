@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.ReportingRepository
 import com.vonage.android.data.network.FeedbackData
 import com.vonage.android.data.network.ReportResponseData
+import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.util.ImageProcessor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class ReportingViewModel @Inject constructor(
     private val reportingRepository: ReportingRepository,
     private val imageProcessor: ImageProcessor,
+    private val vonageVideoClient: VonageVideoClient,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ReportIssueScreenUiState())
@@ -37,10 +39,7 @@ class ReportingViewModel @Inject constructor(
             imageProcessor.extractImageFromUri(uri)
                 .onSuccess { screenshot ->
                     _uiState.update { uiState ->
-                        uiState.copy(
-                            attachment = screenshot,
-                            isProcessingScreenshot = false,
-                        )
+                        uiState.copy(attachment = screenshot, isProcessingScreenshot = false)
                     }
                 }
                 .onFailure {
@@ -55,10 +54,7 @@ class ReportingViewModel @Inject constructor(
             imageProcessor.extractImageFromWindow(window)
                 .onSuccess { image ->
                     _uiState.update { uiState ->
-                        uiState.copy(
-                            attachment = image,
-                            isProcessingScreenshot = false,
-                        )
+                        uiState.copy(attachment = image, isProcessingScreenshot = false)
                     }
                 }
                 .onFailure {
@@ -79,7 +75,7 @@ class ReportingViewModel @Inject constructor(
                 FeedbackData(
                     title = title,
                     name = name,
-                    issue = issue,
+                    issue = issue + vonageVideoClient.debugDump(),
                     attachment = attachment,
                 )
             )
@@ -92,22 +88,49 @@ class ReportingViewModel @Inject constructor(
         _uiState.update { uiState -> ReportIssueScreenUiState() }
     }
 
+    private fun ReportResponseData.toIssueData(): IssueData = IssueData(
+        message = message,
+        ticketUrl = ticketUrl,
+    )
+
+    fun updateTitle(title: String) {
+        _uiState.update { uiState -> uiState.copy(
+            title = title,
+            isTitleValid = title.isEmpty().not() && title.length <= 100
+        )}
+    }
+
+    fun updateUsername(username: String) {
+        _uiState.update { uiState -> uiState.copy(
+            userName = username,
+            isTitleValid = username.isEmpty().not() && username.length <= 100
+        )}
+    }
+
+    fun updateDescription(description: String) {
+        _uiState.update { uiState -> uiState.copy(
+            description = description,
+            isDescriptionValid = description.isEmpty().not() && description.length <= 1000
+        )}
+    }
+
     private companion object {
         const val STOP_TIMEOUT_MILLIS = 2500L
     }
 }
 
 data class ReportIssueScreenUiState(
+    val title: String = "",
+    val isTitleValid: Boolean = true,
+    val userName: String = "",
+    val isUsernameValid: Boolean = true,
+    val description: String = "",
+    val isDescriptionValid: Boolean = true,
+    val attachment: ImageBitmap? = null,
     val isProcessingScreenshot: Boolean = false,
     val isSending: Boolean = false,
     val isSuccess: IssueData? = null,
     val isError: Boolean = false,
-    val attachment: ImageBitmap? = null,
-)
-
-fun ReportResponseData.toIssueData(): IssueData = IssueData(
-    message = message,
-    ticketUrl = ticketUrl,
 )
 
 data class IssueData(

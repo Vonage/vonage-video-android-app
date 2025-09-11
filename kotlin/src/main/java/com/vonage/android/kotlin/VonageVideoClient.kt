@@ -1,6 +1,7 @@
 package com.vonage.android.kotlin
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import com.opentok.android.AudioDeviceManager
 import com.opentok.android.BaseVideoRenderer
@@ -37,6 +38,20 @@ class VonageVideoClient(
     private var session: Session? = null
     private var publisherConfig: PublisherConfig? = null
     private var publisherHolder: VeraPublisherHolder? = null
+
+    fun debugDump(): String {
+        val dump = """
+            Android Version: ${Build.VERSION.RELEASE} SDK-${Build.VERSION.SDK_INT}
+            Device: ${Build.MANUFACTURER} ${Build.MODEL}
+            ===
+            Session: ${session?.sessionId}
+            Connection: ${session?.connection?.connectionId}
+            Connection creation time: ${session?.connection?.creationTime}
+            ===
+        """.trimIndent()
+        Log.d("XXX", dump)
+        return dump
+    }
 
     fun configurePublisher(publisherConfig: PublisherConfig) {
         this.publisherConfig = publisherConfig

@@ -6,6 +6,7 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavDeepLinkRequest
@@ -14,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.navigation.AppNavHost
 import com.vonage.android.notifications.VeraNotificationChannelRegistry
+import com.vonage.android.screen.reporting.ReportIssueScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -35,7 +37,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VonageVideoTheme {
-                InterceptorAppNavHost(flow)
+                //InterceptorAppNavHost(flow)
+                Surface {
+                    ReportIssueScreen(
+                        onClose = {},
+                    )
+                }
             }
         }
     }
