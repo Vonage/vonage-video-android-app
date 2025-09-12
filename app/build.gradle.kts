@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -15,19 +18,13 @@ android {
         applicationId = "com.vonage.android"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 5
+        versionName = "0.0.5"
 
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
     }
 
-    buildTypes {
-        debug {
-            isDebuggable = true
-            isMinifyEnabled = false
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -47,6 +44,59 @@ android {
             it.useJUnitPlatform()
         }
         animationsDisabled = true
+    }
+
+    val signFile: File = rootProject.file(".sign/keystore.properties")
+    if (signFile.exists()) {
+        val properties = Properties()
+        properties.load(FileInputStream(signFile))
+
+        signingConfigs {
+            create("release") {
+                keyAlias = properties["keyAlias"] as? String
+                keyPassword = properties["keyPassword"] as? String
+                storeFile = rootProject.file(properties["keystore"] as String)
+                storePassword = properties["storePassword"] as? String
+            }
+        }
+    } else {
+        signingConfigs {
+            create("release") {
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+                storeFile = rootProject.file(".sign/debug.keystore.jks")
+                storePassword = "android"
+            }
+        }
+    }
+
+    signingConfigs {
+        getByName("debug") {
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            storeFile = rootProject.file(".sign/debug.keystore.jks")
+            storePassword = "android"
+        }
+    }
+
+    buildTypes {
+        debug {
+            versionNameSuffix = "-DEBUG"
+            applicationIdSuffix = ".debug"
+            isDebuggable = true
+            isMinifyEnabled = false
+            isShrinkResources = false
+            signingConfig = signingConfigs.getByName("debug")
+        }
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("release")
+        }
     }
 }
 

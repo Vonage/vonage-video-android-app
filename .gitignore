@@ -26,8 +26,11 @@ deploymentTargetDropDown.xml
 render.experimental.xml
 
 # Keystore files
-*.jks
-*.keystore
+.sign/keystore.properties
+.sign/release.keystore.jks
+
+# Ignore Google Play Publisher files
+.sign/service-account-credentials.json
 
 # Google Services (e.g. APIs or Firebase)
 google-services.json

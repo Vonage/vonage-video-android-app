@@ -23,15 +23,11 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var notificationChannelRegistry: VeraNotificationChannelRegistry
-
     private val flow = MutableSharedFlow<Intent>(extraBufferCapacity = 1)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        notificationChannelRegistry.createNotificationChannels()
         enableEdgeToEdge()
         setContent {
             VonageVideoTheme {
