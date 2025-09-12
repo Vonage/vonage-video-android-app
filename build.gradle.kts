@@ -12,11 +12,10 @@ plugins {
     id("org.jetbrains.kotlinx.kover") version "0.9.1"
 }
 
-sonar {
-    properties {
-        property("sonar.projectKey", "Vonage_vonage-video-android-app")
-        property("sonar.organization", "vonage")
-    }
+apply(from = "${rootDir}/build-tools/sonar.gradle")
+
+subprojects {
+    apply(from = "${rootDir}/build-tools/kover.gradle")
 }
 
 dependencies {
