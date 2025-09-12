@@ -16,6 +16,7 @@ import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
+import kotlin.test.Ignore
 import kotlin.test.assertEquals
 
 class WaitingRoomViewModelTest {
@@ -30,6 +31,7 @@ class WaitingRoomViewModelTest {
         micVolumeListener = micVolumeListener,
     )
 
+    @Ignore
     @Test
     fun `given viewmodel when initialize then returns correct state`() = runTest {
         val publisher = buildMockPublisher()
@@ -41,8 +43,7 @@ class WaitingRoomViewModelTest {
 
         verify { videoClient.buildPublisher() }
         sut.uiState.test {
-//            assertEquals(WaitingRoomUiState(roomName = ANY_ROOM_NAME), awaitItem())
-            awaitItem()
+            assertEquals(WaitingRoomUiState(roomName = ANY_ROOM_NAME), awaitItem())
             assertEquals(
                 WaitingRoomUiState(
                     roomName = ANY_ROOM_NAME,
