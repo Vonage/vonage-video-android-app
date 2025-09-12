@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlin.ksp) apply false
     alias(libs.plugins.detekt)
     id("org.sonarqube") version "6.3.1.5724"
+    id("org.jetbrains.kotlinx.kover") version "0.9.1"
 }
 
 sonar {
