@@ -8,6 +8,14 @@ plugins {
     alias(libs.plugins.dagger.hilt) apply false
     alias(libs.plugins.kotlin.ksp) apply false
     alias(libs.plugins.detekt)
+    id("org.sonarqube") version "6.3.1.5724"
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "Vonage_vonage-video-android-app")
+        property("sonar.organization", "vonage")
+    }
 }
 
 dependencies {
