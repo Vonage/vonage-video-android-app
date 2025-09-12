@@ -68,7 +68,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew build sonar --info
-        
+
       - name: Upload test reports
         uses: actions/upload-artifact@v4
         if: always()
