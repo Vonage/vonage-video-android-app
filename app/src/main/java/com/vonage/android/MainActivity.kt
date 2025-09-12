@@ -37,12 +37,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VonageVideoTheme {
-                //InterceptorAppNavHost(flow)
-                Surface {
-                    ReportIssueScreen(
-                        onClose = {},
-                    )
-                }
+                InterceptorAppNavHost(flow)
+//                Surface {
+//                    ReportIssueScreen(
+//                        onClose = {},
+//                    )
+//                }
             }
         }
     }
