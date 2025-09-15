@@ -49,8 +49,8 @@ class WaitingRoomViewModel @AssistedInject constructor(
     private var currentBlurIndex: Int = 0
 
     fun init() {
-        publisher = videoClient.buildPublisher()
         viewModelScope.launch {
+            publisher = videoClient.buildPublisher()
             publisher = publisher.copy(name = userRepository.getUserName())
             _uiState.update { uiState ->
                 uiState.copy(
@@ -94,11 +94,13 @@ class WaitingRoomViewModel @AssistedInject constructor(
     }
 
     fun setBlur() {
-        val blurLevel = BlurLevel.entries[currentBlurIndex % BlurLevel.entries.size]
-        currentBlurIndex += 1
-        publisher = publisher.copy(blurLevel = blurLevel)
-        publisher.setCameraBlur(blurLevel)
-        _uiState.update { uiState -> uiState.copy(blurLevel = blurLevel) }
+        viewModelScope.launch {
+            val blurLevel = BlurLevel.entries[currentBlurIndex % BlurLevel.entries.size]
+            currentBlurIndex += 1
+            publisher = publisher.copy(blurLevel = blurLevel)
+            publisher.setCameraBlur(blurLevel)
+            _uiState.update { uiState -> uiState.copy(blurLevel = blurLevel) }
+        }
     }
 
     fun joinRoom(userName: String) {
