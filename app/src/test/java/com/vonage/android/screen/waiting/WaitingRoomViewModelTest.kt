@@ -243,28 +243,50 @@ class WaitingRoomViewModelTest {
         coEvery { userRepository.getUserName() } returns "not relevant"
 
         sut.init()
-        sut.onCameraSwitch()
+        sut.uiState.test {
+            awaitItem() // initial state
+            awaitItem() // after init
+
+            sut.onCameraSwitch()
+        }
 
         verify(exactly = 1) { publisher.cycleCamera() }
     }
 
     @Test
     fun `given viewmodel when setBlur then publisher set camera blur`() = runTest {
+        val setCameraBlurCallbacks = mutableListOf<BlurLevel>()
+        val setCameraBlurFunction: (BlurLevel) -> Unit = { blurLevel ->
+            setCameraBlurCallbacks.add(blurLevel)
+        }
+        
         val publisher = buildMockPublisher(
-            setCameraBlur = mockk(relaxed = true),
+            setCameraBlur = setCameraBlurFunction,
         )
         every { videoClient.buildPublisher() } returns publisher
         coEvery { userRepository.getUserName() } returns "not relevant"
 
         sut.init()
-        sut.setBlur()
-        verify(exactly = 1) { publisher.setCameraBlur(BlurLevel.LOW) }
-
-        sut.setBlur()
-        verify(exactly = 1) { publisher.setCameraBlur(BlurLevel.HIGH) }
-
-        sut.setBlur()
-        verify(exactly = 1) { publisher.setCameraBlur(BlurLevel.NONE) }
+        sut.uiState.test {
+            awaitItem() // initial state
+            awaitItem() // after init
+            
+            sut.setBlur()
+            assertEquals(BlurLevel.LOW, awaitItem().blurLevel)
+            
+            sut.setBlur()
+            assertEquals(BlurLevel.HIGH, awaitItem().blurLevel)
+            
+            sut.setBlur()
+            assertEquals(BlurLevel.NONE, awaitItem().blurLevel)
+            
+            cancelAndIgnoreRemainingEvents()
+        }
+        
+        assertEquals(3, setCameraBlurCallbacks.size, "Expected 3 calls to setCameraBlur")
+        assertEquals(BlurLevel.LOW, setCameraBlurCallbacks[0])
+        assertEquals(BlurLevel.HIGH, setCameraBlurCallbacks[1])
+        assertEquals(BlurLevel.NONE, setCameraBlurCallbacks[2])
     }
 
     @Test
