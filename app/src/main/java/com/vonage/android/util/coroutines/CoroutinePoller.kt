@@ -7,6 +7,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+class CoroutinePollerProvider<T> @Inject constructor() {
+    fun get(
+        dispatcher: CoroutineDispatcher,
+        fetchData: suspend () -> T,
+    ): CoroutinePoller<T> =
+        CoroutinePoller(dispatcher, fetchData)
+}
 
 class CoroutinePoller<T>(
     private val dispatcher: CoroutineDispatcher,
@@ -14,7 +23,7 @@ class CoroutinePoller<T>(
 ) {
     var job: Job? = null
 
-    fun poll(delay: Long) = callbackFlow<T> {
+    fun poll(delay: Long) = callbackFlow {
         job = launch(dispatcher) {
             while (isActive) {
                 val data = fetchData()

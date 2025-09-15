@@ -5,9 +5,9 @@ import com.vonage.android.audio.util.MicVolumeListener
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.BlurLevel
-import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
+import com.vonage.android.kotlin.model.VideoSource
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -16,7 +16,6 @@ import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
-import kotlin.test.Ignore
 import kotlin.test.assertEquals
 
 class WaitingRoomViewModelTest {
@@ -31,7 +30,6 @@ class WaitingRoomViewModelTest {
         micVolumeListener = micVolumeListener,
     )
 
-    @Ignore
     @Test
     fun `given viewmodel when initialize then returns correct state`() = runTest {
         val publisher = buildMockPublisher()
