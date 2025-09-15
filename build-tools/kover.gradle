@@ -1,0 +1,44 @@
+if (!rootProject.ext.sonar.ignoreModules.contains(name)) {
+    apply plugin: "org.jetbrains.kotlinx.kover"
+    apply plugin: "org.sonarqube"
+
+    if (hasProperty("android")) {
+        android {
+            buildTypes {
+                debug {
+                    testCoverageEnabled = true
+                    enableUnitTestCoverage = true
+                    enableAndroidTestCoverage true
+                }
+            }
+        }
+    }
+
+    kover {
+        reports {
+            filters {
+                excludes {
+                    androidGeneratedClasses()
+                    classes(
+                            "*_Factory*",
+                            "*Factory_Impl",
+                            "*_MembersInjector",
+                            "*Module",
+                            "*Module_*",
+                            "*_GeneratedInjector",
+                            "*ComposableSingletons*",
+                            "*MainApplication"
+                    )
+                    annotatedBy(
+                            "androidx.compose.runtime.Stable",
+                            "androidx.compose.runtime.Composable",
+                            "androidx.compose.ui.tooling.preview.Preview",
+                            "androidx.compose.ui.tooling.preview.PreviewLightDark",
+                            "javax.annotation.processing.Generated",
+                            "dagger.hilt.processor.internal.aggregateddeps.AggregatedDeps"
+                    )
+                }
+            }
+        }
+    }
+}

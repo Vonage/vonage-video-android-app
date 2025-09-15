@@ -1,0 +1,37 @@
+apply plugin: "org.sonarqube"
+
+ext.sonar = [
+        ignoreModules: [
+                // add here any module you want to ignore
+                "compose",
+                "kotlin"
+        ],
+        excludeFilter: [
+                // add here any regex you want to ignore
+                "**/test/**",
+                "**/androidTest/**",
+                "**/R.class",
+                "**/R2.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/*Test*.*",
+                "**/*Module.*"
+        ]
+]
+
+ext.sonar.ignoreModules.each {
+    ext.sonar.excludeFilter << "**/${it}/**"
+}
+
+sonarqube {
+    properties {
+        property("sonar.token", "${System.getenv("SONAR_TOKEN")}")
+        property("sonar.projectKey", "Vonage_vonage-video-android-app")
+        property("sonar.organization", "vonage")
+        property("sonar.java.coveragePlugin", "jacoco")
+        // this value stays the same for both jacoco and kover
+        property("sonar.sourceEncoding", "UTF-8")
+        property("sonar.java.binaries", "${rootDir}/**/build/tmp/kotlin-classes/debug")
+        property("sonar.coverage.exclusions", rootProject.ext.sonar.excludeFilter)
+    }
+}
