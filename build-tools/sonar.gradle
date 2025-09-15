@@ -25,7 +25,6 @@ ext.sonar.ignoreModules.each {
 
 sonarqube {
     properties {
-        property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.token", "${System.getenv("SONAR_TOKEN")}")
         property("sonar.projectKey", "Vonage_vonage-video-android-app")
         property("sonar.organization", "vonage")
