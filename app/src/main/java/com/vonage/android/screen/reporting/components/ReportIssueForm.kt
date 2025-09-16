@@ -44,6 +44,7 @@ fun ReportIssueForm(
 ) {
     Column(
         modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         VonageTextField(
             modifier = Modifier.fillMaxWidth(),
