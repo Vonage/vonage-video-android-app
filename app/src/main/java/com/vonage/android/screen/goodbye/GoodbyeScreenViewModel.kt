@@ -7,7 +7,7 @@ import com.vonage.android.data.ArchiveRepository
 import com.vonage.android.data.ArchiveStatus
 import com.vonage.android.di.IODispatcher
 import com.vonage.android.util.DownloadManager
-import com.vonage.android.util.coroutines.CoroutinePoller
+import com.vonage.android.util.coroutines.CoroutinePollerProvider
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -28,6 +28,7 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
     private val archiveRepository: ArchiveRepository,
     private val downloadManager: DownloadManager,
+    private val coroutinePollerProvider: CoroutinePollerProvider<Unit>,
     @param:IODispatcher private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -40,7 +41,7 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            CoroutinePoller<Unit>(
+            coroutinePollerProvider.get(
                 dispatcher = dispatcher,
                 fetchData = {
                     archiveRepository.getRecordings(roomName)
@@ -52,6 +53,7 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
                                 archives = archives.toImmutableList()
                             )
                         }
+                        .onFailure { cancel() }
                 },
             ).poll(POLLING_DELAY).collect()
         }

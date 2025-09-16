@@ -130,6 +130,7 @@ private fun AudioDevice.toLabel(): String =
         AudioDeviceType.WIRED_HEADSET -> stringResource(R.string.audio_device_selector_headset_audio_device)
     }
 
+@Composable
 internal fun AudioDeviceType.toImageVector(): ImageVector =
     when (this) {
         AudioDeviceType.EARPIECE -> Icons.Default.Phone

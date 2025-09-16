@@ -8,6 +8,14 @@ plugins {
     alias(libs.plugins.dagger.hilt) apply false
     alias(libs.plugins.kotlin.ksp) apply false
     alias(libs.plugins.detekt)
+    id("org.sonarqube") version "6.3.1.5724"
+    id("org.jetbrains.kotlinx.kover") version "0.9.1"
+}
+
+apply(from = "${rootDir}/build-tools/sonar.gradle")
+
+subprojects {
+    apply(from = "${rootDir}/build-tools/kover.gradle")
 }
 
 dependencies {

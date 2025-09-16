@@ -1,8 +1,6 @@
 package com.vonage.android.screensharing
 
 import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_DEFAULT
 import android.app.Service
 import android.content.Context
@@ -32,7 +30,6 @@ class ScreenSharingService : Service() {
     }
 
     private fun startForeground() {
-        createNotificationChannel()
         ServiceCompat.startForeground(
             this,
             NOTIFICATION_ID,
@@ -45,16 +42,8 @@ class ScreenSharingService : Service() {
         )
     }
 
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, IMPORTANCE_DEFAULT)
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
-
     private fun buildNotification(): Notification =
-        NotificationCompat.Builder(this, CHANNEL_ID)
+        NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setOngoing(true)
             .setPriority(IMPORTANCE_DEFAULT)
             .setCategory(Notification.CATEGORY_SERVICE)
@@ -63,9 +52,9 @@ class ScreenSharingService : Service() {
     inner class LocalBinder : Binder()
 
     companion object {
-        private const val NOTIFICATION_ID = 112233
-        private const val CHANNEL_ID = "screen_capture"
-        private const val CHANNEL_NAME = "Screen_Capture"
+        const val NOTIFICATION_ID = 112233
+        const val NOTIFICATION_CHANNEL_ID = "screen_capture"
+        const val NOTIFICATION_CHANNEL_NAME = "Screen_Capture"
 
         fun intent(context: Context) = Intent(context, ScreenSharingService::class.java)
     }

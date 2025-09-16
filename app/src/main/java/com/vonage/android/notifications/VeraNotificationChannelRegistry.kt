@@ -2,9 +2,11 @@ package com.vonage.android.notifications
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.NotificationManager.IMPORTANCE_DEFAULT
 import android.content.Context
 import android.os.Build
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
+import com.vonage.android.screensharing.ScreenSharingService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -27,8 +29,14 @@ class VeraNotificationChannelRegistry @Inject constructor(
                 ChatSignalPlugin.Companion.NOTIFICATION_CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_DEFAULT,
             )
+            val screenSharingChannel = NotificationChannel(
+                ScreenSharingService.Companion.NOTIFICATION_CHANNEL_ID,
+                ScreenSharingService.Companion.NOTIFICATION_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT,
+            )
             manager.createNotificationChannel(channel)
             manager.createNotificationChannel(chatChannel)
+            manager.createNotificationChannel(screenSharingChannel)
         }
     }
 
