@@ -34,6 +34,7 @@ import com.vonage.android.compose.components.VonageOutlinedButton
 import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.screen.reporting.ReportIssueScreenActions
 import com.vonage.android.screen.reporting.ReportIssueScreenUiState
+import com.vonage.android.screen.reporting.ReportingViewModel
 import com.vonage.android.util.pip.findActivity
 
 @Composable
@@ -49,20 +50,20 @@ fun ReportIssueForm(
         VonageTextField(
             modifier = Modifier.fillMaxWidth(),
             value = uiState.title,
-            maxLength = 100,
+            maxLength = ReportingViewModel.TITLE_MAX_LENGTH,
             onValueChange = { actions.onTitleChange(it) },
             placeholder = { Text(stringResource(R.string.report_title_placeholder)) },
-            supportingText = { Text("${uiState.title.length}/100") },
+            supportingText = { Text("${uiState.title.length}/${ReportingViewModel.TITLE_MAX_LENGTH}") },
             isError = uiState.isTitleValid.not(),
         )
 
         VonageTextField(
             modifier = Modifier.fillMaxWidth(),
             value = uiState.userName,
-            maxLength = 100,
+            maxLength = ReportingViewModel.NAME_MAX_LENGTH,
             onValueChange = { actions.onUsernameChange(it) },
             placeholder = { Text(stringResource(R.string.report_name_placeholder)) },
-            supportingText = { Text("${uiState.userName.length}/100") },
+            supportingText = { Text("${uiState.userName.length}/${ReportingViewModel.NAME_MAX_LENGTH}") },
             isError = uiState.isUsernameValid.not(),
         )
 
@@ -72,9 +73,9 @@ fun ReportIssueForm(
             onValueChange = { actions.onDescriptionChange(it) },
             singleLine = false,
             maxLines = 4,
-            maxLength = 1000,
+            maxLength = ReportingViewModel.DESCRIPTION_MAX_LENGTH,
             placeholder = { Text(stringResource(R.string.report_issue_placeholder)) },
-            supportingText = { Text("${uiState.description.length}/1000") },
+            supportingText = { Text("${uiState.description.length}/${ReportingViewModel.DESCRIPTION_MAX_LENGTH}") },
             isError = uiState.isDescriptionValid.not(),
         )
 
@@ -93,7 +94,7 @@ fun ReportIssueForm(
         VonageButton(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.report_send),
-            enabled = !uiState.isProcessingAttachment || !uiState.isSending || !uiState.isError,
+            enabled = !uiState.isProcessingAttachment && !uiState.isSending && !uiState.isError,
             onClick = {
                 actions.onSend(uiState.title, uiState.userName, uiState.description, uiState.attachment)
             },

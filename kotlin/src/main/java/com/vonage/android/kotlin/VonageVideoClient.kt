@@ -49,7 +49,6 @@ class VonageVideoClient(
             Connection creation time: ${session?.connection?.creationTime}
             ===
         """.trimIndent()
-        Log.d("XXX", dump)
         return dump
     }
 

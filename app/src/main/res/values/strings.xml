@@ -65,6 +65,7 @@
     <string name="captions_stop">Disable captions</string>
 
     <!-- Report -->
+    <string name="report_bottombar_button_label">Report Issue</string>
     <string name="report_title">Report Issue</string>
     <string name="report_capture_screenshot">Capture screenshot</string>
     <string name="report_add_screenshot">Add screenshot</string>
@@ -80,5 +81,6 @@
 
     <!-- Generic -->
     <string name="generic_retry">Retry</string>
+    <string name="report_issue">Report issue</string>
 
 </resources>

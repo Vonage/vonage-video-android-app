@@ -135,7 +135,7 @@ private fun ReportIssueScreenContent(
             VonageButton(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(R.string.report_success_button),
-                enabled = !uiState.isProcessingAttachment || !uiState.isSending || !uiState.isError,
+                enabled = !uiState.isProcessingAttachment && !uiState.isSending && !uiState.isError,
                 onClick = actions.onClose,
             )
         } else {

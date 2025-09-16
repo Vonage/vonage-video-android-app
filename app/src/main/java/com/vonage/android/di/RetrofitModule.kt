@@ -10,7 +10,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
@@ -28,7 +27,7 @@ object RetrofitModule {
     fun provideHttpClient(): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(
             HttpLoggingInterceptor()
-                .apply { level = Level.HEADERS }
+                .apply { level = HttpLoggingInterceptor.Level.HEADERS }
         )
         .addInterceptor(VeraHeaderRequestDecorator())
         .build()
