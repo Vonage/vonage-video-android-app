@@ -92,7 +92,7 @@ class ReportingViewModel @Inject constructor(
     }
 
     fun reset() {
-        _uiState.update { uiState -> ReportIssueScreenUiState() }
+        _uiState.update { _ -> ReportIssueScreenUiState() }
     }
 
     fun updateTitle(title: String) {
