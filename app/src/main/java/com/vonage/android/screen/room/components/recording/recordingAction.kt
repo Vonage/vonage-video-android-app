@@ -38,8 +38,7 @@ fun recordingAction(
                     RecordingState.IDLE -> actions.onToggleRecording(true)
                     RecordingState.RECORDING -> actions.onToggleRecording(false)
                     RecordingState.STARTING,
-                    RecordingState.STOPPING -> {
-                    }
+                    RecordingState.STOPPING -> null
                 }
             }
         },

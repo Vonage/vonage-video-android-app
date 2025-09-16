@@ -25,7 +25,7 @@ class ScreenSharingService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        stopForeground(true)
+        stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
 

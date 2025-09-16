@@ -342,17 +342,17 @@ private val noOpCallFacade = object : CallFacade {
     override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
 
     override fun connect(): Flow<SessionEvent> = flowOf()
-    override fun enableCaptions(enable: Boolean) {}
-    override fun pauseSession() {}
-    override fun resumeSession() {}
-    override fun endSession() {}
+    override fun enableCaptions(enable: Boolean) { /* empty on purpose */ }
+    override fun pauseSession() { /* empty on purpose */ }
+    override fun resumeSession() { /* empty on purpose */ }
+    override fun endSession() { /* empty on purpose */ }
     override fun observeLocalAudioLevel(): Flow<Float> = flowOf()
-    override fun toggleLocalVideo() {}
-    override fun toggleLocalCamera() {}
-    override fun toggleLocalAudio() {}
-    override fun sendChatMessage(message: String) {}
-    override fun listenUnreadChatMessages(enable: Boolean) {}
-    override fun sendEmoji(emoji: String) {}
-    override fun startCapturingScreen(mediaProjection: MediaProjection) {}
-    override fun stopCapturingScreen() {}
+    override fun toggleLocalVideo() { /* empty on purpose */ }
+    override fun toggleLocalCamera() { /* empty on purpose */ }
+    override fun toggleLocalAudio() { /* empty on purpose */ }
+    override fun sendChatMessage(message: String) { /* empty on purpose */ }
+    override fun listenUnreadChatMessages(enable: Boolean) { /* empty on purpose */ }
+    override fun sendEmoji(emoji: String) { /* empty on purpose */ }
+    override fun startCapturingScreen(mediaProjection: MediaProjection) { /* empty on purpose */ }
+    override fun stopCapturingScreen() { /* empty on purpose */ }
 }

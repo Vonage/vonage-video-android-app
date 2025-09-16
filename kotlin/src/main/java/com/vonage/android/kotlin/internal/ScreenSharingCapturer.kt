@@ -30,7 +30,7 @@ class ScreenSharingCapturer(
     }
 
     override fun init() {
-
+        // not needed
     }
 
     override fun startCapture(): Int {
@@ -52,7 +52,7 @@ class ScreenSharingCapturer(
     }
 
     override fun destroy() {
-
+        // not needed
     }
 
     override fun isCaptureStarted(): Boolean = capturing
@@ -66,11 +66,11 @@ class ScreenSharingCapturer(
         }
 
     override fun onPause() {
-
+        // not needed
     }
 
     override fun onResume() {
-
+        // not needed
     }
 
     private fun createVirtualDisplay() {

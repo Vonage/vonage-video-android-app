@@ -50,7 +50,7 @@ fun pipEffect(
         Log.i("PiP", "API does not support PiP")
     }
 
-    val pipModifier = modifier.onGloballyPositioned { layoutCoordinates ->
+    val pipModifier = modifier.onGloballyPositioned { _ ->
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val builder = PictureInPictureParams.Builder()
 
@@ -65,7 +65,7 @@ fun pipEffect(
 }
 
 @Composable
-fun rememberIsInPipMode(): Boolean {
+fun rememberIsInPipMode(): Boolean =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val activity = LocalContext.current.findActivity()
         var pipMode by remember { mutableStateOf(activity.isInPictureInPictureMode) }
@@ -78,11 +78,10 @@ fun rememberIsInPipMode(): Boolean {
             )
             onDispose { activity.removeOnPictureInPictureModeChangedListener(observer) }
         }
-        return pipMode
+        pipMode
     } else {
-        return false
+        false
     }
-}
 
 internal fun Context.findActivity(): ComponentActivity {
     var context = this

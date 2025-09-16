@@ -36,8 +36,7 @@ fun captionsAction(
                 CaptionsState.IDLE -> actions.onToggleCaptions(true)
                 CaptionsState.ENABLED -> actions.onToggleCaptions(false)
                 CaptionsState.ENABLING,
-                CaptionsState.DISABLING -> {
-                }
+                CaptionsState.DISABLING -> null
             }
         },
     )

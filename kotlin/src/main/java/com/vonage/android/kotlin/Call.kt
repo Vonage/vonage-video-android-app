@@ -103,7 +103,7 @@ class Call internal constructor(
             }
         }
         session.setSessionListener(sessionListener)
-        session.setSignalListener { session, type, data, conn ->
+        session.setSignalListener { _, type, data, conn ->
             signalPlugins.forEach { plugin ->
                 val isYou = publisherHolder.publisher.stream.connection == conn
                 val senderName = if (!isYou) {
@@ -252,9 +252,9 @@ class Call internal constructor(
         val subscriber = Subscriber.Builder(context, stream).build()
 
         subscriber.setCaptionsListener { subscriber, text, isFinal ->
-            _captionsStateFlow.update { caption -> "${subscriber.name()}: $text" }
+            _captionsStateFlow.update { _ -> "${subscriber.name()}: $text" }
             if (isFinal) {
-                _captionsStateFlow.update { caption -> null }
+                _captionsStateFlow.update { _ -> null }
             }
         }
         subscriber.setStreamListener(object : SubscriberKit.StreamListener {

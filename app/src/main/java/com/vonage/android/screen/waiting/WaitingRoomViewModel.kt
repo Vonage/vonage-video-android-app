@@ -131,7 +131,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
 }
 
 @AssistedFactory
-interface WaitingRoomViewModelFactory {
+fun interface WaitingRoomViewModelFactory {
     fun create(roomName: String): WaitingRoomViewModel
 }
 

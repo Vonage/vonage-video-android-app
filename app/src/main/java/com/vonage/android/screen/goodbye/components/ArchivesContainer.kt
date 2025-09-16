@@ -64,7 +64,7 @@ fun ArchivesContainer(
                 )
             }
 
-            is GoodbyeScreenUiState.Idle -> {}
+            is GoodbyeScreenUiState.Idle -> null
         }
     }
 }
