@@ -30,7 +30,7 @@ class CaptionsRepositoryTest {
     }
 
     @Test
-    fun `given repository when enableCaptions api success with empty returns success`() = runTest {
+    fun `given repository when enableCaptions api success with empty returns failure`() = runTest {
         coEvery { apiService.enableCaptions("any-room-name") } returns Response.success(null)
         val response = sut.enableCaptions("any-room-name")
         assertTrue(response.isFailure)

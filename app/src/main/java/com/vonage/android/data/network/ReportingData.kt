@@ -1,6 +1,6 @@
 package com.vonage.android.data.network
 
-data class FeedbackData(
+data class ReportDataRequest(
     val title: String,
     val name: String,
     val issue: String,

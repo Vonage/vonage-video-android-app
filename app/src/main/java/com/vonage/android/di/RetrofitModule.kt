@@ -3,6 +3,7 @@ package com.vonage.android.di
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.vonage.android.data.network.APIService
+import com.vonage.android.data.network.interceptor.VeraHeaderRequestDecorator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,8 +28,9 @@ object RetrofitModule {
     fun provideHttpClient(): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(
             HttpLoggingInterceptor()
-                .apply { level = HttpLoggingInterceptor.Level.BODY }
+                .apply { level = Level.HEADERS }
         )
+        .addInterceptor(VeraHeaderRequestDecorator())
         .build()
 
     @Provides

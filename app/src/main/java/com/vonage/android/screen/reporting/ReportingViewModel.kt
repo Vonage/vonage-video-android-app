@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.ReportingRepository
-import com.vonage.android.data.network.FeedbackData
+import com.vonage.android.data.network.ReportDataRequest
 import com.vonage.android.data.network.ReportResponseData
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.util.ImageProcessor
@@ -34,31 +34,31 @@ class ReportingViewModel @Inject constructor(
     )
 
     fun processImage(uri: Uri) {
-        _uiState.update { uiState -> uiState.copy(isProcessingScreenshot = true) }
         viewModelScope.launch {
+            _uiState.update { uiState -> uiState.copy(isProcessingAttachment = true) }
             imageProcessor.extractImageFromUri(uri)
                 .onSuccess { screenshot ->
                     _uiState.update { uiState ->
-                        uiState.copy(attachment = screenshot, isProcessingScreenshot = false)
+                        uiState.copy(attachment = screenshot, isProcessingAttachment = false)
                     }
                 }
                 .onFailure {
-                    _uiState.update { uiState -> uiState.copy(isProcessingScreenshot = false) }
+                    _uiState.update { uiState -> uiState.copy(isProcessingAttachment = false) }
                 }
         }
     }
 
     fun processScreenshot(window: Window) {
-        _uiState.update { uiState -> uiState.copy(isProcessingScreenshot = true) }
+        _uiState.update { uiState -> uiState.copy(isProcessingAttachment = true) }
         viewModelScope.launch {
             imageProcessor.extractImageFromWindow(window)
                 .onSuccess { image ->
                     _uiState.update { uiState ->
-                        uiState.copy(attachment = image, isProcessingScreenshot = false)
+                        uiState.copy(attachment = image, isProcessingAttachment = false)
                     }
                 }
                 .onFailure {
-                    _uiState.update { uiState -> uiState.copy(isProcessingScreenshot = false) }
+                    _uiState.update { uiState -> uiState.copy(isProcessingAttachment = false) }
                 }
         }
     }
@@ -69,17 +69,20 @@ class ReportingViewModel @Inject constructor(
 
     fun sendReport(title: String, name: String, issue: String, imageBitmap: ImageBitmap?) {
         viewModelScope.launch {
+            if (!validateFields(title, name, issue)) return@launch
             _uiState.update { uiState -> uiState.copy(isSending = true) }
             val attachment = imageProcessor.encodeImageToBase64(imageBitmap)
             reportingRepository.sendReport(
-                FeedbackData(
+                ReportDataRequest(
                     title = title,
                     name = name,
                     issue = issue + vonageVideoClient.debugDump(),
                     attachment = attachment,
                 )
             )
-                .onSuccess { _uiState.update { uiState -> uiState.copy(isSuccess = it.toIssueData()) } }
+                .onSuccess {
+                    _uiState.update { uiState -> uiState.copy(isSuccess = it.toIssueData(), isSending = false) }
+                }
                 .onFailure { _uiState.update { uiState -> uiState.copy(isError = true, isSending = false) } }
         }
     }
@@ -88,34 +91,60 @@ class ReportingViewModel @Inject constructor(
         _uiState.update { uiState -> ReportIssueScreenUiState() }
     }
 
+    fun updateTitle(title: String) {
+        _uiState.update { uiState ->
+            uiState.copy(
+                title = title,
+                isTitleValid = title.isNotEmptyAndMaxLength(TITLE_MAX_LENGTH),
+            )
+        }
+    }
+
+    fun updateUsername(username: String) {
+        _uiState.update { uiState ->
+            uiState.copy(
+                userName = username,
+                isUsernameValid = username.isNotEmptyAndMaxLength(NAME_MAX_LENGTH),
+            )
+        }
+    }
+
+    fun updateDescription(description: String) {
+        _uiState.update { uiState ->
+            uiState.copy(
+                description = description,
+                isDescriptionValid = description.isNotEmptyAndMaxLength(DESCRIPTION_MAX_LENGTH),
+            )
+        }
+    }
+
+    private fun validateFields(title: String, username: String, description: String): Boolean {
+        val titleValid = title.isNotEmptyAndMaxLength(TITLE_MAX_LENGTH)
+        val userNameValid = username.isNotEmptyAndMaxLength(NAME_MAX_LENGTH)
+        val descriptionValid = description.isNotEmptyAndMaxLength(DESCRIPTION_MAX_LENGTH)
+        _uiState.update { uiState ->
+            uiState.copy(
+                isTitleValid = titleValid,
+                isUsernameValid = userNameValid,
+                isDescriptionValid = descriptionValid,
+            )
+        }
+        return titleValid && userNameValid && descriptionValid
+    }
+
     private fun ReportResponseData.toIssueData(): IssueData = IssueData(
         message = message,
         ticketUrl = ticketUrl,
     )
 
-    fun updateTitle(title: String) {
-        _uiState.update { uiState -> uiState.copy(
-            title = title,
-            isTitleValid = title.isEmpty().not() && title.length <= 100
-        )}
-    }
+    private fun String.isNotEmptyAndMaxLength(maxLength: Int): Boolean =
+        isNotEmpty() && length <= maxLength
 
-    fun updateUsername(username: String) {
-        _uiState.update { uiState -> uiState.copy(
-            userName = username,
-            isTitleValid = username.isEmpty().not() && username.length <= 100
-        )}
-    }
-
-    fun updateDescription(description: String) {
-        _uiState.update { uiState -> uiState.copy(
-            description = description,
-            isDescriptionValid = description.isEmpty().not() && description.length <= 1000
-        )}
-    }
-
-    private companion object {
-        const val STOP_TIMEOUT_MILLIS = 2500L
+    companion object {
+        private const val STOP_TIMEOUT_MILLIS = 2000L
+        const val TITLE_MAX_LENGTH = 100
+        const val NAME_MAX_LENGTH = 100
+        const val DESCRIPTION_MAX_LENGTH = 1000
     }
 }
 
@@ -127,7 +156,7 @@ data class ReportIssueScreenUiState(
     val description: String = "",
     val isDescriptionValid: Boolean = true,
     val attachment: ImageBitmap? = null,
-    val isProcessingScreenshot: Boolean = false,
+    val isProcessingAttachment: Boolean = false,
     val isSending: Boolean = false,
     val isSuccess: IssueData? = null,
     val isError: Boolean = false,

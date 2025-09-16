@@ -33,6 +33,6 @@ interface APIService {
     ): Response<DisableCaptionsResponse>
 
     @POST("feedback/report")
-    suspend fun report(@Body feedbackData: FeedbackData): Response<ReportResponse>
+    suspend fun report(@Body reportDataRequest: ReportDataRequest): Response<ReportResponse>
 
 }

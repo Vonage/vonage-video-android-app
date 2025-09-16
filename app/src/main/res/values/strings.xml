@@ -75,6 +75,8 @@
     <string name="report_issue_placeholder">Describe your issue</string>
     <string name="report_title_placeholder">When you noticed this issue, what were you trying to do?</string>
     <string name="report_send">Send</string>
+    <string name="report_success_button">Close</string>
+    <string name="report_error_message">Something failed, please try again</string>
 
     <!-- Generic -->
     <string name="generic_retry">Retry</string>

@@ -25,7 +25,7 @@ class ImageProcessor @Inject constructor(
 
     private val scope = CoroutineScope(dispatcher)
 
-    fun extractImageFromUri(uri: Uri): Result<ImageBitmap> =
+    suspend fun extractImageFromUri(uri: Uri): Result<ImageBitmap> =
         runCatching {
             val imageStream = context.contentResolver.openInputStream(uri)
             val bitmap = BitmapFactory.decodeStream(imageStream, null, BitmapFactory.Options())
@@ -35,7 +35,7 @@ class ImageProcessor @Inject constructor(
             } ?: Result.failure(Exception("Unknown error while extracting image from URI $uri"))
         }
 
-    fun extractImageFromWindow(window: Window): Result<ImageBitmap> =
+    suspend fun extractImageFromWindow(window: Window): Result<ImageBitmap> =
         runCatching {
             val view = window.decorView
             view.isDrawingCacheEnabled = true
