@@ -182,7 +182,6 @@ class ReportingViewModelTest : CoroutineTest() {
 
     @Test
     fun `should update state when sendReport success`() = runTest {
-        val imageBitmap = mockk<ImageBitmap>(relaxed = true)
         coEvery { imageProcessor.encodeImageToBase64(null) } returns ""
         every { vonageVideoClient.debugDump() } returns "debug info from SDK"
         coEvery { reportingRepository.sendReport(any()) } returns
@@ -197,6 +196,7 @@ class ReportingViewModelTest : CoroutineTest() {
             assertTrue(awaitItem().isSending)
             with(awaitItem()) {
                 assertFalse(isSending)
+                assertFalse(isError)
                 assertEquals(IssueData(
                     message = "message",
                     ticketUrl = "https://jira.host.io/ticket-968",

@@ -70,7 +70,7 @@ class ReportingViewModel @Inject constructor(
     fun sendReport(title: String, name: String, issue: String, imageBitmap: ImageBitmap?) {
         viewModelScope.launch {
             if (!validateFields(title, name, issue)) return@launch
-            _uiState.update { uiState -> uiState.copy(isSending = true) }
+            _uiState.update { uiState -> uiState.copy(isSending = true, isError = false) }
             val attachment = imageProcessor.encodeImageToBase64(imageBitmap)
             reportingRepository.sendReport(
                 ReportDataRequest(
@@ -81,7 +81,11 @@ class ReportingViewModel @Inject constructor(
                 )
             )
                 .onSuccess {
-                    _uiState.update { uiState -> uiState.copy(isSuccess = it.toIssueData(), isSending = false) }
+                    _uiState.update { uiState -> uiState.copy(
+                        isError = false,
+                        isSuccess = it.toIssueData(),
+                        isSending = false,
+                    ) }
                 }
                 .onFailure { _uiState.update { uiState -> uiState.copy(isError = true, isSending = false) } }
         }
