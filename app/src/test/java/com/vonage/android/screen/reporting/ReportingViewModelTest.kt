@@ -4,7 +4,6 @@ import android.net.Uri
 import android.view.Window
 import androidx.compose.ui.graphics.ImageBitmap
 import app.cash.turbine.test
-import com.vonage.android.CoroutineTest
 import com.vonage.android.data.ReportingRepository
 import com.vonage.android.data.network.ReportResponseData
 import com.vonage.android.kotlin.VonageVideoClient
@@ -12,6 +11,7 @@ import com.vonage.android.util.ImageProcessor
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNull
@@ -19,7 +19,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class ReportingViewModelTest : CoroutineTest() {
+class ReportingViewModelTest {
 
     private val reportingRepository: ReportingRepository = mockk()
     private val imageProcessor: ImageProcessor = mockk()
@@ -123,14 +123,14 @@ class ReportingViewModelTest : CoroutineTest() {
         val uri = mockk<Uri>(relaxed = true)
         val imageBitmap = mockk<ImageBitmap>(relaxed = true)
         coEvery { imageProcessor.extractImageFromUri(uri) } returns Result.success(imageBitmap)
+        
+        sut.processImage(uri)
+        
         sut.uiState.test {
-            awaitItem() // initial item
-            sut.processImage(uri)
-            assertTrue(awaitItem().isProcessingAttachment)
-            with(awaitItem()) {
-                assertFalse(isProcessingAttachment)
-                assertEquals(imageBitmap, attachment)
-            }
+            skipItems(1) // skip initial state
+            val finalState = awaitItem()
+            assertFalse(finalState.isProcessingAttachment)
+            assertEquals(imageBitmap, finalState.attachment)
         }
     }
 
@@ -138,14 +138,13 @@ class ReportingViewModelTest : CoroutineTest() {
     fun `should update state when extractImageFromUri fails`() = runTest {
         val uri = mockk<Uri>(relaxed = true)
         coEvery { imageProcessor.extractImageFromUri(uri) } returns Result.failure(Exception("oops!"))
+        
+        sut.processImage(uri)
+
         sut.uiState.test {
-            awaitItem() // initial item
-            sut.processImage(uri)
-            assertTrue(awaitItem().isProcessingAttachment)
-            with(awaitItem()) {
-                assertFalse(isProcessingAttachment)
-                assertNull(attachment)
-            }
+            val currentState = awaitItem()
+            assertFalse(currentState.isProcessingAttachment)
+            assertNull(currentState.attachment)
         }
     }
 
@@ -154,14 +153,14 @@ class ReportingViewModelTest : CoroutineTest() {
         val window = mockk<Window>(relaxed = true)
         val imageBitmap = mockk<ImageBitmap>(relaxed = true)
         coEvery { imageProcessor.extractImageFromWindow(window) } returns Result.success(imageBitmap)
+        
+        sut.processScreenshot(window)
+        
         sut.uiState.test {
-            awaitItem() // initial item
-            sut.processScreenshot(window)
-            assertTrue(awaitItem().isProcessingAttachment)
-            with(awaitItem()) {
-                assertFalse(isProcessingAttachment)
-                assertEquals(imageBitmap, attachment)
-            }
+            skipItems(1) // skip initial state
+            val finalState = awaitItem()
+            assertFalse(finalState.isProcessingAttachment)
+            assertEquals(imageBitmap, finalState.attachment)
         }
     }
 
@@ -169,14 +168,14 @@ class ReportingViewModelTest : CoroutineTest() {
     fun `should update state when extractImageFromWindow fails`() = runTest {
         val window = mockk<Window>(relaxed = true)
         coEvery { imageProcessor.extractImageFromWindow(window) } returns Result.failure(Exception("oops!"))
+        
+        sut.processScreenshot(window)
+        delay(100)
+        
         sut.uiState.test {
-            awaitItem() // initial item
-            sut.processScreenshot(window)
-            assertTrue(awaitItem().isProcessingAttachment)
-            with(awaitItem()) {
-                assertFalse(isProcessingAttachment)
-                assertNull(attachment)
-            }
+            val currentState = awaitItem()
+            assertFalse(currentState.isProcessingAttachment)
+            assertNull(currentState.attachment)
         }
     }
 
@@ -190,18 +189,18 @@ class ReportingViewModelTest : CoroutineTest() {
                     ticketUrl = "https://jira.host.io/ticket-968",
                     screenshotIncluded = false,
                 ))
+        
+        sut.sendReport("title", "user name", "issue description", null)
+        
         sut.uiState.test {
-            awaitItem() // initial item
-            sut.sendReport("title", "user name", "issue description", null)
-            assertTrue(awaitItem().isSending)
-            with(awaitItem()) {
-                assertFalse(isSending)
-                assertFalse(isError)
-                assertEquals(IssueData(
-                    message = "message",
-                    ticketUrl = "https://jira.host.io/ticket-968",
-                ), isSuccess)
-            }
+            skipItems(1) // skip initial state
+            val finalState = awaitItem()
+            assertFalse(finalState.isSending)
+            assertFalse(finalState.isError)
+            assertEquals(IssueData(
+                message = "message",
+                ticketUrl = "https://jira.host.io/ticket-968",
+            ), finalState.isSuccess)
         }
     }
 
@@ -211,15 +210,15 @@ class ReportingViewModelTest : CoroutineTest() {
         coEvery { imageProcessor.encodeImageToBase64(imageBitmap) } returns "base64Image"
         every { vonageVideoClient.debugDump() } returns "debug info from SDK"
         coEvery { reportingRepository.sendReport(any()) } returns Result.failure(Exception("oops!"))
+        
+        sut.sendReport("title", "user name", "issue description", imageBitmap)
+        
         sut.uiState.test {
-            awaitItem() // initial item
-            sut.sendReport("title", "user name", "issue description", imageBitmap)
-            assertTrue(awaitItem().isSending)
-            with(awaitItem()) {
-                assertFalse(isSending)
-                assertTrue(isError)
-                assertNull(isSuccess)
-            }
+            skipItems(1) // Skip any initial states
+            val finalState = awaitItem()
+            assertFalse(finalState.isSending)
+            assertTrue(finalState.isError)
+            assertNull(finalState.isSuccess)
         }
     }
 

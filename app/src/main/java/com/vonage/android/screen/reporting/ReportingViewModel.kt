@@ -43,7 +43,7 @@ class ReportingViewModel @Inject constructor(
                     }
                 }
                 .onFailure {
-                    _uiState.update { uiState -> uiState.copy(isProcessingAttachment = false) }
+                    _uiState.update { uiState -> uiState.copy(attachment = null, isProcessingAttachment = false) }
                 }
         }
     }
@@ -58,7 +58,7 @@ class ReportingViewModel @Inject constructor(
                     }
                 }
                 .onFailure {
-                    _uiState.update { uiState -> uiState.copy(isProcessingAttachment = false) }
+                    _uiState.update { uiState -> uiState.copy(attachment = null, isProcessingAttachment = false) }
                 }
         }
     }
