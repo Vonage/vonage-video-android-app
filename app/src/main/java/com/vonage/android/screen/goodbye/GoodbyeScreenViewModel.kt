@@ -74,7 +74,7 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
 }
 
 @AssistedFactory
-interface GoodbyeScreenViewModelFactory {
+fun interface GoodbyeScreenViewModelFactory {
     fun create(roomName: String): GoodbyeScreenViewModel
 }
 

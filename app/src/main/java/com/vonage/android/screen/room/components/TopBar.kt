@@ -73,7 +73,7 @@ fun TopBar(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 when (recordingState) {
-                    RecordingState.IDLE -> {}
+                    RecordingState.IDLE -> null
                     RecordingState.STARTING,
                     RecordingState.STOPPING -> CircularProgressIndicator(
                         color = Color.Red,

@@ -7,9 +7,11 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BlurCircular
@@ -29,8 +31,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.vonage.android.audio.ui.AudioVolumeIndicator
 import com.vonage.android.compose.components.VideoRenderer
 import com.vonage.android.compose.modifier.conditional
+import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.screen.components.AvatarInitials
@@ -40,10 +44,8 @@ import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BLUR_BUTTON_
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.MIC_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_INITIALS_TAG
-import com.vonage.android.util.buildTestTag
-import com.vonage.android.compose.preview.previewCamera
-import com.vonage.android.audio.ui.AudioVolumeIndicator
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.VOLUME_INDICATOR_TAG
+import com.vonage.android.util.buildTestTag
 
 @Suppress("LongParameterList")
 @Composable
@@ -104,8 +106,10 @@ fun VideoControlPanel(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (isMicEnabled) {
@@ -114,40 +118,47 @@ fun VideoControlPanel(
                     .testTag(VOLUME_INDICATOR_TAG),
                 audioLevel = audioLevel,
             )
+        } else {
+            Spacer(modifier = Modifier.size(32.dp))
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            CircularControlButton(
+                modifier = Modifier
+                    .conditional(
+                        isMicEnabled,
+                        ifTrue = { background(Color.Unspecified) },
+                        ifFalse = { background(Color.Red.copy(alpha = 0.7f)) }
+                    )
+                    .conditional(
+                        isMicEnabled,
+                        ifTrue = { border(BorderStroke(1.dp, Color.White), CircleShape) })
+                    .testTag(MIC_BUTTON_TAG.buildTestTag(isMicEnabled)),
+                onClick = onMicToggle,
+                icon = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
+            )
+
+            CircularControlButton(
+                modifier = Modifier
+                    .conditional(
+                        isCameraEnabled,
+                        ifTrue = { background(Color.Unspecified) },
+                        ifFalse = { background(Color.Red.copy(alpha = 0.7f)) }
+                    )
+                    .conditional(
+                        isCameraEnabled,
+                        ifTrue = { border(BorderStroke(1.dp, Color.White), CircleShape) })
+                    .testTag(CAMERA_BUTTON_TAG.buildTestTag(isCameraEnabled)),
+                onClick = onCameraToggle,
+                icon = if (isCameraEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
+            )
         }
 
         CircularControlButton(
             modifier = Modifier
-                .conditional(
-                    isMicEnabled,
-                    ifTrue = { background(Color.Unspecified) },
-                    ifFalse = { background(Color.Red.copy(alpha = 0.7f)) }
-                )
-                .conditional(isMicEnabled,
-                    ifTrue = { border(BorderStroke(1.dp, Color.White), CircleShape) })
-                .testTag(MIC_BUTTON_TAG.buildTestTag(isMicEnabled)),
-            onClick = onMicToggle,
-            icon = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
-        )
-
-        CircularControlButton(
-            modifier = Modifier
-                .conditional(
-                    isCameraEnabled,
-                    ifTrue = { background(Color.Unspecified) },
-                    ifFalse = { background(Color.Red.copy(alpha = 0.7f)) }
-                )
-                .conditional(isCameraEnabled,
-                    ifTrue = { border(BorderStroke(1.dp, Color.White), CircleShape) })
-                .testTag(CAMERA_BUTTON_TAG.buildTestTag(isCameraEnabled)),
-            onClick = onCameraToggle,
-            icon = if (isCameraEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
-        )
-
-        CircularControlButton(
-            modifier = Modifier
-                .conditional(isCameraEnabled,
-                    ifTrue = { border(BorderStroke(1.dp, Color.White), CircleShape) })
+                .border(BorderStroke(1.dp, Color.White), CircleShape)
                 .testTag(CAMERA_BLUR_BUTTON_TAG),
             onClick = onCameraBlur,
             icon = rememberBlurIcon(blurLevel),

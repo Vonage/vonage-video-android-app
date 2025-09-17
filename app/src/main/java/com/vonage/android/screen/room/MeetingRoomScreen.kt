@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -29,6 +28,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.audio.ui.AudioDevicesEffect
@@ -37,9 +37,9 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.EmojiState
-import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VeraPublisher
+import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
@@ -70,9 +70,13 @@ fun MeetingRoomScreen(
     val participantsSheetState = rememberModalBottomSheetState()
     val audioDeviceSelectorSheetState = rememberModalBottomSheetState()
     val moreActionsSheetState = rememberModalBottomSheetState()
+    val reportSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
     var showParticipants by remember { mutableStateOf(false) }
     var showAudioDeviceSelector by remember { mutableStateOf(false) }
     var showMoreActions by remember { mutableStateOf(false) }
+    var showReporting by remember { mutableStateOf(false) }
 
     val navigator = rememberSupportingPaneScaffoldNavigator()
     val scope = rememberCoroutineScope()
@@ -151,13 +155,17 @@ fun MeetingRoomScreen(
                                     audioLevel = audioLevel,
                                     showParticipants = showParticipants,
                                     showMoreActions = showMoreActions,
+                                    showReporting = showReporting,
                                     showAudioDeviceSelector = showAudioDeviceSelector,
                                     participantsSheetState = participantsSheetState,
                                     audioDeviceSelectorSheetState = audioDeviceSelectorSheetState,
                                     moreActionsSheetState = moreActionsSheetState,
+                                    reportSheetState = reportSheetState,
                                     onDismissParticipants = { showParticipants = false },
                                     onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
                                     onDismissMoreActions = { showMoreActions = false },
+                                    onShowReporting = { showReporting = showReporting.toggle() },
+                                    onDismissReporting = { showReporting = false },
                                     recordingState = uiState.recordingState,
                                     screenSharingState = uiState.screenSharingState,
                                     captionsState = uiState.captionsState,
@@ -207,7 +215,7 @@ fun ThreePaneScaffoldPaneScope.ExtraPane(
 ) {
     AnimatedPane(
         modifier = modifier
-            .safeContentPadding()
+            .padding(16.dp)
     ) {
         ChatPanel(
             messages = chatState?.messages.orEmpty().toImmutableList(),

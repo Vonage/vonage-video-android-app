@@ -65,7 +65,7 @@ class AudioDeviceSelector @Inject constructor(
             populateAvailableDevices()
             setActiveDevice()
 
-            bluetoothManager.bluetoothStates.collect { bluetoothState ->
+            bluetoothManager.bluetoothStates.collect { _ ->
                 currentDevice.reset()
                 populateAvailableDevices()
                 setActiveDevice()

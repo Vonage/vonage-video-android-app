@@ -22,7 +22,7 @@ internal fun Publisher.applyVideoBlur(blurLevel: BlurLevel) {
 }
 
 internal inline fun Publisher.observeAudioLevel(crossinline onUpdate: (Float) -> Unit): Flow<Float> = callbackFlow {
-    val audioLevelListener = PublisherKit.AudioLevelListener { subscriber, audioLevelRaw ->
+    val audioLevelListener = PublisherKit.AudioLevelListener { _, audioLevelRaw ->
         val audioLevel = audioLevelRaw.round4()
         onUpdate(audioLevel)
         trySend(audioLevel)

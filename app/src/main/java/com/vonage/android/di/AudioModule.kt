@@ -13,7 +13,7 @@ import dagger.hilt.components.SingletonComponent
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
-interface VeraAudioEntryPoint {
+fun interface VeraAudioEntryPoint {
     fun audioDeviceSelector(): AudioDeviceSelector
 }
 

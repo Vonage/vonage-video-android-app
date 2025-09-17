@@ -46,9 +46,7 @@ fun screenSharingAction(
             when (screenSharingState) {
                 IDLE -> actions.onToggleScreenSharing(true)
                 SHARING -> actions.onToggleScreenSharing(false)
-                STARTING,
-                STOPPING -> {
-                }
+                else -> null
             }
         },
     )

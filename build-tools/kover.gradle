@@ -41,4 +41,12 @@ if (!rootProject.ext.sonar.ignoreModules.contains(name)) {
             }
         }
     }
+
+    sonarqube {
+        properties {
+            property "sonar.junit.reportPaths", "${buildDir}/test-results/testDebugUnitTest"
+            property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/kover/reportDebug.xml"
+            property "sonar.sources", "src/main/java"
+        }
+    }
 }
