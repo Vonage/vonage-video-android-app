@@ -36,7 +36,7 @@ interface ChatFacade {
     fun listenUnreadChatMessages(enable: Boolean)
 }
 
-interface EmojiFacade {
+fun interface EmojiFacade {
     fun sendEmoji(emoji: String)
 }
 

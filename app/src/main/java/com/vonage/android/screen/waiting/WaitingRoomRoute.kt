@@ -9,7 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.screen.components.permissions.CallPermissionHandler
 import com.vonage.android.util.pip.pipEffect
@@ -52,7 +52,9 @@ fun WaitingRoomRoute(
 
     CallPermissionHandler(
         onGrantPermissions = {
-            if (permissionsAlreadyGranted) { viewModel.init() }
+            if (permissionsAlreadyGranted) {
+                viewModel.init()
+            }
             permissionsAlreadyGranted = false
         },
         navigateToPermissions = navigateToPermissions,

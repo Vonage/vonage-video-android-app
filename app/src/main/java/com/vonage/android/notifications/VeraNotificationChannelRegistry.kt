@@ -2,7 +2,6 @@ package com.vonage.android.notifications
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.NotificationManager.IMPORTANCE_DEFAULT
 import android.content.Context
 import android.os.Build
 import com.vonage.android.kotlin.signal.ChatSignalPlugin

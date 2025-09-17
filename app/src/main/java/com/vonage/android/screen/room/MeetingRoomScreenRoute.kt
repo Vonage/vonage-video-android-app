@@ -154,4 +154,5 @@ data class MeetingRoomActions(
     val onToggleRecording: (Boolean) -> Unit = {},
     val onToggleCaptions: (Boolean) -> Unit = {},
     val onToggleScreenSharing: (Boolean) -> Unit = {},
+    val onShowFeedbackScreen: () -> Unit = {},
 )

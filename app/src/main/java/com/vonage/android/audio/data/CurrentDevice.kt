@@ -19,18 +19,17 @@ class CurrentDevice @Inject constructor(
         performSwitchTo(device)
     }
 
-    fun getCurrentActiveDevice(): AudioDevice? {
+    fun getCurrentActiveDevice(): AudioDevice? =
         if (userSelectedDevice != null) {
-            return userSelectedDevice
+            userSelectedDevice
         } else {
             val availableDevices = getDevices()
             availableDevices.firstOrNull()?.let { firstDevice ->
                 performSwitchTo(firstDevice)
                 return firstDevice
             }
-            return null
+            null
         }
-    }
 
     private fun performSwitchTo(audioDevice: AudioDevice) {
         when (audioDevice.type) {
