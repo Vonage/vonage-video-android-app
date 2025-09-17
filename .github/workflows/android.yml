@@ -46,8 +46,10 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run unit tests and code quality checks
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          ./gradlew clean :app:testDebugUnitTest detekt --info
+          ./gradlew clean :app:koverXmlReportDebug detekt sonar --info
 #          ./gradlew clean check detekt --info
 
       - name: Upload test reports
