@@ -11,15 +11,16 @@ import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.kotlin.model.VeraScreenPublisher
 import com.vonage.android.kotlin.model.VeraSubscriber
+import kotlinx.coroutines.flow.MutableStateFlow
 
 internal fun Subscriber.toParticipant(): VeraSubscriber = VeraSubscriber(
     id = stream.streamId,
     videoSource = toParticipantType(),
     name = stream.name,
-    isMicEnabled = stream.hasAudio(),
-    isCameraEnabled = stream.hasVideo(),
+    isMicEnabled = MutableStateFlow(stream.hasAudio()),
+    isCameraEnabled = MutableStateFlow(stream.hasVideo()),
     view = view,
-    isSpeaking = false,
+    isSpeaking = MutableStateFlow(false),
 )
 
 internal fun Publisher.toParticipant(
@@ -30,24 +31,24 @@ internal fun Publisher.toParticipant(
     id = PUBLISHER_ID,
     videoSource = VideoSource.CAMERA,
     name = stream?.name ?: name.orEmpty(),
-    isMicEnabled = publishAudio,
-    isCameraEnabled = publishVideo,
+    isMicEnabled = MutableStateFlow(publishAudio),
+    isCameraEnabled = MutableStateFlow(publishVideo),
     view = view,
     cameraIndex = camera,
     cycleCamera = { cycleCamera() },
     blurLevel = BlurLevel.NONE,
     setCameraBlur = { blurLevel -> applyVideoBlur(blurLevel) },
-    isSpeaking = isSpeaking,
+    isSpeaking = MutableStateFlow(isSpeaking),
 )
 
 internal fun Publisher.toScreenParticipant(): VeraScreenPublisher = VeraScreenPublisher(
     id = PUBLISHER_SCREEN_ID,
     videoSource = VideoSource.SCREEN,
     name = name,
-    isMicEnabled = false,
-    isCameraEnabled = true,
+    isMicEnabled = MutableStateFlow(stream.hasAudio()),
+    isCameraEnabled = MutableStateFlow(stream.hasVideo()),
     view = view,
-    isSpeaking = false,
+    isSpeaking = MutableStateFlow(false),
 )
 
 internal fun Subscriber.toParticipantType(): VideoSource =

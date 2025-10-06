@@ -1,10 +1,13 @@
 package com.vonage.android.screen.waiting
 
+import android.content.Context
 import android.view.View
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.audio.util.MicVolumeListener
 import com.vonage.android.data.UserRepository
+import com.vonage.android.di.DefaultDispatcher
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.BlurLevel
@@ -14,6 +17,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -48,14 +55,14 @@ class WaitingRoomViewModel @AssistedInject constructor(
     private lateinit var publisher: VeraPublisher
     private var currentBlurIndex: Int = 0
 
-    fun init() {
+    fun init(context: Context) {
         viewModelScope.launch {
-            publisher = videoClient.buildPublisher()
+            publisher = videoClient.buildPublisher(context)
             publisher = publisher.copy(name = userRepository.getUserName())
             _uiState.update { uiState ->
                 uiState.copy(
-                    isCameraEnabled = publisher.isCameraEnabled,
-                    isMicEnabled = publisher.isMicEnabled,
+                    isCameraEnabled = publisher.isCameraEnabled.value,
+                    isMicEnabled = publisher.isMicEnabled.value,
                     userName = publisher.name,
                     blurLevel = publisher.blurLevel,
                     view = publisher.view,
@@ -76,13 +83,13 @@ class WaitingRoomViewModel @AssistedInject constructor(
     }
 
     fun onMicToggle() {
-        publisher = publisher.copy(isMicEnabled = publisher.isMicEnabled.toggle())
-        _uiState.update { uiState -> uiState.copy(isMicEnabled = publisher.isMicEnabled) }
+//        publisher = publisher.copy(isMicEnabled = publisher.isMicEnabled.toggle())
+//        _uiState.update { uiState -> uiState.copy(isMicEnabled = publisher.isMicEnabled) }
     }
 
     fun onCameraToggle() {
-        publisher = publisher.copy(isCameraEnabled = publisher.isCameraEnabled.toggle())
-        _uiState.update { uiState -> uiState.copy(isCameraEnabled = publisher.isCameraEnabled) }
+//        publisher = publisher.copy(isCameraEnabled = publisher.isCameraEnabled.toggle())
+//        _uiState.update { uiState -> uiState.copy(isCameraEnabled = publisher.isCameraEnabled) }
     }
 
     fun onCameraSwitch() {
@@ -109,8 +116,8 @@ class WaitingRoomViewModel @AssistedInject constructor(
             videoClient.configurePublisher(
                 PublisherConfig(
                     name = userName,
-                    publishVideo = publisher.isCameraEnabled,
-                    publishAudio = publisher.isMicEnabled,
+                    publishVideo = publisher.isCameraEnabled.value,
+                    publishAudio = publisher.isMicEnabled.value,
                     blurLevel = publisher.blurLevel,
                     cameraIndex = publisher.cameraIndex,
                 )
@@ -135,6 +142,7 @@ fun interface WaitingRoomViewModelFactory {
     fun create(roomName: String): WaitingRoomViewModel
 }
 
+@Immutable
 data class WaitingRoomUiState(
     val roomName: String = "",
     val userName: String = "",

@@ -1,5 +1,6 @@
 package com.vonage.android.util.preview
 
+import android.content.Context
 import android.media.projection.MediaProjection
 import androidx.compose.runtime.Composable
 import com.vonage.android.kotlin.model.CallFacade
@@ -22,20 +23,23 @@ fun buildCallWithParticipants(
     unreadCount: Int = 1,
     messagesCount: Int = 5,
 ): CallFacade = object : CallFacade {
+    override fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>) { }
 
     // Participants state
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> =
         MutableStateFlow(buildParticipants(participantCount).toImmutableList())
+    override val participantsCount: StateFlow<Int> = MutableStateFlow(3)
+    override val mainSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
 
     // Session related methods
-    override fun connect(): Flow<SessionEvent> = flowOf()
+    override fun connect(context: Context): Flow<SessionEvent> = flowOf()
     override fun enableCaptions(enable: Boolean) { /* empty on purpose */ }
     override fun pauseSession() { /* empty on purpose */ }
     override fun resumeSession() { /* empty on purpose */ }
     override fun endSession() { /* empty on purpose */ }
 
     // Publisher related methods
-    override fun observeLocalAudioLevel(): Flow<Float> = flowOf()
+    override fun observeLocalAudioLevel(): StateFlow<Float> = MutableStateFlow(0F)
     override fun toggleLocalVideo() { /* empty on purpose */ }
     override fun toggleLocalCamera() { /* empty on purpose */ }
     override fun toggleLocalAudio() { /* empty on purpose */ }

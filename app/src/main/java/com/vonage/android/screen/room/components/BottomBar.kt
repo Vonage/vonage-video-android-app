@@ -10,13 +10,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.AutoAwesomeMosaic
 import androidx.compose.material.icons.filled.CallEnd
+import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.VideocamOff
+import androidx.compose.material.icons.filled.Window
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Surface
@@ -24,12 +27,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.ControlButton
 import com.vonage.android.screen.room.MeetingRoomActions
@@ -40,16 +45,18 @@ import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_EN
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_MIC_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BADGE
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BUTTON
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 data class BottomBarState(
     val onToggleParticipants: () -> Unit,
     val onShowChat: () -> Unit,
     val onToggleMoreActions: () -> Unit,
-    val isMicEnabled: Boolean,
-    val isCameraEnabled: Boolean,
+    val isMicEnabled: MutableStateFlow<Boolean>,
+    val isCameraEnabled: MutableStateFlow<Boolean>,
     val isChatShow: Boolean,
-    val participantsCount: Int,
+    val participantsCount: StateFlow<Int>,
     val unreadCount: Int,
 )
 
@@ -60,6 +67,10 @@ fun BottomBar(
     bottomBarState: BottomBarState,
     modifier: Modifier = Modifier
 ) {
+    val isMicEnabled by bottomBarState.isMicEnabled.collectAsStateWithLifecycle()
+    val isCameraEnabled by bottomBarState.isCameraEnabled.collectAsStateWithLifecycle()
+    val participantsCount by bottomBarState.participantsCount.collectAsStateWithLifecycle()
+
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -76,20 +87,20 @@ fun BottomBar(
                 modifier = Modifier
                     .testTag(BOTTOM_BAR_MIC_BUTTON),
                 onClick = actions.onToggleMic,
-                icon = if (bottomBarState.isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
-                isActive = bottomBarState.isMicEnabled,
+                icon = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
+                isActive = isMicEnabled,
             )
 
             ControlButton(
                 modifier = Modifier
                     .testTag(BOTTOM_BAR_CAMERA_BUTTON),
                 onClick = actions.onToggleCamera,
-                icon = if (bottomBarState.isCameraEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
-                isActive = bottomBarState.isCameraEnabled,
+                icon = if (isCameraEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
+                isActive = isCameraEnabled,
             )
 
             ParticipantsBadgeButton(
-                participantsCount = bottomBarState.participantsCount,
+                participantsCount = participantsCount,
                 onToggleParticipants = bottomBarState.onToggleParticipants,
             )
 
@@ -97,6 +108,14 @@ fun BottomBar(
                 unreadCount = bottomBarState.unreadCount,
                 onShowChat = bottomBarState.onShowChat,
                 isChatShow = bottomBarState.isChatShow,
+            )
+
+            ControlButton(
+                modifier = Modifier,
+                onClick = {},
+                icon = Icons.Default.AutoAwesomeMosaic,
+//                icon = Icons.Default.Window,
+                isActive = false,
             )
 
             ControlButton(
@@ -208,10 +227,10 @@ internal fun BottomBarPreview() {
                 onToggleParticipants = {},
                 onShowChat = {},
                 onToggleMoreActions = {},
-                isMicEnabled = false,
-                isCameraEnabled = true,
+                isMicEnabled = MutableStateFlow(false),
+                isCameraEnabled = MutableStateFlow(true),
                 isChatShow = false,
-                participantsCount = 25,
+                participantsCount = MutableStateFlow(25),
                 unreadCount = 10,
             ),
         )

@@ -30,12 +30,11 @@ import com.vonage.android.util.preview.buildCallWithParticipants
 fun PipMeetingRoomScreen(
     uiState: MeetingRoomUiState,
     actions: MeetingRoomActions,
-    audioLevel: Float,
     modifier: Modifier = Modifier,
 ) {
     when {
         (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
-            val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
+            val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle(emptyList())
             val signalState by uiState.call.signalStateFlow.collectAsStateWithLifecycle(null)
             val chatState = signalState?.signals[SignalType.CHAT.signal] as? ChatState
             val participant = participants.last() // replace to active speaker when logic available
@@ -45,11 +44,11 @@ fun PipMeetingRoomScreen(
                     .fillMaxWidth()
             ) {
                 ParticipantVideoCard(
+                    call = uiState.call,
                     name = participant.name,
                     isCameraEnabled = participant.isCameraEnabled,
                     isMicEnabled = participant.isMicEnabled,
                     view = participant.view,
-                    audioLevel = audioLevel,
                     isSpeaking = participant.isSpeaking,
                     isShowVolumeIndicator = participant is VeraPublisher,
                     videoSource = participant.videoSource,
@@ -95,7 +94,6 @@ internal fun PipMeetingRoomScreenSessionPreview() {
                 call = buildCallWithParticipants(1),
             ),
             actions = MeetingRoomActions(),
-            audioLevel = 0.5f,
         )
     }
 }

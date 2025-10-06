@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,15 +23,18 @@ import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.VideocamOff
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.audio.ui.AudioVolumeIndicator
 import com.vonage.android.compose.components.VideoRenderer
 import com.vonage.android.compose.modifier.conditional
@@ -46,13 +50,14 @@ import com.vonage.android.screen.waiting.WaitingRoomTestTags.MIC_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_INITIALS_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.VOLUME_INDICATOR_TAG
 import com.vonage.android.util.buildTestTag
+import kotlinx.coroutines.flow.StateFlow
 
 @Suppress("LongParameterList")
 @Composable
 fun VideoPreviewContainer(
     view: View?,
     name: String,
-    audioLevels: Float,
+    audioLevels: StateFlow<Float>,
     actions: WaitingRoomActions,
     blurLevel: BlurLevel,
     isMicEnabled: Boolean,
@@ -88,7 +93,7 @@ fun VideoPreviewContainer(
             isMicEnabled = isMicEnabled,
             blurLevel = blurLevel,
             isCameraEnabled = isCameraEnabled,
-            audioLevel = audioLevels,
+            audioLevelState = audioLevels,
         )
     }
 }
@@ -96,7 +101,7 @@ fun VideoPreviewContainer(
 @Suppress("LongParameterList")
 @Composable
 fun VideoControlPanel(
-    audioLevel: Float,
+    audioLevelState: StateFlow<Float>,
     onMicToggle: () -> Unit,
     onCameraToggle: () -> Unit,
     onCameraBlur: () -> Unit,
@@ -112,15 +117,10 @@ fun VideoControlPanel(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (isMicEnabled) {
-            AudioVolumeIndicator(
-                modifier = Modifier
-                    .testTag(VOLUME_INDICATOR_TAG),
-                audioLevel = audioLevel,
-            )
-        } else {
-            Spacer(modifier = Modifier.size(32.dp))
-        }
+        MicVolumeIndicator(
+            isMicEnabled,
+            audioLevelState,
+        )
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -167,6 +167,24 @@ fun VideoControlPanel(
 }
 
 @Composable
+private fun MicVolumeIndicator(
+    isMicEnabled: Boolean,
+    audioLevelState: StateFlow<Float>,
+) {
+    val audioLevel by audioLevelState.collectAsStateWithLifecycle()
+    if (isMicEnabled) {
+        AudioVolumeIndicator(
+            modifier = Modifier
+                .shadow(elevation = 2.dp, shape = CircleShape)
+                .testTag(VOLUME_INDICATOR_TAG),
+            audioLevel = audioLevel,
+        )
+    } else {
+        Spacer(modifier = Modifier.size(32.dp))
+    }
+}
+
+@Composable
 fun rememberBlurIcon(level: BlurLevel): ImageVector = remember(level) {
     when (level) {
         BlurLevel.HIGH -> Icons.Default.BlurOn
@@ -175,18 +193,18 @@ fun rememberBlurIcon(level: BlurLevel): ImageVector = remember(level) {
     }
 }
 
-@PreviewLightDark
-@Composable
-internal fun VideoPreviewContainerPreview() {
-    VonageVideoTheme {
-        VideoPreviewContainer(
-            actions = WaitingRoomActions(),
-            view = previewCamera(),
-            name = "John Doe",
-            blurLevel = BlurLevel.LOW,
-            isMicEnabled = true,
-            isCameraEnabled = true,
-            audioLevels = 0.6f,
-        )
-    }
-}
+//@PreviewLightDark
+//@Composable
+//internal fun VideoPreviewContainerPreview() {
+//    VonageVideoTheme {
+//        VideoPreviewContainer(
+//            actions = WaitingRoomActions(),
+//            view = previewCamera(),
+//            name = "John Doe",
+//            blurLevel = BlurLevel.LOW,
+//            isMicEnabled = true,
+//            isCameraEnabled = true,
+//            audioLevels = 0.6f,
+//        )
+//    }
+//}

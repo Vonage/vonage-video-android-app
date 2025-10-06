@@ -1,7 +1,9 @@
 package com.vonage.android.screen.room
 
+import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjection
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.ArchiveRepository
@@ -13,10 +15,10 @@ import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.SignalState
+import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import com.vonage.android.screensharing.ScreenSharingServiceListener
 import com.vonage.android.screensharing.VeraScreenSharingManager
 import com.vonage.android.service.VeraForegroundServiceHandler
-import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -29,8 +31,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -49,6 +49,8 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private val foregroundServiceHandler: VeraForegroundServiceHandler,
 ) : ViewModel() {
 
+    private lateinit var context: Context
+
     private val initialUiState = MeetingRoomUiState(
         roomName = roomName,
         isLoading = true,
@@ -61,25 +63,17 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         initialValue = initialUiState,
     )
 
-    private val _audioLevel = MutableStateFlow(0F)
-    val audioLevel: StateFlow<Float> = _audioLevel.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
-        initialValue = 0F,
-    )
-
     private var call: CallFacade? = null
     private var currentArchiveId: String? = null
     private var currentCaptionsId: String? = null
 
     init {
-        setup()
-
         foregroundServiceHandler
             .startForegroundService(roomName)
     }
 
-    fun setup() {
+    fun setup(context: Context) {
+        this.context = context
         viewModelScope.launch {
             _uiState.update { uiState -> uiState.copy(isLoading = true) }
             sessionRepository.getSession(roomName)
@@ -134,15 +128,15 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
     @OptIn(FlowPreview::class)
     private fun connect(sessionInfo: SessionInfo) {
-        videoClient.buildPublisher()
-        call = videoClient.initializeSession(
-            apiKey = sessionInfo.apiKey,
-            sessionId = sessionInfo.sessionId,
-            token = sessionInfo.token,
-        )
         viewModelScope.launch {
+            videoClient.buildPublisher(context)
+            call = videoClient.initializeSession(
+                apiKey = sessionInfo.apiKey,
+                sessionId = sessionInfo.sessionId,
+                token = sessionInfo.token,
+            )
             call?.let {
-                it.connect()
+                it.connect(context)
                     .onEach { sessionEvent ->
                         when (sessionEvent) {
                             is SessionEvent.Disconnected -> {
@@ -153,14 +147,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                         }
                     }
                     .collect()
-            }
-        }
-        viewModelScope.launch {
-            call?.let {
-                it.observeLocalAudioLevel()
-                    .distinctUntilChanged()
-                    .debounce(PUBLISHER_AUDIO_LEVEL_DEBOUNCE_MS)
-                    .onEach { audioLevel -> _audioLevel.value = audioLevel }.collect()
             }
         }
     }
@@ -294,15 +280,15 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
     private companion object {
         const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
-        const val PUBLISHER_AUDIO_LEVEL_DEBOUNCE_MS = 36L
     }
 }
 
 @AssistedFactory
-interface MeetingRoomViewModelFactory {
+fun interface MeetingRoomViewModelFactory {
     fun create(roomName: String): MeetingRoomScreenViewModel
 }
 
+@Immutable
 data class MeetingRoomUiState(
     val roomName: String,
     val recordingState: RecordingState = RecordingState.IDLE,
@@ -336,17 +322,22 @@ enum class ScreenSharingState {
 }
 
 @Suppress("EmptyFunctionBlock")
-private val noOpCallFacade = object : CallFacade {
+val noOpCallFacade = object : CallFacade {
+    override fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>) {}
+
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = MutableStateFlow(persistentListOf())
+    override val participantsCount: StateFlow<Int> = MutableStateFlow(1)
+    override val mainSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
     override val signalStateFlow: StateFlow<SignalState?> = MutableStateFlow(null)
     override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
 
-    override fun connect(): Flow<SessionEvent> = flowOf()
+    override fun connect(context: Context): Flow<SessionEvent> = flowOf()
     override fun enableCaptions(enable: Boolean) { /* empty on purpose */ }
     override fun pauseSession() { /* empty on purpose */ }
     override fun resumeSession() { /* empty on purpose */ }
     override fun endSession() { /* empty on purpose */ }
-    override fun observeLocalAudioLevel(): Flow<Float> = flowOf()
+
+    override fun observeLocalAudioLevel(): StateFlow<Float> = MutableStateFlow(0F)
     override fun toggleLocalVideo() { /* empty on purpose */ }
     override fun toggleLocalCamera() { /* empty on purpose */ }
     override fun toggleLocalAudio() { /* empty on purpose */ }

@@ -18,22 +18,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import com.vonage.android.audio.ui.AudioDevices
 import com.vonage.android.audio.ui.AudioDevicesEffect
-import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.screen.components.TopBanner
 import com.vonage.android.screen.waiting.components.WaitingRoomBody
+import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WaitingRoomScreen(
     uiState: WaitingRoomUiState,
     actions: WaitingRoomActions,
-    audioLevel: Float,
+    audioLevel: StateFlow<Float>,
     modifier: Modifier = Modifier,
     navigateToRoom: (String) -> Unit = {},
 ) {
@@ -88,42 +85,42 @@ fun WaitingRoomScreen(
     }
 }
 
-@PreviewLightDark
-@PreviewScreenSizes
-@Composable
-internal fun WaitingRoomScreenPreview() {
-    VonageVideoTheme {
-        WaitingRoomScreen(
-            uiState = WaitingRoomUiState(
-                roomName = "test-room-name",
-                userName = "User Name",
-                isMicEnabled = true,
-                isCameraEnabled = false,
-                blurLevel = BlurLevel.NONE,
-                view = previewCamera(),
-            ),
-            audioLevel = 0.6f,
-            actions = WaitingRoomActions(),
-        )
-    }
-}
-
-@PreviewLightDark
-@PreviewScreenSizes
-@Composable
-internal fun WaitingRoomScreenWithVideoPreview() {
-    VonageVideoTheme {
-        WaitingRoomScreen(
-            uiState = WaitingRoomUiState(
-                roomName = "test-room-name",
-                userName = "John Doe",
-                isMicEnabled = false,
-                isCameraEnabled = true,
-                blurLevel = BlurLevel.NONE,
-                view = previewCamera(),
-            ),
-            audioLevel = 0.6f,
-            actions = WaitingRoomActions(),
-        )
-    }
-}
+//@PreviewLightDark
+//@PreviewScreenSizes
+//@Composable
+//internal fun WaitingRoomScreenPreview() {
+//    VonageVideoTheme {
+//        WaitingRoomScreen(
+//            uiState = WaitingRoomUiState(
+//                roomName = "test-room-name",
+//                userName = "User Name",
+//                isMicEnabled = true,
+//                isCameraEnabled = false,
+//                blurLevel = BlurLevel.NONE,
+//                view = previewCamera(),
+//            ),
+//            audioLevel = 0.6f,
+//            actions = WaitingRoomActions(),
+//        )
+//    }
+//}
+//
+//@PreviewLightDark
+//@PreviewScreenSizes
+//@Composable
+//internal fun WaitingRoomScreenWithVideoPreview() {
+//    VonageVideoTheme {
+//        WaitingRoomScreen(
+//            uiState = WaitingRoomUiState(
+//                roomName = "test-room-name",
+//                userName = "John Doe",
+//                isMicEnabled = false,
+//                isCameraEnabled = true,
+//                blurLevel = BlurLevel.NONE,
+//                view = previewCamera(),
+//            ),
+//            audioLevel = 0.6f,
+//            actions = WaitingRoomActions(),
+//        )
+//    }
+//}
