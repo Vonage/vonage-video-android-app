@@ -17,6 +17,7 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.compose.preview.previewCamera
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -57,7 +58,7 @@ class WaitingRoomScreenTest {
                         blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
-                    audioLevel = 0.5f,
+                    audioLevel = MutableStateFlow(0.5f),
                 )
             }
         }
@@ -93,7 +94,7 @@ class WaitingRoomScreenTest {
                         blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
-                    audioLevel = 0.5f,
+                    audioLevel = MutableStateFlow(0.5f),
                 )
             }
         }
@@ -129,7 +130,7 @@ class WaitingRoomScreenTest {
                         blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
-                    audioLevel = 0.5f,
+                    audioLevel = MutableStateFlow(0.5f),
                 )
             }
         }
@@ -153,7 +154,7 @@ class WaitingRoomScreenTest {
                         blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
-                    audioLevel = 0.5f,
+                    audioLevel = MutableStateFlow(0.5f),
                 )
             }
         }
@@ -177,7 +178,7 @@ class WaitingRoomScreenTest {
                         blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
-                    audioLevel = 0.5f,
+                    audioLevel = MutableStateFlow(0.5f),
                 )
             }
         }
@@ -209,7 +210,7 @@ class WaitingRoomScreenTest {
                         blurLevel = BlurLevel.NONE,
                     ),
                     actions = WaitingRoomActions(),
-                    audioLevel = 0.5f,
+                    audioLevel = MutableStateFlow(0.5f),
                 )
             }
         }
