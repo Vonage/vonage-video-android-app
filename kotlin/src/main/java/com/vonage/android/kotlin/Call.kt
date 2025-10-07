@@ -419,8 +419,8 @@ class Call internal constructor(
     }
 
     private fun removeSubscriber(stream: Stream) {
+        val subscriber = subscriberStreams[stream.streamId] ?: return
         coroutineScope.launch {
-            val subscriber = subscriberStreams[stream.streamId] ?: return@launch
             actualActiveSpeakerTracker.onSubscriberDestroyed(stream.streamId)
             subscriber.setVideoListener(null)
             subscriber.setStreamListener(null)
