@@ -16,6 +16,7 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.reporting.ReportIssueScreen
+import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.RecordingState
@@ -53,8 +54,8 @@ fun MeetingRoomContent(
     onDismissAudioDeviceSelector: () -> Unit,
     onDismissMoreActions: () -> Unit,
     onEmojiClick: (String) -> Unit,
+    layoutType: CallLayoutType,
     modifier: Modifier = Modifier,
-    layoutType: CallLayoutType = CallLayoutType.SPEAKER_LAYOUT,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -140,11 +141,6 @@ fun MeetingRoomContent(
     }
 }
 
-enum class CallLayoutType {
-    GRID,
-    SPEAKER_LAYOUT
-}
-
 object MeetingRoomContentTestTags {
     const val MEETING_ROOM_PARTICIPANTS_GRID = "meeting_room_participants_grid"
     const val MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT = "meeting_room_participants_speaker_layout"
@@ -177,6 +173,7 @@ internal fun MeetingRoomContentPreview() {
             onShowReporting = {},
             onEmojiClick = {},
             onDismissReporting = {},
+            layoutType = CallLayoutType.GRID,
         )
     }
 }

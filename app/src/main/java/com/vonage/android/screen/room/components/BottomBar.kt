@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.VideocamOff
+import androidx.compose.material.icons.filled.Window
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Surface
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.ControlButton
+import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CAMERA_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CHAT_BADGE
@@ -56,6 +58,7 @@ data class BottomBarState(
     val isChatShow: Boolean,
     val participantsCount: StateFlow<Int>,
     val unreadCount: Int,
+    val layoutType: CallLayoutType,
 )
 
 @Suppress("LongParameterList")
@@ -108,13 +111,25 @@ fun BottomBar(
                 isChatShow = bottomBarState.isChatShow,
             )
 
-            ControlButton(
-                modifier = Modifier,
-                onClick = {},
-                icon = Icons.Default.AutoAwesomeMosaic,
-//                icon = Icons.Default.Window,
-                isActive = false,
-            )
+            when (bottomBarState.layoutType) {
+                CallLayoutType.GRID -> {
+                    ControlButton(
+                        modifier = Modifier,
+                        onClick = { actions.onChangeLayout(CallLayoutType.SPEAKER_LAYOUT)},
+                        icon = Icons.Default.AutoAwesomeMosaic,
+                        isActive = false,
+                    )
+                }
+
+                CallLayoutType.SPEAKER_LAYOUT -> {
+                    ControlButton(
+                        modifier = Modifier,
+                        onClick = { actions.onChangeLayout(CallLayoutType.GRID)},
+                        icon = Icons.Default.Window,
+                        isActive = false,
+                    )
+                }
+            }
 
             ControlButton(
                 modifier = Modifier,
@@ -230,6 +245,7 @@ internal fun BottomBarPreview() {
                 isChatShow = false,
                 participantsCount = MutableStateFlow(25),
                 unreadCount = 10,
+                layoutType = CallLayoutType.SPEAKER_LAYOUT,
             ),
         )
     }

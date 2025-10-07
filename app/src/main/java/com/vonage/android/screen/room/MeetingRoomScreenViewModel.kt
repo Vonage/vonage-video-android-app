@@ -281,9 +281,12 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         screenSharingManager.stopSharingScreen()
     }
 
+    fun changeLayout(layoutType: CallLayoutType) {
+        _uiState.update { uiState -> uiState.copy(layoutType = layoutType) }
+    }
+
     override fun onCleared() {
         super.onCleared()
-        // Clean up the activity context when ViewModel is destroyed
         activityContextProvider.clearActivityContext()
     }
 
@@ -307,7 +310,13 @@ data class MeetingRoomUiState(
     val isLoading: Boolean = false,
     val isError: Boolean = false,
     val isEndCall: Boolean = false,
+    val layoutType: CallLayoutType = CallLayoutType.GRID,
 )
+
+enum class CallLayoutType {
+    GRID,
+    SPEAKER_LAYOUT
+}
 
 enum class RecordingState {
     IDLE,

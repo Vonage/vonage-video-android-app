@@ -118,6 +118,7 @@ fun MeetingRoomScreen(
                             isChatShow = isChatShow,
                             participantsCount = uiState.call.participantsCount,
                             unreadCount = chatState?.unreadCount ?: 0,
+                            layoutType = uiState.layoutType,
                         ),
                     )
                 }
@@ -169,6 +170,7 @@ fun MeetingRoomScreen(
                                     screenSharingState = uiState.screenSharingState,
                                     captionsState = uiState.captionsState,
                                     onEmojiClick = actions.onEmojiSent,
+                                    layoutType = uiState.layoutType,
                                 )
                             }
                         }

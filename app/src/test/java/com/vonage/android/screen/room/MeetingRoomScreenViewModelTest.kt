@@ -54,7 +54,6 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
     @BeforeEach
     fun setUp() {
         setMainDispatcherToTestDispatcher()
-        // Set up the mock to return the context when requested
         every { activityContextProvider.requireActivityContext() } returns context
     }
 
@@ -82,9 +81,6 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
                 ), awaitItem()
             )
         }
-
-        // Allow some time for the coroutine to complete the connect call
-        testScheduler.advanceUntilIdle()
 
         verify { activityContextProvider.setActivityContext(context) }
         verify { mockCall.connect(context) }
@@ -666,6 +662,27 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
                     call = mockCall,
                     isEndCall = true
                 ), awaitItem()
+            )
+        }
+    }
+
+    @Test
+    fun `given viewmodel when change layout then update state`() = runTest {
+        givenMockCall()
+
+        val sut = sut()
+        sut.setup(context)
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            awaitItem()
+            sut.changeLayout(CallLayoutType.SPEAKER_LAYOUT)
+            assertEquals(
+                CallLayoutType.SPEAKER_LAYOUT, awaitItem().layoutType
+            )
+            sut.changeLayout(CallLayoutType.GRID)
+            assertEquals(
+                CallLayoutType.GRID, awaitItem().layoutType
             )
         }
     }

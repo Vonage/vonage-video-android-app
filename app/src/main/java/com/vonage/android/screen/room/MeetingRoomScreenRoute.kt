@@ -109,6 +109,9 @@ fun MeetingRoomScreenRoute(
                 } else {
                     viewModel.stopScreenSharing()
                 }
+            },
+            onChangeLayout = { layoutType ->
+                viewModel.changeLayout(layoutType)
             }
         )
     }
@@ -156,4 +159,5 @@ data class MeetingRoomActions(
     val onToggleCaptions: (Boolean) -> Unit = {},
     val onToggleScreenSharing: (Boolean) -> Unit = {},
     val onShowFeedbackScreen: () -> Unit = {},
+    val onChangeLayout: (CallLayoutType) -> Unit = {},
 )
