@@ -1,5 +1,6 @@
 package com.vonage.android.compose.util
 
+import android.graphics.SurfaceTexture
 import android.util.Log
 import android.view.TextureView
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.lifecycle.LifecycleOwner
 /**
  * Utility class to safely manage video view lifecycle and prevent surface crashes
  */
+@Suppress("TooGenericExceptionCaught")
 object VideoViewLifecycleManager {
     
     /**
@@ -40,13 +42,17 @@ object VideoViewLifecycleManager {
                 if (!videoView.isAvailable) {
                     // Surface not ready, defer attachment
                     videoView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-                        override fun onSurfaceTextureAvailable(surface: android.graphics.SurfaceTexture, width: Int, height: Int) {
+                        override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
                             // Surface is now ready for rendering
                         }
                         
-                        override fun onSurfaceTextureSizeChanged(surface: android.graphics.SurfaceTexture, width: Int, height: Int) {}
-                        override fun onSurfaceTextureDestroyed(surface: android.graphics.SurfaceTexture): Boolean = false
-                        override fun onSurfaceTextureUpdated(surface: android.graphics.SurfaceTexture) {}
+                        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
+                            // empty
+                        }
+                        override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = false
+                        override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
+                            // empty
+                        }
                     }
                 }
             }

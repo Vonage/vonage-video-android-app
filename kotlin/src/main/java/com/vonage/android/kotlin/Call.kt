@@ -105,7 +105,8 @@ class Call internal constructor(
         activeSpeakerTracker.setActiveSpeakerListener(object : ActiveSpeakerListener {
             override fun onActiveSpeakerChanged(payload: ActiveSpeakerChangedPayload) {
                 coroutineScope.launch {
-                    Log.d("activeSpeakerTracker", "active speaker = ${payload.newActiveSpeaker.streamId} (${Thread.currentThread()})")
+                    Log.d("activeSpeakerTracker",
+                        "active speaker = ${payload.newActiveSpeaker.streamId} (${Thread.currentThread()})")
                     subscriberStreams[payload.newActiveSpeaker.streamId]?.subscribeToVideo = true
                     _mainSpeaker.value = participantStreams[payload.newActiveSpeaker.streamId]
                 }
@@ -130,7 +131,8 @@ class Call internal constructor(
             }
 
             override fun onStreamReceived(session: Session, stream: Stream) {
-                Log.d("onStreamReceived", "Stream received ${stream.name}-${stream.streamId} - ${Thread.currentThread()}")
+                Log.d("onStreamReceived",
+                    "Stream received ${stream.name}-${stream.streamId} - ${Thread.currentThread()}")
                 addSubscriber(stream)
                 trySend(SessionEvent.StreamReceived(stream.streamId))
             }
@@ -267,7 +269,7 @@ class Call internal constructor(
             publisherHolder.publisher.observeAudioLevel()
                 .filter { publisherHolder.participant.isMicEnabled.value }
                 .distinctUntilChanged()
-                .debounce(60L)
+                .debounce(PUBLISHER_AUDIO_LEVEL_DEBOUNCE)
                 .collect { audioLevel ->
                     _localAudioStateFlow.value = audioLevel
                 }
@@ -310,7 +312,7 @@ class Call internal constructor(
         val subscriber = Subscriber.Builder(context, stream).build()
         session.subscribe(subscriber)
 
-        val talkingTracker = SubscriberTalkingTracker(subscriber)
+        val talkingTracker = SubscriberTalkingTracker()
         talkingTracker.setTalkingStateListener(object : TalkingStateListener {
             override fun onTalkingStateChanged(isTalking: Boolean) {
                 coroutineScope.launch {
@@ -401,7 +403,7 @@ class Call internal constructor(
         coroutineScope.launch {
             subscriber.observeAudioLevel()
                 .distinctUntilChanged()
-                .throttleFirst(500)
+                .throttleFirst(SUBSCRIBER_AUDIO_LEVEL_DEBOUNCE)
                 .onEach { audioLevel ->
                     activeSpeakerTracker.onSubscriberAudioLevelUpdated(subscriber.stream.streamId, audioLevel)
                     talkingTracker.onAudioLevelUpdated(audioLevel)
@@ -441,5 +443,7 @@ class Call internal constructor(
         const val TAG: String = "Call"
         const val PUBLISHER_ID: String = "publisher"
         const val PUBLISHER_SCREEN_ID: String = "publisher-screen"
+        private const val PUBLISHER_AUDIO_LEVEL_DEBOUNCE = 60L
+        private const val SUBSCRIBER_AUDIO_LEVEL_DEBOUNCE = 500L
     }
 }

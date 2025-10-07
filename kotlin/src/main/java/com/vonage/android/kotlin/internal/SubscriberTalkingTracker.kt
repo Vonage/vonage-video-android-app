@@ -1,19 +1,10 @@
 package com.vonage.android.kotlin.internal
 
-import com.opentok.android.Subscriber
-
-private const val SPEAKING_TIME_THRESHOLD = 100L
-private const val NOT_SPEAKING_TIME_THRESHOLD = 800L
-private const val SPEAKING_VOLUME = 0.1
-
 interface TalkingStateListener {
     fun onTalkingStateChanged(isTalking: Boolean)
 }
 
-class SubscriberTalkingTracker(
-    subscriber: Subscriber?,
-    private val isActiveSpeaker: Boolean = false
-) {
+class SubscriberTalkingTracker {
 
     private var isTalking = false
     private var timestamp = System.currentTimeMillis()
@@ -43,5 +34,11 @@ class SubscriberTalkingTracker(
             isTalking = false
             listener?.onTalkingStateChanged(false)
         }
+    }
+
+    private companion object {
+        const val SPEAKING_TIME_THRESHOLD = 100L
+        const val NOT_SPEAKING_TIME_THRESHOLD = 800L
+        const val SPEAKING_VOLUME = 0.1
     }
 }

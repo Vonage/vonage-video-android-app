@@ -128,6 +128,7 @@ class VonageVideoClient(
         )
     }
 
+    @Suppress("MagicNumber")
     private fun getOptimalResolution(): Publisher.CameraCaptureResolution {
         val memoryClass = (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).memoryClass
         return when {

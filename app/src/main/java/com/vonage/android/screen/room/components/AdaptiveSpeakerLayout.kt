@@ -2,7 +2,6 @@ package com.vonage.android.screen.room.components
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -28,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
@@ -90,7 +87,7 @@ fun AdaptiveSpeakerLayout(
                 LazyColumn(
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
-                        .width(maxWidth / 4)
+                        .width(maxWidth / COLUMN_WIDTH_FACTOR)
                 ) {
                     items(
                         items = visibleItems,
@@ -100,7 +97,7 @@ fun AdaptiveSpeakerLayout(
                         ParticipantVideoCard(
                             modifier = Modifier
                                 .height(minItemWidth)
-                                .aspectRatio(16f / 9f)
+                                .aspectRatio(ASPECT_RATIO_16_9)
                                 .padding(8.dp),
                             name = participant.name,
                             isCameraEnabled = participant.isCameraEnabled,
@@ -124,7 +121,7 @@ fun AdaptiveSpeakerLayout(
                         ParticipantVideoCard(
                             modifier = Modifier
                                 .width(maxWidth / 2)
-                                .aspectRatio(16f / 9f)
+                                .aspectRatio(ASPECT_RATIO_16_9)
                                 .padding(8.dp),
                             name = participant.name,
                             isCameraEnabled = participant.isCameraEnabled,
@@ -145,14 +142,15 @@ fun AdaptiveSpeakerLayout(
 @Composable
 fun BoxScope.SpotlightSpeaker(
     call: CallFacade,
+    modifier: Modifier = Modifier,
 ) {
     val mainParticipant by call.mainSpeaker.collectAsStateWithLifecycle()
 
     mainParticipant?.let { participant ->
         ParticipantVideoCard(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxHeight()
-                .aspectRatio(16f / 9f)
+                .aspectRatio(ASPECT_RATIO_16_9)
                 .padding(8.dp)
                 .align(Alignment.Center),
             name = participant.name,
@@ -191,6 +189,9 @@ internal fun <T : ScrollableState> lazyStateWithVisibilityNotification(call: Cal
     }
     return lazyState
 }
+
+private const val ASPECT_RATIO_16_9 = 16f / 9f
+private const val COLUMN_WIDTH_FACTOR = 4
 
 @PreviewLightDark
 @PreviewScreenSizes

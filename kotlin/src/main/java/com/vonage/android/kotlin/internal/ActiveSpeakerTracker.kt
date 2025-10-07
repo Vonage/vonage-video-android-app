@@ -2,7 +2,6 @@ package com.vonage.android.kotlin.internal
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 
 typealias SubscriberAudioLevels = MutableMap<String, Float>
 
@@ -54,14 +53,14 @@ class ActiveSpeakerTracker(
         calculatePending = true
         if (calculateActiveSpeakerRunnable == null) {
             calculateActiveSpeakerRunnable = Runnable {
-                _calculateActiveSpeaker()
+                internalCalculateActiveSpeaker()
                 calculatePending = false
             }
         }
         handler.postDelayed(calculateActiveSpeakerRunnable!!, throttleTimeMs)
     }
 
-    private fun _calculateActiveSpeaker() {
+    private fun internalCalculateActiveSpeaker() {
         var maxMovingAvg = 0F
         var maxSubscriberId: String? = null
         for ((subscriberId, movingAvg) in subscriberAudioLevelsBySubscriberId) {
@@ -71,13 +70,17 @@ class ActiveSpeakerTracker(
             }
         }
         val newActiveSpeaker = ActiveSpeakerInfo(maxSubscriberId, maxMovingAvg)
-        Log.d("YYY2", "newActiveSpeaker = ${newActiveSpeaker.streamId}")
-        if (newActiveSpeaker.streamId != activeSpeaker.streamId && newActiveSpeaker.movingAvg > 0.2) {
+        if (newActiveSpeaker.streamId != activeSpeaker.streamId
+            && newActiveSpeaker.movingAvg > ACTIVE_SPEAKER_AUDIO_LEVEL_THRESHOLD) {
             val previousActiveSpeaker = activeSpeaker.copy()
             activeSpeaker = newActiveSpeaker
             listener?.onActiveSpeakerChanged(
                 ActiveSpeakerChangedPayload(previousActiveSpeaker, newActiveSpeaker)
             )
         }
+    }
+
+    private companion object {
+        const val ACTIVE_SPEAKER_AUDIO_LEVEL_THRESHOLD = 0.2
     }
 }

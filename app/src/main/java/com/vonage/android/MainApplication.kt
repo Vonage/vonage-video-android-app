@@ -17,7 +17,7 @@ class MainApplication : Application() {
     }
 
     private fun enableStrictMode() {
-        TrafficStats.setThreadStatsTag(10000)
+        TrafficStats.setThreadStatsTag(APP_THREAD_TAG)
         StrictMode.setThreadPolicy(
             StrictMode.ThreadPolicy.Builder()
                 .detectAll()
@@ -29,5 +29,9 @@ class MainApplication : Application() {
                 .detectAll()
                 .build()
         )
+    }
+
+    private companion object {
+        const val APP_THREAD_TAG = 10000
     }
 }

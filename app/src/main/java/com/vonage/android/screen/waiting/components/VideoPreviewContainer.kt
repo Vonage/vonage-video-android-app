@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -50,6 +49,7 @@ import com.vonage.android.screen.waiting.WaitingRoomTestTags.MIC_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_INITIALS_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.VOLUME_INDICATOR_TAG
 import com.vonage.android.util.buildTestTag
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Suppress("LongParameterList")
@@ -193,18 +193,18 @@ fun rememberBlurIcon(level: BlurLevel): ImageVector = remember(level) {
     }
 }
 
-//@PreviewLightDark
-//@Composable
-//internal fun VideoPreviewContainerPreview() {
-//    VonageVideoTheme {
-//        VideoPreviewContainer(
-//            actions = WaitingRoomActions(),
-//            view = previewCamera(),
-//            name = "John Doe",
-//            blurLevel = BlurLevel.LOW,
-//            isMicEnabled = true,
-//            isCameraEnabled = true,
-//            audioLevels = 0.6f,
-//        )
-//    }
-//}
+@PreviewLightDark
+@Composable
+internal fun VideoPreviewContainerPreview() {
+    VonageVideoTheme {
+        VideoPreviewContainer(
+            actions = WaitingRoomActions(),
+            view = previewCamera(),
+            name = "John Doe",
+            blurLevel = BlurLevel.LOW,
+            isMicEnabled = true,
+            isCameraEnabled = true,
+            audioLevels = MutableStateFlow(0.5F),
+        )
+    }
+}

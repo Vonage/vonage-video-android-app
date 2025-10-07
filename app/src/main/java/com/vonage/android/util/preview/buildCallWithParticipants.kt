@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.flowOf
 @Suppress("EmptyFunctionBlock")
 @Composable
 fun buildCallWithParticipants(
-    participantCount: Int,
+    participantCount: Int = 3,
     unreadCount: Int = 1,
     messagesCount: Int = 5,
 ): CallFacade = object : CallFacade {
@@ -28,7 +28,7 @@ fun buildCallWithParticipants(
     // Participants state
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> =
         MutableStateFlow(buildParticipants(participantCount).toImmutableList())
-    override val participantsCount: StateFlow<Int> = MutableStateFlow(3)
+    override val participantsCount: StateFlow<Int> = MutableStateFlow(participantCount)
     override val mainSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
 
     // Session related methods

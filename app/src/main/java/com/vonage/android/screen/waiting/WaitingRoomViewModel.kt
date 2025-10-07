@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.audio.util.MicVolumeListener
 import com.vonage.android.data.UserRepository
-import com.vonage.android.di.DefaultDispatcher
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.BlurLevel
@@ -17,10 +16,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.scopes.ActivityScoped
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

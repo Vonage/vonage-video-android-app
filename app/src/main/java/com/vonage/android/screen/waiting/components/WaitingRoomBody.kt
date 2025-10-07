@@ -19,6 +19,7 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.screen.components.DeviceSelectionPanel
 import com.vonage.android.screen.waiting.WaitingRoomActions
 import com.vonage.android.screen.waiting.WaitingRoomUiState
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
@@ -70,44 +71,44 @@ fun WaitingRoomBody(
     }
 }
 
-//@PreviewLightDark
-//@PreviewScreenSizes
-//@Composable
-//internal fun WaitingRoomBodyPreview() {
-//    VonageVideoTheme {
-//        WaitingRoomBody(
-//            uiState = WaitingRoomUiState(
-//                roomName = "test-room-name",
-//                userName = "User Name",
-//                isMicEnabled = true,
-//                isCameraEnabled = false,
-//                blurLevel = BlurLevel.NONE,
-//                view = previewCamera(),
-//            ),
-//            audioLevel = 0.5f,
-//            actions = WaitingRoomActions(),
-//            onMicDeviceSelect = {},
-//        )
-//    }
-//}
-//
-//@PreviewLightDark
-//@PreviewScreenSizes
-//@Composable
-//internal fun WaitingRoomBodyWithVideoPreview() {
-//    VonageVideoTheme {
-//        WaitingRoomBody(
-//            uiState = WaitingRoomUiState(
-//                roomName = "test-room-name",
-//                userName = "John Doe",
-//                isMicEnabled = false,
-//                isCameraEnabled = true,
-//                blurLevel = BlurLevel.NONE,
-//                view = previewCamera(),
-//            ),
-//            audioLevel = 0.5f,
-//            actions = WaitingRoomActions(),
-//            onMicDeviceSelect = {},
-//        )
-//    }
-//}
+@PreviewLightDark
+@PreviewScreenSizes
+@Composable
+internal fun WaitingRoomBodyPreview() {
+    VonageVideoTheme {
+        WaitingRoomBody(
+            uiState = WaitingRoomUiState(
+                roomName = "test-room-name",
+                userName = "User Name",
+                isMicEnabled = true,
+                isCameraEnabled = false,
+                blurLevel = BlurLevel.NONE,
+                view = previewCamera(),
+            ),
+            audioLevel = MutableStateFlow(0.5f),
+            actions = WaitingRoomActions(),
+            onMicDeviceSelect = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@PreviewScreenSizes
+@Composable
+internal fun WaitingRoomBodyWithVideoPreview() {
+    VonageVideoTheme {
+        WaitingRoomBody(
+            uiState = WaitingRoomUiState(
+                roomName = "test-room-name",
+                userName = "John Doe",
+                isMicEnabled = false,
+                isCameraEnabled = true,
+                blurLevel = BlurLevel.NONE,
+                view = previewCamera(),
+            ),
+            audioLevel = MutableStateFlow(0.5f),
+            actions = WaitingRoomActions(),
+            onMicDeviceSelect = {},
+        )
+    }
+}

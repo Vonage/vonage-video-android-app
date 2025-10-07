@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -18,36 +19,40 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.key
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.currentStateAsState
 import com.vonage.android.audio.ui.AudioVolumeIndicator
 import com.vonage.android.compose.components.VideoRenderer
+import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.screen.components.AvatarInitials
+import com.vonage.android.screen.room.noOpCallFacade
 import kotlinx.coroutines.flow.MutableStateFlow
-import androidx.lifecycle.compose.currentStateAsState
+import kotlinx.coroutines.flow.StateFlow
 
 @Suppress("LongParameterList")
 @Composable
 fun ParticipantVideoCard(
-    isCameraEnabled: MutableStateFlow<Boolean>,
+    isCameraEnabled: StateFlow<Boolean>,
     isShowVolumeIndicator: Boolean,
-    isMicEnabled: MutableStateFlow<Boolean>,
-    isSpeaking: MutableStateFlow<Boolean>,
+    isMicEnabled: StateFlow<Boolean>,
+    isSpeaking: StateFlow<Boolean>,
     videoSource: VideoSource,
     call: CallFacade,
     name: String,
@@ -83,7 +88,7 @@ fun ParticipantVideoCard(
 
 @Composable
 private fun ParticipantContainer(
-    isSpeaking: MutableStateFlow<Boolean>,
+    isSpeaking: StateFlow<Boolean>,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -100,13 +105,13 @@ private fun ParticipantContainer(
 
 @Composable
 private fun BoxScope.ParticipantVideoContainer(
-    isCameraEnabled: MutableStateFlow<Boolean>,
+    isCameraEnabled: StateFlow<Boolean>,
     name: String,
     view: View,
 ) {
     val isCameraEnabled by isCameraEnabled.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
-    
+
     // Monitor lifecycle to prevent surface issues
     DisposableEffect(view) {
         val observer = LifecycleEventObserver { _, event ->
@@ -114,22 +119,27 @@ private fun BoxScope.ParticipantVideoContainer(
                 Lifecycle.Event.ON_PAUSE -> {
                     // Video rendering will be paused in VideoRenderer
                 }
+
                 Lifecycle.Event.ON_DESTROY -> {
                     // Cleanup handled in VideoRenderer
                 }
-                else -> { /* no-op */ }
+
+                else -> { /* no-op */
+                }
             }
         }
-        
+
         lifecycleOwner.lifecycle.addObserver(observer)
-        
+
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
     key(view.hashCode(), isCameraEnabled) {
-        if (isCameraEnabled && lifecycleOwner.lifecycle.currentStateAsState().value.isAtLeast(Lifecycle.State.STARTED)) {
+        if (isCameraEnabled
+            && lifecycleOwner.lifecycle.currentStateAsState().value.isAtLeast(Lifecycle.State.STARTED)
+        ) {
             VideoRenderer(
                 modifier = Modifier
                     .fillMaxSize()
@@ -174,7 +184,7 @@ private fun BoxScope.ParticipantLabel(
 @Composable
 private fun BoxScope.MicrophoneIndicator(
     call: CallFacade,
-    isMicEnabled: MutableStateFlow<Boolean>,
+    isMicEnabled: StateFlow<Boolean>,
     isShowVolumeIndicator: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -210,36 +220,38 @@ private fun BoxScope.MicrophoneIndicator(
     }
 }
 
-//@PreviewLightDark
-//@Composable
-//internal fun ParticipantVideoCardPreview() {
-//    VonageVideoTheme {
-//        ParticipantVideoCard(
-//            modifier = Modifier.height(300.dp),
-//            name = "Sample Name",
-//            isCameraEnabled = true,
-//            isMicEnabled = true,
-//            isSpeaking = false,
-//            isShowVolumeIndicator = true,
-//            videoSource = VideoSource.CAMERA,
-//            view = previewCamera(),
-//        )
-//    }
-//}
-//
-//@PreviewLightDark
-//@Composable
-//internal fun ParticipantVideoCardPlaceholderPreview() {
-//    VonageVideoTheme {
-//        ParticipantVideoCard(
-//            modifier = Modifier.height(300.dp),
-//            name = "Sample Name Name Name Name Name Name Name Name Name Name",
-//            isCameraEnabled = false,
-//            isMicEnabled = true,
-//            isSpeaking = false,
-//            isShowVolumeIndicator = false,
-//            videoSource = VideoSource.SCREEN,
-//            view = previewCamera(),
-//        )
-//    }
-//}
+@PreviewLightDark
+@Composable
+internal fun ParticipantVideoCardPreview() {
+    VonageVideoTheme {
+        ParticipantVideoCard(
+            modifier = Modifier.height(300.dp),
+            call = noOpCallFacade,
+            name = "Sample Name",
+            isCameraEnabled = MutableStateFlow(true),
+            isMicEnabled = MutableStateFlow(true),
+            isSpeaking = MutableStateFlow(false),
+            isShowVolumeIndicator = true,
+            videoSource = VideoSource.CAMERA,
+            view = previewCamera(),
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun ParticipantVideoCardPlaceholderPreview() {
+    VonageVideoTheme {
+        ParticipantVideoCard(
+            modifier = Modifier.height(300.dp),
+            call = noOpCallFacade,
+            name = "Sample Name Name Name Name Name Name Name Name Name Name",
+            isCameraEnabled = MutableStateFlow(false),
+            isMicEnabled = MutableStateFlow(true),
+            isSpeaking = MutableStateFlow(false),
+            isShowVolumeIndicator = false,
+            videoSource = VideoSource.SCREEN,
+            view = previewCamera(),
+        )
+    }
+}
