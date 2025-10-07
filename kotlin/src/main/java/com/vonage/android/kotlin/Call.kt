@@ -17,8 +17,6 @@ import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.ext.throttleFirst
 import com.vonage.android.kotlin.ext.toggle
-import com.vonage.android.kotlin.internal.ActiveSpeakerChangedPayload
-import com.vonage.android.kotlin.internal.ActiveSpeakerListener
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
 import com.vonage.android.kotlin.internal.ScreenSharingCapturer
 import com.vonage.android.kotlin.internal.SubscriberTalkingTracker
@@ -54,6 +52,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -68,11 +67,12 @@ class Call internal constructor(
     private val session: Session,
     private val publisherHolder: VeraPublisherHolder,
     private val signalPlugins: ImmutableList<SignalPlugin>,
-    private val activeSpeakerTracker: ActiveSpeakerTracker = ActiveSpeakerTracker(),
+    activeSpeakerTracker: ActiveSpeakerTracker? = null,
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : CallFacade {
 
     private val coroutineScope = CoroutineScope(coroutineDispatcher)
+    private val actualActiveSpeakerTracker = activeSpeakerTracker ?: ActiveSpeakerTracker(coroutineScope = coroutineScope)
 
     private val _participantsStateFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
@@ -100,22 +100,16 @@ class Call internal constructor(
     private lateinit var context: Context
 
     init {
-        activeSpeakerTracker.setActiveSpeakerListener(object : ActiveSpeakerListener {
-            override fun onActiveSpeakerChanged(payload: ActiveSpeakerChangedPayload) {
-                coroutineScope.launch {
-                    Log.d(
-                        "activeSpeakerTracker",
-                        "active speaker = ${payload.newActiveSpeaker.streamId} (${Thread.currentThread()})"
-                    )
-                    subscriberStreams[payload.newActiveSpeaker.streamId]?.subscribeToVideo = true
-                    _mainSpeaker.value = participantStreams[payload.newActiveSpeaker.streamId]
-                }
+        actualActiveSpeakerTracker.activeSpeakerChanges
+            .onEach { payload ->
+                Log.d(
+                    "activeSpeakerTracker",
+                    "active speaker = ${payload.newActiveSpeaker.streamId} (${Thread.currentThread()})"
+                )
+                subscriberStreams[payload.newActiveSpeaker.streamId]?.subscribeToVideo = true
+                _mainSpeaker.value = participantStreams[payload.newActiveSpeaker.streamId]
             }
-
-            override fun onResetActiveSpeaker() {
-                _mainSpeaker.value = participantStreams[publisherHolder.publisher.stream.streamId]
-            }
-        })
+            .launchIn(coroutineScope)
     }
 
     override fun connect(context: Context): Flow<SessionEvent> = callbackFlow {
@@ -407,7 +401,7 @@ class Call internal constructor(
                 .distinctUntilChanged()
                 .throttleFirst(SUBSCRIBER_AUDIO_LEVEL_DEBOUNCE)
                 .onEach { audioLevel ->
-                    activeSpeakerTracker.onSubscriberAudioLevelUpdated(subscriber.stream.streamId, audioLevel)
+                    actualActiveSpeakerTracker.onSubscriberAudioLevelUpdated(subscriber.stream.streamId, audioLevel)
                     talkingTracker.onAudioLevelUpdated(audioLevel)
                 }
                 .collect()
@@ -427,7 +421,7 @@ class Call internal constructor(
     private fun removeSubscriber(stream: Stream) {
         coroutineScope.launch {
             val subscriber = subscriberStreams[stream.streamId] ?: return@launch
-            activeSpeakerTracker.onSubscriberDestroyed(stream.streamId)
+            actualActiveSpeakerTracker.onSubscriberDestroyed(stream.streamId)
             subscriber.setVideoListener(null)
             subscriber.setStreamListener(null)
             subscriber.setAudioLevelListener(null)

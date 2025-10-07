@@ -1,7 +1,15 @@
 package com.vonage.android.kotlin.internal
 
-import android.os.Handler
-import android.os.Looper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 typealias SubscriberAudioLevels = MutableMap<String, Float>
 
@@ -15,30 +23,31 @@ data class ActiveSpeakerChangedPayload(
     val newActiveSpeaker: ActiveSpeakerInfo
 )
 
-interface ActiveSpeakerListener {
-    fun onActiveSpeakerChanged(payload: ActiveSpeakerChangedPayload)
-    fun onResetActiveSpeaker()
-}
-
+@OptIn(FlowPreview::class)
 class ActiveSpeakerTracker(
-    private val throttleTimeMs: Long = 2000L
+    throttleTimeMs: Long = 2000L,
+    coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 ) {
     private val subscriberAudioLevelsBySubscriberId: SubscriberAudioLevels = mutableMapOf()
-    private var activeSpeaker: ActiveSpeakerInfo = ActiveSpeakerInfo(null, 0F)
-    private var listener: ActiveSpeakerListener? = null
 
-    private val handler = Handler(Looper.getMainLooper())
-    private var calculateActiveSpeakerRunnable: Runnable? = null
-    private var calculatePending = false
+    private val _activeSpeaker = MutableStateFlow(ActiveSpeakerInfo(null, 0F))
 
-    fun setActiveSpeakerListener(listener: ActiveSpeakerListener) {
-        this.listener = listener
+    private val _activeSpeakerChanges = MutableSharedFlow<ActiveSpeakerChangedPayload>()
+    val activeSpeakerChanges: SharedFlow<ActiveSpeakerChangedPayload> = _activeSpeakerChanges.asSharedFlow()
+
+    private val _calculateTrigger = MutableSharedFlow<Unit>()
+
+    init {
+        _calculateTrigger
+            .debounce(throttleTimeMs)
+            .onEach { internalCalculateActiveSpeaker() }
+            .launchIn(coroutineScope)
     }
 
     fun onSubscriberDestroyed(subscriberId: String) {
         subscriberAudioLevelsBySubscriberId.remove(subscriberId)
-        if (activeSpeaker.streamId == subscriberId) {
-            activeSpeaker = ActiveSpeakerInfo(null, 0F)
+        if (_activeSpeaker.value.streamId == subscriberId) {
+            _activeSpeaker.value = ActiveSpeakerInfo(null, 0F)
         }
         calculateActiveSpeaker()
     }
@@ -49,15 +58,7 @@ class ActiveSpeakerTracker(
     }
 
     private fun calculateActiveSpeaker() {
-        if (calculatePending) return
-        calculatePending = true
-        if (calculateActiveSpeakerRunnable == null) {
-            calculateActiveSpeakerRunnable = Runnable {
-                internalCalculateActiveSpeaker()
-                calculatePending = false
-            }
-        }
-        handler.postDelayed(calculateActiveSpeakerRunnable!!, throttleTimeMs)
+        _calculateTrigger.tryEmit(Unit)
     }
 
     private fun internalCalculateActiveSpeaker() {
@@ -70,13 +71,16 @@ class ActiveSpeakerTracker(
             }
         }
         val newActiveSpeaker = ActiveSpeakerInfo(maxSubscriberId, maxMovingAvg)
-        if (newActiveSpeaker.streamId != activeSpeaker.streamId
-            && newActiveSpeaker.movingAvg > ACTIVE_SPEAKER_AUDIO_LEVEL_THRESHOLD) {
-            val previousActiveSpeaker = activeSpeaker.copy()
-            activeSpeaker = newActiveSpeaker
-            listener?.onActiveSpeakerChanged(
-                ActiveSpeakerChangedPayload(previousActiveSpeaker, newActiveSpeaker)
-            )
+        val currentActiveSpeaker = _activeSpeaker.value
+
+        if (newActiveSpeaker.streamId != currentActiveSpeaker.streamId
+            && newActiveSpeaker.movingAvg > ACTIVE_SPEAKER_AUDIO_LEVEL_THRESHOLD
+        ) {
+            val previousActiveSpeaker = currentActiveSpeaker.copy()
+            _activeSpeaker.value = newActiveSpeaker
+
+            val payload = ActiveSpeakerChangedPayload(previousActiveSpeaker, newActiveSpeaker)
+            _activeSpeakerChanges.tryEmit(payload)
         }
     }
 
