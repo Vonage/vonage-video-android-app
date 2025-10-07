@@ -28,7 +28,7 @@ android {
         debug {
             isDebuggable = true
             isMinifyEnabled = false
-            isProfileable = true
+            isProfileable = false
         }
         release {
             isDebuggable = false
