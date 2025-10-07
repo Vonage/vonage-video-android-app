@@ -17,10 +17,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
 import com.vonage.android.util.pip.findActivity
 import com.vonage.android.util.pip.pipEffect
 import com.vonage.android.util.pip.rememberIsInPipMode
+import kotlinx.coroutines.launch
 
 @Composable
 fun MeetingRoomScreenRoute(
@@ -34,10 +34,8 @@ fun MeetingRoomScreenRoute(
             factory.create(roomName)
         },
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-//    val audioLevel by viewModel.audioLevel.collectAsStateWithLifecycle()
-
     val currentActivity = LocalContext.current.findActivity()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val inPipMode = rememberIsInPipMode()
     val pipModifier = pipEffect()
 
@@ -121,18 +119,16 @@ fun MeetingRoomScreenRoute(
     }
 
     if (inPipMode) {
-//        PipMeetingRoomScreen(
-//            modifier = modifier.then(pipModifier),
-//            actions = actions,
-//            uiState = uiState,
-//            audioLevel = audioLevel,
-//        )
+        PipMeetingRoomScreen(
+            modifier = modifier.then(pipModifier),
+            actions = actions,
+            uiState = uiState,
+        )
     } else {
         MeetingRoomScreen(
             modifier = modifier.then(pipModifier),
             actions = actions,
             uiState = uiState,
-//            audioLevel = audioLevel,
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.vonage.android.compose.util
 
+import android.util.Log
 import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
@@ -50,7 +51,7 @@ object VideoViewLifecycleManager {
                 }
             }
         } catch (e: Exception) {
-            android.util.Log.w("VideoLifecycle", "Failed to attach video view: ${e.message}")
+            Log.w(TAG, "Failed to attach video view: ${e.message}")
         }
     }
     
@@ -66,7 +67,7 @@ object VideoViewLifecycleManager {
                 videoView.surfaceTextureListener = null
             }
         } catch (e: Exception) {
-            android.util.Log.w("VideoLifecycle", "Failed to detach video view: ${e.message}")
+            Log.w(TAG, "Failed to detach video view: ${e.message}")
         }
     }
     
@@ -96,4 +97,6 @@ object VideoViewLifecycleManager {
             }
         }
     }
+
+    const val TAG = "VideoViewLifecycleManager"
 }

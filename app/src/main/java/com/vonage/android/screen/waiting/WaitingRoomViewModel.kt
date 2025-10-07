@@ -83,13 +83,17 @@ class WaitingRoomViewModel @AssistedInject constructor(
     }
 
     fun onMicToggle() {
-//        publisher = publisher.copy(isMicEnabled = publisher.isMicEnabled.toggle())
-//        _uiState.update { uiState -> uiState.copy(isMicEnabled = publisher.isMicEnabled) }
+        viewModelScope.launch {
+            publisher.isMicEnabled.emit(publisher.isMicEnabled.value.toggle())
+            _uiState.update { uiState -> uiState.copy(isMicEnabled = publisher.isMicEnabled.value) }
+        }
     }
 
     fun onCameraToggle() {
-//        publisher = publisher.copy(isCameraEnabled = publisher.isCameraEnabled.toggle())
-//        _uiState.update { uiState -> uiState.copy(isCameraEnabled = publisher.isCameraEnabled) }
+        viewModelScope.launch {
+            publisher.isCameraEnabled.emit(publisher.isCameraEnabled.value.toggle())
+            _uiState.update { uiState -> uiState.copy(isCameraEnabled = publisher.isCameraEnabled.value) }
+        }
     }
 
     fun onCameraSwitch() {

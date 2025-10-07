@@ -17,6 +17,8 @@ import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.ext.throttleFirst
 import com.vonage.android.kotlin.ext.toggle
+import com.vonage.android.kotlin.internal.ActiveSpeakerChangedPayload
+import com.vonage.android.kotlin.internal.ActiveSpeakerListener
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
 import com.vonage.android.kotlin.internal.ScreenSharingCapturer
 import com.vonage.android.kotlin.internal.SubscriberTalkingTracker
@@ -100,13 +102,19 @@ class Call internal constructor(
     private lateinit var context: Context
 
     init {
-        activeSpeakerTracker.setActiveSpeakerListener { payload ->
-            coroutineScope.launch {
-                Log.d("activeSpeakerTracker", "active speaker = ${payload.newActiveSpeaker.streamId} (${Thread.currentThread()})")
-                subscriberStreams[payload.newActiveSpeaker.streamId]?.subscribeToVideo = true
-                _mainSpeaker.value = participantStreams[payload.newActiveSpeaker.streamId]
+        activeSpeakerTracker.setActiveSpeakerListener(object : ActiveSpeakerListener {
+            override fun onActiveSpeakerChanged(payload: ActiveSpeakerChangedPayload) {
+                coroutineScope.launch {
+                    Log.d("activeSpeakerTracker", "active speaker = ${payload.newActiveSpeaker.streamId} (${Thread.currentThread()})")
+                    subscriberStreams[payload.newActiveSpeaker.streamId]?.subscribeToVideo = true
+                    _mainSpeaker.value = participantStreams[payload.newActiveSpeaker.streamId]
+                }
             }
-        }
+
+            override fun onResetActiveSpeaker() {
+                _mainSpeaker.value = participantStreams[publisherHolder.publisher.stream.streamId]
+            }
+        })
     }
 
     override fun connect(context: Context): Flow<SessionEvent> = callbackFlow {
@@ -128,6 +136,7 @@ class Call internal constructor(
             }
 
             override fun onStreamDropped(session: Session, stream: Stream) {
+                Log.d("subscriber.streamDropped", "stream dropped = ${stream.streamId}")
                 removeSubscriber(stream)
                 trySend(SessionEvent.StreamDropped(stream.streamId))
             }
@@ -405,6 +414,9 @@ class Call internal constructor(
         subscriberStreams[stream.streamId] = subscriber
         participantStreams[stream.streamId] = subscriber.toParticipant()
         _participantsStateFlow.value = participantStreams.values.toImmutableList()
+        if (_participantsCount.value == 2) {
+            _mainSpeaker.value = subscriber.toParticipant()
+        }
         _participantsCount.value = participantStreams.size
     }
 

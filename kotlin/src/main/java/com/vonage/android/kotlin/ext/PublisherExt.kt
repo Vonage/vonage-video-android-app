@@ -1,6 +1,5 @@
 package com.vonage.android.kotlin.ext
 
-import android.util.Log
 import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit
 import com.vonage.android.kotlin.model.BackgroundBlur.KEY
@@ -23,18 +22,6 @@ internal fun Publisher.applyVideoBlur(blurLevel: BlurLevel) {
     }
 }
 
-internal inline fun Publisher.observeAudioLevel(crossinline onUpdate: (Float) -> Unit): Flow<Float> = callbackFlow {
-    val audioLevelListener = PublisherKit.AudioLevelListener { _, audioLevelRaw ->
-        val audioLevel = audioLevelRaw.round2()
-        onUpdate(audioLevel)
-        trySend(audioLevel)
-    }
-    setAudioLevelListener(audioLevelListener)
-    awaitClose {
-        setAudioLevelListener(null)
-    }
-}
-
 internal fun Publisher.observeAudioLevel(): Flow<Float> = callbackFlow {
     val audioLevelListener = PublisherKit.AudioLevelListener { _, audioLevelRaw ->
         val audioLevel = audioLevelRaw.round2()
@@ -52,7 +39,7 @@ internal fun Publisher.observeAudioLevel(): Flow<Float> = callbackFlow {
  *
  * The list passed to [transform] is transient and must not be cached.
  */
-fun <T, R> Flow<T>.chunked(size: Int, transform: suspend (List<T>)-> R): Flow<R> = flow {
+fun <T, R> Flow<T>.chunked(size: Int, transform: suspend (List<T>) -> R): Flow<R> = flow {
     val cache = ArrayList<T>(size)
     collect {
         cache.add(it)

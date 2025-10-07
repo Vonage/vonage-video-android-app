@@ -86,6 +86,16 @@ private fun ParticipantRow(participant: Participant) {
             color = VonageVideoTheme.colors.inverseSurface,
             style = VonageVideoTheme.typography.body,
         )
+        Text(
+            modifier = Modifier
+                .padding(end = 8.dp)
+                .weight(1f),
+            text = participant.id,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            color = VonageVideoTheme.colors.inverseSurface,
+            style = VonageVideoTheme.typography.label,
+        )
         if (!isMicEnabled) {
             Icon(
                 modifier = Modifier.size(16.dp),

@@ -16,8 +16,9 @@ data class ActiveSpeakerChangedPayload(
     val newActiveSpeaker: ActiveSpeakerInfo
 )
 
-fun interface ActiveSpeakerListener {
+interface ActiveSpeakerListener {
     fun onActiveSpeakerChanged(payload: ActiveSpeakerChangedPayload)
+    fun onResetActiveSpeaker()
 }
 
 class ActiveSpeakerTracker(

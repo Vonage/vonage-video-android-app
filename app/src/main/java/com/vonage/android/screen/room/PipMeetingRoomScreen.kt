@@ -34,25 +34,26 @@ fun PipMeetingRoomScreen(
 ) {
     when {
         (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
-            val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle(emptyList())
             val signalState by uiState.call.signalStateFlow.collectAsStateWithLifecycle(null)
             val chatState = signalState?.signals[SignalType.CHAT.signal] as? ChatState
-            val participant = participants.last() // replace to active speaker when logic available
+            val participant by uiState.call.mainSpeaker.collectAsStateWithLifecycle()
 
             Box(
                 modifier = modifier
                     .fillMaxWidth()
             ) {
-                ParticipantVideoCard(
-                    call = uiState.call,
-                    name = participant.name,
-                    isCameraEnabled = participant.isCameraEnabled,
-                    isMicEnabled = participant.isMicEnabled,
-                    view = participant.view,
-                    isSpeaking = participant.isSpeaking,
-                    isShowVolumeIndicator = participant is VeraPublisher,
-                    videoSource = participant.videoSource,
-                )
+                participant?.let { participant ->
+                    ParticipantVideoCard(
+                        call = uiState.call,
+                        name = participant.name,
+                        isCameraEnabled = participant.isCameraEnabled,
+                        isMicEnabled = participant.isMicEnabled,
+                        view = participant.view,
+                        isSpeaking = participant.isSpeaking,
+                        isShowVolumeIndicator = participant is VeraPublisher,
+                        videoSource = participant.videoSource,
+                    )
+                }
                 ChatBadgeButton(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
