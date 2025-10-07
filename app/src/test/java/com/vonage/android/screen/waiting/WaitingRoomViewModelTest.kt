@@ -2,6 +2,7 @@ package com.vonage.android.screen.waiting
 
 import android.content.Context
 import app.cash.turbine.test
+import com.vonage.android.CoroutineTest
 import com.vonage.android.audio.util.MicVolumeListener
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
@@ -14,13 +15,16 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import io.mockk.clearAllMocks
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.AfterEach
 import kotlin.test.assertEquals
 
-class WaitingRoomViewModelTest {
+class WaitingRoomViewModelTest : CoroutineTest() {
 
     val context: Context = mockk(relaxed = true)
     val videoClient: VonageVideoClient = mockk()
@@ -33,6 +37,18 @@ class WaitingRoomViewModelTest {
         micVolumeListener = micVolumeListener,
     )
 
+    @BeforeEach
+    fun setUp() {
+        setMainDispatcherToTestDispatcher()
+    }
+
+    @AfterEach
+    fun tearDown() {
+        testScheduler.advanceUntilIdle()
+        resetMain()
+        clearAllMocks()
+    }
+
     @Test
     fun `given viewmodel when initialize then returns correct state`() = runTest {
         val publisher = buildMockPublisher()
@@ -41,7 +57,7 @@ class WaitingRoomViewModelTest {
         every { micVolumeListener.volume() } returns flowOf(0.5f)
 
         sut.init(context)
-
+            testScheduler.advanceUntilIdle()
         verify { videoClient.buildPublisher(context) }
         sut.uiState.test {
             assertEquals(WaitingRoomUiState(roomName = ANY_ROOM_NAME), awaitItem())
@@ -75,6 +91,7 @@ class WaitingRoomViewModelTest {
         sut.uiState.test {
             assertEquals(WaitingRoomUiState(roomName = ANY_ROOM_NAME), awaitItem())
             sut.init(context)
+            testScheduler.advanceUntilIdle()
             assertEquals(
                 WaitingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -111,6 +128,7 @@ class WaitingRoomViewModelTest {
         sut.uiState.test {
             assertEquals(WaitingRoomUiState(roomName = ANY_ROOM_NAME), awaitItem())
             sut.init(context)
+            testScheduler.advanceUntilIdle()
             assertEquals(
                 WaitingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -147,6 +165,7 @@ class WaitingRoomViewModelTest {
         sut.uiState.test {
             assertEquals(WaitingRoomUiState(roomName = ANY_ROOM_NAME), awaitItem())
             sut.init(context)
+            testScheduler.advanceUntilIdle()
             assertEquals(
                 WaitingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -182,6 +201,7 @@ class WaitingRoomViewModelTest {
 
         sut.uiState.test {
             sut.init(context)
+            testScheduler.advanceUntilIdle()
             awaitItem()
             assertEquals(
                 WaitingRoomUiState(
@@ -209,6 +229,7 @@ class WaitingRoomViewModelTest {
         sut.uiState.test {
             assertEquals(WaitingRoomUiState(roomName = ANY_ROOM_NAME), awaitItem())
             sut.init(context)
+            testScheduler.advanceUntilIdle()
             awaitItem()
             sut.joinRoom("save user name")
             assertEquals(
@@ -246,6 +267,8 @@ class WaitingRoomViewModelTest {
         coEvery { userRepository.getUserName() } returns "not relevant"
 
         sut.init(context)
+        testScheduler.advanceUntilIdle()
+        
         sut.uiState.test {
             awaitItem() // initial state
             awaitItem() // after init
@@ -270,6 +293,8 @@ class WaitingRoomViewModelTest {
         coEvery { userRepository.getUserName() } returns "not relevant"
 
         sut.init(context)
+        testScheduler.advanceUntilIdle()
+        
         sut.uiState.test {
             awaitItem() // initial state
             awaitItem() // after init

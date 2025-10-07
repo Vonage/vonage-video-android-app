@@ -59,6 +59,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @AfterEach
     fun tearDown() {
+        testScheduler.advanceUntilIdle()
         resetMain()
         clearAllMocks()
     }
@@ -68,10 +69,10 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
         val mockCall = givenMockCall()
 
         val sut = sut()
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            sut.setup(context)
-
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
                 MeetingRoomUiState(
@@ -92,6 +93,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true, isError = false), awaitItem())
@@ -105,6 +107,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -126,6 +129,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -148,6 +152,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -170,6 +175,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             awaitItem()
@@ -191,6 +197,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             awaitItem()
@@ -212,6 +219,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -233,6 +241,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -254,6 +263,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -275,6 +285,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -297,6 +308,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -334,6 +346,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -393,6 +406,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -412,6 +426,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
                 ), awaitItem()
             )
             listenerSpy.captured.onStarted(mediaProjection)
+            testScheduler.advanceUntilIdle()  // Ensure callback processing completes
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -436,6 +451,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -455,6 +471,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
                 ), awaitItem()
             )
             listenerSpy.captured.onStopped()
+            testScheduler.advanceUntilIdle()  // Ensure callback processing completes
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -473,6 +490,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -506,6 +524,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -526,6 +545,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -549,6 +569,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -572,6 +593,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -607,6 +629,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -651,6 +674,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -672,6 +696,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
+        testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -700,11 +725,14 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
         )
 
     private fun givenMockCall(): CallFacade {
-        val mockCall = buildMockCall()
+        // Setup all mocks before creating the call mock to avoid race conditions
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher(context) } returns buildMockPublisher()
+        
+        val mockCall = buildMockCall()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
         every { mockCall.connect(any()) } returns flowOf()
+        
         return mockCall
     }
 

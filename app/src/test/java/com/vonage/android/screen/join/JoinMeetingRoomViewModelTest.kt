@@ -46,7 +46,9 @@ class JoinMeetingRoomViewModelTest {
     @Test
     fun `given viewmodel when create room then state is correct`() = runTest {
         every { roomNameGenerator.generateRoomName() } returns "vonage-rocks"
+        
         sut.createRoom()
+        
         sut.uiState.test {
             assertEquals(
                 JoinMeetingRoomUiState.Content(
