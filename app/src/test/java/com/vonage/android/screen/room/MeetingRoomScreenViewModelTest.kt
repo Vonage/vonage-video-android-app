@@ -63,7 +63,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher() } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
-        every { mockCall.observeLocalAudioLevel() } returns flowOf(0.4f)
+        every { mockCall.localAudioLevel() } returns flowOf(0.4f)
         val sut = sut()
 
         sut.uiState.test {
@@ -81,7 +81,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
             assertEquals(0.4f, awaitItem())
         }
         verify { mockCall.connect() }
-        verify { mockCall.observeLocalAudioLevel() }
+        verify { mockCall.localAudioLevel() }
     }
 
     @Test

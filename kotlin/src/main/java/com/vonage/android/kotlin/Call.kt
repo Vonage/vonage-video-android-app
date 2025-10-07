@@ -89,10 +89,8 @@ class Call internal constructor(
     private val _mainSpeaker = MutableStateFlow<Participant?>(null)
     override val mainSpeaker: StateFlow<Participant?> = _mainSpeaker
 
-    override fun observeLocalAudioLevel(): StateFlow<Float> = localAudioStateFlow
-
     private val _localAudioStateFlow = MutableStateFlow(0F)
-    private val localAudioStateFlow: StateFlow<Float> = _localAudioStateFlow
+    override val localAudioLevel: StateFlow<Float> = _localAudioStateFlow
 
     private val signals = ConcurrentHashMap<String, SignalStateContent>()
     private val subscriberStreams = ConcurrentHashMap<String, Subscriber>()
@@ -105,8 +103,10 @@ class Call internal constructor(
         activeSpeakerTracker.setActiveSpeakerListener(object : ActiveSpeakerListener {
             override fun onActiveSpeakerChanged(payload: ActiveSpeakerChangedPayload) {
                 coroutineScope.launch {
-                    Log.d("activeSpeakerTracker",
-                        "active speaker = ${payload.newActiveSpeaker.streamId} (${Thread.currentThread()})")
+                    Log.d(
+                        "activeSpeakerTracker",
+                        "active speaker = ${payload.newActiveSpeaker.streamId} (${Thread.currentThread()})"
+                    )
                     subscriberStreams[payload.newActiveSpeaker.streamId]?.subscribeToVideo = true
                     _mainSpeaker.value = participantStreams[payload.newActiveSpeaker.streamId]
                 }
@@ -131,8 +131,10 @@ class Call internal constructor(
             }
 
             override fun onStreamReceived(session: Session, stream: Stream) {
-                Log.d("onStreamReceived",
-                    "Stream received ${stream.name}-${stream.streamId} - ${Thread.currentThread()}")
+                Log.d(
+                    "onStreamReceived",
+                    "Stream received ${stream.name}-${stream.streamId} - ${Thread.currentThread()}"
+                )
                 addSubscriber(stream)
                 trySend(SessionEvent.StreamReceived(stream.streamId))
             }

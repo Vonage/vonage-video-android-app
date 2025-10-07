@@ -337,7 +337,7 @@ val noOpCallFacade = object : CallFacade {
     override fun resumeSession() { /* empty on purpose */ }
     override fun endSession() { /* empty on purpose */ }
 
-    override fun observeLocalAudioLevel(): StateFlow<Float> = MutableStateFlow(0F)
+    override val localAudioLevel: StateFlow<Float> = MutableStateFlow(0F)
     override fun toggleLocalVideo() { /* empty on purpose */ }
     override fun toggleLocalCamera() { /* empty on purpose */ }
     override fun toggleLocalAudio() { /* empty on purpose */ }

@@ -19,20 +19,18 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.Lifecycle.State.STARTED
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.currentStateAsState
 import com.vonage.android.audio.ui.AudioVolumeIndicator
@@ -110,35 +108,11 @@ private fun BoxScope.ParticipantVideoContainer(
     view: View,
 ) {
     val isCameraEnabled by isCameraEnabled.collectAsStateWithLifecycle()
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    // Monitor lifecycle to prevent surface issues
-    DisposableEffect(view) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_PAUSE -> {
-                    // Video rendering will be paused in VideoRenderer
-                }
-
-                Lifecycle.Event.ON_DESTROY -> {
-                    // Cleanup handled in VideoRenderer
-                }
-
-                else -> { /* no-op */
-                }
-            }
-        }
-
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
 
     key(view.hashCode(), isCameraEnabled) {
         if (isCameraEnabled
-            && lifecycleOwner.lifecycle.currentStateAsState().value.isAtLeast(Lifecycle.State.STARTED)
+            && lifecycle.currentStateAsState().value.isAtLeast(STARTED)
         ) {
             VideoRenderer(
                 modifier = Modifier
@@ -188,7 +162,7 @@ private fun BoxScope.MicrophoneIndicator(
     isShowVolumeIndicator: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val audioLevel by call.observeLocalAudioLevel().collectAsStateWithLifecycle(0F)
+    val audioLevel by call.localAudioLevel.collectAsStateWithLifecycle()
     val isMicEnabled by isMicEnabled.collectAsStateWithLifecycle()
 
     if (isMicEnabled && isShowVolumeIndicator) {

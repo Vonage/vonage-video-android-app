@@ -22,7 +22,7 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
 }
 
 interface PublisherFacade {
-    fun observeLocalAudioLevel(): StateFlow<Float>
+    val localAudioLevel: StateFlow<Float>
     fun toggleLocalVideo()
     fun toggleLocalCamera()
     fun toggleLocalAudio()
