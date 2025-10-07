@@ -19,6 +19,7 @@ import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallActi
 import com.vonage.android.screensharing.ScreenSharingServiceListener
 import com.vonage.android.screensharing.VeraScreenSharingManager
 import com.vonage.android.service.VeraForegroundServiceHandler
+import com.vonage.android.util.ActivityContextProvider
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -47,9 +48,11 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private val videoClient: VonageVideoClient,
     private val screenSharingManager: VeraScreenSharingManager,
     private val foregroundServiceHandler: VeraForegroundServiceHandler,
+    private val activityContextProvider: ActivityContextProvider,
 ) : ViewModel() {
 
-    private lateinit var context: Context
+    private val context: Context
+        get() = activityContextProvider.requireActivityContext()
 
     private val initialUiState = MeetingRoomUiState(
         roomName = roomName,
@@ -73,7 +76,9 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     }
 
     fun setup(context: Context) {
-        this.context = context
+        // Set the activity context in the provider for future use
+        activityContextProvider.setActivityContext(context)
+        
         viewModelScope.launch {
             _uiState.update { uiState -> uiState.copy(isLoading = true) }
             sessionRepository.getSession(roomName)
@@ -107,27 +112,11 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         sessionInfo: SessionInfo,
     ) {
         currentCaptionsId = sessionInfo.captionsId
-        connect(sessionInfo)
-        call?.let { call ->
-            _uiState.update { uiState ->
-                uiState.copy(
-                    roomName = roomName,
-                    call = call,
-                    recordingState = RecordingState.IDLE,
-                    captionsState = if (sessionInfo.captionsId.isNullOrBlank()) {
-                        CaptionsState.IDLE
-                    } else {
-                        CaptionsState.ENABLED
-                    },
-                    isLoading = false,
-                    isError = false,
-                )
-            }
-        }
+        connect(sessionInfo, roomName)
     }
 
     @OptIn(FlowPreview::class)
-    private fun connect(sessionInfo: SessionInfo) {
+    private fun connect(sessionInfo: SessionInfo, roomName: String) {
         viewModelScope.launch {
             videoClient.buildPublisher(context)
             call = videoClient.initializeSession(
@@ -135,8 +124,24 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                 sessionId = sessionInfo.sessionId,
                 token = sessionInfo.token,
             )
-            call?.let {
-                it.connect(context)
+            call?.let { call ->
+                // Update UI state after call is properly initialized
+                _uiState.update { uiState ->
+                    uiState.copy(
+                        roomName = roomName,
+                        call = call,
+                        recordingState = RecordingState.IDLE,
+                        captionsState = if (sessionInfo.captionsId.isNullOrBlank()) {
+                            CaptionsState.IDLE
+                        } else {
+                            CaptionsState.ENABLED
+                        },
+                        isLoading = false,
+                        isError = false,
+                    )
+                }
+                
+                call.connect(context)
                     .onEach { sessionEvent ->
                         when (sessionEvent) {
                             is SessionEvent.Disconnected -> {
@@ -219,12 +224,10 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     }
 
     fun captions(enable: Boolean) {
-        if (enable) {
-            viewModelScope.launch {
+        viewModelScope.launch {
+            if (enable) {
                 enableCaptions()
-            }
-        } else {
-            viewModelScope.launch {
+            } else {
                 disableCaptions()
             }
         }
@@ -276,6 +279,12 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     fun stopScreenSharing() {
         _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.STOPPING) }
         screenSharingManager.stopSharingScreen()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // Clean up the activity context when ViewModel is destroyed
+        activityContextProvider.clearActivityContext()
     }
 
     private companion object {

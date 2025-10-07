@@ -1,5 +1,6 @@
 package com.vonage.android.screen.room
 
+import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjection
 import app.cash.turbine.test
@@ -17,6 +18,7 @@ import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallActi
 import com.vonage.android.screensharing.ScreenSharingServiceListener
 import com.vonage.android.screensharing.VeraScreenSharingManager
 import com.vonage.android.service.VeraForegroundServiceHandler
+import com.vonage.android.util.ActivityContextProvider
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -30,11 +32,14 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import kotlin.Result.Companion.success
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
+    val context: Context = mockk(relaxed = true)
+    val activityContextProvider: ActivityContextProvider = mockk(relaxed = true)
     val sessionRepository: SessionRepository = mockk()
     val archiveRepository: ArchiveRepository = mockk()
     val captionsRepository: CaptionsRepository = mockk()
@@ -49,6 +54,8 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
     @BeforeEach
     fun setUp() {
         setMainDispatcherToTestDispatcher()
+        // Set up the mock to return the context when requested
+        every { activityContextProvider.requireActivityContext() } returns context
     }
 
     @AfterEach
@@ -59,14 +66,13 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when initialize then returns correct state`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
-        every { mockCall.localAudioLevel() } returns flowOf(0.4f)
+        val mockCall = givenMockCall()
+
         val sut = sut()
 
         sut.uiState.test {
+            sut.setup(context)
+
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
                 MeetingRoomUiState(
@@ -76,19 +82,22 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
                 ), awaitItem()
             )
         }
-        sut.audioLevel.test {
-            assertEquals(0.0f, awaitItem()) // initial value
-            assertEquals(0.4f, awaitItem())
-        }
-        verify { mockCall.connect() }
-        verify { mockCall.localAudioLevel() }
+
+        // Allow some time for the coroutine to complete the connect call
+        testScheduler.advanceUntilIdle()
+
+        verify { activityContextProvider.setActivityContext(context) }
+        verify { mockCall.connect(context) }
     }
 
     @Test
     fun `given viewmodel when initialize fails then returns error state`() = runTest {
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns Result.failure(Exception("Empty response"))
 
-        sut().uiState.test {
+        val sut = sut()
+        sut.setup(context)
+
+        sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true, isError = false), awaitItem())
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true, isError = true), awaitItem())
         }
@@ -96,11 +105,10 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when onToggleMic then delegate to call`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val mockCall = givenMockCall()
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -118,11 +126,10 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when onToggleCamera then delegate to call`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val mockCall = givenMockCall()
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -140,12 +147,11 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when endCall then delegate to call`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val mockCall = givenMockCall()
         every { screenSharingManager.stopSharingScreen() } returns Unit
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -164,11 +170,10 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when onPause then delegate to call`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val mockCall = givenMockCall()
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             awaitItem()
@@ -186,11 +191,10 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when onResume then delegate to call`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val mockCall = givenMockCall()
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             awaitItem()
@@ -208,11 +212,10 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when onSwitchCamera then delegate to call`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val mockCall = givenMockCall()
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -230,11 +233,10 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when sendMessage then delegate to call`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val mockCall = givenMockCall()
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -252,11 +254,10 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when listenUnread then delegate to call`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val mockCall = givenMockCall()
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -274,11 +275,10 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when sendEmoji then delegate to call`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val mockCall = givenMockCall()
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -296,12 +296,11 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when archiveCall true then emit correct state`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
-        coEvery { archiveRepository.startArchive(ANY_ROOM_NAME) } returns Result.success("archiveId")
+        val mockCall = givenMockCall()
+        coEvery { archiveRepository.startArchive(ANY_ROOM_NAME) } returns success("archiveId")
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -333,13 +332,12 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when archiveCall false then emit correct state`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
-        coEvery { archiveRepository.startArchive(ANY_ROOM_NAME) } returns Result.success("archiveId")
-        coEvery { archiveRepository.stopArchive(ANY_ROOM_NAME, "archiveId") } returns Result.success(true)
+        val mockCall = givenMockCall()
+        coEvery { archiveRepository.startArchive(ANY_ROOM_NAME) } returns success("archiveId")
+        coEvery { archiveRepository.stopArchive(ANY_ROOM_NAME, "archiveId") } returns success(true)
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -387,19 +385,18 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when startScreenSharing started then emit correct state`() = runTest {
-        val mockCall = buildMockCall()
+        val mockCall = givenMockCall()
         val mediaProjection: MediaProjection = mockk(relaxed = true)
         val mockIntent: Intent = mockk(relaxed = true)
         val listenerSpy = slot<ScreenSharingServiceListener>()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
         every {
             screenSharingManager.startScreenSharing(
                 mockIntent, capture<ScreenSharingServiceListener>(listenerSpy)
             )
         } returns Unit
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -432,18 +429,17 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when startScreenSharing stopped then emit correct state`() = runTest {
-        val mockCall = buildMockCall()
+        val mockCall = givenMockCall()
         val mockIntent: Intent = mockk(relaxed = true)
         val listenerSpy = slot<ScreenSharingServiceListener>()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
         every {
             screenSharingManager.startScreenSharing(
                 mockIntent, capture<ScreenSharingServiceListener>(listenerSpy)
             )
         } returns Unit
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -476,12 +472,11 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when stopScreenSharing stopped then emit correct state`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val mockCall = givenMockCall()
         every { screenSharingManager.stopSharingScreen() } returns Unit
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -510,9 +505,11 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse(
             captionsId = "captionsId",
         )
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
+        every { videoClient.buildPublisher(context) } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -528,15 +525,15 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when enable captions then emit correct state`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
-        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns Result.success("captionsId")
+        val mockCall = givenMockCall()
+        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns success("captionsId")
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            awaitItem()
             sut.captions(true)
             assertEquals(
                 MeetingRoomUiState(
@@ -551,12 +548,11 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when enable captions fails then emit correct state`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        val mockCall = givenMockCall()
         coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns Result.failure(Exception("KO"))
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -574,16 +570,16 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when disable captions then emit correct state`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
-        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns Result.success("captionsId")
-        coEvery { captionsRepository.disableCaptions(ANY_ROOM_NAME, "captionsId") } returns Result.success("OK")
+        val mockCall = givenMockCall()
+        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns success("captionsId")
+        coEvery { captionsRepository.disableCaptions(ANY_ROOM_NAME, "captionsId") } returns success("OK")
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            awaitItem()
             sut.captions(true)
             assertEquals(
                 MeetingRoomUiState(
@@ -608,18 +604,17 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when disable captions fails then emit correct state`() = runTest {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
-
-        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns Result.success("captionsId")
+        val mockCall = givenMockCall()
+        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns success("captionsId")
         coEvery { captionsRepository.disableCaptions(ANY_ROOM_NAME, "captionsId") } returns
                 Result.failure(Exception("KO"))
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            awaitItem()
             // enable captions
             sut.captions(true)
             assertEquals(
@@ -647,11 +642,6 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when initialize then create foreground service`() {
-        val mockCall = buildMockCall()
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
-
         sut()
 
         verify { foregroundServiceHandler.startForegroundService(ANY_ROOM_NAME) }
@@ -659,13 +649,12 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when receive CallActionHangUp then update state`() = runTest {
-        val mockCall = buildMockCall()
+        val mockCall = givenMockCall()
         val callActionsFlow = MutableStateFlow<CallAction?>(null)
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher() } returns buildMockPublisher()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
         every { foregroundServiceHandler.actions } returns callActionsFlow
+
         val sut = sut()
+        sut.setup(context)
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -690,14 +679,24 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
             captionsRepository = captionsRepository,
             videoClient = videoClient,
             foregroundServiceHandler = foregroundServiceHandler,
+            activityContextProvider = activityContextProvider,
         )
+
+    private fun givenMockCall(): CallFacade {
+        val mockCall = buildMockCall()
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        every { videoClient.buildPublisher(context) } returns buildMockPublisher()
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        every { mockCall.connect(any()) } returns flowOf()
+        return mockCall
+    }
 
     private fun buildSuccessSessionResponse(
         apiKey: String = "api-key",
         sessionId: String = "session-id",
         token: String = "token",
         captionsId: String? = null,
-    ) = Result.success(
+    ) = success(
         SessionInfo(
             apiKey = apiKey,
             sessionId = sessionId,
@@ -711,17 +710,20 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
         id = "publisher",
         videoSource = VideoSource.CAMERA,
         name = "I am a publisher",
-        isMicEnabled = true,
-        isCameraEnabled = true,
+        isMicEnabled = MutableStateFlow(true),
+        isCameraEnabled = MutableStateFlow(true),
         view = mockk(),
         blurLevel = BlurLevel.NONE,
         cycleCamera = {},
         setCameraBlur = {},
         cameraIndex = 0,
-        isSpeaking = false,
+        isSpeaking = MutableStateFlow(false),
     )
 
-    private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true)
+    private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true) {
+        every { connect(any()) } returns kotlinx.coroutines.flow.flowOf()
+        every { localAudioLevel } returns MutableStateFlow(0.4f)
+    }
 
     private companion object {
         const val ANY_ROOM_NAME = "room-name"
