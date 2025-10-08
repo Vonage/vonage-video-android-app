@@ -43,36 +43,6 @@ fun CircularControlButton(
     }
 }
 
-@Composable
-fun ControlButton(
-    icon: ImageVector,
-    onClick: () -> Unit,
-    isActive: Boolean,
-    modifier: Modifier = Modifier
-) {
-    val iconColor = if (isActive) Color.White else Color.Gray
-
-    Box(
-        modifier = modifier
-            .size(48.dp)
-            .clip(CircleShape)
-            .conditional(
-                isActive,
-                ifTrue = { background(Color.White.copy(alpha = 0.2f), CircleShape) },
-                ifFalse = { background(Color.Transparent, CircleShape) },
-            )
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = iconColor,
-            modifier = Modifier.size(24.dp),
-        )
-    }
-}
-
 @Preview
 @Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable

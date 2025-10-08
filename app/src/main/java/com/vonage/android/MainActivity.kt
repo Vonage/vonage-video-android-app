@@ -1,7 +1,9 @@
 package com.vonage.android
 
+import android.bluetooth.BluetoothHealthAppConfiguration
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,6 +14,7 @@ import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.config.AppConfig
 import com.vonage.android.navigation.AppNavHost
 import com.vonage.android.notifications.VeraNotificationChannelRegistry
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,6 +36,7 @@ class MainActivity : ComponentActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         notificationChannelRegistry.createNotificationChannels()
         enableEdgeToEdge()
+        Log.i("CONFIG FILE", "--> Video calling: ${AppConfig.VideoSettings.DEFAULT_RESOLUTION}")
         setContent {
             VonageVideoTheme {
                 InterceptorAppNavHost(flow)

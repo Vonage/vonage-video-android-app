@@ -21,7 +21,7 @@ import com.vonage.android.screen.room.ScreenSharingState
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
 import com.vonage.android.screen.room.components.emoji.EmojiSelector
 import com.vonage.android.screen.reporting.ReportIssueScreen
-import com.vonage.android.util.preview.buildParticipants
+import com.vonage.android.compose.preview.buildParticipants
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch

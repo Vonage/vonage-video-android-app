@@ -49,11 +49,11 @@ import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.TopBar
 import com.vonage.android.screen.room.components.captions.CaptionsOverlay
-import com.vonage.android.screen.room.components.chat.ChatPanel
+import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.screen.room.components.emoji.EmojiReactionOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
-import com.vonage.android.util.preview.buildCallWithParticipants
+import com.vonage.android.compose.preview.buildCallWithParticipants
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch

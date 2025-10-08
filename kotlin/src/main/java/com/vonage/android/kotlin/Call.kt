@@ -27,7 +27,6 @@ import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VeraSubscriber
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
-import com.vonage.android.kotlin.signal.ChatSignalPlugin.Companion.PAYLOAD_PARTICIPANT_NAME_KEY
 import com.vonage.android.kotlin.signal.SignalPlugin
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -142,7 +141,7 @@ class Call internal constructor(
             .forEach { plugin ->
                 plugin.sendSignal(
                     session, message, mapOf(
-                        PAYLOAD_PARTICIPANT_NAME_KEY to publisherHolder.publisher.name.orEmpty(),
+                        "participantName" to publisherHolder.publisher.name.orEmpty(),
                     )
                 )
             }

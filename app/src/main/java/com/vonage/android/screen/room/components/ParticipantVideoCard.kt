@@ -31,7 +31,7 @@ import com.vonage.android.compose.components.VideoRenderer
 import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.VideoSource
-import com.vonage.android.screen.components.AvatarInitials
+import com.vonage.android.compose.components.AvatarInitials
 
 @Suppress("LongParameterList")
 @Composable

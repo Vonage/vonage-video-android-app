@@ -1,6 +1,7 @@
 package com.vonage.android.kotlin.signal
 
 import com.opentok.android.Session
+import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.SignalStateContent
 
 interface SignalPlugin {
@@ -13,4 +14,8 @@ interface SignalPlugin {
         callback: (SignalStateContent) -> Unit = {},
     ): SignalStateContent?
     fun sendSignal(session: Session, message: String, payload: Map<String, String> = emptyMap())
+}
+
+interface ChatSignalPlugin : SignalPlugin {
+    fun listenUnread(enable: Boolean): ChatState?
 }

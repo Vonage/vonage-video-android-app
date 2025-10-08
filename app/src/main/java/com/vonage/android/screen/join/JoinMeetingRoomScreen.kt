@@ -1,5 +1,6 @@
 package com.vonage.android.screen.join
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,11 +32,13 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.vonage.android.R
+import com.vonage.android.chat.ChatFeature
 import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.icons.KeyboardIcon
 import com.vonage.android.compose.icons.VideoCameraIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.config.AppConfig
 import com.vonage.android.screen.components.OrSeparator
 import com.vonage.android.screen.components.TopBanner
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.CREATE_ROOM_BUTTON_TAG
@@ -115,6 +118,7 @@ fun JoinMeetingRoomHeader(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        Text(text = "--> Chat: ${AppConfig.MeetingRoomSettings.ALLOW_CHAT}")
         Text(
             modifier = Modifier.testTag(TITLE_TAG),
             text = stringResource(R.string.landing_title),

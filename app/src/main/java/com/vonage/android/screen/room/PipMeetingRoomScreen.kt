@@ -14,16 +14,16 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
+import com.vonage.android.chat.ui.ChatBadgeButton
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VeraPublisher
-import com.vonage.android.screen.room.components.ChatBadgeButton
 import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.ParticipantVideoCard
 import com.vonage.android.util.pip.findActivity
-import com.vonage.android.util.preview.buildCallWithParticipants
+import com.vonage.android.compose.preview.buildCallWithParticipants
 
 @Suppress("LongMethod")
 @Composable

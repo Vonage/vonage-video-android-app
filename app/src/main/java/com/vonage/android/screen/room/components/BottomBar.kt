@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.CallEnd
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Mic
@@ -30,12 +29,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.vonage.android.chat.ui.ChatBadgeButton
+import com.vonage.android.compose.components.ControlButton
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.components.ControlButton
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CAMERA_BUTTON
-import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CHAT_BADGE
-import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CHAT_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_END_CALL_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_MIC_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BADGE
@@ -121,41 +119,6 @@ fun BottomBar(
                 isActive = true,
             )
         }
-    }
-}
-
-@Composable
-fun ChatBadgeButton(
-    unreadCount: Int,
-    onShowChat: () -> Unit,
-    isChatShow: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    val badgeVisible = unreadCount > 0
-    BadgedBox(
-        modifier = modifier,
-        badge = {
-            if (badgeVisible) {
-                Badge(
-                    containerColor = VonageVideoTheme.colors.primary,
-                    contentColor = Color.White,
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .testTag(BOTTOM_BAR_CHAT_BADGE),
-                        text = "$unreadCount",
-                    )
-                }
-            }
-        },
-    ) {
-        ControlButton(
-            modifier = Modifier
-                .testTag(BOTTOM_BAR_CHAT_BUTTON),
-            onClick = onShowChat,
-            icon = Icons.AutoMirrored.Default.Chat,
-            isActive = isChatShow,
-        )
     }
 }
 

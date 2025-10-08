@@ -2,8 +2,8 @@ package com.vonage.android.kotlin.model
 
 import android.media.projection.MediaProjection
 import androidx.compose.runtime.Stable
-import com.vonage.android.kotlin.signal.ChatMessage
 import com.vonage.android.kotlin.signal.EmojiReaction
+import com.vonage.android.shared.ChatMessage
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow

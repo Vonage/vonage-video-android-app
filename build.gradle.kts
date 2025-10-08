@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.detekt)
     id("org.sonarqube") version "6.3.1.5724" apply false
     id("org.jetbrains.kotlinx.kover") version "0.9.1" apply false
+    id("com.vonage.json-config") apply false
 }
 
 dependencies {

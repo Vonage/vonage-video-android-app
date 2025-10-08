@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-tools")
     repositories {
         google {
             content {
@@ -24,3 +25,5 @@ rootProject.name = "Vonage Video Android"
 include(":app")
 include(":compose")
 include(":kotlin")
+include(":vonage-feature-chat")
+include(":shared")
