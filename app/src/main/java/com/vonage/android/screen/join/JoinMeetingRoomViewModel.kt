@@ -1,8 +1,6 @@
 package com.vonage.android.screen.join
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.vonage.android.chat.ChatModule
 import com.vonage.android.util.RoomNameGenerator
 import com.vonage.android.util.isValidRoomName
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,11 +13,6 @@ import javax.inject.Inject
 class JoinMeetingRoomViewModel @Inject constructor(
     private val roomNameGenerator: RoomNameGenerator,
 ) : ViewModel() {
-
-    init {
-        val chat = ChatModule.getChatFeature()
-        Log.d("CONFIG FILE", "Chat ${chat.isEnabled()}")
-    }
 
     private val _uiState = MutableStateFlow<JoinMeetingRoomUiState>(JoinMeetingRoomUiState.Content())
     val uiState: StateFlow<JoinMeetingRoomUiState> = _uiState.asStateFlow()
