@@ -55,8 +55,8 @@ data class BottomBarState(
     val onToggleParticipants: () -> Unit,
     val onShowChat: () -> Unit,
     val onToggleMoreActions: () -> Unit,
-    val isMicEnabled: MutableStateFlow<Boolean>,
-    val isCameraEnabled: MutableStateFlow<Boolean>,
+    val isMicEnabled: StateFlow<Boolean>,
+    val isCameraEnabled: StateFlow<Boolean>,
     val isChatShow: Boolean,
     val participantsCount: StateFlow<Int>,
     val unreadCount: Int,
@@ -118,7 +118,7 @@ fun BottomBar(
                     ControlButton(
                         modifier = Modifier
                             .testTag(BOTTOM_BAR_GRID_LAYOUT_BUTTON),
-                        onClick = { actions.onChangeLayout(CallLayoutType.SPEAKER_LAYOUT)},
+                        onClick = { actions.onChangeLayout(CallLayoutType.SPEAKER_LAYOUT) },
                         icon = Icons.Default.AutoAwesomeMosaic,
                         isActive = false,
                     )
@@ -128,7 +128,7 @@ fun BottomBar(
                     ControlButton(
                         modifier = Modifier
                             .testTag(BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON),
-                        onClick = { actions.onChangeLayout(CallLayoutType.GRID)},
+                        onClick = { actions.onChangeLayout(CallLayoutType.GRID) },
                         icon = Icons.Default.Window,
                         isActive = false,
                     )
