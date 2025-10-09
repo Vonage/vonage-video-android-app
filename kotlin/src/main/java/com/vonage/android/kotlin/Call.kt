@@ -87,7 +87,7 @@ class Call internal constructor(
     override val captionsStateFlow: StateFlow<String?> = _captionsStateFlow
 
     private val _mainSpeaker = MutableStateFlow<Participant?>(null)
-    override val mainSpeaker: StateFlow<Participant?> = _mainSpeaker
+    override val activeSpeaker: StateFlow<Participant?> = _mainSpeaker
 
     private val _localAudioStateFlow = MutableStateFlow(0F)
     override val localAudioLevel: StateFlow<Float> = _localAudioStateFlow
@@ -254,7 +254,7 @@ class Call internal constructor(
             snapshotFlow.collectLatest { visibleParticipants ->
                 if (visibleParticipants.isEmpty()) return@collectLatest
                 subscriberStreams.forEach { (key, value) ->
-                    value.subscribeToVideo = visibleParticipants.contains(key) || (key == mainSpeaker.value?.id)
+                    value.subscribeToVideo = visibleParticipants.contains(key) || (key == activeSpeaker.value?.id)
                 }
             }
         }

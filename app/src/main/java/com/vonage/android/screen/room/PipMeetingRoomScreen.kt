@@ -36,7 +36,7 @@ fun PipMeetingRoomScreen(
         (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
             val signalState by uiState.call.signalStateFlow.collectAsStateWithLifecycle(null)
             val chatState = signalState?.signals[SignalType.CHAT.signal] as? ChatState
-            val participant by uiState.call.mainSpeaker.collectAsStateWithLifecycle()
+            val participant by uiState.call.activeSpeaker.collectAsStateWithLifecycle()
 
             Box(
                 modifier = modifier

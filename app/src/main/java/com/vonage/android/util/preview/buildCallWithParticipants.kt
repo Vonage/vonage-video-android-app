@@ -29,7 +29,7 @@ fun buildCallWithParticipants(
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> =
         MutableStateFlow(buildParticipants(participantCount).toImmutableList())
     override val participantsCount: StateFlow<Int> = MutableStateFlow(participantCount)
-    override val mainSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
+    override val activeSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
 
     // Session related methods
     override fun connect(context: Context): Flow<SessionEvent> = flowOf()

@@ -56,7 +56,7 @@ fun AdaptiveSpeakerLayout(
         modifier = modifier
             .fillMaxSize()
     ) {
-        val mainParticipant by call.mainSpeaker.collectAsStateWithLifecycle()
+        val mainParticipant by call.activeSpeaker.collectAsStateWithLifecycle()
         val itemsPerRow = (maxWidth / (minItemWidth + spacing)).toInt().coerceAtLeast(1)
         val itemsPerCol = (maxHeight / minItemWidth).toInt().coerceAtLeast(1)
         val orientation = LocalConfiguration.current.orientation
@@ -140,7 +140,7 @@ fun BoxScope.SpotlightSpeaker(
     call: CallFacade,
     modifier: Modifier = Modifier,
 ) {
-    val mainParticipant by call.mainSpeaker.collectAsStateWithLifecycle()
+    val mainParticipant by call.activeSpeaker.collectAsStateWithLifecycle()
 
     mainParticipant?.let { participant ->
         ParticipantVideoCard(

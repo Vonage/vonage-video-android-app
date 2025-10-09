@@ -16,7 +16,7 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
 
     val participantsStateFlow: Flow<ImmutableList<Participant>>
     val participantsCount: StateFlow<Int>
-    val mainSpeaker: StateFlow<Participant?>
+    val activeSpeaker: StateFlow<Participant?>
     val signalStateFlow: StateFlow<SignalState?>
     val captionsStateFlow: StateFlow<String?>
 }

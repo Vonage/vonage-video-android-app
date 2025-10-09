@@ -345,7 +345,7 @@ val noOpCallFacade = object : CallFacade {
 
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = MutableStateFlow(persistentListOf())
     override val participantsCount: StateFlow<Int> = MutableStateFlow(1)
-    override val mainSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
+    override val activeSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
     override val signalStateFlow: StateFlow<SignalState?> = MutableStateFlow(null)
     override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
 
