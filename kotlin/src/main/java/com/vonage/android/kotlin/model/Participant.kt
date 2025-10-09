@@ -30,6 +30,8 @@ data class VeraPublisher(
     val cycleCamera: () -> Unit,
     val blurLevel: BlurLevel,
     val setCameraBlur: (BlurLevel) -> Unit,
+    val toggleMic: () -> Boolean,
+    val toggleCamera: () -> Boolean,
 ) : Participant
 
 data class VeraScreenPublisher(

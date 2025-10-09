@@ -52,17 +52,13 @@ fun AdaptiveSpeakerLayout(
     minItemWidth: Dp = 95.dp,
     spacing: Dp = 8.dp
 ) {
-    if (participants.isEmpty()) return
-
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
     ) {
         val mainParticipant by call.mainSpeaker.collectAsStateWithLifecycle()
-        val availableWidth = maxWidth - spacing
-        val itemsPerRow = ((availableWidth + spacing) / (minItemWidth + spacing)).toInt().coerceAtLeast(1)
+        val itemsPerRow = (maxWidth / (minItemWidth + spacing)).toInt().coerceAtLeast(1)
         val itemsPerCol = (maxHeight / minItemWidth).toInt().coerceAtLeast(1)
-
         val orientation = LocalConfiguration.current.orientation
 
         SpotlightSpeaker(
@@ -103,9 +99,9 @@ fun AdaptiveSpeakerLayout(
                             isCameraEnabled = participant.isCameraEnabled,
                             isMicEnabled = participant.isMicEnabled,
                             view = participant.view,
-                            call = call,
+                            audioLevel = call.localAudioLevel,
                             isSpeaking = participant.isSpeaking,
-                            isShowVolumeIndicator = participant is VeraPublisher,
+                            isVolumeIndicatorVisible = participant is VeraPublisher,
                             videoSource = participant.videoSource,
                         )
                     }
@@ -127,9 +123,9 @@ fun AdaptiveSpeakerLayout(
                             isCameraEnabled = participant.isCameraEnabled,
                             isMicEnabled = participant.isMicEnabled,
                             view = participant.view,
-                            call = call,
+                            audioLevel = call.localAudioLevel,
                             isSpeaking = participant.isSpeaking,
-                            isShowVolumeIndicator = participant is VeraPublisher,
+                            isVolumeIndicatorVisible = participant is VeraPublisher,
                             videoSource = participant.videoSource,
                         )
                     }
@@ -157,9 +153,9 @@ fun BoxScope.SpotlightSpeaker(
             isCameraEnabled = participant.isCameraEnabled,
             isMicEnabled = participant.isMicEnabled,
             view = participant.view,
-            call = call,
+            audioLevel = call.localAudioLevel,
             isSpeaking = participant.isSpeaking,
-            isShowVolumeIndicator = mainParticipant is VeraPublisher,
+            isVolumeIndicatorVisible = mainParticipant is VeraPublisher,
             videoSource = participant.videoSource,
         )
     }

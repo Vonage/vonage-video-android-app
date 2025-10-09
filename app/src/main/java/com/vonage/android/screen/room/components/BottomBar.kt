@@ -38,10 +38,12 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.ControlButton
 import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.MeetingRoomActions
+import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CAMERA_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CHAT_BADGE
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CHAT_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_END_CALL_BUTTON
+import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_GRID_LAYOUT_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_MIC_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BADGE
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BUTTON
@@ -114,7 +116,8 @@ fun BottomBar(
             when (bottomBarState.layoutType) {
                 CallLayoutType.GRID -> {
                     ControlButton(
-                        modifier = Modifier,
+                        modifier = Modifier
+                            .testTag(BOTTOM_BAR_GRID_LAYOUT_BUTTON),
                         onClick = { actions.onChangeLayout(CallLayoutType.SPEAKER_LAYOUT)},
                         icon = Icons.Default.AutoAwesomeMosaic,
                         isActive = false,
@@ -123,7 +126,8 @@ fun BottomBar(
 
                 CallLayoutType.SPEAKER_LAYOUT -> {
                     ControlButton(
-                        modifier = Modifier,
+                        modifier = Modifier
+                            .testTag(BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON),
                         onClick = { actions.onChangeLayout(CallLayoutType.GRID)},
                         icon = Icons.Default.Window,
                         isActive = false,
@@ -228,6 +232,8 @@ object BottomBarTestTags {
     const val BOTTOM_BAR_CHAT_BADGE = "bottom_bar_chat_badge"
     const val BOTTOM_BAR_CAMERA_BUTTON = "bottom_bar_camera_button"
     const val BOTTOM_BAR_MIC_BUTTON = "bottom_bar_mic_button"
+    const val BOTTOM_BAR_GRID_LAYOUT_BUTTON = "bottom_bar_grid_layout_button"
+    const val BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON = "bottom_bar_active_speaker_layout_button"
 }
 
 @PreviewLightDark

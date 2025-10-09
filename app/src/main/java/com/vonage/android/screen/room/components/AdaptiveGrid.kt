@@ -75,9 +75,9 @@ fun AdaptiveGrid(
                     isCameraEnabled = participant.isCameraEnabled,
                     isMicEnabled = participant.isMicEnabled,
                     view = participant.view,
-                    call = call,
+                    audioLevel = call.localAudioLevel,
                     isSpeaking = participant.isSpeaking,
-                    isShowVolumeIndicator = participant is VeraPublisher,
+                    isVolumeIndicatorVisible = participant is VeraPublisher,
                     videoSource = participant.videoSource,
                 )
             }

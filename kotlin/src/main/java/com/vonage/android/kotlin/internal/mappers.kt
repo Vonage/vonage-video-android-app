@@ -6,6 +6,7 @@ import com.opentok.android.Subscriber
 import com.vonage.android.kotlin.Call.Companion.PUBLISHER_ID
 import com.vonage.android.kotlin.Call.Companion.PUBLISHER_SCREEN_ID
 import com.vonage.android.kotlin.ext.applyVideoBlur
+import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.kotlin.model.VeraPublisher
@@ -32,7 +33,15 @@ internal fun Publisher.toParticipant(
     videoSource = VideoSource.CAMERA,
     name = stream?.name ?: name.orEmpty(),
     isMicEnabled = MutableStateFlow(publishAudio),
+    toggleMic = {
+        publishAudio = publishAudio.toggle()
+        publishAudio
+    },
     isCameraEnabled = MutableStateFlow(publishVideo),
+    toggleCamera = {
+        publishVideo = publishVideo.toggle()
+        publishVideo
+    },
     view = view,
     cameraIndex = camera,
     cycleCamera = { cycleCamera() },

@@ -37,10 +37,8 @@ import com.vonage.android.audio.ui.AudioVolumeIndicator
 import com.vonage.android.compose.components.VideoRenderer
 import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.screen.components.AvatarInitials
-import com.vonage.android.screen.room.noOpCallFacade
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -48,11 +46,11 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun ParticipantVideoCard(
     isCameraEnabled: StateFlow<Boolean>,
-    isShowVolumeIndicator: Boolean,
+    isVolumeIndicatorVisible: Boolean,
     isMicEnabled: StateFlow<Boolean>,
     isSpeaking: StateFlow<Boolean>,
+    audioLevel: StateFlow<Float>,
     videoSource: VideoSource,
-    call: CallFacade,
     name: String,
     view: View,
     modifier: Modifier = Modifier,
@@ -75,9 +73,9 @@ fun ParticipantVideoCard(
 
             if (videoSource == VideoSource.CAMERA) {
                 MicrophoneIndicator(
-                    call = call,
+                    audioLevel = audioLevel,
                     isMicEnabled = isMicEnabled,
-                    isShowVolumeIndicator = isShowVolumeIndicator,
+                    isShowVolumeIndicator = isVolumeIndicatorVisible,
                 )
             }
         }
@@ -157,12 +155,12 @@ private fun BoxScope.ParticipantLabel(
 
 @Composable
 private fun BoxScope.MicrophoneIndicator(
-    call: CallFacade,
+    audioLevel: StateFlow<Float>,
     isMicEnabled: StateFlow<Boolean>,
     isShowVolumeIndicator: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val audioLevel by call.localAudioLevel.collectAsStateWithLifecycle()
+    val audioLevel by audioLevel.collectAsStateWithLifecycle()
     val isMicEnabled by isMicEnabled.collectAsStateWithLifecycle()
 
     if (isMicEnabled && isShowVolumeIndicator) {
@@ -200,12 +198,12 @@ internal fun ParticipantVideoCardPreview() {
     VonageVideoTheme {
         ParticipantVideoCard(
             modifier = Modifier.height(300.dp),
-            call = noOpCallFacade,
             name = "Sample Name",
+            audioLevel = MutableStateFlow(0.4f),
             isCameraEnabled = MutableStateFlow(true),
             isMicEnabled = MutableStateFlow(true),
             isSpeaking = MutableStateFlow(false),
-            isShowVolumeIndicator = true,
+            isVolumeIndicatorVisible = true,
             videoSource = VideoSource.CAMERA,
             view = previewCamera(),
         )
@@ -218,12 +216,12 @@ internal fun ParticipantVideoCardPlaceholderPreview() {
     VonageVideoTheme {
         ParticipantVideoCard(
             modifier = Modifier.height(300.dp),
-            call = noOpCallFacade,
             name = "Sample Name Name Name Name Name Name Name Name Name Name",
+            audioLevel = MutableStateFlow(0.4f),
             isCameraEnabled = MutableStateFlow(false),
             isMicEnabled = MutableStateFlow(true),
             isSpeaking = MutableStateFlow(false),
-            isShowVolumeIndicator = false,
+            isVolumeIndicatorVisible = false,
             videoSource = VideoSource.SCREEN,
             view = previewCamera(),
         )

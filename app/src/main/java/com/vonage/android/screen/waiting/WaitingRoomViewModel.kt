@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.vonage.android.audio.util.MicVolumeListener
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
-import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
@@ -41,11 +40,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     )
 
     private val _audioLevel = MutableStateFlow(0F)
-    val audioLevel: StateFlow<Float> = _audioLevel.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
-        initialValue = 0F,
-    )
+    val audioLevel: StateFlow<Float> = _audioLevel
 
     private lateinit var publisher: VeraPublisher
     private var currentBlurIndex: Int = 0
@@ -61,6 +56,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
                     userName = publisher.name,
                     blurLevel = publisher.blurLevel,
                     view = publisher.view,
+                    audioLevel = _audioLevel,
                 )
             }
         }
@@ -79,15 +75,13 @@ class WaitingRoomViewModel @AssistedInject constructor(
 
     fun onMicToggle() {
         viewModelScope.launch {
-            publisher.isMicEnabled.emit(publisher.isMicEnabled.value.toggle())
-            _uiState.update { uiState -> uiState.copy(isMicEnabled = publisher.isMicEnabled.value) }
+            _uiState.update { uiState -> uiState.copy(isMicEnabled = publisher.toggleMic()) }
         }
     }
 
     fun onCameraToggle() {
         viewModelScope.launch {
-            publisher.isCameraEnabled.emit(publisher.isCameraEnabled.value.toggle())
-            _uiState.update { uiState -> uiState.copy(isCameraEnabled = publisher.isCameraEnabled.value) }
+            _uiState.update { uiState -> uiState.copy(isCameraEnabled = publisher.toggleCamera()) }
         }
     }
 
@@ -148,6 +142,7 @@ data class WaitingRoomUiState(
     val isMicEnabled: Boolean = true,
     val isCameraEnabled: Boolean = true,
     val blurLevel: BlurLevel = BlurLevel.NONE,
+    val audioLevel: StateFlow<Float> = MutableStateFlow(0F),
     val view: View? = null,
     val isSuccess: Boolean = false,
 )

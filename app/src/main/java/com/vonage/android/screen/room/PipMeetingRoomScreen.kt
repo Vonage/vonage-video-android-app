@@ -44,13 +44,13 @@ fun PipMeetingRoomScreen(
             ) {
                 participant?.let { participant ->
                     ParticipantVideoCard(
-                        call = uiState.call,
+                        audioLevel = uiState.call.localAudioLevel,
                         name = participant.name,
                         isCameraEnabled = participant.isCameraEnabled,
                         isMicEnabled = participant.isMicEnabled,
                         view = participant.view,
                         isSpeaking = participant.isSpeaking,
-                        isShowVolumeIndicator = participant is VeraPublisher,
+                        isVolumeIndicatorVisible = participant is VeraPublisher,
                         videoSource = participant.videoSource,
                     )
                 }
