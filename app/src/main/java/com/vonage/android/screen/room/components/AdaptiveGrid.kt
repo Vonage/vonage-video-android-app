@@ -22,6 +22,7 @@ import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.noOpCallFacade
+import com.vonage.android.util.lazyStateWithVisibilityNotification
 import com.vonage.android.util.preview.buildParticipants
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -52,8 +53,7 @@ fun AdaptiveGrid(
         }
         val visibleItems = participants.take(takeCount)
 
-        val listState =
-            lazyStateWithVisibilityNotification(call = call, lazyState = rememberLazyGridState())
+        val listState = lazyStateWithVisibilityNotification(call = call, lazyState = rememberLazyGridState())
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(itemsPerRow),
@@ -83,7 +83,9 @@ fun AdaptiveGrid(
             }
 
             if (participants.size > takeCount) {
-                item {
+                item(
+                    key = "placeholder",
+                ) {
                     ParticipantsPlaceholders(
                         modifier = Modifier
                             .height(itemHeight)
