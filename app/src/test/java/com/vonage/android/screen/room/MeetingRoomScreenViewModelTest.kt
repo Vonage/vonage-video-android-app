@@ -763,6 +763,8 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
         setCameraBlur = {},
         cameraIndex = 0,
         isSpeaking = MutableStateFlow(false),
+        toggleMic = { false },
+        toggleCamera = { false },
     )
 
     private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true) {

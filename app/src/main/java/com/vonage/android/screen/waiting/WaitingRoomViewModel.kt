@@ -39,10 +39,9 @@ class WaitingRoomViewModel @AssistedInject constructor(
         initialValue = WaitingRoomUiState(roomName = roomName),
     )
 
-    private val _audioLevel = MutableStateFlow(0F)
-    val audioLevel: StateFlow<Float> = _audioLevel
-
     private lateinit var publisher: VeraPublisher
+
+    private val _audioLevel = MutableStateFlow(0F)
     private var currentBlurIndex: Int = 0
 
     fun init(context: Context) {

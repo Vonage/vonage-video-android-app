@@ -28,7 +28,6 @@ fun WaitingRoomRoute(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val audioLevel = viewModel.audioLevel
     var permissionsAlreadyGranted by rememberSaveable { mutableStateOf(true) }
     val pipModifier = pipEffect(shouldEnterPipMode = false)
 
@@ -65,7 +64,6 @@ fun WaitingRoomRoute(
     WaitingRoomScreen(
         uiState = uiState,
         actions = actions,
-        audioLevel = audioLevel,
         modifier = modifier.then(pipModifier),
         navigateToRoom = navigateToRoom,
     )
