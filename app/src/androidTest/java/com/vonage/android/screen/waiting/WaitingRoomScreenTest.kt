@@ -56,9 +56,9 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = true,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
+                        audioLevel = MutableStateFlow(0.5f),
                     ),
                     actions = WaitingRoomActions(),
-                    audioLevel = MutableStateFlow(0.5f),
                 )
             }
         }
@@ -92,9 +92,9 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = true,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
+                        audioLevel = MutableStateFlow(0.5f),
                     ),
                     actions = WaitingRoomActions(),
-                    audioLevel = MutableStateFlow(0.5f),
                 )
             }
         }
@@ -128,9 +128,9 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = false,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
+                        audioLevel = MutableStateFlow(0.5f),
                     ),
                     actions = WaitingRoomActions(),
-                    audioLevel = MutableStateFlow(0.5f),
                 )
             }
         }
@@ -152,9 +152,9 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = false,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
+                        audioLevel = MutableStateFlow(0.5f),
                     ),
                     actions = WaitingRoomActions(),
-                    audioLevel = MutableStateFlow(0.5f),
                 )
             }
         }
@@ -176,9 +176,9 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = false,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
+                        audioLevel = MutableStateFlow(0.5f),
                     ),
                     actions = WaitingRoomActions(),
-                    audioLevel = MutableStateFlow(0.5f),
                 )
             }
         }
@@ -208,9 +208,9 @@ class WaitingRoomScreenTest {
                         isCameraEnabled = false,
                         view = previewCamera(),
                         blurLevel = BlurLevel.NONE,
+                        audioLevel = MutableStateFlow(0.5f),
                     ),
                     actions = WaitingRoomActions(),
-                    audioLevel = MutableStateFlow(0.5f),
                 )
             }
         }
