@@ -14,7 +14,7 @@ import androidx.lifecycle.LifecycleOwner
  */
 @Suppress("TooGenericExceptionCaught")
 object VideoViewLifecycleManager {
-    
+
     /**
      * Safely attach a video view to a container with lifecycle awareness
      */
@@ -27,32 +27,31 @@ object VideoViewLifecycleManager {
         if (!lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             return
         }
-        
+
         try {
             // Remove from any existing parent
             (videoView.parent as? ViewGroup)?.removeView(videoView)
-            
+
             // Add to new container if not already there
             if (videoView.parent != container) {
                 container.addView(videoView)
             }
-            
+
             // For TextureView, ensure surface is ready
-            if (videoView is TextureView) {
-                if (!videoView.isAvailable) {
-                    // Surface not ready, defer attachment
-                    videoView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-                        override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
-                            // Surface is now ready for rendering
-                        }
-                        
-                        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
-                            // empty
-                        }
-                        override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = false
-                        override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
-                            // empty
-                        }
+            if (videoView is TextureView && !videoView.isAvailable) {
+                // Surface not ready, defer attachment
+                videoView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+                    override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
+                        // Surface is now ready for rendering
+                    }
+
+                    override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
+                        // empty
+                    }
+
+                    override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = false
+                    override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
+                        // empty
                     }
                 }
             }
@@ -60,14 +59,13 @@ object VideoViewLifecycleManager {
             Log.w(TAG, "Failed to attach video view: ${e.message}")
         }
     }
-    
+
     /**
      * Safely detach a video view from its container
      */
     fun detachVideoView(videoView: View) {
         try {
             (videoView.parent as? ViewGroup)?.removeView(videoView)
-            
             // Clear texture listener if applicable
             if (videoView is TextureView) {
                 videoView.surfaceTextureListener = null
@@ -76,7 +74,7 @@ object VideoViewLifecycleManager {
             Log.w(TAG, "Failed to detach video view: ${e.message}")
         }
     }
-    
+
     /**
      * Create a lifecycle observer that manages video view attachment/detachment
      */
@@ -92,14 +90,18 @@ object VideoViewLifecycleManager {
                     // Temporarily detach to prevent surface issues
                     detachVideoView(videoView)
                 }
+
                 Lifecycle.Event.ON_RESUME -> {
                     onResume()
                     // Reattachment will be handled by the composable
                 }
+
                 Lifecycle.Event.ON_DESTROY -> {
                     detachVideoView(videoView)
                 }
-                else -> { /* no-op */ }
+
+                else -> { /* no-op */
+                }
             }
         }
     }
