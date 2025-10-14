@@ -7,9 +7,9 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.dagger.hilt) apply false
     alias(libs.plugins.kotlin.ksp) apply false
+    alias(libs.plugins.sonarqube) apply false
+    alias(libs.plugins.kover) apply false
     alias(libs.plugins.detekt)
-    id("org.sonarqube") version "6.3.1.5724" apply false
-    id("org.jetbrains.kotlinx.kover") version "0.9.1" apply false
 }
 
 dependencies {

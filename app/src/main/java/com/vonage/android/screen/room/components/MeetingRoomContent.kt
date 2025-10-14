@@ -13,14 +13,18 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.audio.ui.AudioDevices
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.screen.reporting.ReportIssueScreen
+import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.RecordingState
 import com.vonage.android.screen.room.ScreenSharingState
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
+import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT
 import com.vonage.android.screen.room.components.emoji.EmojiSelector
-import com.vonage.android.screen.reporting.ReportIssueScreen
+import com.vonage.android.screen.room.noOpCallFacade
 import com.vonage.android.util.preview.buildParticipants
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -35,7 +39,7 @@ fun MeetingRoomContent(
     recordingState: RecordingState,
     screenSharingState: ScreenSharingState,
     captionsState: CaptionsState,
-    audioLevel: Float,
+    call: CallFacade,
     participantsSheetState: SheetState,
     audioDeviceSelectorSheetState: SheetState,
     moreActionsSheetState: SheetState,
@@ -50,6 +54,7 @@ fun MeetingRoomContent(
     onDismissAudioDeviceSelector: () -> Unit,
     onDismissMoreActions: () -> Unit,
     onEmojiClick: (String) -> Unit,
+    layoutType: CallLayoutType,
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
@@ -58,13 +63,28 @@ fun MeetingRoomContent(
         modifier = modifier
             .fillMaxSize(),
     ) {
-        AdaptiveGrid(
-            participants = participants,
-            modifier = Modifier
-                .fillMaxSize()
-                .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
-            audioLevel = audioLevel,
-        )
+        when (layoutType) {
+            CallLayoutType.GRID -> {
+                AdaptiveGrid(
+                    participants = participants,
+                    call = call,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
+                )
+            }
+
+            CallLayoutType.SPEAKER_LAYOUT -> {
+                AdaptiveSpeakerLayout(
+                    participants = participants,
+                    call = call,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag(MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT),
+                )
+            }
+        }
+
         if (showParticipants) {
             ModalBottomSheet(
                 onDismissRequest = onDismissParticipants,
@@ -123,6 +143,7 @@ fun MeetingRoomContent(
 
 object MeetingRoomContentTestTags {
     const val MEETING_ROOM_PARTICIPANTS_GRID = "meeting_room_participants_grid"
+    const val MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT = "meeting_room_participants_speaker_layout"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -133,11 +154,11 @@ internal fun MeetingRoomContentPreview() {
         val sheetState = rememberModalBottomSheetState()
         MeetingRoomContent(
             participants = buildParticipants(5).toImmutableList(),
+            call = noOpCallFacade,
             actions = MeetingRoomActions(),
             recordingState = RecordingState.IDLE,
             screenSharingState = ScreenSharingState.IDLE,
             captionsState = CaptionsState.IDLE,
-            audioLevel = 0.5f,
             participantsSheetState = sheetState,
             audioDeviceSelectorSheetState = sheetState,
             moreActionsSheetState = sheetState,
@@ -152,6 +173,7 @@ internal fun MeetingRoomContentPreview() {
             onShowReporting = {},
             onEmojiClick = {},
             onDismissReporting = {},
+            layoutType = CallLayoutType.GRID,
         )
     }
 }

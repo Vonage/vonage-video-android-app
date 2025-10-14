@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.callbackFlow
 
 internal fun Subscriber.observeAudioLevel(): Flow<Float> = callbackFlow {
     val audioLevelListener = SubscriberKit.AudioLevelListener { _, audioLevel ->
-        trySend(audioLevel.round4())
+        trySend(audioLevel.round2())
     }
     setAudioLevelListener(audioLevelListener)
     awaitClose {

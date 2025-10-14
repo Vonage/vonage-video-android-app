@@ -15,12 +15,14 @@ import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
@@ -59,6 +61,7 @@ fun ParticipantsList(
 
 @Composable
 private fun ParticipantRow(participant: Participant) {
+    val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
     Row(
         modifier = Modifier
             .padding(bottom = 4.dp, end = 8.dp)
@@ -83,7 +86,7 @@ private fun ParticipantRow(participant: Participant) {
             color = VonageVideoTheme.colors.inverseSurface,
             style = VonageVideoTheme.typography.body,
         )
-        if (!participant.isMicEnabled) {
+        if (!isMicEnabled) {
             Icon(
                 modifier = Modifier.size(16.dp),
                 imageVector = Icons.Default.MicOff,
