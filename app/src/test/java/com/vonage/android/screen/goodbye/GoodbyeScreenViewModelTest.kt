@@ -14,7 +14,8 @@ import io.mockk.verify
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -22,6 +23,8 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalCoroutinesApi::class)
 class GoodbyeScreenViewModelTest {
 
+    private val testScheduler = TestCoroutineScheduler()
+    private val testDispatcher = StandardTestDispatcher(testScheduler)
     private val archiveRepository: ArchiveRepository = mockk()
     private val downloadManager: DownloadManager = mockk()
     private val coroutinePollerProvider: CoroutinePollerProvider<Unit> = mockk()
@@ -31,7 +34,7 @@ class GoodbyeScreenViewModelTest {
         archiveRepository = archiveRepository,
         downloadManager = downloadManager,
         coroutinePollerProvider = coroutinePollerProvider,
-        dispatcher = UnconfinedTestDispatcher(),
+        dispatcher = testDispatcher,
     )
 
     private fun setupPollerMock() {
