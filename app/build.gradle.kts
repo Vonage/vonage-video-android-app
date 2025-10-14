@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.dagger.hilt)
+    alias(libs.plugins.sonarqube)
+    alias(libs.plugins.kover)
     kotlin("plugin.serialization") version "2.0.21"
     id("org.jetbrains.kotlinx.kover") version "0.9.1"
     id("org.sonarqube") version "6.3.1.5724"
@@ -27,6 +29,19 @@ android {
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
     }
 
+    buildTypes {
+        debug {
+            isDebuggable = true
+            isMinifyEnabled = false
+            isProfileable = false
+        }
+        release {
+            isDebuggable = false
+            isMinifyEnabled = true
+            isProfileable = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -36,6 +51,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     testOptions {
         unitTests {
@@ -100,6 +116,11 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
     }
+
+    composeCompiler {
+        reportsDestination = layout.buildDirectory.dir("compose_compiler")
+        metricsDestination = layout.buildDirectory.dir("compose_compiler")
+    }
 }
 
 dependencies {
@@ -128,11 +149,11 @@ dependencies {
     implementation(libs.androidx.adaptive.layout)
     implementation(libs.androidx.adaptive.navigation)
     implementation(libs.androidx.material3)
-    ksp(libs.hilt.android.compiler)
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
+    ksp(libs.hilt.android.compiler)
 
     // to be removed when extracting to module all the audio stuff
     implementation(libs.opentok.android.sdk)
@@ -140,10 +161,10 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.params)
-    testRuntimeOnly(libs.junit.jupiter.engine)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
+    testRuntimeOnly(libs.junit.jupiter.engine)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.test.rules)

@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -26,49 +29,45 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle.State.STARTED
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.currentStateAsState
 import com.vonage.android.audio.ui.AudioVolumeIndicator
 import com.vonage.android.compose.components.VideoRenderer
 import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.screen.components.AvatarInitials
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Suppress("LongParameterList")
 @Composable
 fun ParticipantVideoCard(
-    isCameraEnabled: Boolean,
-    isShowVolumeIndicator: Boolean,
-    isMicEnabled: Boolean,
-    isSpeaking: Boolean,
+    isCameraEnabled: StateFlow<Boolean>,
+    isVolumeIndicatorVisible: Boolean,
+    isMicEnabled: StateFlow<Boolean>,
+    isSpeaking: StateFlow<Boolean>,
+    audioLevel: StateFlow<Float>,
     videoSource: VideoSource,
-    audioLevel: Float,
     name: String,
     view: View,
     modifier: Modifier = Modifier,
 ) {
-    Card(
+    ParticipantContainer(
         modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
-        border = if (isSpeaking) BorderStroke(1.dp, VonageVideoTheme.colors.primary) else null,
+        isSpeaking = isSpeaking,
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
-            if (isCameraEnabled) {
-                VideoRenderer(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clipToBounds(),
-                    view = view,
-                )
-            } else {
-                AvatarInitials(
-                    modifier = Modifier
-                        .align(Alignment.Center),
-                    userName = name,
-                )
-            }
+            ParticipantVideoContainer(
+                isCameraEnabled = isCameraEnabled,
+                name = name,
+                view = view,
+            )
 
             ParticipantLabel(name)
 
@@ -76,9 +75,55 @@ fun ParticipantVideoCard(
                 MicrophoneIndicator(
                     audioLevel = audioLevel,
                     isMicEnabled = isMicEnabled,
-                    isShowVolumeIndicator = isShowVolumeIndicator,
+                    isShowVolumeIndicator = isVolumeIndicatorVisible,
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun ParticipantContainer(
+    isSpeaking: StateFlow<Boolean>,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val isSpeaking by isSpeaking.collectAsStateWithLifecycle()
+
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        border = if (isSpeaking) BorderStroke(1.dp, VonageVideoTheme.colors.primary) else null,
+    ) {
+        content()
+    }
+}
+
+@Composable
+private fun BoxScope.ParticipantVideoContainer(
+    isCameraEnabled: StateFlow<Boolean>,
+    name: String,
+    view: View,
+) {
+    val isCameraEnabled by isCameraEnabled.collectAsStateWithLifecycle()
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+
+    key(view.hashCode(), isCameraEnabled) {
+        if (isCameraEnabled
+            && lifecycle.currentStateAsState().value.isAtLeast(STARTED)
+        ) {
+            VideoRenderer(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clipToBounds(),
+                view = view,
+            )
+        } else {
+            AvatarInitials(
+                modifier = Modifier
+                    .align(Alignment.Center),
+                userName = name,
+            )
         }
     }
 }
@@ -110,17 +155,20 @@ private fun BoxScope.ParticipantLabel(
 
 @Composable
 private fun BoxScope.MicrophoneIndicator(
+    audioLevel: StateFlow<Float>,
+    isMicEnabled: StateFlow<Boolean>,
     isShowVolumeIndicator: Boolean,
-    isMicEnabled: Boolean,
-    audioLevel: Float,
     modifier: Modifier = Modifier,
 ) {
+    val audioLevel by audioLevel.collectAsStateWithLifecycle()
+    val isMicEnabled by isMicEnabled.collectAsStateWithLifecycle()
+
     if (isMicEnabled && isShowVolumeIndicator) {
         AudioVolumeIndicator(
             size = 32.dp,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(vertical = 12.dp),
+                .padding(8.dp),
             audioLevel = audioLevel,
         )
     } else {
@@ -151,11 +199,11 @@ internal fun ParticipantVideoCardPreview() {
         ParticipantVideoCard(
             modifier = Modifier.height(300.dp),
             name = "Sample Name",
-            isCameraEnabled = true,
-            isMicEnabled = true,
-            audioLevel = 0.6f,
-            isSpeaking = false,
-            isShowVolumeIndicator = true,
+            audioLevel = MutableStateFlow(0.4f),
+            isCameraEnabled = MutableStateFlow(true),
+            isMicEnabled = MutableStateFlow(true),
+            isSpeaking = MutableStateFlow(false),
+            isVolumeIndicatorVisible = true,
             videoSource = VideoSource.CAMERA,
             view = previewCamera(),
         )
@@ -169,11 +217,11 @@ internal fun ParticipantVideoCardPlaceholderPreview() {
         ParticipantVideoCard(
             modifier = Modifier.height(300.dp),
             name = "Sample Name Name Name Name Name Name Name Name Name Name",
-            isCameraEnabled = false,
-            isMicEnabled = true,
-            audioLevel = 0.6f,
-            isSpeaking = false,
-            isShowVolumeIndicator = false,
+            audioLevel = MutableStateFlow(0.4f),
+            isCameraEnabled = MutableStateFlow(false),
+            isMicEnabled = MutableStateFlow(true),
+            isSpeaking = MutableStateFlow(false),
+            isVolumeIndicatorVisible = false,
             videoSource = VideoSource.SCREEN,
             view = previewCamera(),
         )

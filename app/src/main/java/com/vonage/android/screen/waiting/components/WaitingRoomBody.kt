@@ -24,7 +24,6 @@ import com.vonage.android.screen.waiting.WaitingRoomUiState
 fun WaitingRoomBody(
     uiState: WaitingRoomUiState,
     actions: WaitingRoomActions,
-    audioLevel: Float,
     onMicDeviceSelect: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -49,7 +48,7 @@ fun WaitingRoomBody(
                 isMicEnabled = uiState.isMicEnabled,
                 isCameraEnabled = uiState.isCameraEnabled,
                 blurLevel = uiState.blurLevel,
-                audioLevels = audioLevel,
+                audioLevels = uiState.audioLevel,
                 actions = actions,
             )
             DeviceSelectionPanel(
@@ -83,7 +82,6 @@ internal fun WaitingRoomBodyPreview() {
                 blurLevel = BlurLevel.NONE,
                 view = previewCamera(),
             ),
-            audioLevel = 0.5f,
             actions = WaitingRoomActions(),
             onMicDeviceSelect = {},
         )
@@ -104,7 +102,6 @@ internal fun WaitingRoomBodyWithVideoPreview() {
                 blurLevel = BlurLevel.NONE,
                 view = previewCamera(),
             ),
-            audioLevel = 0.5f,
             actions = WaitingRoomActions(),
             onMicDeviceSelect = {},
         )

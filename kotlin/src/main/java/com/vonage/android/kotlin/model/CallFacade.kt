@@ -1,5 +1,6 @@
 package com.vonage.android.kotlin.model
 
+import android.content.Context
 import android.media.projection.MediaProjection
 import androidx.compose.runtime.Stable
 import com.vonage.android.kotlin.signal.ChatMessage
@@ -11,20 +12,24 @@ import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, ScreenShareFacade {
-    val participantsStateFlow: StateFlow<ImmutableList<Participant>>
+    fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>)
+
+    val participantsStateFlow: Flow<ImmutableList<Participant>>
+    val participantsCount: StateFlow<Int>
+    val activeSpeaker: StateFlow<Participant?>
     val signalStateFlow: StateFlow<SignalState?>
     val captionsStateFlow: StateFlow<String?>
 }
 
 interface PublisherFacade {
-    fun observeLocalAudioLevel(): Flow<Float>
+    val localAudioLevel: StateFlow<Float>
     fun toggleLocalVideo()
     fun toggleLocalCamera()
     fun toggleLocalAudio()
 }
 
 interface SessionFacade {
-    fun connect(): Flow<SessionEvent>
+    fun connect(context: Context): Flow<SessionEvent>
     fun enableCaptions(enable: Boolean)
     fun pauseSession()
     fun resumeSession()
@@ -36,7 +41,7 @@ interface ChatFacade {
     fun listenUnreadChatMessages(enable: Boolean)
 }
 
-interface EmojiFacade {
+fun interface EmojiFacade {
     fun sendEmoji(emoji: String)
 }
 

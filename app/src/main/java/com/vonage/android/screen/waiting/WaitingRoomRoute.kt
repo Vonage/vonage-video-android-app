@@ -9,7 +9,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.screen.components.permissions.CallPermissionHandler
 import com.vonage.android.util.pip.pipEffect
@@ -25,8 +26,8 @@ fun WaitingRoomRoute(
         factory.create(roomName)
     },
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val audioLevelState by viewModel.audioLevel.collectAsStateWithLifecycle()
     var permissionsAlreadyGranted by rememberSaveable { mutableStateOf(true) }
     val pipModifier = pipEffect(shouldEnterPipMode = false)
 
@@ -52,7 +53,9 @@ fun WaitingRoomRoute(
 
     CallPermissionHandler(
         onGrantPermissions = {
-            if (permissionsAlreadyGranted) { viewModel.init() }
+            if (permissionsAlreadyGranted) {
+                viewModel.init(context)
+            }
             permissionsAlreadyGranted = false
         },
         navigateToPermissions = navigateToPermissions,
@@ -60,7 +63,6 @@ fun WaitingRoomRoute(
 
     WaitingRoomScreen(
         uiState = uiState,
-        audioLevel = audioLevelState,
         actions = actions,
         modifier = modifier.then(pipModifier),
         navigateToRoom = navigateToRoom,
