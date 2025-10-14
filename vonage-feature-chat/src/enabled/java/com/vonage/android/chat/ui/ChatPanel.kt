@@ -32,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.components.VonageTextField
@@ -47,6 +46,9 @@ val dateFormat = SimpleDateFormat("hh:mm a", Locale.current.platformLocale)
 
 @Composable
 fun ChatPanel(
+    title: String,
+    sendLabel: String,
+    jumpToBottomLabel: String,
     messages: ImmutableList<ChatMessage>,
     onCloseChat: () -> Unit,
     onSendMessage: (String) -> Unit,
@@ -74,8 +76,7 @@ fun ChatPanel(
             Text(
                 modifier = Modifier
                     .weight(1f),
-                //text = stringResource(R.string.chat_panel_title),
-                text = "Chat",
+                text = title,
                 color = VonageVideoTheme.colors.inverseSurface,
                 style = VonageVideoTheme.typography.title,
             )
@@ -93,10 +94,12 @@ fun ChatPanel(
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1f),
+            jumpToBottomLabel = jumpToBottomLabel,
             scrollState = listState,
             messages = messages,
         )
         ChatPanelInput(
+            sendLabel = sendLabel,
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceContainer)
                 .padding(8.dp),
@@ -107,6 +110,7 @@ fun ChatPanel(
 
 @Composable
 private fun ChatPanelMessages(
+    jumpToBottomLabel: String,
     scrollState: LazyListState,
     messages: ImmutableList<ChatMessage>,
     modifier: Modifier = Modifier,
@@ -146,6 +150,7 @@ private fun ChatPanelMessages(
         }
 
         JumpToBottom(
+            label = jumpToBottomLabel,
             enabled = jumpToBottomButtonEnabled,
             onClick = {
                 scope.launch {
@@ -159,6 +164,7 @@ private fun ChatPanelMessages(
 
 @Composable
 fun ChatPanelInput(
+    sendLabel: String,
     onSendMessage: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -182,8 +188,7 @@ fun ChatPanelInput(
             maxLines = 3,
             placeholder = {
                 Text(
-                    //text = stringResource(R.string.chat_panel_input_text_placeholder),
-                    text = "Send",
+                    text = sendLabel,
                     color = VonageVideoTheme.colors.textPrimaryDisabled,
                 )
             },
@@ -205,11 +210,13 @@ fun ChatPanelInput(
 }
 
 @PreviewLightDark
-@Preview
 @Composable
 internal fun ChatPanelPreview() {
     VonageVideoTheme {
         ChatPanel(
+            title = "Chat Preview",
+            sendLabel = "Send message preview",
+            jumpToBottomLabel = "Jump to bottom preview",
             messages = persistentListOf(),
             onSendMessage = {},
             onCloseChat = {},

@@ -7,6 +7,9 @@ import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun ChatPanel(
+    title: String,
+    sendLabel: String,
+    jumpToBottomLabel: String,
     messages: ImmutableList<ChatMessage>,
     onCloseChat: () -> Unit,
     onSendMessage: (String) -> Unit,

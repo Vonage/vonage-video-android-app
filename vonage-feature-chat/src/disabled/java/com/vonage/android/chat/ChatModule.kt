@@ -1,15 +1,15 @@
-import com.vonage.android.chat.ChatFeature
-import com.vonage.android.chat.DisabledChatFeature
-import com.vonage.android.chat.DisabledChatSignalPlugin
-import com.vonage.android.kotlin.signal.ChatSignalPlugin
+package com.vonage.android.chat
 
-object ChatModule {
-    
-    fun getChatFeature(): ChatFeature {
-        return DisabledChatFeature()
-    }
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
-    fun getPlugin(): ChatSignalPlugin {
-        return DisabledChatSignalPlugin()
-    }
+@Module
+@InstallIn(SingletonComponent::class)
+class ChatModule {
+
+    @Provides
+    fun provideChatFeature(): ChatFeature =
+        DisabledChatFeature()
 }

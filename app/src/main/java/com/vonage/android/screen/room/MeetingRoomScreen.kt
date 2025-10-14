@@ -218,6 +218,9 @@ fun ThreePaneScaffoldPaneScope.ExtraPane(
             .padding(16.dp)
     ) {
         ChatPanel(
+            title = stringResource(R.string.chat_panel_title),
+            sendLabel = stringResource(R.string.chat_panel_input_text_placeholder),
+            jumpToBottomLabel = stringResource(R.string.chat_panel_jump_to_bottom),
             messages = chatState?.messages.orEmpty().toImmutableList(),
             onSendMessage = actions.onMessageSent,
             onCloseChat = onCloseChat,
@@ -255,7 +258,6 @@ internal fun MeetingRoomScreenSessionErrorPreview() {
     }
 }
 
-@PreviewLightDark
 @PreviewScreenSizes
 @Composable
 internal fun MeetingRoomScreenSessionPreview() {
@@ -264,7 +266,7 @@ internal fun MeetingRoomScreenSessionPreview() {
             uiState = MeetingRoomUiState(
                 roomName = "sample-room-name",
                 recordingState = RecordingState.RECORDING,
-                call = buildCallWithParticipants(1),
+                call = buildCallWithParticipants(10),
                 isLoading = false,
                 isError = false,
             ),

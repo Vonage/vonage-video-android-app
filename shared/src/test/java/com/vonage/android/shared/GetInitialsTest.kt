@@ -1,6 +1,6 @@
-package com.vonage.android.util
+package com.vonage.android.shared
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -10,7 +10,7 @@ class GetInitialsTest {
     @ParameterizedTest
     @MethodSource("userNames")
     fun `should validate user name initials`(userName: String, initials: String) {
-        assertEquals(initials, userName.getInitials())
+        Assertions.assertEquals(initials, userName.getInitials())
     }
 
     companion object {

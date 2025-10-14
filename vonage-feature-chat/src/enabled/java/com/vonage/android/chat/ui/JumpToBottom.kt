@@ -29,6 +29,7 @@ private const val BOTTOM_OFFSET = 32
  */
 @Composable
 fun JumpToBottom(
+    label: String,
     enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -54,10 +55,7 @@ fun JumpToBottom(
                 )
             },
             text = {
-                Text(
-//                    text = stringResource(R.string.chat_panel_jump_to_bottom)
-                    text = "jump to bottom"
-                )
+                Text(text = label)
             },
             onClick = onClick,
             containerColor = MaterialTheme.colorScheme.surface,
@@ -73,6 +71,7 @@ fun JumpToBottom(
 @Composable
 internal fun JumpToBottomPreview() {
     JumpToBottom(
+        label = "Jump to bottom preview",
         enabled = true,
         onClick = {},
     )

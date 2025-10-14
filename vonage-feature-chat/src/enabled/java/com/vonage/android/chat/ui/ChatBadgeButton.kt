@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.tooling.preview.Preview
 import com.vonage.android.compose.components.ControlButton
 import com.vonage.android.compose.theme.VonageVideoTheme
 
@@ -43,6 +44,18 @@ fun ChatBadgeButton(
             onClick = onShowChat,
             icon = Icons.AutoMirrored.Default.Chat,
             isActive = isChatShow,
+        )
+    }
+}
+
+@Preview
+@Composable
+internal fun ChatBadgeButtonPreview() {
+    VonageVideoTheme {
+        ChatBadgeButton(
+            unreadCount = 12,
+            onShowChat = { },
+            isChatShow = false,
         )
     }
 }

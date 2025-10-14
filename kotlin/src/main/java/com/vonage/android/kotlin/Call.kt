@@ -131,7 +131,7 @@ class Call internal constructor(
         signalPlugins
             .filter { it.canHandle(SignalType.REACTION.signal) }
             .forEach { plugin ->
-                plugin.sendSignal(session, emoji)
+                plugin.sendSignal(session = session, senderName = publisherHolder.publisher.name, message = emoji)
             }
     }
 
@@ -139,11 +139,7 @@ class Call internal constructor(
         signalPlugins
             .filter { it.canHandle(SignalType.CHAT.signal) }
             .forEach { plugin ->
-                plugin.sendSignal(
-                    session, message, mapOf(
-                        "participantName" to publisherHolder.publisher.name.orEmpty(),
-                    )
-                )
+                plugin.sendSignal(session = session, senderName = publisherHolder.publisher.name, message = message)
             }
     }
 

@@ -13,7 +13,7 @@ interface SignalPlugin {
         isYou: Boolean,
         callback: (SignalStateContent) -> Unit = {},
     ): SignalStateContent?
-    fun sendSignal(session: Session, message: String, payload: Map<String, String> = emptyMap())
+    fun sendSignal(session: Session, senderName: String, message: String)
 }
 
 interface ChatSignalPlugin : SignalPlugin {

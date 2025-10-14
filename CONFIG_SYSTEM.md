@@ -56,23 +56,6 @@ The system now includes modular architecture with separate feature modules:
 ### AppConfig (Runtime Configuration)
 
 ```kotlin
-// Video Settings
-if (AppConfig.VideoSettings.ALLOW_BACKGROUND_EFFECTS) {
-    enableBackgroundEffects()
-}
-
-val resolution = AppConfig.VideoSettings.DEFAULT_RESOLUTION
-configureVideoResolution(resolution)
-
-// Audio Settings  
-if (AppConfig.AudioSettings.ALLOW_ADVANCED_NOISE_SUPPRESSION) {
-    enableNoiseSuppression()
-}
-
-// Meeting Room Settings
-val layoutMode = AppConfig.MeetingRoomSettings.DEFAULT_LAYOUT_MODE
-setLayoutMode(layoutMode)
-
 if (AppConfig.MeetingRoomSettings.ALLOW_CHAT) {
     initializeChatFeature()
 }

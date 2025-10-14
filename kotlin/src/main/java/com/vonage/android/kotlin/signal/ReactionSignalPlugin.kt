@@ -58,7 +58,7 @@ class ReactionSignalPlugin(
         return EmojiState(reactions = reactions.toImmutableList())
     }
 
-    override fun sendSignal(session: Session, message: String, payload: Map<String, String>) {
+    override fun sendSignal(session: Session, senderName: String, message: String) {
         val signal = Json.encodeToString(
             ReactionSignal(
                 emoji = message,
