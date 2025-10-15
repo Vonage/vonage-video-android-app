@@ -39,7 +39,6 @@ import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VeraPublisher
-import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
@@ -56,6 +55,7 @@ import com.vonage.android.util.ext.toggleChat
 import com.vonage.android.compose.preview.buildCallWithParticipants
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 @Suppress("LongMethod")
@@ -64,7 +64,6 @@ import kotlinx.coroutines.launch
 fun MeetingRoomScreen(
     uiState: MeetingRoomUiState,
     actions: MeetingRoomActions,
-    audioLevel: Float,
     modifier: Modifier = Modifier,
 ) {
     val participantsSheetState = rememberModalBottomSheetState()
@@ -114,11 +113,12 @@ fun MeetingRoomScreen(
                             onToggleParticipants = { showParticipants = showParticipants.toggle() },
                             onToggleMoreActions = { showMoreActions = showMoreActions.toggle() },
                             onShowChat = { scope.launch { navigator.toggleChat() } },
-                            isMicEnabled = publisher?.isMicEnabled ?: false,
-                            isCameraEnabled = publisher?.isCameraEnabled ?: false,
+                            isMicEnabled = publisher?.isMicEnabled ?: MutableStateFlow(false),
+                            isCameraEnabled = publisher?.isCameraEnabled ?: MutableStateFlow(false),
                             isChatShow = isChatShow,
-                            participantsCount = participants.filter { it.videoSource == VideoSource.CAMERA }.size,
+                            participantsCount = uiState.call.participantsCount,
                             unreadCount = chatState?.unreadCount ?: 0,
+                            layoutType = uiState.layoutType,
                         ),
                     )
                 }
@@ -152,7 +152,7 @@ fun MeetingRoomScreen(
                                     modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
                                     actions = actions,
                                     participants = participants,
-                                    audioLevel = audioLevel,
+                                    call = uiState.call,
                                     showParticipants = showParticipants,
                                     showMoreActions = showMoreActions,
                                     showReporting = showReporting,
@@ -170,6 +170,7 @@ fun MeetingRoomScreen(
                                     screenSharingState = uiState.screenSharingState,
                                     captionsState = uiState.captionsState,
                                     onEmojiClick = actions.onEmojiSent,
+                                    layoutType = uiState.layoutType,
                                 )
                             }
                         }
@@ -238,7 +239,6 @@ internal fun MeetingRoomScreenLoadingPreview() {
                 isLoading = true,
             ),
             actions = MeetingRoomActions(),
-            audioLevel = 0.5f,
         )
     }
 }
@@ -253,7 +253,6 @@ internal fun MeetingRoomScreenSessionErrorPreview() {
                 isError = true,
             ),
             actions = MeetingRoomActions(),
-            audioLevel = 0.5f,
         )
     }
 }
@@ -271,7 +270,6 @@ internal fun MeetingRoomScreenSessionPreview() {
                 isError = false,
             ),
             actions = MeetingRoomActions(),
-            audioLevel = 0.5f,
         )
     }
 }

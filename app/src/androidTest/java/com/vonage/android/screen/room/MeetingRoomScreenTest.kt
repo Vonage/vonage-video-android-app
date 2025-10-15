@@ -41,7 +41,6 @@ class MeetingRoomScreenTest {
                         ),
                     ),
                     actions = MeetingRoomActions(),
-                    audioLevel = 0.4f,
                 )
             }
         }

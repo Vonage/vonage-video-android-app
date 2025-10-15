@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,8 +18,11 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VeraPublisher
+import com.vonage.android.screen.room.noOpCallFacade
+import com.vonage.android.util.lazyStateWithVisibilityNotification
 import com.vonage.android.compose.preview.buildParticipants
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -27,9 +31,9 @@ import kotlinx.collections.immutable.toImmutableList
 @Composable
 fun AdaptiveGrid(
     participants: ImmutableList<Participant>,
-    audioLevel: Float,
+    call: CallFacade,
     modifier: Modifier = Modifier,
-    itemHeight: Dp = 225.dp,
+    itemHeight: Dp = 215.dp,
     minItemWidth: Dp = 300.dp,
     spacing: Dp = 8.dp
 ) {
@@ -49,13 +53,20 @@ fun AdaptiveGrid(
         }
         val visibleItems = participants.take(takeCount)
 
+        val listState = lazyStateWithVisibilityNotification(call = call, lazyState = rememberLazyGridState())
+
         LazyVerticalGrid(
             columns = GridCells.Fixed(itemsPerRow),
+            state = listState,
             contentPadding = PaddingValues(spacing),
             verticalArrangement = Arrangement.spacedBy(spacing),
             horizontalArrangement = Arrangement.spacedBy(spacing),
         ) {
-            items(visibleItems) { participant ->
+            items(
+                items = visibleItems,
+                key = { participant -> participant.id },
+                contentType = { "ParticipantVideoCard" },
+            ) { participant ->
                 ParticipantVideoCard(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -64,15 +75,17 @@ fun AdaptiveGrid(
                     isCameraEnabled = participant.isCameraEnabled,
                     isMicEnabled = participant.isMicEnabled,
                     view = participant.view,
-                    audioLevel = audioLevel,
+                    audioLevel = call.localAudioLevel,
                     isSpeaking = participant.isSpeaking,
-                    isShowVolumeIndicator = participant is VeraPublisher,
+                    isVolumeIndicatorVisible = participant is VeraPublisher,
                     videoSource = participant.videoSource,
                 )
             }
 
             if (participants.size > takeCount) {
-                item {
+                item(
+                    key = "placeholder",
+                ) {
                     ParticipantsPlaceholders(
                         modifier = Modifier
                             .height(itemHeight)
@@ -94,7 +107,7 @@ internal fun AdaptiveGridPreview() {
     VonageVideoTheme {
         AdaptiveGrid(
             participants = buildParticipants(10).toImmutableList(),
-            audioLevel = 0.6f,
+            call = noOpCallFacade,
         )
     }
 }

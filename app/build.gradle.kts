@@ -6,9 +6,9 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.dagger.hilt)
+    alias(libs.plugins.sonarqube)
+    alias(libs.plugins.kover)
     kotlin("plugin.serialization") version "2.0.21"
-    id("org.jetbrains.kotlinx.kover") version "0.9.1"
-    id("org.sonarqube") version "6.3.1.5724"
     id("com.vonage.json-config")
 }
 
@@ -42,10 +42,12 @@ android {
         debug {
             isDebuggable = true
             isMinifyEnabled = false
+            isProfileable = false
         }
         release {
             isDebuggable = false
             isMinifyEnabled = true
+            isProfileable = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -69,6 +71,11 @@ android {
             it.useJUnitPlatform()
         }
         animationsDisabled = true
+    }
+
+    composeCompiler {
+        reportsDestination = layout.buildDirectory.dir("compose_compiler")
+        metricsDestination = layout.buildDirectory.dir("compose_compiler")
     }
 
     sourceSets.configureEach {

@@ -30,30 +30,30 @@ import com.vonage.android.compose.preview.buildCallWithParticipants
 fun PipMeetingRoomScreen(
     uiState: MeetingRoomUiState,
     actions: MeetingRoomActions,
-    audioLevel: Float,
     modifier: Modifier = Modifier,
 ) {
     when {
         (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
-            val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
             val signalState by uiState.call.signalStateFlow.collectAsStateWithLifecycle(null)
             val chatState = signalState?.signals[SignalType.CHAT.signal] as? ChatState
-            val participant = participants.last() // replace to active speaker when logic available
+            val participant by uiState.call.activeSpeaker.collectAsStateWithLifecycle()
 
             Box(
                 modifier = modifier
                     .fillMaxWidth()
             ) {
-                ParticipantVideoCard(
-                    name = participant.name,
-                    isCameraEnabled = participant.isCameraEnabled,
-                    isMicEnabled = participant.isMicEnabled,
-                    view = participant.view,
-                    audioLevel = audioLevel,
-                    isSpeaking = participant.isSpeaking,
-                    isShowVolumeIndicator = participant is VeraPublisher,
-                    videoSource = participant.videoSource,
-                )
+                participant?.let { participant ->
+                    ParticipantVideoCard(
+                        audioLevel = uiState.call.localAudioLevel,
+                        name = participant.name,
+                        isCameraEnabled = participant.isCameraEnabled,
+                        isMicEnabled = participant.isMicEnabled,
+                        view = participant.view,
+                        isSpeaking = participant.isSpeaking,
+                        isVolumeIndicatorVisible = participant is VeraPublisher,
+                        videoSource = participant.videoSource,
+                    )
+                }
                 ChatBadgeButton(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
@@ -95,7 +95,6 @@ internal fun PipMeetingRoomScreenSessionPreview() {
                 call = buildCallWithParticipants(1),
             ),
             actions = MeetingRoomActions(),
-            audioLevel = 0.5f,
         )
     }
 }

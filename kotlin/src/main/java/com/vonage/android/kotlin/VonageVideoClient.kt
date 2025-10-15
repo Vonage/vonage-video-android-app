@@ -1,5 +1,6 @@
 package com.vonage.android.kotlin
 
+import android.app.ActivityManager
 import android.content.Context
 import android.os.Build
 import android.util.Log
@@ -8,7 +9,6 @@ import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit.PublisherKitVideoType
 import com.opentok.android.Session
-import com.opentok.android.Session.SessionOptions
 import com.opentok.android.VeraCameraCapturer
 import com.vonage.android.kotlin.ext.applyVideoBlur
 import com.vonage.android.kotlin.internal.VeraAudioDevice
@@ -18,6 +18,8 @@ import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.kotlin.signal.SignalPlugin
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 class VonageVideoClient(
     private val context: Context,
@@ -51,7 +53,7 @@ class VonageVideoClient(
         this.publisherConfig = publisherConfig
     }
 
-    fun buildPublisher(): VeraPublisher {
+    fun buildPublisher(context: Context): VeraPublisher {
         Log.d(TAG, "build publisher with $publisherConfig")
         val resolvedName = publisherConfig?.name ?: Default.PUBLISHER_NAME
         val publisher = Publisher.Builder(context)
@@ -61,7 +63,7 @@ class VonageVideoClient(
             .capturer(
                 VeraCameraCapturer(
                     context = context,
-                    resolution = Default.PUBLISHER_RESOLUTION,
+                    resolution = getOptimalResolution(),
                     frameRate = Default.PUBLISHER_FRAME_RATE,
                     initialCameraIndex = publisherConfig?.cameraIndex ?: Default.PUBLISHER_CAMERA_INDEX,
                 )
@@ -83,7 +85,7 @@ class VonageVideoClient(
             name = resolvedName,
             camera = publisherConfig?.cameraIndex ?: 0,
         )
-        this.publisherHolder = VeraPublisherHolder(
+        publisherHolder = VeraPublisherHolder(
             participant = participant,
             publisher = publisher,
         )
@@ -105,11 +107,8 @@ class VonageVideoClient(
         Log.i(TAG, "token: $token")
 
         session = Session.Builder(context, apiKey, sessionId)
-            .sessionOptions(
-                object : SessionOptions() {
-                    override fun useTextureViews(): Boolean = true
-                }
-            ).build()
+            .setSinglePeerConnection(true)
+            .build()
 
         session?.capabilities?.let { capabilities ->
             Log.i(TAG, "Session capabilities:")
@@ -117,7 +116,6 @@ class VonageVideoClient(
         }
 
         return Call(
-            context = context,
             token = token,
             session = session!!,
             publisherHolder = publisherHolder!!,
@@ -125,13 +123,22 @@ class VonageVideoClient(
         )
     }
 
+    @Suppress("MagicNumber")
+    private fun getOptimalResolution(): Publisher.CameraCaptureResolution {
+        val memoryClass = (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).memoryClass
+        return when {
+            memoryClass >= 512 -> Publisher.CameraCaptureResolution.HIGH
+            memoryClass >= 256 -> Publisher.CameraCaptureResolution.MEDIUM
+            else -> Publisher.CameraCaptureResolution.LOW
+        }
+    }
+
     private companion object {
         const val TAG: String = "VonageVideoClient"
     }
 
     object Default {
-        val PUBLISHER_RESOLUTION = Publisher.CameraCaptureResolution.MEDIUM
-        val PUBLISHER_FRAME_RATE = Publisher.CameraCaptureFrameRate.FPS_30
+        val PUBLISHER_FRAME_RATE = Publisher.CameraCaptureFrameRate.FPS_15 // implement adaptative frame rate
         const val PUBLISHER_CAMERA_INDEX = 0
         const val PUBLISHER_NAME = ""
     }

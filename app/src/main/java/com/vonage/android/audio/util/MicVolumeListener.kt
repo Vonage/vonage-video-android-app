@@ -41,7 +41,7 @@ class MicVolumeListener @Inject constructor() {
         audioRecord.startRecording()
     }
 
-    fun volume(samplingMillis: Long = 60): Flow<Float> = flow {
+    fun volume(samplingMillis: Long = 80): Flow<Float> = flow {
         val buffer = ShortArray(bufferSize)
         var bufferReadSize: Int
 

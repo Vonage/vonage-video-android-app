@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VideoSource
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.security.SecureRandom
 
 @Composable
@@ -15,10 +16,10 @@ fun buildParticipants(count: Int): List<Participant> {
             override val id: String = SecureRandom().nextInt().toString()
             override val videoSource: VideoSource = VideoSource.CAMERA
             override var name: String = "Name Sample $i"
-            override val isMicEnabled: Boolean = false
-            override val isCameraEnabled: Boolean = true
+            override val isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)
+            override val isSpeaking: MutableStateFlow<Boolean> = MutableStateFlow(false)
+            override val isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(true)
             override val view: View = previewCamera()
-            override val isSpeaking: Boolean = false
         }
         participants += sampleParticipant
     }

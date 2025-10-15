@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -56,6 +57,8 @@ fun ParticipantsPlaceholders(
             visiblePlaceholders.forEachIndexed { index, participant ->
                 AvatarInitials(
                     userName = participant,
+                    textStyle = MaterialTheme.typography.displaySmall,
+                    size = 64.dp,
                     modifier = Modifier
                         .zIndex((visiblePlaceholders.size - index).toFloat())
                         .border(2.dp, Color.DarkGray, CircleShape)
@@ -65,7 +68,9 @@ fun ParticipantsPlaceholders(
             if (additionalCount > 0) {
                 AdditionalParticipantsAvatar(
                     count = additionalCount,
+                    size = 64.dp,
                     zIndex = 0f,
+                    textStyle = MaterialTheme.typography.displaySmall,
                 )
             }
         }
@@ -78,6 +83,7 @@ fun AdditionalParticipantsAvatar(
     modifier: Modifier = Modifier,
     zIndex: Float = 0f,
     size: Dp = 96.dp, // move to theme
+    textStyle: TextStyle = MaterialTheme.typography.displayMedium,
 ) {
     Box(
         modifier = modifier
@@ -90,7 +96,7 @@ fun AdditionalParticipantsAvatar(
         Text(
             text = "+$count",
             color = Color.White,
-            style = MaterialTheme.typography.displayMedium,
+            style = textStyle,
         )
     }
 }
