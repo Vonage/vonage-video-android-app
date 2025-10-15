@@ -30,7 +30,7 @@ render.experimental.xml
 .sign/release.keystore.jks
 
 # Ignore Google Play Publisher files
-.sign/service-account-credentials.json
+.sign/service-account.json
 
 # Google Services (e.g. APIs or Firebase)
 google-services.json
