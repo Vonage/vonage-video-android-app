@@ -60,8 +60,8 @@ jobs:
         run: |
           VERSION_CODE=$((1000000 + $GITHUB_RUN_NUMBER))
           VERSION_NAME="1.0.0-build${GITHUB_RUN_NUMBER}"
-          sed -i "s/versionCode [0-9]\+/versionCode $VERSION_CODE/" app/build.gradle
-          sed -i "s/versionName \".*\"/versionName \"$VERSION_NAME\"/" app/build.gradle
+          sed -i "s/versionCode = [0-9]\+/versionCode = $VERSION_CODE/" app/build.gradle.kts
+          sed -i "s/versionName = \".*\"/versionName = \"$VERSION_NAME\"/" app/build.gradle.kts
 
       - name: Build release AAB
         run: ./gradlew bundleRelease --stacktrace
@@ -78,4 +78,3 @@ jobs:
         if: failure()
         run: |
           echo "Failed to publish to Play Store"
-          exit 1

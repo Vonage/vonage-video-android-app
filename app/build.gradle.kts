@@ -21,8 +21,10 @@ android {
         applicationId = "com.vonage.android"
         minSdk = 24
         targetSdk = 36
-        versionCode = 6
-        versionName = "0.0.6"
+        // NOTE: The following versionCode and versionName are placeholders.
+        // Actual values are set dynamically by the GitHub Actions workflow during CI/CD.
+        versionCode = 100
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
