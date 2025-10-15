@@ -55,7 +55,7 @@ jobs:
         env:
           SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
         run: |
-          echo $SERVICE_ACCOUNT_JSON > .sign/service_account.json
+          echo $SERVICE_ACCOUNT_JSON | base64 -d > .sign/service_account.json
 
       - name: Set version from GitHub run number
         run: |
