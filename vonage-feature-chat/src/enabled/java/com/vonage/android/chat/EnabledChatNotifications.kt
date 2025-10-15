@@ -1,19 +1,19 @@
 package com.vonage.android.chat
 
 import android.annotation.SuppressLint
-import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
 import com.vonage.android.shared.ChatMessage
 
-class ChatNotifications(
+class EnabledChatNotifications(
     private val context: Context,
-    private val notificationManager: NotificationManager,
-) {
+    private val notificationManager: NotificationManagerCompat,
+): ChatNotifications {
 
     @SuppressLint("MissingPermission")
-    fun showChatNotification(messages: List<ChatMessage>) {
+    override fun showChatNotification(messages: List<ChatMessage>) {
         val summary = NotificationCompat.MessagingStyle(Person.Builder().setName("Vonage").build())
         messages.forEach { message ->
             val notificationMessage = NotificationCompat.MessagingStyle.Message(
@@ -30,11 +30,11 @@ class ChatNotifications(
         notificationManager.notify(NOTIFICATION_ID, chatNotification)
     }
 
-    fun cancelNotification() {
+    override fun cancelNotification() {
         notificationManager.cancel(NOTIFICATION_ID)
     }
 
-    companion object {
+    companion object Companion {
         const val NOTIFICATION_CHANNEL_ID = "VeraNotificationManagerChat"
         const val NOTIFICATION_CHANNEL_NAME = "Vonage Chat"
         const val NOTIFICATION_ID = 123

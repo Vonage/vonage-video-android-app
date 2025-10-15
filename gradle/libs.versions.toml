@@ -92,7 +92,6 @@ opentok-android-sdk = { module = "com.opentok.android:opentok-android-sdk", vers
 opentok-android-video-transformers = { module = "com.vonage:client-sdk-video-transformers", version.ref = "opentokAndroidSdk" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
-junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }

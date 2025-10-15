@@ -39,7 +39,6 @@ import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.compose.components.AvatarInitials
-import com.vonage.android.screen.components.AvatarInitials
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

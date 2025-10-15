@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.audio.ui.AudioDevices
+import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
@@ -24,10 +25,7 @@ import com.vonage.android.screen.room.ScreenSharingState
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT
 import com.vonage.android.screen.room.components.emoji.EmojiSelector
-import com.vonage.android.screen.reporting.ReportIssueScreen
-import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.screen.room.noOpCallFacade
-import com.vonage.android.util.preview.buildParticipants
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch

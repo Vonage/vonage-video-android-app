@@ -19,7 +19,7 @@ class DisabledChatSignalPlugin : ChatSignalPlugin {
         callback: (SignalStateContent) -> Unit
     ): SignalStateContent? = null
 
-    override fun sendSignal(session: Session, message: String, payload: Map<String, String>) {
+    override fun sendSignal(session: Session, senderName: String, message: String) {
 
     }
 }

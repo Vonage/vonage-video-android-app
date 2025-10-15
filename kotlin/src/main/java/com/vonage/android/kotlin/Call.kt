@@ -65,7 +65,7 @@ class Call internal constructor(
     private val token: String,
     private val session: Session,
     private val publisherHolder: VeraPublisherHolder,
-    private val signalPlugins: ImmutableList<SignalPlugin>,
+    private val signalPlugins: List<SignalPlugin>,
     activeSpeakerTracker: ActiveSpeakerTracker? = null,
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : CallFacade {

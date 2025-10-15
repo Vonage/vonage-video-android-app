@@ -1,14 +1,13 @@
 package com.vonage.android.chat
 
 import android.app.NotificationManager
-import com.vonage.android.kotlin.signal.ChatSignalPlugin
-import com.vonage.android.shared.ForegroundChecker
+import com.vonage.android.shared.ChatMessage
 
 interface ChatFeature {
-    fun getPlugin(
-        foregroundChecker: ForegroundChecker,
-        notifications: ChatNotifications,
-    ): ChatSignalPlugin?
-
     fun createNotificationChannel(manager: NotificationManager)
+}
+
+interface ChatNotifications {
+    fun showChatNotification(messages: List<ChatMessage>)
+    fun cancelNotification()
 }
