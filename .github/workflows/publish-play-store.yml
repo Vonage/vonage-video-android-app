@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - mvera/vidsol-137/upload-to-alpha-play-store
   workflow_dispatch:
 
 jobs:
