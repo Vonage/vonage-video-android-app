@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,6 +10,7 @@ plugins {
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.kover)
     kotlin("plugin.serialization") version "2.0.21"
+    id("com.github.triplet.play") version "3.12.1"
 }
 
 android {
@@ -17,8 +21,10 @@ android {
         applicationId = "com.vonage.android"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        // NOTE: The following versionCode and versionName are placeholders.
+        // Actual values are set dynamically by the GitHub Actions workflow during CI/CD.
+        versionCode = 100
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
@@ -59,10 +65,72 @@ android {
         animationsDisabled = true
     }
 
+    val signFile: File = rootProject.file(".sign/keystore.properties")
+    if (signFile.exists()) {
+        val properties = Properties()
+        properties.load(FileInputStream(signFile))
+
+        signingConfigs {
+            create("release") {
+                keyAlias = properties["keyAlias"] as? String
+                keyPassword = properties["keyPassword"] as? String
+                storeFile = rootProject.file(properties["keystore"] as String)
+                storePassword = properties["storePassword"] as? String
+            }
+        }
+    } else {
+        signingConfigs {
+            create("release") {
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+                storeFile = rootProject.file(".sign/debug.keystore.jks")
+                storePassword = "android"
+            }
+        }
+    }
+
+    signingConfigs {
+        getByName("debug") {
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            storeFile = rootProject.file(".sign/debug.keystore.jks")
+            storePassword = "android"
+        }
+    }
+
+    buildTypes {
+        debug {
+            versionNameSuffix = "-DEBUG"
+            applicationIdSuffix = ".debug"
+            isDebuggable = true
+            isMinifyEnabled = false
+            isShrinkResources = false
+            signingConfig = signingConfigs.getByName("debug")
+        }
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+
     composeCompiler {
         reportsDestination = layout.buildDirectory.dir("compose_compiler")
         metricsDestination = layout.buildDirectory.dir("compose_compiler")
     }
+}
+
+play {
+    serviceAccountCredentials.set(rootProject.file(".sign/service_account.json"))
+    track.set("alpha")
+    releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.COMPLETED)
+    artifactDir.set(file("build/outputs/bundle/release"))
+    defaultToAppBundles.set(true)
+    commit.set(true)
 }
 
 dependencies {
