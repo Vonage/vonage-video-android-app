@@ -13,25 +13,19 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.navigation.AppNavHost
-import com.vonage.android.notifications.VeraNotificationChannelRegistry
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    @Inject
-    lateinit var notificationChannelRegistry: VeraNotificationChannelRegistry
 
     private val flow = MutableSharedFlow<Intent>(extraBufferCapacity = 1)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        notificationChannelRegistry.createNotificationChannels()
         enableEdgeToEdge()
         setContent {
             VonageVideoTheme {
@@ -49,7 +43,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun InterceptorAppNavHost(intentFlow: Flow<Intent>) {
     val navController = rememberNavController()
-
     LaunchedEffect(intentFlow) {
         intentFlow.collectLatest {
             it.data?.let { uri ->
@@ -64,6 +57,5 @@ fun InterceptorAppNavHost(intentFlow: Flow<Intent>) {
             }
         }
     }
-
     AppNavHost(navController = navController)
 }

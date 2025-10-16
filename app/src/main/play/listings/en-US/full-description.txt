@@ -1,0 +1,8 @@
+Vonage reference app
+Create conference rooms easily
+- Select audio device output
+- User background blur effects
+- Share conference room link
+- Share screen
+- Archive your calls
+- Enable captions

@@ -1,0 +1,4 @@
+• Nueva funcionalidad de chat en tiempo real
+• Mejoras en la calidad de video
+• Corrección de errores menores
+• Optimizaciones de rendimiento
