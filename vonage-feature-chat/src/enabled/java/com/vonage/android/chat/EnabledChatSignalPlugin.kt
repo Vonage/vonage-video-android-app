@@ -53,7 +53,9 @@ class EnabledChatSignalPlugin(
             ++chatMessagesUnreadCount
         } else 0
 
-        showNotificationWhenInBackground()
+        if (listenUnread) {
+            showNotificationWhenInBackground()
+        }
 
         _output.value = ChatState(
             unreadCount = unreadCount,
@@ -84,7 +86,7 @@ class EnabledChatSignalPlugin(
     }
 
     private fun showNotificationWhenInBackground() {
-        if (foregroundChecker.isInBackground() && chatMessagesUnreadCount > 0) {
+        if (foregroundChecker.isInBackground()) {
             chatNotifications.showChatNotification(chatMessages.take(chatMessagesUnreadCount))
         }
     }
