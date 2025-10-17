@@ -10,14 +10,7 @@ plugins {
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.kover)
     kotlin("plugin.serialization") version "2.0.21"
-    id("com.github.triplet.play") version "3.12.1"
-    id("com.vonage.json-config")
-}
-
-val configProps = Properties()
-val configFile = rootProject.file("gradle/generated-config.properties")
-if (configFile.exists()) {
-    configFile.inputStream().use { configProps.load(it) }
+    alias(libs.plugins.play.publisher)
 }
 
 android {
@@ -36,10 +29,7 @@ android {
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
 
-        // chat conditional configuration
-        val chatProperty = configProps.getProperty("vonage.meetingRoom.allow_chat", "false")
-        buildConfigField("boolean", "FEATURE_CHAT_ENABLED", "$chatProperty")
-        missingDimensionStrategy("chat", chatProperty.toEnabledString())
+        missingDimensionStrategy("chat", "enabled")
     }
 
     buildTypes {
@@ -138,20 +128,6 @@ android {
     sourceSets.configureEach {
         kotlin.srcDir("build/generated/source/jsonConfig/com/vonage/android/config")
     }
-}
-
-fun String.toEnabledString(): String = if (toBoolean()) "enabled" else "disabled"
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    dependsOn("generateVonageConfig")
-}
-
-tasks.matching { it.name.startsWith("ksp") }.configureEach {
-    dependsOn("generateVonageConfig")
-}
-
-jsonConfig {
-    configFile.set("config/app-config.json")
 }
 
 play {

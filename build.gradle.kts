@@ -10,7 +10,6 @@ plugins {
     alias(libs.plugins.sonarqube) apply false
     alias(libs.plugins.kover) apply false
     alias(libs.plugins.detekt)
-    id("com.vonage.json-config") apply false
 }
 
 dependencies {
