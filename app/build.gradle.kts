@@ -124,10 +124,6 @@ android {
         reportsDestination = layout.buildDirectory.dir("compose_compiler")
         metricsDestination = layout.buildDirectory.dir("compose_compiler")
     }
-
-    sourceSets.configureEach {
-        kotlin.srcDir("build/generated/source/jsonConfig/com/vonage/android/config")
-    }
 }
 
 play {
