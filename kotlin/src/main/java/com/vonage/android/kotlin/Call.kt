@@ -191,20 +191,18 @@ class Call internal constructor(
     }
 
     override fun sendEmoji(emoji: String) {
-        signalPlugins
-            .filter { it.canHandle(SignalType.REACTION.signal) }
-            .forEach { plugin ->
-                plugin.sendSignal(senderName = publisherHolder.publisher.name, message = emoji).let {
-                    session.sendSignal(it.type, it.data)
-                }
-            }
+        sendSignal(SignalType.REACTION, emoji)
     }
 
     override fun sendChatMessage(message: String) {
+        sendSignal(SignalType.CHAT, message)
+    }
+
+    private fun sendSignal(signalType: SignalType, data: String) {
         signalPlugins
-            .filter { it.canHandle(SignalType.CHAT.signal) }
+            .filter { it.canHandle(signalType.signal) }
             .forEach { plugin ->
-                plugin.sendSignal(senderName = publisherHolder.publisher.name, message = message).let {
+                plugin.sendSignal(senderName = publisherHolder.publisher.name, message = data).let {
                     session.sendSignal(it.type, it.data)
                 }
             }
