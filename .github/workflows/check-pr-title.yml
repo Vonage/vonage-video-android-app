@@ -21,7 +21,7 @@ jobs:
           # Starts with "VIDSOL-" followed by digits
           # A colon (:) followed by exactly one space
           # followed by the actual PR title text
-          regex="^VIDSOL-[0-9]+: [^ ].*$"
+          regex="^VIDSOL-[0-9]+: \S.*$"
 
           if echo "$PR_NAME" | grep -Eq "$regex"; then
             echo "Acceptable title"
