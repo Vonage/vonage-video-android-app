@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import com.vonage.android.shared.ChatMessage
 import kotlinx.collections.immutable.ImmutableList
 
+@Suppress("UnusedParameter", "EmptyFunctionBlock")
 @Composable
 fun ChatPanel(
     title: String,

@@ -25,8 +25,11 @@ import com.vonage.android.kotlin.internal.VeraPublisherHolder
 import com.vonage.android.kotlin.internal.toParticipant
 import com.vonage.android.kotlin.internal.toScreenParticipant
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.ChatState
+import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
+import com.vonage.android.kotlin.model.SignalFlows
 import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
@@ -44,6 +47,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collect
@@ -52,7 +56,9 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.SortedMap
@@ -91,7 +97,23 @@ class Call internal constructor(
     private val _localAudioStateFlow = MutableStateFlow(0F)
     override val localAudioLevel: StateFlow<Float> = _localAudioStateFlow
 
-    private val signals = ConcurrentHashMap<String, SignalStateContent>()
+    val signalState: SignalFlows = mutableMapOf()
+    override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> =
+        signalPlugins
+            .filter { it.canHandle(signalType.signal) }
+            .map { it.output }
+            .firstOrNull() ?: MutableStateFlow(null)
+
+    override fun chatSignalState(): StateFlow<ChatState?> =
+        signalState(SignalType.CHAT)
+            .map { it as? ChatState }
+            .stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)
+
+    override fun emojiSignalState(): StateFlow<EmojiState?> =
+        signalState(SignalType.REACTION)
+            .map { it as? EmojiState }
+            .stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)
+
     private val subscriberStreams = ConcurrentHashMap<String, Subscriber>()
     private val subscriberJobs = ConcurrentHashMap<String, Job>()
     private var participantStreams: SortedMap<String, Participant> = sortedMapOf()
@@ -99,6 +121,15 @@ class Call internal constructor(
     private lateinit var context: Context
 
     init {
+        signalPlugins.forEach {
+            if (it.canHandle(SignalType.CHAT.signal)) {
+                signalState[SignalType.CHAT] = it.output
+            }
+            if (it.canHandle(SignalType.REACTION.signal)) {
+                signalState[SignalType.REACTION] = it.output
+            }
+        }
+
         actualActiveSpeakerTracker.activeSpeakerChanges
             .onEach { payload ->
                 Log.d(
@@ -152,28 +183,20 @@ class Call internal constructor(
                 } else {
                     ""
                 }
-
-                plugin.handleSignal(type, data, senderName, isYou) { state ->
-                    updateSignals(type, state)
-                }?.let { state ->
-                    updateSignals(type, state)
-                }
+                plugin.handleSignal(type, data, senderName, isYou)
             }
         }
         session.connect(token)
         awaitClose { session.setSessionListener(null) }
     }
 
-    private fun updateSignals(type: String, state: SignalStateContent) {
-        signals[type] = state
-        _signalStateFlow.value = SignalState(signals = signals)
-    }
-
     override fun sendEmoji(emoji: String) {
         signalPlugins
             .filter { it.canHandle(SignalType.REACTION.signal) }
             .forEach { plugin ->
-                plugin.sendSignal(session = session, senderName = publisherHolder.publisher.name, message = emoji)
+                plugin.sendSignal(senderName = publisherHolder.publisher.name, message = emoji).let {
+                    session.sendSignal(it.type, it.data)
+                }
             }
     }
 
@@ -181,18 +204,16 @@ class Call internal constructor(
         signalPlugins
             .filter { it.canHandle(SignalType.CHAT.signal) }
             .forEach { plugin ->
-                plugin.sendSignal(session = session, senderName = publisherHolder.publisher.name, message = message)
+                plugin.sendSignal(senderName = publisherHolder.publisher.name, message = message).let {
+                    session.sendSignal(it.type, it.data)
+                }
             }
     }
 
     override fun listenUnreadChatMessages(enable: Boolean) {
         signalPlugins
             .filterIsInstance<ChatSignalPlugin>()
-            .mapNotNull { it.listenUnread(enable) }
-            .forEach { state ->
-                signals[SignalType.CHAT.signal] = state
-                _signalStateFlow.value = SignalState(signals = signals)
-            }
+            .forEach { chatPlugin -> chatPlugin.listenUnread(enable) }
     }
 
     override fun endSession() {

@@ -36,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.chat.ui.ChatBadgeButton
 import com.vonage.android.compose.components.ControlButton
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON
@@ -57,7 +58,7 @@ data class BottomBarState(
     val isCameraEnabled: StateFlow<Boolean>,
     val isChatShow: Boolean,
     val participantsCount: StateFlow<Int>,
-    val unreadCount: Int,
+    val chatState: StateFlow<ChatState?>,
     val layoutType: CallLayoutType,
 )
 
@@ -71,6 +72,7 @@ fun BottomBar(
     val isMicEnabled by bottomBarState.isMicEnabled.collectAsStateWithLifecycle()
     val isCameraEnabled by bottomBarState.isCameraEnabled.collectAsStateWithLifecycle()
     val participantsCount by bottomBarState.participantsCount.collectAsStateWithLifecycle()
+    val chatState by bottomBarState.chatState.collectAsStateWithLifecycle()
 
     Surface(
         modifier = modifier
@@ -106,7 +108,7 @@ fun BottomBar(
             )
 
             ChatBadgeButton(
-                unreadCount = bottomBarState.unreadCount,
+                unreadCount = chatState?.unreadCount ?: 0,
                 onShowChat = bottomBarState.onShowChat,
                 isChatShow = bottomBarState.isChatShow,
             )
@@ -213,7 +215,7 @@ internal fun BottomBarPreview() {
                 isCameraEnabled = MutableStateFlow(true),
                 isChatShow = false,
                 participantsCount = MutableStateFlow(25),
-                unreadCount = 10,
+                chatState = MutableStateFlow(null),
                 layoutType = CallLayoutType.SPEAKER_LAYOUT,
             ),
         )

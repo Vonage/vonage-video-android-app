@@ -1,49 +1,50 @@
 package com.vonage.android.chat
 
-import com.opentok.android.Session
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
+import com.vonage.android.kotlin.signal.RawSignal
 import com.vonage.android.shared.ChatMessage
+import com.vonage.android.shared.DateProvider
 import com.vonage.android.shared.ForegroundChecker
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import java.util.Date
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 
 class EnabledChatSignalPlugin(
     private val chatNotifications: ChatNotifications,
     private val foregroundChecker: ForegroundChecker,
+    private val dateProvider: DateProvider,
 ) : ChatSignalPlugin {
 
     private val chatMessages: MutableList<ChatMessage> = CopyOnWriteArrayList()
     private var chatMessagesUnreadCount: Int = 0
     private var listenUnread: Boolean = true
 
+    private val _output = MutableStateFlow(ChatState(unreadCount = 0, messages = persistentListOf()))
+    override val output: StateFlow<SignalStateContent> = _output
+
     override fun canHandle(signalType: String): Boolean = signalType == SignalType.CHAT.signal
 
-    override fun handleSignal(
-        type: String,
-        data: String,
-        senderName: String,
-        isYou: Boolean,
-        callback: (SignalStateContent) -> Unit,
-    ): SignalStateContent? {
-        if (!canHandle(type)) return null
+    override fun handleSignal(type: String, data: String, senderName: String, isYou: Boolean) {
+        if (!canHandle(type)) return
 
         val chatSignal = try {
             Json.decodeFromString<ChatSignal>(data)
         } catch (_: SerializationException) {
-            return null
+            return
         }
 
         val message = ChatMessage(
             id = UUID.randomUUID(),
-            date = Date(),
+            date = dateProvider.current(),
             participantName = chatSignal.participantName,
             text = chatSignal.text,
         )
@@ -54,38 +55,36 @@ class EnabledChatSignalPlugin(
 
         showNotificationWhenInBackground()
 
-        return ChatState(
+        _output.value = ChatState(
             unreadCount = unreadCount,
             messages = chatMessages.toImmutableList(),
         )
     }
 
-    override fun sendSignal(session: Session, senderName: String, message: String) {
-        val signal = Json.encodeToString(
+    override fun sendSignal(senderName: String, message: String): RawSignal {
+        val signalData = Json.encodeToString(
             ChatSignal(
                 participantName = senderName,
                 text = message,
             )
         )
-        session.sendSignal(SignalType.CHAT.signal, signal)
+        return RawSignal(SignalType.CHAT.signal, signalData)
     }
 
-    override fun listenUnread(enable: Boolean): ChatState? {
+    override fun listenUnread(enable: Boolean) {
         listenUnread = enable
         if (!enable) {
             chatMessagesUnreadCount = 0
             chatNotifications.cancelNotification()
-            return ChatState(
+            _output.value = ChatState(
                 unreadCount = 0,
                 messages = chatMessages.toImmutableList(),
             )
         }
-        return null
     }
 
     private fun showNotificationWhenInBackground() {
-        val isInForeground = foregroundChecker.isInForeground()
-        if (isInForeground.not()) {
+        if (foregroundChecker.isInBackground() && chatMessagesUnreadCount > 0) {
             chatNotifications.showChatNotification(chatMessages.take(chatMessagesUnreadCount))
         }
     }

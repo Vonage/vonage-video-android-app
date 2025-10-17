@@ -5,9 +5,11 @@ import android.media.projection.MediaProjection
 import androidx.compose.runtime.Composable
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.ChatState
+import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.SignalState
+import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -56,6 +58,21 @@ fun buildCallWithParticipants(
         )
     )
     override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
+
+    override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> {
+        val signalState = signalStateFlow.value.signals[signalType.signal]
+        return MutableStateFlow(signalState)
+    }
+
+    override fun chatSignalState(): StateFlow<ChatState?> {
+        val chatState = signalStateFlow.value.signals[SignalType.CHAT.signal] as? ChatState
+        return MutableStateFlow(chatState)
+    }
+
+    override fun emojiSignalState(): StateFlow<EmojiState?> {
+        val emojiState = signalStateFlow.value.signals[SignalType.REACTION.signal] as? EmojiState
+        return MutableStateFlow(emojiState)
+    }
 
     override fun sendChatMessage(message: String) { /* empty on purpose */ }
     override fun listenUnreadChatMessages(enable: Boolean) { /* empty on purpose */ }

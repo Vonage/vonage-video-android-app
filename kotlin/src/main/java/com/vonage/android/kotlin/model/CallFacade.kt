@@ -7,17 +7,34 @@ import com.vonage.android.kotlin.signal.EmojiReaction
 import com.vonage.android.shared.ChatMessage
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 @Stable
 interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, ScreenShareFacade {
+
     fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>)
 
     val participantsStateFlow: Flow<ImmutableList<Participant>>
     val participantsCount: StateFlow<Int>
     val activeSpeaker: StateFlow<Participant?>
     val signalStateFlow: StateFlow<SignalState?>
+    
+    fun signalState(signalType: SignalType): StateFlow<SignalStateContent?>
+    
+    fun chatSignalState(): StateFlow<ChatState?> = signalState(SignalType.CHAT)
+        .map { it as? ChatState }
+        .stateIn(scope = CoroutineScope(Dispatchers.Default), started = SharingStarted.Lazily, initialValue = null)
+    
+    fun emojiSignalState(): StateFlow<EmojiState?> = signalState(SignalType.REACTION)
+        .map { it as? EmojiState }
+        .stateIn(scope = CoroutineScope(Dispatchers.Default), started = SharingStarted.Lazily, initialValue = null)
+    
     val captionsStateFlow: StateFlow<String?>
 }
 
@@ -56,8 +73,10 @@ enum class SignalType(val signal: String) {
 }
 
 data class SignalState(
-    val signals: Map<String, SignalStateContent>
+    val signals: Map<String, SignalStateContent>,
 )
+
+typealias SignalFlows = MutableMap<SignalType, StateFlow<SignalStateContent?>>
 
 sealed interface SignalStateContent
 

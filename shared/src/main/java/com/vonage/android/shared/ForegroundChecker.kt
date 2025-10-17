@@ -4,6 +4,8 @@ import android.app.ActivityManager
 
 class ForegroundChecker {
 
+    fun isInBackground(): Boolean = !isInForeground()
+
     fun isInForeground(): Boolean =
         ActivityManager.RunningAppProcessInfo()
             .let { appProcessInfo ->

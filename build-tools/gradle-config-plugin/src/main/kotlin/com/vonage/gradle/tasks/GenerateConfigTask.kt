@@ -10,6 +10,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
+@Suppress("NestedBlockDepth")
 abstract class GenerateConfigTask : DefaultTask() {
 
     @get:Input
@@ -29,9 +30,7 @@ abstract class GenerateConfigTask : DefaultTask() {
         val configFilePath = resolveConfigFile()
         val configFile = File(configFilePath)
 
-        if (!configFile.exists()) {
-            throw IllegalArgumentException("Config file not found: $configFilePath")
-        }
+        require(configFile.exists())
 
         val jsonContent = configFile.readText()
         val gson = Gson()

@@ -14,7 +14,8 @@ class EnabledChatNotifications(
 
     @SuppressLint("MissingPermission")
     override fun showChatNotification(messages: List<ChatMessage>) {
-        val summary = NotificationCompat.MessagingStyle(Person.Builder().setName("Vonage").build())
+        val person = Person.Builder().setName(DEFAULT_NOTIFICATION_PERSON).build()
+        val summary = NotificationCompat.MessagingStyle(person)
         messages.forEach { message ->
             val notificationMessage = NotificationCompat.MessagingStyle.Message(
                 message.text,
@@ -35,6 +36,7 @@ class EnabledChatNotifications(
     }
 
     companion object Companion {
+        const val DEFAULT_NOTIFICATION_PERSON = "Vonage"
         const val NOTIFICATION_CHANNEL_ID = "VeraNotificationManagerChat"
         const val NOTIFICATION_CHANNEL_NAME = "Vonage Chat"
         const val NOTIFICATION_ID = 123

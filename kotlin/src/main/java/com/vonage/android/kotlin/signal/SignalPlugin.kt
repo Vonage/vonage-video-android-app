@@ -1,21 +1,20 @@
 package com.vonage.android.kotlin.signal
 
-import com.opentok.android.Session
-import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.SignalStateContent
+import kotlinx.coroutines.flow.StateFlow
 
 interface SignalPlugin {
+    val output: StateFlow<SignalStateContent?>
     fun canHandle(signalType: String): Boolean
-    fun handleSignal(
-        type: String,
-        data: String,
-        senderName: String,
-        isYou: Boolean,
-        callback: (SignalStateContent) -> Unit = {},
-    ): SignalStateContent?
-    fun sendSignal(session: Session, senderName: String, message: String)
+    fun handleSignal(type: String, data: String, senderName: String, isYou: Boolean)
+    fun sendSignal(senderName: String, message: String): RawSignal
 }
 
+data class RawSignal(
+    val type: String,
+    val data: String,
+)
+
 interface ChatSignalPlugin : SignalPlugin {
-    fun listenUnread(enable: Boolean): ChatState?
+    fun listenUnread(enable: Boolean)
 }

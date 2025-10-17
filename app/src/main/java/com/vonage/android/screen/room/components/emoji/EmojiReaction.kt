@@ -36,10 +36,13 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.signal.EMOJI_LIFETIME_MILLIS
 import com.vonage.android.kotlin.signal.EmojiReaction
+import kotlinx.coroutines.flow.StateFlow
 import kotlin.random.Random
 
 private const val ANIMATION_DURATION = EMOJI_LIFETIME_MILLIS.toInt()
@@ -47,9 +50,10 @@ private const val OVERLAY_ZINDEX = 9F
 
 @Composable
 fun EmojiReactionOverlay(
-    reactions: List<EmojiReaction>,
+    reactions: StateFlow<EmojiState?>,
     modifier: Modifier = Modifier,
 ) {
+    val reactions by reactions.collectAsStateWithLifecycle()
     var size by remember { mutableStateOf(IntSize.Zero) }
 
     Box(
@@ -59,7 +63,7 @@ fun EmojiReactionOverlay(
             .onSizeChanged { size = it },
         contentAlignment = Alignment.BottomStart,
     ) {
-        reactions.forEach { reaction ->
+        reactions?.reactions?.forEach { reaction ->
             key(reaction.id) {
                 EmojiAnimationItem(
                     emojiReaction = reaction,

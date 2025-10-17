@@ -18,8 +18,6 @@ import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.kotlin.signal.SignalPlugin
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 
 class VonageVideoClient(
     private val context: Context,
