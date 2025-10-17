@@ -32,19 +32,6 @@ android {
         missingDimensionStrategy("chat", "enabled")
     }
 
-    buildTypes {
-        debug {
-            isDebuggable = true
-            isMinifyEnabled = false
-            isProfileable = false
-        }
-        release {
-            isDebuggable = false
-            isMinifyEnabled = true
-            isProfileable = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
