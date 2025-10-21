@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test
 import kotlin.test.Ignore
 import kotlin.test.assertEquals
 
-@Ignore
 class WaitingRoomViewModelTest : CoroutineTest() {
 
     val context: Context = mockk(relaxed = true)
@@ -124,7 +123,7 @@ class WaitingRoomViewModelTest : CoroutineTest() {
             }
             sut.onMicToggle()
             assertEquals(false, awaitItem().isMicEnabled)
-            cancelAndIgnoreRemainingEvents()
+//            cancelAndIgnoreRemainingEvents()
         }
     }
 
