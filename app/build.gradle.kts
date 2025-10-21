@@ -36,6 +36,8 @@ android {
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
 
+        buildConfigField("String", "BASE_API_URL", "\"https://meet.vonagenetworks.net\"")
+
         val chatProperty = configProps.getProperty("vonage.meetingRoom.allow_chat", "true")
         buildConfigField("boolean", "FEATURE_CHAT_ENABLED", "$chatProperty")
         missingDimensionStrategy("chat", chatProperty.toEnabledString())
@@ -192,6 +194,9 @@ dependencies {
     debugImplementation(libs.leakcanary.android)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    debugImplementation("com.telefonica:tweaks:5.1.0")
+    releaseImplementation("com.telefonica:tweaks-no-op:5.1.0")
 }
 
 fun String.toEnabledString(): String = if (toBoolean()) "enabled" else "disabled"

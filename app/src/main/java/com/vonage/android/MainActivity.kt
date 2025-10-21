@@ -11,6 +11,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
+import com.telefonica.tweaks.navigateToTweaksOnShake
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.navigation.AppNavHost
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,5 +58,6 @@ fun InterceptorAppNavHost(intentFlow: Flow<Intent>) {
             }
         }
     }
+    navController.navigateToTweaksOnShake()
     AppNavHost(navController = navController)
 }
