@@ -29,20 +29,6 @@ android {
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
     }
-
-    buildTypes {
-        debug {
-            isDebuggable = true
-            isMinifyEnabled = false
-            isProfileable = false
-        }
-        release {
-            isDebuggable = false
-            isMinifyEnabled = true
-            isProfileable = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -58,9 +44,6 @@ android {
         unitTests {
             isIncludeAndroidResources = true
             isReturnDefaultValues = true
-        }
-        unitTests.all {
-            it.useJUnitPlatform()
         }
         animationsDisabled = true
     }
@@ -170,12 +153,12 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
+    testImplementation(libs.junit.junit)
     testImplementation(libs.junit.jupiter.params)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.core.testing)
-    testRuntimeOnly(libs.junit.jupiter.engine)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.test.rules)

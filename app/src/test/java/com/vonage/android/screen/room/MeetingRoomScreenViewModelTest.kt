@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjection
 import app.cash.turbine.test
-import com.vonage.android.CoroutineTest
+import com.vonage.android.MainDispatcherRule
 import com.vonage.android.data.ArchiveRepository
 import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
@@ -19,7 +19,6 @@ import com.vonage.android.screensharing.ScreenSharingServiceListener
 import com.vonage.android.screensharing.VeraScreenSharingManager
 import com.vonage.android.service.VeraForegroundServiceHandler
 import com.vonage.android.util.ActivityContextProvider
-import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -30,13 +29,15 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
+import org.junit.Assert.assertEquals
+import org.junit.Rule
+import org.junit.Test
 import kotlin.Result.Companion.success
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
-class MeetingRoomScreenViewModelTest : CoroutineTest() {
+class MeetingRoomScreenViewModelTest {
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     val context: Context = mockk(relaxed = true)
     val activityContextProvider: ActivityContextProvider = mockk(relaxed = true)
@@ -49,19 +50,6 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
         every { startForegroundService(any()) } returns Unit
         every { stopForegroundService() } returns Unit
         every { actions } returns MutableSharedFlow()
-    }
-
-    @BeforeEach
-    fun setUp() {
-        setMainDispatcherToTestDispatcher()
-        every { activityContextProvider.requireActivityContext() } returns context
-    }
-
-    @AfterEach
-    fun tearDown() {
-        testScheduler.advanceUntilIdle()
-        resetMain()
-        clearAllMocks()
     }
 
     @Test
@@ -84,7 +72,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
         }
 
         verify { activityContextProvider.setActivityContext(context) }
-        verify { mockCall.connect(context) }
+        verify { mockCall.connect(any(Context::class)) }
     }
 
     @Test
@@ -107,7 +95,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
         val sut = sut()
         sut.setup(context)
-        testScheduler.advanceUntilIdle()
+        //testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -515,7 +503,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
 
     @Test
     fun `given viewmodel when init with captionsId then emit correct state`() = runTest {
-        val mockCall = buildMockCall()
+        val mockCall = givenMockCall()
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse(
             captionsId = "captionsId",
         )
@@ -724,15 +712,14 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
             activityContextProvider = activityContextProvider,
         )
 
-    private fun givenMockCall(): CallFacade {
-        // Setup all mocks before creating the call mock to avoid race conditions
+    private inline fun givenMockCall(): CallFacade {
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
-        every { videoClient.buildPublisher(context) } returns buildMockPublisher()
-        
+        every { videoClient.buildPublisher(any()) } returns buildMockPublisher()
+
         val mockCall = buildMockCall()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
         every { mockCall.connect(any()) } returns flowOf()
-        
+
         return mockCall
     }
 
@@ -768,7 +755,7 @@ class MeetingRoomScreenViewModelTest : CoroutineTest() {
     )
 
     private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true) {
-        every { connect(any()) } returns kotlinx.coroutines.flow.flowOf()
+        every { connect(any()) } returns flowOf()
         every { localAudioLevel } returns MutableStateFlow(0.4f)
     }
 

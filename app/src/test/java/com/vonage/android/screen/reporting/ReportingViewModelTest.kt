@@ -13,11 +13,11 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertNull
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
 
 class ReportingViewModelTest {
 

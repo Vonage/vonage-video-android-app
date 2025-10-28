@@ -5,8 +5,8 @@ import com.vonage.android.util.RoomNameGenerator
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
 class JoinMeetingRoomViewModelTest {
 

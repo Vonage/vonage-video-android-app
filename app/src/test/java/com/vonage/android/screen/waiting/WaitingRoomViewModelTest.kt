@@ -2,7 +2,7 @@ package com.vonage.android.screen.waiting
 
 import android.content.Context
 import app.cash.turbine.test
-import com.vonage.android.CoroutineTest
+import com.vonage.android.MainDispatcherRule
 import com.vonage.android.audio.util.MicVolumeListener
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
@@ -10,26 +10,33 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.kotlin.model.VideoSource
-import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
+import org.junit.Assert.assertEquals
+import org.junit.Rule
+import org.junit.Test
 
-class WaitingRoomViewModelTest : CoroutineTest() {
+@OptIn(ExperimentalCoroutinesApi::class)
+class WaitingRoomViewModelTest {
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     val context: Context = mockk(relaxed = true)
     val videoClient: VonageVideoClient = mockk()
     val userRepository: UserRepository = mockk()
-    val micVolumeListener: MicVolumeListener = mockk(relaxed = true)
+    val micVolumeListener: MicVolumeListener = mockk {
+        every { start() } returns Unit
+        every { stop() } returns Unit
+        every { volume() } returns flowOf(0.33f)
+    }
     val sut = WaitingRoomViewModel(
         roomName = ANY_ROOM_NAME,
         userRepository = userRepository,
@@ -37,17 +44,17 @@ class WaitingRoomViewModelTest : CoroutineTest() {
         micVolumeListener = micVolumeListener,
     )
 
-    @BeforeEach
-    fun setUp() {
-        setMainDispatcherToTestDispatcher()
-    }
-
-    @AfterEach
-    fun tearDown() {
-        testScheduler.advanceUntilIdle()
-        resetMain()
-        clearAllMocks()
-    }
+//    @Before
+//    fun setUp() {
+//        setMainDispatcherToTestDispatcher()
+//    }
+//
+//    @After
+//    fun tearDown() {
+//        testScheduler.advanceUntilIdle()
+//        resetMain()
+//        clearAllMocks()
+//    }
 
     @Test
     fun `given viewmodel when initialize then returns correct state`() = runTest {
@@ -85,8 +92,8 @@ class WaitingRoomViewModelTest : CoroutineTest() {
         sut.uiState.test {
             awaitItem()
             sut.init(context)
-            awaitItem()
             testScheduler.advanceUntilIdle()
+            awaitItem()
             awaitItem().let { uiState ->
                 assertEquals(ANY_ROOM_NAME, uiState.roomName)
                 assertEquals(publisher.isCameraEnabled.value, uiState.isCameraEnabled)
@@ -110,7 +117,6 @@ class WaitingRoomViewModelTest : CoroutineTest() {
         coEvery { userRepository.getUserName() } returns ""
 
         sut.uiState.test {
-            awaitItem()
             sut.init(context)
             testScheduler.advanceUntilIdle()
             awaitItem().let { uiState ->
@@ -121,8 +127,8 @@ class WaitingRoomViewModelTest : CoroutineTest() {
                 assertEquals(BlurLevel.NONE, uiState.blurLevel)
             }
             sut.onMicToggle()
+            testScheduler.advanceUntilIdle()
             assertEquals(false, awaitItem().isMicEnabled)
-//            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -135,12 +141,13 @@ class WaitingRoomViewModelTest : CoroutineTest() {
         every { videoClient.buildPublisher(context) } returns publisher
         coEvery { userRepository.getUserName() } returns ""
 
+        sut.init(context)
+        testScheduler.advanceUntilIdle()
+
         sut.uiState.test {
-            awaitItem()
-            sut.init(context)
-            testScheduler.advanceUntilIdle()
             assertEquals(true, awaitItem().isCameraEnabled)
             sut.onCameraToggle()
+            testScheduler.advanceUntilIdle()
             assertEquals(false, awaitItem().isCameraEnabled)
             cancelAndIgnoreRemainingEvents()
         }
@@ -159,7 +166,6 @@ class WaitingRoomViewModelTest : CoroutineTest() {
             testScheduler.advanceUntilIdle()
             awaitItem()
             assertEquals("Cached user name", awaitItem().userName)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -248,7 +254,7 @@ class WaitingRoomViewModelTest : CoroutineTest() {
             cancelAndIgnoreRemainingEvents()
         }
 
-        assertEquals(3, setCameraBlurCallbacks.size, "Expected 3 calls to setCameraBlur")
+        assertEquals(3, setCameraBlurCallbacks.size)
         assertEquals(BlurLevel.LOW, setCameraBlurCallbacks[0])
         assertEquals(BlurLevel.HIGH, setCameraBlurCallbacks[1])
         assertEquals(BlurLevel.NONE, setCameraBlurCallbacks[2])

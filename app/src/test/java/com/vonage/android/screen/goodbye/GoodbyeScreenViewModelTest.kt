@@ -17,8 +17,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GoodbyeScreenViewModelTest {
