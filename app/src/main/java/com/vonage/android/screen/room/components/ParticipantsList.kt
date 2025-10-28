@@ -27,8 +27,8 @@ import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VideoSource
-import com.vonage.android.screen.components.AvatarInitials
-import com.vonage.android.util.preview.buildParticipants
+import com.vonage.android.compose.components.AvatarInitials
+import com.vonage.android.compose.preview.buildParticipants
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 

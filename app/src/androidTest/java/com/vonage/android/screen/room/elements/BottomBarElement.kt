@@ -5,8 +5,6 @@ import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CAMERA_BUTTON
-import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CHAT_BADGE
-import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CHAT_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_END_CALL_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_MIC_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BADGE
@@ -29,9 +27,9 @@ class BottomBarElement(
     val endCallButton: SemanticsNodeInteraction
         get() = child(BOTTOM_BAR_END_CALL_BUTTON)
     val chatButton: SemanticsNodeInteraction
-        get() = child(BOTTOM_BAR_CHAT_BUTTON)
+        get() = child("BOTTOM_BAR_CHAT_BUTTON")
     val chatUnreadBadge: SemanticsNodeInteraction
-        get() = element(BOTTOM_BAR_CHAT_BADGE)
+        get() = element("BOTTOM_BAR_CHAT_BADGE")
     val cameraButton: SemanticsNodeInteraction
         get() = child(BOTTOM_BAR_CAMERA_BUTTON)
     val micButton: SemanticsNodeInteraction

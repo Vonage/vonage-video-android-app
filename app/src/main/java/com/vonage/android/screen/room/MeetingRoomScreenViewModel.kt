@@ -12,9 +12,13 @@ import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.ChatState
+import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.SignalState
+import com.vonage.android.kotlin.model.SignalStateContent
+import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import com.vonage.android.screensharing.ScreenSharingServiceListener
 import com.vonage.android.screensharing.VeraScreenSharingManager
@@ -348,6 +352,10 @@ val noOpCallFacade = object : CallFacade {
     override val activeSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
     override val signalStateFlow: StateFlow<SignalState?> = MutableStateFlow(null)
     override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
+
+    override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> = MutableStateFlow(null)
+    override fun chatSignalState(): StateFlow<ChatState?> = MutableStateFlow(null)
+    override fun emojiSignalState(): StateFlow<EmojiState?> = MutableStateFlow(null)
 
     override fun connect(context: Context): Flow<SessionEvent> = flowOf()
     override fun enableCaptions(enable: Boolean) { /* empty on purpose */ }
