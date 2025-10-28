@@ -691,7 +691,7 @@ class MeetingRoomScreenViewModelTest {
         }
     }
 
-    private inline fun givenMockCall(): CallFacade {
+    private fun givenMockCall(): CallFacade {
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher(any()) } returns buildMockPublisher()
 
