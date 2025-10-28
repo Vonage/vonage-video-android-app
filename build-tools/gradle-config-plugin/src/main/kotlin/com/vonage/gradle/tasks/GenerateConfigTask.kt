@@ -119,33 +119,7 @@ abstract class GenerateConfigTask : DefaultTask() {
             sb.appendLine("     * Video Settings Configuration")
             sb.appendLine("     */")
             sb.appendLine("    object VideoSettings {")
-
-            videoSettings.entrySet().forEach { (key, value) ->
-                val constantName = key.toCamelCase().uppercase()
-                when {
-                    value.isJsonPrimitive -> {
-                        val primitive = value.asJsonPrimitive
-                        when {
-                            primitive.isString -> {
-                                sb.appendLine("        const val $constantName: String = \"${primitive.asString}\"")
-                            }
-
-                            primitive.isNumber -> {
-                                val number = primitive.asNumber
-                                if (number.toString().contains('.')) {
-                                    sb.appendLine("        const val $constantName: Double = ${number.toDouble()}")
-                                } else {
-                                    sb.appendLine("        const val $constantName: Int = ${number.toInt()}")
-                                }
-                            }
-
-                            primitive.isBoolean -> {
-                                sb.appendLine("        const val $constantName: Boolean = ${primitive.asBoolean}")
-                            }
-                        }
-                    }
-                }
-            }
+            appendObject(videoSettings, sb)
             sb.appendLine("    }")
             sb.appendLine()
         }
@@ -158,33 +132,7 @@ abstract class GenerateConfigTask : DefaultTask() {
             sb.appendLine("     * Audio Settings Configuration")
             sb.appendLine("     */")
             sb.appendLine("    object AudioSettings {")
-
-            audioSettings.entrySet().forEach { (key, value) ->
-                val constantName = key.toCamelCase().uppercase()
-                when {
-                    value.isJsonPrimitive -> {
-                        val primitive = value.asJsonPrimitive
-                        when {
-                            primitive.isString -> {
-                                sb.appendLine("        const val $constantName: String = \"${primitive.asString}\"")
-                            }
-
-                            primitive.isNumber -> {
-                                val number = primitive.asNumber
-                                if (number.toString().contains('.')) {
-                                    sb.appendLine("        const val $constantName: Double = ${number.toDouble()}")
-                                } else {
-                                    sb.appendLine("        const val $constantName: Int = ${number.toInt()}")
-                                }
-                            }
-
-                            primitive.isBoolean -> {
-                                sb.appendLine("        const val $constantName: Boolean = ${primitive.asBoolean}")
-                            }
-                        }
-                    }
-                }
-            }
+            appendObject(audioSettings, sb)
             sb.appendLine("    }")
             sb.appendLine()
         }
@@ -197,33 +145,7 @@ abstract class GenerateConfigTask : DefaultTask() {
             sb.appendLine("     * Waiting Room Settings Configuration")
             sb.appendLine("     */")
             sb.appendLine("    object WaitingRoomSettings {")
-
-            waitingRoomSettings.entrySet().forEach { (key, value) ->
-                val constantName = key.toCamelCase().uppercase()
-                when {
-                    value.isJsonPrimitive -> {
-                        val primitive = value.asJsonPrimitive
-                        when {
-                            primitive.isString -> {
-                                sb.appendLine("        const val $constantName: String = \"${primitive.asString}\"")
-                            }
-
-                            primitive.isNumber -> {
-                                val number = primitive.asNumber
-                                if (number.toString().contains('.')) {
-                                    sb.appendLine("        const val $constantName: Double = ${number.toDouble()}")
-                                } else {
-                                    sb.appendLine("        const val $constantName: Int = ${number.toInt()}")
-                                }
-                            }
-
-                            primitive.isBoolean -> {
-                                sb.appendLine("        const val $constantName: Boolean = ${primitive.asBoolean}")
-                            }
-                        }
-                    }
-                }
-            }
+            appendObject(waitingRoomSettings, sb)
             sb.appendLine("    }")
             sb.appendLine()
         }
@@ -236,35 +158,38 @@ abstract class GenerateConfigTask : DefaultTask() {
             sb.appendLine("     * Meeting Room Settings Configuration")
             sb.appendLine("     */")
             sb.appendLine("    object MeetingRoomSettings {")
+            appendObject(meetingRoomSettings, sb)
+            sb.appendLine("    }")
+            sb.appendLine()
+        }
+    }
 
-            meetingRoomSettings.entrySet().forEach { (key, value) ->
-                val constantName = key.toCamelCase().uppercase()
-                when {
-                    value.isJsonPrimitive -> {
-                        val primitive = value.asJsonPrimitive
-                        when {
-                            primitive.isString -> {
-                                sb.appendLine("        const val $constantName: String = \"${primitive.asString}\"")
-                            }
+    private fun appendObject(jsonObject: JsonObject, sb: StringBuilder) {
+        jsonObject.entrySet().forEach { (key, value) ->
+            val constantName = key.toCamelCase().uppercase()
+            when {
+                value.isJsonPrimitive -> {
+                    val primitive = value.asJsonPrimitive
+                    when {
+                        primitive.isString -> {
+                            sb.appendLine("        const val $constantName: String = \"${primitive.asString}\"")
+                        }
 
-                            primitive.isNumber -> {
-                                val number = primitive.asNumber
-                                if (number.toString().contains('.')) {
-                                    sb.appendLine("        const val $constantName: Double = ${number.toDouble()}")
-                                } else {
-                                    sb.appendLine("        const val $constantName: Int = ${number.toInt()}")
-                                }
+                        primitive.isNumber -> {
+                            val number = primitive.asNumber
+                            if (number.toString().contains('.')) {
+                                sb.appendLine("        const val $constantName: Double = ${number.toDouble()}")
+                            } else {
+                                sb.appendLine("        const val $constantName: Int = ${number.toInt()}")
                             }
+                        }
 
-                            primitive.isBoolean -> {
-                                sb.appendLine("        const val $constantName: Boolean = ${primitive.asBoolean}")
-                            }
+                        primitive.isBoolean -> {
+                            sb.appendLine("        const val $constantName: Boolean = ${primitive.asBoolean}")
                         }
                     }
                 }
             }
-            sb.appendLine("    }")
-            sb.appendLine()
         }
     }
 

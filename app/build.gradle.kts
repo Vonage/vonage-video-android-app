@@ -124,7 +124,7 @@ android {
     }
 
     sourceSets.configureEach {
-        kotlin.srcDir("build/generated/source/jsonConfig/com/vonage/android/config")
+        kotlin.srcDir(layout.buildDirectory.dir("generated/source/jsonConfig"))
     }
 }
 
