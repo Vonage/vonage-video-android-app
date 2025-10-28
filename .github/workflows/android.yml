@@ -88,9 +88,13 @@ jobs:
           api-level: 34
           arch: x86_64
           profile: pixel
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-window -gpu swiftshader_indirect -no-boot-anim -camera-back webcam0 -camera-front webcam0
           disable-animations: true
-          script: echo "Generated AVD snapshot for caching."
+          script: |
+            adb shell settings put global window_animation_scale 0.0
+            adb shell settings put global transition_animation_scale 0.0
+            adb shell settings put global animator_duration_scale 0.0
+            echo "Generated AVD snapshot for caching."
 
       - name: Run UI Tests
         uses: reactivecircus/android-emulator-runner@v2
@@ -98,10 +102,13 @@ jobs:
           api-level: 34
           arch: x86_64
           profile: pixel
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -no-boot-anim -camera-back webcam0 -camera-front webcam0
           disable-animations: true
           script: |
-            ./gradlew connectedDebugAndroidTest --info
+            adb shell settings put global window_animation_scale 0.0
+            adb shell settings put global transition_animation_scale 0.0
+            adb shell settings put global animator_duration_scale 0.0
+            ./gradlew connectedDebugAndroidTest --info --continue
 
       - name: Upload UI test reports
         uses: actions/upload-artifact@v4
