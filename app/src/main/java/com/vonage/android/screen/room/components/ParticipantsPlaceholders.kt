@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.components.AvatarInitials
+import com.vonage.android.compose.components.AvatarInitials
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

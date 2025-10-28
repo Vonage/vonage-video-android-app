@@ -5,8 +5,8 @@ import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import com.vonage.android.screen.components.AvatarInitialsTestTags.USER_INITIALS_ICON_TAG
-import com.vonage.android.screen.components.AvatarInitialsTestTags.USER_INITIALS_TEXT_TAG
+import com.vonage.android.compose.components.AvatarInitialsTestTags.USER_INITIALS_ICON_TAG
+import com.vonage.android.compose.components.AvatarInitialsTestTags.USER_INITIALS_TEXT_TAG
 import com.vonage.android.util.ComposeTestElement
 
 fun SemanticsNodeInteractionsProvider.avatarInitials(

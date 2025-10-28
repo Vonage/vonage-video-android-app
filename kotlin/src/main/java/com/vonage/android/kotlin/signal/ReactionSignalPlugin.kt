@@ -1,14 +1,16 @@
 package com.vonage.android.kotlin.signal
 
-import com.opentok.android.Session
 import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -22,21 +24,18 @@ class ReactionSignalPlugin(
     private val coroutineScope = CoroutineScope(coroutineDispatcher)
     private val reactions: MutableList<EmojiReaction> = CopyOnWriteArrayList()
 
+    private val _output = MutableStateFlow(EmojiState(reactions = persistentListOf()))
+    override val output: StateFlow<SignalStateContent?> = _output
+
     override fun canHandle(signalType: String): Boolean = signalType == SignalType.REACTION.signal
 
-    override fun handleSignal(
-        type: String,
-        data: String,
-        senderName: String,
-        isYou: Boolean,
-        callback: (SignalStateContent) -> Unit,
-    ): SignalStateContent? {
-        if (!canHandle(type)) return null
+    override fun handleSignal(type: String, data: String, senderName: String, isYou: Boolean) {
+        if (!canHandle(type)) return
 
         val reactionSignal = try {
             Json.decodeFromString<ReactionSignal>(data)
         } catch (_: SerializationException) {
-            return null
+            return
         }
 
         val emojiReaction = EmojiReaction(
@@ -52,20 +51,20 @@ class ReactionSignalPlugin(
         coroutineScope.launch {
             delay(EMOJI_LIFETIME_MILLIS)
             reactions.removeAll { it.id == emojiReaction.id }
-            callback(EmojiState(reactions = reactions.toImmutableList()))
+            _output.value = EmojiState(reactions = reactions.toImmutableList())
         }
 
-        return EmojiState(reactions = reactions.toImmutableList())
+        _output.value = EmojiState(reactions = reactions.toImmutableList())
     }
 
-    override fun sendSignal(session: Session, message: String, payload: Map<String, String>) {
+    override fun sendSignal(senderName: String, message: String): RawSignal {
         val signal = Json.encodeToString(
             ReactionSignal(
                 emoji = message,
                 time = System.currentTimeMillis(),
             )
         )
-        session.sendSignal(SignalType.REACTION.signal, signal)
+        return RawSignal(SignalType.REACTION.signal, signal)
     }
 }
 

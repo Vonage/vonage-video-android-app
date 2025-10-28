@@ -34,7 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.components.LinkifyText
+import com.vonage.android.compose.components.LinkifyText
 import com.vonage.android.screen.reporting.components.ReportIssueForm
 
 @Composable

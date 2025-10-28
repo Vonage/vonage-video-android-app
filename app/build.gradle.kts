@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.kover)
     kotlin("plugin.serialization") version "2.0.21"
-    id("com.github.triplet.play") version "3.12.1"
+    alias(libs.plugins.play.publisher)
 }
 
 android {
@@ -28,7 +28,10 @@ android {
 
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
+
+        missingDimensionStrategy("chat", "enabled")
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -119,6 +122,8 @@ play {
 dependencies {
     implementation(project(":compose"))
     implementation(project(":kotlin"))
+    implementation(project(":shared"))
+    implementation(project(":vonage-feature-chat"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

@@ -36,8 +36,6 @@ import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.ChatState
-import com.vonage.android.kotlin.model.EmojiState
-import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
@@ -48,14 +46,15 @@ import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.TopBar
 import com.vonage.android.screen.room.components.captions.CaptionsOverlay
-import com.vonage.android.screen.room.components.chat.ChatPanel
+import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.screen.room.components.emoji.EmojiReactionOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
-import com.vonage.android.util.preview.buildCallWithParticipants
+import com.vonage.android.compose.preview.buildCallWithParticipants
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @Suppress("LongMethod")
@@ -69,9 +68,7 @@ fun MeetingRoomScreen(
     val participantsSheetState = rememberModalBottomSheetState()
     val audioDeviceSelectorSheetState = rememberModalBottomSheetState()
     val moreActionsSheetState = rememberModalBottomSheetState()
-    val reportSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
+    val reportSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showParticipants by remember { mutableStateOf(false) }
     var showAudioDeviceSelector by remember { mutableStateOf(false) }
     var showMoreActions by remember { mutableStateOf(false) }
@@ -97,9 +94,6 @@ fun MeetingRoomScreen(
     when {
         (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
             val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle(persistentListOf())
-            val signalState by uiState.call.signalStateFlow.collectAsStateWithLifecycle(null)
-            val chatState = signalState?.signals[SignalType.CHAT.signal] as? ChatState
-            val emojiState = signalState?.signals[SignalType.REACTION.signal] as? EmojiState
             val captions by uiState.call.captionsStateFlow.collectAsStateWithLifecycle()
             val publisher = participants.filterIsInstance<VeraPublisher>().firstOrNull()
 
@@ -117,7 +111,7 @@ fun MeetingRoomScreen(
                             isCameraEnabled = publisher?.isCameraEnabled ?: MutableStateFlow(false),
                             isChatShow = isChatShow,
                             participantsCount = uiState.call.participantsCount,
-                            unreadCount = chatState?.unreadCount ?: 0,
+                            chatState = uiState.call.chatSignalState(),
                             layoutType = uiState.layoutType,
                         ),
                     )
@@ -133,7 +127,7 @@ fun MeetingRoomScreen(
                     mainPane = {
                         Box(modifier = Modifier.fillMaxSize()) {
                             EmojiReactionOverlay(
-                                reactions = emojiState?.reactions.orEmpty(),
+                                reactions = uiState.call.emojiSignalState(),
                             )
                             CaptionsOverlay(
                                 captions = captions,
@@ -178,7 +172,7 @@ fun MeetingRoomScreen(
                     supportingPane = { },
                     extraPane = {
                         ExtraPane(
-                            chatState = chatState,
+                            chatState = uiState.call.chatSignalState(),
                             actions = actions,
                             onCloseChat = { scope.launch { navigator.navigateBack() } }
                         )
@@ -209,16 +203,21 @@ fun MeetingRoomScreen(
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun ThreePaneScaffoldPaneScope.ExtraPane(
-    chatState: ChatState?,
+    chatState: StateFlow<ChatState?>,
     actions: MeetingRoomActions,
     onCloseChat: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val chatState by chatState.collectAsStateWithLifecycle()
+
     AnimatedPane(
         modifier = modifier
             .padding(16.dp)
     ) {
         ChatPanel(
+            title = stringResource(R.string.chat_panel_title),
+            sendLabel = stringResource(R.string.chat_panel_input_text_placeholder),
+            jumpToBottomLabel = stringResource(R.string.chat_panel_jump_to_bottom),
             messages = chatState?.messages.orEmpty().toImmutableList(),
             onSendMessage = actions.onMessageSent,
             onCloseChat = onCloseChat,
@@ -254,7 +253,6 @@ internal fun MeetingRoomScreenSessionErrorPreview() {
     }
 }
 
-@PreviewLightDark
 @PreviewScreenSizes
 @Composable
 internal fun MeetingRoomScreenSessionPreview() {
@@ -263,7 +261,7 @@ internal fun MeetingRoomScreenSessionPreview() {
             uiState = MeetingRoomUiState(
                 roomName = "sample-room-name",
                 recordingState = RecordingState.RECORDING,
-                call = buildCallWithParticipants(1),
+                call = buildCallWithParticipants(10),
                 isLoading = false,
                 isError = false,
             ),
