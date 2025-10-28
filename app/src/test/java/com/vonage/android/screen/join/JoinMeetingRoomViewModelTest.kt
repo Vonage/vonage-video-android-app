@@ -1,15 +1,20 @@
 package com.vonage.android.screen.join
 
 import app.cash.turbine.test
+import com.vonage.android.MainDispatcherRule
 import com.vonage.android.util.RoomNameGenerator
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class JoinMeetingRoomViewModelTest {
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     private val roomNameGenerator: RoomNameGenerator = mockk()
 

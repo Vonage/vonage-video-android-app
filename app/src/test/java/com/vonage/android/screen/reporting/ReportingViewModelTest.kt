@@ -4,6 +4,7 @@ import android.net.Uri
 import android.view.Window
 import androidx.compose.ui.graphics.ImageBitmap
 import app.cash.turbine.test
+import com.vonage.android.MainDispatcherRule
 import com.vonage.android.data.ReportingRepository
 import com.vonage.android.data.network.ReportResponseData
 import com.vonage.android.kotlin.VonageVideoClient
@@ -18,9 +19,13 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class ReportingViewModelTest {
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     private val reportingRepository: ReportingRepository = mockk()
     private val imageProcessor: ImageProcessor = mockk()
