@@ -193,8 +193,6 @@ object BottomBarTestTags {
     const val BOTTOM_BAR_PARTICIPANTS_BUTTON = "bottom_bar_participants_button"
     const val BOTTOM_BAR_PARTICIPANTS_BADGE = "bottom_bar_participants_badge"
     const val BOTTOM_BAR_END_CALL_BUTTON = "bottom_bar_end_call_button"
-    const val BOTTOM_BAR_CHAT_BUTTON = "bottom_bar_chat_button"
-    const val BOTTOM_BAR_CHAT_BADGE = "bottom_bar_chat_badge"
     const val BOTTOM_BAR_CAMERA_BUTTON = "bottom_bar_camera_button"
     const val BOTTOM_BAR_MIC_BUTTON = "bottom_bar_mic_button"
     const val BOTTOM_BAR_GRID_LAYOUT_BUTTON = "bottom_bar_grid_layout_button"
