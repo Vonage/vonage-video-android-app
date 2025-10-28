@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import kotlin.Result.Companion.success
@@ -39,24 +40,39 @@ class MeetingRoomScreenViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    val context: Context = mockk(relaxed = true)
-    val activityContextProvider: ActivityContextProvider = mockk(relaxed = true)
-    val sessionRepository: SessionRepository = mockk()
-    val archiveRepository: ArchiveRepository = mockk()
-    val captionsRepository: CaptionsRepository = mockk()
-    val screenSharingManager: VeraScreenSharingManager = mockk()
-    val videoClient: VonageVideoClient = mockk()
-    val foregroundServiceHandler: VeraForegroundServiceHandler = mockk {
+    private val context: Context = mockk(relaxed = true)
+    private val activityContextProvider: ActivityContextProvider = mockk(relaxed = true)
+    private val sessionRepository: SessionRepository = mockk()
+    private val archiveRepository: ArchiveRepository = mockk()
+    private val captionsRepository: CaptionsRepository = mockk()
+    private val screenSharingManager: VeraScreenSharingManager = mockk()
+    private val videoClient: VonageVideoClient = mockk()
+    private val foregroundServiceHandler: VeraForegroundServiceHandler = mockk {
         every { startForegroundService(any()) } returns Unit
         every { stopForegroundService() } returns Unit
         every { actions } returns MutableSharedFlow()
+    }
+
+    private lateinit var sut: MeetingRoomScreenViewModel
+
+    @Before
+    fun setUp() {
+        sut = MeetingRoomScreenViewModel(
+            roomName = ANY_ROOM_NAME,
+            sessionRepository = sessionRepository,
+            archiveRepository = archiveRepository,
+            screenSharingManager = screenSharingManager,
+            captionsRepository = captionsRepository,
+            videoClient = videoClient,
+            foregroundServiceHandler = foregroundServiceHandler,
+            activityContextProvider = activityContextProvider,
+        )
     }
 
     @Test
     fun `given viewmodel when initialize then returns correct state`() = runTest {
         val mockCall = givenMockCall()
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -79,7 +95,6 @@ class MeetingRoomScreenViewModelTest {
     fun `given viewmodel when initialize fails then returns error state`() = runTest {
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns Result.failure(Exception("Empty response"))
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -93,9 +108,7 @@ class MeetingRoomScreenViewModelTest {
     fun `given viewmodel when onToggleMic then delegate to call`() = runTest {
         val mockCall = givenMockCall()
 
-        val sut = sut()
         sut.setup(context)
-        //testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
@@ -115,7 +128,6 @@ class MeetingRoomScreenViewModelTest {
     fun `given viewmodel when onToggleCamera then delegate to call`() = runTest {
         val mockCall = givenMockCall()
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -138,7 +150,6 @@ class MeetingRoomScreenViewModelTest {
         val mockCall = givenMockCall()
         every { screenSharingManager.stopSharingScreen() } returns Unit
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -161,7 +172,6 @@ class MeetingRoomScreenViewModelTest {
     fun `given viewmodel when onPause then delegate to call`() = runTest {
         val mockCall = givenMockCall()
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -183,7 +193,6 @@ class MeetingRoomScreenViewModelTest {
     fun `given viewmodel when onResume then delegate to call`() = runTest {
         val mockCall = givenMockCall()
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -205,7 +214,6 @@ class MeetingRoomScreenViewModelTest {
     fun `given viewmodel when onSwitchCamera then delegate to call`() = runTest {
         val mockCall = givenMockCall()
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -227,7 +235,6 @@ class MeetingRoomScreenViewModelTest {
     fun `given viewmodel when sendMessage then delegate to call`() = runTest {
         val mockCall = givenMockCall()
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -249,7 +256,6 @@ class MeetingRoomScreenViewModelTest {
     fun `given viewmodel when listenUnread then delegate to call`() = runTest {
         val mockCall = givenMockCall()
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -271,7 +277,6 @@ class MeetingRoomScreenViewModelTest {
     fun `given viewmodel when sendEmoji then delegate to call`() = runTest {
         val mockCall = givenMockCall()
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -294,7 +299,6 @@ class MeetingRoomScreenViewModelTest {
         val mockCall = givenMockCall()
         coEvery { archiveRepository.startArchive(ANY_ROOM_NAME) } returns success("archiveId")
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -332,7 +336,6 @@ class MeetingRoomScreenViewModelTest {
         coEvery { archiveRepository.startArchive(ANY_ROOM_NAME) } returns success("archiveId")
         coEvery { archiveRepository.stopArchive(ANY_ROOM_NAME, "archiveId") } returns success(true)
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -392,7 +395,6 @@ class MeetingRoomScreenViewModelTest {
             )
         } returns Unit
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -437,7 +439,6 @@ class MeetingRoomScreenViewModelTest {
             )
         } returns Unit
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -476,7 +477,6 @@ class MeetingRoomScreenViewModelTest {
         val mockCall = givenMockCall()
         every { screenSharingManager.stopSharingScreen() } returns Unit
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -510,7 +510,6 @@ class MeetingRoomScreenViewModelTest {
         every { videoClient.buildPublisher(context) } returns buildMockPublisher()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -531,7 +530,6 @@ class MeetingRoomScreenViewModelTest {
         val mockCall = givenMockCall()
         coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns success("captionsId")
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -555,7 +553,6 @@ class MeetingRoomScreenViewModelTest {
         val mockCall = givenMockCall()
         coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns Result.failure(Exception("KO"))
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -579,7 +576,6 @@ class MeetingRoomScreenViewModelTest {
         coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns success("captionsId")
         coEvery { captionsRepository.disableCaptions(ANY_ROOM_NAME, "captionsId") } returns success("OK")
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -615,7 +611,6 @@ class MeetingRoomScreenViewModelTest {
         coEvery { captionsRepository.disableCaptions(ANY_ROOM_NAME, "captionsId") } returns
                 Result.failure(Exception("KO"))
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -649,8 +644,6 @@ class MeetingRoomScreenViewModelTest {
 
     @Test
     fun `given viewmodel when initialize then create foreground service`() {
-        sut()
-
         verify { foregroundServiceHandler.startForegroundService(ANY_ROOM_NAME) }
     }
 
@@ -660,7 +653,6 @@ class MeetingRoomScreenViewModelTest {
         val callActionsFlow = MutableStateFlow<CallAction?>(null)
         every { foregroundServiceHandler.actions } returns callActionsFlow
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -682,7 +674,6 @@ class MeetingRoomScreenViewModelTest {
     fun `given viewmodel when change layout then update state`() = runTest {
         givenMockCall()
 
-        val sut = sut()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
@@ -699,18 +690,6 @@ class MeetingRoomScreenViewModelTest {
             )
         }
     }
-
-    private fun sut(): MeetingRoomScreenViewModel =
-        MeetingRoomScreenViewModel(
-            roomName = ANY_ROOM_NAME,
-            sessionRepository = sessionRepository,
-            archiveRepository = archiveRepository,
-            screenSharingManager = screenSharingManager,
-            captionsRepository = captionsRepository,
-            videoClient = videoClient,
-            foregroundServiceHandler = foregroundServiceHandler,
-            activityContextProvider = activityContextProvider,
-        )
 
     private inline fun givenMockCall(): CallFacade {
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()

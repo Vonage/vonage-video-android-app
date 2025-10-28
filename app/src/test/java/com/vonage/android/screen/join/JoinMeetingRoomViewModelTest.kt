@@ -6,14 +6,21 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
 
 class JoinMeetingRoomViewModelTest {
 
-    val roomNameGenerator: RoomNameGenerator = mockk()
-    val sut = JoinMeetingRoomViewModel(
-        roomNameGenerator = roomNameGenerator,
-    )
+    private val roomNameGenerator: RoomNameGenerator = mockk()
+
+    private lateinit var sut: JoinMeetingRoomViewModel
+
+    @Before
+    fun setUp() {
+        sut = JoinMeetingRoomViewModel(
+            roomNameGenerator = roomNameGenerator,
+        )
+    }
 
     @Test
     fun `given valid room name then state is correct`() = runTest {
@@ -46,9 +53,9 @@ class JoinMeetingRoomViewModelTest {
     @Test
     fun `given viewmodel when create room then state is correct`() = runTest {
         every { roomNameGenerator.generateRoomName() } returns "vonage-rocks"
-        
+
         sut.createRoom()
-        
+
         sut.uiState.test {
             assertEquals(
                 JoinMeetingRoomUiState.Content(

@@ -173,25 +173,25 @@ class GoodbyeScreenViewModelTest {
         }
     }
 
-    val availableArchive = Archive(
+    private val availableArchive = Archive(
         id = "archive-id",
         name = "recording 1",
         url = "https://cdn.recording.io/potatoe",
         status = ArchiveStatus.AVAILABLE,
         createdAt = 123
     )
-    val pendingArchive = Archive(
+    private val pendingArchive = Archive(
         id = "archive-id-pending",
         name = "recording 1",
         url = "https://cdn.recording.io/potatoe-pending",
         status = ArchiveStatus.PENDING,
         createdAt = 123
     )
-    val archiveList = listOf(
+    private val archiveList = listOf(
         availableArchive,
         pendingArchive,
     )
-    val archiveListAfterPolling = listOf(
+    private val archiveListAfterPolling = listOf(
         availableArchive,
         availableArchive,
     )

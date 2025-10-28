@@ -17,6 +17,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 
 class ReportingViewModelTest {
@@ -24,11 +25,17 @@ class ReportingViewModelTest {
     private val reportingRepository: ReportingRepository = mockk()
     private val imageProcessor: ImageProcessor = mockk()
     private val vonageVideoClient: VonageVideoClient = mockk()
-    private val sut = ReportingViewModel(
-        reportingRepository = reportingRepository,
-        imageProcessor = imageProcessor,
-        vonageVideoClient = vonageVideoClient
-    )
+
+    private lateinit var sut: ReportingViewModel
+
+    @Before
+    fun setUp() {
+        sut = ReportingViewModel(
+            reportingRepository = reportingRepository,
+            imageProcessor = imageProcessor,
+            vonageVideoClient = vonageVideoClient
+        )
+    }
 
     @Test
     fun `should reset state`() = runTest {
@@ -123,9 +130,9 @@ class ReportingViewModelTest {
         val uri = mockk<Uri>(relaxed = true)
         val imageBitmap = mockk<ImageBitmap>(relaxed = true)
         coEvery { imageProcessor.extractImageFromUri(uri) } returns Result.success(imageBitmap)
-        
+
         sut.processImage(uri)
-        
+
         sut.uiState.test {
             skipItems(1) // skip initial state
             val finalState = awaitItem()
@@ -138,7 +145,7 @@ class ReportingViewModelTest {
     fun `should update state when extractImageFromUri fails`() = runTest {
         val uri = mockk<Uri>(relaxed = true)
         coEvery { imageProcessor.extractImageFromUri(uri) } returns Result.failure(Exception("oops!"))
-        
+
         sut.processImage(uri)
 
         sut.uiState.test {
@@ -153,9 +160,9 @@ class ReportingViewModelTest {
         val window = mockk<Window>(relaxed = true)
         val imageBitmap = mockk<ImageBitmap>(relaxed = true)
         coEvery { imageProcessor.extractImageFromWindow(window) } returns Result.success(imageBitmap)
-        
+
         sut.processScreenshot(window)
-        
+
         sut.uiState.test {
             skipItems(1) // skip initial state
             val finalState = awaitItem()
@@ -168,10 +175,10 @@ class ReportingViewModelTest {
     fun `should update state when extractImageFromWindow fails`() = runTest {
         val window = mockk<Window>(relaxed = true)
         coEvery { imageProcessor.extractImageFromWindow(window) } returns Result.failure(Exception("oops!"))
-        
+
         sut.processScreenshot(window)
         delay(100)
-        
+
         sut.uiState.test {
             val currentState = awaitItem()
             assertFalse(currentState.isProcessingAttachment)
@@ -184,23 +191,27 @@ class ReportingViewModelTest {
         coEvery { imageProcessor.encodeImageToBase64(null) } returns ""
         every { vonageVideoClient.debugDump() } returns "debug info from SDK"
         coEvery { reportingRepository.sendReport(any()) } returns
-                Result.success(ReportResponseData(
-                    message = "message",
-                    ticketUrl = "https://jira.host.io/ticket-968",
-                    screenshotIncluded = false,
-                ))
-        
+                Result.success(
+                    ReportResponseData(
+                        message = "message",
+                        ticketUrl = "https://jira.host.io/ticket-968",
+                        screenshotIncluded = false,
+                    )
+                )
+
         sut.sendReport("title", "user name", "issue description", null)
-        
+
         sut.uiState.test {
             skipItems(1) // skip initial state
             val finalState = awaitItem()
             assertFalse(finalState.isSending)
             assertFalse(finalState.isError)
-            assertEquals(IssueData(
-                message = "message",
-                ticketUrl = "https://jira.host.io/ticket-968",
-            ), finalState.isSuccess)
+            assertEquals(
+                IssueData(
+                    message = "message",
+                    ticketUrl = "https://jira.host.io/ticket-968",
+                ), finalState.isSuccess
+            )
         }
     }
 
@@ -210,9 +221,9 @@ class ReportingViewModelTest {
         coEvery { imageProcessor.encodeImageToBase64(imageBitmap) } returns "base64Image"
         every { vonageVideoClient.debugDump() } returns "debug info from SDK"
         coEvery { reportingRepository.sendReport(any()) } returns Result.failure(Exception("oops!"))
-        
+
         sut.sendReport("title", "user name", "issue description", imageBitmap)
-        
+
         sut.uiState.test {
             skipItems(1) // Skip any initial states
             val finalState = awaitItem()
