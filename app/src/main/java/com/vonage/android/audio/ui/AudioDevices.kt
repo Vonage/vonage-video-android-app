@@ -6,6 +6,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -18,6 +19,8 @@ import dagger.hilt.android.EntryPointAccessors
 fun AudioDevicesEffect(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
+    if (LocalInspectionMode.current) return
+
     val context = LocalContext.current
     val audioDeviceSelector = rememberAudioDeviceSelector(context)
 

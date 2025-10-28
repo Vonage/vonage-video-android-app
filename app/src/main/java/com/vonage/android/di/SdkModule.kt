@@ -3,6 +3,8 @@ package com.vonage.android.di
 import android.content.Context
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.internal.VeraAudioDevice
+import com.vonage.android.kotlin.signal.ChatSignalPlugin
+import com.vonage.android.kotlin.signal.ReactionSignalPlugin
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,11 +26,16 @@ object SdkModule {
     @Provides
     fun provideVonageVideoClient(
         @ApplicationContext context: Context,
+        chatSignalPlugin: ChatSignalPlugin,
         baseAudioDevice: VeraAudioDevice,
     ): VonageVideoClient =
         VonageVideoClient(
             context = context,
             baseAudioDevice = baseAudioDevice,
+            signalPlugins = listOfNotNull(
+                chatSignalPlugin,
+                ReactionSignalPlugin(),
+            )
         )
 
 }

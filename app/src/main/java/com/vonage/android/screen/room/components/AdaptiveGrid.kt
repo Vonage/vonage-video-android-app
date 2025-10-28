@@ -23,7 +23,7 @@ import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.noOpCallFacade
 import com.vonage.android.util.lazyStateWithVisibilityNotification
-import com.vonage.android.util.preview.buildParticipants
+import com.vonage.android.compose.preview.buildParticipants
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 

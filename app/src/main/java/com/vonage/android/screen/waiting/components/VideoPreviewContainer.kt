@@ -40,7 +40,7 @@ import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.BlurLevel
-import com.vonage.android.screen.components.AvatarInitials
+import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.screen.components.CircularControlButton
 import com.vonage.android.screen.waiting.WaitingRoomActions
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BLUR_BUTTON_TAG

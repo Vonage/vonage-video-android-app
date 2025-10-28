@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.AutoAwesomeMosaic
 import androidx.compose.material.icons.filled.CallEnd
 import androidx.compose.material.icons.filled.Group
@@ -34,14 +33,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.chat.ui.ChatBadgeButton
+import com.vonage.android.compose.components.ControlButton
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.components.ControlButton
+import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CAMERA_BUTTON
-import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CHAT_BADGE
-import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_CHAT_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_END_CALL_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_GRID_LAYOUT_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_MIC_BUTTON
@@ -59,7 +58,7 @@ data class BottomBarState(
     val isCameraEnabled: StateFlow<Boolean>,
     val isChatShow: Boolean,
     val participantsCount: StateFlow<Int>,
-    val unreadCount: Int,
+    val chatState: StateFlow<ChatState?>,
     val layoutType: CallLayoutType,
 )
 
@@ -73,6 +72,7 @@ fun BottomBar(
     val isMicEnabled by bottomBarState.isMicEnabled.collectAsStateWithLifecycle()
     val isCameraEnabled by bottomBarState.isCameraEnabled.collectAsStateWithLifecycle()
     val participantsCount by bottomBarState.participantsCount.collectAsStateWithLifecycle()
+    val chatState by bottomBarState.chatState.collectAsStateWithLifecycle()
 
     Surface(
         modifier = modifier
@@ -108,7 +108,7 @@ fun BottomBar(
             )
 
             ChatBadgeButton(
-                unreadCount = bottomBarState.unreadCount,
+                unreadCount = chatState?.unreadCount ?: 0,
                 onShowChat = bottomBarState.onShowChat,
                 isChatShow = bottomBarState.isChatShow,
             )
@@ -161,41 +161,6 @@ fun BottomBar(
 }
 
 @Composable
-fun ChatBadgeButton(
-    unreadCount: Int,
-    onShowChat: () -> Unit,
-    isChatShow: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    val badgeVisible = unreadCount > 0
-    BadgedBox(
-        modifier = modifier,
-        badge = {
-            if (badgeVisible) {
-                Badge(
-                    containerColor = VonageVideoTheme.colors.primary,
-                    contentColor = Color.White,
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .testTag(BOTTOM_BAR_CHAT_BADGE),
-                        text = "$unreadCount",
-                    )
-                }
-            }
-        },
-    ) {
-        ControlButton(
-            modifier = Modifier
-                .testTag(BOTTOM_BAR_CHAT_BUTTON),
-            onClick = onShowChat,
-            icon = Icons.AutoMirrored.Default.Chat,
-            isActive = isChatShow,
-        )
-    }
-}
-
-@Composable
 private fun ParticipantsBadgeButton(
     participantsCount: Int,
     onToggleParticipants: () -> Unit,
@@ -228,8 +193,6 @@ object BottomBarTestTags {
     const val BOTTOM_BAR_PARTICIPANTS_BUTTON = "bottom_bar_participants_button"
     const val BOTTOM_BAR_PARTICIPANTS_BADGE = "bottom_bar_participants_badge"
     const val BOTTOM_BAR_END_CALL_BUTTON = "bottom_bar_end_call_button"
-    const val BOTTOM_BAR_CHAT_BUTTON = "bottom_bar_chat_button"
-    const val BOTTOM_BAR_CHAT_BADGE = "bottom_bar_chat_badge"
     const val BOTTOM_BAR_CAMERA_BUTTON = "bottom_bar_camera_button"
     const val BOTTOM_BAR_MIC_BUTTON = "bottom_bar_mic_button"
     const val BOTTOM_BAR_GRID_LAYOUT_BUTTON = "bottom_bar_grid_layout_button"
@@ -250,7 +213,7 @@ internal fun BottomBarPreview() {
                 isCameraEnabled = MutableStateFlow(true),
                 isChatShow = false,
                 participantsCount = MutableStateFlow(25),
-                unreadCount = 10,
+                chatState = MutableStateFlow(null),
                 layoutType = CallLayoutType.SPEAKER_LAYOUT,
             ),
         )
