@@ -194,9 +194,6 @@ dependencies {
     debugImplementation(libs.leakcanary.android)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-    debugImplementation("com.telefonica:tweaks:5.1.0")
-    releaseImplementation("com.telefonica:tweaks-no-op:5.1.0")
 }
 
 fun String.toEnabledString(): String = if (toBoolean()) "enabled" else "disabled"

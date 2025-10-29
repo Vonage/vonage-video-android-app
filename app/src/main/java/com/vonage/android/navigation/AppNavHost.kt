@@ -9,7 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import com.telefonica.tweaks.addTweakGraph
 import com.vonage.android.BuildConfig
 import com.vonage.android.navigation.AppRoute.Goodbye
 import com.vonage.android.navigation.AppRoute.Landing
@@ -89,8 +88,5 @@ fun AppNavHost(
                 },
             )
         }
-        addTweakGraph(
-            navController = navController,
-        )
     }
 }
