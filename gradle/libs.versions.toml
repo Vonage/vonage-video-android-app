@@ -6,6 +6,7 @@ appcompat = "1.7.1"
 composeBom = "2025.09.01"
 converterMoshi = "3.0.0"
 coreKtx = "1.17.0"
+coreTesting = "1.17.0"
 datastoreCore = "1.1.7"
 detekt = "1.23.8"
 detektCompose = "0.4.27"
@@ -49,6 +50,7 @@ androidx-adaptive-navigation = { module = "androidx.compose.material3.adaptive:a
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-testing = { module = "androidx.core:core-testing", version.ref = "coreTesting" }
 androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences", version.ref = "datastoreCore" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
@@ -77,7 +79,6 @@ hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", ve
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroid" }
 junit = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
 junit-junit = { module = "junit:junit", version.ref = "junitJunit" }
-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }

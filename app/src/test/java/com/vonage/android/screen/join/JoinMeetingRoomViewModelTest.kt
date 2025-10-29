@@ -1,19 +1,31 @@
 package com.vonage.android.screen.join
 
 import app.cash.turbine.test
+import com.vonage.android.MainDispatcherRule
 import com.vonage.android.util.RoomNameGenerator
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 
 class JoinMeetingRoomViewModelTest {
 
-    val roomNameGenerator: RoomNameGenerator = mockk()
-    val sut = JoinMeetingRoomViewModel(
-        roomNameGenerator = roomNameGenerator,
-    )
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
+    private val roomNameGenerator: RoomNameGenerator = mockk()
+
+    private lateinit var sut: JoinMeetingRoomViewModel
+
+    @Before
+    fun setUp() {
+        sut = JoinMeetingRoomViewModel(
+            roomNameGenerator = roomNameGenerator,
+        )
+    }
 
     @Test
     fun `given valid room name then state is correct`() = runTest {
@@ -46,9 +58,9 @@ class JoinMeetingRoomViewModelTest {
     @Test
     fun `given viewmodel when create room then state is correct`() = runTest {
         every { roomNameGenerator.generateRoomName() } returns "vonage-rocks"
-        
+
         sut.createRoom()
-        
+
         sut.uiState.test {
             assertEquals(
                 JoinMeetingRoomUiState.Content(
