@@ -25,13 +25,15 @@ kotlinxCoroutinesTest = "1.10.2"
 kotlinxSerializationJson = "1.9.0"
 leakcanaryAndroid = "2.14"
 lifecycleRuntimeKtx = "2.9.4"
-loggingInterceptor = "5.2.1"
+loggingInterceptor = "5.3.0"
 mockk = "1.14.6"
+mockwebserver3 = "5.3.0"
 moshiKotlin = "1.15.2"
 navigationCompose = "2.9.5"
 navigationRuntimeAndroid = "2.9.5"
-okhttp = "5.2.1"
+okhttp = "5.3.0"
 opentokAndroidSdk = "2.31.1"
+orchestrator = "1.6.1"
 retrofit = "3.0.0"
 runtimeAndroid = "1.9.4"
 testRules = "1.7.0"
@@ -40,6 +42,7 @@ turbine = "1.2.1"
 material = "1.13.0"
 runtime = "1.9.4"
 material3 = "1.4.0"
+uiTestJunit4 = "1.9.4"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -61,6 +64,7 @@ androidx-material-icons-extended = { module = "androidx.compose.material:materia
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-navigation-runtime-android = { group = "androidx.navigation", name = "navigation-runtime-android", version.ref = "navigationRuntimeAndroid" }
+androidx-orchestrator = { module = "androidx.test:orchestrator", version.ref = "orchestrator" }
 androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime-android", version.ref = "runtimeAndroid" }
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "testRules" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "testRunner" }
@@ -96,6 +100,7 @@ turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "uiTestJunit4" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

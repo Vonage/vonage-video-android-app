@@ -49,6 +49,7 @@ android {
             isReturnDefaultValues = true
         }
         animationsDisabled = true
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
     val signFile: File = rootProject.file(".sign/keystore.properties")
@@ -172,6 +173,7 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.hilt.android.testing)
+    androidTestUtil(libs.androidx.orchestrator)
     kspAndroidTest(libs.hilt.android.compiler)
 
     debugImplementation(libs.leakcanary.android)
