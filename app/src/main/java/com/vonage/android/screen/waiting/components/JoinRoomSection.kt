@@ -63,6 +63,12 @@ fun JoinRoomSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag(USER_NAME_INPUT_TAG),
+            placeholder = {
+                Text(
+                    text = stringResource(R.string.waiting_room_name_input_placeholder),
+                    color = VonageVideoTheme.colors.textPrimaryDisabled,
+                )
+            },
             value = username,
             onValueChange = onUsernameChange,
             leadingIcon = { PersonIcon() },

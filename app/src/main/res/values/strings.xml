@@ -14,6 +14,7 @@
     <!-- Waiting Screen -->
     <string name="waiting_room_prepare_to_join">Prepare to join:</string>
     <string name="waiting_room_whats_your_name">What is your name?</string>
+    <string name="waiting_room_name_input_placeholder">Enter your name</string>
     <string name="waiting_room_join">Join</string>
     <string name="waiting_room_switch_camera">Switch camera</string>
     <string name="waiting_room_audio_output">Audio output</string>
