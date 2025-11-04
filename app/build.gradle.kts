@@ -11,6 +11,8 @@ plugins {
     alias(libs.plugins.kover)
     kotlin("plugin.serialization") version "2.0.21"
     alias(libs.plugins.play.publisher)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.crashlytics)
 }
 
 android {
@@ -152,6 +154,11 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
     ksp(libs.hilt.android.compiler)
+
+    // Firebase Crashlytics
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics.ndk)
+    implementation(libs.firebase.analytics)
 
     // to be removed when extracting to module all the audio stuff
     implementation(libs.opentok.android.sdk)
