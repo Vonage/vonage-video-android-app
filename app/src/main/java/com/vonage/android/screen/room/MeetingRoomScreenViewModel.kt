@@ -151,6 +151,12 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                             is SessionEvent.Disconnected -> {
                                 endCall()
                             }
+                            is SessionEvent.Error -> {
+                                _uiState.update { uiState -> uiState.copy(
+                                    isError = true,
+                                    errorMessage = sessionEvent.error.message,
+                                ) }
+                            }
 
                             else -> {}
                         }
@@ -313,6 +319,7 @@ data class MeetingRoomUiState(
     val call: CallFacade = noOpCallFacade,
     val isLoading: Boolean = false,
     val isError: Boolean = false,
+    val errorMessage: String? = null,
     val isEndCall: Boolean = false,
     val layoutType: CallLayoutType = CallLayoutType.GRID,
 )

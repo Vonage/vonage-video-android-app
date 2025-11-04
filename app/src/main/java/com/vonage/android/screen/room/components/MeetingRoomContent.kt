@@ -1,63 +1,33 @@
 package com.vonage.android.screen.room.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.vonage.android.audio.ui.AudioDevices
-import com.vonage.android.compose.preview.buildParticipants
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.kotlin.model.Participant
-import com.vonage.android.screen.reporting.ReportIssueScreen
 import com.vonage.android.screen.room.CallLayoutType
-import com.vonage.android.screen.room.CaptionsState
-import com.vonage.android.screen.room.MeetingRoomActions
-import com.vonage.android.screen.room.RecordingState
-import com.vonage.android.screen.room.ScreenSharingState
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT
-import com.vonage.android.screen.room.components.emoji.EmojiSelector
 import com.vonage.android.screen.room.noOpCallFacade
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.launch
+import kotlinx.collections.immutable.persistentListOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("LongParameterList")
 @Composable
 fun MeetingRoomContent(
-    participants: ImmutableList<Participant>,
-    actions: MeetingRoomActions,
-    recordingState: RecordingState,
-    screenSharingState: ScreenSharingState,
-    captionsState: CaptionsState,
     call: CallFacade,
-    participantsSheetState: SheetState,
-    audioDeviceSelectorSheetState: SheetState,
-    moreActionsSheetState: SheetState,
-    showParticipants: Boolean,
-    showAudioDeviceSelector: Boolean,
-    showMoreActions: Boolean,
-    showReporting: Boolean,
-    reportSheetState: SheetState,
-    onShowReporting: () -> Unit,
-    onDismissReporting: () -> Unit,
-    onDismissParticipants: () -> Unit,
-    onDismissAudioDeviceSelector: () -> Unit,
-    onDismissMoreActions: () -> Unit,
-    onEmojiClick: (String) -> Unit,
     layoutType: CallLayoutType,
     modifier: Modifier = Modifier,
 ) {
-    val scope = rememberCoroutineScope()
+    Log.d("XXX", "MeetingRoomContent recompose")
+    val participants by call.participantsStateFlow.collectAsStateWithLifecycle(persistentListOf())
 
     Box(
         modifier = modifier
@@ -84,60 +54,6 @@ fun MeetingRoomContent(
                 )
             }
         }
-
-        if (showParticipants) {
-            ModalBottomSheet(
-                onDismissRequest = onDismissParticipants,
-                sheetState = participantsSheetState,
-            ) {
-                ParticipantsList(participants = participants)
-            }
-        }
-        if (showAudioDeviceSelector) {
-            ModalBottomSheet(
-                onDismissRequest = onDismissAudioDeviceSelector,
-                sheetState = audioDeviceSelectorSheetState,
-            ) {
-                AudioDevices(
-                    onDismissRequest = onDismissAudioDeviceSelector,
-                )
-            }
-        }
-        if (showMoreActions) {
-            ModalBottomSheet(
-                onDismissRequest = onDismissMoreActions,
-                sheetState = moreActionsSheetState,
-            ) {
-                EmojiSelector(
-                    onEmojiClick = { emoji -> onEmojiClick(emoji) },
-                )
-                MoreActionsGrid(
-                    recordingState = recordingState,
-                    screenSharingState = screenSharingState,
-                    captionsState = captionsState,
-                    onShowReporting = {
-                        onDismissMoreActions()
-                        onShowReporting()
-                    },
-                    actions = actions,
-                )
-            }
-        }
-        if (showReporting) {
-            ModalBottomSheet(
-                onDismissRequest = onDismissReporting,
-                sheetState = reportSheetState,
-            ) {
-                ReportIssueScreen(
-                    onClose = {
-                        scope.launch {
-                            reportSheetState.hide()
-                            onDismissReporting()
-                        }
-                    },
-                )
-            }
-        }
     }
 }
 
@@ -151,28 +67,8 @@ object MeetingRoomContentTestTags {
 @Composable
 internal fun MeetingRoomContentPreview() {
     VonageVideoTheme {
-        val sheetState = rememberModalBottomSheetState()
         MeetingRoomContent(
-            participants = buildParticipants(5).toImmutableList(),
             call = noOpCallFacade,
-            actions = MeetingRoomActions(),
-            recordingState = RecordingState.IDLE,
-            screenSharingState = ScreenSharingState.IDLE,
-            captionsState = CaptionsState.IDLE,
-            participantsSheetState = sheetState,
-            audioDeviceSelectorSheetState = sheetState,
-            moreActionsSheetState = sheetState,
-            showParticipants = false,
-            showAudioDeviceSelector = false,
-            showMoreActions = false,
-            showReporting = false,
-            reportSheetState = sheetState,
-            onDismissParticipants = {},
-            onDismissAudioDeviceSelector = {},
-            onDismissMoreActions = {},
-            onShowReporting = {},
-            onEmojiClick = {},
-            onDismissReporting = {},
             layoutType = CallLayoutType.GRID,
         )
     }

@@ -1,5 +1,6 @@
 package com.vonage.android.screen.room
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,7 +9,9 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
@@ -31,6 +34,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
+import com.vonage.android.audio.ui.AudioDevices
 import com.vonage.android.audio.ui.AudioDevicesEffect
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -51,10 +55,18 @@ import com.vonage.android.screen.room.components.emoji.EmojiReactionOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
 import com.vonage.android.compose.preview.buildCallWithParticipants
+import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.screen.reporting.ReportIssueScreen
+import com.vonage.android.screen.room.components.MoreActionsGrid
+import com.vonage.android.screen.room.components.ParticipantsList
+import com.vonage.android.screen.room.components.emoji.EmojiSelector
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 
 @Suppress("LongMethod")
@@ -65,6 +77,7 @@ fun MeetingRoomScreen(
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
 ) {
+    Log.d("XXX", "MeetingRoomScreen recompose")
     val participantsSheetState = rememberModalBottomSheetState()
     val audioDeviceSelectorSheetState = rememberModalBottomSheetState()
     val moreActionsSheetState = rememberModalBottomSheetState()
@@ -93,13 +106,10 @@ fun MeetingRoomScreen(
 
     when {
         (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
-            val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle(persistentListOf())
-            val captions by uiState.call.captionsStateFlow.collectAsStateWithLifecycle()
-            val publisher = participants.filterIsInstance<VeraPublisher>().firstOrNull()
-
             Scaffold(
                 modifier = modifier,
                 bottomBar = {
+                    Log.d("XXX", "BottomBar recompose")
                     BottomBar(
                         modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
                         actions = actions,
@@ -107,10 +117,10 @@ fun MeetingRoomScreen(
                             onToggleParticipants = { showParticipants = showParticipants.toggle() },
                             onToggleMoreActions = { showMoreActions = showMoreActions.toggle() },
                             onShowChat = { scope.launch { navigator.toggleChat() } },
-                            isMicEnabled = publisher?.isMicEnabled ?: MutableStateFlow(false),
-                            isCameraEnabled = publisher?.isCameraEnabled ?: MutableStateFlow(false),
+                            isMicEnabled = MutableStateFlow(false),
+                            isCameraEnabled = MutableStateFlow(false),
                             isChatShow = isChatShow,
-                            participantsCount = uiState.call.participantsCount,
+                            participantsCount = MutableStateFlow(12), //uiState.call.participantsCount,
                             chatState = uiState.call.chatSignalState(),
                             layoutType = uiState.layoutType,
                         ),
@@ -130,7 +140,7 @@ fun MeetingRoomScreen(
                                 reactions = uiState.call.emojiSignalState(),
                             )
                             CaptionsOverlay(
-                                captions = captions,
+                                captions = uiState.call.captionsStateFlow,
                             )
                             Column(verticalArrangement = Arrangement.Top) {
                                 TopBar(
@@ -144,9 +154,12 @@ fun MeetingRoomScreen(
                                 )
                                 MeetingRoomContent(
                                     modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
-                                    actions = actions,
-                                    participants = participants,
                                     call = uiState.call,
+                                    layoutType = uiState.layoutType,
+                                )
+                                CallModals(
+                                    call = uiState.call,
+                                    actions = actions,
                                     showParticipants = showParticipants,
                                     showMoreActions = showMoreActions,
                                     showReporting = showReporting,
@@ -164,7 +177,6 @@ fun MeetingRoomScreen(
                                     screenSharingState = uiState.screenSharingState,
                                     captionsState = uiState.captionsState,
                                     onEmojiClick = actions.onEmojiSent,
-                                    layoutType = uiState.layoutType,
                                 )
                             }
                         }
@@ -184,8 +196,13 @@ fun MeetingRoomScreen(
         (uiState.isLoading) -> GenericLoading()
 
         (uiState.isError) -> {
+            val message = if (uiState.errorMessage?.isNotBlank() == true) {
+                uiState.errorMessage
+            } else {
+                stringResource(R.string.meeting_screen_session_creation_error)
+            }
             BasicAlertDialog(
-                text = stringResource(R.string.meeting_screen_session_creation_error),
+                text = message,
                 acceptLabel = stringResource(R.string.generic_retry),
                 onAccept = actions.onRetry,
                 onCancel = actions.onBack,
@@ -196,6 +213,87 @@ fun MeetingRoomScreen(
             LaunchedEffect(uiState) {
                 actions.onEndCall()
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CallModals(
+    call: CallFacade,
+    actions: MeetingRoomActions,
+    showParticipants: Boolean,
+    participantsSheetState: SheetState,
+    recordingState: RecordingState,
+    screenSharingState: ScreenSharingState,
+    captionsState: CaptionsState,
+    audioDeviceSelectorSheetState: SheetState,
+    moreActionsSheetState: SheetState,
+    showAudioDeviceSelector: Boolean,
+    showMoreActions: Boolean,
+    showReporting: Boolean,
+    reportSheetState: SheetState,
+    onShowReporting: () -> Unit,
+    onDismissReporting: () -> Unit,
+    onDismissAudioDeviceSelector: () -> Unit,
+    onDismissMoreActions: () -> Unit,
+    onDismissParticipants: () -> Unit,
+    onEmojiClick: (String) -> Unit,
+) {
+    val participants by call.participantsStateFlow.collectAsStateWithLifecycle(persistentListOf())
+
+    val scope = rememberCoroutineScope()
+    if (showParticipants) {
+        ModalBottomSheet(
+            onDismissRequest = onDismissParticipants,
+            sheetState = participantsSheetState,
+        ) {
+            ParticipantsList(participants = participants)
+        }
+    }
+    if (showAudioDeviceSelector) {
+        ModalBottomSheet(
+            onDismissRequest = onDismissAudioDeviceSelector,
+            sheetState = audioDeviceSelectorSheetState,
+        ) {
+            AudioDevices(
+                onDismissRequest = onDismissAudioDeviceSelector,
+            )
+        }
+    }
+    if (showMoreActions) {
+        ModalBottomSheet(
+            onDismissRequest = onDismissMoreActions,
+            sheetState = moreActionsSheetState,
+        ) {
+            EmojiSelector(
+                onEmojiClick = { emoji -> onEmojiClick(emoji) },
+            )
+            MoreActionsGrid(
+                recordingState = recordingState,
+                screenSharingState = screenSharingState,
+                captionsState = captionsState,
+                onShowReporting = {
+                    onDismissMoreActions()
+                    onShowReporting()
+                },
+                actions = actions,
+            )
+        }
+    }
+    if (showReporting) {
+        ModalBottomSheet(
+            onDismissRequest = onDismissReporting,
+            sheetState = reportSheetState,
+        ) {
+            ReportIssueScreen(
+                onClose = {
+                    scope.launch {
+                        reportSheetState.hide()
+                        onDismissReporting()
+                    }
+                },
+            )
         }
     }
 }

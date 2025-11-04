@@ -69,7 +69,9 @@ fun ParticipantVideoCard(
                 view = view,
             )
 
-            ParticipantLabel(name)
+            if (name.isNotBlank()) {
+                ParticipantLabel(name)
+            }
 
             if (videoSource == VideoSource.CAMERA) {
                 MicrophoneIndicator(

@@ -12,12 +12,13 @@ import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
+import com.opentok.android.VideoUtils
 import com.vonage.android.kotlin.ext.extractSenderName
 import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.observeAudioLevel
-import com.vonage.android.kotlin.ext.throttleFirst
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
+import com.vonage.android.kotlin.internal.AudioLevelProcessor
 import com.vonage.android.kotlin.internal.ScreenSharingCapturer
 import com.vonage.android.kotlin.internal.SubscriberTalkingTracker
 import com.vonage.android.kotlin.internal.TalkingStateListener
@@ -45,12 +46,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -61,7 +62,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.SortedMap
 import java.util.concurrent.ConcurrentHashMap
 
 @Suppress("TooManyFunctions")
@@ -76,8 +76,11 @@ class Call internal constructor(
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : CallFacade {
 
+    // todo: expose a shortcut to the publisher to improve audio/video enabling/disabling
+
     private val coroutineScope = CoroutineScope(coroutineDispatcher)
     private val actualActiveSpeakerTracker = activeSpeakerTracker ?: ActiveSpeakerTracker(coroutineScope = coroutineScope)
+    private val audioLevelProcessor = AudioLevelProcessor(coroutineScope)
 
     private val _participantsStateFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
@@ -115,8 +118,7 @@ class Call internal constructor(
             .stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)
 
     private val subscriberStreams = ConcurrentHashMap<String, Subscriber>()
-    private val subscriberJobs = ConcurrentHashMap<String, Job>()
-    private var participantStreams: SortedMap<String, Participant> = sortedMapOf()
+    private val participantStreams: ConcurrentHashMap<String, Participant> = ConcurrentHashMap()
 
     private lateinit var context: Context
 
@@ -170,7 +172,7 @@ class Call internal constructor(
             }
 
             override fun onError(session: Session, error: OpentokError) {
-                Log.d("subscriber.onError", "error = $error")
+                Log.d("subscriber.onError", "error = ${error.message}")
                 trySend(SessionEvent.Error(error))
             }
         }
@@ -227,7 +229,7 @@ class Call internal constructor(
         publisherHolder.publisher.let { publisher ->
             publisher.publishVideo = publisher.publishVideo.toggle()
             participantStreams[PUBLISHER_ID] = publisher.toParticipant()
-            _participantsStateFlow.value = participantStreams.values.toImmutableList()
+            updateParticipantsState()
         }
     }
 
@@ -239,7 +241,7 @@ class Call internal constructor(
         publisherHolder.publisher.let { publisher ->
             publisher.publishAudio = publisher.publishAudio.toggle()
             participantStreams[PUBLISHER_ID] = publisher.toParticipant()
-            _participantsStateFlow.value = participantStreams.values.toImmutableList()
+            updateParticipantsState()
         }
     }
 
@@ -257,20 +259,26 @@ class Call internal constructor(
         publisherHolder.let { holder ->
             val id = PUBLISHER_ID
             participantStreams[id] = holder.participant
-            _participantsStateFlow.value = participantStreams.values.toImmutableList()
+            updateParticipantsState()
             session.publish(holder.publisher)
         }
         publisherAudioLevel()
     }
 
     override fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>) {
-        coroutineScope.launch {
-            snapshotFlow.collectLatest { visibleParticipants ->
-                if (visibleParticipants.isEmpty()) return@collectLatest
-                subscriberStreams.forEach { (key, value) ->
-                    value.subscribeToVideo = visibleParticipants.contains(key) || (key == activeSpeaker.value?.id)
+        coroutineScope.launch(Dispatchers.Default) {
+            snapshotFlow
+                .debounce(100)
+                .distinctUntilChanged()
+                .collectLatest { visibleParticipants ->
+                    if (visibleParticipants.isEmpty()) return@collectLatest
+                    subscriberStreams.forEach { (key, value) ->
+                        val shouldSubscribe = visibleParticipants.contains(key) || (key == activeSpeaker.value?.id)
+                        if (value.subscribeToVideo != shouldSubscribe) {
+                            value.subscribeToVideo = shouldSubscribe
+                        }
+                    }
                 }
-            }
         }
     }
 
@@ -300,7 +308,7 @@ class Call internal constructor(
             }
         publisherHolder.screenPublisher = screenPublisher
         participantStreams[PUBLISHER_SCREEN_ID] = screenPublisher.toScreenParticipant()
-        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+        updateParticipantsState()
 
         session.publish(screenPublisher)
     }
@@ -310,7 +318,7 @@ class Call internal constructor(
             session.unpublish(it)
         }
         participantStreams.remove(PUBLISHER_SCREEN_ID)
-        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+        updateParticipantsState()
     }
 
     override fun enableCaptions(enable: Boolean) {
@@ -318,114 +326,47 @@ class Call internal constructor(
         subscriberStreams.values.forEach { it.subscribeToCaptions = enable }
     }
 
+    /**
+     * Get smoothed audio level flow for a specific subscriber.
+     * Audio levels are processed in background with moving average for better performance.
+     */
+    fun getSmoothedAudioLevel(subscriberId: String): StateFlow<Float> {
+        return audioLevelProcessor.getAudioLevelFlow(subscriberId)
+    }
+
+    private fun updateParticipantsState() {
+        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+    }
+
     private fun addSubscriber(stream: Stream) {
         val subscriber = Subscriber.Builder(context, stream).build()
+//        subscriber.preferredResolution = VideoUtils.Size(320, 240)
+//        subscriber.preferredFrameRate = 15F // Reduced from 30F to 15F
         session.subscribe(subscriber)
 
         val talkingTracker = SubscriberTalkingTracker()
         talkingTracker.setTalkingStateListener(object : TalkingStateListener {
             override fun onTalkingStateChanged(isTalking: Boolean) {
-                coroutineScope.launch {
+                coroutineScope.launch(Dispatchers.Default) {
                     subscriberStreams[subscriber.stream.streamId]?.let { subs ->
                         participantStreams[subs.stream.streamId]?.let { p ->
-                            val updatedParticipant = (p as VeraSubscriber)
-                            updatedParticipant.isSpeaking.value = isTalking
-                            participantStreams[subs.stream.streamId] = updatedParticipant
+                            val updatedParticipant = (p as? VeraSubscriber)
+                            updatedParticipant?.isSpeaking?.value = isTalking
+                            updatedParticipant?.let { participantStreams[subs.stream.streamId] = it }
                         }
                     }
                 }
             }
         })
 
-        subscriber.setStreamListener(object : SubscriberKit.StreamListener {
-            override fun onReconnected(p0: SubscriberKit?) {
-                // not implemented yet
-            }
-
-            override fun onDisconnected(p0: SubscriberKit?) {
-                // not implemented yet
-            }
-
-            override fun onAudioDisabled(subscriber: SubscriberKit) {
-                coroutineScope.launch {
-                    Log.d(TAG, "Subscriber - audio disabled - ${Thread.currentThread()}")
-                    subscriberStreams[subscriber.stream.streamId]?.let { subscriber ->
-                        val updatedParticipant = (participantStreams[subscriber.stream.streamId] as VeraSubscriber)
-                        updatedParticipant.isMicEnabled.value = false
-                        participantStreams[subscriber.stream.streamId] = updatedParticipant
-                    }
-                }
-            }
-
-            override fun onAudioEnabled(subscriber: SubscriberKit) {
-                coroutineScope.launch {
-                    Log.d(TAG, "Subscriber - audio enabled - ${Thread.currentThread()}")
-                    subscriberStreams[subscriber.stream.streamId]?.let { subs ->
-                        val updatedParticipant = (participantStreams[subs.stream.streamId] as VeraSubscriber)
-                        updatedParticipant.isMicEnabled.value = true
-                        participantStreams[subs.stream.streamId] = updatedParticipant
-                    }
-                }
-            }
-        })
-
-        subscriber.setCaptionsListener { subscriber, text, isFinal ->
-            _captionsStateFlow.update { _ -> "${subscriber.name()}: $text" }
-            if (isFinal) {
-                _captionsStateFlow.update { _ -> null }
-            }
-        }
-
-        subscriber.setVideoListener(object : SubscriberKit.VideoListener {
-            override fun onVideoDataReceived(subscriber: SubscriberKit) {
-                // not implemented yet
-            }
-
-            override fun onVideoDisabled(subscriber: SubscriberKit, reason: String) {
-                coroutineScope.launch {
-                    Log.d(TAG, "Subscriber video disabled - reason $reason - ${Thread.currentThread()}")
-                    subscriberStreams[subscriber.stream.streamId]?.let { subs ->
-                        val updatedParticipant = (participantStreams[subs.stream.streamId] as VeraSubscriber)
-                        updatedParticipant.isCameraEnabled.value = false
-                    }
-                }
-            }
-
-            override fun onVideoEnabled(subscriber: SubscriberKit, reason: String) {
-                coroutineScope.launch {
-                    Log.d(TAG, "Subscriber video enabled - reason $reason - ${Thread.currentThread()}")
-                    subscriberStreams[subscriber.stream.streamId]?.let { subs ->
-                        val updatedParticipant = (participantStreams[subs.stream.streamId] as VeraSubscriber)
-                        updatedParticipant.isCameraEnabled.value = true
-                    }
-                }
-            }
-
-            override fun onVideoDisableWarning(subscriber: SubscriberKit) {
-                // not implemented yet
-            }
-
-            override fun onVideoDisableWarningLifted(subscriber: SubscriberKit) {
-                // not implemented yet
-            }
-        })
-
-        coroutineScope.launch {
-            subscriber.observeAudioLevel()
-                .distinctUntilChanged()
-                .throttleFirst(SUBSCRIBER_AUDIO_LEVEL_DEBOUNCE)
-                .onEach { audioLevel ->
-                    actualActiveSpeakerTracker.onSubscriberAudioLevelUpdated(subscriber.stream.streamId, audioLevel)
-                    talkingTracker.onAudioLevelUpdated(audioLevel)
-                }
-                .collect()
-        }.also {
-            subscriberJobs[subscriber.stream.streamId] = it
-        }
+        subscriber.setStreamListener(streamDelegate)
+        subscriber.setCaptionsListener(captionsDelegate)
+        subscriber.setVideoListener(videoDelegate)
+        subscriber.setAudioLevelListener(audioLevelDelegate)
 
         subscriberStreams[stream.streamId] = subscriber
         participantStreams[stream.streamId] = subscriber.toParticipant()
-        _participantsStateFlow.value = participantStreams.values.toImmutableList()
+        updateParticipantsState()
         if (_participantsCount.value == 2) {
             _mainSpeaker.value = subscriber.toParticipant()
         }
@@ -436,16 +377,97 @@ class Call internal constructor(
         val subscriber = subscriberStreams[stream.streamId] ?: return
         coroutineScope.launch {
             actualActiveSpeakerTracker.onSubscriberDestroyed(stream.streamId)
+            audioLevelProcessor.removeSubscriber(stream.streamId)
             subscriber.setVideoListener(null)
             subscriber.setStreamListener(null)
             subscriber.setAudioLevelListener(null)
-            subscriberJobs[stream.streamId]?.cancel()
-            subscriberJobs.remove(stream.streamId)
             subscriberStreams.remove(stream.streamId)
             participantStreams.remove(stream.streamId)
-            _participantsStateFlow.value = participantStreams.values.toImmutableList()
+            updateParticipantsState()
             _participantsCount.value = participantStreams.size
             session.unsubscribe(subscriber)
+        }
+    }
+
+    private val streamDelegate: SubscriberKit.StreamListener = object : SubscriberKit.StreamListener {
+        override fun onReconnected(subscriber: SubscriberKit) {
+            // not implemented yet
+        }
+
+        override fun onDisconnected(subscriber: SubscriberKit) {
+            // not implemented yet
+        }
+
+        override fun onAudioDisabled(subscriber: SubscriberKit) {
+            coroutineScope.launch(Dispatchers.Default) {
+                Log.d(TAG, "Subscriber - audio disabled - ${Thread.currentThread()}")
+                subscriberStreams[subscriber.stream.streamId]?.let { subscriber ->
+                    val updatedParticipant = (participantStreams[subscriber.stream.streamId] as? VeraSubscriber)
+                    updatedParticipant?.isMicEnabled?.value = false
+                    updatedParticipant?.let { participantStreams[subscriber.stream.streamId] = it }
+                }
+            }
+        }
+
+        override fun onAudioEnabled(subscriber: SubscriberKit) {
+            coroutineScope.launch(Dispatchers.Default) {
+                Log.d(TAG, "Subscriber - audio enabled - ${Thread.currentThread()}")
+                subscriberStreams[subscriber.stream.streamId]?.let { subs ->
+                    val updatedParticipant = (participantStreams[subs.stream.streamId] as? VeraSubscriber)
+                    updatedParticipant?.isMicEnabled?.value = true
+                    updatedParticipant?.let { participantStreams[subs.stream.streamId] = it }
+                }
+            }
+        }
+    }
+
+    private val captionsDelegate: SubscriberKit.CaptionsListener =
+        SubscriberKit.CaptionsListener { subscriber, text, isFinal ->
+            _captionsStateFlow.update { _ -> "${subscriber.name()}: $text" }
+            if (isFinal) {
+                _captionsStateFlow.update { _ -> null }
+            }
+        }
+
+    private val audioLevelDelegate: SubscriberKit.AudioLevelListener =
+        SubscriberKit.AudioLevelListener { subscriber, audioLevel ->
+            // Process audio level in background with moving average
+            audioLevelProcessor.onAudioLevelUpdate(subscriber.stream.streamId, audioLevel)
+            // Also send to active speaker tracker for speaker detection
+            //actualActiveSpeakerTracker.onSubscriberAudioLevelUpdated(subscriber.stream.streamId, audioLevel)
+        }
+
+    private val videoDelegate: SubscriberKit.VideoListener = object : SubscriberKit.VideoListener {
+        override fun onVideoDataReceived(subscriber: SubscriberKit) {
+            // not implemented yet
+        }
+
+        override fun onVideoDisabled(subscriber: SubscriberKit, reason: String) {
+            coroutineScope.launch(Dispatchers.Default) {
+                Log.d(TAG, "Subscriber video disabled - reason $reason - ${Thread.currentThread()}")
+                subscriberStreams[subscriber.stream.streamId]?.let { subs ->
+                    val updatedParticipant = (participantStreams[subs.stream.streamId] as? VeraSubscriber)
+                    updatedParticipant?.isCameraEnabled?.value = false
+                }
+            }
+        }
+
+        override fun onVideoEnabled(subscriber: SubscriberKit, reason: String) {
+            coroutineScope.launch(Dispatchers.Default) {
+                Log.d(TAG, "Subscriber video enabled - reason $reason - ${Thread.currentThread()}")
+                subscriberStreams[subscriber.stream.streamId]?.let { subs ->
+                    val updatedParticipant = (participantStreams[subs.stream.streamId] as? VeraSubscriber)
+                    updatedParticipant?.isCameraEnabled?.value = true
+                }
+            }
+        }
+
+        override fun onVideoDisableWarning(subscriber: SubscriberKit) {
+            // not implemented yet
+        }
+
+        override fun onVideoDisableWarningLifted(subscriber: SubscriberKit) {
+            // not implemented yet
         }
     }
 
@@ -454,6 +476,5 @@ class Call internal constructor(
         const val PUBLISHER_ID: String = "publisher"
         const val PUBLISHER_SCREEN_ID: String = "publisher-screen"
         private const val PUBLISHER_AUDIO_LEVEL_DEBOUNCE = 60L
-        private const val SUBSCRIBER_AUDIO_LEVEL_DEBOUNCE = 500L
     }
 }

@@ -1,5 +1,6 @@
 package com.vonage.android.kotlin.internal
 
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -53,6 +54,7 @@ class ActiveSpeakerTracker(
     }
 
     fun onSubscriberAudioLevelUpdated(streamId: String, movingAvg: Float) {
+        Log.d("ActiveSpeakerTracker", "audio level updated $streamId -> $movingAvg")
         subscriberAudioLevelsBySubscriberId[streamId] = movingAvg
         calculateActiveSpeaker()
     }
