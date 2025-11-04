@@ -1,6 +1,7 @@
 package com.vonage.gradle.tasks
 
 import com.google.gson.Gson
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -207,8 +208,7 @@ abstract class GenerateConfigTask : DefaultTask() {
         if (videoSettings != null) {
             sb.appendLine("# Video Settings")
             videoSettings.entrySet().forEach { (key, value) ->
-                val propName = "vonage.video.${key.toSnakeCase()}"
-                sb.appendLine("$propName=${value.asString}")
+                sb.appendProp("vonage.video.${key.toSnakeCase()}", value)
             }
             sb.appendLine()
         }
@@ -218,8 +218,7 @@ abstract class GenerateConfigTask : DefaultTask() {
         if (audioSettings != null) {
             sb.appendLine("# Audio Settings")
             audioSettings.entrySet().forEach { (key, value) ->
-                val propName = "vonage.audio.${key.toSnakeCase()}"
-                sb.appendLine("$propName=${value.asString}")
+                sb.appendProp("vonage.audio.${key.toSnakeCase()}", value)
             }
             sb.appendLine()
         }
@@ -229,8 +228,7 @@ abstract class GenerateConfigTask : DefaultTask() {
         if (waitingRoomSettings != null) {
             sb.appendLine("# Waiting Room Settings")
             waitingRoomSettings.entrySet().forEach { (key, value) ->
-                val propName = "vonage.waitingRoom.${key.toSnakeCase()}"
-                sb.appendLine("$propName=${value.asString}")
+                sb.appendProp("vonage.waitingRoom.${key.toSnakeCase()}", value)
             }
             sb.appendLine()
         }
@@ -240,13 +238,16 @@ abstract class GenerateConfigTask : DefaultTask() {
         if (meetingRoomSettings != null) {
             sb.appendLine("# Meeting Room Settings")
             meetingRoomSettings.entrySet().forEach { (key, value) ->
-                val propName = "vonage.meetingRoom.${key.toSnakeCase()}"
-                sb.appendLine("$propName=${value.asString}")
+                sb.appendProp("vonage.meetingRoom.${key.toSnakeCase()}", value)
             }
             sb.appendLine()
         }
 
         return sb.toString()
+    }
+
+    private fun StringBuilder.appendProp(propName: String, value: JsonElement) {
+        appendLine("$propName=${value.asString}")
     }
 
     /**
