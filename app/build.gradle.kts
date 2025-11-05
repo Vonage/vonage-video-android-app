@@ -167,6 +167,9 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
     ksp(libs.hilt.android.compiler)
+    // InApp Updates
+    implementation(libs.app.update)
+    implementation(libs.app.update.ktx)
 
     // to be removed when extracting to module all the audio stuff
     implementation(libs.opentok.android.sdk)
