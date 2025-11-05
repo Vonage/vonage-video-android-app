@@ -11,6 +11,13 @@ plugins {
     alias(libs.plugins.kover)
     kotlin("plugin.serialization") version "2.0.21"
     alias(libs.plugins.play.publisher)
+    id("com.vonage.json-config")
+}
+
+val configProps = Properties()
+val configFile = rootProject.file("gradle/generated-config.properties")
+if (configFile.exists()) {
+    configFile.inputStream().use { configProps.load(it) }
 }
 
 android {
@@ -29,7 +36,11 @@ android {
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
 
-        missingDimensionStrategy("chat", "enabled")
+        buildConfigField("String", "BASE_API_URL", "\"https://meet.vonagenetworks.net\"")
+
+        val chatProperty = configProps.getProperty("vonage.meetingRoom.allow_chat", "true")
+        buildConfigField("boolean", "FEATURE_CHAT_ENABLED", "$chatProperty")
+        missingDimensionStrategy("chat", chatProperty.toEnabledString())
     }
 
     compileOptions {
@@ -108,6 +119,10 @@ android {
         reportsDestination = layout.buildDirectory.dir("compose_compiler")
         metricsDestination = layout.buildDirectory.dir("compose_compiler")
     }
+
+    sourceSets.configureEach {
+        kotlin.srcDir(layout.buildDirectory.dir("generated/source/jsonConfig"))
+    }
 }
 
 play {
@@ -177,4 +192,18 @@ dependencies {
     debugImplementation(libs.leakcanary.android)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+fun String.toEnabledString(): String = if (toBoolean()) "enabled" else "disabled"
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    dependsOn("generateVonageConfig")
+}
+
+tasks.matching { it.name.startsWith("ksp") }.configureEach {
+    dependsOn("generateVonageConfig")
+}
+
+jsonConfig {
+    configFile.set("config/app-config.json")
 }
