@@ -19,9 +19,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import com.vonage.android.BuildConfig
 import com.vonage.android.MainActivity
 import com.vonage.android.R
-import com.vonage.android.di.RetrofitModule.BASE_URL
 import com.vonage.android.service.VeraForegroundServiceHandler.Companion.HANG_UP_ACTION
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.Companion.CHANNEL_ID
 
@@ -69,7 +69,7 @@ class VeraForegroundService : Service() {
         // deeplink intent
         val deepLinkIntent = Intent(
             Intent.ACTION_VIEW,
-            "$BASE_URL/room/$roomName".toUri(),
+            "${BuildConfig.BASE_API_URL}/room/$roomName".toUri(),
             this,
             MainActivity::class.java
         )
