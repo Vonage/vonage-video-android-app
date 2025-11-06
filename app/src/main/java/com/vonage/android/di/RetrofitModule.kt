@@ -2,6 +2,7 @@ package com.vonage.android.di
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.vonage.android.BuildConfig
 import com.vonage.android.data.network.APIService
 import com.vonage.android.data.network.interceptor.VeraHeaderRequestDecorator
 import dagger.Module
@@ -18,10 +19,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RetrofitModule {
 
-    // move to build config parameter
-    // use "http://10.0.2.2:3345" to point to react-app locally
-    const val BASE_URL = "https://vonage.video.backend"
-
     @Provides
     @Singleton
     fun provideHttpClient(): OkHttpClient = OkHttpClient.Builder()
@@ -35,7 +32,7 @@ object RetrofitModule {
     @Provides
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(BuildConfig.BASE_API_URL)
         .client(client)
         .addConverterFactory(MoshiConverterFactory.create(Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()))
         .build()
