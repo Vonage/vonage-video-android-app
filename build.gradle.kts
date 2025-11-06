@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.crashlytics) apply false
     alias(libs.plugins.detekt)
+    id("com.vonage.json-config") apply false
 }
 
 dependencies {
