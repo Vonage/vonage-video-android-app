@@ -1,5 +1,7 @@
 package com.vonage.android.kotlin.internal
 
+import android.util.Log
+import com.vonage.android.kotlin.ext.name
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -37,7 +39,8 @@ class AudioLevelProcessor(
     init {
         // Process audio updates in background coroutine
         coroutineScope.launch(Dispatchers.Default) {
-            audioUpdateChannel.consumeAsFlow().collect { update ->
+            audioUpdateChannel.consumeAsFlow().distinctUntilChanged().collect { update ->
+                Log.d("processAudioUpdate", "${update.subscriberId} -> ${update.audioLevel} [ ${Thread.currentThread()} ]")
                 processAudioLevel(update.subscriberId, update.audioLevel)
             }
         }

@@ -120,7 +120,7 @@ fun MeetingRoomScreen(
                             isMicEnabled = MutableStateFlow(false),
                             isCameraEnabled = MutableStateFlow(false),
                             isChatShow = isChatShow,
-                            participantsCount = MutableStateFlow(12), //uiState.call.participantsCount,
+                            participantsCount = uiState.call.participantsCount,
                             chatState = uiState.call.chatSignalState(),
                             layoutType = uiState.layoutType,
                         ),

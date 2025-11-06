@@ -39,6 +39,6 @@ class SubscriberTalkingTracker {
     private companion object {
         const val SPEAKING_TIME_THRESHOLD = 100L
         const val NOT_SPEAKING_TIME_THRESHOLD = 800L
-        const val SPEAKING_VOLUME = 0.1
+        const val SPEAKING_VOLUME = 0.2
     }
 }

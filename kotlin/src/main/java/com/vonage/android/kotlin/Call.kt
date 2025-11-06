@@ -348,12 +348,9 @@ class Call internal constructor(
         talkingTracker.setTalkingStateListener(object : TalkingStateListener {
             override fun onTalkingStateChanged(isTalking: Boolean) {
                 coroutineScope.launch(Dispatchers.Default) {
-                    subscriberStreams[subscriber.stream.streamId]?.let { subs ->
-                        participantStreams[subs.stream.streamId]?.let { p ->
-                            val updatedParticipant = (p as? VeraSubscriber)
-                            updatedParticipant?.isSpeaking?.value = isTalking
-                            updatedParticipant?.let { participantStreams[subs.stream.streamId] = it }
-                        }
+                    participantStreams[subscriber.stream.streamId]?.let { p ->
+                        val updatedParticipant = (p as? VeraSubscriber)
+                        updatedParticipant?.isSpeaking?.value = isTalking
                     }
                 }
             }
@@ -363,6 +360,14 @@ class Call internal constructor(
         subscriber.setCaptionsListener(captionsDelegate)
         subscriber.setVideoListener(videoDelegate)
         subscriber.setAudioLevelListener(audioLevelDelegate)
+
+        coroutineScope.launch {
+            audioLevelProcessor.getAudioLevelFlow(subscriber.stream.streamId)
+                .collect { value ->
+                    talkingTracker.onAudioLevelUpdated(value)
+                    actualActiveSpeakerTracker.onSubscriberAudioLevelUpdated(subscriber.stream.streamId, value)
+                }
+        }
 
         subscriberStreams[stream.streamId] = subscriber
         participantStreams[stream.streamId] = subscriber.toParticipant()
@@ -431,10 +436,10 @@ class Call internal constructor(
 
     private val audioLevelDelegate: SubscriberKit.AudioLevelListener =
         SubscriberKit.AudioLevelListener { subscriber, audioLevel ->
-            // Process audio level in background with moving average
-            audioLevelProcessor.onAudioLevelUpdate(subscriber.stream.streamId, audioLevel)
-            // Also send to active speaker tracker for speaker detection
-            //actualActiveSpeakerTracker.onSubscriberAudioLevelUpdated(subscriber.stream.streamId, audioLevel)
+            coroutineScope.launch(Dispatchers.Default) {
+                //Log.d("audioLevelDelegate", "${subscriber.name()} -> $audioLevel [ ${Thread.currentThread()} ]")
+                audioLevelProcessor.onAudioLevelUpdate(subscriber.stream.streamId, audioLevel)
+            }
         }
 
     private val videoDelegate: SubscriberKit.VideoListener = object : SubscriberKit.VideoListener {
