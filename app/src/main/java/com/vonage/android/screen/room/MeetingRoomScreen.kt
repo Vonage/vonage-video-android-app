@@ -57,6 +57,7 @@ import com.vonage.android.util.ext.toggleChat
 import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.ParticipantState
 import com.vonage.android.screen.reporting.ReportIssueScreen
 import com.vonage.android.screen.room.components.MoreActionsGrid
 import com.vonage.android.screen.room.components.ParticipantsList
@@ -240,7 +241,8 @@ fun CallModals(
     onDismissParticipants: () -> Unit,
     onEmojiClick: (String) -> Unit,
 ) {
-    val participants by call.participantsStateFlow.collectAsStateWithLifecycle(persistentListOf())
+    val participants by call.participantsStateFlow.collectAsStateWithLifecycle()
+//    val participants = persistentListOf<ParticipantState>()
 
     val scope = rememberCoroutineScope()
     if (showParticipants) {

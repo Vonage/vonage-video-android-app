@@ -138,6 +138,6 @@ data class WaitingRoomUiState(
     val isCameraEnabled: Boolean = true,
     val blurLevel: BlurLevel = BlurLevel.NONE,
     val audioLevel: StateFlow<Float> = MutableStateFlow(0F),
-    val view: View? = null,
+    val view: StateFlow<View>? = null,
     val isSuccess: Boolean = false,
 )

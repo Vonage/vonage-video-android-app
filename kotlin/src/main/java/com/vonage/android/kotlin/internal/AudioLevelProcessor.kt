@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.abs
 
 /**
  * Processes audio level updates in the background and provides moving averages per subscriber.
@@ -19,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap
 class AudioLevelProcessor(
     private val coroutineScope: CoroutineScope,
     private val windowSize: Int = 5, // Number of samples for moving average
-    private val significantChangeThreshold: Float = 0.15f // Only emit if change is significant
+    private val significantChangeThreshold: Float = 0.05f // Only emit if change is significant
 ) {
     
     private data class AudioLevelUpdate(
@@ -35,11 +36,12 @@ class AudioLevelProcessor(
     
     // Current smoothed audio levels per subscriber
     private val _audioLevels = ConcurrentHashMap<String, MutableStateFlow<Float>>()
+    val audioLevels = _audioLevels
     
     init {
         // Process audio updates in background coroutine
         coroutineScope.launch(Dispatchers.Default) {
-            audioUpdateChannel.consumeAsFlow().distinctUntilChanged().collect { update ->
+            audioUpdateChannel.consumeAsFlow().collect { update ->
                 Log.d("processAudioUpdate", "${update.subscriberId} -> ${update.audioLevel} [ ${Thread.currentThread()} ]")
                 processAudioLevel(update.subscriberId, update.audioLevel)
             }
@@ -93,7 +95,8 @@ class AudioLevelProcessor(
         
         // Only update if the change is significant to avoid unnecessary UI updates
         val currentLevel = stateFlow.value
-        if (kotlin.math.abs(smoothedLevel - currentLevel) >= significantChangeThreshold) {
+        if (abs(smoothedLevel - currentLevel) >= significantChangeThreshold) {
+            Log.d("XXX", "smoothedLevel $smoothedLevel")
             stateFlow.value = smoothedLevel
         }
     }

@@ -52,7 +52,7 @@ fun ParticipantVideoCard(
     audioLevel: StateFlow<Float>,
     videoSource: VideoSource,
     name: String,
-    view: View,
+    view: StateFlow<View>,
     modifier: Modifier = Modifier,
 ) {
     ParticipantContainer(
@@ -103,9 +103,9 @@ private fun ParticipantContainer(
 
 @Composable
 private fun BoxScope.ParticipantVideoContainer(
-    isCameraEnabled: StateFlow<Boolean>,
     name: String,
-    view: View,
+    isCameraEnabled: StateFlow<Boolean>,
+    view: StateFlow<View>,
 ) {
     val isCameraEnabled by isCameraEnabled.collectAsStateWithLifecycle()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -162,17 +162,17 @@ private fun BoxScope.MicrophoneIndicator(
     isShowVolumeIndicator: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val audioLevel by audioLevel.collectAsStateWithLifecycle()
+    //val audioLevel by audioLevel.collectAsStateWithLifecycle()
     val isMicEnabled by isMicEnabled.collectAsStateWithLifecycle()
 
     if (isMicEnabled && isShowVolumeIndicator) {
-        AudioVolumeIndicator(
-            size = 32.dp,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(8.dp),
-            audioLevel = audioLevel,
-        )
+//        AudioVolumeIndicator(
+//            size = 32.dp,
+//            modifier = Modifier
+//                .align(Alignment.TopEnd)
+//                .padding(8.dp),
+//            audioLevel = audioLevel,
+//        )
     } else {
         Box(
             modifier = modifier
@@ -194,38 +194,38 @@ private fun BoxScope.MicrophoneIndicator(
     }
 }
 
-@PreviewLightDark
-@Composable
-internal fun ParticipantVideoCardPreview() {
-    VonageVideoTheme {
-        ParticipantVideoCard(
-            modifier = Modifier.height(300.dp),
-            name = "Sample Name",
-            audioLevel = MutableStateFlow(0.4f),
-            isCameraEnabled = MutableStateFlow(true),
-            isMicEnabled = MutableStateFlow(true),
-            isSpeaking = MutableStateFlow(false),
-            isVolumeIndicatorVisible = true,
-            videoSource = VideoSource.CAMERA,
-            view = previewCamera(),
-        )
-    }
-}
+//@PreviewLightDark
+//@Composable
+//internal fun ParticipantVideoCardPreview() {
+//    VonageVideoTheme {
+//        ParticipantVideoCard(
+//            modifier = Modifier.height(300.dp),
+//            name = "Sample Name",
+//            audioLevel = MutableStateFlow(0.4f),
+//            isCameraEnabled = MutableStateFlow(true),
+//            isMicEnabled = MutableStateFlow(true),
+//            isSpeaking = MutableStateFlow(false),
+//            isVolumeIndicatorVisible = true,
+//            videoSource = VideoSource.CAMERA,
+//            view = previewCamera(),
+//        )
+//    }
+//}
 
-@PreviewLightDark
-@Composable
-internal fun ParticipantVideoCardPlaceholderPreview() {
-    VonageVideoTheme {
-        ParticipantVideoCard(
-            modifier = Modifier.height(300.dp),
-            name = "Sample Name Name Name Name Name Name Name Name Name Name",
-            audioLevel = MutableStateFlow(0.4f),
-            isCameraEnabled = MutableStateFlow(false),
-            isMicEnabled = MutableStateFlow(true),
-            isSpeaking = MutableStateFlow(false),
-            isVolumeIndicatorVisible = false,
-            videoSource = VideoSource.SCREEN,
-            view = previewCamera(),
-        )
-    }
-}
+//@PreviewLightDark
+//@Composable
+//internal fun ParticipantVideoCardPlaceholderPreview() {
+//    VonageVideoTheme {
+//        ParticipantVideoCard(
+//            modifier = Modifier.height(300.dp),
+//            name = "Sample Name Name Name Name Name Name Name Name Name Name",
+//            audioLevel = MutableStateFlow(0.4f),
+//            isCameraEnabled = MutableStateFlow(false),
+//            isMicEnabled = MutableStateFlow(true),
+//            isSpeaking = MutableStateFlow(false),
+//            isVolumeIndicatorVisible = false,
+//            videoSource = VideoSource.SCREEN,
+//            view = previewCamera(),
+//        )
+//    }
+//}

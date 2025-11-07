@@ -29,12 +29,13 @@ import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.preview.buildParticipants
+import com.vonage.android.kotlin.model.ParticipantState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun ParticipantsList(
-    participants: ImmutableList<Participant>,
+    participants: ImmutableList<ParticipantState>,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -104,14 +105,14 @@ private fun ParticipantRow(participant: Participant) {
     }
 }
 
-@PreviewLightDark
-@Composable
-internal fun ParticipantsListPreview() {
-    val sampleParticipant = buildParticipants(5)
-    VonageVideoTheme {
-        ParticipantsList(
-            modifier = Modifier.background(VonageVideoTheme.colors.surface),
-            participants = sampleParticipant.toImmutableList(),
-        )
-    }
-}
+//@PreviewLightDark
+//@Composable
+//internal fun ParticipantsListPreview() {
+//    val sampleParticipant = buildParticipants(5)
+//    VonageVideoTheme {
+//        ParticipantsList(
+//            modifier = Modifier.background(VonageVideoTheme.colors.surface),
+//            participants = sampleParticipant.toImmutableList(),
+//        )
+//    }
+//}

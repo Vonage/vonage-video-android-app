@@ -33,7 +33,7 @@ fun AdaptiveGrid(
     participants: ImmutableList<Participant>,
     call: CallFacade,
     modifier: Modifier = Modifier,
-    itemHeight: Dp = 120.dp,
+    itemHeight: Dp = 220.dp,
     minItemWidth: Dp = 120.dp,
     spacing: Dp = 8.dp
 ) {

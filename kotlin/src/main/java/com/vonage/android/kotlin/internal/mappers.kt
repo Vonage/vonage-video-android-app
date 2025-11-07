@@ -11,18 +11,7 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.kotlin.model.VeraScreenPublisher
-import com.vonage.android.kotlin.model.VeraSubscriber
 import kotlinx.coroutines.flow.MutableStateFlow
-
-internal fun Subscriber.toParticipant(): VeraSubscriber = VeraSubscriber(
-    id = stream.streamId,
-    videoSource = toParticipantType(),
-    name = stream.name,
-    isMicEnabled = MutableStateFlow(stream.hasAudio()),
-    isCameraEnabled = MutableStateFlow(stream.hasVideo()),
-    view = view,
-    isSpeaking = MutableStateFlow(false),
-)
 
 internal fun Publisher.toParticipant(
     name: String? = null,
@@ -42,7 +31,7 @@ internal fun Publisher.toParticipant(
         publishVideo = publishVideo.toggle()
         publishVideo
     },
-    view = view,
+    view = MutableStateFlow(view),
     cameraIndex = camera,
     cycleCamera = { cycleCamera() },
     blurLevel = BlurLevel.NONE,
@@ -56,7 +45,7 @@ internal fun Publisher.toScreenParticipant(): VeraScreenPublisher = VeraScreenPu
     name = name,
     isMicEnabled = MutableStateFlow(stream.hasAudio()),
     isCameraEnabled = MutableStateFlow(stream.hasVideo()),
-    view = view,
+    view = MutableStateFlow(view),
     isSpeaking = MutableStateFlow(false),
 )
 

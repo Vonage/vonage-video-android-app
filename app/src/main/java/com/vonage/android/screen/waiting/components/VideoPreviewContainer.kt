@@ -55,7 +55,7 @@ import kotlinx.coroutines.flow.StateFlow
 @Suppress("LongParameterList")
 @Composable
 fun VideoPreviewContainer(
-    view: View?,
+    view: StateFlow<View>?,
     name: String,
     audioLevels: StateFlow<Float>,
     actions: WaitingRoomActions,
@@ -199,7 +199,7 @@ internal fun VideoPreviewContainerPreview() {
     VonageVideoTheme {
         VideoPreviewContainer(
             actions = WaitingRoomActions(),
-            view = previewCamera(),
+            view = MutableStateFlow(previewCamera()),
             name = "John Doe",
             blurLevel = BlurLevel.LOW,
             isMicEnabled = true,

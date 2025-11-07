@@ -27,6 +27,7 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.screen.components.TopBanner
 import com.vonage.android.screen.waiting.components.WaitingRoomBody
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,7 +99,7 @@ internal fun WaitingRoomScreenPreview() {
                 isMicEnabled = true,
                 isCameraEnabled = false,
                 blurLevel = BlurLevel.NONE,
-                view = previewCamera(),
+                view = MutableStateFlow(previewCamera()),
             ),
             actions = WaitingRoomActions(),
         )
@@ -117,7 +118,7 @@ internal fun WaitingRoomScreenWithVideoPreview() {
                 isMicEnabled = false,
                 isCameraEnabled = true,
                 blurLevel = BlurLevel.NONE,
-                view = previewCamera(),
+                view = MutableStateFlow(previewCamera()),
             ),
             actions = WaitingRoomActions(),
         )
