@@ -728,7 +728,7 @@ class MeetingRoomScreenViewModelTest {
         cycleCamera = {},
         setCameraBlur = {},
         cameraIndex = 0,
-        isSpeaking = MutableStateFlow(false),
+        isTalking = MutableStateFlow(false),
         toggleMic = { false },
         toggleCamera = { false },
     )

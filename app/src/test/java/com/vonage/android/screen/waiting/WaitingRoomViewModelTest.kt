@@ -268,7 +268,7 @@ class WaitingRoomViewModelTest {
         cycleCamera = cycleCamera,
         setCameraBlur = setCameraBlur,
         cameraIndex = cameraIndex,
-        isSpeaking = MutableStateFlow(false),
+        isTalking = MutableStateFlow(false),
         toggleMic = toggleMic,
         toggleCamera = toggleCamera,
     )

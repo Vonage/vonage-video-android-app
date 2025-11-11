@@ -43,7 +43,7 @@ import kotlinx.coroutines.flow.StateFlow
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun AdaptiveSpeakerLayout(
-    participants: ImmutableList<Participant>,
+    participants: List<Participant>,
     call: CallFacade,
     modifier: Modifier = Modifier,
     minItemWidth: Dp = 95.dp,
@@ -113,7 +113,7 @@ private fun BoxWithConstraintsScope.PortraitSpeakerLayout(
     listState: LazyListState,
     visibleItems: List<Participant>,
     audioLevel: StateFlow<Float>,
-    participants: ImmutableList<Participant>,
+    participants: List<Participant>,
     takeCount: Int
 ) {
     LazyRow(
@@ -136,7 +136,7 @@ private fun BoxWithConstraintsScope.PortraitSpeakerLayout(
                 isMicEnabled = participant.isMicEnabled,
                 view = participant.view,
                 audioLevel = audioLevel,
-                isSpeaking = participant.isSpeaking,
+                isSpeaking = participant.isTalking,
                 isVolumeIndicatorVisible = participant is VeraPublisher,
                 videoSource = participant.videoSource,
             )
@@ -164,7 +164,7 @@ private fun BoxWithConstraintsScope.LandscapeSpeakerLayout(
     visibleItems: List<Participant>,
     minItemWidth: Dp,
     audioLevel: StateFlow<Float>,
-    participants: ImmutableList<Participant>,
+    participants: List<Participant>,
     takeCount: Int
 ) {
     LazyColumn(
@@ -187,7 +187,7 @@ private fun BoxWithConstraintsScope.LandscapeSpeakerLayout(
                 isMicEnabled = participant.isMicEnabled,
                 view = participant.view,
                 audioLevel = audioLevel,
-                isSpeaking = participant.isSpeaking,
+                isSpeaking = participant.isTalking,
                 isVolumeIndicatorVisible = participant is VeraPublisher,
                 videoSource = participant.videoSource,
             )
@@ -228,7 +228,7 @@ fun BoxScope.SpotlightSpeaker(
             isMicEnabled = participant.isMicEnabled,
             view = participant.view,
             audioLevel = audioLevel,
-            isSpeaking = participant.isSpeaking,
+            isSpeaking = participant.isTalking,
             isVolumeIndicatorVisible = activeParticipant is VeraPublisher,
             videoSource = participant.videoSource,
         )

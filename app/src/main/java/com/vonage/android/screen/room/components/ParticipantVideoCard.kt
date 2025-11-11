@@ -52,7 +52,7 @@ fun ParticipantVideoCard(
     audioLevel: StateFlow<Float>,
     videoSource: VideoSource,
     name: String,
-    view: StateFlow<View>,
+    view: View,
     modifier: Modifier = Modifier,
 ) {
     ParticipantContainer(
@@ -105,7 +105,7 @@ private fun ParticipantContainer(
 private fun BoxScope.ParticipantVideoContainer(
     name: String,
     isCameraEnabled: StateFlow<Boolean>,
-    view: StateFlow<View>,
+    view: View,
 ) {
     val isCameraEnabled by isCameraEnabled.collectAsStateWithLifecycle()
     val lifecycle = LocalLifecycleOwner.current.lifecycle

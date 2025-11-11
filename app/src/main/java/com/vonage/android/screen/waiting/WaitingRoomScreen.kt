@@ -99,7 +99,7 @@ internal fun WaitingRoomScreenPreview() {
                 isMicEnabled = true,
                 isCameraEnabled = false,
                 blurLevel = BlurLevel.NONE,
-                view = MutableStateFlow(previewCamera()),
+                view = previewCamera(),
             ),
             actions = WaitingRoomActions(),
         )
@@ -118,7 +118,7 @@ internal fun WaitingRoomScreenWithVideoPreview() {
                 isMicEnabled = false,
                 isCameraEnabled = true,
                 blurLevel = BlurLevel.NONE,
-                view = MutableStateFlow(previewCamera()),
+                view = previewCamera(),
             ),
             actions = WaitingRoomActions(),
         )

@@ -17,16 +17,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.kotlin.model.CallFacade
 import kotlinx.coroutines.flow.StateFlow
 
 private const val OVERLAY_ZINDEX = 10F
 
 @Composable
 fun CaptionsOverlay(
-    captions: StateFlow<String?>,
+    call: CallFacade,
     modifier: Modifier = Modifier,
 ) {
-    val captions by captions.collectAsStateWithLifecycle()
+    val captions by call.captionsStateFlow.collectAsStateWithLifecycle()
 
     Box(
         modifier = modifier

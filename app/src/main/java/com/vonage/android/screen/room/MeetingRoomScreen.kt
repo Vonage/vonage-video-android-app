@@ -36,11 +36,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.audio.ui.AudioDevices
 import com.vonage.android.audio.ui.AudioDevicesEffect
+import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
+import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
-import com.vonage.android.kotlin.model.ChatState
-import com.vonage.android.kotlin.model.VeraPublisher
+import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.screen.reporting.ReportIssueScreen
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
@@ -48,26 +50,16 @@ import com.vonage.android.screen.room.components.BottomBar
 import com.vonage.android.screen.room.components.BottomBarState
 import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.MeetingRoomContent
-import com.vonage.android.screen.room.components.TopBar
-import com.vonage.android.screen.room.components.captions.CaptionsOverlay
-import com.vonage.android.chat.ui.ChatPanel
-import com.vonage.android.screen.room.components.emoji.EmojiReactionOverlay
-import com.vonage.android.util.ext.isExtraPaneShow
-import com.vonage.android.util.ext.toggleChat
-import com.vonage.android.compose.preview.buildCallWithParticipants
-import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.kotlin.model.Participant
-import com.vonage.android.kotlin.model.ParticipantState
-import com.vonage.android.screen.reporting.ReportIssueScreen
 import com.vonage.android.screen.room.components.MoreActionsGrid
 import com.vonage.android.screen.room.components.ParticipantsList
+import com.vonage.android.screen.room.components.TopBar
+import com.vonage.android.screen.room.components.captions.CaptionsOverlay
+import com.vonage.android.screen.room.components.emoji.EmojiReactionOverlay
 import com.vonage.android.screen.room.components.emoji.EmojiSelector
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
+import com.vonage.android.util.ext.isExtraPaneShow
+import com.vonage.android.util.ext.toggleChat
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 
 @Suppress("LongMethod")
@@ -137,12 +129,8 @@ fun MeetingRoomScreen(
                     value = navigator.scaffoldValue,
                     mainPane = {
                         Box(modifier = Modifier.fillMaxSize()) {
-                            EmojiReactionOverlay(
-                                reactions = uiState.call.emojiSignalState(),
-                            )
-                            CaptionsOverlay(
-                                captions = uiState.call.captionsStateFlow,
-                            )
+                            EmojiReactionOverlay(call = uiState.call)
+                            CaptionsOverlay(call = uiState.call)
                             Column(verticalArrangement = Arrangement.Top) {
                                 TopBar(
                                     modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
@@ -185,7 +173,7 @@ fun MeetingRoomScreen(
                     supportingPane = { },
                     extraPane = {
                         ExtraPane(
-                            chatState = uiState.call.chatSignalState(),
+                            call = uiState.call,
                             actions = actions,
                             onCloseChat = { scope.launch { navigator.navigateBack() } }
                         )
@@ -242,7 +230,6 @@ fun CallModals(
     onEmojiClick: (String) -> Unit,
 ) {
     val participants by call.participantsStateFlow.collectAsStateWithLifecycle()
-//    val participants = persistentListOf<ParticipantState>()
 
     val scope = rememberCoroutineScope()
     if (showParticipants) {
@@ -303,12 +290,12 @@ fun CallModals(
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun ThreePaneScaffoldPaneScope.ExtraPane(
-    chatState: StateFlow<ChatState?>,
+    call: CallFacade,
     actions: MeetingRoomActions,
     onCloseChat: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val chatState by chatState.collectAsStateWithLifecycle()
+    val chatState by call.chatSignalState().collectAsStateWithLifecycle()
 
     AnimatedPane(
         modifier = modifier

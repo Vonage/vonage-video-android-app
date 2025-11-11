@@ -26,7 +26,7 @@ data class ActiveSpeakerChangedPayload(
 
 @OptIn(FlowPreview::class)
 class ActiveSpeakerTracker(
-    throttleTimeMs: Long = 2000L,
+    throttleTimeMs: Long = 500L,
     coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 ) {
     private val subscriberAudioLevelsBySubscriberId: SubscriberAudioLevels = mutableMapOf()
@@ -41,7 +41,10 @@ class ActiveSpeakerTracker(
     init {
         _calculateTrigger
             .debounce(throttleTimeMs)
-            .onEach { internalCalculateActiveSpeaker() }
+            .onEach {
+                Log.d("ActiveSpeakerTracker", "calculate onEach")
+                internalCalculateActiveSpeaker()
+            }
             .launchIn(coroutineScope)
     }
 
@@ -50,20 +53,20 @@ class ActiveSpeakerTracker(
         if (_activeSpeaker.value.streamId == subscriberId) {
             _activeSpeaker.value = ActiveSpeakerInfo(null, 0F)
         }
-        calculateActiveSpeaker()
+        //calculateActiveSpeaker()
     }
 
-    fun onSubscriberAudioLevelUpdated(streamId: String, movingAvg: Float) {
+    suspend fun onSubscriberAudioLevelUpdated(streamId: String, movingAvg: Float) {
         Log.d("ActiveSpeakerTracker", "audio level updated $streamId -> $movingAvg")
         subscriberAudioLevelsBySubscriberId[streamId] = movingAvg
         calculateActiveSpeaker()
     }
 
-    private fun calculateActiveSpeaker() {
-        _calculateTrigger.tryEmit(Unit)
+    private suspend fun calculateActiveSpeaker() {
+        val a = _calculateTrigger.emit(Unit)
     }
 
-    private fun internalCalculateActiveSpeaker() {
+    private suspend fun internalCalculateActiveSpeaker() {
         var maxMovingAvg = 0F
         var maxSubscriberId: String? = null
         for ((subscriberId, movingAvg) in subscriberAudioLevelsBySubscriberId) {
@@ -75,14 +78,18 @@ class ActiveSpeakerTracker(
         val newActiveSpeaker = ActiveSpeakerInfo(maxSubscriberId, maxMovingAvg)
         val currentActiveSpeaker = _activeSpeaker.value
 
-        if (newActiveSpeaker.streamId != currentActiveSpeaker.streamId
-            && newActiveSpeaker.movingAvg > ACTIVE_SPEAKER_AUDIO_LEVEL_THRESHOLD
+        Log.d("ActiveSpeakerTracker", "calculate ${currentActiveSpeaker.streamId} || ${newActiveSpeaker.streamId}")
+//        if (newActiveSpeaker.streamId != currentActiveSpeaker.streamId
+//            && newActiveSpeaker.movingAvg > ACTIVE_SPEAKER_AUDIO_LEVEL_THRESHOLD
+//        ) {
+        if (newActiveSpeaker.movingAvg > ACTIVE_SPEAKER_AUDIO_LEVEL_THRESHOLD
         ) {
             val previousActiveSpeaker = currentActiveSpeaker.copy()
             _activeSpeaker.value = newActiveSpeaker
 
             val payload = ActiveSpeakerChangedPayload(previousActiveSpeaker, newActiveSpeaker)
-            _activeSpeakerChanges.tryEmit(payload)
+            val r = _activeSpeakerChanges.emit(payload)
+            Log.d("ActiveSpeakerTracker", "emit change $r")
         }
     }
 

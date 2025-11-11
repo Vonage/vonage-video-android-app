@@ -2,6 +2,7 @@ package com.vonage.android.kotlin.model
 
 import android.content.Context
 import android.media.projection.MediaProjection
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.vonage.android.kotlin.signal.EmojiReaction
 import com.vonage.android.shared.ChatMessage
@@ -45,7 +46,7 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
 
     fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>)
 
-    val participantsStateFlow: StateFlow<ImmutableList<ParticipantState>>
+    val participantsStateFlow: StateFlow<ImmutableList<Participant>>
     val participantsCount: StateFlow<Int>
     val activeSpeaker: StateFlow<Participant?>
     val signalStateFlow: StateFlow<SignalState?>
@@ -99,11 +100,13 @@ typealias SignalFlows = MutableMap<SignalType, StateFlow<SignalStateContent?>>
 
 sealed interface SignalStateContent
 
+@Immutable
 data class ChatState(
     val unreadCount: Int = 0,
     val messages: ImmutableList<ChatMessage> = persistentListOf(),
 ) : SignalStateContent
 
+@Immutable
 data class EmojiState(
     val reactions: ImmutableList<EmojiReaction> = persistentListOf(),
 ) : SignalStateContent

@@ -3,42 +3,41 @@ package com.vonage.android.kotlin.model
 import android.util.Log
 import android.view.View
 import androidx.compose.runtime.Stable
+import com.opentok.android.Publisher
 import com.opentok.android.Session
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
-import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.internal.toParticipantType
-import com.vonage.android.kotlin.ext.mapTalking
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
 @Stable
-data class ParticipantState(
-    private val subscriber: Subscriber,
+data class PublisherState(
+    private val publisher: Publisher,
 ) : Participant,
     SubscriberKit.StreamListener,
     SubscriberKit.VideoListener {
 
-    private val TAG = "Subscriber[$id]"
+    private val TAG = "Publisher[$id]"
 
     override val id: String
-        get() = subscriber.stream.streamId
+        get() = publisher.stream.streamId
 
     override val videoSource: VideoSource
-        get() = subscriber.stream.toParticipantType()
+        get() = publisher.stream.toParticipantType()
 
     override val name: String
-        get() = subscriber.name()
+        get() = publisher.stream.name
 
-    internal val _isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(subscriber.stream.hasAudio())
+    internal val _isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(publisher.stream.hasAudio())
     override val isMicEnabled: StateFlow<Boolean>
         get() = _isMicEnabled
 
-    internal val _isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(subscriber.stream.hasVideo())
+    internal val _isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(publisher.stream.hasVideo())
     override val isCameraEnabled: StateFlow<Boolean>
         get() = _isCameraEnabled
 
@@ -51,40 +50,19 @@ data class ParticipantState(
     val audioLevel: StateFlow<Float>
         get() = _audioLevel
 
-    internal val _isTalking: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    internal val _isSpeaking: MutableStateFlow<Boolean> = MutableStateFlow(false)
     override val isTalking: StateFlow<Boolean>
-        get() = _isTalking
+        get() = _isSpeaking
 
-    override val view: View = subscriber.view
-
-    fun changeVisibility(visible: Boolean) {
-        when (visible) {
-            true -> subscriber.subscribeToVideo = subscriber.stream.hasVideo()
-            false -> subscriber.subscribeToVideo = false
-        }
-    }
+    override val view: View = publisher.view
 
     suspend fun setup() {
-        subscriber.setStreamListener(this)
-        subscriber.setVideoListener(this)
 
-        delay(3000)
-        subscriber.observeAudioLevel()
-            .movingAverage(windowSize = 5)
-            .onEach { audioLevel ->
-                _audioLevel.emit(audioLevel)
-            }
-            .mapTalking()
-            .collect { isTalking ->
-                _isTalking.value = isTalking
-            }
     }
 
     fun clean(session: Session) {
-        subscriber.setVideoListener(null)
-        subscriber.setStreamListener(null)
-        subscriber.setAudioLevelListener(null)
-        session.unsubscribe(subscriber)
+        publisher.setVideoListener(null)
+
     }
 
     override fun onReconnected(subscriber: SubscriberKit) {

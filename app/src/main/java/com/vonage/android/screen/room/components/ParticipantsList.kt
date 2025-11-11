@@ -24,18 +24,18 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
-import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.Participant
-import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.preview.buildParticipants
+import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.ParticipantState
+import com.vonage.android.kotlin.model.VideoSource
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun ParticipantsList(
-    participants: ImmutableList<ParticipantState>,
+    participants: ImmutableList<Participant>,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -105,14 +105,14 @@ private fun ParticipantRow(participant: Participant) {
     }
 }
 
-//@PreviewLightDark
-//@Composable
-//internal fun ParticipantsListPreview() {
-//    val sampleParticipant = buildParticipants(5)
-//    VonageVideoTheme {
-//        ParticipantsList(
-//            modifier = Modifier.background(VonageVideoTheme.colors.surface),
-//            participants = sampleParticipant.toImmutableList(),
-//        )
-//    }
-//}
+@PreviewLightDark
+@Composable
+internal fun ParticipantsListPreview() {
+    val sampleParticipant = buildParticipants(5)
+    VonageVideoTheme {
+        ParticipantsList(
+            modifier = Modifier.background(VonageVideoTheme.colors.surface),
+            participants = sampleParticipant.toImmutableList(),
+        )
+    }
+}

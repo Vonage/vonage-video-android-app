@@ -16,7 +16,7 @@ fun buildParticipants(count: Int): List<Participant> {
             override val videoSource: VideoSource = VideoSource.CAMERA
             override var name: String = "Name Sample $i"
             override val isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)
-            override val isSpeaking: MutableStateFlow<Boolean> = MutableStateFlow(false)
+            override val isTalking: MutableStateFlow<Boolean> = MutableStateFlow(false)
             override val isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(true)
             override val view: View = previewCamera()
         }
