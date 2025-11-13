@@ -24,6 +24,7 @@ import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.noOpCallFacade
 import com.vonage.android.util.lazyStateWithVisibilityNotification
 import com.vonage.android.compose.preview.buildParticipants
+import com.vonage.android.kotlin.model.PublisherState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -71,14 +72,15 @@ fun AdaptiveGrid(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(itemHeight),
-                    name = participant.name,
-                    isCameraEnabled = participant.isCameraEnabled,
-                    isMicEnabled = participant.isMicEnabled,
-                    view = participant.view,
-                    audioLevel = call.localAudioLevel,
-                    isSpeaking = participant.isTalking,
-                    isVolumeIndicatorVisible = participant is VeraPublisher,
-                    videoSource = participant.videoSource,
+                    participant = participant,
+//                    name = participant.name,
+//                    isCameraEnabled = participant.isCameraEnabled,
+//                    isMicEnabled = participant.isMicEnabled,
+//                    view = participant.view,
+//                    audioLevel = participant.audioLevel,
+//                    isSpeaking = participant.isTalking,
+                    isVolumeIndicatorVisible = participant is PublisherState,
+//                    videoSource = participant.videoSource,
                 )
             }
 

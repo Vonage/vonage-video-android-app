@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.stability.analyzer)
 }
 
 android {
@@ -46,6 +47,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.accompanist.permissions)
     implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.opentok.android.sdk)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

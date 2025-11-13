@@ -16,6 +16,7 @@ import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.ParticipantState
+import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
@@ -371,7 +372,9 @@ val noOpCallFacade = object : CallFacade {
     override fun resumeSession() { /* empty on purpose */ }
     override fun endSession() { /* empty on purpose */ }
 
-    override val localAudioLevel: StateFlow<Float> = MutableStateFlow(0F)
+//    override val localAudioLevel: StateFlow<Float> = MutableStateFlow(0F)
+    override val publisher: StateFlow<PublisherState?> = MutableStateFlow(null)
+
     override fun toggleLocalVideo() { /* empty on purpose */ }
     override fun toggleLocalCamera() { /* empty on purpose */ }
     override fun toggleLocalAudio() { /* empty on purpose */ }

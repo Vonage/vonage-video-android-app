@@ -33,17 +33,19 @@ import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.noOpCallFacade
 import com.vonage.android.util.lazyStateWithVisibilityNotification
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun AdaptiveSpeakerLayout(
-    participants: List<Participant>,
+    participants: ImmutableList<Participant>,
     call: CallFacade,
     modifier: Modifier = Modifier,
     minItemWidth: Dp = 95.dp,
@@ -60,7 +62,7 @@ fun AdaptiveSpeakerLayout(
         val itemsPerCol = (maxHeight / minItemWidth).toInt().coerceAtLeast(1)
 
         SpotlightSpeaker(
-            audioLevel = call.localAudioLevel,
+            audioLevel = call.publisher.value?.audioLevel ?: MutableStateFlow(0F),
             activeSpeaker = call.activeSpeaker,
         )
 
@@ -80,7 +82,7 @@ fun AdaptiveSpeakerLayout(
             }
         }
         val visibleItems by remember(participants) {
-            derivedStateOf { participants.filter { it.id != mainParticipant?.id }.take(takeCount) }
+            derivedStateOf { participants.filter { it.id != mainParticipant?.id }.take(takeCount).toImmutableList() }
         }
 
         if (visibleItems.isNotEmpty()) {
@@ -91,15 +93,17 @@ fun AdaptiveSpeakerLayout(
                     listState = listState,
                     visibleItems = visibleItems,
                     minItemWidth = minItemWidth,
-                    audioLevel = call.localAudioLevel,
+                    audioLevel = call.publisher.value?.audioLevel ?: MutableStateFlow(0F),
                     participants = participants,
                     takeCount = takeCount,
                 )
             } else {
+                val paudioLevel = call.publisher.value?.audioLevel ?: MutableStateFlow(0F)
+                val audioLevel by paudioLevel.collectAsStateWithLifecycle()
                 PortraitSpeakerLayout(
                     listState = listState,
                     visibleItems = visibleItems,
-                    audioLevel = call.localAudioLevel,
+                    audioLevel = audioLevel,
                     participants = participants,
                     takeCount = takeCount,
                 )
@@ -111,9 +115,9 @@ fun AdaptiveSpeakerLayout(
 @Composable
 private fun BoxWithConstraintsScope.PortraitSpeakerLayout(
     listState: LazyListState,
-    visibleItems: List<Participant>,
-    audioLevel: StateFlow<Float>,
-    participants: List<Participant>,
+    visibleItems: ImmutableList<Participant>,
+    audioLevel: Float,
+    participants: ImmutableList<Participant>,
     takeCount: Int
 ) {
     LazyRow(
@@ -131,14 +135,15 @@ private fun BoxWithConstraintsScope.PortraitSpeakerLayout(
                     .width(maxWidth / 2)
                     .aspectRatio(ASPECT_RATIO_16_9)
                     .padding(8.dp),
-                name = participant.name,
-                isCameraEnabled = participant.isCameraEnabled,
-                isMicEnabled = participant.isMicEnabled,
-                view = participant.view,
-                audioLevel = audioLevel,
-                isSpeaking = participant.isTalking,
+                participant = participant,
+//                name = participant.name,
+//                isCameraEnabled = participant.isCameraEnabled,
+//                isMicEnabled = participant.isMicEnabled,
+//                view = participant.view,
+//                audioLevel = audioLevel,
+//                isSpeaking = participant.isTalking,
                 isVolumeIndicatorVisible = participant is VeraPublisher,
-                videoSource = participant.videoSource,
+//                videoSource = participant.videoSource,
             )
         }
         if (participants.size > takeCount) {
@@ -182,14 +187,15 @@ private fun BoxWithConstraintsScope.LandscapeSpeakerLayout(
                     .height(minItemWidth)
                     .aspectRatio(ASPECT_RATIO_16_9)
                     .padding(8.dp),
-                name = participant.name,
-                isCameraEnabled = participant.isCameraEnabled,
-                isMicEnabled = participant.isMicEnabled,
-                view = participant.view,
-                audioLevel = audioLevel,
-                isSpeaking = participant.isTalking,
+                participant = participant,
+//                name = participant.name,
+//                isCameraEnabled = participant.isCameraEnabled,
+//                isMicEnabled = participant.isMicEnabled,
+//                view = participant.view,
+//                audioLevel = audioLevel,
+//                isSpeaking = participant.isTalking,
                 isVolumeIndicatorVisible = participant is VeraPublisher,
-                videoSource = participant.videoSource,
+//                videoSource = participant.videoSource,
             )
         }
         if (participants.size > takeCount) {
@@ -223,14 +229,15 @@ fun BoxScope.SpotlightSpeaker(
                 .aspectRatio(ASPECT_RATIO_16_9)
                 .padding(8.dp)
                 .align(Alignment.Center),
-            name = participant.name,
-            isCameraEnabled = participant.isCameraEnabled,
-            isMicEnabled = participant.isMicEnabled,
-            view = participant.view,
-            audioLevel = audioLevel,
-            isSpeaking = participant.isTalking,
-            isVolumeIndicatorVisible = activeParticipant is VeraPublisher,
-            videoSource = participant.videoSource,
+            participant = participant,
+//            name = participant.name,
+//            isCameraEnabled = participant.isCameraEnabled,
+//            isMicEnabled = participant.isMicEnabled,
+//            view = participant.view,
+//            audioLevel = audioLevel,
+//            isSpeaking = participant.isTalking,
+            isVolumeIndicatorVisible = activeParticipant is PublisherState,
+//            videoSource = participant.videoSource,
         )
     }
 }

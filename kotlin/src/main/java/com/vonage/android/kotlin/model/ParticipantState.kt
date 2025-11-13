@@ -6,12 +6,11 @@ import androidx.compose.runtime.Stable
 import com.opentok.android.Session
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
+import com.vonage.android.kotlin.ext.mapTalking
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.internal.toParticipantType
-import com.vonage.android.kotlin.ext.mapTalking
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onEach
@@ -23,7 +22,7 @@ data class ParticipantState(
     SubscriberKit.StreamListener,
     SubscriberKit.VideoListener {
 
-    private val TAG = "Subscriber[$id]"
+    private val logTag = "Subscriber[$id]"
 
     override val id: String
         get() = subscriber.stream.streamId
@@ -34,30 +33,30 @@ data class ParticipantState(
     override val name: String
         get() = subscriber.name()
 
-    internal val _isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(subscriber.stream.hasAudio())
+    private val _isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(subscriber.stream.hasAudio())
     override val isMicEnabled: StateFlow<Boolean>
         get() = _isMicEnabled
 
-    internal val _isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(subscriber.stream.hasVideo())
+    private val _isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(subscriber.stream.hasVideo())
     override val isCameraEnabled: StateFlow<Boolean>
         get() = _isCameraEnabled
 
-    internal val _visible: MutableStateFlow<Boolean>
+    private val _visible: MutableStateFlow<Boolean>
         get() = MutableStateFlow(false)
     val visible: StateFlow<Boolean>
         get() = _visible
 
-    internal val _audioLevel: MutableStateFlow<Float> = MutableStateFlow(0F)
-    val audioLevel: StateFlow<Float>
+    private val _audioLevel: MutableStateFlow<Float> = MutableStateFlow(0F)
+    override val audioLevel: StateFlow<Float>
         get() = _audioLevel
 
-    internal val _isTalking: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val _isTalking: MutableStateFlow<Boolean> = MutableStateFlow(false)
     override val isTalking: StateFlow<Boolean>
         get() = _isTalking
 
     override val view: View = subscriber.view
 
-    fun changeVisibility(visible: Boolean) {
+    override fun changeVisibility(visible: Boolean) {
         when (visible) {
             true -> subscriber.subscribeToVideo = subscriber.stream.hasVideo()
             false -> subscriber.subscribeToVideo = false
@@ -68,7 +67,6 @@ data class ParticipantState(
         subscriber.setStreamListener(this)
         subscriber.setVideoListener(this)
 
-        delay(3000)
         subscriber.observeAudioLevel()
             .movingAverage(windowSize = 5)
             .onEach { audioLevel ->
@@ -80,7 +78,7 @@ data class ParticipantState(
             }
     }
 
-    fun clean(session: Session) {
+    override fun clean(session: Session) {
         subscriber.setVideoListener(null)
         subscriber.setStreamListener(null)
         subscriber.setAudioLevelListener(null)
@@ -88,42 +86,42 @@ data class ParticipantState(
     }
 
     override fun onReconnected(subscriber: SubscriberKit) {
-        Log.d(TAG, "Subscriber reconnected")
+        Log.d(logTag, "Subscriber reconnected")
     }
 
     override fun onDisconnected(subscriber: SubscriberKit) {
-        Log.d(TAG, "Subscriber disconnected")
+        Log.d(logTag, "Subscriber disconnected")
     }
 
     override fun onAudioDisabled(subscriber: SubscriberKit) {
-        Log.d(TAG, "Subscriber audio disabled")
+        Log.d(logTag, "Subscriber audio disabled")
         _isMicEnabled.value = false
     }
 
     override fun onAudioEnabled(subscriber: SubscriberKit) {
-        Log.d(TAG, "Subscriber audio enabled")
+        Log.d(logTag, "Subscriber audio enabled")
         _isMicEnabled.value = true
     }
 
     override fun onVideoDataReceived(subscriber: SubscriberKit) {
-        Log.d(TAG, "Subscriber video data received")
+        Log.d(logTag, "Subscriber video data received")
     }
 
     override fun onVideoDisabled(subscriber: SubscriberKit, reason: String) {
-        Log.d(TAG, "Subscriber video disabled")
+        Log.d(logTag, "Subscriber video disabled")
         _isCameraEnabled.value = false
     }
 
     override fun onVideoEnabled(subscriber: SubscriberKit, reason: String) {
-        Log.d(TAG, "Subscriber video enabled")
+        Log.d(logTag, "Subscriber video enabled")
         _isCameraEnabled.value = true
     }
 
     override fun onVideoDisableWarning(subscriber: SubscriberKit) {
-        Log.d(TAG, "Subscriber video disable warning")
+        Log.d(logTag, "Subscriber video disable warning")
     }
 
     override fun onVideoDisableWarningLifted(subscriber: SubscriberKit) {
-        Log.d(TAG, "Subscriber video disable warning lifted")
+        Log.d(logTag, "Subscriber video disable warning lifted")
     }
 }

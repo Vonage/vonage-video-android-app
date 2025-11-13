@@ -26,7 +26,7 @@ data class ActiveSpeakerChangedPayload(
 
 @OptIn(FlowPreview::class)
 class ActiveSpeakerTracker(
-    throttleTimeMs: Long = 500L,
+    throttleTimeMs: Long = 1000L,
     coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 ) {
     private val subscriberAudioLevelsBySubscriberId: SubscriberAudioLevels = mutableMapOf()
@@ -48,12 +48,12 @@ class ActiveSpeakerTracker(
             .launchIn(coroutineScope)
     }
 
-    fun onSubscriberDestroyed(subscriberId: String) {
+    suspend fun onSubscriberDestroyed(subscriberId: String) {
         subscriberAudioLevelsBySubscriberId.remove(subscriberId)
         if (_activeSpeaker.value.streamId == subscriberId) {
             _activeSpeaker.value = ActiveSpeakerInfo(null, 0F)
         }
-        //calculateActiveSpeaker()
+        calculateActiveSpeaker()
     }
 
     suspend fun onSubscriberAudioLevelUpdated(streamId: String, movingAvg: Float) {
@@ -63,7 +63,7 @@ class ActiveSpeakerTracker(
     }
 
     private suspend fun calculateActiveSpeaker() {
-        val a = _calculateTrigger.emit(Unit)
+        _calculateTrigger.emit(Unit)
     }
 
     private suspend fun internalCalculateActiveSpeaker() {

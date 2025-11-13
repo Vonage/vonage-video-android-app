@@ -1,5 +1,6 @@
 package com.vonage.android.screen.room.components
 
+import android.util.Log
 import android.view.View
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -7,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -26,35 +26,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle.State.STARTED
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.compose.currentStateAsState
 import com.vonage.android.audio.ui.AudioVolumeIndicator
-import com.vonage.android.compose.components.VideoRenderer
-import com.vonage.android.compose.preview.previewCamera
-import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.compose.components.AvatarInitials
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import com.vonage.android.compose.components.VideoRenderer
+import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.VideoSource
 
 @Suppress("LongParameterList")
 @Composable
 fun ParticipantVideoCard(
-    isCameraEnabled: StateFlow<Boolean>,
+    participant: Participant,
+//    isCameraEnabled: StateFlow<Boolean>,
     isVolumeIndicatorVisible: Boolean,
-    isMicEnabled: StateFlow<Boolean>,
-    isSpeaking: StateFlow<Boolean>,
-    audioLevel: StateFlow<Float>,
-    videoSource: VideoSource,
-    name: String,
-    view: View,
+//    isMicEnabled: StateFlow<Boolean>,
+//    isSpeaking: StateFlow<Boolean>,
+//    audioLevel: StateFlow<Float>,
+//    videoSource: VideoSource,
+//    name: String,
+//    view: View,
     modifier: Modifier = Modifier,
 ) {
+    Log.d("Recomposition", "ParticipantVideoCard")
+    val isCameraEnabled by participant.isCameraEnabled.collectAsStateWithLifecycle()
+    val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
+    val isSpeaking by participant.isTalking.collectAsStateWithLifecycle()
+    val audioLevel by participant.audioLevel.collectAsStateWithLifecycle()
+
     ParticipantContainer(
         modifier = modifier,
         isSpeaking = isSpeaking,
@@ -65,16 +66,18 @@ fun ParticipantVideoCard(
         ) {
             ParticipantVideoContainer(
                 isCameraEnabled = isCameraEnabled,
-                name = name,
-                view = view,
+                name = participant.name,
+                view = participant.view,
             )
 
-            if (name.isNotBlank()) {
-                ParticipantLabel(name)
+            if (participant.name.isNotBlank()) {
+                ParticipantLabel(participant.name)
             }
 
-            if (videoSource == VideoSource.CAMERA) {
+            if (participant.videoSource == VideoSource.CAMERA) {
                 MicrophoneIndicator(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd),
                     audioLevel = audioLevel,
                     isMicEnabled = isMicEnabled,
                     isShowVolumeIndicator = isVolumeIndicatorVisible,
@@ -86,11 +89,11 @@ fun ParticipantVideoCard(
 
 @Composable
 private fun ParticipantContainer(
-    isSpeaking: StateFlow<Boolean>,
+    isSpeaking: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val isSpeaking by isSpeaking.collectAsStateWithLifecycle()
+//    val isSpeaking by isSpeaking.collectAsStateWithLifecycle()
 
     Card(
         modifier = modifier,
@@ -104,16 +107,13 @@ private fun ParticipantContainer(
 @Composable
 private fun BoxScope.ParticipantVideoContainer(
     name: String,
-    isCameraEnabled: StateFlow<Boolean>,
+    isCameraEnabled: Boolean,
     view: View,
 ) {
-    val isCameraEnabled by isCameraEnabled.collectAsStateWithLifecycle()
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    //val isCameraEnabled by isCameraEnabled.collectAsStateWithLifecycle()
 
     key(view.hashCode(), isCameraEnabled) {
-        if (isCameraEnabled
-            && lifecycle.currentStateAsState().value.isAtLeast(STARTED)
-        ) {
+        if (isCameraEnabled) {
             VideoRenderer(
                 modifier = Modifier
                     .fillMaxSize()
@@ -131,7 +131,7 @@ private fun BoxScope.ParticipantVideoContainer(
 }
 
 @Composable
-private fun BoxScope.ParticipantLabel(
+fun BoxScope.ParticipantLabel(
     name: String,
     modifier: Modifier = Modifier,
 ) {
@@ -156,38 +156,62 @@ private fun BoxScope.ParticipantLabel(
 }
 
 @Composable
-private fun BoxScope.MicrophoneIndicator(
-    audioLevel: StateFlow<Float>,
-    isMicEnabled: StateFlow<Boolean>,
+fun MicrophoneIndicator(
+    audioLevel: Float,
+    isMicEnabled: Boolean,
     isShowVolumeIndicator: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    //val audioLevel by audioLevel.collectAsStateWithLifecycle()
-    val isMicEnabled by isMicEnabled.collectAsStateWithLifecycle()
+//    val audioLevel by audioLevel.collectAsStateWithLifecycle()
+//    val isMicEnabled by isMicEnabled.collectAsStateWithLifecycle()
 
-    if (isMicEnabled && isShowVolumeIndicator) {
-//        AudioVolumeIndicator(
-//            size = 32.dp,
-//            modifier = Modifier
-//                .align(Alignment.TopEnd)
-//                .padding(8.dp),
-//            audioLevel = audioLevel,
-//        )
-    } else {
-        Box(
-            modifier = modifier
-                .align(Alignment.TopEnd)
-                .padding(12.dp)
-                .background(
-                    Color.Black.copy(alpha = 0.6f),
-                    CircleShape
-                )
-                .padding(6.dp)
-        ) {
+    Box(
+        modifier = modifier,
+    ) {
+        if (isMicEnabled && isShowVolumeIndicator) {
+            AudioVolumeIndicator(
+                size = 32.dp,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp),
+                audioLevel = audioLevel,
+            )
+        } else {
+            MicrophoneIcon(
+                modifier = Modifier
+                    .align(Alignment.TopEnd),
+                isMicEnabled = isMicEnabled,
+            )
+        }
+    }
+}
+
+@Composable
+fun MicrophoneIcon(
+    isMicEnabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .padding(12.dp)
+            .background(
+                Color.Black.copy(alpha = 0.6f),
+                CircleShape
+            )
+            .padding(6.dp)
+    ) {
+        if (isMicEnabled) {
             Icon(
-                imageVector = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
+                imageVector = Icons.Default.Mic,
                 contentDescription = null,
                 tint = Color.White,
+                modifier = Modifier.size(16.dp)
+            )
+        } else {
+            Icon(
+                imageVector = Icons.Default.MicOff,
+                contentDescription = null,
+                tint = Color.Red,
                 modifier = Modifier.size(16.dp)
             )
         }
@@ -211,7 +235,7 @@ private fun BoxScope.MicrophoneIndicator(
 //        )
 //    }
 //}
-
+//
 //@PreviewLightDark
 //@Composable
 //internal fun ParticipantVideoCardPlaceholderPreview() {

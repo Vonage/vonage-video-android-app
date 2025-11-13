@@ -2,6 +2,7 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
+import com.opentok.android.Session
 import kotlinx.coroutines.flow.StateFlow
 
 @Stable
@@ -12,7 +13,10 @@ interface Participant {
     val isMicEnabled: StateFlow<Boolean>
     val isCameraEnabled: StateFlow<Boolean>
     val isTalking: StateFlow<Boolean>
+    val audioLevel: StateFlow<Float>
     val view: View
+    fun changeVisibility(visible: Boolean)
+    fun clean(session: Session)
 }
 
 enum class VideoSource {
@@ -33,8 +37,16 @@ data class VeraPublisher(
     val blurLevel: BlurLevel,
     val setCameraBlur: (BlurLevel) -> Unit,
     val toggleMic: () -> Boolean,
-    val toggleCamera: () -> Boolean,
-) : Participant
+    val toggleCamera: () -> Boolean, override val audioLevel: StateFlow<Float>,
+) : Participant {
+    override fun changeVisibility(visible: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override fun clean(session: Session) {
+        TODO("Not yet implemented")
+    }
+}
 
 data class VeraScreenPublisher(
     override val id: String,
@@ -43,5 +55,13 @@ data class VeraScreenPublisher(
     override val isMicEnabled: StateFlow<Boolean>,
     override val isCameraEnabled: StateFlow<Boolean>,
     override val view: View,
-    override val isTalking: StateFlow<Boolean>,
-) : Participant
+    override val isTalking: StateFlow<Boolean>, override val audioLevel: StateFlow<Float>,
+) : Participant {
+    override fun changeVisibility(visible: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override fun clean(session: Session) {
+        TODO("Not yet implemented")
+    }
+}

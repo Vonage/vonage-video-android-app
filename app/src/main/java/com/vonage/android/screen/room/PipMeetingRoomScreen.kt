@@ -18,6 +18,7 @@ import com.vonage.android.chat.ui.ChatBadgeButton
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.ParticipantVideoCard
@@ -43,14 +44,8 @@ fun PipMeetingRoomScreen(
             ) {
                 participant?.let { participant ->
                     ParticipantVideoCard(
-                        audioLevel = uiState.call.localAudioLevel,
-                        name = participant.name,
-                        isCameraEnabled = participant.isCameraEnabled,
-                        isMicEnabled = participant.isMicEnabled,
-                        view = participant.view,
-                        isSpeaking = participant.isTalking,
-                        isVolumeIndicatorVisible = participant is VeraPublisher,
-                        videoSource = participant.videoSource,
+                        participant = participant,
+                        isVolumeIndicatorVisible = participant is PublisherState,
                     )
                 }
                 ChatBadgeButton(

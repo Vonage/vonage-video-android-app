@@ -27,7 +27,6 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.screen.components.TopBanner
 import com.vonage.android.screen.waiting.components.WaitingRoomBody
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

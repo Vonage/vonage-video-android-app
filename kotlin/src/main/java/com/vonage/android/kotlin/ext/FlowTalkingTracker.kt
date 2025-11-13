@@ -1,6 +1,7 @@
 package com.vonage.android.kotlin.ext
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.scan
@@ -8,7 +9,7 @@ import kotlinx.coroutines.flow.scan
 fun Flow<Float>.mapTalking(): Flow<Boolean> =
     scan(TalkingState()) { state, audioLevel ->
         state.update(audioLevel)
-    }.map { it.isTalking }.distinctUntilChanged()
+    }.map { it.isTalking }.debounce(100).distinctUntilChanged()
 
 /**
  * Internal state holder for talking state

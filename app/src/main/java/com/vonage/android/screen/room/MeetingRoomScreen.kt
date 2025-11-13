@@ -42,24 +42,21 @@ import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.reporting.ReportIssueScreen
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
-import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
 import com.vonage.android.screen.room.components.BottomBar
 import com.vonage.android.screen.room.components.BottomBarState
 import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.MoreActionsGrid
 import com.vonage.android.screen.room.components.ParticipantsList
-import com.vonage.android.screen.room.components.TopBar
-import com.vonage.android.screen.room.components.captions.CaptionsOverlay
-import com.vonage.android.screen.room.components.emoji.EmojiReactionOverlay
 import com.vonage.android.screen.room.components.emoji.EmojiSelector
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 @Suppress("LongMethod")
@@ -70,7 +67,6 @@ fun MeetingRoomScreen(
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
 ) {
-    Log.d("XXX", "MeetingRoomScreen recompose")
     val participantsSheetState = rememberModalBottomSheetState()
     val audioDeviceSelectorSheetState = rememberModalBottomSheetState()
     val moreActionsSheetState = rememberModalBottomSheetState()
@@ -99,25 +95,27 @@ fun MeetingRoomScreen(
 
     when {
         (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
+            val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
+            val publisher by uiState.call.publisher.collectAsStateWithLifecycle()
             Scaffold(
                 modifier = modifier,
                 bottomBar = {
                     Log.d("XXX", "BottomBar recompose")
-                    BottomBar(
-                        modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
-                        actions = actions,
-                        bottomBarState = BottomBarState(
-                            onToggleParticipants = { showParticipants = showParticipants.toggle() },
-                            onToggleMoreActions = { showMoreActions = showMoreActions.toggle() },
-                            onShowChat = { scope.launch { navigator.toggleChat() } },
-                            isMicEnabled = MutableStateFlow(false),
-                            isCameraEnabled = MutableStateFlow(false),
-                            isChatShow = isChatShow,
-                            participantsCount = uiState.call.participantsCount,
-                            chatState = uiState.call.chatSignalState(),
-                            layoutType = uiState.layoutType,
-                        ),
-                    )
+                    publisher?.let { p ->
+//                        BottomBar(
+//                            modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
+//                            actions = actions,
+//                            state = BottomBarState(
+//                                call = uiState.call,
+//                                onToggleParticipants = { showParticipants = showParticipants.toggle() },
+//                                onToggleMoreActions = { showMoreActions = showMoreActions.toggle() },
+//                                onShowChat = { scope.launch { navigator.toggleChat() } },
+//                                isChatShow = isChatShow,
+//                                participant = p,
+//                                layoutType = uiState.layoutType,
+//                            ),
+//                        )
+                    }
                 }
             ) { paddingValues ->
                 SupportingPaneScaffold(
@@ -129,44 +127,45 @@ fun MeetingRoomScreen(
                     value = navigator.scaffoldValue,
                     mainPane = {
                         Box(modifier = Modifier.fillMaxSize()) {
-                            EmojiReactionOverlay(call = uiState.call)
-                            CaptionsOverlay(call = uiState.call)
+//                            EmojiReactionOverlay(call = uiState.call)
+//                            CaptionsOverlay(call = uiState.call)
                             Column(verticalArrangement = Arrangement.Top) {
-                                TopBar(
-                                    modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
-                                    roomName = uiState.roomName,
-                                    recordingState = uiState.recordingState,
-                                    actions = actions,
-                                    onToggleAudioDeviceSelector = {
-                                        showAudioDeviceSelector = showAudioDeviceSelector.toggle()
-                                    },
-                                )
+//                                TopBar(
+//                                    modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
+//                                    roomName = uiState.roomName,
+//                                    recordingState = uiState.recordingState,
+//                                    actions = actions,
+//                                    onToggleAudioDeviceSelector = {
+//                                        showAudioDeviceSelector = showAudioDeviceSelector.toggle()
+//                                    },
+//                                )
                                 MeetingRoomContent(
                                     modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
                                     call = uiState.call,
+                                    participants = participants,
                                     layoutType = uiState.layoutType,
                                 )
-                                CallModals(
-                                    call = uiState.call,
-                                    actions = actions,
-                                    showParticipants = showParticipants,
-                                    showMoreActions = showMoreActions,
-                                    showReporting = showReporting,
-                                    showAudioDeviceSelector = showAudioDeviceSelector,
-                                    participantsSheetState = participantsSheetState,
-                                    audioDeviceSelectorSheetState = audioDeviceSelectorSheetState,
-                                    moreActionsSheetState = moreActionsSheetState,
-                                    reportSheetState = reportSheetState,
-                                    onDismissParticipants = { showParticipants = false },
-                                    onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
-                                    onDismissMoreActions = { showMoreActions = false },
-                                    onShowReporting = { showReporting = showReporting.toggle() },
-                                    onDismissReporting = { showReporting = false },
-                                    recordingState = uiState.recordingState,
-                                    screenSharingState = uiState.screenSharingState,
-                                    captionsState = uiState.captionsState,
-                                    onEmojiClick = actions.onEmojiSent,
-                                )
+//                                CallModals(
+//                                    participants = participants,
+//                                    actions = actions,
+//                                    showParticipants = showParticipants,
+//                                    showMoreActions = showMoreActions,
+//                                    showReporting = showReporting,
+//                                    showAudioDeviceSelector = showAudioDeviceSelector,
+//                                    participantsSheetState = participantsSheetState,
+//                                    audioDeviceSelectorSheetState = audioDeviceSelectorSheetState,
+//                                    moreActionsSheetState = moreActionsSheetState,
+//                                    reportSheetState = reportSheetState,
+//                                    onDismissParticipants = { showParticipants = false },
+//                                    onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
+//                                    onDismissMoreActions = { showMoreActions = false },
+//                                    onShowReporting = { showReporting = showReporting.toggle() },
+//                                    onDismissReporting = { showReporting = false },
+//                                    recordingState = uiState.recordingState,
+//                                    screenSharingState = uiState.screenSharingState,
+//                                    captionsState = uiState.captionsState,
+//                                    onEmojiClick = actions.onEmojiSent,
+//                                )
                             }
                         }
                     },
@@ -209,7 +208,7 @@ fun MeetingRoomScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CallModals(
-    call: CallFacade,
+    participants: ImmutableList<Participant>,
     actions: MeetingRoomActions,
     showParticipants: Boolean,
     participantsSheetState: SheetState,
@@ -229,8 +228,6 @@ fun CallModals(
     onDismissParticipants: () -> Unit,
     onEmojiClick: (String) -> Unit,
 ) {
-    val participants by call.participantsStateFlow.collectAsStateWithLifecycle()
-
     val scope = rememberCoroutineScope()
     if (showParticipants) {
         ModalBottomSheet(

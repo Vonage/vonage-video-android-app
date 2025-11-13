@@ -19,7 +19,6 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.screen.components.DeviceSelectionPanel
 import com.vonage.android.screen.waiting.WaitingRoomActions
 import com.vonage.android.screen.waiting.WaitingRoomUiState
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun WaitingRoomBody(

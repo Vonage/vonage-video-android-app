@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +37,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.chat.ui.ChatBadgeButton
 import com.vonage.android.compose.components.ControlButton
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.ChatState
+import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON
@@ -46,19 +48,17 @@ import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_GR
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_MIC_BUTTON
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BADGE
 import com.vonage.android.screen.room.components.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BUTTON
+import com.vonage.android.screen.room.noOpCallFacade
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 data class BottomBarState(
+    val call: CallFacade,
+    val participant: Participant,
     val onToggleParticipants: () -> Unit,
     val onShowChat: () -> Unit,
     val onToggleMoreActions: () -> Unit,
-    val isMicEnabled: StateFlow<Boolean>,
-    val isCameraEnabled: StateFlow<Boolean>,
     val isChatShow: Boolean,
-    val participantsCount: StateFlow<Int>,
-    val chatState: StateFlow<ChatState?>,
     val layoutType: CallLayoutType,
 )
 
@@ -66,13 +66,14 @@ data class BottomBarState(
 @Composable
 fun BottomBar(
     actions: MeetingRoomActions,
-    bottomBarState: BottomBarState,
+    state: BottomBarState,
     modifier: Modifier = Modifier
 ) {
-    val isMicEnabled by bottomBarState.isMicEnabled.collectAsStateWithLifecycle()
-    val isCameraEnabled by bottomBarState.isCameraEnabled.collectAsStateWithLifecycle()
-    val participantsCount by bottomBarState.participantsCount.collectAsStateWithLifecycle()
-    val chatState by bottomBarState.chatState.collectAsStateWithLifecycle()
+
+    val isMicEnabled by state.participant.isMicEnabled.collectAsStateWithLifecycle()
+    val isCameraEnabled by state.participant.isCameraEnabled.collectAsStateWithLifecycle()
+    val participantsCount by state.call.participantsCount.collectAsStateWithLifecycle()
+    val chatState by state.call.chatSignalState().collectAsStateWithLifecycle()
 
     Surface(
         modifier = modifier
@@ -104,16 +105,16 @@ fun BottomBar(
 
             ParticipantsBadgeButton(
                 participantsCount = participantsCount,
-                onToggleParticipants = bottomBarState.onToggleParticipants,
+                onToggleParticipants = state.onToggleParticipants,
             )
 
             ChatBadgeButton(
                 unreadCount = chatState?.unreadCount ?: 0,
-                onShowChat = bottomBarState.onShowChat,
-                isChatShow = bottomBarState.isChatShow,
+                onShowChat = state.onShowChat,
+                isChatShow = state.isChatShow,
             )
 
-            when (bottomBarState.layoutType) {
+            when (state.layoutType) {
                 CallLayoutType.GRID -> {
                     ControlButton(
                         modifier = Modifier
@@ -137,7 +138,7 @@ fun BottomBar(
 
             ControlButton(
                 modifier = Modifier,
-                onClick = bottomBarState.onToggleMoreActions,
+                onClick = state.onToggleMoreActions,
                 icon = Icons.Default.MoreVert,
                 isActive = false,
             )
@@ -199,23 +200,20 @@ object BottomBarTestTags {
     const val BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON = "bottom_bar_active_speaker_layout_button"
 }
 
-@PreviewLightDark
-@Composable
-internal fun BottomBarPreview() {
-    VonageVideoTheme {
-        BottomBar(
-            actions = MeetingRoomActions(),
-            bottomBarState = BottomBarState(
-                onToggleParticipants = {},
-                onShowChat = {},
-                onToggleMoreActions = {},
-                isMicEnabled = MutableStateFlow(false),
-                isCameraEnabled = MutableStateFlow(true),
-                isChatShow = false,
-                participantsCount = MutableStateFlow(25),
-                chatState = MutableStateFlow(null),
-                layoutType = CallLayoutType.SPEAKER_LAYOUT,
-            ),
-        )
-    }
-}
+//@PreviewLightDark
+//@Composable
+//internal fun BottomBarPreview() {
+//    VonageVideoTheme {
+//        BottomBar(
+//            actions = MeetingRoomActions(),
+//            state = BottomBarState(
+//                onToggleParticipants = {},
+//                onShowChat = {},
+//                onToggleMoreActions = {},
+//                isChatShow = false,
+//                call = noOpCallFacade,
+//                layoutType = CallLayoutType.SPEAKER_LAYOUT,
+//            ),
+//        )
+//    }
+//}

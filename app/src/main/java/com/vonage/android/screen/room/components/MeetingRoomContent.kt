@@ -10,50 +10,63 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.skydoves.compose.stability.runtime.TraceRecomposition
+import com.vonage.android.compose.modifier.recomposeHighlighter
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT
 import com.vonage.android.screen.room.noOpCallFacade
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("LongParameterList")
 @Composable
 fun MeetingRoomContent(
     call: CallFacade,
+    participants: ImmutableList<Participant>,
     layoutType: CallLayoutType,
     modifier: Modifier = Modifier,
 ) {
     Log.d("XXX", "MeetingRoomContent recompose")
-    val participants by call.participantsStateFlow.collectAsStateWithLifecycle(persistentListOf())
+    //val participants by call.participantsStateFlow.collectAsStateWithLifecycle(persistentListOf())
 
     Box(
         modifier = modifier
             .fillMaxSize(),
     ) {
-        when (layoutType) {
-            CallLayoutType.GRID -> {
-                AdaptiveGrid(
-                    participants = participants,
-                    call = call,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
-                )
-            }
-
-            CallLayoutType.SPEAKER_LAYOUT -> {
-                AdaptiveSpeakerLayout(
-                    participants = participants,
-                    call = call,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .testTag(MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT),
-                )
-            }
-        }
+        SimpleGrid(
+            modifier = Modifier
+//                .recomposeHighlighter()
+                .fillMaxSize(),
+            participants = participants,
+            call = call,
+        )
+//        when (layoutType) {
+//            CallLayoutType.GRID -> {
+//                AdaptiveGrid(
+//                    participants = participants,
+//                    call = call,
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
+//                )
+//            }
+//
+//            CallLayoutType.SPEAKER_LAYOUT -> {
+//                AdaptiveSpeakerLayout(
+//                    participants = participants,
+//                    call = call,
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .testTag(MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT),
+//                )
+//            }
+//        }
     }
 }
 
@@ -62,14 +75,14 @@ object MeetingRoomContentTestTags {
     const val MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT = "meeting_room_participants_speaker_layout"
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@PreviewLightDark
-@Composable
-internal fun MeetingRoomContentPreview() {
-    VonageVideoTheme {
-        MeetingRoomContent(
-            call = noOpCallFacade,
-            layoutType = CallLayoutType.GRID,
-        )
-    }
-}
+//@OptIn(ExperimentalMaterial3Api::class)
+//@PreviewLightDark
+//@Composable
+//internal fun MeetingRoomContentPreview() {
+//    VonageVideoTheme {
+//        MeetingRoomContent(
+//            call = noOpCallFacade,
+//            layoutType = CallLayoutType.GRID,
+//        )
+//    }
+//}

@@ -1,5 +1,6 @@
 package com.vonage.android.screen.room.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,8 +29,6 @@ import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
-import com.vonage.android.kotlin.model.ParticipantState
-import com.vonage.android.kotlin.model.VideoSource
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -38,6 +37,7 @@ fun ParticipantsList(
     participants: ImmutableList<Participant>,
     modifier: Modifier = Modifier,
 ) {
+    Log.d("Recomposition", "ParticipantsList ${participants.size}")
     LazyColumn(
         contentPadding = PaddingValues(8.dp),
         modifier = modifier
@@ -52,10 +52,10 @@ fun ParticipantsList(
             )
         }
         items(
-            items = participants.filter { it.videoSource == VideoSource.CAMERA },
-            key = { participant -> participant.id },
-        ) { participant ->
-            ParticipantRow(participant)
+            items = participants,
+            key = { it.id },
+        ) { participantState ->
+            ParticipantRow(participantState)
         }
     }
 }
