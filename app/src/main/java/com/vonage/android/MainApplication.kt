@@ -8,7 +8,7 @@ import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 @HiltAndroidApp
-class MainApplication : Application() {
+open class MainApplication : Application() {
 
     @Inject
     lateinit var notificationChannelRegistry: VeraNotificationChannelRegistry

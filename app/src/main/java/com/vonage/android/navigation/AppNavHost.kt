@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import com.vonage.android.di.RetrofitModule.BASE_URL
+import com.vonage.android.BuildConfig
 import com.vonage.android.navigation.AppRoute.Goodbye
 import com.vonage.android.navigation.AppRoute.Landing
 import com.vonage.android.navigation.AppRoute.Meeting
@@ -39,7 +39,7 @@ fun AppNavHost(
         }
         composable<Waiting>(
             deepLinks = listOf(
-                navDeepLink<Waiting>("$BASE_URL/waiting-room"),
+                navDeepLink<Waiting>("${BuildConfig.BASE_API_URL}/waiting-room"),
             )
         ) { backStackEntry ->
             val roomName = backStackEntry.toRoute<Waiting>().roomName
@@ -61,7 +61,7 @@ fun AppNavHost(
         }
         composable<Meeting>(
             deepLinks = listOf(
-                navDeepLink<Meeting>("$BASE_URL/room"),
+                navDeepLink<Meeting>("${BuildConfig.BASE_API_URL}/room"),
             )
         ) { backStackEntry ->
             val roomName = backStackEntry.toRoute<Meeting>().roomName
