@@ -5,7 +5,6 @@ import android.media.projection.MediaProjection
 import android.util.Log
 import androidx.compose.runtime.Stable
 import com.opentok.android.BaseVideoRenderer
-import com.opentok.android.NoOpVideoRenderer
 import com.opentok.android.OpentokError
 import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit.PublisherKitVideoType
@@ -13,7 +12,6 @@ import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
-import com.opentok.android.VeraVideoRenderer
 import com.vonage.android.kotlin.ext.extractSenderName
 import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.toggle
@@ -31,7 +29,6 @@ import com.vonage.android.kotlin.model.SignalFlows
 import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
-import com.vonage.android.kotlin.model.mapState
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.kotlin.signal.SignalPlugin
 import kotlinx.collections.immutable.ImmutableList
@@ -45,10 +42,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -57,12 +54,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.emptyList
 
 @Suppress("TooManyFunctions")
 @OptIn(FlowPreview::class)
@@ -72,38 +69,47 @@ class Call internal constructor(
     private val session: Session,
     private val publisherHolder: VeraPublisherHolder,
     private val signalPlugins: List<SignalPlugin>,
-    activeSpeakerTracker: ActiveSpeakerTracker? = null,
-    coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
+    coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : CallFacade {
 
-    private val VISIBILITY_MONITOR_ENABLED = true
+    private lateinit var context: Context
 
+    private val coroutineScope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
 
-    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val actualActiveSpeakerTracker = activeSpeakerTracker ?: ActiveSpeakerTracker(coroutineScope = coroutineScope)
+    private var participantsOnScreenJob: Job? = null
+    private var activeSpeakerTrackerJob: Job? = null
+    private var signalsJob: Job? = null
+
+    private val activeSpeakerTracker = ActiveSpeakerTracker(coroutineScope = coroutineScope)
     private val participants = ConcurrentHashMap<String, Participant>()
 
-    private val _participantsRawFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
-    override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsRawFlow
-//        .debounce(PARTICIPANTS_UPDATE_DEBOUNCE)
-//        .distinctUntilChanged()
-        .mapState { participants -> participants.sortedByDescending { it.creationTime }.toImmutableList() }
-        .onEach { Log.d("SessionTracing", "emit participants to UI") }
+    private val _participantsInternalFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
+    override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsInternalFlow
+        .sample(PARTICIPANTS_DEBOUNCE_MILLIS)
+        .distinctUntilChanged()
+        .map { participants -> participants.sortedByDescending { it.creationTime }.toImmutableList() }
         .stateIn(
             scope = coroutineScope,
-            started = SharingStarted.WhileSubscribed(10000),
-            initialValue = persistentListOf()
+            started = WhileSubscribed(SUBSCRIBE_TIMEOUT_MILLIS),
+            initialValue = persistentListOf(),
         )
 
-    private val _mainSpeaker = MutableStateFlow<Participant?>(null)
-    override val activeSpeaker: StateFlow<Participant?> = _mainSpeaker
-        .debounce(PARTICIPANTS_UPDATE_DEBOUNCE)
-        .distinctUntilChanged()
-        .onEach { Log.d("SessionTracing", "emit main speaker to UI") }
+    override val publisher: StateFlow<PublisherState?> = _participantsInternalFlow
+        .map { participants -> participants.firstOrNull { it.id == PUBLISHER_ID }?.let { it as PublisherState } }
         .stateIn(
             scope = coroutineScope,
-            started = SharingStarted.WhileSubscribed(10000),
-            initialValue = null
+            started = WhileSubscribed(SUBSCRIBE_TIMEOUT_MILLIS),
+            initialValue = null,
+        )
+
+    private val _activeSpeaker = MutableStateFlow<Participant?>(null)
+    override val activeSpeaker: StateFlow<Participant?> = _activeSpeaker
+        .debounce(ACTIVE_SPEAKER_DEBOUNCE_MILLIS)
+        .distinctUntilChanged()
+        .stateIn(
+            scope = coroutineScope,
+            started = WhileSubscribed(SUBSCRIBE_TIMEOUT_MILLIS),
+            initialValue = null,
         )
 
     private val _participantsCount = MutableStateFlow(0)
@@ -132,44 +138,14 @@ class Call internal constructor(
             .map { it as? EmojiState }
             .stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)
 
-    override val publisher: StateFlow<PublisherState?> = participantsStateFlow
-        .mapState { participants -> participants.firstOrNull { it.id == PUBLISHER_ID }?.let { it as PublisherState } }
-
-    private lateinit var context: Context
-
-    init {
-        coroutineScope.launch {
-            signalPlugins.forEach {
-                if (it.canHandle(SignalType.CHAT.signal)) {
-                    signalState[SignalType.CHAT] = it.output
-                }
-                if (it.canHandle(SignalType.REACTION.signal)) {
-                    signalState[SignalType.REACTION] = it.output
-                }
-            }
-        }
-
-        actualActiveSpeakerTracker.activeSpeakerChanges
-            .onEach { payload ->
-                participants[payload.newActiveSpeaker.streamId]?.let {
-                    it.changeVisibility(true)
-                    _mainSpeaker.value = it
-                    Log.d("ACTIVE SPEAKER CHANGE", "active speaker ${it.id}")
-                }
-            }
-            .launchIn(coroutineScope)
-    }
-
-    private var currentTime = System.currentTimeMillis()
-
     //region Session lifecycle
     override fun connect(context: Context): Flow<SessionEvent> = callbackFlow {
         this@Call.context = context
         val sessionListener = object : Session.SessionListener {
             override fun onConnected(session: Session) {
-                currentTime = System.currentTimeMillis()
-                Log.d("SessionTracing", "onConnected")
                 publishToSession()
+                startActiveSpeakerTracker()
+                startListeningSignals()
                 trySend(SessionEvent.Connected)
             }
 
@@ -178,9 +154,6 @@ class Call internal constructor(
             }
 
             override fun onStreamReceived(session: Session, stream: Stream) {
-                val now = System.currentTimeMillis()
-                Log.d("SessionTracing", "onStreamReceived - ${now - currentTime}")
-                Log.d("Session", "onStreamReceived ${stream.streamId}")
                 addSubscriber(stream)
                 trySend(SessionEvent.StreamReceived(stream.streamId))
             }
@@ -231,7 +204,6 @@ class Call internal constructor(
     //endregion
 
     //region Signals
-
     override fun sendEmoji(emoji: String) {
         sendSignal(SignalType.REACTION, emoji)
     }
@@ -256,14 +228,24 @@ class Call internal constructor(
             .forEach { chatPlugin -> chatPlugin.listenUnread(enable) }
     }
 
+    private fun startListeningSignals() {
+        signalsJob?.cancel()
+        signalsJob = coroutineScope.launch {
+            signalPlugins.forEach {
+                if (it.canHandle(SignalType.CHAT.signal)) {
+                    signalState[SignalType.CHAT] = it.output
+                }
+                if (it.canHandle(SignalType.REACTION.signal)) {
+                    signalState[SignalType.REACTION] = it.output
+                }
+            }
+        }
+    }
     //endregion
 
     //region Publisher
     override fun toggleLocalVideo() {
-        (participants[PUBLISHER_ID] as PublisherState)._isCameraEnabled.value = true
-//        publisherHolder.publisher.let { publisher ->
-//            publisher.publishVideo = publisher.publishVideo.toggle()
-//        }
+        (participants[PUBLISHER_ID] as PublisherState).toggleVideo()
     }
 
     override fun toggleLocalCamera() {
@@ -271,10 +253,7 @@ class Call internal constructor(
     }
 
     override fun toggleLocalAudio() {
-        (participants[PUBLISHER_ID] as PublisherState)._isMicEnabled.value = true
-        publisherHolder.publisher.let { publisher ->
-            publisher.publishAudio = publisher.publishAudio.toggle()
-        }
+        (participants[PUBLISHER_ID] as PublisherState).toggleAudio()
     }
 
     private fun publishToSession() {
@@ -287,7 +266,7 @@ class Call internal constructor(
                 participants[PUBLISHER_ID] = publisher
                 coroutineScope.launch {
                     async { publisher.setup() }.await()
-                    updateParticipants(publisher)
+                    updateParticipants()
                 }
             }
         }
@@ -328,14 +307,10 @@ class Call internal constructor(
         //subscriberStreams.values.forEach { it.subscribeToCaptions = enable }
     }
 
-    private var participantsVisibilityMonitor: Job? = null
-
     override fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>) {
         if (!VISIBILITY_MONITOR_ENABLED) return
-
-        participantsVisibilityMonitor?.cancel()
-
-        participantsVisibilityMonitor = coroutineScope.launch(Dispatchers.Default) {
+        participantsOnScreenJob?.cancel()
+        participantsOnScreenJob = coroutineScope.launch(Dispatchers.Default) {
             snapshotFlow
                 .distinctUntilChanged()
                 .collectLatest { visibleParticipants ->
@@ -349,63 +324,44 @@ class Call internal constructor(
     }
 
     private fun addSubscriber(stream: Stream) {
-        Log.d(TAG, "Adding subscriber ${stream.streamId}")
-        coroutineScope.launch(Dispatchers.Default) {
+        coroutineScope.launch {
             try {
-                // Build subscriber off main thread (renderer creation can be slow)
                 val participant = withContext(Dispatchers.Main) {
-                    val subscriber = Subscriber.Builder(context, stream)
-                        .renderer(VeraVideoRenderer(context))
-//                        .renderer(NoOpVideoRenderer(context))
-                        .build()
+                    val subscriber = Subscriber.Builder(context, stream).build()
+                    subscriber.setCaptionsListener(captionsDelegate)
                     session.subscribe(subscriber)
                     ParticipantState(subscriber = subscriber)
                 }
-
-                //subscriber.setCaptionsListener(captionsDelegate)
                 launch { participant.setup() }
-
-                // Add to participants map and update UI
                 participants[stream.streamId] = participant
-                updateParticipants(participant)
-                
-                Log.d(TAG, "Subscriber added successfully: ${stream.streamId}")
-                val now = System.currentTimeMillis()
-                Log.d("SessionTracing", "Subscriber added - ${now - currentTime}")
+                updateParticipants()
+                observeSubscriberAudioLevel(participant)
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to add subscriber ${stream.streamId}", e)
             }
         }
     }
 
-    private fun observeSubscriber(participant: Participant) {
+    private fun observeSubscriberAudioLevel(participant: Participant) {
         coroutineScope.launch {
-            participant.audioLevel.collect { audioLevel ->
-                Log.d(TAG, "audio level collected ${Thread.currentThread()}")
-                actualActiveSpeakerTracker.onSubscriberAudioLevelUpdated(
-                    participant.id,
-                    audioLevel,
-                )
+            participant.audioLevel.collect { movingAvg ->
+                activeSpeakerTracker.onSubscriberAudioLevelUpdated(streamId = participant.id, movingAvg = movingAvg)
             }
         }
     }
 
-    private fun updateParticipants(participant: Participant) {
-        _participantsRawFlow.update { participants.values.toImmutableList() }
+    private fun updateParticipants() {
+        _participantsInternalFlow.update { participants.values.toImmutableList() }
         _participantsCount.update { participants.size }
-
-        observeSubscriber(participant)
     }
 
     private fun removeSubscriber(stream: Stream) {
         val subscriber = participants[stream.streamId] ?: return
         coroutineScope.launch {
-            actualActiveSpeakerTracker.onSubscriberDestroyed(stream.streamId)
-
+            activeSpeakerTracker.onSubscriberDestroyed(stream.streamId)
             participants.remove(stream.streamId)
-            updateParticipants(subscriber)
+            updateParticipants()
         }
-
         subscriber.clean(session)
     }
 
@@ -417,10 +373,27 @@ class Call internal constructor(
             }
         }
 
+    private fun startActiveSpeakerTracker() {
+        activeSpeakerTrackerJob?.cancel()
+        activeSpeakerTrackerJob = activeSpeakerTracker.activeSpeakerChanges
+            .onEach { payload ->
+                participants[payload.newActiveSpeaker.streamId]?.let { mainSpeaker ->
+                    mainSpeaker.changeVisibility(true)
+                    _activeSpeaker.update { mainSpeaker }
+                }
+            }
+            .launchIn(coroutineScope)
+    }
+
     companion object {
         private const val TAG: String = "Call"
+        private const val SUBSCRIBE_TIMEOUT_MILLIS = 10000L
         const val PUBLISHER_ID: String = "publisher"
         const val PUBLISHER_SCREEN_ID: String = "publisher-screen"
-        private const val PARTICIPANTS_UPDATE_DEBOUNCE = 60L // ms - batch subscriber additions
+
+        // Add the following parameters to a Config-kind object
+        private const val PARTICIPANTS_DEBOUNCE_MILLIS = 100L
+        private const val ACTIVE_SPEAKER_DEBOUNCE_MILLIS = 100L
+        private const val VISIBILITY_MONITOR_ENABLED = true
     }
 }

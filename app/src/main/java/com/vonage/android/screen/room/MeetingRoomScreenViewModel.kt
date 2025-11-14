@@ -329,7 +329,7 @@ data class MeetingRoomUiState(
 enum class CallLayoutType {
     GRID,
     SPEAKER_LAYOUT,
-    SCOLL_GRID,
+    ADAPTIVE_GRID,
 }
 
 enum class RecordingState {

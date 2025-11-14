@@ -30,7 +30,7 @@ fun MeetingRoomContent(
     ) {
         when (layoutType) {
             CallLayoutType.GRID -> {
-                SimpleGrid(
+                ParticipantsLazyVerticalGridLayout(
                     modifier = Modifier
                         .fillMaxSize(),
                     participants = participants.toImmutableList(),
@@ -38,7 +38,7 @@ fun MeetingRoomContent(
                 )
             }
 
-            CallLayoutType.SCOLL_GRID    -> {
+            CallLayoutType.ADAPTIVE_GRID    -> {
                 AdaptiveGrid(
                     call = call,
                     participants = participants,
@@ -49,7 +49,7 @@ fun MeetingRoomContent(
             }
 
             CallLayoutType.SPEAKER_LAYOUT -> {
-                AdaptiveSpeakerLayout(
+                ActiveSpeakerLayout(
                     call = call,
                     participants = participants,
                     modifier = Modifier

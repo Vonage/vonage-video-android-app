@@ -47,6 +47,9 @@ import kotlin.random.Random
 private const val ANIMATION_DURATION = EMOJI_LIFETIME_MILLIS.toInt()
 private const val OVERLAY_ZINDEX = 9F
 
+/**
+ * todo: detected too much recompositions in this composable, need to review
+ */
 @Composable
 fun EmojiReactionOverlay(
     call: CallFacade,

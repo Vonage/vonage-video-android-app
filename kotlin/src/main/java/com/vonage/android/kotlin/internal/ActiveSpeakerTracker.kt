@@ -1,6 +1,5 @@
 package com.vonage.android.kotlin.internal
 
-import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -8,7 +7,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
@@ -41,12 +39,8 @@ class ActiveSpeakerTracker(
 
     init {
         _calculateTrigger
-            //.debounce(throttleTimeMs)
             .sample(throttleTimeMs)
-            .onEach {
-                Log.d("ActiveSpeakerTracker", "calculate onEach")
-                internalCalculateActiveSpeaker()
-            }
+            .onEach { internalCalculateActiveSpeaker() }
             .launchIn(coroutineScope)
     }
 
@@ -59,7 +53,6 @@ class ActiveSpeakerTracker(
     }
 
     suspend fun onSubscriberAudioLevelUpdated(streamId: String, movingAvg: Float) {
-        Log.d("ActiveSpeakerTracker", "audio level updated $streamId -> $movingAvg")
         subscriberAudioLevelsBySubscriberId[streamId] = movingAvg
         calculateActiveSpeaker()
     }
@@ -80,18 +73,12 @@ class ActiveSpeakerTracker(
         val newActiveSpeaker = ActiveSpeakerInfo(maxSubscriberId, maxMovingAvg)
         val currentActiveSpeaker = _activeSpeaker.value
 
-        Log.d("ActiveSpeakerTracker", "calculate ${currentActiveSpeaker.streamId} || ${newActiveSpeaker.streamId}")
-//        if (newActiveSpeaker.streamId != currentActiveSpeaker.streamId
-//            && newActiveSpeaker.movingAvg > ACTIVE_SPEAKER_AUDIO_LEVEL_THRESHOLD
-//        ) {
-        if (newActiveSpeaker.movingAvg > ACTIVE_SPEAKER_AUDIO_LEVEL_THRESHOLD
-        ) {
+        if (newActiveSpeaker.movingAvg > ACTIVE_SPEAKER_AUDIO_LEVEL_THRESHOLD) {
             val previousActiveSpeaker = currentActiveSpeaker.copy()
             _activeSpeaker.value = newActiveSpeaker
 
             val payload = ActiveSpeakerChangedPayload(previousActiveSpeaker, newActiveSpeaker)
-            val r = _activeSpeakerChanges.emit(payload)
-            Log.d("ActiveSpeakerTracker", "emit change $r")
+            _activeSpeakerChanges.emit(payload)
         }
     }
 

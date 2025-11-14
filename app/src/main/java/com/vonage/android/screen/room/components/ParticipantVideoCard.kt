@@ -4,7 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,16 +20,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.skydoves.compose.stability.runtime.TraceRecomposition
 import com.vonage.android.audio.ui.AudioVolumeIndicator
 import com.vonage.android.compose.components.AvatarInitials
-import com.vonage.android.compose.components.VideoRenderer2
+import com.vonage.android.compose.components.ParticipantVideoRenderer
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VideoSource
 
@@ -62,8 +59,8 @@ fun ParticipantVideoCard(
             MicrophoneIndicator(
                 modifier = Modifier
                     .align(Alignment.TopEnd),
-                audioLevel = 0f,
                 isMicEnabled = isMicEnabled,
+                participant = participant,
                 isShowVolumeIndicator = participant.isPublisher,
             )
         }
@@ -109,7 +106,7 @@ private fun BoxScope.ParticipantVideoContainer(
     val isCameraEnabled by participant.isCameraEnabled.collectAsStateWithLifecycle()
 
     if (isCameraEnabled) {
-        VideoRenderer2(
+        ParticipantVideoRenderer(
             modifier = Modifier
                 .fillMaxSize(),
             participant = participant,
@@ -150,16 +147,17 @@ fun BoxScope.ParticipantLabel(
 }
 
 @Composable
-fun MicrophoneIndicator(
-    audioLevel: Float,
+private fun MicrophoneIndicator(
     isMicEnabled: Boolean,
     isShowVolumeIndicator: Boolean,
+    participant: Participant,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier,
     ) {
         if (isMicEnabled && isShowVolumeIndicator) {
+            val audioLevel by participant.audioLevel.collectAsStateWithLifecycle()
             AudioVolumeIndicator(
                 size = 32.dp,
                 modifier = Modifier
