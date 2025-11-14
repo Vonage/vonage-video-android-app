@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.preview.buildParticipants
@@ -37,6 +38,9 @@ fun ActiveSpeakerLayout(
     participants: ImmutableList<Participant>,
     call: CallFacade,
     modifier: Modifier = Modifier,
+    spotlightWeight: Float = 0.7f,
+    otherParticipantsWeight: Float = 0.3f,
+    otherParticipantsSize: Dp = 200.dp
 ) {
     val mainParticipant by call.activeSpeaker.collectAsStateWithLifecycle()
     val nonMainParticipant by remember(mainParticipant) {
@@ -52,14 +56,14 @@ fun ActiveSpeakerLayout(
         ) {
             mainParticipant?.let {
                 SpotlightSpeaker(
-                    modifier = Modifier.weight(0.7f),
+                    modifier = Modifier.weight(spotlightWeight),
                     participant = it,
                 )
-            } ?: Spacer(modifier = Modifier.weight(0.7f))
+            } ?: Spacer(modifier = Modifier.weight(spotlightWeight))
             LazyRow(
                 state = listState,
                 modifier = Modifier
-                    .weight(0.3f),
+                    .weight(otherParticipantsWeight),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -69,8 +73,8 @@ fun ActiveSpeakerLayout(
                 ) { participant ->
                     ParticipantVideoCard(
                         modifier = Modifier
-                            .width(200.dp)
-                            .height(200.dp),
+                            .width(otherParticipantsSize)
+                            .height(otherParticipantsSize),
                         participant = participant,
                     )
                 }

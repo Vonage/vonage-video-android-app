@@ -17,8 +17,8 @@ interface Participant {
     val isTalking: StateFlow<Boolean>
     val audioLevel: StateFlow<Float>
     val view: View
-    fun changeVisibility(visible: Boolean)
-    fun clean(session: Session)
+    fun changeVisibility(visible: Boolean) {}
+    fun clean(session: Session) {}
 }
 
 enum class VideoSource {

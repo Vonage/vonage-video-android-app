@@ -14,10 +14,8 @@ fun buildParticipants(count: Int): List<Participant> {
     for (i in 1..count) {
         val sampleParticipant = object : Participant {
             override val id: String = SecureRandom().nextInt().toString()
-            override val isPublisher: Boolean
-                get() = false
-            override val creationTime: Long
-                get() = 123L
+            override val isPublisher: Boolean = false
+            override val creationTime: Long = 1L
             override val videoSource: VideoSource = VideoSource.CAMERA
             override var name: String = "Name Sample $i"
             override val isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -25,13 +23,6 @@ fun buildParticipants(count: Int): List<Participant> {
             override val audioLevel: StateFlow<Float> = MutableStateFlow(0F)
             override val isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(true)
             override val view: View = previewCamera()
-            override fun changeVisibility(visible: Boolean) {
-                TODO("Not yet implemented")
-            }
-
-            override fun clean(session: com.opentok.android.Session) {
-                TODO("Not yet implemented")
-            }
         }
         participants += sampleParticipant
     }

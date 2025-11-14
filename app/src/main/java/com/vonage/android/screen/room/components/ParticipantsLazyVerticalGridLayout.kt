@@ -33,7 +33,7 @@ fun ParticipantsLazyVerticalGridLayout(
     modifier: Modifier = Modifier,
     columns: Int = 2,
     rows: Int = 3,
-    spacing: Dp = 8.dp
+    spacing: Dp = 8.dp,
 ) {
     BoxWithConstraints(
         modifier = modifier.fillMaxSize(),
@@ -60,7 +60,7 @@ fun ParticipantsLazyVerticalGridLayout(
             ) { participant ->
                 ParticipantVideoCard(
                     participant = participant,
-                    modifier = modifier
+                    modifier = Modifier
                         .height(itemHeight)
                         .width(itemWidth)
                 )

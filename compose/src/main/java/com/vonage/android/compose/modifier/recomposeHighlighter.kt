@@ -1,3 +1,4 @@
+@file:Suppress("MagicNumber")
 /*
  *  Copyright 2022 Google Inc.
  *
@@ -17,7 +18,6 @@ package com.vonage.android.compose.modifier
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -31,9 +31,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.lerp
-import kotlin.math.min
 import kotlinx.coroutines.delay
+import kotlin.math.min
 
 /**
  * A [Modifier] that draws a border around elements that are recomposing. The border increases in

@@ -14,7 +14,6 @@ import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
 import com.vonage.android.kotlin.ext.extractSenderName
 import com.vonage.android.kotlin.ext.name
-import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
 import com.vonage.android.kotlin.internal.ScreenSharingCapturer
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
@@ -323,6 +322,7 @@ class Call internal constructor(
         }
     }
 
+    @Suppress("TooGenericExceptionCaught")
     private fun addSubscriber(stream: Stream) {
         coroutineScope.launch {
             try {

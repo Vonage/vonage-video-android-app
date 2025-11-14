@@ -17,7 +17,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 
 @OptIn(FlowPreview::class)
@@ -56,7 +55,10 @@ data class PublisherState(
     override val view: View = publisher.view
 
     override fun changeVisibility(visible: Boolean) {
-
+        when (visible) {
+            true -> publisher.publishVideo = publisher.stream.hasVideo()
+            false -> publisher.publishVideo = false
+        }
     }
 
     fun toggleVideo() {
@@ -75,7 +77,6 @@ data class PublisherState(
         publisher.setMuteListener(this)
 
         publisher.observeAudioLevel()
-            .filter { publisher.publishAudio }
             .movingAverage(windowSize = 2)
             .distinctUntilChanged()
             .collect { audioLevel ->

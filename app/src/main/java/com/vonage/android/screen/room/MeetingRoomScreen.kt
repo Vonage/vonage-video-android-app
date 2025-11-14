@@ -208,6 +208,7 @@ fun MeetingRoomScreen(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Suppress("LongParameterList")
 @Composable
 fun CallModals(
     participants: ImmutableList<Participant>,

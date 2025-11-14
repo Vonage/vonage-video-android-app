@@ -18,12 +18,9 @@ import com.vonage.android.chat.ui.ChatBadgeButton
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.PublisherState
-import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.ParticipantVideoCard
 import com.vonage.android.util.pip.findActivity
-import kotlinx.collections.immutable.persistentListOf
 
 @Suppress("LongMethod")
 @Composable
@@ -35,8 +32,7 @@ fun PipMeetingRoomScreen(
     when {
         (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
             val chatState by uiState.call.chatSignalState().collectAsStateWithLifecycle()
-            val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle(persistentListOf())
-            val participant = participants.filterIsInstance<VeraPublisher>().firstOrNull()
+            val participant by uiState.call.activeSpeaker.collectAsStateWithLifecycle()
 
             Box(
                 modifier = modifier

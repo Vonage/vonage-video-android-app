@@ -8,7 +8,6 @@ import com.vonage.android.kotlin.model.BlurLevel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
 
 internal fun Publisher.applyVideoBlur(blurLevel: BlurLevel) {
     when (blurLevel) {
