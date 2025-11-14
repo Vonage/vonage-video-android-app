@@ -37,7 +37,7 @@ internal fun Publisher.toParticipant(
     setCameraBlur = { blurLevel -> applyVideoBlur(blurLevel) },
     isTalking = MutableStateFlow(isSpeaking),
     audioLevel = MutableStateFlow(0f),
-    creationTime = 123,
+    creationTime = 1,
 )
 
 internal fun Publisher.toScreenParticipant(): VeraScreenPublisher = VeraScreenPublisher(
@@ -49,7 +49,7 @@ internal fun Publisher.toScreenParticipant(): VeraScreenPublisher = VeraScreenPu
     view = view,
     isTalking = MutableStateFlow(false),
     audioLevel = MutableStateFlow(0f),
-    creationTime = 131,
+    creationTime = 1,
 )
 
 internal fun Stream.toParticipantType(): VideoSource =

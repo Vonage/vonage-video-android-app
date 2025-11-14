@@ -92,7 +92,6 @@ android {
             isDebuggable = true
             isMinifyEnabled = false
             isShrinkResources = false
-            isProfileable = true
             signingConfig = signingConfigs.getByName("debug")
         }
         release {

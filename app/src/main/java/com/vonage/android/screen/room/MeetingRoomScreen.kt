@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
@@ -33,7 +31,6 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
-import com.vonage.android.audio.ui.AudioDevices
 import com.vonage.android.audio.ui.AudioDevicesEffect
 import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
@@ -41,24 +38,19 @@ import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.kotlin.model.Participant
-import com.vonage.android.screen.reporting.ReportIssueScreen
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
 import com.vonage.android.screen.room.components.BottomBar
 import com.vonage.android.screen.room.components.BottomBarState
+import com.vonage.android.screen.room.components.CallModals
 import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.MeetingRoomContent
-import com.vonage.android.screen.room.components.MoreActionsGrid
-import com.vonage.android.screen.room.components.ParticipantsList
 import com.vonage.android.screen.room.components.TopBar
 import com.vonage.android.screen.room.components.captions.CaptionsOverlay
 import com.vonage.android.screen.room.components.emoji.EmojiReactionOverlay
-import com.vonage.android.screen.room.components.emoji.EmojiSelector
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
@@ -207,89 +199,9 @@ fun MeetingRoomScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Suppress("LongParameterList")
-@Composable
-fun CallModals(
-    participants: ImmutableList<Participant>,
-    actions: MeetingRoomActions,
-    showParticipants: Boolean,
-    participantsSheetState: SheetState,
-    recordingState: RecordingState,
-    screenSharingState: ScreenSharingState,
-    captionsState: CaptionsState,
-    audioDeviceSelectorSheetState: SheetState,
-    moreActionsSheetState: SheetState,
-    showAudioDeviceSelector: Boolean,
-    showMoreActions: Boolean,
-    showReporting: Boolean,
-    reportSheetState: SheetState,
-    onShowReporting: () -> Unit,
-    onDismissReporting: () -> Unit,
-    onDismissAudioDeviceSelector: () -> Unit,
-    onDismissMoreActions: () -> Unit,
-    onDismissParticipants: () -> Unit,
-    onEmojiClick: (String) -> Unit,
-) {
-    val scope = rememberCoroutineScope()
-    if (showParticipants) {
-        ModalBottomSheet(
-            onDismissRequest = onDismissParticipants,
-            sheetState = participantsSheetState,
-        ) {
-            ParticipantsList(participants = participants)
-        }
-    }
-    if (showAudioDeviceSelector) {
-        ModalBottomSheet(
-            onDismissRequest = onDismissAudioDeviceSelector,
-            sheetState = audioDeviceSelectorSheetState,
-        ) {
-            AudioDevices(
-                onDismissRequest = onDismissAudioDeviceSelector,
-            )
-        }
-    }
-    if (showMoreActions) {
-        ModalBottomSheet(
-            onDismissRequest = onDismissMoreActions,
-            sheetState = moreActionsSheetState,
-        ) {
-            EmojiSelector(
-                onEmojiClick = { emoji -> onEmojiClick(emoji) },
-            )
-            MoreActionsGrid(
-                recordingState = recordingState,
-                screenSharingState = screenSharingState,
-                captionsState = captionsState,
-                onShowReporting = {
-                    onDismissMoreActions()
-                    onShowReporting()
-                },
-                actions = actions,
-            )
-        }
-    }
-    if (showReporting) {
-        ModalBottomSheet(
-            onDismissRequest = onDismissReporting,
-            sheetState = reportSheetState,
-        ) {
-            ReportIssueScreen(
-                onClose = {
-                    scope.launch {
-                        reportSheetState.hide()
-                        onDismissReporting()
-                    }
-                },
-            )
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun ThreePaneScaffoldPaneScope.ExtraPane(
+private fun ThreePaneScaffoldPaneScope.ExtraPane(
     call: CallFacade,
     actions: MeetingRoomActions,
     onCloseChat: () -> Unit,

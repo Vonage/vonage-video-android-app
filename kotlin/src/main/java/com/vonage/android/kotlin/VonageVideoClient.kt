@@ -74,7 +74,7 @@ class VonageVideoClient(
                 )
                 publisherConfig?.let { config ->
                     publishVideo = config.publishVideo
-                    publishAudio = false//config.publishAudio
+                    publishAudio = config.publishAudio
                     applyVideoBlur(config.blurLevel)
                 }
                 publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeCamera

@@ -42,7 +42,6 @@ fun buildCallWithParticipants(
     override fun endSession() { /* empty on purpose */ }
 
     // Publisher related methods
-//    override val localAudioLevel: StateFlow<Float> = MutableStateFlow(0F)
     override val publisher: StateFlow<PublisherState?> = MutableStateFlow(null)
 
     override fun toggleLocalVideo() { /* empty on purpose */ }

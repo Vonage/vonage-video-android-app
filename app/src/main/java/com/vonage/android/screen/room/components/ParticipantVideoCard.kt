@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -22,12 +23,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.audio.ui.AudioVolumeIndicator
 import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.components.ParticipantVideoRenderer
+import com.vonage.android.compose.preview.buildParticipants
+import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VideoSource
 
@@ -125,7 +129,6 @@ fun BoxScope.ParticipantLabel(
     name: String,
     modifier: Modifier = Modifier,
 ) {
-    // Cache immutable values to avoid recreation
     val labelShape = remember { RoundedCornerShape(8.dp) }
     val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
 
@@ -180,7 +183,6 @@ fun MicrophoneIcon(
     isMicEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    // Cache immutable values
     val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
     val iconSize = remember { Modifier.size(16.dp) }
 
@@ -208,38 +210,13 @@ fun MicrophoneIcon(
     }
 }
 
-//@PreviewLightDark
-//@Composable
-//internal fun ParticipantVideoCardPreview() {
-//    VonageVideoTheme {
-//        ParticipantVideoCard(
-//            modifier = Modifier.height(300.dp),
-//            name = "Sample Name",
-//            audioLevel = MutableStateFlow(0.4f),
-//            isCameraEnabled = MutableStateFlow(true),
-//            isMicEnabled = MutableStateFlow(true),
-//            isSpeaking = MutableStateFlow(false),
-//            isVolumeIndicatorVisible = true,
-//            videoSource = VideoSource.CAMERA,
-//            view = previewCamera(),
-//        )
-//    }
-//}
-//
-//@PreviewLightDark
-//@Composable
-//internal fun ParticipantVideoCardPlaceholderPreview() {
-//    VonageVideoTheme {
-//        ParticipantVideoCard(
-//            modifier = Modifier.height(300.dp),
-//            name = "Sample Name Name Name Name Name Name Name Name Name Name",
-//            audioLevel = MutableStateFlow(0.4f),
-//            isCameraEnabled = MutableStateFlow(false),
-//            isMicEnabled = MutableStateFlow(true),
-//            isSpeaking = MutableStateFlow(false),
-//            isVolumeIndicatorVisible = false,
-//            videoSource = VideoSource.SCREEN,
-//            view = previewCamera(),
-//        )
-//    }
-//}
+@PreviewLightDark
+@Composable
+internal fun ParticipantVideoCardPreview() {
+    VonageVideoTheme {
+        ParticipantVideoCard(
+            modifier = Modifier.height(300.dp),
+            participant = buildParticipants(1).first(),
+        )
+    }
+}

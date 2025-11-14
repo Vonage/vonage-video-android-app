@@ -34,24 +34,16 @@ data class VeraPublisher(
     override val isCameraEnabled: StateFlow<Boolean>,
     override val view: View,
     override val isTalking: StateFlow<Boolean>,
+    override val audioLevel: StateFlow<Float>,
+    override val creationTime: Long,
     val cameraIndex: Int,
     val cycleCamera: () -> Unit,
     val blurLevel: BlurLevel,
     val setCameraBlur: (BlurLevel) -> Unit,
     val toggleMic: () -> Boolean,
-    val toggleCamera: () -> Boolean, override val audioLevel: StateFlow<Float>,
-    override val creationTime: Long,
+    val toggleCamera: () -> Boolean,
 ) : Participant {
-    override val isPublisher: Boolean
-        get() = true
-
-    override fun changeVisibility(visible: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun clean(session: Session) {
-        TODO("Not yet implemented")
-    }
+    override val isPublisher: Boolean = true
 }
 
 data class VeraScreenPublisher(
@@ -61,17 +53,9 @@ data class VeraScreenPublisher(
     override val isMicEnabled: StateFlow<Boolean>,
     override val isCameraEnabled: StateFlow<Boolean>,
     override val view: View,
-    override val isTalking: StateFlow<Boolean>, override val audioLevel: StateFlow<Float>,
+    override val isTalking: StateFlow<Boolean>,
+    override val audioLevel: StateFlow<Float>,
     override val creationTime: Long,
 ) : Participant {
-    override val isPublisher: Boolean
-        get() = true
-
-    override fun changeVisibility(visible: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun clean(session: Session) {
-        TODO("Not yet implemented")
-    }
+    override val isPublisher: Boolean = true
 }
