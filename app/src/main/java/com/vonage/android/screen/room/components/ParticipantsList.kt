@@ -34,7 +34,7 @@ import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun ParticipantsList(
-    participants: List<Participant>,
+    participants: ImmutableList<Participant>,
     modifier: Modifier = Modifier,
 ) {
     Log.d("Recomposition", "ParticipantsList ${participants.size}")

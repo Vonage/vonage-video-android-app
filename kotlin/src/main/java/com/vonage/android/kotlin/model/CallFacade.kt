@@ -47,7 +47,7 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
 
     fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>)
 
-    val participantsStateFlow: StateFlow<List<Participant>>
+    val participantsStateFlow: StateFlow<ImmutableList<Participant>>
     val participantsCount: StateFlow<Int>
     val activeSpeaker: StateFlow<Participant?>
     val signalStateFlow: StateFlow<SignalState?>

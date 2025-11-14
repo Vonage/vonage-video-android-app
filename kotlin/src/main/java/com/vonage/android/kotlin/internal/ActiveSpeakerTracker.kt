@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.sample
 
 typealias SubscriberAudioLevels = MutableMap<String, Float>
 
@@ -40,7 +41,8 @@ class ActiveSpeakerTracker(
 
     init {
         _calculateTrigger
-            .debounce(throttleTimeMs)
+            //.debounce(throttleTimeMs)
+            .sample(throttleTimeMs)
             .onEach {
                 Log.d("ActiveSpeakerTracker", "calculate onEach")
                 internalCalculateActiveSpeaker()
@@ -94,6 +96,6 @@ class ActiveSpeakerTracker(
     }
 
     private companion object {
-        const val ACTIVE_SPEAKER_AUDIO_LEVEL_THRESHOLD = 0.2
+        const val ACTIVE_SPEAKER_AUDIO_LEVEL_THRESHOLD = 0.1
     }
 }

@@ -27,6 +27,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,7 +56,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 @Stable
 data class BottomBarState(
     val call: CallFacade,
-    val participant: Participant,
+    val participant: Participant?,
     val onToggleParticipants: () -> Unit,
     val onShowChat: () -> Unit,
     val onToggleMoreActions: () -> Unit,
@@ -70,8 +72,18 @@ fun BottomBar(
     modifier: Modifier = Modifier
 ) {
 
-    val isMicEnabled by state.participant.isMicEnabled.collectAsStateWithLifecycle()
-    val isCameraEnabled by state.participant.isCameraEnabled.collectAsStateWithLifecycle()
+    val isMicEnabled by remember {
+        state.participant?.let {
+            state.participant.isMicEnabled
+        } ?: MutableStateFlow(false)
+    }.collectAsStateWithLifecycle()
+    val isCameraEnabled by remember {
+        state.participant?.let {
+            state.participant.isCameraEnabled
+        } ?: MutableStateFlow(false)
+    }.collectAsStateWithLifecycle()
+    //val isMicEnabled by state.participant.isMicEnabled.collectAsStateWithLifecycle()
+//    val isCameraEnabled by state.participant.isCameraEnabled.collectAsStateWithLifecycle()
     val participantsCount by state.call.participantsCount.collectAsStateWithLifecycle()
     val chatState by state.call.chatSignalState().collectAsStateWithLifecycle()
 
@@ -134,6 +146,7 @@ fun BottomBar(
                         isActive = false,
                     )
                 }
+                else -> {}
             }
 
             ControlButton(

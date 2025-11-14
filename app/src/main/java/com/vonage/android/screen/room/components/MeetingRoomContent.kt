@@ -1,6 +1,7 @@
 package com.vonage.android.screen.room.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -12,6 +13,7 @@ import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("LongParameterList")
@@ -22,17 +24,19 @@ fun MeetingRoomContent(
     layoutType: CallLayoutType,
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    Column(
         modifier = modifier
             .fillMaxSize(),
     ) {
-//        SimpleGrid(
-//            modifier = Modifier
-//                .fillMaxSize(),
-//            participants = participants,
-//            call = call,
-//        )
         when (layoutType) {
+            CallLayoutType.SCOLL_GRID -> {
+                SimpleGrid(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    participants = participants.toImmutableList(),
+                    call = call,
+                )
+            }
             CallLayoutType.GRID -> {
                 AdaptiveGrid(
                     call = call,

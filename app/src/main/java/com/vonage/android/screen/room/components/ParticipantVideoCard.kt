@@ -54,6 +54,8 @@ fun ParticipantVideoCard(
 
         if (participant.name.isNotBlank()) {
             ParticipantLabel(participant.name)
+        } else {
+            ParticipantLabel(participant.id)
         }
 
         if (participant.videoSource == VideoSource.CAMERA) {
@@ -109,8 +111,7 @@ private fun BoxScope.ParticipantVideoContainer(
     if (isCameraEnabled) {
         VideoRenderer2(
             modifier = Modifier
-                .fillMaxSize()
-                .clipToBounds(),
+                .fillMaxSize(),
             participant = participant,
         )
     } else {

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.isActive
 
 @OptIn(FlowPreview::class)
@@ -23,7 +24,7 @@ internal fun Subscriber.observeAudioLevel(): Flow<Float> = callbackFlow {
     }
 }
     .conflate()
-    .debounce(DEBOUNCE_SUBSCRIBER_AUDIO_LEVEL_MILLIS)
+    .sample(DEBOUNCE_SUBSCRIBER_AUDIO_LEVEL_MILLIS)
 
 const val DEBOUNCE_SUBSCRIBER_AUDIO_LEVEL_MILLIS = 100L
 

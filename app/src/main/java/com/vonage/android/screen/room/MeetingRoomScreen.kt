@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -102,7 +103,6 @@ fun MeetingRoomScreen(
             Scaffold(
                 modifier = modifier,
                 bottomBar = {
-                    publisher?.let { p ->
                         BottomBar(
                             modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
                             actions = actions,
@@ -112,11 +112,10 @@ fun MeetingRoomScreen(
                                 onToggleMoreActions = { showMoreActions = showMoreActions.toggle() },
                                 onShowChat = { scope.launch { navigator.toggleChat() } },
                                 isChatShow = isChatShow,
-                                participant = p,
+                                participant = publisher,
                                 layoutType = uiState.layoutType,
                             ),
                         )
-                    }
                 }
             ) { paddingValues ->
                 SupportingPaneScaffold(
@@ -132,7 +131,8 @@ fun MeetingRoomScreen(
 //                            CaptionsOverlay(call = uiState.call)
                             Column(verticalArrangement = Arrangement.Top) {
                                 TopBar(
-                                    modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
+                                    modifier = Modifier
+                                        .testTag(MEETING_ROOM_TOP_BAR),
                                     roomName = uiState.roomName,
                                     recordingState = uiState.recordingState,
                                     actions = actions,
@@ -211,7 +211,7 @@ fun MeetingRoomScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CallModals(
-    participants: List<Participant>,
+    participants: ImmutableList<Participant>,
     actions: MeetingRoomActions,
     showParticipants: Boolean,
     participantsSheetState: SheetState,

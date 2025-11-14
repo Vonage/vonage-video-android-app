@@ -18,9 +18,9 @@ import javax.microedition.khronos.opengles.GL10;
 public class VeraVideoRenderer extends BaseVideoRenderer {
 
     private final GLSurfaceView view;
-    private final MyRenderer renderer;
+    private final VeraRenderer renderer;
 
-    static class MyRenderer implements GLSurfaceView.Renderer {
+    static class VeraRenderer implements GLSurfaceView.Renderer {
 
         int[] textureIds = new int[3];
         float[] scaleMatrix = new float[16];
@@ -59,21 +59,21 @@ public class VeraVideoRenderer extends BaseVideoRenderer {
         private int textureHeight;
         private int viewportWidth;
         private int viewportHeight;
-        
+
         // Cache scale matrix to avoid recalculation every frame
         private boolean scaleMatrixDirty = true;
         private int lastFrameWidth = 0;
         private int lastFrameHeight = 0;
-        
+
         // Shader uniform location cache - lookup once, reuse every frame
         private int mvpMatrixHandle = -1;
         private int positionHandle = -1;
         private int textureHandle = -1;
-        
+
         // VBO (Vertex Buffer Objects) - store geometry on GPU
         private final int[] vboIds = new int[3]; // 0: vertices, 1: texCoords, 2: indices
 
-        public MyRenderer() {
+        public VeraRenderer() {
             ByteBuffer bb = ByteBuffer.allocateDirect(xyzCoords.length * 4);
             bb.order(ByteOrder.nativeOrder());
             vertexBuffer = bb.asFloatBuffer();
@@ -110,25 +110,28 @@ public class VeraVideoRenderer extends BaseVideoRenderer {
                     """;
             int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
 
-            String fragmentShaderCode = "precision mediump float;\n"
-                    + "uniform sampler2D Ytex;\n"
-                    + "uniform sampler2D Utex,Vtex;\n"
-                    + "varying vec2 vTextureCoord;\n"
-                    + "void main(void) {\n"
-                    + "  float nx,ny,r,g,b,y,u,v;\n"
-                    + "  mediump vec4 txl,ux,vx;"
-                    + "  nx=vTextureCoord[0];\n"
-                    + "  ny=vTextureCoord[1];\n"
-                    + "  y=texture2D(Ytex,vec2(nx,ny)).r;\n"
-                    + "  u=texture2D(Utex,vec2(nx,ny)).r;\n"
-                    + "  v=texture2D(Vtex,vec2(nx,ny)).r;\n"
-
-//                + "  y=1.0-1.1643*(y-0.0625);\n" // this line produces the inverted effect
-                    + "  y=1.1643*(y-0.0625);\n"  // use this line instead if you want to have normal colors
-
-                    + "  u=u-0.5;\n" + "  v=v-0.5;\n" + "  r=y+1.5958*v;\n"
-                    + "  g=y-0.39173*u-0.81290*v;\n" + "  b=y+2.017*u;\n"
-                    + "  gl_FragColor=vec4(r,g,b,1.0);\n" + "}\n";
+            String fragmentShaderCode = """
+                    precision mediump float;
+                    uniform sampler2D Ytex;
+                    uniform sampler2D Utex,Vtex;
+                    varying vec2 vTextureCoord;
+                    void main(void) {
+                      float nx,ny,r,g,b,y,u,v;
+                      mediump vec4 txl,ux,vx;\
+                      nx=vTextureCoord[0];
+                      ny=vTextureCoord[1];
+                      y=texture2D(Ytex,vec2(nx,ny)).r;
+                      u=texture2D(Utex,vec2(nx,ny)).r;
+                      v=texture2D(Vtex,vec2(nx,ny)).r;
+                      y=1.1643*(y-0.0625);
+                      u=u-0.5;
+                      v=v-0.5;
+                      r=y+1.5958*v;
+                      g=y-0.39173*u-0.81290*v;
+                      b=y+2.017*u;
+                      gl_FragColor=vec4(r,g,b,1.0);
+                    }
+                    """;
             int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
 
             program = GLES20.glCreateProgram(); // create empty OpenGL ES
@@ -147,24 +150,15 @@ public class VeraVideoRenderer extends BaseVideoRenderer {
 
             // VBO 0: Vertex positions
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboIds[0]);
-            GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, 
-                    vertexBuffer.capacity() * 4, 
-                    vertexBuffer, 
-                    GLES20.GL_STATIC_DRAW);
+            GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, vertexBuffer.capacity() * 4, vertexBuffer, GLES20.GL_STATIC_DRAW);
 
             // VBO 1: Texture coordinates
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboIds[1]);
-            GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, 
-                    textureBuffer.capacity() * 4, 
-                    textureBuffer, 
-                    GLES20.GL_STATIC_DRAW);
+            GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, textureBuffer.capacity() * 4, textureBuffer, GLES20.GL_STATIC_DRAW);
 
             // VBO 2: Element indices
             GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, vboIds[2]);
-            GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, 
-                    drawListBuffer.capacity() * 2, 
-                    drawListBuffer, 
-                    GLES20.GL_STATIC_DRAW);
+            GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, drawListBuffer.capacity() * 2, drawListBuffer, GLES20.GL_STATIC_DRAW);
 
             // Unbind to avoid accidental modifications
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
@@ -194,10 +188,7 @@ public class VeraVideoRenderer extends BaseVideoRenderer {
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 
-            GLES20.glTexImage2D(
-                    GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE,
-                    width, height, 0, GLES20.GL_LUMINANCE,
-                    GLES20.GL_UNSIGNED_BYTE, null);
+            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, width, height, 0, GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, null);
         }
 
         void setupTextures(Frame frame) {
@@ -222,18 +213,14 @@ public class VeraVideoRenderer extends BaseVideoRenderer {
         void GlTexSubImage2D(int width, int height, int stride, ByteBuffer buf) {
             if (stride == width) {
                 // Fast path: upload entire plane in a single GL call
-                GLES20.glTexSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, width,
-                        height, GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE,
-                        buf);
+                GLES20.glTexSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, width, height, GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, buf);
             } else {
                 // Optimized: use glPixelStorei with GL_UNPACK_ROW_LENGTH when available
                 // Fall back to row-by-row only if necessary
                 GLES20.glPixelStorei(GLES20.GL_UNPACK_ALIGNMENT, 1);
                 for (int row = 0; row < height; ++row) {
                     buf.position(row * stride);
-                    GLES20.glTexSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, row, width,
-                            1, GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE,
-                            buf);
+                    GLES20.glTexSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, row, width, 1, GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, buf);
                 }
             }
         }
@@ -285,7 +272,7 @@ public class VeraVideoRenderer extends BaseVideoRenderer {
             // Minimize lock time: just swap frames, don't hold during GL operations
             Frame frameToRender = null;
             boolean videoEnabled = false;
-            
+
             frameLock.lock();
             try {
                 if (pendingFrame != null) {
@@ -307,7 +294,7 @@ public class VeraVideoRenderer extends BaseVideoRenderer {
 
                 int frameWidth = frameToRender.getWidth();
                 int frameHeight = frameToRender.getHeight();
-                
+
                 if (textureWidth != frameWidth || textureHeight != frameHeight) {
                     setupTextures(frameToRender);
                     scaleMatrixDirty = true;
@@ -336,9 +323,7 @@ public class VeraVideoRenderer extends BaseVideoRenderer {
                         }
                     }
 
-                    Matrix.scaleM(scaleMatrix, 0,
-                            scaleX * (frameToRender.isMirroredX() ? -1.0f : 1.0f),
-                            scaleY, 1);
+                    Matrix.scaleM(scaleMatrix, 0, scaleX * (frameToRender.isMirroredX() ? -1.0f : 1.0f), scaleY, 1);
 
                     lastFrameWidth = frameWidth;
                     lastFrameHeight = frameHeight;
@@ -351,20 +336,17 @@ public class VeraVideoRenderer extends BaseVideoRenderer {
                 // Bind VBOs and draw using data stored on GPU
                 // Position attribute from VBO
                 GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboIds[0]);
-                GLES20.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX,
-                        GLES20.GL_FLOAT, false, COORDS_PER_VERTEX * 4, 0);
+                GLES20.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false, COORDS_PER_VERTEX * 4, 0);
                 GLES20.glEnableVertexAttribArray(positionHandle);
 
                 // Texture coordinate attribute from VBO
                 GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboIds[1]);
-                GLES20.glVertexAttribPointer(textureHandle, TEXTURE_COORDS_PER_VERTEX,
-                        GLES20.GL_FLOAT, false, TEXTURE_COORDS_PER_VERTEX * 4, 0);
+                GLES20.glVertexAttribPointer(textureHandle, TEXTURE_COORDS_PER_VERTEX, GLES20.GL_FLOAT, false, TEXTURE_COORDS_PER_VERTEX * 4, 0);
                 GLES20.glEnableVertexAttribArray(textureHandle);
 
                 // Element indices from VBO
                 GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, vboIds[2]);
-                GLES20.glDrawElements(GLES20.GL_TRIANGLES, vertexIndex.length, 
-                        GLES20.GL_UNSIGNED_SHORT, 0);
+                GLES20.glDrawElements(GLES20.GL_TRIANGLES, vertexIndex.length, GLES20.GL_UNSIGNED_SHORT, 0);
 
                 // Unbind VBOs (good practice)
                 GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
@@ -453,16 +435,16 @@ public class VeraVideoRenderer extends BaseVideoRenderer {
     public VeraVideoRenderer(Context context) {
         view = new GLSurfaceView(context);
         view.setEGLContextClientVersion(2);
-        
+
         // Optimize: Preserve EGL context on pause to avoid recreation overhead
         view.setPreserveEGLContextOnPause(true);
 
-        renderer = new MyRenderer();
+        renderer = new VeraRenderer();
         view.setRenderer(renderer);
 
         // RENDERMODE_WHEN_DIRTY is correct: only render on requestRender() call
         view.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-        
+
         // Allows video to overlay other media surfaces
         view.setZOrderMediaOverlay(true);
     }

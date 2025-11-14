@@ -13,54 +13,41 @@ import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.internal.toParticipantType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 
 @Stable
 data class ParticipantState(
-    private val subscriber: Subscriber,
+    val subscriber: Subscriber,
 ) : Participant,
     SubscriberKit.StreamListener,
     SubscriberKit.VideoListener {
 
-    private val logTag = "Subscriber[$id]"
+    override val id: String = subscriber.stream.streamId
 
-    override val id: String
-        get() = subscriber.stream.streamId
+    override val isPublisher: Boolean = false
 
-    override val isPublisher: Boolean
-        get() = false
+    override val creationTime: Long = subscriber.stream.creationTime.time
 
-    override val creationTime: Long
-        get() = subscriber.stream.creationTime.time
+    override val videoSource: VideoSource = subscriber.stream.toParticipantType()
 
-    override val videoSource: VideoSource
-        get() = subscriber.stream.toParticipantType()
-
-    override val name: String
-        get() = subscriber.name()
+    override val name: String = subscriber.name()
 
     private val _isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(subscriber.stream.hasAudio())
-    override val isMicEnabled: StateFlow<Boolean>
-        get() = _isMicEnabled
+    override val isMicEnabled: StateFlow<Boolean> = _isMicEnabled
 
     private val _isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(subscriber.stream.hasVideo())
-    override val isCameraEnabled: StateFlow<Boolean>
-        get() = _isCameraEnabled
-
-    private val _visible: MutableStateFlow<Boolean>
-        get() = MutableStateFlow(false)
-    val visible: StateFlow<Boolean>
-        get() = _visible
+    override val isCameraEnabled: StateFlow<Boolean> = _isCameraEnabled
 
     private val _audioLevel: MutableStateFlow<Float> = MutableStateFlow(0F)
-    override val audioLevel: StateFlow<Float>
-        get() = _audioLevel
+    override val audioLevel: StateFlow<Float> = _audioLevel
 
     private val _isTalking: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val isTalking: StateFlow<Boolean>
-        get() = _isTalking
+    override val isTalking: StateFlow<Boolean> = _isTalking
 
     override val view: View = subscriber.view
+
+    private val logTag = "Subscriber[$id]"
 
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
@@ -75,6 +62,7 @@ data class ParticipantState(
 
         subscriber.observeAudioLevel()
             .movingAverage(windowSize = 5)
+            .distinctUntilChanged()
             .onEach { audioLevel ->
                 _audioLevel.emit(audioLevel)
             }
