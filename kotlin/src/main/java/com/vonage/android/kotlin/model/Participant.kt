@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 @Stable
 interface Participant {
     val id: String
+    val isPublisher: Boolean
+    val creationTime: Long
     val videoSource: VideoSource
     val name: String
     val isMicEnabled: StateFlow<Boolean>
@@ -38,7 +40,11 @@ data class VeraPublisher(
     val setCameraBlur: (BlurLevel) -> Unit,
     val toggleMic: () -> Boolean,
     val toggleCamera: () -> Boolean, override val audioLevel: StateFlow<Float>,
+    override val creationTime: Long,
 ) : Participant {
+    override val isPublisher: Boolean
+        get() = true
+
     override fun changeVisibility(visible: Boolean) {
         TODO("Not yet implemented")
     }
@@ -56,7 +62,11 @@ data class VeraScreenPublisher(
     override val isCameraEnabled: StateFlow<Boolean>,
     override val view: View,
     override val isTalking: StateFlow<Boolean>, override val audioLevel: StateFlow<Float>,
+    override val creationTime: Long,
 ) : Participant {
+    override val isPublisher: Boolean
+        get() = true
+
     override fun changeVisibility(visible: Boolean) {
         TODO("Not yet implemented")
     }

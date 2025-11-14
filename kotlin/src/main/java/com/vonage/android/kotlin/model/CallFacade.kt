@@ -13,6 +13,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -46,7 +47,7 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
 
     fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>)
 
-    val participantsStateFlow: StateFlow<ImmutableList<Participant>>
+    val participantsStateFlow: StateFlow<List<Participant>>
     val participantsCount: StateFlow<Int>
     val activeSpeaker: StateFlow<Participant?>
     val signalStateFlow: StateFlow<SignalState?>

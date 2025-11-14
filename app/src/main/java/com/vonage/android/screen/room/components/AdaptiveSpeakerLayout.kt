@@ -45,7 +45,7 @@ import kotlinx.coroutines.flow.StateFlow
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun AdaptiveSpeakerLayout(
-    participants: ImmutableList<Participant>,
+    participants: List<Participant>,
     call: CallFacade,
     modifier: Modifier = Modifier,
     minItemWidth: Dp = 95.dp,
@@ -115,9 +115,9 @@ fun AdaptiveSpeakerLayout(
 @Composable
 private fun BoxWithConstraintsScope.PortraitSpeakerLayout(
     listState: LazyListState,
-    visibleItems: ImmutableList<Participant>,
+    visibleItems: List<Participant>,
     audioLevel: Float,
-    participants: ImmutableList<Participant>,
+    participants: List<Participant>,
     takeCount: Int
 ) {
     LazyRow(
@@ -136,14 +136,6 @@ private fun BoxWithConstraintsScope.PortraitSpeakerLayout(
                     .aspectRatio(ASPECT_RATIO_16_9)
                     .padding(8.dp),
                 participant = participant,
-//                name = participant.name,
-//                isCameraEnabled = participant.isCameraEnabled,
-//                isMicEnabled = participant.isMicEnabled,
-//                view = participant.view,
-//                audioLevel = audioLevel,
-//                isSpeaking = participant.isTalking,
-                isVolumeIndicatorVisible = participant is VeraPublisher,
-//                videoSource = participant.videoSource,
             )
         }
         if (participants.size > takeCount) {
@@ -188,14 +180,6 @@ private fun BoxWithConstraintsScope.LandscapeSpeakerLayout(
                     .aspectRatio(ASPECT_RATIO_16_9)
                     .padding(8.dp),
                 participant = participant,
-//                name = participant.name,
-//                isCameraEnabled = participant.isCameraEnabled,
-//                isMicEnabled = participant.isMicEnabled,
-//                view = participant.view,
-//                audioLevel = audioLevel,
-//                isSpeaking = participant.isTalking,
-                isVolumeIndicatorVisible = participant is VeraPublisher,
-//                videoSource = participant.videoSource,
             )
         }
         if (participants.size > takeCount) {
@@ -230,14 +214,6 @@ fun BoxScope.SpotlightSpeaker(
                 .padding(8.dp)
                 .align(Alignment.Center),
             participant = participant,
-//            name = participant.name,
-//            isCameraEnabled = participant.isCameraEnabled,
-//            isMicEnabled = participant.isMicEnabled,
-//            view = participant.view,
-//            audioLevel = audioLevel,
-//            isSpeaking = participant.isTalking,
-            isVolumeIndicatorVisible = activeParticipant is PublisherState,
-//            videoSource = participant.videoSource,
         )
     }
 }

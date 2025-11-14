@@ -18,7 +18,7 @@ class MainApplication : Application() {
 
         notificationChannelRegistry.createNotificationChannels()
         if (BuildConfig.DEBUG) { // could be moved to debug source set
-            enableStrictMode()
+//            enableStrictMode()
         }
     }
 

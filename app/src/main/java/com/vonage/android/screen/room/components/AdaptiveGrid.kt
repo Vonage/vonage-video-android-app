@@ -3,6 +3,7 @@ package com.vonage.android.screen.room.components
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,12 +12,15 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.skydoves.compose.stability.runtime.TraceRecomposition
+import com.vonage.android.compose.modifier.recomposeHighlighter
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
@@ -29,9 +33,10 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
+//@TraceRecomposition
 @Composable
 fun AdaptiveGrid(
-    participants: ImmutableList<Participant>,
+    participants: List<Participant>,
     call: CallFacade,
     modifier: Modifier = Modifier,
     itemHeight: Dp = 220.dp,
@@ -70,17 +75,10 @@ fun AdaptiveGrid(
             ) { participant ->
                 ParticipantVideoCard(
                     modifier = Modifier
+                        .recomposeHighlighter()
                         .fillMaxWidth()
                         .height(itemHeight),
                     participant = participant,
-//                    name = participant.name,
-//                    isCameraEnabled = participant.isCameraEnabled,
-//                    isMicEnabled = participant.isMicEnabled,
-//                    view = participant.view,
-//                    audioLevel = participant.audioLevel,
-//                    isSpeaking = participant.isTalking,
-                    isVolumeIndicatorVisible = participant is PublisherState,
-//                    videoSource = participant.videoSource,
                 )
             }
 

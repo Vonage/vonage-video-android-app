@@ -41,8 +41,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -69,15 +71,25 @@ class Call internal constructor(
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : CallFacade {
 
-    private val coroutineScope = CoroutineScope(coroutineDispatcher)
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val actualActiveSpeakerTracker = activeSpeakerTracker ?: ActiveSpeakerTracker(coroutineScope = coroutineScope)
+    private val participants = ConcurrentHashMap<String, Participant>()
 
-    private val _participantsStateFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
-    override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsStateFlow
-        .mapState { it }
-    //.mapState { it.values.toList() }
+    // Internal flow for raw participant updates (not debounced)
+    private val _participantsRawFlow = MutableStateFlow<List<Participant>>(emptyList())
+    
+    // Public flow with debouncing to batch multiple subscriber additions (150ms window)
+    override val participantsStateFlow: StateFlow<List<Participant>> = _participantsRawFlow
+        .debounce(PARTICIPANTS_UPDATE_DEBOUNCE)
+        .distinctUntilChanged()
+        .map { participants -> participants.sortedBy { it.creationTime } }
+        .stateIn(
+            scope = coroutineScope,
+            started = SharingStarted.Eagerly,
+            initialValue = emptyList()
+        )
 
-    private val _participantsCount = MutableStateFlow(_participantsStateFlow.value.size)
+    private val _participantsCount = MutableStateFlow(0)
     override val participantsCount: StateFlow<Int> = _participantsCount
 
     private val _signalStateFlow = MutableStateFlow<SignalState?>(null)
@@ -106,10 +118,8 @@ class Call internal constructor(
             .map { it as? EmojiState }
             .stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)
 
-    private val participants = ConcurrentHashMap<String, Participant>()
-    override val publisher: StateFlow<PublisherState?> = _participantsStateFlow
+    override val publisher: StateFlow<PublisherState?> = participantsStateFlow
         .mapState { participants -> participants.firstOrNull { it.id == PUBLISHER_ID }?.let { it as PublisherState } }
-    //.mapState { map -> map[PUBLISHER_ID]?.let { it as PublisherState } }
 
     private lateinit var context: Context
 
@@ -248,10 +258,9 @@ class Call internal constructor(
         publisherHolder.let { holder ->
             val publisher = PublisherState(holder.publisher)
             participants[PUBLISHER_ID] = publisher
-            _participantsStateFlow.update { participants.values.toImmutableList() }
-            _participantsCount.update { participants.size }
             coroutineScope.launch {
-                publisher.setup()
+                async { publisher.setup() }.await()
+                updateParticipants(publisher)
             }
             session.publish(holder.publisher)
         }
@@ -299,10 +308,8 @@ class Call internal constructor(
 
         participantsVisibilityMonitor = coroutineScope.launch(Dispatchers.Default) {
             snapshotFlow
-//                .debounce(PARTICIPANTS_VISIBILITY_DEBOUNCE)
                 .distinctUntilChanged()
                 .collectLatest { visibleParticipants ->
-                    Log.d("CCC", "visible : ${visibleParticipants.joinToString()}")
                     if (visibleParticipants.isEmpty()) return@collectLatest
                     participants.forEach { (key, participantState) ->
                         val isVisible = visibleParticipants.contains(key) || (key == activeSpeaker.value?.id)
@@ -313,32 +320,34 @@ class Call internal constructor(
     }
 
     private fun addSubscriber(stream: Stream) {
-        Log.d("SSS", ">>>> adding subscriber ${stream.streamId}")
-        val subscriber = Subscriber.Builder(context, stream)
-            .renderer(VeraVideoRenderer(context))
-            .build()
-        val participant = ParticipantState(subscriber = subscriber)
+        synchronized(stream) {
+            Log.d("SSS", ">>>> adding subscriber ${stream.streamId}")
+            val subscriber = Subscriber.Builder(context, stream)
+//                .renderer(VeraVideoRenderer(context))
+                .build()
+            val participant = ParticipantState(subscriber = subscriber)
 
-        subscriber.setCaptionsListener(captionsDelegate)
+            subscriber.setCaptionsListener(captionsDelegate)
 
-        coroutineScope.launch {
-            async { participant.setup() }.await()
-            participant.audioLevel
-                .collect { audioLevel ->
-                    actualActiveSpeakerTracker.onSubscriberAudioLevelUpdated(participant.id, audioLevel)
-                }
+            session.subscribe(subscriber)
+
+            coroutineScope.launch {
+                participants[stream.streamId] = participant
+                updateParticipants(participant)
+                async { participant.setup() }.await()
+                participant.audioLevel
+                    .collect { audioLevel ->
+                        actualActiveSpeakerTracker.onSubscriberAudioLevelUpdated(participant.id, audioLevel)
+                    }
+            }
+
+            Log.d("SSS", "<<<< subscriber added ${stream.streamId}")
         }
-
-        participants[stream.streamId] = participant
-        _participantsStateFlow.update { participants.values.toImmutableList() }
-        _participantsCount.update { participants.size }
-
-        session.subscribe(subscriber)
-        Log.d("SSS", "<<<< subscriber added ${stream.streamId}")
     }
 
-    private fun updateParticipants() {
-        _participantsStateFlow.update { participants.values.toImmutableList() }
+    private suspend fun updateParticipants(participant: Participant) {
+        // Update raw flow - debouncing will batch these updates
+        _participantsRawFlow.value = participants.values.toList()
         _participantsCount.update { participants.size }
     }
 
@@ -346,14 +355,12 @@ class Call internal constructor(
         val subscriber = participants[stream.streamId] ?: return
         coroutineScope.launch {
             actualActiveSpeakerTracker.onSubscriberDestroyed(stream.streamId)
+
+            participants.remove(stream.streamId)
+            updateParticipants(subscriber)
         }
 
-        participants.remove(stream.streamId)
         subscriber.clean(session)
-
-        //updateParticipants()
-        _participantsStateFlow.update { participants.values.toImmutableList() }
-        _participantsCount.update { participants.size }
     }
 
     private val captionsDelegate: SubscriberKit.CaptionsListener =
@@ -368,6 +375,6 @@ class Call internal constructor(
         private const val TAG: String = "Call"
         const val PUBLISHER_ID: String = "publisher"
         const val PUBLISHER_SCREEN_ID: String = "publisher-screen"
-        private const val PARTICIPANTS_VISIBILITY_DEBOUNCE = 100L
+        private const val PARTICIPANTS_UPDATE_DEBOUNCE = 100L // ms - batch subscriber additions
     }
 }

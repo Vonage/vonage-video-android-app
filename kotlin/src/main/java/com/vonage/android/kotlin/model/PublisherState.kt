@@ -32,6 +32,12 @@ data class PublisherState(
     override val id: String
         get() = PUBLISHER_ID
 
+    override val isPublisher: Boolean
+        get() = true
+
+    override val creationTime: Long
+        get() = publisher.stream.creationTime.time
+
     override val videoSource: VideoSource
         get() = publisher.stream.toParticipantType()
 

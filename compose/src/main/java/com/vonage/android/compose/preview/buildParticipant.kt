@@ -14,6 +14,10 @@ fun buildParticipants(count: Int): List<Participant> {
     for (i in 1..count) {
         val sampleParticipant = object : Participant {
             override val id: String = SecureRandom().nextInt().toString()
+            override val isPublisher: Boolean
+                get() = false
+            override val creationTime: Long
+                get() = 123L
             override val videoSource: VideoSource = VideoSource.CAMERA
             override var name: String = "Name Sample $i"
             override val isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)

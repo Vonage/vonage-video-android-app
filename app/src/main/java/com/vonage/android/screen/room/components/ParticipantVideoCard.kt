@@ -1,7 +1,5 @@
 package com.vonage.android.screen.room.components
 
-import android.util.Log
-import android.view.View
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -20,7 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -29,10 +27,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.skydoves.compose.stability.runtime.TraceRecomposition
 import com.vonage.android.audio.ui.AudioVolumeIndicator
 import com.vonage.android.compose.components.AvatarInitials
-import com.vonage.android.compose.components.VideoRenderer
-import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.components.VideoRenderer2
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VideoSource
 
@@ -40,49 +38,32 @@ import com.vonage.android.kotlin.model.VideoSource
 @Composable
 fun ParticipantVideoCard(
     participant: Participant,
-//    isCameraEnabled: StateFlow<Boolean>,
-    isVolumeIndicatorVisible: Boolean,
-//    isMicEnabled: StateFlow<Boolean>,
-//    isSpeaking: StateFlow<Boolean>,
-//    audioLevel: StateFlow<Float>,
-//    videoSource: VideoSource,
-//    name: String,
-//    view: View,
     modifier: Modifier = Modifier,
 ) {
-    Log.d("Recomposition", "ParticipantVideoCard")
-    val isCameraEnabled by participant.isCameraEnabled.collectAsStateWithLifecycle()
     val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
     val isSpeaking by participant.isTalking.collectAsStateWithLifecycle()
-    val audioLevel by participant.audioLevel.collectAsStateWithLifecycle()
 
     ParticipantContainer(
         modifier = modifier,
         isSpeaking = isSpeaking,
+        isMicEnabled = isMicEnabled,
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            ParticipantVideoContainer(
-                isCameraEnabled = isCameraEnabled,
-                name = participant.name,
-                view = participant.view,
+        ParticipantVideoContainer(
+            participant = participant
+        )
+
+        if (participant.name.isNotBlank()) {
+            ParticipantLabel(participant.name)
+        }
+
+        if (participant.videoSource == VideoSource.CAMERA) {
+            MicrophoneIndicator(
+                modifier = Modifier
+                    .align(Alignment.TopEnd),
+                audioLevel = 0f,
+                isMicEnabled = isMicEnabled,
+                isShowVolumeIndicator = participant.isPublisher,
             )
-
-            if (participant.name.isNotBlank()) {
-                ParticipantLabel(participant.name)
-            }
-
-            if (participant.videoSource == VideoSource.CAMERA) {
-                MicrophoneIndicator(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd),
-                    audioLevel = audioLevel,
-                    isMicEnabled = isMicEnabled,
-                    isShowVolumeIndicator = isVolumeIndicatorVisible,
-                )
-            }
         }
     }
 }
@@ -90,43 +71,54 @@ fun ParticipantVideoCard(
 @Composable
 private fun ParticipantContainer(
     isSpeaking: Boolean,
+    isMicEnabled: Boolean,
     modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit,
+    content: @Composable BoxScope.() -> Unit,
 ) {
-//    val isSpeaking by isSpeaking.collectAsStateWithLifecycle()
+    val shape = remember { RoundedCornerShape(8.dp) }
+    val borderWidth = remember { 1.dp }
+
+    val border = remember(isSpeaking, isMicEnabled) {
+        if (isSpeaking && isMicEnabled) {
+            BorderStroke(borderWidth, Color.Cyan)
+        } else {
+            null
+        }
+    }
 
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
-        border = if (isSpeaking) BorderStroke(1.dp, VonageVideoTheme.colors.primary) else null,
+        shape = shape,
+        border = border,
     ) {
-        content()
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            content()
+        }
     }
 }
 
 @Composable
 private fun BoxScope.ParticipantVideoContainer(
-    name: String,
-    isCameraEnabled: Boolean,
-    view: View,
+    participant: Participant
 ) {
-    //val isCameraEnabled by isCameraEnabled.collectAsStateWithLifecycle()
+    val isCameraEnabled by participant.isCameraEnabled.collectAsStateWithLifecycle()
 
-    key(view.hashCode(), isCameraEnabled) {
-        if (isCameraEnabled) {
-            VideoRenderer(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clipToBounds(),
-                view = view,
-            )
-        } else {
-            AvatarInitials(
-                modifier = Modifier
-                    .align(Alignment.Center),
-                userName = name,
-            )
-        }
+    if (isCameraEnabled) {
+        VideoRenderer2(
+            modifier = Modifier
+                .fillMaxSize()
+                .clipToBounds(),
+            participant = participant,
+        )
+    } else {
+        AvatarInitials(
+            modifier = Modifier
+                .align(Alignment.Center),
+            userName = participant.name,
+        )
     }
 }
 
@@ -135,14 +127,15 @@ fun BoxScope.ParticipantLabel(
     name: String,
     modifier: Modifier = Modifier,
 ) {
+    // Cache immutable values to avoid recreation
+    val labelShape = remember { RoundedCornerShape(8.dp) }
+    val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
+
     Box(
         modifier = modifier
             .align(Alignment.BottomStart)
             .padding(4.dp)
-            .background(
-                Color.Black.copy(alpha = 0.6f),
-                RoundedCornerShape(8.dp)
-            )
+            .background(backgroundColor, labelShape)
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(
@@ -162,9 +155,6 @@ fun MicrophoneIndicator(
     isShowVolumeIndicator: Boolean,
     modifier: Modifier = Modifier,
 ) {
-//    val audioLevel by audioLevel.collectAsStateWithLifecycle()
-//    val isMicEnabled by isMicEnabled.collectAsStateWithLifecycle()
-
     Box(
         modifier = modifier,
     ) {
@@ -191,13 +181,14 @@ fun MicrophoneIcon(
     isMicEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    // Cache immutable values
+    val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
+    val iconSize = remember { Modifier.size(16.dp) }
+
     Box(
         modifier = modifier
             .padding(12.dp)
-            .background(
-                Color.Black.copy(alpha = 0.6f),
-                CircleShape
-            )
+            .background(backgroundColor, CircleShape)
             .padding(6.dp)
     ) {
         if (isMicEnabled) {
@@ -205,14 +196,14 @@ fun MicrophoneIcon(
                 imageVector = Icons.Default.Mic,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(16.dp)
+                modifier = iconSize
             )
         } else {
             Icon(
                 imageVector = Icons.Default.MicOff,
                 contentDescription = null,
                 tint = Color.Red,
-                modifier = Modifier.size(16.dp)
+                modifier = iconSize
             )
         }
     }

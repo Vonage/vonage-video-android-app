@@ -27,6 +27,12 @@ data class ParticipantState(
     override val id: String
         get() = subscriber.stream.streamId
 
+    override val isPublisher: Boolean
+        get() = false
+
+    override val creationTime: Long
+        get() = subscriber.stream.creationTime.time
+
     override val videoSource: VideoSource
         get() = subscriber.stream.toParticipantType()
 

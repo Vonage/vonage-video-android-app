@@ -1,6 +1,5 @@
 package com.vonage.android.screen.room
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,6 +37,7 @@ import com.vonage.android.audio.ui.AudioDevices
 import com.vonage.android.audio.ui.AudioDevicesEffect
 import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
+import com.vonage.android.compose.modifier.recomposeHighlighter
 import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
@@ -46,12 +46,14 @@ import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.reporting.ReportIssueScreen
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
+import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
 import com.vonage.android.screen.room.components.BottomBar
 import com.vonage.android.screen.room.components.BottomBarState
 import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.MoreActionsGrid
 import com.vonage.android.screen.room.components.ParticipantsList
+import com.vonage.android.screen.room.components.TopBar
 import com.vonage.android.screen.room.components.emoji.EmojiSelector
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
@@ -100,21 +102,20 @@ fun MeetingRoomScreen(
             Scaffold(
                 modifier = modifier,
                 bottomBar = {
-                    Log.d("XXX", "BottomBar recompose")
                     publisher?.let { p ->
-//                        BottomBar(
-//                            modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
-//                            actions = actions,
-//                            state = BottomBarState(
-//                                call = uiState.call,
-//                                onToggleParticipants = { showParticipants = showParticipants.toggle() },
-//                                onToggleMoreActions = { showMoreActions = showMoreActions.toggle() },
-//                                onShowChat = { scope.launch { navigator.toggleChat() } },
-//                                isChatShow = isChatShow,
-//                                participant = p,
-//                                layoutType = uiState.layoutType,
-//                            ),
-//                        )
+                        BottomBar(
+                            modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
+                            actions = actions,
+                            state = BottomBarState(
+                                call = uiState.call,
+                                onToggleParticipants = { showParticipants = showParticipants.toggle() },
+                                onToggleMoreActions = { showMoreActions = showMoreActions.toggle() },
+                                onShowChat = { scope.launch { navigator.toggleChat() } },
+                                isChatShow = isChatShow,
+                                participant = p,
+                                layoutType = uiState.layoutType,
+                            ),
+                        )
                     }
                 }
             ) { paddingValues ->
@@ -130,42 +131,44 @@ fun MeetingRoomScreen(
 //                            EmojiReactionOverlay(call = uiState.call)
 //                            CaptionsOverlay(call = uiState.call)
                             Column(verticalArrangement = Arrangement.Top) {
-//                                TopBar(
-//                                    modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
-//                                    roomName = uiState.roomName,
-//                                    recordingState = uiState.recordingState,
-//                                    actions = actions,
-//                                    onToggleAudioDeviceSelector = {
-//                                        showAudioDeviceSelector = showAudioDeviceSelector.toggle()
-//                                    },
-//                                )
+                                TopBar(
+                                    modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
+                                    roomName = uiState.roomName,
+                                    recordingState = uiState.recordingState,
+                                    actions = actions,
+                                    onToggleAudioDeviceSelector = {
+                                        showAudioDeviceSelector = showAudioDeviceSelector.toggle()
+                                    },
+                                )
                                 MeetingRoomContent(
-                                    modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
+                                    modifier = Modifier
+                                        .recomposeHighlighter()
+                                        .testTag(MEETING_ROOM_CONTENT),
                                     call = uiState.call,
                                     participants = participants,
                                     layoutType = uiState.layoutType,
                                 )
-//                                CallModals(
-//                                    participants = participants,
-//                                    actions = actions,
-//                                    showParticipants = showParticipants,
-//                                    showMoreActions = showMoreActions,
-//                                    showReporting = showReporting,
-//                                    showAudioDeviceSelector = showAudioDeviceSelector,
-//                                    participantsSheetState = participantsSheetState,
-//                                    audioDeviceSelectorSheetState = audioDeviceSelectorSheetState,
-//                                    moreActionsSheetState = moreActionsSheetState,
-//                                    reportSheetState = reportSheetState,
-//                                    onDismissParticipants = { showParticipants = false },
-//                                    onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
-//                                    onDismissMoreActions = { showMoreActions = false },
-//                                    onShowReporting = { showReporting = showReporting.toggle() },
-//                                    onDismissReporting = { showReporting = false },
-//                                    recordingState = uiState.recordingState,
-//                                    screenSharingState = uiState.screenSharingState,
-//                                    captionsState = uiState.captionsState,
-//                                    onEmojiClick = actions.onEmojiSent,
-//                                )
+                                CallModals(
+                                    participants = participants,
+                                    actions = actions,
+                                    showParticipants = showParticipants,
+                                    showMoreActions = showMoreActions,
+                                    showReporting = showReporting,
+                                    showAudioDeviceSelector = showAudioDeviceSelector,
+                                    participantsSheetState = participantsSheetState,
+                                    audioDeviceSelectorSheetState = audioDeviceSelectorSheetState,
+                                    moreActionsSheetState = moreActionsSheetState,
+                                    reportSheetState = reportSheetState,
+                                    onDismissParticipants = { showParticipants = false },
+                                    onDismissAudioDeviceSelector = { showAudioDeviceSelector = false },
+                                    onDismissMoreActions = { showMoreActions = false },
+                                    onShowReporting = { showReporting = showReporting.toggle() },
+                                    onDismissReporting = { showReporting = false },
+                                    recordingState = uiState.recordingState,
+                                    screenSharingState = uiState.screenSharingState,
+                                    captionsState = uiState.captionsState,
+                                    onEmojiClick = actions.onEmojiSent,
+                                )
                             }
                         }
                     },
@@ -208,7 +211,7 @@ fun MeetingRoomScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CallModals(
-    participants: ImmutableList<Participant>,
+    participants: List<Participant>,
     actions: MeetingRoomActions,
     showParticipants: Boolean,
     participantsSheetState: SheetState,

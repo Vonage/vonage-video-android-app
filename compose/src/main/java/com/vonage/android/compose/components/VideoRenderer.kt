@@ -20,7 +20,7 @@ import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
 
-@TraceRecomposition
+//@TraceRecomposition
 @Composable
 fun VideoRenderer2(
     participant: Participant,

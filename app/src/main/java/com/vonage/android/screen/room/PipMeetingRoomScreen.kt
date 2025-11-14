@@ -45,7 +45,6 @@ fun PipMeetingRoomScreen(
                 participant?.let { participant ->
                     ParticipantVideoCard(
                         participant = participant,
-                        isVolumeIndicatorVisible = participant is PublisherState,
                     )
                 }
                 ChatBadgeButton(

@@ -83,12 +83,10 @@ private fun GridItemCard(
     participant: Participant,
     modifier: Modifier = Modifier,
 ) {
-    // Collect states in isolated scope - only this card recomposes on state change
     val isCameraEnabled by participant.isCameraEnabled.collectAsStateWithLifecycle()
     val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
     val isSpeaking by participant.isTalking.collectAsStateWithLifecycle()
     
-    // Cache shape to avoid recreation
     val shape = remember { RoundedCornerShape(8.dp) }
     
     Card(
