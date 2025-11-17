@@ -8,7 +8,6 @@ import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit
 import com.opentok.android.Session
 import com.opentok.android.Stream
-import com.vonage.android.kotlin.Call.Companion.PUBLISHER_ID
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.ext.toggle
@@ -22,13 +21,14 @@ import kotlinx.coroutines.flow.update
 @OptIn(FlowPreview::class)
 @Stable
 data class PublisherState(
+    val publisherId: String,
     val publisher: Publisher,
 ) : Participant,
     PublisherKit.VideoListener,
     PublisherKit.PublisherListener,
     PublisherKit.MuteListener {
 
-    override val id: String = PUBLISHER_ID
+    override val id: String = publisherId
 
     private val logTag = "Publisher[$id]"
 

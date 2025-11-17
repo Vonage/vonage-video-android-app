@@ -39,7 +39,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -260,13 +259,16 @@ class Call internal constructor(
             publisherHolder.let { holder ->
                 val publisher = withContext(Dispatchers.Main) {
                     session.publish(holder.publisher)
-                    PublisherState(holder.publisher)
+                    PublisherState(
+                        publisherId = PUBLISHER_ID,
+                        publisher = holder.publisher,
+                    )
                 }
                 participants[PUBLISHER_ID] = publisher
                 coroutineScope.launch {
-                    async { publisher.setup() }.await()
-                    updateParticipants()
+                    publisher.setup()
                 }
+                updateParticipants()
             }
         }
     }
@@ -274,30 +276,37 @@ class Call internal constructor(
 
     //region Screen sharing
     override fun startCapturingScreen(mediaProjection: MediaProjection) {
-        val name = "${publisherHolder.publisher.name}'s Screen" // translate this!
-        val screenPublisher = Publisher.Builder(context)
-            .name(name)
-            .capturer(ScreenSharingCapturer(context, mediaProjection))
-            .build()
-            .apply {
-                renderer?.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FIT)
-                publishVideo = true
-                publishAudio = false
-                publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeScreen
+        coroutineScope.launch(Dispatchers.Default) {
+            val name = "${publisherHolder.publisher.name}'s Screen" // translate this!
+            val publisher = withContext(Dispatchers.Main) {
+                val screenPublisher = Publisher.Builder(context)
+                    .name(name)
+                    .capturer(ScreenSharingCapturer(context, mediaProjection))
+                    .build()
+                    .apply {
+                        renderer?.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FIT)
+                        publishVideo = true
+                        publishAudio = false
+                        publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeScreen
+                    }
+                session.publish(screenPublisher)
+                publisherHolder.screenPublisher = screenPublisher
+                PublisherState(
+                    publisherId = PUBLISHER_SCREEN_ID,
+                    publisher = screenPublisher,
+                )
             }
-        publisherHolder.screenPublisher = screenPublisher
-        //participants[PUBLISHER_SCREEN_ID] = screenPublisher.toScreenParticipant()
-        //updateParticipantsState()
-
-        session.publish(screenPublisher)
+            participants[PUBLISHER_SCREEN_ID] = publisher
+            updateParticipants()
+        }
     }
 
     override fun stopCapturingScreen() {
         publisherHolder.screenPublisher?.let {
             session.unpublish(it)
         }
-        //participantStreams.remove(PUBLISHER_SCREEN_ID)
-        //updateParticipantsState()
+        participants.remove(PUBLISHER_SCREEN_ID)
+        updateParticipants()
     }
     //endregion
 
