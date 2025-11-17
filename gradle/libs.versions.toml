@@ -113,6 +113,6 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version = "2.2.21-2.0.4" }
-kover = { id = "org.jetbrains.kotlinx.kover", version = "0.9.2" }
+kover = { id = "org.jetbrains.kotlinx.kover", version = "0.9.3" }
 play-publisher = { id = "com.github.triplet.play", version = "3.12.1" }
 sonarqube = { id = "org.sonarqube", version = "6.3.1.5724" }
