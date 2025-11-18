@@ -311,8 +311,11 @@ class Call internal constructor(
     //endregion
 
     override fun enableCaptions(enable: Boolean) {
-        publisherHolder.publisher.publishCaptions = enable
-        //subscriberStreams.values.forEach { it.subscribeToCaptions = enable }
+        coroutineScope.launch {
+            publisherHolder.publisher.publishCaptions = enable
+            participants.values.filterIsInstance<ParticipantState>()
+                .forEach { participant -> participant.subscriber.subscribeToCaptions = enable }
+        }
     }
 
     override fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>) {
