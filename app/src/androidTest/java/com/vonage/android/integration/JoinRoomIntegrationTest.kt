@@ -1,11 +1,10 @@
 package com.vonage.android.integration
 
 import android.Manifest
-import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.vonage.android.MainActivity
-import com.vonage.android.integration.helper.launchApp
 import com.vonage.android.integration.robots.landing
 import com.vonage.android.integration.robots.waiting
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -23,7 +22,7 @@ class JoinRoomIntegrationTest {
     val hiltRule = HiltAndroidRule(this)
 
     @get:Rule(order = 1)
-    val compose = createEmptyComposeRule()
+    val compose = createAndroidComposeRule<MainActivity>()
 
     @get:Rule(order = 2)
     var runtimePermissionRule: GrantPermissionRule = GrantPermissionRule
@@ -36,7 +35,7 @@ class JoinRoomIntegrationTest {
 
     @Before
     fun setUp() {
-        launchApp<MainActivity>()
+        hiltRule.inject()
     }
 
     @Test
