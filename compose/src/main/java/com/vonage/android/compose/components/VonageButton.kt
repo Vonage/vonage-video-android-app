@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import com.vonage.android.compose.icons.VideoCameraIcon
+import com.vonage.android.compose.icons.PlusIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 
 @Composable
@@ -68,7 +68,7 @@ internal fun VonageButtonPreview() {
                 text = "Button label",
                 onClick = {},
                 leadingIcon = {
-                    VideoCameraIcon()
+                    PlusIcon()
                 }
             )
         }

@@ -34,7 +34,7 @@ import com.vonage.android.R
 import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.icons.KeyboardIcon
-import com.vonage.android.compose.icons.VideoCameraIcon
+import com.vonage.android.compose.icons.PlusIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.OrSeparator
 import com.vonage.android.screen.components.TopBanner
@@ -151,7 +151,7 @@ fun JoinMeetingRoomContent(
             modifier = Modifier
                 .testTag(CREATE_ROOM_BUTTON_TAG),
             onClick = actions.onCreateRoomClick,
-            leadingIcon = { VideoCameraIcon() },
+            leadingIcon = { PlusIcon() },
         )
         OrSeparator()
         RoomInput(

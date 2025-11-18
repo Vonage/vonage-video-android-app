@@ -13,9 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +33,9 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.line.Close
+import com.vonage.android.compose.vivid.icons.solid.MessageSent
 import com.vonage.android.shared.ChatMessage
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -84,7 +84,7 @@ fun ChatPanel(
                 onClick = onCloseChat,
             ) {
                 Icon(
-                    imageVector = Icons.Default.Close,
+                    imageVector = VividIcons.Line.Close,
                     tint = VonageVideoTheme.colors.inverseSurface,
                     contentDescription = null,
                 )
@@ -201,7 +201,7 @@ fun ChatPanelInput(
             enabled = chatInputValue.isNotBlank(),
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Default.Send,
+                imageVector = VividIcons.Solid.MessageSent,
                 tint = VonageVideoTheme.colors.inverseSurface,
                 contentDescription = null,
             )

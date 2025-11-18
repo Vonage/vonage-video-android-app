@@ -13,14 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BlurCircular
-import androidx.compose.material.icons.filled.BlurOff
-import androidx.compose.material.icons.filled.BlurOn
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MicOff
-import androidx.compose.material.icons.filled.Videocam
-import androidx.compose.material.icons.filled.VideocamOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -41,6 +33,14 @@ import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.compose.components.AvatarInitials
+import com.vonage.android.compose.vivid.icons.solid.MicMute
+import com.vonage.android.compose.vivid.icons.solid.Microphone2
+import com.vonage.android.compose.vivid.icons.solid.VideoOff
+import com.vonage.android.compose.vivid.icons.solid.Video
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.line.Blur
+import com.vonage.android.compose.vivid.icons.line.BlurOff
+import com.vonage.android.compose.vivid.icons.solid.Blur
 import com.vonage.android.screen.components.CircularControlButton
 import com.vonage.android.screen.waiting.WaitingRoomActions
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BLUR_BUTTON_TAG
@@ -137,7 +137,7 @@ fun VideoControlPanel(
                         ifTrue = { border(BorderStroke(1.dp, Color.White), CircleShape) })
                     .testTag(MIC_BUTTON_TAG.buildTestTag(isMicEnabled)),
                 onClick = onMicToggle,
-                icon = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
+                icon = if (isMicEnabled) VividIcons.Solid.Microphone2 else VividIcons.Solid.MicMute,
             )
 
             CircularControlButton(
@@ -152,7 +152,7 @@ fun VideoControlPanel(
                         ifTrue = { border(BorderStroke(1.dp, Color.White), CircleShape) })
                     .testTag(CAMERA_BUTTON_TAG.buildTestTag(isCameraEnabled)),
                 onClick = onCameraToggle,
-                icon = if (isCameraEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
+                icon = if (isCameraEnabled) VividIcons.Solid.Video else VividIcons.Solid.VideoOff,
             )
         }
 
@@ -187,9 +187,9 @@ private fun MicVolumeIndicator(
 @Composable
 fun rememberBlurIcon(level: BlurLevel): ImageVector = remember(level) {
     when (level) {
-        BlurLevel.HIGH -> Icons.Default.BlurOn
-        BlurLevel.LOW -> Icons.Default.BlurCircular
-        BlurLevel.NONE -> Icons.Default.BlurOff
+        BlurLevel.HIGH -> VividIcons.Solid.Blur
+        BlurLevel.LOW -> VividIcons.Line.Blur
+        BlurLevel.NONE -> VividIcons.Line.BlurOff
     }
 }
 
