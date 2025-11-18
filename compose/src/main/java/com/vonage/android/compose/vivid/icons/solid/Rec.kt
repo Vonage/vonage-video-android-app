@@ -1,3 +1,4 @@
+@file:Suppress("MaxLineLength")
 package com.vonage.android.compose.vivid.icons.solid
 
 import androidx.compose.ui.graphics.Color
