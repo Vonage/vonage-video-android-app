@@ -97,8 +97,8 @@ data class PublisherState(
     }
 
     override fun onVideoEnabled(publisher: PublisherKit, reason: String) {
-        Log.d(logTag, "Publisher video disabled - $reason")
-        _isCameraEnabled.value = false
+        Log.d(logTag, "Publisher video enabled - $reason")
+        _isCameraEnabled.value = true
     }
 
     override fun onVideoDisableWarning(publisher: PublisherKit) {

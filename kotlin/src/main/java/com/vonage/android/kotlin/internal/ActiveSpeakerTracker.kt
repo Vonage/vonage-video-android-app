@@ -73,7 +73,8 @@ class ActiveSpeakerTracker(
         val newActiveSpeaker = ActiveSpeakerInfo(maxSubscriberId, maxMovingAvg)
         val currentActiveSpeaker = _activeSpeaker.value
 
-        if (newActiveSpeaker.movingAvg > ACTIVE_SPEAKER_AUDIO_LEVEL_THRESHOLD) {
+        if (newActiveSpeaker.streamId != currentActiveSpeaker.streamId
+            && newActiveSpeaker.movingAvg > ACTIVE_SPEAKER_AUDIO_LEVEL_THRESHOLD) {
             val previousActiveSpeaker = currentActiveSpeaker.copy()
             _activeSpeaker.value = newActiveSpeaker
 

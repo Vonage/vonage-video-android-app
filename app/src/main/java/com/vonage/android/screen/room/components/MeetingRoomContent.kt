@@ -33,12 +33,12 @@ fun MeetingRoomContent(
                 ParticipantsLazyVerticalGridLayout(
                     modifier = Modifier
                         .fillMaxSize(),
-                    participants = participants.toImmutableList(),
+                    participants = participants,
                     call = call,
                 )
             }
 
-            CallLayoutType.ADAPTIVE_GRID    -> {
+            CallLayoutType.ADAPTIVE_GRID -> {
                 AdaptiveGrid(
                     call = call,
                     participants = participants,

@@ -1,6 +1,5 @@
 package com.vonage.android.screen.room.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,7 +36,6 @@ fun ParticipantsList(
     participants: ImmutableList<Participant>,
     modifier: Modifier = Modifier,
 ) {
-    Log.d("Recomposition", "ParticipantsList ${participants.size}")
     LazyColumn(
         contentPadding = PaddingValues(8.dp),
         modifier = modifier
