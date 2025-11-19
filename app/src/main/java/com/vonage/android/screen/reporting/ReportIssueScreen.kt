@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +33,8 @@ import com.vonage.android.R
 import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.components.LinkifyText
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.line.Close
 import com.vonage.android.screen.reporting.components.ReportIssueForm
 
 @Composable
@@ -115,7 +115,7 @@ private fun ReportIssueScreenContent(
                 style = MaterialTheme.typography.titleLarge,
             )
             IconButton(onClick = actions.onClose) {
-                Icon(imageVector = Icons.Default.Close, contentDescription = null)
+                Icon(imageVector = VividIcons.Line.Close, contentDescription = null)
             }
         }
 

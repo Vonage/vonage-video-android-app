@@ -1,11 +1,11 @@
 package com.vonage.android.screen.room.components.recording
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Archive
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import com.vonage.android.R
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.Inbox3
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.RecordingState
 import com.vonage.android.screen.room.components.ExtraAction
@@ -17,7 +17,7 @@ fun recordingAction(
 ): ExtraAction =
     ExtraAction(
         id = 1,
-        icon = Icons.Default.Archive,
+        icon = VividIcons.Solid.Inbox3,
         label = when (recordingState) {
             RecordingState.IDLE,
             RecordingState.STARTING,
