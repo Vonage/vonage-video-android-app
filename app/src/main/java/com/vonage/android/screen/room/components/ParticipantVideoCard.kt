@@ -10,9 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -34,6 +31,12 @@ import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VideoSource
+import com.vonage.android.compose.components.AvatarInitials
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.MicMute
+import com.vonage.android.compose.vivid.icons.solid.Microphone2
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Suppress("LongParameterList")
 @Composable
@@ -194,14 +197,14 @@ fun MicrophoneIcon(
     ) {
         if (isMicEnabled) {
             Icon(
-                imageVector = Icons.Default.Mic,
+                imageVector = VividIcons.Solid.Microphone2,
                 contentDescription = null,
                 tint = Color.White,
                 modifier = iconSize
             )
         } else {
             Icon(
-                imageVector = Icons.Default.MicOff,
+                imageVector = VividIcons.Solid.MicMute,
                 contentDescription = null,
                 tint = Color.Red,
                 modifier = iconSize

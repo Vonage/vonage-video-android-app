@@ -53,7 +53,6 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material.icons.extended)
     implementation(libs.opentok.android.sdk)
 
     ksp(libs.hilt.android.compiler)

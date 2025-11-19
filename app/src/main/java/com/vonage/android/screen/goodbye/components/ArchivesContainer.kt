@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -26,6 +23,9 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.Download
+import com.vonage.android.compose.vivid.icons.solid.Error
 import com.vonage.android.data.Archive
 import com.vonage.android.data.ArchiveStatus.AVAILABLE
 import com.vonage.android.data.ArchiveStatus.FAILED
@@ -129,7 +129,7 @@ private fun ArchiveRow(
             AVAILABLE -> {
                 Icon(
                     modifier = Modifier.size(24.dp),
-                    imageVector = Icons.Default.Download,
+                    imageVector = VividIcons.Solid.Download,
                     contentDescription = null,
                     tint = VonageVideoTheme.colors.inverseSurface,
                 )
@@ -144,7 +144,7 @@ private fun ArchiveRow(
             FAILED -> {
                 Icon(
                     modifier = Modifier.size(24.dp),
-                    imageVector = Icons.Default.Error,
+                    imageVector = VividIcons.Solid.Error,
                     contentDescription = null,
                     tint = VonageVideoTheme.colors.inverseSurface,
                 )

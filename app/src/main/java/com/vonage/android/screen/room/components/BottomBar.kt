@@ -8,16 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesomeMosaic
-import androidx.compose.material.icons.filled.CallEnd
-import androidx.compose.material.icons.filled.Group
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MicOff
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Videocam
-import androidx.compose.material.icons.filled.VideocamOff
-import androidx.compose.material.icons.filled.Window
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Surface
@@ -38,6 +28,19 @@ import com.vonage.android.chat.ui.ChatBadgeButton
 import com.vonage.android.compose.components.ControlButton
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.MoreVertical
+import com.vonage.android.compose.vivid.icons.solid.EndCall
+import com.vonage.android.compose.vivid.icons.solid.Group2
+import com.vonage.android.compose.vivid.icons.solid.Layout2
+import com.vonage.android.compose.vivid.icons.solid.MicMute
+import com.vonage.android.compose.vivid.icons.solid.Microphone2
+import com.vonage.android.compose.vivid.icons.solid.MoreVertical
+import com.vonage.android.compose.vivid.icons.solid.VideoOff
+import com.vonage.android.compose.vivid.icons.solid.Video
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.Apps
+import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.room.CallLayoutType
@@ -94,7 +97,7 @@ fun BottomBar(
                 modifier = Modifier
                     .testTag(BOTTOM_BAR_MIC_BUTTON),
                 onClick = actions.onToggleMic,
-                icon = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
+                icon = if (isMicEnabled) VividIcons.Solid.Microphone2 else VividIcons.Solid.MicMute,
                 isActive = isMicEnabled,
             )
 
@@ -102,7 +105,7 @@ fun BottomBar(
                 modifier = Modifier
                     .testTag(BOTTOM_BAR_CAMERA_BUTTON),
                 onClick = actions.onToggleCamera,
-                icon = if (isCameraEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff,
+                icon = if (isCameraEnabled) VividIcons.Solid.Video else VividIcons.Solid.VideoOff,
                 isActive = isCameraEnabled,
             )
 
@@ -123,7 +126,7 @@ fun BottomBar(
                         modifier = Modifier
                             .testTag(BOTTOM_BAR_GRID_LAYOUT_BUTTON),
                         onClick = { actions.onChangeLayout(CallLayoutType.SPEAKER_LAYOUT) },
-                        icon = Icons.Default.AutoAwesomeMosaic,
+                        icon = VividIcons.Solid.Apps,
                         isActive = false,
                     )
                 }
@@ -133,7 +136,7 @@ fun BottomBar(
                         modifier = Modifier
                             .testTag(BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON),
                         onClick = { actions.onChangeLayout(CallLayoutType.GRID) },
-                        icon = Icons.Default.Window,
+                        icon = VividIcons.Solid.Layout2,
                         isActive = false,
                     )
                 }
@@ -144,7 +147,7 @@ fun BottomBar(
             ControlButton(
                 modifier = Modifier,
                 onClick = state.onToggleMoreActions,
-                icon = Icons.Default.MoreVert,
+                icon = VividIcons.Solid.MoreVertical,
                 isActive = false,
             )
 
@@ -159,7 +162,7 @@ fun BottomBar(
                     .background(Color.Red, CircleShape)
                     .testTag(BOTTOM_BAR_END_CALL_BUTTON),
                 onClick = actions.onEndCall,
-                icon = Icons.Default.CallEnd,
+                icon = VividIcons.Solid.EndCall,
                 isActive = true,
             )
         }
@@ -189,7 +192,7 @@ private fun ParticipantsBadgeButton(
             modifier = Modifier
                 .testTag(BOTTOM_BAR_PARTICIPANTS_BUTTON),
             onClick = onToggleParticipants,
-            icon = Icons.Default.Group,
+            icon = VividIcons.Solid.Group2,
             isActive = false,
         )
     }

@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +25,9 @@ import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.MicMute
+import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -88,14 +88,14 @@ private fun ParticipantRow(participant: Participant) {
         if (!isMicEnabled) {
             Icon(
                 modifier = Modifier.size(16.dp),
-                imageVector = Icons.Default.MicOff,
+                imageVector = VividIcons.Solid.MicMute,
                 contentDescription = null,
                 tint = VonageVideoTheme.colors.inverseSurface,
             )
         } else {
             Icon(
                 modifier = Modifier.size(16.dp),
-                imageVector = Icons.Default.Mic,
+                imageVector = VividIcons.Solid.Microphone2,
                 contentDescription = null,
                 tint = VonageVideoTheme.colors.inverseSurface,
             )

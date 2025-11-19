@@ -1,10 +1,11 @@
 package com.vonage.android.screen.room.components.captions
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ClosedCaption
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.vonage.android.R
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.ClosedCaptioningOff
+import com.vonage.android.compose.vivid.icons.solid.ClosedCaptioning
 import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.components.ExtraAction
@@ -16,7 +17,13 @@ fun captionsAction(
 ): ExtraAction =
     ExtraAction(
         id = 3,
-        icon = Icons.Default.ClosedCaption,
+        icon = when (captionsState) {
+            CaptionsState.IDLE,
+            CaptionsState.DISABLING -> VividIcons.Solid.ClosedCaptioning
+
+            CaptionsState.ENABLING,
+            CaptionsState.ENABLED -> VividIcons.Solid.ClosedCaptioningOff
+        },
         label = when (captionsState) {
             CaptionsState.IDLE,
             CaptionsState.ENABLING,
