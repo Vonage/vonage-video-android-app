@@ -29,14 +29,11 @@ import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.components.ParticipantVideoRenderer
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.Participant
-import com.vonage.android.kotlin.model.VideoSource
-import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.MicMute
 import com.vonage.android.compose.vivid.icons.solid.Microphone2
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.VideoSource
 
 @Suppress("LongParameterList")
 @Composable
