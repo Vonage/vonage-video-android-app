@@ -32,7 +32,8 @@ fun MeetingRoomContent(
             CallLayoutType.GRID -> {
                 ParticipantsLazyVerticalGridLayout(
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .fillMaxSize()
+                        .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
                     participants = participants,
                     call = call,
                 )
@@ -43,8 +44,7 @@ fun MeetingRoomContent(
                     call = call,
                     participants = participants,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
+                        .fillMaxSize(),
                 )
             }
 
