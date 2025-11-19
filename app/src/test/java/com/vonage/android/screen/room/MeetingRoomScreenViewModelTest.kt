@@ -731,11 +731,12 @@ class MeetingRoomScreenViewModelTest {
         isTalking = MutableStateFlow(false),
         toggleMic = { false },
         toggleCamera = { false },
+        audioLevel = MutableStateFlow(0F),
+        creationTime = 123,
     )
 
     private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true) {
         every { connect(any()) } returns flowOf()
-        every { localAudioLevel } returns MutableStateFlow(0.4f)
     }
 
     private companion object {

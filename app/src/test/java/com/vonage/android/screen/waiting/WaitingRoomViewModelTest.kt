@@ -271,6 +271,8 @@ class WaitingRoomViewModelTest {
         isTalking = MutableStateFlow(false),
         toggleMic = toggleMic,
         toggleCamera = toggleCamera,
+        audioLevel = MutableStateFlow(0f),
+        creationTime = 123,
     )
 
     private companion object {
