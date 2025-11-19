@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddReaction
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,6 +21,8 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.Blur
 
 @Composable
 fun ActionCell(
@@ -79,13 +79,13 @@ internal fun MoreActionsGridPreview() {
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             ActionCell(
-                icon = Icons.Default.AddReaction,
+                icon = VividIcons.Solid.Blur,
                 label = "Sample label",
                 isSelected = false,
                 onClickCell = {},
             )
             ActionCell(
-                icon = Icons.Default.AddReaction,
+                icon = VividIcons.Solid.Blur,
                 label = "Sample label",
                 isSelected = true,
                 onClickCell = {},

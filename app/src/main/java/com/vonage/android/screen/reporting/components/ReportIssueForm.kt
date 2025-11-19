@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +30,8 @@ import com.vonage.android.R
 import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.components.VonageOutlinedButton
 import com.vonage.android.compose.components.VonageTextField
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.line.Close
 import com.vonage.android.screen.reporting.ReportIssueScreenActions
 import com.vonage.android.screen.reporting.ReportIssueScreenUiState
 import com.vonage.android.screen.reporting.ReportingViewModel
@@ -152,7 +152,7 @@ private fun ColumnScope.AttachmentRow(
                     onClick = onRemoveAttachment,
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Cancel,
+                        imageVector = VividIcons.Line.Close,
                         contentDescription = null,
                     )
                 }

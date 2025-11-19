@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -39,6 +36,9 @@ import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.compose.components.AvatarInitials
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.MicMute
+import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -183,7 +183,7 @@ private fun BoxScope.MicrophoneIndicator(
                 .padding(6.dp)
         ) {
             Icon(
-                imageVector = if (isMicEnabled) Icons.Default.Mic else Icons.Default.MicOff,
+                imageVector = if (isMicEnabled) VividIcons.Solid.Microphone2 else VividIcons.Solid.MicMute,
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier.size(16.dp)
@@ -204,7 +204,7 @@ internal fun ParticipantVideoCardPreview() {
             isMicEnabled = MutableStateFlow(true),
             isSpeaking = MutableStateFlow(false),
             isVolumeIndicatorVisible = true,
-            videoSource = VideoSource.CAMERA,
+            videoSource = VideoSource.SCREEN,
             view = previewCamera(),
         )
     }
@@ -216,13 +216,13 @@ internal fun ParticipantVideoCardPlaceholderPreview() {
     VonageVideoTheme {
         ParticipantVideoCard(
             modifier = Modifier.height(300.dp),
-            name = "Sample Name Name Name Name Name Name Name Name Name Name",
+            name = "Sample Name",
             audioLevel = MutableStateFlow(0.4f),
             isCameraEnabled = MutableStateFlow(false),
-            isMicEnabled = MutableStateFlow(true),
+            isMicEnabled = MutableStateFlow(false),
             isSpeaking = MutableStateFlow(false),
             isVolumeIndicatorVisible = false,
-            videoSource = VideoSource.SCREEN,
+            videoSource = VideoSource.CAMERA,
             view = previewCamera(),
         )
     }

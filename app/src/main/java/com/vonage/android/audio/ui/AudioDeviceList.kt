@@ -15,10 +15,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Bluetooth
-import androidx.compose.material.icons.filled.Headset
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,6 +32,10 @@ import com.vonage.android.audio.AudioDeviceSelector.AudioDevice
 import com.vonage.android.audio.AudioDeviceSelector.AudioDeviceType
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.AudioMid
+import com.vonage.android.compose.vivid.icons.solid.Call
+import com.vonage.android.compose.vivid.icons.solid.Headset2
 
 @Composable
 fun AudioDeviceList(
@@ -133,10 +134,10 @@ private fun AudioDevice.toLabel(): String =
 @Composable
 internal fun AudioDeviceType.toImageVector(): ImageVector =
     when (this) {
-        AudioDeviceType.EARPIECE -> Icons.Default.Phone
+        AudioDeviceType.EARPIECE -> VividIcons.Solid.Call
         AudioDeviceType.BLUETOOTH -> Icons.Default.Bluetooth
-        AudioDeviceType.SPEAKER -> Icons.AutoMirrored.Default.VolumeUp
-        AudioDeviceType.WIRED_HEADSET -> Icons.Default.Headset
+        AudioDeviceType.SPEAKER -> VividIcons.Solid.AudioMid
+        AudioDeviceType.WIRED_HEADSET -> VividIcons.Solid.Headset2
     }
 
 @PreviewLightDark
