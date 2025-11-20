@@ -94,8 +94,8 @@ fun TopBar(
                     text = roomName,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = VonageVideoTheme.typography.body,
-                    color = VonageVideoTheme.colors.inverseSurface,
+                    style = VonageVideoTheme.typography.bodyBase,
+                    color = VonageVideoTheme.colors.onSurface,
                 )
             }
         },
@@ -116,7 +116,7 @@ fun TopBar(
                     Icon(
                         imageVector = it.type.toImageVector(),
                         contentDescription = null,
-                        tint = VonageVideoTheme.colors.inverseSurface,
+                        tint = VonageVideoTheme.colors.onSurface,
                         modifier = Modifier.size(24.dp),
                     )
                 } ?: AudioSelectorIcon(

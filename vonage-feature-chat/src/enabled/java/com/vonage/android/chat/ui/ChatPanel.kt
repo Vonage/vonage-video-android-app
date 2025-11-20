@@ -77,15 +77,15 @@ fun ChatPanel(
                 modifier = Modifier
                     .weight(1f),
                 text = title,
-                color = VonageVideoTheme.colors.inverseSurface,
-                style = VonageVideoTheme.typography.title,
+                color = VonageVideoTheme.colors.onSurface,
+                style = VonageVideoTheme.typography.bodyBase,
             )
             IconButton(
                 onClick = onCloseChat,
             ) {
                 Icon(
                     imageVector = VividIcons.Line.Close,
-                    tint = VonageVideoTheme.colors.inverseSurface,
+                    tint = VonageVideoTheme.colors.onSurface,
                     contentDescription = null,
                 )
             }
@@ -189,7 +189,7 @@ fun ChatPanelInput(
             placeholder = {
                 Text(
                     text = sendLabel,
-                    color = VonageVideoTheme.colors.textPrimaryDisabled,
+                    color = VonageVideoTheme.colors.primary,
                 )
             },
         )
@@ -202,7 +202,7 @@ fun ChatPanelInput(
         ) {
             Icon(
                 imageVector = VividIcons.Solid.MessageSent,
-                tint = VonageVideoTheme.colors.inverseSurface,
+                tint = VonageVideoTheme.colors.onSurface,
                 contentDescription = null,
             )
         }

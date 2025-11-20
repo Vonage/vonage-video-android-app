@@ -58,8 +58,8 @@ fun AudioDeviceList(
                 modifier = Modifier
                     .padding(start = 8.dp, bottom = 8.dp),
                 text = stringResource(R.string.waiting_room_available_audio_outputs),
-                color = VonageVideoTheme.colors.inverseSurface,
-                style = VonageVideoTheme.typography.title,
+                color = VonageVideoTheme.colors.onSurface,
+                style = VonageVideoTheme.typography.heading1,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -85,7 +85,7 @@ private fun AudioDeviceCell(
     isSelected: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val defaultColor = VonageVideoTheme.colors.inverseSurface
+    val defaultColor = VonageVideoTheme.colors.onSurface
     val selectedColor = VonageVideoTheme.colors.surface
 
     Column(
@@ -115,7 +115,7 @@ private fun AudioDeviceCell(
         Text(
             text = audioDevice.toLabel(),
             color = if (isSelected) selectedColor else defaultColor,
-            style = VonageVideoTheme.typography.body,
+            style = VonageVideoTheme.typography.bodyBase,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )

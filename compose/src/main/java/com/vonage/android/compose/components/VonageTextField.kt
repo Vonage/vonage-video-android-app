@@ -41,8 +41,8 @@ fun VonageTextField(
         placeholder = placeholder,
         leadingIcon = leadingIcon,
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = VonageVideoTheme.colors.buttonPrimary,
-            unfocusedBorderColor = VonageVideoTheme.colors.buttonPrimaryDisabled,
+            focusedBorderColor = VonageVideoTheme.colors.primary,
+            unfocusedBorderColor = VonageVideoTheme.colors.onPrimary,
         ),
         singleLine = singleLine,
         maxLines = maxLines,

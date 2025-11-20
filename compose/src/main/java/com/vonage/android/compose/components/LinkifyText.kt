@@ -48,8 +48,8 @@ fun LinkifyText(
 
     Text(
         text = annotatedString,
-        color = VonageVideoTheme.colors.inverseSurface,
-        style = VonageVideoTheme.typography.body,
+        color = VonageVideoTheme.colors.onSurface,
+        style = VonageVideoTheme.typography.bodyBase,
         onTextLayout = { layout.value = it },
         modifier = modifier
             .pointerInput(Unit) {

@@ -32,7 +32,7 @@ fun ActionCell(
     onClickCell: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val defaultColor = VonageVideoTheme.colors.inverseSurface
+    val defaultColor = VonageVideoTheme.colors.surface
 
     Column(
         modifier = modifier
@@ -61,7 +61,7 @@ fun ActionCell(
         Text(
             text = label,
             color = defaultColor,
-            style = VonageVideoTheme.typography.body,
+            style = VonageVideoTheme.typography.bodyBase,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )

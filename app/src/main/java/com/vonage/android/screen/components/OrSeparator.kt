@@ -30,7 +30,7 @@ fun OrSeparator(
         Text(
             modifier = Modifier.padding(8.dp),
             text = stringResource(R.string.landing_or),
-            color = VonageVideoTheme.colors.textPrimaryDisabled,
+            color = VonageVideoTheme.colors.textPrimary,
             fontSize = 14.sp,
         )
         HorizontalDivider(

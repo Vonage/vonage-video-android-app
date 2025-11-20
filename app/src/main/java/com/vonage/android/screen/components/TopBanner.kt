@@ -56,8 +56,8 @@ fun TopBanner(
                 )
                 Text(
                     text = BuildConfig.VERSION_NAME,
-                    style = VonageVideoTheme.typography.label,
-                    color = VonageVideoTheme.colors.textPrimaryDisabled,
+                    style = VonageVideoTheme.typography.caption,
+                    color = VonageVideoTheme.colors.textSecondary,
                 )
             }
         }

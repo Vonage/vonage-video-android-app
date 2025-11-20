@@ -52,8 +52,8 @@ fun ArchivesContainer(
             modifier = Modifier
                 .padding(bottom = 8.dp),
             text = stringResource(R.string.recording_title),
-            style = VonageVideoTheme.typography.titleLarge,
-            color = VonageVideoTheme.colors.inverseSurface,
+            style = VonageVideoTheme.typography.heading1,
+            color = VonageVideoTheme.colors.onSurface,
             textAlign = TextAlign.Center,
         )
         when (uiState) {
@@ -115,13 +115,13 @@ private fun ArchiveRow(
                 text = archive.name,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                style = VonageVideoTheme.typography.body,
-                color = VonageVideoTheme.colors.inverseSurface,
+                style = VonageVideoTheme.typography.bodyBase,
+                color = VonageVideoTheme.colors.onSurface,
             )
             Text(
                 text = dateFormat.format(archive.createdAt),
-                style = VonageVideoTheme.typography.body,
-                color = VonageVideoTheme.colors.textPrimaryDisabled,
+                style = VonageVideoTheme.typography.bodyBase,
+                color = VonageVideoTheme.colors.textSecondary,
             )
         }
 
@@ -131,7 +131,7 @@ private fun ArchiveRow(
                     modifier = Modifier.size(24.dp),
                     imageVector = VividIcons.Solid.Download,
                     contentDescription = null,
-                    tint = VonageVideoTheme.colors.inverseSurface,
+                    tint = VonageVideoTheme.colors.onSurface,
                 )
             }
 
@@ -146,7 +146,7 @@ private fun ArchiveRow(
                     modifier = Modifier.size(24.dp),
                     imageVector = VividIcons.Solid.Error,
                     contentDescription = null,
-                    tint = VonageVideoTheme.colors.inverseSurface,
+                    tint = VonageVideoTheme.colors.onSurface,
                 )
             }
         }

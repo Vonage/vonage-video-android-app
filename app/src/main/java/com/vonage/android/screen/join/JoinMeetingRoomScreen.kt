@@ -118,16 +118,16 @@ fun JoinMeetingRoomHeader(
         Text(
             modifier = Modifier.testTag(TITLE_TAG),
             text = stringResource(R.string.landing_title),
-            style = VonageVideoTheme.typography.titleLarge,
-            color = VonageVideoTheme.colors.inverseSurface,
+            style = VonageVideoTheme.typography.heading1,
+            color = VonageVideoTheme.colors.onSurface,
             textAlign = TextAlign.Start,
         )
 
         Text(
             modifier = Modifier.testTag(SUBTITLE_TAG),
             text = stringResource(R.string.landing_subtitle),
-            style = VonageVideoTheme.typography.body,
-            color = VonageVideoTheme.colors.textPrimaryDisabled,
+            style = VonageVideoTheme.typography.bodyBase,
+            color = VonageVideoTheme.colors.textDisabled,
             textAlign = TextAlign.Start,
         )
     }
@@ -185,7 +185,7 @@ fun RoomInput(
             placeholder = {
                 Text(
                     text = stringResource(R.string.landing_enter_room_name),
-                    color = VonageVideoTheme.colors.textPrimaryDisabled,
+                    color = VonageVideoTheme.colors.textDisabled,
                 )
             },
             leadingIcon = { KeyboardIcon() },
@@ -197,7 +197,7 @@ fun RoomInput(
                             .padding(vertical = 8.dp)
                             .testTag(ROOM_INPUT_ERROR_TAG),
                         text = stringResource(R.string.landing_room_name_error_message),
-                        color = VonageVideoTheme.colors.textError,
+                        color = VonageVideoTheme.colors.error,
                     )
                 }
             }
@@ -214,8 +214,8 @@ fun RoomInput(
                 text = stringResource(R.string.landing_join),
                 color = if (isRoomNameWrong.not()) {
                     VonageVideoTheme.colors.textPrimary
-                } else VonageVideoTheme.colors.textPrimaryDisabled,
-                style = VonageVideoTheme.typography.body,
+                } else VonageVideoTheme.colors.textDisabled,
+                style = VonageVideoTheme.typography.bodyBase,
             )
         }
     }

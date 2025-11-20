@@ -62,7 +62,7 @@ fun ShareIcon(
     Icon(
         imageVector = VividIcons.Solid.Share2,
         contentDescription = contentDescription,
-        tint = VonageVideoTheme.colors.inverseSurface,
+        tint = VonageVideoTheme.colors.surface,
         modifier = modifier.size(24.dp)
     )
 }
@@ -75,7 +75,7 @@ fun AudioSelectorIcon(
     Icon(
         imageVector = VividIcons.Solid.AudioMid,
         contentDescription = contentDescription,
-        tint = VonageVideoTheme.colors.inverseSurface,
+        tint = VonageVideoTheme.colors.surface,
         modifier = modifier.size(24.dp)
     )
 }
@@ -88,7 +88,7 @@ fun CameraSwitchIcon(
     Icon(
         imageVector = VividIcons.Line.CameraSwitch,
         contentDescription = contentDescription,
-        tint = VonageVideoTheme.colors.inverseSurface,
+        tint = VonageVideoTheme.colors.onSurface,
         modifier = modifier.size(24.dp)
     )
 }

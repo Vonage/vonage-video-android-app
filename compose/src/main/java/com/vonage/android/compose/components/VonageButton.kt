@@ -37,7 +37,7 @@ fun VonageButton(
             .fillMaxWidth()
             .wrapContentHeight(),
         colors = ButtonDefaults.buttonColors(
-            containerColor = VonageVideoTheme.colors.buttonPrimary,
+            containerColor = VonageVideoTheme.colors.primary,
         ),
         contentPadding = PaddingValues(12.dp),
         enabled = enabled,
@@ -49,7 +49,7 @@ fun VonageButton(
         Text(
             text = text,
             color = Color.White,
-            style = VonageVideoTheme.typography.body,
+            style = VonageVideoTheme.typography.bodyBase,
             textAlign = TextAlign.Center,
         )
     }

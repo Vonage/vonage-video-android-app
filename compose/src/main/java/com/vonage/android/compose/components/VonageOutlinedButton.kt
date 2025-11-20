@@ -31,10 +31,10 @@ fun VonageOutlinedButton(
         shape = RoundedCornerShape(corner = CornerSize(8.dp)),
         modifier = modifier,
         colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = VonageVideoTheme.colors.buttonPrimary,
+            contentColor = VonageVideoTheme.colors.primary,
         ),
         contentPadding = PaddingValues(12.dp),
-        border = BorderStroke(1.dp, VonageVideoTheme.colors.buttonPrimary),
+        border = BorderStroke(1.dp, VonageVideoTheme.colors.primary),
         enabled = enabled,
     ) {
         leadingIcon?.let {
@@ -43,8 +43,8 @@ fun VonageOutlinedButton(
         }
         Text(
             text = text,
-            color = VonageVideoTheme.colors.buttonPrimary,
-            style = VonageVideoTheme.typography.body,
+            color = VonageVideoTheme.colors.primary,
+            style = VonageVideoTheme.typography.bodyBase,
         )
     }
 }

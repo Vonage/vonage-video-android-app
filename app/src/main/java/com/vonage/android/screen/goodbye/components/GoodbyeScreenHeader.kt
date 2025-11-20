@@ -31,15 +31,15 @@ fun GoodbyeScreenHeader(
     ) {
         Text(
             text = stringResource(R.string.goodbye_title),
-            style = VonageVideoTheme.typography.titleLarge,
-            color = VonageVideoTheme.colors.inverseSurface,
+            style = VonageVideoTheme.typography.heading1,
+            color = VonageVideoTheme.colors.onSurface,
             textAlign = TextAlign.Center,
         )
 
         Text(
             text = stringResource(R.string.goodbye_subtitle),
-            style = VonageVideoTheme.typography.body,
-            color = VonageVideoTheme.colors.textPrimaryDisabled,
+            style = VonageVideoTheme.typography.bodyBase,
+            color = VonageVideoTheme.colors.textDisabled,
             textAlign = TextAlign.Center,
         )
 
