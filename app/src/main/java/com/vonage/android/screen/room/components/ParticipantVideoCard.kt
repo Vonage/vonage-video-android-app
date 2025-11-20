@@ -77,7 +77,6 @@ private fun ParticipantContainer(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val shape = VonageVideoTheme.shapes.medium
     val borderWidth = remember { 1.dp }
 
     val border = remember(isSpeaking, isMicEnabled) {
@@ -90,7 +89,7 @@ private fun ParticipantContainer(
 
     Card(
         modifier = modifier,
-        shape = shape,
+        shape = VonageVideoTheme.shapes.medium,
         border = border,
     ) {
         Box(
@@ -128,14 +127,13 @@ fun BoxScope.ParticipantLabel(
     name: String,
     modifier: Modifier = Modifier,
 ) {
-    val labelShape = VonageVideoTheme.shapes.medium
     val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
 
     Box(
         modifier = modifier
             .align(Alignment.BottomStart)
             .padding(4.dp)
-            .background(backgroundColor, labelShape)
+            .background(backgroundColor, VonageVideoTheme.shapes.medium)
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(
