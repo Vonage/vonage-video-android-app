@@ -47,28 +47,42 @@ val Warning600 = Color(0xFFA64C03)
 val Success500 = Color(0xFF1C8731)
 val Success600 = Color(0xFF1F7629)
 
+// Dark theme specific colors from theme.json
+val DarkPrimary = Color(0xFFB377FF)
+val DarkPrimaryHover = Color(0xFFC799FF)
+val DarkBackground = Color(0xFF1C1C1E)
+val DarkSurface = Color(0xFF2C2C2E)
+val DarkBorder = Color(0xFF3A3A3C)
+val DarkTextDisabled = Color(0xFF636366)
+val DarkError = Color(0xFFFF6B6B)
+val DarkErrorHover = Color(0xFFFF8787)
+val DarkWarning = Color(0xFFFF9F4A)
+val DarkWarningHover = Color(0xFFFFB370)
+val DarkSuccess = Color(0xFF4CD964)
+val DarkSuccessHover = Color(0xFF6FE07D)
+
 internal val DarkColorScheme = darkColorScheme(
-    primary = Cta500,
+    primary = DarkPrimary,
     onPrimary = CanvasText,
     primaryContainer = Accent600,
     onPrimaryContainer = Neutral100,
-    secondary = Accent300,
+    secondary = Canvas,
     onSecondary = CanvasText,
-    secondaryContainer = Accent600,
-    onSecondaryContainer = Neutral100,
-    tertiary = Accent400,
+    secondaryContainer = DarkSurface,
+    onSecondaryContainer = Canvas,
+    tertiary = Neutral300,
     onTertiary = CanvasText,
-    background = CanvasText,
-    onBackground = Neutral100,
-    surface = Accent600,
-    onSurface = Neutral100,
-    surfaceVariant = Accent500,
+    background = DarkBackground,
+    onBackground = Neutral300,
+    surface = DarkSurface,
+    onSurface = Neutral400,
+    surfaceVariant = Accent600,
     onSurfaceVariant = Neutral300,
-    error = Alert500,
+    error = DarkError,
     onError = CanvasText,
-    errorContainer = Alert600,
-    onErrorContainer = Neutral100,
-    outline = Accent500,
+    errorContainer = DarkErrorHover,
+    onErrorContainer = CanvasText,
+    outline = DarkBorder,
     outlineVariant = Accent600,
 )
 

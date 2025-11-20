@@ -15,39 +15,72 @@ fun VonageVideoTheme(
         else -> LightColorScheme
     }
 
-    val extendedColors = VonageColors(
-        primary = colorScheme.primary,
-        onPrimary = colorScheme.onPrimary,
-        primaryHover = colorScheme.primary,
-        secondary = colorScheme.secondary,
-        onSecondary = colorScheme.onSecondary,
-        tertiary = colorScheme.tertiary,
-        onTertiary = colorScheme.onTertiary,
-        accent = colorScheme.primary,
-        onAccent = colorScheme.onPrimary,
-        background = colorScheme.background,
-        onBackground = colorScheme.onBackground,
-        surface = colorScheme.surface,
-        onSurface = colorScheme.onSurface,
-        error = colorScheme.error,
-        onError = colorScheme.onError,
-        errorHover = colorScheme.onError,
-        warning = colorScheme.primary,
-        onWarning = colorScheme.primary,
-        warningHover = colorScheme.primary,
-        success = colorScheme.primary,
-        onSuccess = colorScheme.primary,
-        successHover = colorScheme.primary,
-        border = colorScheme.primary,
-        disabled = colorScheme.primary,
-        textDisabled = colorScheme.primary,
-        textPrimary = colorScheme.primary,
-        textSecondary = colorScheme.secondary,
-        textTertiary = colorScheme.tertiary,
-    )
+    // Extended colors based on theme.json
+    val extendedColors = if (darkTheme) {
+        VonageColors(
+            primary = DarkPrimary,
+            onPrimary = CanvasText,
+            primaryHover = DarkPrimaryHover,
+            secondary = Canvas,
+            onSecondary = CanvasText,
+            tertiary = Neutral300,
+            onTertiary = CanvasText,
+            accent = DarkPrimary,
+            onAccent = CanvasText,
+            background = DarkBackground,
+            onBackground = Neutral300,
+            surface = DarkSurface,
+            onSurface = Neutral400,
+            error = DarkError,
+            onError = CanvasText,
+            errorHover = DarkErrorHover,
+            warning = DarkWarning,
+            onWarning = CanvasText,
+            warningHover = DarkWarningHover,
+            success = DarkSuccess,
+            onSuccess = CanvasText,
+            successHover = DarkSuccessHover,
+            border = DarkBorder,
+            disabled = DarkBorder,
+            textDisabled = DarkTextDisabled,
+            textPrimary = DarkPrimary,
+            textSecondary = Canvas,
+            textTertiary = Neutral300,
+        )
+    } else {
+        VonageColors(
+            primary = Cta500,
+            onPrimary = Canvas,
+            primaryHover = Cta600,
+            secondary = CanvasText,
+            onSecondary = Canvas,
+            tertiary = Accent500,
+            onTertiary = Canvas,
+            accent = CanvasText,
+            onAccent = Canvas,
+            background = Cta50,
+            onBackground = Neutral500,
+            surface = Canvas,
+            onSurface = Neutral400,
+            error = Alert500,
+            onError = Canvas,
+            errorHover = Alert600,
+            warning = Warning500,
+            onWarning = Canvas,
+            warningHover = Warning600,
+            success = Success500,
+            onSuccess = Canvas,
+            successHover = Success600,
+            border = Neutral100,
+            disabled = Neutral100,
+            textDisabled = Neutral300,
+            textPrimary = Cta500,
+            textSecondary = CanvasText,
+            textTertiary = Accent500,
+        )
+    }
 
     val extendedTypography = VonageTypography()
-
     val extendedShapes = VonageShapes()
 
     CompositionLocalProvider(
