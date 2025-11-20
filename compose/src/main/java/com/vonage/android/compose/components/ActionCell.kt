@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
@@ -34,7 +33,7 @@ fun ActionCell(
 
     Column(
         modifier = modifier
-            .height(96.dp)
+            .height(VonageVideoTheme.dimens.avatarSizeXLarge)
             .clickable(onClick = onClickCell)
             .conditional(
                 isSelected,
@@ -46,21 +45,21 @@ fun ActionCell(
                 },
                 ifFalse = {
                     border(
-                        width = 1.dp,
+                        width = VonageVideoTheme.dimens.borderWidthThin,
                         color = VonageVideoTheme.colors.surface,
                         shape = VonageVideoTheme.shapes.medium,
                     )
                 },
             )
-            .padding(vertical = 8.dp, horizontal = 16.dp),
+            .padding(vertical = VonageVideoTheme.dimens.paddingSmall, horizontal = VonageVideoTheme.dimens.paddingDefault),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+        verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall, Alignment.CenterVertically),
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             tint = defaultColor,
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeDefault),
         )
 
         Text(
@@ -80,8 +79,8 @@ internal fun MoreActionsGridPreview() {
         Column(
             modifier = Modifier
                 .background(VonageVideoTheme.colors.background)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+                .padding(VonageVideoTheme.dimens.paddingDefault),
+            verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
         ) {
             ActionCell(
                 icon = VividIcons.Solid.Blur,

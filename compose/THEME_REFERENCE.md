@@ -82,6 +82,75 @@ VonageVideoTheme.shapes.large         // 12dp
 VonageVideoTheme.shapes.extraLarge    // 24dp
 ```
 
+## Dimensions
+
+### Spacing
+```kotlin
+VonageVideoTheme.dimens.spaceNone       // 0dp
+VonageVideoTheme.dimens.spaceXXSmall    // 2dp
+VonageVideoTheme.dimens.spaceXSmall     // 4dp
+VonageVideoTheme.dimens.spaceSmall      // 8dp
+VonageVideoTheme.dimens.spaceMedium     // 12dp
+VonageVideoTheme.dimens.spaceDefault    // 16dp
+VonageVideoTheme.dimens.spaceLarge      // 24dp
+VonageVideoTheme.dimens.spaceXLarge     // 32dp
+VonageVideoTheme.dimens.spaceXXLarge    // 48dp
+VonageVideoTheme.dimens.spaceXXXLarge   // 64dp
+```
+
+### Padding
+```kotlin
+VonageVideoTheme.dimens.paddingXSmall   // 4dp
+VonageVideoTheme.dimens.paddingSmall    // 8dp
+VonageVideoTheme.dimens.paddingMedium   // 12dp
+VonageVideoTheme.dimens.paddingDefault  // 16dp
+VonageVideoTheme.dimens.paddingLarge    // 24dp
+VonageVideoTheme.dimens.paddingXLarge   // 32dp
+```
+
+### Component Sizes
+```kotlin
+// Buttons
+VonageVideoTheme.dimens.buttonHeight        // 48dp
+VonageVideoTheme.dimens.buttonHeightSmall   // 36dp
+VonageVideoTheme.dimens.buttonHeightLarge   // 56dp
+
+// Icons
+VonageVideoTheme.dimens.iconSizeSmall       // 16dp
+VonageVideoTheme.dimens.iconSizeDefault     // 24dp
+VonageVideoTheme.dimens.iconSizeLarge       // 32dp
+VonageVideoTheme.dimens.iconSizeXLarge      // 48dp
+
+// Avatars
+VonageVideoTheme.dimens.avatarSizeSmall     // 32dp
+VonageVideoTheme.dimens.avatarSizeDefault   // 48dp
+VonageVideoTheme.dimens.avatarSizeLarge     // 64dp
+VonageVideoTheme.dimens.avatarSizeXLarge    // 96dp
+```
+
+### Borders & Elevation
+```kotlin
+// Border widths
+VonageVideoTheme.dimens.borderWidthThin     // 1dp
+VonageVideoTheme.dimens.borderWidthDefault  // 2dp
+VonageVideoTheme.dimens.borderWidthThick    // 4dp
+
+// Elevation
+VonageVideoTheme.dimens.elevationNone       // 0dp
+VonageVideoTheme.dimens.elevationSmall      // 2dp
+VonageVideoTheme.dimens.elevationDefault    // 4dp
+VonageVideoTheme.dimens.elevationMedium     // 8dp
+VonageVideoTheme.dimens.elevationLarge      // 16dp
+```
+
+### Other
+```kotlin
+VonageVideoTheme.dimens.cardMinHeight       // 100dp
+VonageVideoTheme.dimens.cardMaxWidth        // 600dp
+VonageVideoTheme.dimens.dividerThickness    // 1dp
+VonageVideoTheme.dimens.minTouchTarget      // 48dp
+```
+
 ## Common Patterns
 
 ### Card with Theme
@@ -132,9 +201,34 @@ Box(
             shape = VonageVideoTheme.shapes.medium
         )
         .border(
-            width = 1.dp,
+            width = VonageVideoTheme.dimens.borderWidthThin,
             color = VonageVideoTheme.colors.border,
             shape = VonageVideoTheme.shapes.medium
         )
+        .padding(VonageVideoTheme.dimens.paddingDefault)
 )
+```
+
+### Spaced Column
+```kotlin
+Column(
+    verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceDefault),
+    modifier = Modifier.padding(VonageVideoTheme.dimens.paddingDefault)
+) {
+    // Content
+}
+```
+
+### Icon Button with Size
+```kotlin
+IconButton(
+    onClick = { },
+    modifier = Modifier.size(VonageVideoTheme.dimens.minTouchTarget)
+) {
+    Icon(
+        imageVector = Icons.Default.Add,
+        contentDescription = null,
+        modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeDefault)
+    )
+}
 ```

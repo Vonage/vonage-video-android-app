@@ -10,7 +10,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.icons.PersonIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 
@@ -60,7 +59,7 @@ internal fun VonageTextFieldPreview() {
         Box(
             modifier = Modifier
                 .background(VonageVideoTheme.colors.background)
-                .padding(16.dp)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
         ) {
             VonageTextField(
                 value = "user name",

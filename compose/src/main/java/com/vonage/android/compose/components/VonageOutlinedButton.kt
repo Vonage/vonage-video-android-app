@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 
 @Composable
@@ -31,16 +30,16 @@ fun VonageOutlinedButton(
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = VonageVideoTheme.colors.primary,
         ),
-        contentPadding = PaddingValues(12.dp),
+        contentPadding = PaddingValues(VonageVideoTheme.dimens.paddingMedium),
         border = BorderStroke(
-            width = 1.dp,
+            width = VonageVideoTheme.dimens.borderWidthThin,
             color = VonageVideoTheme.colors.primary,
         ),
         enabled = enabled,
     ) {
         leadingIcon?.let {
             leadingIcon()
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(VonageVideoTheme.dimens.spaceSmall))
         }
         Text(
             text = text,
@@ -57,7 +56,7 @@ internal fun VonageOutlinedButtonPreview() {
         Box(
             modifier = Modifier
                 .background(VonageVideoTheme.colors.background)
-                .padding(16.dp)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
         ) {
             VonageOutlinedButton(
                 text = "Button label",

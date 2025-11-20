@@ -82,11 +82,13 @@ fun VonageVideoTheme(
 
     val extendedTypography = VonageTypography()
     val extendedShapes = VonageShapes()
+    val extendedDimens = VonageDimens()
 
     CompositionLocalProvider(
         LocalVonageColors provides extendedColors,
         LocalVonageTypography provides extendedTypography,
         LocalVonageShapes provides extendedShapes,
+        LocalVonageDimens provides extendedDimens,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
@@ -105,4 +107,7 @@ object VonageVideoTheme {
     val shapes: VonageShapes
         @Composable
         get() = LocalVonageShapes.current
+    val dimens: VonageDimens
+        @Composable
+        get() = LocalVonageDimens.current
 }

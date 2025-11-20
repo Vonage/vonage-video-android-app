@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.line.ArrowBoldLeft
@@ -19,7 +18,7 @@ import com.vonage.android.compose.vivid.icons.solid.User2
 @Composable
 fun BackIcon(
     modifier: Modifier = Modifier,
-    size: Dp = 24.dp,
+    size: Dp = VonageVideoTheme.dimens.iconSizeDefault,
     tint: Color = VonageVideoTheme.colors.secondary,
 ) {
     Icon(
@@ -33,7 +32,7 @@ fun BackIcon(
 @Composable
 fun PersonIcon(
     modifier: Modifier = Modifier,
-    size: Dp = 24.dp,
+    size: Dp = VonageVideoTheme.dimens.iconSizeDefault,
     tint: Color = Color.Gray,
 ) {
     Icon(
@@ -52,7 +51,7 @@ fun PlusIcon(
         imageVector = VividIcons.Line.Plus,
         contentDescription = null,
         tint = Color.White,
-        modifier = modifier.size(24.dp)
+        modifier = modifier.size(VonageVideoTheme.dimens.iconSizeDefault)
     )
 }
 
@@ -65,7 +64,7 @@ fun ShareIcon(
         imageVector = VividIcons.Solid.Share2,
         contentDescription = contentDescription,
         tint = VonageVideoTheme.colors.surface,
-        modifier = modifier.size(24.dp)
+        modifier = modifier.size(VonageVideoTheme.dimens.iconSizeDefault)
     )
 }
 
@@ -78,7 +77,7 @@ fun AudioSelectorIcon(
         imageVector = VividIcons.Solid.AudioMid,
         contentDescription = contentDescription,
         tint = VonageVideoTheme.colors.surface,
-        modifier = modifier.size(24.dp)
+        modifier = modifier.size(VonageVideoTheme.dimens.iconSizeDefault)
     )
 }
 
@@ -91,6 +90,6 @@ fun CameraSwitchIcon(
         imageVector = VividIcons.Line.CameraSwitch,
         contentDescription = contentDescription,
         tint = VonageVideoTheme.colors.onSurface,
-        modifier = modifier.size(24.dp)
+        modifier = modifier.size(VonageVideoTheme.dimens.iconSizeDefault)
     )
 }

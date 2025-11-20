@@ -66,7 +66,7 @@ fun JoinMeetingRoomScreen(
                 .background(VonageVideoTheme.colors.background)
                 .verticalScroll(rememberScrollState())
                 .consumeWindowInsets(contentPadding)
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = VonageVideoTheme.dimens.paddingLarge),
         ) {
 
             JoinMeetingRoomHeader(

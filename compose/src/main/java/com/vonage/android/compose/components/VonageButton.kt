@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.icons.PlusIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 
@@ -35,12 +34,12 @@ fun VonageButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = VonageVideoTheme.colors.primary,
         ),
-        contentPadding = PaddingValues(12.dp),
+        contentPadding = PaddingValues(VonageVideoTheme.dimens.paddingMedium),
         enabled = enabled,
     ) {
         leadingIcon?.let {
             leadingIcon()
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(VonageVideoTheme.dimens.spaceSmall))
         }
         Text(
             text = text,
@@ -58,7 +57,7 @@ internal fun VonageButtonPreview() {
         Box(
             modifier = Modifier
                 .background(VonageVideoTheme.colors.background)
-                .padding(16.dp)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
         ) {
             VonageButton(
                 text = "Button label",
