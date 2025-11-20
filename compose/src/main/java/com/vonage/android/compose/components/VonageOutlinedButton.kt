@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -28,13 +26,16 @@ fun VonageOutlinedButton(
 ) {
     OutlinedButton(
         onClick = onClick,
-        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+        shape = VonageVideoTheme.shapes.medium,
         modifier = modifier,
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = VonageVideoTheme.colors.primary,
         ),
         contentPadding = PaddingValues(12.dp),
-        border = BorderStroke(1.dp, VonageVideoTheme.colors.primary),
+        border = BorderStroke(
+            width = 1.dp,
+            color = VonageVideoTheme.colors.primary,
+        ),
         enabled = enabled,
     ) {
         leadingIcon?.let {

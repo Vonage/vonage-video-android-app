@@ -83,7 +83,7 @@ private fun ParticipantRow(participant: Participant) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             color = VonageVideoTheme.colors.onSurface,
-            style = VonageVideoTheme.typography.bodyBase,
+            style = VonageVideoTheme.typography.bodyExtended,
         )
         if (!isMicEnabled) {
             Icon(

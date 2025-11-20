@@ -7,9 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -32,10 +29,9 @@ fun VonageButton(
 ) {
     Button(
         onClick = onClick,
-        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+        shape = VonageVideoTheme.shapes.medium,
         modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
+            .fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
             containerColor = VonageVideoTheme.colors.primary,
         ),

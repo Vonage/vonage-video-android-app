@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,9 +21,9 @@ fun ControlButton(
     icon: ImageVector,
     onClick: () -> Unit,
     isActive: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val iconColor = if (isActive) Color.White else Color.Gray
+    val iconColor = remember(isActive) { if (isActive) Color.White else Color.Gray }
 
     Box(
         modifier = modifier

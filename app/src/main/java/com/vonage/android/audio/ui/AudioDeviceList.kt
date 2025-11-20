@@ -13,11 +13,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -95,10 +93,17 @@ private fun AudioDeviceCell(
             .conditional(
                 isSelected,
                 ifTrue = {
-                    background(VonageVideoTheme.colors.primary, RoundedCornerShape(8.dp))
+                    background(
+                        color = VonageVideoTheme.colors.primary,
+                        shape = VonageVideoTheme.shapes.medium,
+                    )
                 },
                 ifFalse = {
-                    border(1.dp, MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(8.dp))
+                    border(
+                        width = 1.dp,
+                        color = VonageVideoTheme.colors.tertiary,
+                        shape = VonageVideoTheme.shapes.medium,
+                    )
                 },
             )
             .padding(vertical = 8.dp, horizontal = 16.dp),

@@ -16,7 +16,7 @@ fun VonageIcon(
 ) {
     Icon(
         painter = painterResource(R.drawable.ic_vonage),
-        tint = VonageVideoTheme.colors.onSurface,
+        tint = VonageVideoTheme.colors.secondary,
         contentDescription = null,
         modifier = modifier.size(80.dp)
     )

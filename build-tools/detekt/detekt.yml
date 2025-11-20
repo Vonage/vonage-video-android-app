@@ -810,7 +810,7 @@ Compose:
     # treatAsLambda: MyLambdaType
   CompositionLocalAllowlist:
     active: true
-    allowedCompositionLocals: LocalVonageColors, LocalVonageTypography
+    allowedCompositionLocals: LocalVonageColors, LocalVonageTypography, LocalVonageShapes
   CompositionLocalNaming:
     active: true
   ContentEmitterReturningValues:

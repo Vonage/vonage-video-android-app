@@ -32,16 +32,16 @@ fun LinkifyText(
             addStyle(
                 style = SpanStyle(
                     color = VonageVideoTheme.colors.primary,
-                    textDecoration = TextDecoration.Underline
+                    textDecoration = TextDecoration.Underline,
                 ),
                 start = it.start,
-                end = it.end
+                end = it.end,
             )
             addStringAnnotation(
                 tag = it.tag.name,
                 annotation = it.url,
                 start = it.start,
-                end = it.end
+                end = it.end,
             )
         }
     }

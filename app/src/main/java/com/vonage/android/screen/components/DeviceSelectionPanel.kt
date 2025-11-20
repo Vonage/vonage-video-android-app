@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,10 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.compose.vivid.icons.line.CameraSwitch
-import com.vonage.android.compose.vivid.icons.solid.MoreVertical
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.line.AudioMid
+import com.vonage.android.compose.vivid.icons.line.CameraSwitch
+import com.vonage.android.compose.vivid.icons.solid.MoreVertical
 
 @Composable
 fun DeviceSelectionPanel(
@@ -64,8 +63,12 @@ fun DeviceSelector(
 ) {
     Row(
         modifier = modifier
-            .border(1.dp, MaterialTheme.colorScheme.inverseOnSurface, RoundedCornerShape(8.dp))
-            .clip(RoundedCornerShape(8.dp))
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.inverseOnSurface,
+                shape = VonageVideoTheme.shapes.medium,
+            )
+            .clip(VonageVideoTheme.shapes.medium)
             .clickable { onClick() }
             .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,

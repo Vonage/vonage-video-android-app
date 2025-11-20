@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,7 +30,7 @@ fun ActionCell(
     onClickCell: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val defaultColor = VonageVideoTheme.colors.surface
+    val defaultColor = VonageVideoTheme.colors.secondary
 
     Column(
         modifier = modifier
@@ -41,10 +39,17 @@ fun ActionCell(
             .conditional(
                 isSelected,
                 ifTrue = {
-                    background(VonageVideoTheme.colors.primary, RoundedCornerShape(8.dp))
+                    background(
+                        color = VonageVideoTheme.colors.primary,
+                        shape = VonageVideoTheme.shapes.medium,
+                    )
                 },
                 ifFalse = {
-                    border(1.dp, MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(8.dp))
+                    border(
+                        width = 1.dp,
+                        color = VonageVideoTheme.colors.surface,
+                        shape = VonageVideoTheme.shapes.medium,
+                    )
                 },
             )
             .padding(vertical = 8.dp, horizontal = 16.dp),

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -78,7 +77,7 @@ private fun ParticipantContainer(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val shape = remember { RoundedCornerShape(8.dp) }
+    val shape = VonageVideoTheme.shapes.medium
     val borderWidth = remember { 1.dp }
 
     val border = remember(isSpeaking, isMicEnabled) {
@@ -129,7 +128,7 @@ fun BoxScope.ParticipantLabel(
     name: String,
     modifier: Modifier = Modifier,
 ) {
-    val labelShape = remember { RoundedCornerShape(8.dp) }
+    val labelShape = VonageVideoTheme.shapes.medium
     val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
 
     Box(

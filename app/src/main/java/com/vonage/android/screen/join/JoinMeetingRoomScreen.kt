@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +15,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -32,8 +30,8 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.vonage.android.R
 import com.vonage.android.compose.components.VonageButton
+import com.vonage.android.compose.components.VonageOutlinedButton
 import com.vonage.android.compose.components.VonageTextField
-import com.vonage.android.compose.icons.KeyboardIcon
 import com.vonage.android.compose.icons.PlusIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.OrSeparator
@@ -118,16 +116,16 @@ fun JoinMeetingRoomHeader(
         Text(
             modifier = Modifier.testTag(TITLE_TAG),
             text = stringResource(R.string.landing_title),
-            style = VonageVideoTheme.typography.heading1,
-            color = VonageVideoTheme.colors.onSurface,
+            style = VonageVideoTheme.typography.headline,
+            color = VonageVideoTheme.colors.textSecondary,
             textAlign = TextAlign.Start,
         )
 
         Text(
             modifier = Modifier.testTag(SUBTITLE_TAG),
             text = stringResource(R.string.landing_subtitle),
-            style = VonageVideoTheme.typography.bodyBase,
-            color = VonageVideoTheme.colors.textDisabled,
+            style = VonageVideoTheme.typography.heading2,
+            color = VonageVideoTheme.colors.textTertiary,
             textAlign = TextAlign.Start,
         )
     }
@@ -170,14 +168,12 @@ fun RoomInput(
     actions: JoinMeetingRoomActions,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Column(
         modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         VonageTextField(
             modifier = Modifier
-                .weight(1f)
+                .fillMaxWidth()
                 .testTag(ROOM_INPUT_TAG),
             value = roomName,
             onValueChange = actions.onRoomNameChange,
@@ -188,7 +184,9 @@ fun RoomInput(
                     color = VonageVideoTheme.colors.textDisabled,
                 )
             },
-            leadingIcon = { KeyboardIcon() },
+            label = {
+                Text("Room name")
+            },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
             supportingText = {
                 if (isRoomNameWrong) {
@@ -203,21 +201,15 @@ fun RoomInput(
             }
         )
 
-        TextButton(
+        VonageOutlinedButton(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(vertical = 6.dp)
                 .testTag(JOIN_BUTTON_TAG),
             onClick = { actions.onJoinRoomClick(roomName) },
             enabled = isRoomNameWrong.not() && roomName.isNotEmpty(),
-        ) {
-            Text(
-                text = stringResource(R.string.landing_join),
-                color = if (isRoomNameWrong.not()) {
-                    VonageVideoTheme.colors.textPrimary
-                } else VonageVideoTheme.colors.textDisabled,
-                style = VonageVideoTheme.typography.bodyBase,
-            )
-        }
+            text = stringResource(R.string.landing_join),
+        )
     }
 }
 

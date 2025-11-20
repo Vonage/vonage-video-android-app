@@ -8,23 +8,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.compose.vivid.icons.solid.AbcKeyboard
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.line.ArrowBoldLeft
 import com.vonage.android.compose.vivid.icons.line.CameraSwitch
 import com.vonage.android.compose.vivid.icons.line.Plus
+import com.vonage.android.compose.vivid.icons.solid.AudioMid
 import com.vonage.android.compose.vivid.icons.solid.Share2
 import com.vonage.android.compose.vivid.icons.solid.User2
-import com.vonage.android.compose.vivid.icons.VividIcons
-import com.vonage.android.compose.vivid.icons.solid.AudioMid
 
 @Composable
-fun KeyboardIcon(
+fun BackIcon(
     modifier: Modifier = Modifier,
+    size: Dp = 24.dp,
+    tint: Color = VonageVideoTheme.colors.secondary,
 ) {
     Icon(
-        imageVector = VividIcons.Solid.AbcKeyboard,
+        imageVector = VividIcons.Line.ArrowBoldLeft,
+        tint = tint,
         contentDescription = null,
-        tint = Color.Gray,
-        modifier = modifier.size(24.dp)
+        modifier = modifier.size(size),
     )
 }
 
