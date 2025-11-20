@@ -12,7 +12,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -112,7 +111,7 @@ private fun ReportIssueScreenContent(
         ) {
             Text(
                 text = stringResource(R.string.report_title),
-                style = MaterialTheme.typography.titleLarge,
+                style = VonageVideoTheme.typography.headline,
             )
             IconButton(onClick = actions.onClose) {
                 Icon(imageVector = VividIcons.Line.Close, contentDescription = null)
