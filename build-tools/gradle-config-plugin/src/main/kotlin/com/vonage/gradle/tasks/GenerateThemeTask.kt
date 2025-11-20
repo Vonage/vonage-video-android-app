@@ -36,9 +36,6 @@ abstract class GenerateThemeTask : DefaultTask() {
     @get:Input
     abstract val generateShapes: Property<Boolean>
 
-    @get:Input
-    abstract val generateDimens: Property<Boolean>
-
     @TaskAction
     fun generate() {
         val themeFile = themeJsonFile.get().asFile
@@ -62,10 +59,6 @@ abstract class GenerateThemeTask : DefaultTask() {
 
         if (generateTypography.get()) {
             generateTypographyFile(theme, outputDirectory, packageName)
-        }
-
-        if (generateDimens.get()) {
-            generateDimenFile(outputDirectory, packageName)
         }
 
         generateThemeFile(outputDirectory, packageName)
@@ -439,71 +432,6 @@ abstract class GenerateThemeTask : DefaultTask() {
 
         File(outputDir, "Typography.kt").writeText(content)
         println("Updated Typography.kt")
-    }
-
-    private fun generateDimenFile(outputDir: File, packageName: String) {
-        val content = buildString {
-            appendLine("package $packageName")
-            appendLine()
-            appendLine("import androidx.compose.runtime.Immutable")
-            appendLine("import androidx.compose.runtime.staticCompositionLocalOf")
-            appendLine("import androidx.compose.ui.unit.Dp")
-            appendLine("import androidx.compose.ui.unit.dp")
-            appendLine()
-            appendLine("// Auto-generated - Standard dimensions")
-            appendLine()
-
-            appendLine("internal val LocalVonageDimens = staticCompositionLocalOf {")
-            appendLine("    VonageDimens()")
-            appendLine("}")
-            appendLine()
-
-            appendLine("@Immutable")
-            appendLine("data class VonageDimens(")
-            appendLine("    val spaceNone: Dp = 0.dp,")
-            appendLine("    val spaceXXSmall: Dp = 2.dp,")
-            appendLine("    val spaceXSmall: Dp = 4.dp,")
-            appendLine("    val spaceSmall: Dp = 8.dp,")
-            appendLine("    val spaceMedium: Dp = 12.dp,")
-            appendLine("    val spaceDefault: Dp = 16.dp,")
-            appendLine("    val spaceLarge: Dp = 24.dp,")
-            appendLine("    val spaceXLarge: Dp = 32.dp,")
-            appendLine("    val spaceXXLarge: Dp = 48.dp,")
-            appendLine("    val spaceXXXLarge: Dp = 64.dp,")
-            appendLine("    val paddingXSmall: Dp = 4.dp,")
-            appendLine("    val paddingSmall: Dp = 8.dp,")
-            appendLine("    val paddingMedium: Dp = 12.dp,")
-            appendLine("    val paddingDefault: Dp = 16.dp,")
-            appendLine("    val paddingLarge: Dp = 24.dp,")
-            appendLine("    val paddingXLarge: Dp = 32.dp,")
-            appendLine("    val buttonHeight: Dp = 48.dp,")
-            appendLine("    val buttonHeightSmall: Dp = 36.dp,")
-            appendLine("    val buttonHeightLarge: Dp = 56.dp,")
-            appendLine("    val iconSizeSmall: Dp = 16.dp,")
-            appendLine("    val iconSizeDefault: Dp = 24.dp,")
-            appendLine("    val iconSizeLarge: Dp = 32.dp,")
-            appendLine("    val iconSizeXLarge: Dp = 48.dp,")
-            appendLine("    val avatarSizeSmall: Dp = 32.dp,")
-            appendLine("    val avatarSizeDefault: Dp = 48.dp,")
-            appendLine("    val avatarSizeLarge: Dp = 64.dp,")
-            appendLine("    val avatarSizeXLarge: Dp = 96.dp,")
-            appendLine("    val borderWidthThin: Dp = 1.dp,")
-            appendLine("    val borderWidthDefault: Dp = 2.dp,")
-            appendLine("    val borderWidthThick: Dp = 4.dp,")
-            appendLine("    val elevationNone: Dp = 0.dp,")
-            appendLine("    val elevationSmall: Dp = 2.dp,")
-            appendLine("    val elevationDefault: Dp = 4.dp,")
-            appendLine("    val elevationMedium: Dp = 8.dp,")
-            appendLine("    val elevationLarge: Dp = 16.dp,")
-            appendLine("    val cardMinHeight: Dp = 100.dp,")
-            appendLine("    val cardMaxWidth: Dp = 600.dp,")
-            appendLine("    val dividerThickness: Dp = 1.dp,")
-            appendLine("    val minTouchTarget: Dp = 48.dp,")
-            appendLine(")")
-        }
-
-        File(outputDir, "Dimen.kt").writeText(content)
-        println("Updated Dimen.kt")
     }
 
     private fun generateThemeFile(outputDir: File, packageName: String) {
