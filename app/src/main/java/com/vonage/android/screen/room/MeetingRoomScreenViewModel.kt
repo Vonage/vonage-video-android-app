@@ -15,6 +15,8 @@ import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.ParticipantState
+import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
@@ -150,6 +152,12 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                         when (sessionEvent) {
                             is SessionEvent.Disconnected -> {
                                 endCall()
+                            }
+                            is SessionEvent.Error -> {
+                                _uiState.update { uiState -> uiState.copy(
+                                    isError = true,
+                                    errorMessage = sessionEvent.error.message,
+                                ) }
                             }
 
                             else -> {}
@@ -313,13 +321,15 @@ data class MeetingRoomUiState(
     val call: CallFacade = noOpCallFacade,
     val isLoading: Boolean = false,
     val isError: Boolean = false,
+    val errorMessage: String? = null,
     val isEndCall: Boolean = false,
     val layoutType: CallLayoutType = CallLayoutType.GRID,
 )
 
 enum class CallLayoutType {
     GRID,
-    SPEAKER_LAYOUT
+    SPEAKER_LAYOUT,
+    ADAPTIVE_GRID,
 }
 
 enum class RecordingState {
@@ -347,7 +357,7 @@ enum class ScreenSharingState {
 val noOpCallFacade = object : CallFacade {
     override fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>) {}
 
-    override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = MutableStateFlow(persistentListOf())
+    override val participantsStateFlow: StateFlow<ImmutableList<ParticipantState>> = MutableStateFlow(persistentListOf())
     override val participantsCount: StateFlow<Int> = MutableStateFlow(1)
     override val activeSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
     override val signalStateFlow: StateFlow<SignalState?> = MutableStateFlow(null)
@@ -363,7 +373,8 @@ val noOpCallFacade = object : CallFacade {
     override fun resumeSession() { /* empty on purpose */ }
     override fun endSession() { /* empty on purpose */ }
 
-    override val localAudioLevel: StateFlow<Float> = MutableStateFlow(0F)
+    override val publisher: StateFlow<PublisherState?> = MutableStateFlow(null)
+
     override fun toggleLocalVideo() { /* empty on purpose */ }
     override fun toggleLocalCamera() { /* empty on purpose */ }
     override fun toggleLocalAudio() { /* empty on purpose */ }

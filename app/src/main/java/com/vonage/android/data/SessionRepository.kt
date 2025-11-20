@@ -23,10 +23,10 @@ class SessionRepository @Inject constructor(
 
 fun GetSessionResponse.toSessionInfo() =
     SessionInfo(
-        apiKey = this.apiKey,
-        sessionId = this.sessionId,
-        token = this.token,
-        captionsId = this.captionsId,
+        apiKey = apiKey,
+        sessionId = sessionId,
+        token = token,
+        captionsId = captionsId,
     )
 
 data class SessionInfo(

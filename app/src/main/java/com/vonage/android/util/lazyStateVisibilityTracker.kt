@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 @Composable
-internal fun <T : ScrollableState> lazyStateWithVisibilityNotification(call: CallFacade, lazyState: T): T {
+internal fun <T : ScrollableState> lazyStateVisibilityTracker(call: CallFacade, lazyState: T): T {
     val snapshotFlow: Flow<List<String>> = when (lazyState) {
         is LazyGridState -> {
             snapshotFlow {
