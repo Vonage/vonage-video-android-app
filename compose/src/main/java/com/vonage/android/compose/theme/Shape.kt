@@ -6,7 +6,8 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 
-// Border radius values from theme.json
+// Auto-generated from theme.json
+
 internal val shapeNone = RoundedCornerShape(0.dp)
 internal val shapeExtraSmall = RoundedCornerShape(2.dp)
 internal val shapeSmall = RoundedCornerShape(4.dp)

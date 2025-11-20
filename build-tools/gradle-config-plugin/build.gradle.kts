@@ -26,6 +26,12 @@ gradlePlugin {
             displayName = "JSON Config Generator"
             description = "Generates BuildConfig fields from JSON configuration files"
         }
+        create("themeGenerator") {
+            id = "com.vonage.theme-generator"
+            implementationClass = "com.vonage.gradle.ThemeGeneratorPlugin"
+            displayName = "Theme Generator"
+            description = "Generates Compose theme code from theme.json configuration"
+        }
     }
 }
 
