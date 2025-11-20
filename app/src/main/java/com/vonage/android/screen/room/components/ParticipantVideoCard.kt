@@ -196,14 +196,14 @@ fun MicrophoneIcon(
                 imageVector = VividIcons.Solid.Microphone2,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = iconSize
+                modifier = iconSize,
             )
         } else {
             Icon(
                 imageVector = VividIcons.Solid.MicMute,
                 contentDescription = null,
                 tint = Color.Red,
-                modifier = iconSize
+                modifier = iconSize,
             )
         }
     }

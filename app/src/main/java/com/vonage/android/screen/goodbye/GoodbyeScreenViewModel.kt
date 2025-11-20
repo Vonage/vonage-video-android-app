@@ -1,5 +1,6 @@
 package com.vonage.android.screen.goodbye
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.Archive
@@ -78,6 +79,7 @@ fun interface GoodbyeScreenViewModelFactory {
     fun create(roomName: String): GoodbyeScreenViewModel
 }
 
+@Stable
 sealed interface GoodbyeScreenUiState {
     data class Content(
         val archives: ImmutableList<Archive>,

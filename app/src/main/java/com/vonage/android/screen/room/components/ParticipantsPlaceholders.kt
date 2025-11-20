@@ -50,7 +50,7 @@ fun ParticipantsPlaceholders(
                 .padding(8.dp)
                 .wrapContentSize(),
             horizontalArrangement = Arrangement.spacedBy(spacedBy), // Overlap
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             visiblePlaceholders.forEachIndexed { index, participant ->
                 AvatarInitials(
@@ -89,7 +89,7 @@ fun AdditionalParticipantsAvatar(
             .size(size)
             .background(Color.Gray, CircleShape)
             .border(BorderStroke(2.dp, Color.White), CircleShape),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Text(
             text = "+$count",

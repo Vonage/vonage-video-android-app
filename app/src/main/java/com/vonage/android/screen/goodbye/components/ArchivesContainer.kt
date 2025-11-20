@@ -70,7 +70,7 @@ fun ArchivesContainer(
 }
 
 @Composable
-fun ArchivesList(
+private fun ArchivesList(
     archives: ImmutableList<Archive>,
     actions: GoodbyeScreenActions,
     modifier: Modifier = Modifier,

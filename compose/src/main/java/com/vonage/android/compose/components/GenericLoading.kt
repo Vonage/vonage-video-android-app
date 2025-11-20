@@ -1,4 +1,4 @@
-package com.vonage.android.screen.room.components
+package com.vonage.android.compose.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
