@@ -21,11 +21,10 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
-import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.Participant
-import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.preview.buildParticipants
+import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.MicMute
 import com.vonage.android.compose.vivid.icons.solid.Microphone2
@@ -51,10 +50,10 @@ fun ParticipantsList(
             )
         }
         items(
-            items = participants.filter { it.videoSource == VideoSource.CAMERA },
-            key = { participant -> participant.id },
-        ) { participant ->
-            ParticipantRow(participant)
+            items = participants,
+            key = { it.id },
+        ) { participantState ->
+            ParticipantRow(participantState)
         }
     }
 }

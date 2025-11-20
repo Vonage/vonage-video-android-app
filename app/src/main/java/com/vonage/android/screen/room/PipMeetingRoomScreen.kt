@@ -18,11 +18,9 @@ import com.vonage.android.chat.ui.ChatBadgeButton
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.VeraPublisher
 import com.vonage.android.screen.room.components.GenericLoading
 import com.vonage.android.screen.room.components.ParticipantVideoCard
 import com.vonage.android.util.pip.findActivity
-import kotlinx.collections.immutable.persistentListOf
 
 @Suppress("LongMethod")
 @Composable
@@ -34,8 +32,7 @@ fun PipMeetingRoomScreen(
     when {
         (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
             val chatState by uiState.call.chatSignalState().collectAsStateWithLifecycle()
-            val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle(persistentListOf())
-            val participant = participants.filterIsInstance<VeraPublisher>().firstOrNull()
+            val participant by uiState.call.activeSpeaker.collectAsStateWithLifecycle()
 
             Box(
                 modifier = modifier
@@ -43,14 +40,7 @@ fun PipMeetingRoomScreen(
             ) {
                 participant?.let { participant ->
                     ParticipantVideoCard(
-                        audioLevel = uiState.call.localAudioLevel,
-                        name = participant.name,
-                        isCameraEnabled = participant.isCameraEnabled,
-                        isMicEnabled = participant.isMicEnabled,
-                        view = participant.view,
-                        isSpeaking = participant.isSpeaking,
-                        isVolumeIndicatorVisible = participant is VeraPublisher,
-                        videoSource = participant.videoSource,
+                        participant = participant,
                     )
                 }
                 ChatBadgeButton(
@@ -67,8 +57,13 @@ fun PipMeetingRoomScreen(
         (uiState.isLoading) -> GenericLoading()
 
         (uiState.isError) -> {
+            val message = if (uiState.errorMessage?.isNotBlank() == true) {
+                uiState.errorMessage
+            } else {
+                stringResource(R.string.meeting_screen_session_creation_error)
+            }
             BasicAlertDialog(
-                text = stringResource(R.string.meeting_screen_session_creation_error),
+                text = message,
                 acceptLabel = stringResource(R.string.generic_retry),
                 onAccept = actions.onRetry,
                 onCancel = actions.onBack,
