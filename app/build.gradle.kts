@@ -138,7 +138,6 @@ play {
     releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.COMPLETED)
     artifactDir.set(file("build/outputs/bundle/release"))
     defaultToAppBundles.set(true)
-    commit.set(true)
 }
 
 dependencies {
