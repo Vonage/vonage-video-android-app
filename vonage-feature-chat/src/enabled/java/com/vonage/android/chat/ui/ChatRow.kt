@@ -38,7 +38,7 @@ fun ChatRow(
         AvatarInitials(
             userName = userName,
             size = 36.dp,
-            textStyle = VonageVideoTheme.typography.body,
+            textStyle = VonageVideoTheme.typography.bodyBase,
         )
         Column(
             modifier = Modifier
@@ -51,13 +51,13 @@ fun ChatRow(
             ) {
                 Text(
                     text = userName,
-                    style = VonageVideoTheme.typography.title,
-                    color = VonageVideoTheme.colors.inverseSurface,
+                    style = VonageVideoTheme.typography.heading1,
+                    color = VonageVideoTheme.colors.onSurface,
                 )
                 Text(
                     text = dateFormat.format(date),
-                    style = VonageVideoTheme.typography.body,
-                    color = VonageVideoTheme.colors.textPrimaryDisabled,
+                    style = VonageVideoTheme.typography.bodyBase,
+                    color = VonageVideoTheme.colors.textPrimary,
                 )
             }
             LinkifyText(

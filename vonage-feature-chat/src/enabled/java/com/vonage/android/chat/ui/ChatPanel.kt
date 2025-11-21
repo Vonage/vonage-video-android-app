@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -77,15 +76,15 @@ fun ChatPanel(
                 modifier = Modifier
                     .weight(1f),
                 text = title,
-                color = VonageVideoTheme.colors.inverseSurface,
-                style = VonageVideoTheme.typography.title,
+                color = VonageVideoTheme.colors.onSurface,
+                style = VonageVideoTheme.typography.bodyBase,
             )
             IconButton(
                 onClick = onCloseChat,
             ) {
                 Icon(
                     imageVector = VividIcons.Line.Close,
-                    tint = VonageVideoTheme.colors.inverseSurface,
+                    tint = VonageVideoTheme.colors.onSurface,
                     contentDescription = null,
                 )
             }
@@ -101,7 +100,7 @@ fun ChatPanel(
         ChatPanelInput(
             sendLabel = sendLabel,
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .background(VonageVideoTheme.colors.surface)
                 .padding(8.dp),
             onSendMessage = onSendMessage,
         )
@@ -189,7 +188,7 @@ fun ChatPanelInput(
             placeholder = {
                 Text(
                     text = sendLabel,
-                    color = VonageVideoTheme.colors.textPrimaryDisabled,
+                    color = VonageVideoTheme.colors.primary,
                 )
             },
         )
@@ -202,7 +201,7 @@ fun ChatPanelInput(
         ) {
             Icon(
                 imageVector = VividIcons.Solid.MessageSent,
-                tint = VonageVideoTheme.colors.inverseSurface,
+                tint = VonageVideoTheme.colors.onSurface,
                 contentDescription = null,
             )
         }

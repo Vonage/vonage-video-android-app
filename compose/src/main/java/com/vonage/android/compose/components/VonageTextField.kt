@@ -10,8 +10,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
-import com.vonage.android.compose.icons.KeyboardIcon
+import com.vonage.android.compose.icons.PersonIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 
 @Suppress("LongParameterList")
@@ -28,6 +27,7 @@ fun VonageTextField(
     leadingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null,
+    label: @Composable (() -> Unit)? = null,
 ) {
     OutlinedTextField(
         modifier = modifier,
@@ -37,12 +37,13 @@ fun VonageTextField(
                 onValueChange(it)
             }
         },
+        label = label,
         isError = isError,
         placeholder = placeholder,
         leadingIcon = leadingIcon,
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = VonageVideoTheme.colors.buttonPrimary,
-            unfocusedBorderColor = VonageVideoTheme.colors.buttonPrimaryDisabled,
+            focusedBorderColor = VonageVideoTheme.colors.tertiary,
+            unfocusedBorderColor = VonageVideoTheme.colors.tertiary,
         ),
         singleLine = singleLine,
         maxLines = maxLines,
@@ -58,15 +59,13 @@ internal fun VonageTextFieldPreview() {
         Box(
             modifier = Modifier
                 .background(VonageVideoTheme.colors.background)
-                .padding(16.dp)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
         ) {
             VonageTextField(
                 value = "user name",
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
-                    KeyboardIcon()
-                },
+                leadingIcon = { PersonIcon() },
             )
         }
     }

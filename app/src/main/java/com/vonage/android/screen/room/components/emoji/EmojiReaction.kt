@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -154,7 +153,7 @@ private fun EmojiItem(
                 .padding(4.dp)
                 .background(
                     Color.Black.copy(alpha = 0.6f),
-                    RoundedCornerShape(8.dp)
+                    shape = VonageVideoTheme.shapes.medium,
                 )
                 .padding(horizontal = 8.dp, vertical = 4.dp)
         ) {

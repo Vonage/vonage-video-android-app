@@ -7,9 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -18,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.icons.PlusIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 
@@ -32,24 +28,23 @@ fun VonageButton(
 ) {
     Button(
         onClick = onClick,
-        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+        shape = VonageVideoTheme.shapes.medium,
         modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
+            .fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
-            containerColor = VonageVideoTheme.colors.buttonPrimary,
+            containerColor = VonageVideoTheme.colors.primary,
         ),
-        contentPadding = PaddingValues(12.dp),
+        contentPadding = PaddingValues(VonageVideoTheme.dimens.paddingMedium),
         enabled = enabled,
     ) {
         leadingIcon?.let {
             leadingIcon()
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(VonageVideoTheme.dimens.spaceSmall))
         }
         Text(
             text = text,
             color = Color.White,
-            style = VonageVideoTheme.typography.body,
+            style = VonageVideoTheme.typography.bodyBase,
             textAlign = TextAlign.Center,
         )
     }
@@ -62,7 +57,7 @@ internal fun VonageButtonPreview() {
         Box(
             modifier = Modifier
                 .background(VonageVideoTheme.colors.background)
-                .padding(16.dp)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
         ) {
             VonageButton(
                 text = "Button label",
