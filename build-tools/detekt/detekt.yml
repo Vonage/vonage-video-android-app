@@ -622,7 +622,7 @@ style:
     maxJumpCount: 1
   MagicNumber:
     active: true
-    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/*.kts']
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/*.kts', '**/com/vonage/android/compose/theme/**']
     ignoreNumbers:
       - '-1'
       - '0'
@@ -810,7 +810,7 @@ Compose:
     # treatAsLambda: MyLambdaType
   CompositionLocalAllowlist:
     active: true
-    allowedCompositionLocals: LocalVonageColors, LocalVonageTypography
+    allowedCompositionLocals: LocalVonageColors, LocalVonageTypography, LocalVonageShapes, LocalVonageDimens
   CompositionLocalNaming:
     active: true
   ContentEmitterReturningValues:

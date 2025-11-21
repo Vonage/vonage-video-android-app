@@ -40,8 +40,8 @@ fun PermissionsDialog(
         ) {
             Text(
                 text = stringResource(R.string.camera_and_microphone_permissions_are_needed),
-                color = VonageVideoTheme.colors.inverseSurface,
-                style = VonageVideoTheme.typography.title,
+                color = VonageVideoTheme.colors.onSurface,
+                style = VonageVideoTheme.typography.heading1,
                 textAlign = TextAlign.Center,
             )
 

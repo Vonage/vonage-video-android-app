@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.stability.analyzer)
+    id("com.vonage.theme-generator")
 }
 
 android {
@@ -31,6 +32,12 @@ android {
     buildFeatures {
         compose = true
     }
+}
+
+themeGenerator {
+    themeJsonFile.set(file("../config/theme.json"))
+    outputPackage.set("com.vonage.android.compose.theme")
+    themeDirectory.set(file("src/main/java/com/vonage/android/compose/theme"))
 }
 
 dependencies {

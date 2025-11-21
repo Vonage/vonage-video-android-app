@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -78,7 +77,6 @@ private fun ParticipantContainer(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val shape = remember { RoundedCornerShape(8.dp) }
     val borderWidth = remember { 1.dp }
 
     val border = remember(isSpeaking, isMicEnabled) {
@@ -91,7 +89,7 @@ private fun ParticipantContainer(
 
     Card(
         modifier = modifier,
-        shape = shape,
+        shape = VonageVideoTheme.shapes.medium,
         border = border,
     ) {
         Box(
@@ -129,14 +127,13 @@ fun BoxScope.ParticipantLabel(
     name: String,
     modifier: Modifier = Modifier,
 ) {
-    val labelShape = remember { RoundedCornerShape(8.dp) }
     val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
 
     Box(
         modifier = modifier
             .align(Alignment.BottomStart)
             .padding(4.dp)
-            .background(backgroundColor, labelShape)
+            .background(backgroundColor, VonageVideoTheme.shapes.medium)
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(
@@ -197,14 +194,14 @@ fun MicrophoneIcon(
                 imageVector = VividIcons.Solid.Microphone2,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = iconSize
+                modifier = iconSize,
             )
         } else {
             Icon(
                 imageVector = VividIcons.Solid.MicMute,
                 contentDescription = null,
                 tint = Color.Red,
-                modifier = iconSize
+                modifier = iconSize,
             )
         }
     }

@@ -1,48 +1,95 @@
 package com.vonage.android.compose.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+
+// Auto-generated from theme.json
 
 @Composable
 fun VonageVideoTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
 
-    val extendedColors = VonageColors(
-        primary = colorScheme.primary,
-        background = colorScheme.background,
-        buttonPrimary = colorScheme.primary,
-        buttonPrimaryDisabled = Color.LightGray,
-        textPrimary = colorScheme.surfaceTint,
-        textPrimaryDisabled = Color.Gray,
-        textError = Color.Red,
-        surface = colorScheme.surface,
-        inverseSurface = colorScheme.inverseSurface,
-    )
+    val extendedColors = if (darkTheme) {
+        VonageColors(
+            primary = DarkPrimary,
+            onPrimary = DarkOnPrimary,
+            primaryHover = DarkPrimaryHover,
+            secondary = DarkSecondary,
+            onSecondary = DarkOnSecondary,
+            tertiary = DarkTertiary,
+            onTertiary = DarkOnTertiary,
+            accent = DarkPrimary,
+            onAccent = DarkOnPrimary,
+            background = DarkBackground,
+            onBackground = DarkOnBackground,
+            surface = DarkSurface,
+            onSurface = DarkOnSurface,
+            error = DarkError,
+            onError = DarkOnError,
+            errorHover = DarkErrorHover,
+            warning = DarkWarning,
+            onWarning = DarkOnWarning,
+            warningHover = DarkWarningHover,
+            success = DarkSuccess,
+            onSuccess = DarkOnSuccess,
+            successHover = DarkSuccessHover,
+            border = DarkBorder,
+            disabled = DarkDisabled,
+            textDisabled = DarkTextDisabled,
+            textPrimary = DarkPrimary,
+            textSecondary = DarkSecondary,
+            textTertiary = DarkTertiary,
+        )
+    } else {
+        VonageColors(
+            primary = LightPrimary,
+            onPrimary = LightOnPrimary,
+            primaryHover = LightPrimaryHover,
+            secondary = LightSecondary,
+            onSecondary = LightOnSecondary,
+            tertiary = LightTertiary,
+            onTertiary = LightOnTertiary,
+            accent = LightSecondary,
+            onAccent = LightOnSecondary,
+            background = LightBackground,
+            onBackground = LightOnBackground,
+            surface = LightSurface,
+            onSurface = LightOnSurface,
+            error = LightError,
+            onError = LightOnError,
+            errorHover = LightErrorHover,
+            warning = LightWarning,
+            onWarning = LightOnWarning,
+            warningHover = LightWarningHover,
+            success = LightSuccess,
+            onSuccess = LightOnSuccess,
+            successHover = LightSuccessHover,
+            border = LightBorder,
+            disabled = LightDisabled,
+            textDisabled = LightTextDisabled,
+            textPrimary = LightPrimary,
+            textSecondary = LightSecondary,
+            textTertiary = LightTertiary,
+        )
+    }
 
     val extendedTypography = VonageTypography()
+    val extendedShapes = VonageShapes()
+    val extendedDimens = VonageDimens()
 
     CompositionLocalProvider(
         LocalVonageColors provides extendedColors,
         LocalVonageTypography provides extendedTypography,
+        LocalVonageShapes provides extendedShapes,
+        LocalVonageDimens provides extendedDimens,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
@@ -58,4 +105,10 @@ object VonageVideoTheme {
     val typography: VonageTypography
         @Composable
         get() = LocalVonageTypography.current
+    val shapes: VonageShapes
+        @Composable
+        get() = LocalVonageShapes.current
+    val dimens: VonageDimens
+        @Composable
+        get() = LocalVonageDimens.current
 }

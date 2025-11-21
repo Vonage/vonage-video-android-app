@@ -4,12 +4,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,12 +22,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.audio.ui.rememberAudioDeviceSelector
 import com.vonage.android.audio.ui.toImageVector
+import com.vonage.android.compose.components.VonageTopAppBar
 import com.vonage.android.compose.icons.AudioSelectorIcon
 import com.vonage.android.compose.icons.CameraSwitchIcon
 import com.vonage.android.compose.icons.ShareIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.compose.vivid.icons.VividIcons
-import com.vonage.android.compose.vivid.icons.line.ArrowBoldLeft
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.RecordingState
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_AUDIO_SELECTOR_ACTION
@@ -39,9 +35,8 @@ import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_SHARE_AC
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_TITLE
 import com.vonage.android.screen.room.components.recording.RecordingIndicator
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(
+fun MeetingTopBar(
     roomName: String,
     recordingState: RecordingState,
     actions: MeetingRoomActions,
@@ -53,21 +48,9 @@ fun TopBar(
 
     val activeDevice by audioDeviceSelector.activeDevice.collectAsStateWithLifecycle()
 
-    TopAppBar(
+    VonageTopAppBar(
         modifier = modifier,
-        colors = topAppBarColors(
-            containerColor = VonageVideoTheme.colors.surface,
-        ),
-        navigationIcon = {
-            IconButton(
-                onClick = actions.onBack,
-            ) {
-                Icon(
-                    imageVector = VividIcons.Line.ArrowBoldLeft,
-                    contentDescription = null,
-                )
-            }
-        },
+        onBack = actions.onBack,
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -94,8 +77,8 @@ fun TopBar(
                     text = roomName,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = VonageVideoTheme.typography.body,
-                    color = VonageVideoTheme.colors.inverseSurface,
+                    style = VonageVideoTheme.typography.bodyBase,
+                    color = VonageVideoTheme.colors.onSurface,
                 )
             }
         },
@@ -116,7 +99,7 @@ fun TopBar(
                     Icon(
                         imageVector = it.type.toImageVector(),
                         contentDescription = null,
-                        tint = VonageVideoTheme.colors.inverseSurface,
+                        tint = VonageVideoTheme.colors.onSurface,
                         modifier = Modifier.size(24.dp),
                     )
                 } ?: AudioSelectorIcon(
@@ -145,9 +128,9 @@ object TopBarTestTags {
 
 @PreviewLightDark
 @Composable
-internal fun TopBarPreview() {
+internal fun MeetingTopBarPreview() {
     VonageVideoTheme {
-        TopBar(
+        MeetingTopBar(
             roomName = "sample-name",
             recordingState = RecordingState.RECORDING,
             actions = MeetingRoomActions(),

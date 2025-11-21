@@ -53,5 +53,5 @@ data class GoodbyeScreenActions(
     val onReEnter: () -> Unit = {},
     val onGoHome: () -> Unit = {},
     val onBack: () -> Unit = {},
-    val onDownloadArchive: (Archive) -> Unit = {}
+    val onDownloadArchive: (Archive) -> Unit = {},
 )

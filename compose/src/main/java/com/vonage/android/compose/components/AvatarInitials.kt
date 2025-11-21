@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +29,7 @@ fun AvatarInitials(
     userName: String,
     modifier: Modifier = Modifier,
     size: Dp = 96.dp,
-    textStyle: TextStyle = MaterialTheme.typography.displayMedium,
+    textStyle: TextStyle = VonageVideoTheme.typography.bodyBase,
 ) {
     val color = remember(userName) { userName.getParticipantColor() }
     val initials = remember(userName) { mutableStateOf(userName.getInitials()) }

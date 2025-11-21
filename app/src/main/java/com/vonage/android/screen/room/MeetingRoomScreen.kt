@@ -44,9 +44,9 @@ import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP
 import com.vonage.android.screen.room.components.BottomBar
 import com.vonage.android.screen.room.components.BottomBarState
 import com.vonage.android.screen.room.components.CallModals
-import com.vonage.android.screen.room.components.GenericLoading
+import com.vonage.android.compose.components.GenericLoading
 import com.vonage.android.screen.room.components.MeetingRoomContent
-import com.vonage.android.screen.room.components.TopBar
+import com.vonage.android.screen.room.components.MeetingTopBar
 import com.vonage.android.screen.room.components.captions.CaptionsOverlay
 import com.vonage.android.screen.room.components.emoji.EmojiReactionOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
@@ -122,7 +122,7 @@ fun MeetingRoomScreen(
                             EmojiReactionOverlay(call = uiState.call)
                             CaptionsOverlay(call = uiState.call)
                             Column(verticalArrangement = Arrangement.Top) {
-                                TopBar(
+                                MeetingTopBar(
                                     modifier = Modifier
                                         .testTag(MEETING_ROOM_TOP_BAR),
                                     roomName = uiState.roomName,

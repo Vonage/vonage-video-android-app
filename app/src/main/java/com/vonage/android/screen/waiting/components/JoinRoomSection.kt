@@ -41,22 +41,22 @@ fun JoinRoomSection(
         Text(
             modifier = Modifier.testTag(PREPARE_TO_JOIN_TEXT_TAG),
             text = stringResource(R.string.waiting_room_prepare_to_join),
-            style = VonageVideoTheme.typography.bodyMedium,
-            color = VonageVideoTheme.colors.inverseSurface,
+            style = VonageVideoTheme.typography.bodyExtended,
+            color = VonageVideoTheme.colors.onSurface,
         )
 
         Text(
             modifier = Modifier.testTag(ROOM_NAME_TEXT_TAG),
             text = roomName,
-            style = VonageVideoTheme.typography.body,
-            color = VonageVideoTheme.colors.textPrimaryDisabled,
+            style = VonageVideoTheme.typography.bodyExtended,
+            color = VonageVideoTheme.colors.textDisabled,
         )
 
         Text(
             modifier = Modifier.testTag(WHATS_YOU_NAME_TEXT_TAG),
             text = stringResource(R.string.waiting_room_whats_your_name),
-            style = VonageVideoTheme.typography.bodyMedium,
-            color = VonageVideoTheme.colors.inverseSurface,
+            style = VonageVideoTheme.typography.bodyExtended,
+            color = VonageVideoTheme.colors.onSurface,
         )
 
         VonageTextField(

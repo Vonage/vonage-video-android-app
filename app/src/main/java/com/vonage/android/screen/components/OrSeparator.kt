@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 
@@ -30,12 +30,20 @@ fun OrSeparator(
         Text(
             modifier = Modifier.padding(8.dp),
             text = stringResource(R.string.landing_or),
-            color = VonageVideoTheme.colors.textPrimaryDisabled,
-            fontSize = 14.sp,
+            style = VonageVideoTheme.typography.bodyBase,
+            color = VonageVideoTheme.colors.textTertiary,
         )
         HorizontalDivider(
             modifier = Modifier.weight(.5f),
             thickness = 1.dp,
         )
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun OrSeparatorPreview() {
+    VonageVideoTheme {
+        OrSeparator()
     }
 }

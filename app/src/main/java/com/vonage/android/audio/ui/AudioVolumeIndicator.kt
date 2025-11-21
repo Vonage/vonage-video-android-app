@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -54,7 +53,7 @@ fun AudioVolumeIndicator(
                     .fillMaxHeight(audioLevel.coerceIn(0.12f, 0.9f))
                     .background(
                         color = color,
-                        shape = RoundedCornerShape(4.dp),
+                        shape = VonageVideoTheme.shapes.small,
                     )
                     .shadow(elevation = 2.dp, shape = CircleShape),
             )

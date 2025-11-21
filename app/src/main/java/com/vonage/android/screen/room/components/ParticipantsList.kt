@@ -45,8 +45,8 @@ fun ParticipantsList(
             Text(
                 modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
                 text = stringResource(R.string.meeting_room_participants_list_title),
-                color = VonageVideoTheme.colors.inverseSurface,
-                style = VonageVideoTheme.typography.title,
+                color = VonageVideoTheme.colors.onSurface,
+                style = VonageVideoTheme.typography.heading1,
             )
         }
         items(
@@ -73,7 +73,7 @@ private fun ParticipantRow(participant: Participant) {
                 .padding(vertical = 4.dp, horizontal = 8.dp),
             size = 24.dp,
             userName = participant.name,
-            textStyle = VonageVideoTheme.typography.label,
+            textStyle = VonageVideoTheme.typography.caption,
         )
         Text(
             modifier = Modifier
@@ -82,22 +82,22 @@ private fun ParticipantRow(participant: Participant) {
             text = participant.name,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            color = VonageVideoTheme.colors.inverseSurface,
-            style = VonageVideoTheme.typography.body,
+            color = VonageVideoTheme.colors.onSurface,
+            style = VonageVideoTheme.typography.bodyExtended,
         )
         if (!isMicEnabled) {
             Icon(
                 modifier = Modifier.size(16.dp),
                 imageVector = VividIcons.Solid.MicMute,
                 contentDescription = null,
-                tint = VonageVideoTheme.colors.inverseSurface,
+                tint = VonageVideoTheme.colors.onSurface,
             )
         } else {
             Icon(
                 modifier = Modifier.size(16.dp),
                 imageVector = VividIcons.Solid.Microphone2,
                 contentDescription = null,
-                tint = VonageVideoTheme.colors.inverseSurface,
+                tint = VonageVideoTheme.colors.onSurface,
             )
         }
     }

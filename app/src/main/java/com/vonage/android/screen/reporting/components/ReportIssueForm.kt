@@ -4,7 +4,7 @@ import android.net.Uri
 import android.view.Window
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,6 +29,7 @@ import com.vonage.android.R
 import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.components.VonageOutlinedButton
 import com.vonage.android.compose.components.VonageTextField
+import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.line.Close
 import com.vonage.android.screen.reporting.ReportIssueScreenActions
@@ -80,8 +80,8 @@ fun ReportIssueForm(
         )
 
         Text(
-            stringResource(R.string.report_advice),
-            style = MaterialTheme.typography.bodySmall
+            text = stringResource(R.string.report_advice),
+            style = VonageVideoTheme.typography.caption,
         )
 
         AttachmentRow(
@@ -102,7 +102,7 @@ fun ReportIssueForm(
                 if (uiState.isSending) {
                     CircularProgressIndicator(
                         color = Color.White,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
                     )
                 }
             }
@@ -119,14 +119,14 @@ private fun ColumnScope.AttachmentRow(
 ) {
     val context = LocalContext.current
     val photoPicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
+        contract = PickVisualMedia(),
         onResult = { uri ->
             uri?.let { onPickImage(uri) }
         })
 
     Text(
         stringResource(R.string.report_add_screenshot_advice),
-        style = MaterialTheme.typography.bodySmall
+        style = VonageVideoTheme.typography.bodyBase,
     )
 
     if (uiState.isProcessingAttachment) {
@@ -139,7 +139,7 @@ private fun ColumnScope.AttachmentRow(
         uiState.attachment?.let { img ->
             Text(
                 text = stringResource(R.string.report_screenshot_attached_title),
-                style = MaterialTheme.typography.titleMedium,
+                style = VonageVideoTheme.typography.bodyExtended,
             )
             Box {
                 Image(
@@ -170,9 +170,7 @@ private fun ColumnScope.AttachmentRow(
                     modifier = Modifier.weight(1f),
                     text = stringResource(R.string.report_add_screenshot),
                     onClick = {
-                        photoPicker.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        )
+                        photoPicker.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
                     },
                 )
             }
