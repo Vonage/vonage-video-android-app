@@ -66,7 +66,7 @@ fun JoinRoomSection(
             placeholder = {
                 Text(
                     text = stringResource(R.string.waiting_room_name_input_placeholder),
-                    color = VonageVideoTheme.colors.textPrimaryDisabled,
+                    color = VonageVideoTheme.colors.textDisabled,
                 )
             },
             value = username,
