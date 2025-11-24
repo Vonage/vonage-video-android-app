@@ -2,6 +2,7 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
+import com.opentok.android.Publisher
 import com.opentok.android.Session
 import kotlinx.coroutines.flow.StateFlow
 
@@ -22,7 +23,8 @@ interface Participant {
 }
 
 @Stable
-interface PublisherParticipant : Participant {
+interface PublisherParticipant : Participant,
+    Publisher.CameraListener {
     val camera: StateFlow<CameraType>
     val blurLevel: StateFlow<BlurLevel>
     fun toggleVideo()

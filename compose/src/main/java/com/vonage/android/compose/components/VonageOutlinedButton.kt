@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonDefaults
@@ -27,8 +26,7 @@ fun VonageOutlinedButton(
     OutlinedButton(
         onClick = onClick,
         shape = VonageVideoTheme.shapes.medium,
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier,
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = VonageVideoTheme.colors.primary,
         ),

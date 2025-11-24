@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.LinearGradientShader
 import androidx.compose.ui.graphics.Shader
 import androidx.compose.ui.graphics.ShaderBrush
@@ -125,7 +126,7 @@ private fun JoinMeetingRoomHeader(
     )
     val brush = remember(offset) {
         object : ShaderBrush() {
-            override fun createShader(size: androidx.compose.ui.geometry.Size): Shader {
+            override fun createShader(size: Size): Shader {
                 val widthOffset = size.width * offset
                 val heightOffset = size.height * offset
                 return LinearGradientShader(
@@ -148,7 +149,6 @@ private fun JoinMeetingRoomHeader(
             text = stringResource(R.string.landing_title),
             style = VonageVideoTheme.typography.headline
                 .copy(brush = brush),
-//                .copy(brush = Brush.linearGradient(colors = gradientColors)),
             color = VonageVideoTheme.colors.textSecondary,
             textAlign = TextAlign.Start,
         )
@@ -227,6 +227,7 @@ private fun RoomInput(
         VonageOutlinedButton(
             modifier = Modifier
                 .padding(vertical = VonageVideoTheme.dimens.paddingSmall)
+                .fillMaxWidth()
                 .testTag(JOIN_BUTTON_TAG),
             onClick = { actions.onJoinRoomClick(roomName) },
             enabled = isRoomNameWrong.not() && roomName.isNotEmpty(),

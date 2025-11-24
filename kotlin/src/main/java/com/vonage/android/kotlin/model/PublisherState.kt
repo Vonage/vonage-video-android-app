@@ -8,7 +8,7 @@ import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit
 import com.opentok.android.Session
 import com.opentok.android.Stream
-import com.vonage.android.kotlin.ext.applyVideoBlur
+import com.vonage.android.kotlin.ext.cycleBlur
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.ext.toParticipantType
@@ -23,7 +23,6 @@ data class PublisherState(
     private val publisherId: String,
     val publisher: Publisher,
 ) : PublisherParticipant,
-    Publisher.CameraListener,
     PublisherKit.VideoListener,
     PublisherKit.PublisherListener,
     PublisherKit.MuteListener {
@@ -77,10 +76,8 @@ data class PublisherState(
 
     // todo: pending add to UI
     override fun cycleCameraBlur() {
-        var index = BlurLevel.entries.first { it == _blurLevel.value }.ordinal
-        (BlurLevel by ++index).also { blurLevel ->
-            publisher.applyVideoBlur(blurLevel)
-            _blurLevel.update { blurLevel }
+        publisher.cycleBlur(_blurLevel.value) {
+            _blurLevel.update { it }
         }
     }
 
@@ -141,7 +138,7 @@ data class PublisherState(
     }
 
     override fun onCameraChanged(publisher: Publisher, cameraIndex: Int) {
-        (CameraType fromInt cameraIndex)?.let { cameraType ->
+        CameraType.fromInt(cameraIndex)?.let { cameraType ->
             _camera.update { cameraType }
         }
     }

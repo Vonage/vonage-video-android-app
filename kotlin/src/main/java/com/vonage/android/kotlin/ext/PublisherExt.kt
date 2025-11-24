@@ -21,6 +21,14 @@ internal fun Publisher.applyVideoBlur(blurLevel: BlurLevel) {
     }
 }
 
+internal fun Publisher.cycleBlur(currentBlur: BlurLevel, callback: (BlurLevel) -> Unit) {
+    var index = BlurLevel.entries.first { it == currentBlur }.ordinal
+    (BlurLevel by ++index).also { blurLevel ->
+        applyVideoBlur(blurLevel)
+        callback(blurLevel)
+    }
+}
+
 internal fun Publisher.observeAudioLevel(): Flow<Float> = callbackFlow {
     val audioLevelListener = PublisherKit.AudioLevelListener { _, audioLevelRaw ->
         val audioLevel = audioLevelRaw.round2()

@@ -4,7 +4,7 @@ import android.view.View
 import androidx.compose.runtime.Stable
 import com.opentok.android.OpentokError
 import com.opentok.android.Publisher
-import com.vonage.android.kotlin.ext.applyVideoBlur
+import com.vonage.android.kotlin.ext.cycleBlur
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.MicVolumeListener
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,10 +56,8 @@ data class PreviewPublisherState(
     }
 
     override fun cycleCameraBlur() {
-        var index = BlurLevel.entries.first { it == _blurLevel.value }.ordinal
-        (BlurLevel by ++index).also { blurLevel ->
-            publisher.applyVideoBlur(blurLevel)
-            _blurLevel.update { blurLevel }
+        publisher.cycleBlur(_blurLevel.value) {
+            _blurLevel.update { it }
         }
     }
 
@@ -79,7 +77,7 @@ data class PreviewPublisherState(
     }
 
     override fun onCameraChanged(publisher: Publisher, cameraIndex: Int) {
-        (CameraType fromInt cameraIndex)?.let { cameraType ->
+        CameraType.fromInt(cameraIndex)?.let { cameraType ->
             _camera.update { cameraType }
         }
     }
