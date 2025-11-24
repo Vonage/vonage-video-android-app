@@ -8,42 +8,37 @@ import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit
 import com.opentok.android.Session
 import com.opentok.android.Stream
+import com.vonage.android.kotlin.ext.cycleBlur
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.observeAudioLevel
+import com.vonage.android.kotlin.ext.toParticipantType
 import com.vonage.android.kotlin.ext.toggle
-import com.vonage.android.kotlin.internal.toParticipantType
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 
-@OptIn(FlowPreview::class)
 @Stable
 data class PublisherState(
-    val publisherId: String,
+    private val publisherId: String,
     val publisher: Publisher,
-) : Participant,
+) : PublisherParticipant,
+    Publisher.CameraListener,
     PublisherKit.VideoListener,
     PublisherKit.PublisherListener,
     PublisherKit.MuteListener {
 
     override val id: String = publisherId
-
     private val logTag = "Publisher[$id]"
+    override val creationTime: Long = publisher.stream?.creationTime?.time ?: 0
+    override val videoSource: VideoSource = publisher.stream?.toParticipantType() ?: VideoSource.CAMERA
+    override val name: String = publisher.stream?.name ?: ""
+    override val view: View = publisher.view
 
-    override val isPublisher: Boolean = true
-
-    override val creationTime: Long = publisher.stream.creationTime.time
-
-    override val videoSource: VideoSource = publisher.stream.toParticipantType()
-
-    override val name: String = publisher.stream.name
-
-    private val _isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(publisher.stream?.hasAudio() ?: false)
+    private val _isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(publisher.publishAudio)
     override val isMicEnabled: StateFlow<Boolean> = _isMicEnabled
 
-    private val _isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(publisher.stream?.hasVideo() ?: false)
+    private val _isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(publisher.publishVideo)
     override val isCameraEnabled: StateFlow<Boolean> = _isCameraEnabled
 
     private val _audioLevel: MutableStateFlow<Float> = MutableStateFlow(0F)
@@ -52,7 +47,11 @@ data class PublisherState(
     private val _isSpeaking: MutableStateFlow<Boolean> = MutableStateFlow(false)
     override val isTalking: StateFlow<Boolean> = _isSpeaking
 
-    override val view: View = publisher.view
+    private val _blurLevel: MutableStateFlow<BlurLevel> = MutableStateFlow(BlurLevel.NONE)
+    override val blurLevel: StateFlow<BlurLevel> = _blurLevel
+
+    private val _camera: MutableStateFlow<CameraType> = MutableStateFlow(CameraType.BACK)
+    override val camera: StateFlow<CameraType> = _camera
 
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
@@ -61,20 +60,32 @@ data class PublisherState(
         }
     }
 
-    fun toggleVideo() {
+    override fun toggleVideo() {
         publisher.publishVideo = publisher.publishVideo.toggle()
         _isCameraEnabled.update { publisher.publishVideo }
     }
 
-    fun toggleAudio() {
+    override fun toggleAudio() {
         publisher.publishAudio = publisher.publishAudio.toggle()
         _isMicEnabled.update { publisher.publishAudio }
+    }
+
+    override fun cycleCamera() {
+        publisher.cycleCamera()
+    }
+
+    // todo: pending add to UI
+    override fun cycleCameraBlur() {
+        publisher.cycleBlur(_blurLevel.value) {
+            _blurLevel.update { it }
+        }
     }
 
     suspend fun setup() {
         publisher.setVideoListener(this)
         publisher.setPublisherListener(this)
         publisher.setMuteListener(this)
+        publisher.setCameraListener(this)
 
         publisher.observeAudioLevel()
             .movingAverage(windowSize = 2)
@@ -89,6 +100,12 @@ data class PublisherState(
         publisher.setMuteListener(null)
         publisher.setPublisherListener(null)
         session.unpublish(publisher)
+    }
+
+    override fun clean() {
+        publisher.setVideoListener(null)
+        publisher.setMuteListener(null)
+        publisher.setPublisherListener(null)
     }
 
     override fun onVideoDisabled(publisher: PublisherKit, reason: String) {
@@ -124,5 +141,15 @@ data class PublisherState(
     override fun onMuteForced(publisher: PublisherKit) {
         Log.d(logTag, "Publisher mute forced")
         _isMicEnabled.value = false
+    }
+
+    override fun onCameraChanged(publisher: Publisher, cameraIndex: Int) {
+        CameraType.fromInt(cameraIndex)?.let { cameraType ->
+            _camera.update { cameraType }
+        }
+    }
+
+    override fun onCameraError(publisher: Publisher, error: OpentokError) {
+        // do nothing by now
     }
 }

@@ -43,7 +43,7 @@ class JoinMeetingRoomScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 JoinMeetingRoomScreen(
-                    uiState = JoinMeetingRoomUiState.Content(),
+                    uiState = JoinMeetingRoomUiState(),
                     actions = NO_OP_JOIN_MEETING_ROOM_ACTIONS,
                 )
             }
@@ -68,7 +68,7 @@ class JoinMeetingRoomScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 JoinMeetingRoomScreen(
-                    uiState = JoinMeetingRoomUiState.Content(
+                    uiState = JoinMeetingRoomUiState(
                         roomName = "hithere",
                     ),
                     actions = NO_OP_JOIN_MEETING_ROOM_ACTIONS,
@@ -97,7 +97,7 @@ class JoinMeetingRoomScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 JoinMeetingRoomScreen(
-                    uiState = JoinMeetingRoomUiState.Content(
+                    uiState = JoinMeetingRoomUiState(
                         roomName = "hi@there",
                         isRoomNameWrong = true,
                     ),

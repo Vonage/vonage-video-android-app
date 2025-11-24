@@ -32,7 +32,7 @@ class JoinMeetingRoomViewModelTest {
         sut.updateName("validroomname")
         sut.uiState.test {
             assertEquals(
-                JoinMeetingRoomUiState.Content(
+                JoinMeetingRoomUiState(
                     roomName = "validroomname",
                     isRoomNameWrong = false,
                 ),
@@ -46,7 +46,7 @@ class JoinMeetingRoomViewModelTest {
         sut.updateName("room@name")
         sut.uiState.test {
             assertEquals(
-                JoinMeetingRoomUiState.Content(
+                JoinMeetingRoomUiState(
                     roomName = "room@name",
                     isRoomNameWrong = true,
                 ),
@@ -63,7 +63,7 @@ class JoinMeetingRoomViewModelTest {
 
         sut.uiState.test {
             assertEquals(
-                JoinMeetingRoomUiState.Content(
+                JoinMeetingRoomUiState(
                     roomName = "vonage-rocks",
                     isSuccess = true,
                 ),
@@ -78,7 +78,7 @@ class JoinMeetingRoomViewModelTest {
             awaitItem() // initial state
             sut.joinRoom("validname")
             assertEquals(
-                JoinMeetingRoomUiState.Content(
+                JoinMeetingRoomUiState(
                     roomName = "validname",
                     isSuccess = true,
                 ),

@@ -23,7 +23,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.vonage.android.audio.ui.AudioVolumeIndicator
+import com.vonage.android.compose.components.AudioVolumeIndicator
 import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.components.ParticipantVideoRenderer
 import com.vonage.android.compose.preview.buildParticipants
@@ -34,7 +34,6 @@ import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VideoSource
 
-@Suppress("LongParameterList")
 @Composable
 fun ParticipantVideoCard(
     participant: Participant,
@@ -123,7 +122,7 @@ private fun BoxScope.ParticipantVideoContainer(
 }
 
 @Composable
-fun BoxScope.ParticipantLabel(
+private fun BoxScope.ParticipantLabel(
     name: String,
     modifier: Modifier = Modifier,
 ) {
@@ -176,7 +175,7 @@ private fun MicrophoneIndicator(
 }
 
 @Composable
-fun MicrophoneIcon(
+private fun MicrophoneIcon(
     isMicEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {

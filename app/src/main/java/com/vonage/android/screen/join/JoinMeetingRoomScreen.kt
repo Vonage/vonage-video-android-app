@@ -1,8 +1,15 @@
 package com.vonage.android.screen.join
 
 import android.widget.Toast
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -17,9 +24,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.LinearGradientShader
+import androidx.compose.ui.graphics.Shader
+import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -43,7 +57,6 @@ import com.vonage.android.screen.join.JoinMeetingRoomTestTags.ROOM_INPUT_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.SUBTITLE_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.TITLE_TAG
 
-@Stable
 @Composable
 fun JoinMeetingRoomScreen(
     uiState: JoinMeetingRoomUiState,
@@ -54,13 +67,22 @@ fun JoinMeetingRoomScreen(
     val context = LocalContext.current
     val errorMessage = stringResource(R.string.landing_room_generic_error_message)
 
+    LaunchedEffect(uiState.isError, uiState.isSuccess) {
+        if (uiState.isError) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+        }
+        if (uiState.isSuccess) {
+            navigateToRoom(JoinMeetingRoomRouteParams(roomName = uiState.roomName))
+        }
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = { TopBanner() },
     ) { contentPadding ->
         FlowRow(
             verticalArrangement = Arrangement.Center,
-            horizontalArrangement = Arrangement.spacedBy(48.dp, Alignment.CenterHorizontally),
+            horizontalArrangement = spacedBy(VonageVideoTheme.dimens.spaceXXLarge, Alignment.CenterHorizontally),
             modifier = Modifier
                 .fillMaxSize()
                 .background(VonageVideoTheme.colors.background)
@@ -68,55 +90,65 @@ fun JoinMeetingRoomScreen(
                 .consumeWindowInsets(contentPadding)
                 .padding(horizontal = VonageVideoTheme.dimens.paddingLarge),
         ) {
-
             JoinMeetingRoomHeader(
                 modifier = Modifier
                     .padding(top = 80.dp)
                     .widthIn(0.dp, 380.dp)
             )
-
-            when (uiState) {
-                is JoinMeetingRoomUiState.Content -> {
-                    LaunchedEffect(uiState.isError) {
-                        if (uiState.isError) {
-                            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                    LaunchedEffect(uiState.isSuccess) {
-                        if (uiState.isSuccess) {
-                            navigateToRoom(
-                                JoinMeetingRoomRouteParams(roomName = uiState.roomName)
-                            )
-                        }
-                    }
-                    JoinMeetingRoomContent(
-                        modifier = Modifier
-                            .padding(top = 48.dp)
-                            .widthIn(0.dp, 320.dp),
-                        roomName = uiState.roomName,
-                        isRoomNameWrong = uiState.isRoomNameWrong,
-                        actions = actions,
-                    )
-                }
-            }
+            JoinMeetingRoomContent(
+                modifier = Modifier
+                    .padding(top = 48.dp)
+                    .widthIn(0.dp, 320.dp),
+                roomName = uiState.roomName,
+                isRoomNameWrong = uiState.isRoomNameWrong,
+                actions = actions,
+            )
         }
     }
 }
 
-@Stable
 @Composable
-fun JoinMeetingRoomHeader(
+private fun JoinMeetingRoomHeader(
     modifier: Modifier = Modifier,
 ) {
+    val gradientColors = listOf(
+        VonageVideoTheme.colors.primary,
+        VonageVideoTheme.colors.secondary,
+    )
+    val infiniteTransition = rememberInfiniteTransition()
+    val offset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+    )
+    val brush = remember(offset) {
+        object : ShaderBrush() {
+            override fun createShader(size: Size): Shader {
+                val widthOffset = size.width * offset
+                val heightOffset = size.height * offset
+                return LinearGradientShader(
+                    colors = gradientColors,
+                    from = Offset(widthOffset, heightOffset),
+                    to = Offset(widthOffset + size.width, heightOffset + size.height),
+                    tileMode = TileMode.Mirror,
+                )
+            }
+        }
+    }
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = spacedBy(VonageVideoTheme.dimens.spaceDefault),
     ) {
         Text(
             modifier = Modifier.testTag(TITLE_TAG),
             text = stringResource(R.string.landing_title),
-            style = VonageVideoTheme.typography.headline,
+            style = VonageVideoTheme.typography.headline
+                .copy(brush = brush),
             color = VonageVideoTheme.colors.textSecondary,
             textAlign = TextAlign.Start,
         )
@@ -131,9 +163,8 @@ fun JoinMeetingRoomHeader(
     }
 }
 
-@Stable
 @Composable
-fun JoinMeetingRoomContent(
+private fun JoinMeetingRoomContent(
     roomName: String,
     isRoomNameWrong: Boolean,
     actions: JoinMeetingRoomActions,
@@ -142,7 +173,7 @@ fun JoinMeetingRoomContent(
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(32.dp)
+        verticalArrangement = spacedBy(VonageVideoTheme.dimens.spaceXLarge),
     ) {
         VonageButton(
             text = stringResource(R.string.landing_create_room),
@@ -160,9 +191,8 @@ fun JoinMeetingRoomContent(
     }
 }
 
-@Stable
 @Composable
-fun RoomInput(
+private fun RoomInput(
     roomName: String,
     isRoomNameWrong: Boolean,
     actions: JoinMeetingRoomActions,
@@ -178,21 +208,14 @@ fun RoomInput(
             value = roomName,
             onValueChange = actions.onRoomNameChange,
             isError = isRoomNameWrong,
-            placeholder = {
-                Text(
-                    text = stringResource(R.string.landing_enter_room_name),
-                    color = VonageVideoTheme.colors.textDisabled,
-                )
-            },
-            label = {
-                Text("Room name")
-            },
+            placeholder = { Text(text = stringResource(R.string.landing_enter_room_name)) },
+            label = { Text(text = stringResource(R.string.landing_enter_room_name_label)) },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
             supportingText = {
                 if (isRoomNameWrong) {
                     Text(
                         modifier = Modifier
-                            .padding(vertical = 8.dp)
+                            .padding(vertical = VonageVideoTheme.dimens.paddingSmall)
                             .testTag(ROOM_INPUT_ERROR_TAG),
                         text = stringResource(R.string.landing_room_name_error_message),
                         color = VonageVideoTheme.colors.error,
@@ -203,8 +226,8 @@ fun RoomInput(
 
         VonageOutlinedButton(
             modifier = Modifier
+                .padding(vertical = VonageVideoTheme.dimens.paddingSmall)
                 .fillMaxWidth()
-                .padding(vertical = 6.dp)
                 .testTag(JOIN_BUTTON_TAG),
             onClick = { actions.onJoinRoomClick(roomName) },
             enabled = isRoomNameWrong.not() && roomName.isNotEmpty(),
@@ -219,7 +242,7 @@ fun RoomInput(
 internal fun PreviewJoinRoomScreen() {
     VonageVideoTheme {
         JoinMeetingRoomScreen(
-            uiState = JoinMeetingRoomUiState.Content(
+            uiState = JoinMeetingRoomUiState(
                 roomName = "hithere",
                 isRoomNameWrong = false,
             ),

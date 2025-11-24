@@ -15,12 +15,12 @@ class JoinMeetingRoomViewModel @Inject constructor(
     private val roomNameGenerator: RoomNameGenerator,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<JoinMeetingRoomUiState>(JoinMeetingRoomUiState.Content())
+    private val _uiState = MutableStateFlow(JoinMeetingRoomUiState())
     val uiState: StateFlow<JoinMeetingRoomUiState> = _uiState.asStateFlow()
 
     fun updateName(roomName: String) {
         val roomNameError = roomName.isValidRoomName().not()
-        _uiState.value = JoinMeetingRoomUiState.Content(
+        _uiState.value = JoinMeetingRoomUiState(
             roomName = roomName,
             isRoomNameWrong = roomNameError,
         )
@@ -28,14 +28,11 @@ class JoinMeetingRoomViewModel @Inject constructor(
 
     fun createRoom() {
         val roomNameGenerated = roomNameGenerator.generateRoomName()
-        _uiState.value = JoinMeetingRoomUiState.Content(
-            roomName = roomNameGenerated,
-            isSuccess = true,
-        )
+        joinRoom(roomNameGenerated)
     }
 
     fun joinRoom(roomName: String) {
-        _uiState.value = JoinMeetingRoomUiState.Content(
+        _uiState.value = JoinMeetingRoomUiState(
             roomName = roomName,
             isSuccess = true,
         )
@@ -43,11 +40,9 @@ class JoinMeetingRoomViewModel @Inject constructor(
 }
 
 @Immutable
-sealed interface JoinMeetingRoomUiState {
-    data class Content(
-        val roomName: String = "",
-        val isRoomNameWrong: Boolean = false,
-        val isError: Boolean = false,
-        val isSuccess: Boolean = false,
-    ) : JoinMeetingRoomUiState
-}
+data class JoinMeetingRoomUiState(
+    val roomName: String = "",
+    val isRoomNameWrong: Boolean = false,
+    val isError: Boolean = false,
+    val isSuccess: Boolean = false,
+)

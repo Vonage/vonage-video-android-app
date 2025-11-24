@@ -10,7 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.util.pip.pipEffect
 
 @Composable
-fun JoinMeetingRoomRoute(
+internal fun JoinMeetingRoomRoute(
     modifier: Modifier = Modifier,
     viewModel: JoinMeetingRoomViewModel = hiltViewModel(),
     navigateToRoom: (JoinMeetingRoomRouteParams) -> Unit,
