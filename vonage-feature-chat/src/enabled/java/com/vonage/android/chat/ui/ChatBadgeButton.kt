@@ -1,7 +1,5 @@
 package com.vonage.android.chat.ui
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Text
@@ -12,6 +10,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import com.vonage.android.compose.components.ControlButton
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.Chat2
 
 @Composable
 fun ChatBadgeButton(
@@ -42,7 +42,7 @@ fun ChatBadgeButton(
             modifier = Modifier
                 .testTag("BOTTOM_BAR_CHAT_BUTTON"),
             onClick = onShowChat,
-            icon = Icons.AutoMirrored.Default.Chat,
+            icon = VividIcons.Solid.Chat2,
             isActive = isChatShow,
         )
     }

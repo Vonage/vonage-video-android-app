@@ -13,14 +13,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Bluetooth
-import androidx.compose.material.icons.filled.Headset
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,6 +30,10 @@ import com.vonage.android.audio.AudioDeviceSelector.AudioDevice
 import com.vonage.android.audio.AudioDeviceSelector.AudioDeviceType
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.AudioMid
+import com.vonage.android.compose.vivid.icons.solid.Call
+import com.vonage.android.compose.vivid.icons.solid.Headset2
 
 @Composable
 fun AudioDeviceList(
@@ -57,8 +56,8 @@ fun AudioDeviceList(
                 modifier = Modifier
                     .padding(start = 8.dp, bottom = 8.dp),
                 text = stringResource(R.string.waiting_room_available_audio_outputs),
-                color = VonageVideoTheme.colors.inverseSurface,
-                style = VonageVideoTheme.typography.title,
+                color = VonageVideoTheme.colors.onSurface,
+                style = VonageVideoTheme.typography.heading1,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -84,7 +83,7 @@ private fun AudioDeviceCell(
     isSelected: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val defaultColor = VonageVideoTheme.colors.inverseSurface
+    val defaultColor = VonageVideoTheme.colors.onSurface
     val selectedColor = VonageVideoTheme.colors.surface
 
     Column(
@@ -94,10 +93,17 @@ private fun AudioDeviceCell(
             .conditional(
                 isSelected,
                 ifTrue = {
-                    background(VonageVideoTheme.colors.primary, RoundedCornerShape(8.dp))
+                    background(
+                        color = VonageVideoTheme.colors.primary,
+                        shape = VonageVideoTheme.shapes.medium,
+                    )
                 },
                 ifFalse = {
-                    border(1.dp, MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(8.dp))
+                    border(
+                        width = 1.dp,
+                        color = VonageVideoTheme.colors.tertiary,
+                        shape = VonageVideoTheme.shapes.medium,
+                    )
                 },
             )
             .padding(vertical = 8.dp, horizontal = 16.dp),
@@ -114,7 +120,7 @@ private fun AudioDeviceCell(
         Text(
             text = audioDevice.toLabel(),
             color = if (isSelected) selectedColor else defaultColor,
-            style = VonageVideoTheme.typography.body,
+            style = VonageVideoTheme.typography.bodyBase,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -133,10 +139,10 @@ private fun AudioDevice.toLabel(): String =
 @Composable
 internal fun AudioDeviceType.toImageVector(): ImageVector =
     when (this) {
-        AudioDeviceType.EARPIECE -> Icons.Default.Phone
+        AudioDeviceType.EARPIECE -> VividIcons.Solid.Call
         AudioDeviceType.BLUETOOTH -> Icons.Default.Bluetooth
-        AudioDeviceType.SPEAKER -> Icons.AutoMirrored.Default.VolumeUp
-        AudioDeviceType.WIRED_HEADSET -> Icons.Default.Headset
+        AudioDeviceType.SPEAKER -> VividIcons.Solid.AudioMid
+        AudioDeviceType.WIRED_HEADSET -> VividIcons.Solid.Headset2
     }
 
 @PreviewLightDark

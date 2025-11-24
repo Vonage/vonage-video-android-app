@@ -7,6 +7,7 @@ import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
@@ -41,7 +42,8 @@ fun buildCallWithParticipants(
     override fun endSession() { /* empty on purpose */ }
 
     // Publisher related methods
-    override val localAudioLevel: StateFlow<Float> = MutableStateFlow(0F)
+    override val publisher: StateFlow<PublisherState?> = MutableStateFlow(null)
+
     override fun toggleLocalVideo() { /* empty on purpose */ }
     override fun toggleLocalCamera() { /* empty on purpose */ }
     override fun toggleLocalAudio() { /* empty on purpose */ }

@@ -4,17 +4,17 @@ import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.ChevronDown
 
 private enum class Visibility {
     VISIBLE,
@@ -48,7 +48,7 @@ fun JumpToBottom(
         ExtendedFloatingActionButton(
             icon = {
                 Icon(
-                    imageVector = Icons.Default.ArrowDownward,
+                    imageVector = VividIcons.Solid.ChevronDown,
                     modifier = Modifier.height(18.dp),
                     contentDescription = null,
                 )
@@ -57,8 +57,8 @@ fun JumpToBottom(
                 Text(text = label)
             },
             onClick = onClick,
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.primary,
+            containerColor = VonageVideoTheme.colors.primary,
+            contentColor = VonageVideoTheme.colors.textSecondary,
             modifier = modifier
                 .offset(x = 0.dp, y = -bottomOffset)
                 .height(36.dp),

@@ -1,11 +1,11 @@
 package com.vonage.android.screensharing.ui
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ScreenShare
-import androidx.compose.material.icons.automirrored.filled.StopScreenShare
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.vonage.android.R
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.ScreenShareOff
+import com.vonage.android.compose.vivid.icons.solid.ScreenShare
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.ScreenSharingState
 import com.vonage.android.screen.room.ScreenSharingState.IDLE
@@ -23,10 +23,10 @@ fun screenSharingAction(
         id = 2,
         icon = when (screenSharingState) {
             STOPPING,
-            IDLE -> Icons.AutoMirrored.Default.ScreenShare
+            IDLE -> VividIcons.Solid.ScreenShare
 
             STARTING,
-            SHARING -> Icons.AutoMirrored.Default.StopScreenShare
+            SHARING -> VividIcons.Solid.ScreenShareOff
         },
         label = when (screenSharingState) {
             IDLE,

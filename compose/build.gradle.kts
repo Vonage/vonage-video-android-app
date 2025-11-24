@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.stability.analyzer)
+    id("com.vonage.theme-generator")
 }
 
 android {
@@ -32,6 +34,12 @@ android {
     }
 }
 
+themeGenerator {
+    themeJsonFile.set(file("../config/theme.json"))
+    outputPackage.set("com.vonage.android.compose.theme")
+    themeDirectory.set(file("src/main/java/com/vonage/android/compose/theme"))
+}
+
 dependencies {
     implementation(project(":kotlin"))
     implementation(project(":shared"))
@@ -43,9 +51,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.material.icons.extended)
     implementation(libs.accompanist.permissions)
     implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.opentok.android.sdk)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

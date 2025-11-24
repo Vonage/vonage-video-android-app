@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -26,6 +23,9 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.Download
+import com.vonage.android.compose.vivid.icons.solid.Error
 import com.vonage.android.data.Archive
 import com.vonage.android.data.ArchiveStatus.AVAILABLE
 import com.vonage.android.data.ArchiveStatus.FAILED
@@ -52,8 +52,8 @@ fun ArchivesContainer(
             modifier = Modifier
                 .padding(bottom = 8.dp),
             text = stringResource(R.string.recording_title),
-            style = VonageVideoTheme.typography.titleLarge,
-            color = VonageVideoTheme.colors.inverseSurface,
+            style = VonageVideoTheme.typography.heading1,
+            color = VonageVideoTheme.colors.onSurface,
             textAlign = TextAlign.Center,
         )
         when (uiState) {
@@ -70,7 +70,7 @@ fun ArchivesContainer(
 }
 
 @Composable
-fun ArchivesList(
+private fun ArchivesList(
     archives: ImmutableList<Archive>,
     actions: GoodbyeScreenActions,
     modifier: Modifier = Modifier,
@@ -115,13 +115,13 @@ private fun ArchiveRow(
                 text = archive.name,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                style = VonageVideoTheme.typography.body,
-                color = VonageVideoTheme.colors.inverseSurface,
+                style = VonageVideoTheme.typography.bodyBase,
+                color = VonageVideoTheme.colors.onSurface,
             )
             Text(
                 text = dateFormat.format(archive.createdAt),
-                style = VonageVideoTheme.typography.body,
-                color = VonageVideoTheme.colors.textPrimaryDisabled,
+                style = VonageVideoTheme.typography.bodyBase,
+                color = VonageVideoTheme.colors.textSecondary,
             )
         }
 
@@ -129,9 +129,9 @@ private fun ArchiveRow(
             AVAILABLE -> {
                 Icon(
                     modifier = Modifier.size(24.dp),
-                    imageVector = Icons.Default.Download,
+                    imageVector = VividIcons.Solid.Download,
                     contentDescription = null,
-                    tint = VonageVideoTheme.colors.inverseSurface,
+                    tint = VonageVideoTheme.colors.onSurface,
                 )
             }
 
@@ -144,9 +144,9 @@ private fun ArchiveRow(
             FAILED -> {
                 Icon(
                     modifier = Modifier.size(24.dp),
-                    imageVector = Icons.Default.Error,
+                    imageVector = VividIcons.Solid.Error,
                     contentDescription = null,
-                    tint = VonageVideoTheme.colors.inverseSurface,
+                    tint = VonageVideoTheme.colors.onSurface,
                 )
             }
         }

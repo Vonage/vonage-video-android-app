@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,8 +20,8 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.components.AvatarInitials
+import com.vonage.android.compose.theme.VonageVideoTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -42,8 +40,8 @@ fun ParticipantsPlaceholders(
     Box(
         modifier = modifier
             .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                shape = RoundedCornerShape(8.dp),
+                color = VonageVideoTheme.colors.background,
+                shape = VonageVideoTheme.shapes.medium,
             ),
         contentAlignment = Alignment.Center,
     ) {
@@ -52,12 +50,12 @@ fun ParticipantsPlaceholders(
                 .padding(8.dp)
                 .wrapContentSize(),
             horizontalArrangement = Arrangement.spacedBy(spacedBy), // Overlap
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             visiblePlaceholders.forEachIndexed { index, participant ->
                 AvatarInitials(
                     userName = participant,
-                    textStyle = MaterialTheme.typography.displaySmall,
+                    textStyle = VonageVideoTheme.typography.caption,
                     size = 64.dp,
                     modifier = Modifier
                         .zIndex((visiblePlaceholders.size - index).toFloat())
@@ -70,7 +68,7 @@ fun ParticipantsPlaceholders(
                     count = additionalCount,
                     size = 64.dp,
                     zIndex = 0f,
-                    textStyle = MaterialTheme.typography.displaySmall,
+                    textStyle = VonageVideoTheme.typography.bodyBase,
                 )
             }
         }
@@ -80,10 +78,10 @@ fun ParticipantsPlaceholders(
 @Composable
 fun AdditionalParticipantsAvatar(
     count: Int,
+    textStyle: TextStyle,
     modifier: Modifier = Modifier,
     zIndex: Float = 0f,
     size: Dp = 96.dp, // move to theme
-    textStyle: TextStyle = MaterialTheme.typography.displayMedium,
 ) {
     Box(
         modifier = modifier
@@ -91,7 +89,7 @@ fun AdditionalParticipantsAvatar(
             .size(size)
             .background(Color.Gray, CircleShape)
             .border(BorderStroke(2.dp, Color.White), CircleShape),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Text(
             text = "+$count",

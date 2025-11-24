@@ -1,41 +1,42 @@
 package com.vonage.android.compose.icons
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.VolumeUp
-import androidx.compose.material.icons.filled.Cameraswitch
-import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.VideoCall
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.line.ArrowBoldLeft
+import com.vonage.android.compose.vivid.icons.line.CameraSwitch
+import com.vonage.android.compose.vivid.icons.line.Plus
+import com.vonage.android.compose.vivid.icons.solid.AudioMid
+import com.vonage.android.compose.vivid.icons.solid.Share2
+import com.vonage.android.compose.vivid.icons.solid.User2
 
 @Composable
-fun KeyboardIcon(
+fun BackIcon(
     modifier: Modifier = Modifier,
+    size: Dp = VonageVideoTheme.dimens.iconSizeDefault,
+    tint: Color = VonageVideoTheme.colors.secondary,
 ) {
     Icon(
-        imageVector = Icons.Default.Keyboard,
+        imageVector = VividIcons.Line.ArrowBoldLeft,
+        tint = tint,
         contentDescription = null,
-        tint = Color.Gray,
-        modifier = modifier.size(24.dp)
+        modifier = modifier.size(size),
     )
 }
 
 @Composable
 fun PersonIcon(
     modifier: Modifier = Modifier,
-    size: Dp = 24.dp,
+    size: Dp = VonageVideoTheme.dimens.iconSizeDefault,
     tint: Color = Color.Gray,
 ) {
     Icon(
-        imageVector = Icons.Default.Person,
+        imageVector = VividIcons.Solid.User2,
         contentDescription = null,
         tint = tint,
         modifier = modifier.size(size),
@@ -43,14 +44,14 @@ fun PersonIcon(
 }
 
 @Composable
-fun VideoCameraIcon(
+fun PlusIcon(
     modifier: Modifier = Modifier,
 ) {
     Icon(
-        imageVector = Icons.Default.VideoCall,
+        imageVector = VividIcons.Line.Plus,
         contentDescription = null,
         tint = Color.White,
-        modifier = modifier.size(24.dp)
+        modifier = modifier.size(VonageVideoTheme.dimens.iconSizeDefault)
     )
 }
 
@@ -60,10 +61,10 @@ fun ShareIcon(
     contentDescription: String? = null
 ) {
     Icon(
-        imageVector = Icons.Default.Share,
+        imageVector = VividIcons.Solid.Share2,
         contentDescription = contentDescription,
-        tint = VonageVideoTheme.colors.inverseSurface,
-        modifier = modifier.size(24.dp)
+        tint = VonageVideoTheme.colors.surface,
+        modifier = modifier.size(VonageVideoTheme.dimens.iconSizeDefault)
     )
 }
 
@@ -73,10 +74,10 @@ fun AudioSelectorIcon(
     contentDescription: String? = null
 ) {
     Icon(
-        imageVector = Icons.AutoMirrored.Default.VolumeUp,
+        imageVector = VividIcons.Solid.AudioMid,
         contentDescription = contentDescription,
-        tint = VonageVideoTheme.colors.inverseSurface,
-        modifier = modifier.size(24.dp)
+        tint = VonageVideoTheme.colors.surface,
+        modifier = modifier.size(VonageVideoTheme.dimens.iconSizeDefault)
     )
 }
 
@@ -86,9 +87,9 @@ fun CameraSwitchIcon(
     contentDescription: String? = null
 ) {
     Icon(
-        imageVector = Icons.Default.Cameraswitch,
+        imageVector = VividIcons.Line.CameraSwitch,
         contentDescription = contentDescription,
-        tint = VonageVideoTheme.colors.inverseSurface,
-        modifier = modifier.size(24.dp)
+        tint = VonageVideoTheme.colors.onSurface,
+        modifier = modifier.size(VonageVideoTheme.dimens.iconSizeDefault)
     )
 }
