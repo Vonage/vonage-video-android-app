@@ -371,8 +371,9 @@ class Call internal constructor(
                 .distinctUntilChanged()
                 .collectLatest { visibleParticipants ->
                     if (visibleParticipants.isEmpty()) return@collectLatest
+                    val activeSpeakerId = activeSpeaker.value?.id
                     participants.forEach { (key, participantState) ->
-                        val isVisible = visibleParticipants.contains(key) || (key == activeSpeaker.value?.id)
+                        val isVisible = visibleParticipants.contains(key) || (key == activeSpeakerId)
                         participantState.changeVisibility(isVisible)
                     }
                 }
