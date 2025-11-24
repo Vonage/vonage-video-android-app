@@ -22,3 +22,17 @@
 -keeppackagenames
 -keep class com.opentok.** { *; }
 -keep class com.vonage.** { *; }
+
+-dontwarn com.google.common.flogger.FluentLogger$Api
+-dontwarn com.google.common.flogger.FluentLogger
+-dontwarn com.google.common.flogger.LoggingApi
+-dontwarn com.google.protobuf.GeneratedMessageLite$Builder
+-dontwarn com.google.protobuf.GeneratedMessageLite$MethodToInvoke
+-dontwarn com.google.protobuf.GeneratedMessageLite
+-dontwarn com.google.protobuf.Internal$EnumLite
+-dontwarn com.google.protobuf.Internal$EnumLiteMap
+-dontwarn com.google.protobuf.Internal$EnumVerifier
+-dontwarn com.google.protobuf.Internal$FloatList
+-dontwarn com.google.protobuf.Internal$IntList
+-dontwarn com.google.protobuf.Internal$ProtobufList
+-dontwarn com.google.protobuf.MessageLiteOrBuilder

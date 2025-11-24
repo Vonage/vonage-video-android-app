@@ -22,8 +22,6 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
-        with:
-          gradle-home-cache-cleanup: true
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -50,7 +48,8 @@ jobs:
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
-          echo $GOOGLE_SERVICES_JSON | base64 -d > app/src/release/service_account.json
+          mkdir -p app/src/release
+          echo $GOOGLE_SERVICES_JSON | base64 -d > app/src/release/google-services.json
 
       - name: Create service account key
         env:
