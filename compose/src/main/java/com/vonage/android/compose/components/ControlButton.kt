@@ -12,21 +12,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.modifier.conditional
+import com.vonage.android.compose.theme.VonageVideoTheme
 
 @Composable
 fun ControlButton(
     icon: ImageVector,
     onClick: () -> Unit,
     isActive: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val iconColor = if (isActive) Color.White else Color.Gray
 
     Box(
         modifier = modifier
-            .size(48.dp)
+            .size(VonageVideoTheme.dimens.minTouchTarget)
             .clip(CircleShape)
             .conditional(
                 isActive,
@@ -40,7 +40,7 @@ fun ControlButton(
             imageVector = icon,
             contentDescription = null,
             tint = iconColor,
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeDefault),
         )
     }
 }

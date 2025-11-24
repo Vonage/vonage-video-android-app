@@ -2,6 +2,7 @@ package com.vonage.android.screen.reporting
 
 import android.net.Uri
 import android.view.Window
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -152,6 +153,7 @@ class ReportingViewModel @Inject constructor(
     }
 }
 
+@Stable
 data class ReportIssueScreenUiState(
     val title: String = "",
     val isTitleValid: Boolean = true,

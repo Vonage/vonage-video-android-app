@@ -13,12 +13,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,6 +32,9 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.line.Close
+import com.vonage.android.compose.vivid.icons.solid.MessageSent
 import com.vonage.android.shared.ChatMessage
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -77,15 +76,15 @@ fun ChatPanel(
                 modifier = Modifier
                     .weight(1f),
                 text = title,
-                color = VonageVideoTheme.colors.inverseSurface,
-                style = VonageVideoTheme.typography.title,
+                color = VonageVideoTheme.colors.onSurface,
+                style = VonageVideoTheme.typography.bodyBase,
             )
             IconButton(
                 onClick = onCloseChat,
             ) {
                 Icon(
-                    imageVector = Icons.Default.Close,
-                    tint = VonageVideoTheme.colors.inverseSurface,
+                    imageVector = VividIcons.Line.Close,
+                    tint = VonageVideoTheme.colors.onSurface,
                     contentDescription = null,
                 )
             }
@@ -101,7 +100,7 @@ fun ChatPanel(
         ChatPanelInput(
             sendLabel = sendLabel,
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .background(VonageVideoTheme.colors.surface)
                 .padding(8.dp),
             onSendMessage = onSendMessage,
         )
@@ -189,7 +188,7 @@ fun ChatPanelInput(
             placeholder = {
                 Text(
                     text = sendLabel,
-                    color = VonageVideoTheme.colors.textPrimaryDisabled,
+                    color = VonageVideoTheme.colors.primary,
                 )
             },
         )
@@ -201,8 +200,8 @@ fun ChatPanelInput(
             enabled = chatInputValue.isNotBlank(),
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Default.Send,
-                tint = VonageVideoTheme.colors.inverseSurface,
+                imageVector = VividIcons.Solid.MessageSent,
+                tint = VonageVideoTheme.colors.onSurface,
                 contentDescription = null,
             )
         }

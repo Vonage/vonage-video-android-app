@@ -9,6 +9,8 @@ plugins {
     alias(libs.plugins.kotlin.ksp) apply false
     alias(libs.plugins.sonarqube) apply false
     alias(libs.plugins.kover) apply false
+    alias(libs.plugins.google.services) apply false
+    alias(libs.plugins.crashlytics) apply false
     alias(libs.plugins.detekt)
     id("com.vonage.json-config") apply false
 }

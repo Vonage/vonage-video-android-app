@@ -7,15 +7,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 
 @Composable
@@ -28,23 +25,26 @@ fun VonageOutlinedButton(
 ) {
     OutlinedButton(
         onClick = onClick,
-        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+        shape = VonageVideoTheme.shapes.medium,
         modifier = modifier,
         colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = VonageVideoTheme.colors.buttonPrimary,
+            contentColor = VonageVideoTheme.colors.primary,
         ),
-        contentPadding = PaddingValues(12.dp),
-        border = BorderStroke(1.dp, VonageVideoTheme.colors.buttonPrimary),
+        contentPadding = PaddingValues(VonageVideoTheme.dimens.paddingMedium),
+        border = BorderStroke(
+            width = VonageVideoTheme.dimens.borderWidthThin,
+            color = VonageVideoTheme.colors.primary,
+        ),
         enabled = enabled,
     ) {
         leadingIcon?.let {
             leadingIcon()
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(VonageVideoTheme.dimens.spaceSmall))
         }
         Text(
             text = text,
-            color = VonageVideoTheme.colors.buttonPrimary,
-            style = VonageVideoTheme.typography.body,
+            color = VonageVideoTheme.colors.primary,
+            style = VonageVideoTheme.typography.bodyBase,
         )
     }
 }
@@ -56,7 +56,7 @@ internal fun VonageOutlinedButtonPreview() {
         Box(
             modifier = Modifier
                 .background(VonageVideoTheme.colors.background)
-                .padding(16.dp)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
         ) {
             VonageOutlinedButton(
                 text = "Button label",

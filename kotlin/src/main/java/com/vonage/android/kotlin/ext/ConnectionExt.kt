@@ -1,11 +1,11 @@
 package com.vonage.android.kotlin.ext
 
 import com.opentok.android.Connection
-import com.opentok.android.Subscriber
+import com.vonage.android.kotlin.model.Participant
 
-fun Connection.extractSenderName(subs: Collection<Subscriber>): String =
+fun Connection.extractSenderName(subs: Collection<Participant>): String =
     subs
-        .filter { it.stream.connection.connectionId == connectionId }
-        .map { it.stream.name }
+        .filter { it.id == connectionId }
+        .map { it.name }
         .firstOrNull()
         .orEmpty()

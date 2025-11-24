@@ -11,7 +11,14 @@ plugins {
     alias(libs.plugins.kover)
     kotlin("plugin.serialization") version "2.0.21"
     alias(libs.plugins.play.publisher)
+    alias(libs.plugins.stability.analyzer)
     id("com.vonage.json-config")
+}
+
+val isReleaseBuild = gradle.startParameter.taskNames.any { it.contains("Release", ignoreCase = true) }
+if (isReleaseBuild) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
 }
 
 val configProps = Properties()
@@ -132,7 +139,6 @@ play {
     releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.COMPLETED)
     artifactDir.set(file("build/outputs/bundle/release"))
     defaultToAppBundles.set(true)
-    commit.set(true)
 }
 
 dependencies {
@@ -171,6 +177,11 @@ dependencies {
     // InApp Updates
     implementation(libs.app.update)
     implementation(libs.app.update.ktx)
+
+    // Firebase Crashlytics - Only in release builds
+    releaseImplementation(platform(libs.firebase.bom))
+    releaseImplementation(libs.firebase.crashlytics.ndk)
+    releaseImplementation(libs.firebase.analytics)
 
     // to be removed when extracting to module all the audio stuff
     implementation(libs.opentok.android.sdk)

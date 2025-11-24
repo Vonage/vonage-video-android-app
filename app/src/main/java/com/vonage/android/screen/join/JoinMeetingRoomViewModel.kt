@@ -1,5 +1,6 @@
 package com.vonage.android.screen.join
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import com.vonage.android.util.RoomNameGenerator
 import com.vonage.android.util.isValidRoomName
@@ -41,6 +42,7 @@ class JoinMeetingRoomViewModel @Inject constructor(
     }
 }
 
+@Immutable
 sealed interface JoinMeetingRoomUiState {
     data class Content(
         val roomName: String = "",

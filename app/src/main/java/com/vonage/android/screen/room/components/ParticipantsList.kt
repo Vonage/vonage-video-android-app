@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,11 +21,13 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
-import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.Participant
-import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.preview.buildParticipants
+import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.MicMute
+import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -46,15 +45,15 @@ fun ParticipantsList(
             Text(
                 modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
                 text = stringResource(R.string.meeting_room_participants_list_title),
-                color = VonageVideoTheme.colors.inverseSurface,
-                style = VonageVideoTheme.typography.title,
+                color = VonageVideoTheme.colors.onSurface,
+                style = VonageVideoTheme.typography.heading1,
             )
         }
         items(
-            items = participants.filter { it.videoSource == VideoSource.CAMERA },
-            key = { participant -> participant.id },
-        ) { participant ->
-            ParticipantRow(participant)
+            items = participants,
+            key = { it.id },
+        ) { participantState ->
+            ParticipantRow(participantState)
         }
     }
 }
@@ -74,7 +73,7 @@ private fun ParticipantRow(participant: Participant) {
                 .padding(vertical = 4.dp, horizontal = 8.dp),
             size = 24.dp,
             userName = participant.name,
-            textStyle = VonageVideoTheme.typography.label,
+            textStyle = VonageVideoTheme.typography.caption,
         )
         Text(
             modifier = Modifier
@@ -83,22 +82,22 @@ private fun ParticipantRow(participant: Participant) {
             text = participant.name,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            color = VonageVideoTheme.colors.inverseSurface,
-            style = VonageVideoTheme.typography.body,
+            color = VonageVideoTheme.colors.onSurface,
+            style = VonageVideoTheme.typography.bodyExtended,
         )
         if (!isMicEnabled) {
             Icon(
                 modifier = Modifier.size(16.dp),
-                imageVector = Icons.Default.MicOff,
+                imageVector = VividIcons.Solid.MicMute,
                 contentDescription = null,
-                tint = VonageVideoTheme.colors.inverseSurface,
+                tint = VonageVideoTheme.colors.onSurface,
             )
         } else {
             Icon(
                 modifier = Modifier.size(16.dp),
-                imageVector = Icons.Default.Mic,
+                imageVector = VividIcons.Solid.Microphone2,
                 contentDescription = null,
-                tint = VonageVideoTheme.colors.inverseSurface,
+                tint = VonageVideoTheme.colors.onSurface,
             )
         }
     }

@@ -7,13 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.VolumeUp
-import androidx.compose.material.icons.filled.Cameraswitch
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,6 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.line.AudioMid
+import com.vonage.android.compose.vivid.icons.line.CameraSwitch
+import com.vonage.android.compose.vivid.icons.solid.MoreVertical
 
 @Composable
 fun DeviceSelectionPanel(
@@ -40,14 +38,14 @@ fun DeviceSelectionPanel(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         DeviceSelector(
-            icon = Icons.AutoMirrored.Default.VolumeUp,
+            icon = VividIcons.Line.AudioMid,
             label = stringResource(R.string.waiting_room_audio_output),
             onClick = onMicDeviceSelect,
             showIndicator = true,
         )
 
         DeviceSelector(
-            icon = Icons.Default.Cameraswitch,
+            icon = VividIcons.Line.CameraSwitch,
             label = stringResource(R.string.waiting_room_switch_camera),
             onClick = onCameraDeviceSelect,
         )
@@ -64,8 +62,12 @@ fun DeviceSelector(
 ) {
     Row(
         modifier = modifier
-            .border(1.dp, MaterialTheme.colorScheme.inverseOnSurface, RoundedCornerShape(8.dp))
-            .clip(RoundedCornerShape(8.dp))
+            .border(
+                width = 1.dp,
+                color = VonageVideoTheme.colors.surface,
+                shape = VonageVideoTheme.shapes.medium,
+            )
+            .clip(VonageVideoTheme.shapes.medium)
             .clickable { onClick() }
             .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -84,7 +86,7 @@ fun DeviceSelector(
         )
         if (showIndicator) {
             Icon(
-                imageVector = Icons.Default.MoreVert,
+                imageVector = VividIcons.Solid.MoreVertical,
                 contentDescription = null,
                 tint = Color.Gray,
                 modifier = Modifier.size(24.dp),

@@ -24,7 +24,13 @@ object RetrofitModule {
     fun provideHttpClient(): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(
             HttpLoggingInterceptor()
-                .apply { level = HttpLoggingInterceptor.Level.HEADERS }
+                .apply {
+                    level = if (BuildConfig.DEBUG) {
+                        HttpLoggingInterceptor.Level.BODY
+                    } else {
+                        HttpLoggingInterceptor.Level.NONE
+                    }
+                }
         )
         .addInterceptor(VeraHeaderRequestDecorator())
         .build()
