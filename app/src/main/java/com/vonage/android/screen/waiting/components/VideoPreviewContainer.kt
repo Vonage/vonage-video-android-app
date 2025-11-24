@@ -1,10 +1,10 @@
 package com.vonage.android.screen.waiting.components
 
-import android.view.View
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,29 +18,27 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.vonage.android.audio.ui.AudioVolumeIndicator
-import com.vonage.android.compose.components.VideoRenderer
-import com.vonage.android.compose.modifier.conditional
-import com.vonage.android.compose.preview.previewCamera
-import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.BlurLevel
+import com.vonage.android.compose.components.AudioVolumeIndicator
 import com.vonage.android.compose.components.AvatarInitials
-import com.vonage.android.compose.vivid.icons.solid.MicMute
-import com.vonage.android.compose.vivid.icons.solid.Microphone2
-import com.vonage.android.compose.vivid.icons.solid.VideoOff
-import com.vonage.android.compose.vivid.icons.solid.Video
+import com.vonage.android.compose.components.ParticipantVideoRenderer
+import com.vonage.android.compose.modifier.conditional
+import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.line.Blur
 import com.vonage.android.compose.vivid.icons.line.BlurOff
 import com.vonage.android.compose.vivid.icons.solid.Blur
+import com.vonage.android.compose.vivid.icons.solid.MicMute
+import com.vonage.android.compose.vivid.icons.solid.Microphone2
+import com.vonage.android.compose.vivid.icons.solid.Video
+import com.vonage.android.compose.vivid.icons.solid.VideoOff
+import com.vonage.android.kotlin.model.BlurLevel
+import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.screen.components.CircularControlButton
 import com.vonage.android.screen.waiting.WaitingRoomActions
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BLUR_BUTTON_TAG
@@ -49,33 +47,27 @@ import com.vonage.android.screen.waiting.WaitingRoomTestTags.MIC_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_INITIALS_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.VOLUME_INDICATOR_TAG
 import com.vonage.android.util.buildTestTag
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
-@Suppress("LongParameterList")
 @Composable
 fun VideoPreviewContainer(
-    view: View?,
     name: String,
-    audioLevels: StateFlow<Float>,
     actions: WaitingRoomActions,
-    blurLevel: BlurLevel,
-    isMicEnabled: Boolean,
-    isCameraEnabled: Boolean,
+    publisher: PreviewPublisherState,
     modifier: Modifier = Modifier,
 ) {
+    val isCameraEnabled by publisher.isCameraEnabled.collectAsStateWithLifecycle()
+
     Box(
         modifier = modifier
             .background(Color.DarkGray),
         contentAlignment = Alignment.BottomCenter,
     ) {
-        if (isCameraEnabled && view != null) {
-            VideoRenderer(
+        if (isCameraEnabled) {
+            ParticipantVideoRenderer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp)
-                    .clipToBounds(),
-                view = view,
+                    .height(360.dp),
+                participant = publisher,
             )
         } else {
             AvatarInitials(
@@ -87,56 +79,50 @@ fun VideoPreviewContainer(
         }
         VideoControlPanel(
             modifier = Modifier.padding(bottom = 16.dp),
-            onMicToggle = actions.onMicToggle,
-            onCameraToggle = actions.onCameraToggle,
-            onCameraBlur = actions.onCameraBlur,
-            isMicEnabled = isMicEnabled,
-            blurLevel = blurLevel,
-            isCameraEnabled = isCameraEnabled,
-            audioLevelState = audioLevels,
+            publisher = publisher,
+            actions = actions,
         )
     }
 }
 
-@Suppress("LongParameterList")
 @Composable
-fun VideoControlPanel(
-    audioLevelState: StateFlow<Float>,
-    onMicToggle: () -> Unit,
-    onCameraToggle: () -> Unit,
-    onCameraBlur: () -> Unit,
-    blurLevel: BlurLevel,
-    isMicEnabled: Boolean,
-    isCameraEnabled: Boolean,
+private fun VideoControlPanel(
+    publisher: PreviewPublisherState,
+    actions: WaitingRoomActions,
     modifier: Modifier = Modifier,
 ) {
+    val isCameraEnabled by publisher.isCameraEnabled.collectAsStateWithLifecycle()
+    val isMicEnabled by publisher.isMicEnabled.collectAsStateWithLifecycle()
+    val audioLevel by publisher.audioLevel.collectAsStateWithLifecycle()
+    val blurLevel by publisher.blurLevel.collectAsStateWithLifecycle()
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = VonageVideoTheme.dimens.spaceDefault),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         MicVolumeIndicator(
-            isMicEnabled,
-            audioLevelState,
+            isMicEnabled = isMicEnabled,
+            audioLevel = audioLevel,
         )
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = spacedBy(VonageVideoTheme.dimens.spaceDefault),
         ) {
             CircularControlButton(
                 modifier = Modifier
                     .conditional(
                         isMicEnabled,
-                        ifTrue = { background(Color.Unspecified) },
-                        ifFalse = { background(Color.Red.copy(alpha = 0.7f)) }
+                        ifTrue = {
+                            background(Color.Unspecified)
+                                .border(BorderStroke(1.dp, Color.White), CircleShape)
+                        },
+                        ifFalse = { background(VonageVideoTheme.colors.error) }
                     )
-                    .conditional(
-                        isMicEnabled,
-                        ifTrue = { border(BorderStroke(1.dp, Color.White), CircleShape) })
                     .testTag(MIC_BUTTON_TAG.buildTestTag(isMicEnabled)),
-                onClick = onMicToggle,
+                onClick = actions.onMicToggle,
                 icon = if (isMicEnabled) VividIcons.Solid.Microphone2 else VividIcons.Solid.MicMute,
             )
 
@@ -144,24 +130,22 @@ fun VideoControlPanel(
                 modifier = Modifier
                     .conditional(
                         isCameraEnabled,
-                        ifTrue = { background(Color.Unspecified) },
-                        ifFalse = { background(Color.Red.copy(alpha = 0.7f)) }
+                        ifTrue = {
+                            background(Color.Unspecified)
+                                .border(BorderStroke(1.dp, Color.White), CircleShape)
+                        },
+                        ifFalse = { background(VonageVideoTheme.colors.error) }
                     )
-                    .conditional(
-                        isCameraEnabled,
-                        ifTrue = { border(BorderStroke(1.dp, Color.White), CircleShape) })
                     .testTag(CAMERA_BUTTON_TAG.buildTestTag(isCameraEnabled)),
-                onClick = onCameraToggle,
+                onClick = actions.onCameraToggle,
                 icon = if (isCameraEnabled) VividIcons.Solid.Video else VividIcons.Solid.VideoOff,
             )
         }
 
-        CircularControlButton(
-            modifier = Modifier
-                .border(BorderStroke(1.dp, Color.White), CircleShape)
-                .testTag(CAMERA_BLUR_BUTTON_TAG),
-            onClick = onCameraBlur,
-            icon = rememberBlurIcon(blurLevel),
+        BlurIndicator(
+            isCameraEnabled = isCameraEnabled,
+            blurLevel = blurLevel,
+            actions = actions,
         )
     }
 }
@@ -169,9 +153,8 @@ fun VideoControlPanel(
 @Composable
 private fun MicVolumeIndicator(
     isMicEnabled: Boolean,
-    audioLevelState: StateFlow<Float>,
+    audioLevel: Float,
 ) {
-    val audioLevel by audioLevelState.collectAsStateWithLifecycle()
     if (isMicEnabled) {
         AudioVolumeIndicator(
             modifier = Modifier
@@ -185,26 +168,29 @@ private fun MicVolumeIndicator(
 }
 
 @Composable
-fun rememberBlurIcon(level: BlurLevel): ImageVector = remember(level) {
+private fun BlurIndicator(
+    isCameraEnabled: Boolean,
+    blurLevel: BlurLevel,
+    actions: WaitingRoomActions,
+) {
+    if (isCameraEnabled) {
+        CircularControlButton(
+            modifier = Modifier
+                .border(BorderStroke(1.dp, Color.White), CircleShape)
+                .testTag(CAMERA_BLUR_BUTTON_TAG),
+            onClick = actions.onCameraBlur,
+            icon = rememberBlurIcon(blurLevel),
+        )
+    } else {
+        Spacer(modifier = Modifier.size(56.dp))
+    }
+}
+
+@Composable
+private fun rememberBlurIcon(level: BlurLevel): ImageVector = remember(level) {
     when (level) {
         BlurLevel.HIGH -> VividIcons.Solid.Blur
         BlurLevel.LOW -> VividIcons.Line.Blur
         BlurLevel.NONE -> VividIcons.Line.BlurOff
-    }
-}
-
-@PreviewLightDark
-@Composable
-internal fun VideoPreviewContainerPreview() {
-    VonageVideoTheme {
-        VideoPreviewContainer(
-            actions = WaitingRoomActions(),
-            view = previewCamera(),
-            name = "John Doe",
-            blurLevel = BlurLevel.LOW,
-            isMicEnabled = true,
-            isCameraEnabled = true,
-            audioLevels = MutableStateFlow(0.5F),
-        )
     }
 }

@@ -1,4 +1,4 @@
-package com.vonage.android.audio.util
+package com.vonage.android.kotlin.internal
 
 import android.annotation.SuppressLint
 import android.media.AudioFormat
@@ -8,7 +8,6 @@ import android.util.Log
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
 import kotlin.math.sqrt
 
 /**
@@ -17,13 +16,13 @@ import kotlin.math.sqrt
  * the conference room it's listening to the SDK AudioLevelListener
  */
 @SuppressLint("MissingPermission")
-class MicVolumeListener @Inject constructor() {
+class MicVolumeListener {
 
     private val bufferSize by lazy {
         AudioRecord.getMinBufferSize(
             SAMPLE_RATE_HZ,
             CHANNEL_CONFIG,
-            AUDIO_FORMAT
+            AUDIO_FORMAT,
         )
     }
 
@@ -37,11 +36,9 @@ class MicVolumeListener @Inject constructor() {
         )
     }
 
-    fun start() {
+    fun start(samplingMillis: Long = 100): Flow<Float> = flow {
         audioRecord.startRecording()
-    }
 
-    fun volume(samplingMillis: Long = 80): Flow<Float> = flow {
         val buffer = ShortArray(bufferSize)
         var bufferReadSize: Int
 

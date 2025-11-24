@@ -12,6 +12,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,9 +23,9 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import com.vonage.android.audio.ui.AudioDevices
 import com.vonage.android.audio.ui.AudioDevicesEffect
-import com.vonage.android.compose.preview.previewCamera
+import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.BlurLevel
+import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.screen.components.TopBanner
 import com.vonage.android.screen.waiting.components.WaitingRoomBody
 
@@ -38,6 +39,12 @@ fun WaitingRoomScreen(
 ) {
     val sheetState = rememberModalBottomSheetState()
     var showAudioDeviceSelector by remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) {
+            navigateToRoom(uiState.roomName)
+        }
+    }
 
     AudioDevicesEffect()
 
@@ -54,7 +61,6 @@ fun WaitingRoomScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-
             if (showAudioDeviceSelector) {
                 ModalBottomSheet(
                     onDismissRequest = { showAudioDeviceSelector = false },
@@ -65,23 +71,14 @@ fun WaitingRoomScreen(
                     )
                 }
             }
-
-            when {
-                uiState.isSuccess -> {
-                    navigateToRoom(uiState.roomName)
+            WaitingRoomBody(
+                uiState = uiState,
+                actions = actions,
+                onMicDeviceSelect = {
+                    showAudioDeviceSelector = true
+                    actions.onAudioSwitch()
                 }
-
-                else -> {
-                    WaitingRoomBody(
-                        uiState = uiState,
-                        actions = actions,
-                        onMicDeviceSelect = {
-                            showAudioDeviceSelector = true
-                            actions.onAudioSwitch()
-                        }
-                    )
-                }
-            }
+            )
         }
     }
 }
@@ -95,29 +92,8 @@ internal fun WaitingRoomScreenPreview() {
             uiState = WaitingRoomUiState(
                 roomName = "test-room-name",
                 userName = "User Name",
-                isMicEnabled = true,
-                isCameraEnabled = false,
-                blurLevel = BlurLevel.NONE,
-                view = previewCamera(),
-            ),
-            actions = WaitingRoomActions(),
-        )
-    }
-}
-
-@PreviewLightDark
-@PreviewScreenSizes
-@Composable
-internal fun WaitingRoomScreenWithVideoPreview() {
-    VonageVideoTheme {
-        WaitingRoomScreen(
-            uiState = WaitingRoomUiState(
-                roomName = "test-room-name",
-                userName = "John Doe",
-                isMicEnabled = false,
-                isCameraEnabled = true,
-                blurLevel = BlurLevel.NONE,
-                view = previewCamera(),
+                publisher = buildParticipants(0).first() as PreviewPublisherState?,
+                isSuccess = false,
             ),
             actions = WaitingRoomActions(),
         )
