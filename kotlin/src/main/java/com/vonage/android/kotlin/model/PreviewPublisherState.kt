@@ -22,7 +22,6 @@ data class PreviewPublisherState(
     private val micVolumeListener by lazy { MicVolumeListener() }
 
     override val id: String = "preview-publisher"
-    override val isPublisher: Boolean = true
     override val creationTime: Long = 0
     override val videoSource: VideoSource = VideoSource.CAMERA
     override val name: String = publisher.name

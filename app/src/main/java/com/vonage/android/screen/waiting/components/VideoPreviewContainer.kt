@@ -38,9 +38,7 @@ import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.compose.vivid.icons.solid.Video
 import com.vonage.android.compose.vivid.icons.solid.VideoOff
 import com.vonage.android.kotlin.model.BlurLevel
-import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.PublisherParticipant
-import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.screen.components.CircularControlButton
 import com.vonage.android.screen.waiting.WaitingRoomActions
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BLUR_BUTTON_TAG
