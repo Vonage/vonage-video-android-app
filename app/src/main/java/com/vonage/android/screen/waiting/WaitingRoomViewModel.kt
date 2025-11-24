@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
-import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.PublisherConfig
+import com.vonage.android.kotlin.model.PublisherParticipant
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -104,6 +104,6 @@ fun interface WaitingRoomViewModelFactory {
 data class WaitingRoomUiState(
     val roomName: String,
     val userName: String = "",
-    val publisher: PreviewPublisherState? = null,
+    val publisher: PublisherParticipant? = null,
     val isSuccess: Boolean = false,
 )

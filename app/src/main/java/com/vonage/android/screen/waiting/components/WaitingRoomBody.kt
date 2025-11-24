@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import com.vonage.android.compose.preview.buildPublisher
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.DeviceSelectionPanel
 import com.vonage.android.screen.waiting.WaitingRoomActions
@@ -62,42 +65,19 @@ fun WaitingRoomBody(
     }
 }
 
-//@PreviewLightDark
-//@PreviewScreenSizes
-//@Composable
-//internal fun WaitingRoomBodyPreview() {
-//    VonageVideoTheme {
-//        WaitingRoomBody(
-//            uiState = WaitingRoomUiState(
-//                roomName = "test-room-name",
-//                userName = "User Name",
-//                isMicEnabled = true,
-//                isCameraEnabled = false,
-//                blurLevel = BlurLevel.NONE,
-//                view = previewCamera(),
-//            ),
-//            actions = WaitingRoomActions(),
-//            onMicDeviceSelect = {},
-//        )
-//    }
-//}
-//
-//@PreviewLightDark
-//@PreviewScreenSizes
-//@Composable
-//internal fun WaitingRoomBodyWithVideoPreview() {
-//    VonageVideoTheme {
-//        WaitingRoomBody(
-//            uiState = WaitingRoomUiState(
-//                roomName = "test-room-name",
-//                userName = "John Doe",
-//                isMicEnabled = false,
-//                isCameraEnabled = true,
-//                blurLevel = BlurLevel.NONE,
-//                view = previewCamera(),
-//            ),
-//            actions = WaitingRoomActions(),
-//            onMicDeviceSelect = {},
-//        )
-//    }
-//}
+@PreviewLightDark
+@PreviewScreenSizes
+@Composable
+internal fun WaitingRoomBodyPreview() {
+    VonageVideoTheme {
+        WaitingRoomBody(
+            uiState = WaitingRoomUiState(
+                roomName = "test-room-name",
+                userName = "User Name",
+                publisher = buildPublisher(),
+            ),
+            actions = WaitingRoomActions(),
+            onMicDeviceSelect = {},
+        )
+    }
+}

@@ -39,6 +39,8 @@ import com.vonage.android.compose.vivid.icons.solid.Video
 import com.vonage.android.compose.vivid.icons.solid.VideoOff
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.PreviewPublisherState
+import com.vonage.android.kotlin.model.PublisherParticipant
+import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.screen.components.CircularControlButton
 import com.vonage.android.screen.waiting.WaitingRoomActions
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BLUR_BUTTON_TAG
@@ -52,7 +54,7 @@ import com.vonage.android.util.buildTestTag
 fun VideoPreviewContainer(
     name: String,
     actions: WaitingRoomActions,
-    publisher: PreviewPublisherState,
+    publisher: PublisherParticipant,
     modifier: Modifier = Modifier,
 ) {
     val isCameraEnabled by publisher.isCameraEnabled.collectAsStateWithLifecycle()
@@ -87,7 +89,7 @@ fun VideoPreviewContainer(
 
 @Composable
 private fun VideoControlPanel(
-    publisher: PreviewPublisherState,
+    publisher: PublisherParticipant,
     actions: WaitingRoomActions,
     modifier: Modifier = Modifier,
 ) {

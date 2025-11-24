@@ -72,7 +72,7 @@ data class PreviewPublisherState(
             .collectLatest { _audioLevel.value = it }
     }
 
-    fun clean() {
+    override fun clean() {
         micVolumeListener.stop()
     }
 

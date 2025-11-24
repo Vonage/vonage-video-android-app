@@ -23,6 +23,7 @@ data class PublisherState(
     private val publisherId: String,
     val publisher: Publisher,
 ) : PublisherParticipant,
+    Publisher.CameraListener,
     PublisherKit.VideoListener,
     PublisherKit.PublisherListener,
     PublisherKit.MuteListener {
@@ -100,6 +101,12 @@ data class PublisherState(
         publisher.setMuteListener(null)
         publisher.setPublisherListener(null)
         session.unpublish(publisher)
+    }
+
+    override fun clean() {
+        publisher.setVideoListener(null)
+        publisher.setMuteListener(null)
+        publisher.setPublisherListener(null)
     }
 
     override fun onVideoDisabled(publisher: PublisherKit, reason: String) {

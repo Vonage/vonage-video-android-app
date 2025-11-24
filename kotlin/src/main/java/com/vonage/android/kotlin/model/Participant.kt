@@ -23,14 +23,14 @@ interface Participant {
 }
 
 @Stable
-interface PublisherParticipant : Participant,
-    Publisher.CameraListener {
+interface PublisherParticipant : Participant {
     val camera: StateFlow<CameraType>
     val blurLevel: StateFlow<BlurLevel>
     fun toggleVideo()
     fun toggleAudio()
     fun cycleCamera()
     fun cycleCameraBlur()
+    fun clean()
 }
 
 enum class CameraType(val index: Int) {

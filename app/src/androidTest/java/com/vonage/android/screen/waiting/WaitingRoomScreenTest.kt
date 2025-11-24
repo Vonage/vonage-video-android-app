@@ -52,6 +52,7 @@ class WaitingRoomScreenTest {
                     uiState = WaitingRoomUiState(
                         roomName = "room-name",
                         userName = "",
+                        publisher = ,
                         isMicEnabled = true,
                         isCameraEnabled = true,
                         view = previewCamera(),
