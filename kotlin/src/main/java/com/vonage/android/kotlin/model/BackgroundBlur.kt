@@ -26,5 +26,10 @@ enum class BlurLevel {
     HIGH,
 
     @SerialName("None")
-    NONE
+    NONE;
+
+    companion object {
+        private val map = BlurLevel.entries.toTypedArray()
+        infix fun by(index: Int): BlurLevel = map[index % BlurLevel.entries.size]
+    }
 }

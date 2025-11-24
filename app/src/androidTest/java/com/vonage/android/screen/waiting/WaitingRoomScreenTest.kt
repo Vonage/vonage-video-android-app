@@ -1,6 +1,8 @@
 package com.vonage.android.screen.waiting
 
 import android.Manifest
+import android.view.View
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
@@ -12,12 +14,16 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
+import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.BlurLevel
-import com.vonage.android.compose.preview.previewCamera
+import com.vonage.android.kotlin.model.CameraType
+import com.vonage.android.kotlin.model.PublisherParticipant
+import com.vonage.android.kotlin.model.VideoSource
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -52,11 +58,10 @@ class WaitingRoomScreenTest {
                     uiState = WaitingRoomUiState(
                         roomName = "room-name",
                         userName = "",
-                        isMicEnabled = true,
-                        isCameraEnabled = true,
-                        view = previewCamera(),
-                        blurLevel = BlurLevel.NONE,
-                        audioLevel = MutableStateFlow(0.5f),
+                        publisher = buildPublisher(
+                            isMicEnabled = true,
+                            isCameraEnabled = true,
+                        ),
                     ),
                     actions = WaitingRoomActions(),
                 )
@@ -88,11 +93,10 @@ class WaitingRoomScreenTest {
                     uiState = WaitingRoomUiState(
                         roomName = "room-name",
                         userName = "user name",
-                        isMicEnabled = true,
-                        isCameraEnabled = true,
-                        view = previewCamera(),
-                        blurLevel = BlurLevel.NONE,
-                        audioLevel = MutableStateFlow(0.5f),
+                        publisher = buildPublisher(
+                            isMicEnabled = true,
+                            isCameraEnabled = true,
+                        ),
                     ),
                     actions = WaitingRoomActions(),
                 )
@@ -124,11 +128,10 @@ class WaitingRoomScreenTest {
                     uiState = WaitingRoomUiState(
                         roomName = "room-name",
                         userName = "user name",
-                        isMicEnabled = true,
-                        isCameraEnabled = false,
-                        view = previewCamera(),
-                        blurLevel = BlurLevel.NONE,
-                        audioLevel = MutableStateFlow(0.5f),
+                        publisher = buildPublisher(
+                            isMicEnabled = true,
+                            isCameraEnabled = false,
+                        ),
                     ),
                     actions = WaitingRoomActions(),
                 )
@@ -148,11 +151,10 @@ class WaitingRoomScreenTest {
                     uiState = WaitingRoomUiState(
                         roomName = "room-name",
                         userName = "user name",
-                        isMicEnabled = false,
-                        isCameraEnabled = false,
-                        view = previewCamera(),
-                        blurLevel = BlurLevel.NONE,
-                        audioLevel = MutableStateFlow(0.5f),
+                        publisher = buildPublisher(
+                            isMicEnabled = false,
+                            isCameraEnabled = false,
+                        ),
                     ),
                     actions = WaitingRoomActions(),
                 )
@@ -172,11 +174,10 @@ class WaitingRoomScreenTest {
                     uiState = WaitingRoomUiState(
                         roomName = "room-name",
                         userName = "",
-                        isMicEnabled = true,
-                        isCameraEnabled = false,
-                        view = previewCamera(),
-                        blurLevel = BlurLevel.NONE,
-                        audioLevel = MutableStateFlow(0.5f),
+                        publisher = buildPublisher(
+                            isMicEnabled = true,
+                            isCameraEnabled = false,
+                        ),
                     ),
                     actions = WaitingRoomActions(),
                 )
@@ -204,11 +205,10 @@ class WaitingRoomScreenTest {
                     uiState = WaitingRoomUiState(
                         roomName = "room-name",
                         userName = "",
-                        isMicEnabled = false,
-                        isCameraEnabled = false,
-                        view = previewCamera(),
-                        blurLevel = BlurLevel.NONE,
-                        audioLevel = MutableStateFlow(0.5f),
+                        publisher = buildPublisher(
+                            isMicEnabled = false,
+                            isCameraEnabled = false,
+                        ),
                     ),
                     actions = WaitingRoomActions(),
                 )
@@ -226,5 +226,33 @@ class WaitingRoomScreenTest {
             .performScrollTo()
             .assertIsDisplayed()
             .assertIsNotEnabled()
+    }
+
+    @Suppress("EmptyFunctionBlock")
+    @Composable
+    private fun buildPublisher(
+        isMicEnabled: Boolean,
+        isCameraEnabled: Boolean,
+    ): PublisherParticipant {
+        return object : PublisherParticipant {
+            override val camera: StateFlow<CameraType> = MutableStateFlow(CameraType.FRONT)
+            override val blurLevel: StateFlow<BlurLevel> = MutableStateFlow(BlurLevel.NONE)
+
+            override fun toggleVideo() {}
+            override fun toggleAudio() {}
+            override fun cycleCamera() {}
+            override fun cycleCameraBlur() {}
+            override fun clean() {}
+
+            override val id: String = "publisher"
+            override val creationTime: Long = 1L
+            override val videoSource: VideoSource = VideoSource.CAMERA
+            override val name: String = "test publisher"
+            override val isMicEnabled: StateFlow<Boolean> = MutableStateFlow(isMicEnabled)
+            override val isCameraEnabled: StateFlow<Boolean> = MutableStateFlow(isCameraEnabled)
+            override val isTalking: StateFlow<Boolean> = MutableStateFlow(isMicEnabled)
+            override val audioLevel: StateFlow<Float> = MutableStateFlow(0F)
+            override val view: View = previewCamera()
+        }
     }
 }

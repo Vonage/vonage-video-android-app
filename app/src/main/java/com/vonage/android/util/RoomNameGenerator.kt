@@ -42,11 +42,9 @@ class RoomNameGenerator @Inject constructor() {
         "charming", "whimsical", "serene"
     )
 
-    private fun pickRandom(list: List<String>): String = list.random()
-
     /**
      * Generates a random room name with the schema `adjective`-`animal`.
      * @return A randomized room name
      */
-    fun generateRoomName(): String = "${pickRandom(adjectives)}-${pickRandom(animals)}"
+    fun generateRoomName(): String = "${adjectives.random()}-${animals.random()}"
 }

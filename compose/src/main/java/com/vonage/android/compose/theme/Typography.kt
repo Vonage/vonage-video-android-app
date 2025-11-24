@@ -32,7 +32,7 @@ internal val heading1TextStyle = TextStyle(
 
 internal val heading2TextStyle = TextStyle(
     fontSize = 24.sp,
-    fontWeight = FontWeight(500),
+    fontWeight = FontWeight(300),
     lineHeight = 32.sp,
     fontFamily = FontFamily.Default,
 )

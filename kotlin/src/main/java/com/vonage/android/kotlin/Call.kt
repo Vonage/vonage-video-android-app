@@ -59,7 +59,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
 
-@Suppress("TooManyFunctions")
 @OptIn(FlowPreview::class)
 @Stable
 class Call internal constructor(
@@ -73,7 +72,6 @@ class Call internal constructor(
     private lateinit var context: Context
 
     private val coroutineScope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
-
     private var participantsOnScreenJob: Job? = null
     private var activeSpeakerTrackerJob: Job? = null
     private var signalsJob: Job? = null
@@ -119,7 +117,7 @@ class Call internal constructor(
     private val _captionsStateFlow = MutableStateFlow<String?>(null)
     override val captionsStateFlow: StateFlow<String?> = _captionsStateFlow
 
-    val signalState: SignalFlows = mutableMapOf()
+    private val signalState: SignalFlows = mutableMapOf()
     override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> =
         signalPlugins
             .filter { it.canHandle(signalType.signal) }
@@ -168,7 +166,7 @@ class Call internal constructor(
         session.setSessionListener(sessionListener)
         session.setSignalListener { _, type, data, conn ->
             signalPlugins.forEach { plugin ->
-                val isYou = publisherHolder.publisher.stream.connection == conn
+                val isYou = publisher()?.publisher?.stream?.connection == conn
                 val senderName = if (!isYou) {
                     conn.extractSenderName(participants.values)
                 } else {
@@ -193,7 +191,7 @@ class Call internal constructor(
 
     override fun endSession() {
         // wait for PublisherListener#streamDestroyed before returning : VIDSOL-104
-        session.unpublish(publisherHolder.publisher)
+        session.unpublish(publisher()?.publisher)
 
         session.setSessionListener(null)
         session.setSignalListener(null)
@@ -214,7 +212,7 @@ class Call internal constructor(
         signalPlugins
             .filter { it.canHandle(signalType.signal) }
             .forEach { plugin ->
-                plugin.sendSignal(senderName = publisherHolder.publisher.name, message = data).let {
+                plugin.sendSignal(senderName = publisher()?.publisher?.name.orEmpty(), message = data).let {
                     session.sendSignal(it.type, it.data)
                 }
             }
@@ -242,16 +240,18 @@ class Call internal constructor(
     //endregion
 
     //region Publisher
+    private fun publisher(): PublisherState? = (participants[PUBLISHER_ID] as? PublisherState)
+
     override fun toggleLocalVideo() {
-        (participants[PUBLISHER_ID] as PublisherState).toggleVideo()
+        publisher()?.toggleVideo()
     }
 
     override fun toggleLocalCamera() {
-        publisherHolder.publisher.cycleCamera()
+        publisher()?.cycleCamera()
     }
 
     override fun toggleLocalAudio() {
-        (participants[PUBLISHER_ID] as PublisherState).toggleAudio()
+        publisher()?.toggleAudio()
     }
 
     private fun publishToSession() {
@@ -259,15 +259,10 @@ class Call internal constructor(
             publisherHolder.let { holder ->
                 val publisher = withContext(Dispatchers.Main) {
                     session.publish(holder.publisher)
-                    PublisherState(
-                        publisherId = PUBLISHER_ID,
-                        publisher = holder.publisher,
-                    )
+                    PublisherState(publisherId = PUBLISHER_ID, publisher = holder.publisher)
                 }
                 participants[PUBLISHER_ID] = publisher
-                coroutineScope.launch {
-                    publisher.setup()
-                }
+                coroutineScope.launch { publisher.setup() }
                 updateParticipants()
             }
         }
@@ -310,30 +305,25 @@ class Call internal constructor(
     }
     //endregion
 
+    //region Captions
+    private val captionsDelegate: SubscriberKit.CaptionsListener =
+        SubscriberKit.CaptionsListener { subscriber, text, isFinal ->
+            _captionsStateFlow.update { _ -> "${subscriber.name()}: $text" }
+            if (isFinal) {
+                _captionsStateFlow.update { _ -> null }
+            }
+        }
+
     override fun enableCaptions(enable: Boolean) {
         coroutineScope.launch {
-            publisherHolder.publisher.publishCaptions = enable
+            publisher()?.publisher?.publishCaptions = enable
             participants.values.filterIsInstance<ParticipantState>()
                 .forEach { participant -> participant.subscriber.subscribeToCaptions = enable }
         }
     }
+    //endregion
 
-    override fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>) {
-        if (!VISIBILITY_MONITOR_ENABLED) return
-        participantsOnScreenJob?.cancel()
-        participantsOnScreenJob = coroutineScope.launch(Dispatchers.Default) {
-            snapshotFlow
-                .distinctUntilChanged()
-                .collectLatest { visibleParticipants ->
-                    if (visibleParticipants.isEmpty()) return@collectLatest
-                    participants.forEach { (key, participantState) ->
-                        val isVisible = visibleParticipants.contains(key) || (key == activeSpeaker.value?.id)
-                        participantState.changeVisibility(isVisible)
-                    }
-                }
-        }
-    }
-
+    //region Subscribers
     @Suppress("TooGenericExceptionCaught")
     private fun addSubscriber(stream: Stream) {
         coroutineScope.launch {
@@ -362,11 +352,6 @@ class Call internal constructor(
         }
     }
 
-    private fun updateParticipants() {
-        _participantsInternalFlow.update { participants.values.toImmutableList() }
-        _participantsCount.update { participants.size }
-    }
-
     private fun removeSubscriber(stream: Stream) {
         val subscriber = participants[stream.streamId] ?: return
         coroutineScope.launch {
@@ -376,14 +361,24 @@ class Call internal constructor(
         }
         subscriber.clean(session)
     }
+    //endregion
 
-    private val captionsDelegate: SubscriberKit.CaptionsListener =
-        SubscriberKit.CaptionsListener { subscriber, text, isFinal ->
-            _captionsStateFlow.update { _ -> "${subscriber.name()}: $text" }
-            if (isFinal) {
-                _captionsStateFlow.update { _ -> null }
-            }
+    override fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>) {
+        if (!VISIBILITY_MONITOR_ENABLED) return
+        participantsOnScreenJob?.cancel()
+        participantsOnScreenJob = coroutineScope.launch(Dispatchers.Default) {
+            snapshotFlow
+                .distinctUntilChanged()
+                .collectLatest { visibleParticipants ->
+                    if (visibleParticipants.isEmpty()) return@collectLatest
+                    val activeSpeakerId = activeSpeaker.value?.id
+                    participants.forEach { (key, participantState) ->
+                        val isVisible = visibleParticipants.contains(key) || (key == activeSpeakerId)
+                        participantState.changeVisibility(isVisible)
+                    }
+                }
         }
+    }
 
     private fun startActiveSpeakerTracker() {
         activeSpeakerTrackerJob?.cancel()
@@ -395,6 +390,11 @@ class Call internal constructor(
                 }
             }
             .launchIn(coroutineScope)
+    }
+
+    private fun updateParticipants() {
+        _participantsInternalFlow.update { participants.values.toImmutableList() }
+        _participantsCount.update { participants.size }
     }
 
     companion object {
