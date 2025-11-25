@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,13 +17,14 @@ fun VonageTopAppBar(
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
+    colors: TopAppBarColors = topAppBarColors(
+        containerColor = VonageVideoTheme.colors.surface,
+    ),
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     TopAppBar(
         modifier = modifier,
-        colors = topAppBarColors(
-            containerColor = VonageVideoTheme.colors.surface,
-        ),
+        colors = colors,
         navigationIcon = {
             onBack?.let {
                 IconButton(onClick = onBack) {

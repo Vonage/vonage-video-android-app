@@ -46,9 +46,9 @@ object JoinMeetingRoomTestTags {
 
 @Stable
 data class JoinMeetingRoomActions(
-    val onJoinRoomClick: (String) -> Unit,
-    val onCreateRoomClick: () -> Unit,
-    val onRoomNameChange: (String) -> Unit,
+    val onJoinRoomClick: (String) -> Unit = {},
+    val onCreateRoomClick: () -> Unit = {},
+    val onRoomNameChange: (String) -> Unit = {},
 )
 
 data class JoinMeetingRoomRouteParams(
