@@ -36,3 +36,9 @@
 -dontwarn com.google.protobuf.Internal$IntList
 -dontwarn com.google.protobuf.Internal$ProtobufList
 -dontwarn com.google.protobuf.MessageLiteOrBuilder
+
+-dontwarn com.vonage.android.kotlin.VonageVideoClient
+-dontwarn com.vonage.android.kotlin.ext.**
+-dontwarn com.vonage.android.kotlin.internal.**
+-dontwarn com.vonage.android.kotlin.model.**
+-dontwarn com.vonage.android.kotlin.signal.**
