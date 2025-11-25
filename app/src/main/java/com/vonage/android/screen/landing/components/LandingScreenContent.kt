@@ -1,4 +1,4 @@
-package com.vonage.android.screen.join.components
+package com.vonage.android.screen.landing.components
 
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Column
@@ -13,8 +13,8 @@ import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.icons.PlusIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.OrSeparator
-import com.vonage.android.screen.join.JoinMeetingRoomActions
-import com.vonage.android.screen.join.LandingScreenTestTags.CREATE_ROOM_BUTTON_TAG
+import com.vonage.android.screen.landing.JoinMeetingRoomActions
+import com.vonage.android.screen.landing.LandingScreenTestTags.CREATE_ROOM_BUTTON_TAG
 
 @Composable
 internal fun LandingScreenContent(

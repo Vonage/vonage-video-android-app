@@ -1,4 +1,4 @@
-package com.vonage.android.screen.join
+package com.vonage.android.screen.landing
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel

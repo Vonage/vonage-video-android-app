@@ -1,4 +1,4 @@
-package com.vonage.android.screen.join
+package com.vonage.android.screen.landing
 
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule

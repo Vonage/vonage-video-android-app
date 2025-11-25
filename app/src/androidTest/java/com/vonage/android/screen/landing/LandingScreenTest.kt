@@ -1,4 +1,4 @@
-package com.vonage.android.screen.join
+package com.vonage.android.screen.landing
 
 import android.content.Context
 import androidx.compose.ui.test.assert

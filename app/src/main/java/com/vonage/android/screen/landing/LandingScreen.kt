@@ -1,4 +1,4 @@
-package com.vonage.android.screen.join
+package com.vonage.android.screen.landing
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -17,8 +17,8 @@ import com.vonage.android.R
 import com.vonage.android.compose.layout.TwoPaneScaffold
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.TopBanner
-import com.vonage.android.screen.join.components.LandingScreenContent
-import com.vonage.android.screen.join.components.LandingScreenHeader
+import com.vonage.android.screen.landing.components.LandingScreenContent
+import com.vonage.android.screen.landing.components.LandingScreenHeader
 
 @Composable
 fun LandingScreen(

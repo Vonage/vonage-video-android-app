@@ -1,4 +1,4 @@
-package com.vonage.android.screen.join.components
+package com.vonage.android.screen.landing.components
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -25,8 +25,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.join.LandingScreenTestTags.SUBTITLE_TAG
-import com.vonage.android.screen.join.LandingScreenTestTags.TITLE_TAG
+import com.vonage.android.screen.landing.LandingScreenTestTags.SUBTITLE_TAG
+import com.vonage.android.screen.landing.LandingScreenTestTags.TITLE_TAG
 
 @Composable
 internal fun LandingScreenHeader(

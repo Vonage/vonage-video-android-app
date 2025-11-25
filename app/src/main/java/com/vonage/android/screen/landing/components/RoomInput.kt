@@ -1,4 +1,4 @@
-package com.vonage.android.screen.join.components
+package com.vonage.android.screen.landing.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -20,10 +20,10 @@ import com.vonage.android.R
 import com.vonage.android.compose.components.VonageOutlinedButton
 import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.join.JoinMeetingRoomActions
-import com.vonage.android.screen.join.LandingScreenTestTags.JOIN_BUTTON_TAG
-import com.vonage.android.screen.join.LandingScreenTestTags.ROOM_INPUT_ERROR_TAG
-import com.vonage.android.screen.join.LandingScreenTestTags.ROOM_INPUT_TAG
+import com.vonage.android.screen.landing.JoinMeetingRoomActions
+import com.vonage.android.screen.landing.LandingScreenTestTags.JOIN_BUTTON_TAG
+import com.vonage.android.screen.landing.LandingScreenTestTags.ROOM_INPUT_ERROR_TAG
+import com.vonage.android.screen.landing.LandingScreenTestTags.ROOM_INPUT_TAG
 
 @Composable
 internal fun RoomInput(

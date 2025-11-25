@@ -8,7 +8,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.components.VonageTopAppBar
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.join.LandingScreenTestTags.VONAGE_ICON_TAG
+import com.vonage.android.screen.landing.LandingScreenTestTags.VONAGE_ICON_TAG
 
 @Composable
 fun TopBanner(

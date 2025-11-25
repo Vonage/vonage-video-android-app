@@ -1,14 +1,14 @@
-package com.vonage.android.screen.join
+package com.vonage.android.screen.landing
 
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.onNodeWithTag
-import com.vonage.android.screen.join.LandingScreenTestTags.CREATE_ROOM_BUTTON_TAG
-import com.vonage.android.screen.join.LandingScreenTestTags.JOIN_BUTTON_TAG
-import com.vonage.android.screen.join.LandingScreenTestTags.ROOM_INPUT_ERROR_TAG
-import com.vonage.android.screen.join.LandingScreenTestTags.ROOM_INPUT_TAG
-import com.vonage.android.screen.join.LandingScreenTestTags.SUBTITLE_TAG
-import com.vonage.android.screen.join.LandingScreenTestTags.TITLE_TAG
-import com.vonage.android.screen.join.LandingScreenTestTags.VONAGE_ICON_TAG
+import com.vonage.android.screen.landing.LandingScreenTestTags.CREATE_ROOM_BUTTON_TAG
+import com.vonage.android.screen.landing.LandingScreenTestTags.JOIN_BUTTON_TAG
+import com.vonage.android.screen.landing.LandingScreenTestTags.ROOM_INPUT_ERROR_TAG
+import com.vonage.android.screen.landing.LandingScreenTestTags.ROOM_INPUT_TAG
+import com.vonage.android.screen.landing.LandingScreenTestTags.SUBTITLE_TAG
+import com.vonage.android.screen.landing.LandingScreenTestTags.TITLE_TAG
+import com.vonage.android.screen.landing.LandingScreenTestTags.VONAGE_ICON_TAG
 
 class LandingScreenObject(
     compose: SemanticsNodeInteractionsProvider
