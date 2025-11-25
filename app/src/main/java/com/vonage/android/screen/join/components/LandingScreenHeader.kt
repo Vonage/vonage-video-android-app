@@ -25,11 +25,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.SUBTITLE_TAG
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.TITLE_TAG
+import com.vonage.android.screen.join.LandingScreenTestTags.SUBTITLE_TAG
+import com.vonage.android.screen.join.LandingScreenTestTags.TITLE_TAG
 
 @Composable
-internal fun JoinMeetingRoomHeader(
+internal fun LandingScreenHeader(
     modifier: Modifier = Modifier,
 ) {
     val gradientColors = listOf(

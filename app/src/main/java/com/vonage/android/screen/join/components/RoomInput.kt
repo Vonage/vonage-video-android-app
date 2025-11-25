@@ -21,9 +21,9 @@ import com.vonage.android.compose.components.VonageOutlinedButton
 import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.join.JoinMeetingRoomActions
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.JOIN_BUTTON_TAG
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.ROOM_INPUT_ERROR_TAG
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.ROOM_INPUT_TAG
+import com.vonage.android.screen.join.LandingScreenTestTags.JOIN_BUTTON_TAG
+import com.vonage.android.screen.join.LandingScreenTestTags.ROOM_INPUT_ERROR_TAG
+import com.vonage.android.screen.join.LandingScreenTestTags.ROOM_INPUT_TAG
 
 @Composable
 internal fun RoomInput(

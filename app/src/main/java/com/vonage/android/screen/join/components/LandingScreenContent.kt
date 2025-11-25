@@ -14,10 +14,10 @@ import com.vonage.android.compose.icons.PlusIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.OrSeparator
 import com.vonage.android.screen.join.JoinMeetingRoomActions
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.CREATE_ROOM_BUTTON_TAG
+import com.vonage.android.screen.join.LandingScreenTestTags.CREATE_ROOM_BUTTON_TAG
 
 @Composable
-internal fun JoinMeetingRoomContent(
+internal fun LandingScreenContent(
     roomName: String,
     isRoomNameWrong: Boolean,
     actions: JoinMeetingRoomActions,

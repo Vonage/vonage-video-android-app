@@ -10,9 +10,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.util.pip.pipEffect
 
 @Composable
-internal fun JoinMeetingRoomRoute(
+internal fun LandingScreenRoute(
     modifier: Modifier = Modifier,
-    viewModel: JoinMeetingRoomViewModel = hiltViewModel(),
+    viewModel: LandingScreenViewModel = hiltViewModel(),
     navigateToRoom: (JoinMeetingRoomRouteParams) -> Unit,
 ) {
     val pipModifier = pipEffect(shouldEnterPipMode = false)
@@ -26,7 +26,7 @@ internal fun JoinMeetingRoomRoute(
         )
     }
 
-    JoinMeetingRoomScreen(
+    LandingScreen(
         uiState = uiState,
         actions = actions,
         modifier = modifier.then(pipModifier),
@@ -34,14 +34,14 @@ internal fun JoinMeetingRoomRoute(
     )
 }
 
-object JoinMeetingRoomTestTags {
-    const val TITLE_TAG = "join_meeting_room_screen_title"
-    const val VONAGE_ICON_TAG = "join_meeting_room_screen_icon"
-    const val SUBTITLE_TAG = "join_meeting_room_screen_subtitle"
-    const val CREATE_ROOM_BUTTON_TAG = "join_meeting_room_screen_create_room_button"
-    const val JOIN_BUTTON_TAG = "join_meeting_room_screen_join_button"
-    const val ROOM_INPUT_TAG = "join_meeting_room_screen_room_input"
-    const val ROOM_INPUT_ERROR_TAG = "join_meeting_room_screen_room_error_label"
+object LandingScreenTestTags {
+    const val TITLE_TAG = "landing_screen_title"
+    const val VONAGE_ICON_TAG = "landing_screen_icon"
+    const val SUBTITLE_TAG = "landing_screen_subtitle"
+    const val CREATE_ROOM_BUTTON_TAG = "landing_screen_create_room_button"
+    const val JOIN_BUTTON_TAG = "landing_screen_join_button"
+    const val ROOM_INPUT_TAG = "landing_screen_room_input"
+    const val ROOM_INPUT_ERROR_TAG = "landing_screen_room_error_label"
 }
 
 @Stable

@@ -14,14 +14,15 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.vonage.android.R
+import com.vonage.android.compose.layout.TwoPaneScaffold
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.TopBanner
-import com.vonage.android.screen.join.components.JoinMeetingRoomContent
-import com.vonage.android.screen.join.components.JoinMeetingRoomHeader
+import com.vonage.android.screen.join.components.LandingScreenContent
+import com.vonage.android.screen.join.components.LandingScreenHeader
 
 @Composable
-fun JoinMeetingRoomScreen(
-    uiState: JoinMeetingRoomUiState,
+fun LandingScreen(
+    uiState: LandingScreenUiState,
     actions: JoinMeetingRoomActions,
     modifier: Modifier = Modifier,
     navigateToRoom: (JoinMeetingRoomRouteParams) -> Unit = {},
@@ -42,14 +43,14 @@ fun JoinMeetingRoomScreen(
         modifier = modifier.fillMaxSize(),
         topBar = { TopBanner() },
         firstPane = {
-            JoinMeetingRoomHeader(
+            LandingScreenHeader(
                 modifier = Modifier
                     .padding(VonageVideoTheme.dimens.paddingLarge)
                     .widthIn(0.dp, 550.dp),
             )
         },
         secondPane = {
-            JoinMeetingRoomContent(
+            LandingScreenContent(
                 modifier = Modifier
                     .background(VonageVideoTheme.colors.surface, VonageVideoTheme.shapes.small)
                     .padding(VonageVideoTheme.dimens.paddingLarge)
@@ -65,10 +66,10 @@ fun JoinMeetingRoomScreen(
 @PreviewLightDark
 @PreviewScreenSizes
 @Composable
-internal fun PreviewJoinRoomScreen() {
+internal fun LandingScreenPreview() {
     VonageVideoTheme {
-        JoinMeetingRoomScreen(
-            uiState = JoinMeetingRoomUiState(
+        LandingScreen(
+            uiState = LandingScreenUiState(
                 roomName = "hithere",
                 isRoomNameWrong = false,
             ),

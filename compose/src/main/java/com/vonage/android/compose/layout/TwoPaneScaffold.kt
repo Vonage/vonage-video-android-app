@@ -1,4 +1,4 @@
-package com.vonage.android.screen.join
+package com.vonage.android.compose.layout
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -80,7 +80,7 @@ private fun VerticalLayout(
         modifier = modifier
             .padding(top = VonageVideoTheme.dimens.spaceXXLarge)
             .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.Center,
     ) {
         Box(
             modifier = Modifier

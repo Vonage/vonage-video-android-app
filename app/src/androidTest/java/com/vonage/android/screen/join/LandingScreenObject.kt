@@ -2,15 +2,15 @@ package com.vonage.android.screen.join
 
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.onNodeWithTag
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.CREATE_ROOM_BUTTON_TAG
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.JOIN_BUTTON_TAG
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.ROOM_INPUT_ERROR_TAG
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.ROOM_INPUT_TAG
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.SUBTITLE_TAG
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.TITLE_TAG
-import com.vonage.android.screen.join.JoinMeetingRoomTestTags.VONAGE_ICON_TAG
+import com.vonage.android.screen.join.LandingScreenTestTags.CREATE_ROOM_BUTTON_TAG
+import com.vonage.android.screen.join.LandingScreenTestTags.JOIN_BUTTON_TAG
+import com.vonage.android.screen.join.LandingScreenTestTags.ROOM_INPUT_ERROR_TAG
+import com.vonage.android.screen.join.LandingScreenTestTags.ROOM_INPUT_TAG
+import com.vonage.android.screen.join.LandingScreenTestTags.SUBTITLE_TAG
+import com.vonage.android.screen.join.LandingScreenTestTags.TITLE_TAG
+import com.vonage.android.screen.join.LandingScreenTestTags.VONAGE_ICON_TAG
 
-class JoinMeetingRoomScreenObject(
+class LandingScreenObject(
     compose: SemanticsNodeInteractionsProvider
 ) {
     val logo = compose.onNodeWithTag(VONAGE_ICON_TAG)
