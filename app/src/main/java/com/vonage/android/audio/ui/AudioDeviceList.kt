@@ -56,8 +56,8 @@ fun AudioDeviceList(
                 modifier = Modifier
                     .padding(start = 8.dp, bottom = 8.dp),
                 text = stringResource(R.string.waiting_room_available_audio_outputs),
-                color = VonageVideoTheme.colors.onSurface,
-                style = VonageVideoTheme.typography.heading1,
+                color = VonageVideoTheme.colors.textSecondary,
+                style = VonageVideoTheme.typography.heading2,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -100,8 +100,8 @@ private fun AudioDeviceCell(
                 },
                 ifFalse = {
                     border(
-                        width = 1.dp,
-                        color = VonageVideoTheme.colors.tertiary,
+                        width = VonageVideoTheme.dimens.borderWidthThin,
+                        color = VonageVideoTheme.colors.surface,
                         shape = VonageVideoTheme.shapes.medium,
                     )
                 },
