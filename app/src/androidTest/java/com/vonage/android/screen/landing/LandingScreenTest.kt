@@ -1,4 +1,4 @@
-package com.vonage.android.screen.join
+package com.vonage.android.screen.landing
 
 import android.content.Context
 import androidx.compose.ui.test.assert
@@ -23,7 +23,7 @@ import org.junit.runner.RunWith
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
-class JoinMeetingRoomScreenTest {
+class LandingScreenTest {
 
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
@@ -31,7 +31,7 @@ class JoinMeetingRoomScreenTest {
     @get:Rule(order = 1)
     val compose = createComposeRule()
 
-    private val screen = JoinMeetingRoomScreenObject(compose)
+    private val screen = LandingScreenObject(compose)
 
     @Before
     fun setup() {
@@ -42,8 +42,8 @@ class JoinMeetingRoomScreenTest {
     fun given_initial_state_THEN_components_are_displayed() {
         compose.setContent {
             VonageVideoTheme {
-                JoinMeetingRoomScreen(
-                    uiState = JoinMeetingRoomUiState(),
+                LandingScreen(
+                    uiState = LandingScreenUiState(),
                     actions = NO_OP_JOIN_MEETING_ROOM_ACTIONS,
                 )
             }
@@ -67,8 +67,8 @@ class JoinMeetingRoomScreenTest {
     fun given_valid_state_THEN_components_are_displayed() {
         compose.setContent {
             VonageVideoTheme {
-                JoinMeetingRoomScreen(
-                    uiState = JoinMeetingRoomUiState(
+                LandingScreen(
+                    uiState = LandingScreenUiState(
                         roomName = "hithere",
                     ),
                     actions = NO_OP_JOIN_MEETING_ROOM_ACTIONS,
@@ -96,8 +96,8 @@ class JoinMeetingRoomScreenTest {
 
         compose.setContent {
             VonageVideoTheme {
-                JoinMeetingRoomScreen(
-                    uiState = JoinMeetingRoomUiState(
+                LandingScreen(
+                    uiState = LandingScreenUiState(
                         roomName = "hi@there",
                         isRoomNameWrong = true,
                     ),

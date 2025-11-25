@@ -4,9 +4,11 @@
     <!-- Landing Screen -->
     <string name="landing_title">Upgrade video communication</string>
     <string name="landing_subtitle">Power your business with video that transforms customer satisfaction</string>
+    <string name="landing_enter_room_name_title">Join existing meeting</string>
     <string name="landing_enter_room_name">Enter room name</string>
     <string name="landing_enter_room_name_label">Room name</string>
     <string name="landing_join">Join waiting room</string>
+    <string name="landing_create_room_title">Start a new video meeting</string>
     <string name="landing_create_room">Create a new room</string>
     <string name="landing_or">or</string>
     <string name="landing_room_name_error_message">No spaces or special characters allowed</string>
