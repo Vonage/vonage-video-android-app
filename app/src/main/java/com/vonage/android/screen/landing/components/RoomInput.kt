@@ -15,7 +15,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import com.vonage.android.R
 import com.vonage.android.compose.components.VonageOutlinedButton
 import com.vonage.android.compose.components.VonageTextField
@@ -38,7 +37,7 @@ internal fun RoomInput(
         VonageTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .defaultMinSize(minHeight = 48.dp)
+                .defaultMinSize(minHeight = VonageVideoTheme.dimens.spaceXXLarge)
                 .testTag(ROOM_INPUT_TAG),
             value = roomName,
             onValueChange = actions.onRoomNameChange,

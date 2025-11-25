@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -122,14 +121,14 @@ private fun HorizontalLayout(
         ) {
             Box(
                 modifier = Modifier
-                    .padding(40.dp)
+                    .padding(VonageVideoTheme.dimens.paddingXLarge)
                     .align(Alignment.TopStart)
             ) {
                 topBar()
             }
             Box(
                 modifier = Modifier
-                    .padding(start = 64.dp)
+                    .padding(start = VonageVideoTheme.dimens.spaceXXXLarge)
                     .align(Alignment.Center)
             ) {
                 firstPane()

@@ -46,7 +46,7 @@ fun LandingScreen(
             LandingScreenHeader(
                 modifier = Modifier
                     .padding(VonageVideoTheme.dimens.paddingLarge)
-                    .widthIn(0.dp, 550.dp),
+                    .widthIn(0.dp, MAX_PANE_WIDTH.dp),
             )
         },
         secondPane = {
@@ -54,7 +54,7 @@ fun LandingScreen(
                 modifier = Modifier
                     .background(VonageVideoTheme.colors.surface, VonageVideoTheme.shapes.small)
                     .padding(VonageVideoTheme.dimens.paddingLarge)
-                    .widthIn(0.dp, 550.dp),
+                    .widthIn(0.dp, MAX_PANE_WIDTH.dp),
                 roomName = uiState.roomName,
                 isRoomNameWrong = uiState.isRoomNameWrong,
                 actions = actions,
@@ -62,6 +62,8 @@ fun LandingScreen(
         }
     )
 }
+
+private const val MAX_PANE_WIDTH = 550
 
 @PreviewLightDark
 @PreviewScreenSizes
