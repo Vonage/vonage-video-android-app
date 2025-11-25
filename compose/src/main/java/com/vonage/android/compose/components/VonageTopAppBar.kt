@@ -21,7 +21,7 @@ fun VonageTopAppBar(
     TopAppBar(
         modifier = modifier,
         colors = topAppBarColors(
-            containerColor = VonageVideoTheme.colors.background,
+            containerColor = VonageVideoTheme.colors.surface,
         ),
         navigationIcon = {
             onBack?.let {

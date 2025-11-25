@@ -1,5 +1,7 @@
 package com.vonage.android.screen.join
 
+import android.R.attr.maxWidth
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -10,18 +12,26 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.spacedBy
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.LinearGradientShader
 import androidx.compose.ui.graphics.Shader
 import androidx.compose.ui.graphics.ShaderBrush
@@ -41,6 +52,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vonage.android.R
 import com.vonage.android.compose.components.VonageButton
@@ -56,6 +68,83 @@ import com.vonage.android.screen.join.JoinMeetingRoomTestTags.ROOM_INPUT_ERROR_T
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.ROOM_INPUT_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.SUBTITLE_TAG
 import com.vonage.android.screen.join.JoinMeetingRoomTestTags.TITLE_TAG
+import kotlinx.coroutines.flow.Flow
+
+/**
+ * A responsive two-pane layout that displays panes horizontally on large screens/landscape
+ * and vertically on small screens/portrait.
+ *
+ * @param firstPaneBackground Background color for the first pane
+ * @param secondPaneBackground Background color for the second pane
+ * @param breakpointWidth Width threshold in dp to switch between horizontal and vertical layout
+ * @param firstPane Content for the first pane
+ * @param secondPane Content for the second pane
+ */
+@Composable
+private fun ResponsiveTwoPaneLayout(
+    firstPaneBackground: Color,
+    secondPaneBackground: Color,
+    modifier: Modifier = Modifier,
+    breakpointWidth: Dp = 600.dp,
+    firstPane: @Composable () -> Unit,
+    secondPane: @Composable () -> Unit,
+) {
+    BoxWithConstraints(modifier = modifier) {
+        val isHorizontalLayout = maxWidth >= breakpointWidth
+        Log.d("ADAPTIVE", "max width = $maxWidth --> $isHorizontalLayout")
+        if (isHorizontalLayout) {
+            // Horizontal layout for landscape/large screens
+            Row(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .background(firstPaneBackground),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    firstPane()
+                }
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .background(secondPaneBackground),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    secondPane()
+                }
+            }
+        } else {
+            // Vertical layout for portrait/small screens
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(firstPaneBackground)
+                        .padding(VonageVideoTheme.dimens.paddingLarge),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    firstPane()
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(secondPaneBackground)
+                        .padding(VonageVideoTheme.dimens.paddingLarge),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    secondPane()
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun JoinMeetingRoomScreen(
@@ -78,32 +167,34 @@ fun JoinMeetingRoomScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = { TopBanner() },
     ) { contentPadding ->
-        FlowRow(
-            verticalArrangement = Arrangement.Center,
-            horizontalArrangement = spacedBy(VonageVideoTheme.dimens.spaceXXLarge, Alignment.CenterHorizontally),
+        ResponsiveTwoPaneLayout(
             modifier = Modifier
                 .fillMaxSize()
-                .background(VonageVideoTheme.colors.background)
-                .verticalScroll(rememberScrollState())
-                .consumeWindowInsets(contentPadding)
-                .padding(horizontal = VonageVideoTheme.dimens.paddingLarge),
-        ) {
-            JoinMeetingRoomHeader(
-                modifier = Modifier
-                    .padding(top = 80.dp)
-                    .widthIn(0.dp, 380.dp)
-            )
-            JoinMeetingRoomContent(
-                modifier = Modifier
-                    .padding(top = 48.dp)
-                    .widthIn(0.dp, 320.dp),
-                roomName = uiState.roomName,
-                isRoomNameWrong = uiState.isRoomNameWrong,
-                actions = actions,
-            )
-        }
+                .consumeWindowInsets(contentPadding),
+            firstPaneBackground = VonageVideoTheme.colors.surface,
+            secondPaneBackground = VonageVideoTheme.colors.background,
+            breakpointWidth = 500.dp,
+            firstPane = {
+                Column {
+                    TopBanner()
+                    JoinMeetingRoomHeader(
+                        modifier = Modifier
+                            .padding(VonageVideoTheme.dimens.paddingLarge)
+                    )
+                }
+            },
+            secondPane = {
+                JoinMeetingRoomContent(
+                    modifier = Modifier
+                        .background(VonageVideoTheme.colors.surface, VonageVideoTheme.shapes.small)
+                        .padding(VonageVideoTheme.dimens.paddingLarge),
+                    roomName = uiState.roomName,
+                    isRoomNameWrong = uiState.isRoomNameWrong,
+                    actions = actions,
+                )
+            }
+        )
     }
 }
 
@@ -172,9 +263,13 @@ private fun JoinMeetingRoomContent(
 ) {
     Column(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = spacedBy(VonageVideoTheme.dimens.spaceXLarge),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = spacedBy(VonageVideoTheme.dimens.spaceLarge),
     ) {
+        Text(
+            text = "Start a new video meeting",
+            style = VonageVideoTheme.typography.heading4,
+        )
         VonageButton(
             text = stringResource(R.string.landing_create_room),
             modifier = Modifier
@@ -183,6 +278,10 @@ private fun JoinMeetingRoomContent(
             leadingIcon = { PlusIcon() },
         )
         OrSeparator()
+        Text(
+            text = "Join existing meeting",
+            style = VonageVideoTheme.typography.heading4,
+        )
         RoomInput(
             roomName = roomName,
             isRoomNameWrong = isRoomNameWrong,
@@ -204,6 +303,7 @@ private fun RoomInput(
         VonageTextField(
             modifier = Modifier
                 .fillMaxWidth()
+                .defaultMinSize(minHeight = 48.dp)
                 .testTag(ROOM_INPUT_TAG),
             value = roomName,
             onValueChange = actions.onRoomNameChange,
@@ -228,6 +328,7 @@ private fun RoomInput(
             modifier = Modifier
                 .padding(vertical = VonageVideoTheme.dimens.paddingSmall)
                 .fillMaxWidth()
+                .height(48.dp)
                 .testTag(JOIN_BUTTON_TAG),
             onClick = { actions.onJoinRoomClick(roomName) },
             enabled = isRoomNameWrong.not() && roomName.isNotEmpty(),
