@@ -36,6 +36,7 @@ object RetrofitModule {
         .build()
 
     @Provides
+    @Singleton
     fun provideMoshi(): Moshi =
         Moshi.Builder()
             .addLast(KotlinJsonAdapterFactory())
