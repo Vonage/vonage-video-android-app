@@ -36,11 +36,20 @@ object RetrofitModule {
         .build()
 
     @Provides
+    fun provideMoshi(): Moshi =
+        Moshi.Builder()
+            .addLast(KotlinJsonAdapterFactory())
+            .build()
+
+    @Provides
     @Singleton
-    fun provideRetrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
+    fun provideRetrofit(
+        client: OkHttpClient,
+        moshi: Moshi,
+    ): Retrofit = Retrofit.Builder()
         .baseUrl(BuildConfig.BASE_API_URL)
         .client(client)
-        .addConverterFactory(MoshiConverterFactory.create(Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()))
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
         .build()
 
     @Provides
