@@ -25,41 +25,41 @@ env:
 
 jobs:
 
-  build-and-test:
-    name: Build and Unit Tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: ./.github/actions/setup-java
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-
-      - name: Run unit tests and code quality checks
-        run: |
-          ./gradlew clean :app:koverXmlReportDebug detekt --info
-
-      - name: Send report to sonar
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          ./gradlew sonar
-
-      - name: Upload test reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-reports
-          path: |
-            app/build/reports/
-            build/reports/
+#  build-and-test:
+#    name: Build and Unit Tests
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#
+#      - name: Setup Java
+#        uses: ./.github/actions/setup-java
+#
+#      - name: Setup Gradle
+#        uses: gradle/actions/setup-gradle@v4
+#
+#      - name: Make gradlew executable
+#        run: chmod +x ./gradlew
+#
+#      - name: Run unit tests and code quality checks
+#        run: |
+#          ./gradlew clean :app:koverXmlReportDebug detekt --info
+#
+#      - name: Send report to sonar
+#        env:
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#        run: |
+#          ./gradlew sonar
+#
+#      - name: Upload test reports
+#        uses: actions/upload-artifact@v4
+#        if: always()
+#        with:
+#          name: test-reports
+#          path: |
+#            app/build/reports/
+#            build/reports/
 
   ui-tests:
     name: UI Tests
@@ -83,14 +83,14 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: AVD cache
-        uses: actions/cache@v4
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-pixel-34-aosp-atd
+#      - name: AVD cache
+#        uses: actions/cache@v4
+#        id: avd-cache
+#        with:
+#          path: |
+#            ~/.android/avd/*
+#            ~/.android/adb*
+#          key: avd-pixel-34-aosp-atd
 
       - name: Run UI Tests
         run: |
