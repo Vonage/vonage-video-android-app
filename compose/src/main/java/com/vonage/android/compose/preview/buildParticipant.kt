@@ -14,6 +14,7 @@ fun buildParticipants(count: Int): List<Participant> {
     for (i in 1..count) {
         val sampleParticipant = object : Participant {
             override val id: String = SecureRandom().nextInt().toString()
+            override val connectionId: String = "connection-id-$i"
             override val isPublisher: Boolean = false
             override val creationTime: Long = 1L
             override val videoSource: VideoSource = VideoSource.CAMERA
