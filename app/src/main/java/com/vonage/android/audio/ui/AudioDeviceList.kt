@@ -43,18 +43,21 @@ fun AudioDeviceList(
     modifier: Modifier = Modifier,
 ) {
     LazyVerticalGrid(
-        modifier = modifier.padding(bottom = 24.dp),
-        contentPadding = PaddingValues(8.dp),
+        modifier = modifier.padding(bottom = VonageVideoTheme.dimens.paddingLarge),
+        contentPadding = PaddingValues(VonageVideoTheme.dimens.paddingSmall),
         columns = GridCells.Fixed(2),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.paddingSmall),
+        verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.paddingSmall),
     ) {
         item(
             span = { GridItemSpan(maxLineSpan) },
         ) {
             Text(
                 modifier = Modifier
-                    .padding(start = 8.dp, bottom = 8.dp),
+                    .padding(
+                        start = VonageVideoTheme.dimens.paddingSmall,
+                        bottom = VonageVideoTheme.dimens.paddingSmall,
+                    ),
                 text = stringResource(R.string.waiting_room_available_audio_outputs),
                 color = VonageVideoTheme.colors.textSecondary,
                 style = VonageVideoTheme.typography.heading2,
@@ -108,7 +111,10 @@ private fun AudioDeviceCell(
             )
             .padding(vertical = 8.dp, horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+        verticalArrangement = Arrangement.spacedBy(
+            space = VonageVideoTheme.dimens.spaceSmall,
+            alignment = Alignment.CenterVertically,
+        ),
     ) {
         Icon(
             imageVector = audioDevice.type.toImageVector(),

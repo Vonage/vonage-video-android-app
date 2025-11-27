@@ -76,7 +76,7 @@ fun VideoPreviewContainer(
             )
         }
         VideoControlPanel(
-            modifier = Modifier.padding(bottom = 8.dp),
+            modifier = Modifier.padding(bottom = VonageVideoTheme.dimens.paddingSmall),
             publisher = publisher,
             actions = actions,
         )
@@ -161,7 +161,7 @@ private fun MicVolumeIndicator(
             audioLevel = audioLevel,
         )
     } else {
-        Spacer(modifier = Modifier.size(32.dp))
+        Spacer(modifier = Modifier.size(VonageVideoTheme.dimens.spaceXLarge))
     }
 }
 
