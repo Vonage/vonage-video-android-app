@@ -67,12 +67,13 @@ android {
             isReturnDefaultValues = true
         }
         animationsDisabled = true
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
         managedDevices {
             localDevices {
                 create("pixel") {
                     device = "Pixel 2"
-                    apiLevel = 36
-                    systemImageSource = "google_apis"
+                    apiLevel = 34
+                    systemImageSource = "aosp_atd"
                 }
             }
         }
