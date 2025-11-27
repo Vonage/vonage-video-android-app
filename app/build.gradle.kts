@@ -67,6 +67,15 @@ android {
             isReturnDefaultValues = true
         }
         animationsDisabled = true
+        managedDevices {
+            localDevices {
+                create("pixel") {
+                    device = "Pixel 2"
+                    apiLevel = 36
+                    systemImageSource = "google_apis"
+                }
+            }
+        }
     }
 
     val signFile: File = rootProject.file(".sign/keystore.properties")
