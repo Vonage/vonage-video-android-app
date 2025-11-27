@@ -211,7 +211,6 @@ private fun ThreePaneScaffoldPaneScope.ExtraPane(
 
     AnimatedPane(
         modifier = modifier
-            .padding(16.dp)
     ) {
         ChatPanel(
             title = stringResource(R.string.chat_panel_title),
