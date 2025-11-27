@@ -98,7 +98,7 @@ class MeetingRoomScreenViewModelTest {
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true, isError = false), awaitItem())
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true, isError = true), awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = false, isError = true), awaitItem())
         }
     }
 
