@@ -23,7 +23,7 @@
     <string name="waiting_room_available_audio_outputs">Available Audio Outputs</string>
 
     <!-- Meeting Screen -->
-    <string name="meeting_room_participants_list_title">Participants</string>
+    <string name="meeting_room_participants_list_title">Participants (%d)</string>
     <string name="meeting_screen_session_creation_error">Error while creating room, please try again</string>
     <string name="meeting_room_share_room_link">Share room link</string>
 
