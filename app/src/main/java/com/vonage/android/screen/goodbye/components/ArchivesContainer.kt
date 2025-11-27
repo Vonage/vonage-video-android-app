@@ -53,7 +53,7 @@ fun ArchivesContainer(
                 .padding(bottom = VonageVideoTheme.dimens.paddingSmall),
             text = stringResource(R.string.recording_title),
             style = VonageVideoTheme.typography.heading4,
-            color = VonageVideoTheme.colors.onSurface,
+            color = VonageVideoTheme.colors.textSecondary,
             textAlign = TextAlign.Center,
         )
         when (uiState) {
@@ -80,7 +80,11 @@ private fun ArchivesList(
         verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall)
     ) {
         if (archives.isEmpty()) {
-            Text(stringResource(R.string.recording_empty_title))
+            Text(
+                text = stringResource(R.string.recording_empty_title),
+                style = VonageVideoTheme.typography.bodyBase,
+                color = VonageVideoTheme.colors.textDisabled,
+            )
         } else {
             archives.forEach { archive ->
                 ArchiveRow(
