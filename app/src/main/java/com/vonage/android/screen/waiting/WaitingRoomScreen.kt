@@ -66,7 +66,7 @@ fun WaitingRoomScreen(
         firstPane = {
             Column(
                 modifier = Modifier
-                    .padding(vertical = VonageVideoTheme.dimens.paddingDefault)
+                    .padding(VonageVideoTheme.dimens.paddingLarge)
                     .widthIn(0.dp, 380.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),

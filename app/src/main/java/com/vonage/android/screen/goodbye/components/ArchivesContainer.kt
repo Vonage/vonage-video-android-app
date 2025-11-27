@@ -46,13 +46,13 @@ fun ArchivesContainer(
 ) {
     Column(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
     ) {
         Text(
             modifier = Modifier
-                .padding(bottom = 8.dp),
+                .padding(bottom = VonageVideoTheme.dimens.paddingSmall),
             text = stringResource(R.string.recording_title),
-            style = VonageVideoTheme.typography.heading1,
+            style = VonageVideoTheme.typography.heading4,
             color = VonageVideoTheme.colors.onSurface,
             textAlign = TextAlign.Center,
         )
@@ -77,7 +77,7 @@ private fun ArchivesList(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall)
     ) {
         if (archives.isEmpty()) {
             Text(stringResource(R.string.recording_empty_title))
@@ -101,7 +101,7 @@ private fun ArchiveRow(
         modifier = Modifier
             .clickable(onClick = { actions.onDownloadArchive(archive) })
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(VonageVideoTheme.dimens.paddingSmall),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
     ) {
@@ -111,7 +111,7 @@ private fun ArchiveRow(
         ) {
             Text(
                 modifier = Modifier
-                    .padding(end = 8.dp),
+                    .padding(end = VonageVideoTheme.dimens.paddingSmall),
                 text = archive.name,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -137,16 +137,18 @@ private fun ArchiveRow(
 
             PENDING -> {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier
+                        .size(VonageVideoTheme.dimens.iconSizeDefault),
                 )
             }
 
             FAILED -> {
                 Icon(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier
+                        .size(VonageVideoTheme.dimens.iconSizeDefault),
                     imageVector = VividIcons.Solid.Error,
-                    contentDescription = null,
                     tint = VonageVideoTheme.colors.onSurface,
+                    contentDescription = null,
                 )
             }
         }
@@ -160,31 +162,33 @@ internal fun ArchiveListPreview() {
         Box(
             modifier = Modifier.background(VonageVideoTheme.colors.surface)
         ) {
-            ArchivesList(
+            ArchivesContainer(
                 actions = GoodbyeScreenActions(),
-                archives = persistentListOf(
-                    Archive(
-                        id = "1",
-                        name = "Recording Available",
-                        url = "url",
-                        status = AVAILABLE,
-                        createdAt = 1231,
-                    ),
-                    Archive(
-                        id = "2",
-                        name = "Recording Pending",
-                        url = "url",
-                        status = PENDING,
-                        createdAt = 1231,
-                    ),
-                    Archive(
-                        id = "3",
-                        name = "Recording Failed",
-                        url = "url",
-                        status = FAILED,
-                        createdAt = 1231,
-                    ),
-                )
+                uiState = GoodbyeScreenUiState.Content(
+                    archives = persistentListOf(
+                        Archive(
+                            id = "1",
+                            name = "Recording Available",
+                            url = "url",
+                            status = AVAILABLE,
+                            createdAt = 1231,
+                        ),
+                        Archive(
+                            id = "2",
+                            name = "Recording Pending",
+                            url = "url",
+                            status = PENDING,
+                            createdAt = 1231,
+                        ),
+                        Archive(
+                            id = "3",
+                            name = "Recording Failed",
+                            url = "url",
+                            status = FAILED,
+                            createdAt = 1231,
+                        ),
+                    )
+                ),
             )
         }
     }
