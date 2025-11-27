@@ -28,12 +28,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.audio.ui.AudioDevicesEffect
 import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
+import com.vonage.android.compose.components.GenericLoading
 import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
@@ -44,7 +44,6 @@ import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP
 import com.vonage.android.screen.room.components.BottomBar
 import com.vonage.android.screen.room.components.BottomBarState
 import com.vonage.android.screen.room.components.CallModals
-import com.vonage.android.compose.components.GenericLoading
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.MeetingTopBar
 import com.vonage.android.screen.room.components.captions.CaptionsOverlay
