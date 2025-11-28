@@ -121,17 +121,17 @@ private fun HorizontalLayout(
         ) {
             Box(
                 modifier = Modifier
-                    .padding(VonageVideoTheme.dimens.paddingXLarge)
-                    .align(Alignment.TopStart)
-            ) {
-                topBar()
-            }
-            Box(
-                modifier = Modifier
                     .padding(start = VonageVideoTheme.dimens.spaceXXXLarge)
                     .align(Alignment.Center)
             ) {
                 firstPane()
+            }
+            Box(
+                modifier = Modifier
+                    .padding(VonageVideoTheme.dimens.paddingXLarge)
+                    .align(Alignment.TopStart)
+            ) {
+                topBar()
             }
         }
         Box(

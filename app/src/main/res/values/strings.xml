@@ -15,9 +15,10 @@
     <string name="landing_room_generic_error_message">Unexpected error, please try again</string>
 
     <!-- Waiting Screen -->
-    <string name="waiting_room_prepare_to_join">Prepare to join:</string>
-    <string name="waiting_room_whats_your_name">What is your name?</string>
-    <string name="waiting_room_join">Join</string>
+    <string name="waiting_room_prepare_to_join">Prepare to join</string>
+    <string name="waiting_room_name_input_label">Name</string>
+    <string name="waiting_room_whats_your_name">Enter your name</string>
+    <string name="waiting_room_join">Join meeting</string>
     <string name="waiting_room_switch_camera">Switch camera</string>
     <string name="waiting_room_audio_output">Audio output</string>
     <string name="waiting_room_available_audio_outputs">Available Audio Outputs</string>

@@ -9,19 +9,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.di.VeraAudioEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 
 @Composable
-fun AudioDevicesEffect(
-    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-) {
+fun AudioDevicesEffect() {
     if (LocalInspectionMode.current) return
 
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val audioDeviceSelector = rememberAudioDeviceSelector(context)
 
     DisposableEffect(lifecycleOwner) {

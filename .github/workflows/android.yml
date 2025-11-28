@@ -65,11 +65,26 @@ jobs:
     name: UI Tests
     runs-on: ubuntu-latest
     needs: build-and-test
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          df -h
+
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls -al /dev/kvm
 
       - name: Setup Java
         uses: ./.github/actions/setup-java
@@ -77,39 +92,21 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Enable KVM group perms
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
-      - name: Create AVD and generate snapshot for caching
-        uses: reactivecircus/android-emulator-runner@v2
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
         with:
-          api-level: 34
-          arch: x86_64
-          profile: pixel
-          emulator-options: -no-window -gpu swiftshader_indirect -no-boot-anim -camera-back webcam0 -camera-front webcam0
-          disable-animations: true
-          script: |
-            adb shell settings put global window_animation_scale 0.0
-            adb shell settings put global transition_animation_scale 0.0
-            adb shell settings put global animator_duration_scale 0.0
-            echo "Generated AVD snapshot for caching."
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-pixel-34-aosp-atd-x86_64-v2
 
       - name: Run UI Tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          arch: x86_64
-          profile: pixel
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -no-boot-anim -camera-back webcam0 -camera-front webcam0
-          disable-animations: true
-          script: |
-            adb shell settings put global window_animation_scale 0.0
-            adb shell settings put global transition_animation_scale 0.0
-            adb shell settings put global animator_duration_scale 0.0
-            ./gradlew connectedDebugAndroidTest --info --continue
+        run: |
+          ./gradlew pixelDebugAndroidTest --info --stacktrace --no-build-cache
 
       - name: Upload UI test reports
         uses: actions/upload-artifact@v4

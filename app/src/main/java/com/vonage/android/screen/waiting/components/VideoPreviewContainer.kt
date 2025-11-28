@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -58,15 +58,13 @@ fun VideoPreviewContainer(
     val isCameraEnabled by publisher.isCameraEnabled.collectAsStateWithLifecycle()
 
     Box(
-        modifier = modifier
-            .background(Color.DarkGray),
+        modifier = modifier,
         contentAlignment = Alignment.BottomCenter,
     ) {
         if (isCameraEnabled) {
             ParticipantVideoRenderer(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(360.dp),
+                    .fillMaxSize(),
                 participant = publisher,
             )
         } else {
@@ -78,7 +76,7 @@ fun VideoPreviewContainer(
             )
         }
         VideoControlPanel(
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = VonageVideoTheme.dimens.paddingSmall),
             publisher = publisher,
             actions = actions,
         )
@@ -163,7 +161,7 @@ private fun MicVolumeIndicator(
             audioLevel = audioLevel,
         )
     } else {
-        Spacer(modifier = Modifier.size(32.dp))
+        Spacer(modifier = Modifier.size(VonageVideoTheme.dimens.spaceXLarge))
     }
 }
 

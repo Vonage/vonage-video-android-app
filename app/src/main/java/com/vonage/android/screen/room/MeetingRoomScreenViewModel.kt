@@ -95,7 +95,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                     )
                 }
                 .onFailure {
-                    _uiState.update { uiState -> uiState.copy(isError = true) }
+                    _uiState.update { uiState -> uiState.copy(isLoading = false, isError = true) }
                 }
         }
 
