@@ -92,6 +92,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
       - name: AVD cache
         uses: actions/cache@v4
         id: avd-cache
@@ -99,7 +102,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-pixel-34-aosp-atd-arm64-v2
+          key: avd-pixel-34-aosp-atd-x86_64-v2
 
       - name: Run UI Tests
         run: |
