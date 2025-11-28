@@ -57,7 +57,7 @@
 
     <!-- Recordings -->
     <string name="recording_title">Download latest recording</string>
-    <string name="recording_empty_title">There are no recordings for this meeting</string>
+    <string name="recording_empty_title">The meeting hasn’t been recorded</string>
     <string name="recording_stop_recording">Stop Recording</string>
     <string name="recording_start_recording">Start Recording</string>
 

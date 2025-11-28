@@ -80,6 +80,8 @@ internal fun GoodbyeScreenPreview() {
                         url = "url",
                         status = AVAILABLE,
                         createdAt = 1231,
+                        duration = 123,
+                        size = 123123,
                     ),
                     Archive(
                         id = "2",
@@ -87,6 +89,8 @@ internal fun GoodbyeScreenPreview() {
                         url = "url",
                         status = PENDING,
                         createdAt = 1231,
+                        duration = 123,
+                        size = 123123,
                     ),
                     Archive(
                         id = "3",
@@ -94,6 +98,8 @@ internal fun GoodbyeScreenPreview() {
                         url = "url",
                         status = FAILED,
                         createdAt = 1231,
+                        duration = 123,
+                        size = 123123,
                     ),
                 )
             ),

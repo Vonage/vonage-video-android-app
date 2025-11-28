@@ -1,5 +1,6 @@
 package com.vonage.android.screen.goodbye.components
 
+import android.text.format.DateUtils.formatElapsedTime
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,13 +14,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
@@ -35,7 +36,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.text.SimpleDateFormat
 
-val dateFormat = SimpleDateFormat("EEE, dd MMM hh:mm a", Locale.current.platformLocale)
+val dateFormat = SimpleDateFormat("dd MMM y HH:mm", Locale.current.platformLocale)
 
 @Composable
 fun ArchivesContainer(
@@ -78,11 +79,7 @@ private fun ArchivesList(
         verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall)
     ) {
         if (archives.isEmpty()) {
-            Text(
-                text = stringResource(R.string.recording_empty_title),
-                style = VonageVideoTheme.typography.bodyBase,
-                color = VonageVideoTheme.colors.textDisabled,
-            )
+            ArchiveEmptyRow()
         } else {
             archives.forEach { archive ->
                 ArchiveRow(
@@ -95,18 +92,46 @@ private fun ArchivesList(
 }
 
 @Composable
+private fun ArchiveEmptyRow(
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .padding(VonageVideoTheme.dimens.paddingLarge)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceDefault)
+    ) {
+        RecordingIcon()
+        Text(
+            text = stringResource(R.string.recording_empty_title),
+            style = VonageVideoTheme.typography.bodyExtended,
+            color = VonageVideoTheme.colors.onSurface,
+        )
+    }
+}
+
+@Composable
 private fun ArchiveRow(
     archive: Archive,
     actions: GoodbyeScreenActions,
 ) {
+    val title = remember(archive) {
+        listOf(
+            formatElapsedTime(archive.duration.toLong()),
+            bytesToHumanReadableSize(archive.size.toFloat()),
+            dateFormat.format(archive.createdAt),
+        ).joinToString(separator = " • ")
+    }
     Row(
         modifier = Modifier
             .clickable(onClick = { actions.onDownloadArchive(archive) })
             .fillMaxWidth()
             .padding(VonageVideoTheme.dimens.paddingSmall),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
+        horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceDefault),
     ) {
+        RecordingIcon()
         Column(
             modifier = Modifier
                 .weight(1f),
@@ -117,11 +142,11 @@ private fun ArchiveRow(
                 text = archive.name,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                style = VonageVideoTheme.typography.bodyBase,
+                style = VonageVideoTheme.typography.heading3,
                 color = VonageVideoTheme.colors.onSurface,
             )
             Text(
-                text = dateFormat.format(archive.createdAt),
+                text = title,
                 style = VonageVideoTheme.typography.bodyBase,
                 color = VonageVideoTheme.colors.textSecondary,
             )
@@ -130,10 +155,11 @@ private fun ArchiveRow(
         when (archive.status) {
             AVAILABLE -> {
                 Icon(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier
+                        .size(VonageVideoTheme.dimens.iconSizeDefault),
                     imageVector = VividIcons.Solid.Download,
                     contentDescription = null,
-                    tint = VonageVideoTheme.colors.onSurface,
+                    tint = VonageVideoTheme.colors.primary,
                 )
             }
 
@@ -150,7 +176,7 @@ private fun ArchiveRow(
                         .size(VonageVideoTheme.dimens.iconSizeDefault),
                     imageVector = VividIcons.Solid.Error,
                     contentDescription = null,
-                    tint = VonageVideoTheme.colors.onSurface,
+                    tint = VonageVideoTheme.colors.error,
                 )
             }
         }
@@ -174,6 +200,8 @@ internal fun ArchiveListPreview() {
                             url = "url",
                             status = AVAILABLE,
                             createdAt = 1231,
+                            duration = 123,
+                            size = 13,
                         ),
                         Archive(
                             id = "2",
@@ -181,6 +209,8 @@ internal fun ArchiveListPreview() {
                             url = "url",
                             status = PENDING,
                             createdAt = 1231,
+                            duration = 123,
+                            size = 13,
                         ),
                         Archive(
                             id = "3",
@@ -188,10 +218,20 @@ internal fun ArchiveListPreview() {
                             url = "url",
                             status = FAILED,
                             createdAt = 1231,
+                            duration = 123,
+                            size = 13,
                         ),
                     )
                 ),
             )
         }
     }
+}
+
+@Suppress("MagicNumber")
+private fun bytesToHumanReadableSize(bytes: Float) = when {
+    bytes >= 1 shl 30 -> "%.1f GB".format(bytes / (1 shl 30))
+    bytes >= 1 shl 20 -> "%.1f MB".format(bytes / (1 shl 20))
+    bytes >= 1 shl 10 -> "%.0f kB".format(bytes / (1 shl 10))
+    else -> "$bytes bytes"
 }
