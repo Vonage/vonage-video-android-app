@@ -72,7 +72,7 @@ android {
                 create("pixel") {
                     device = "Pixel 2"
                     apiLevel = 34
-                    systemImageSource = "aosp_atd"
+                    systemImageSource = "aosp-atd"
                 }
             }
         }
