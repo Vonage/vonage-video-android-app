@@ -135,6 +135,7 @@ private fun ArchiveRow(
         Column(
             modifier = Modifier
                 .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.paddingSmall),
         ) {
             Text(
                 modifier = Modifier
