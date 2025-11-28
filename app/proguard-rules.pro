@@ -1,44 +1,91 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# ProGuard rules for Vonage Video Android App
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# ================================================================================================
+# General Configuration
+# ================================================================================================
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Preserve line numbers for debugging stack traces
+-keepattributes SourceFile,LineNumberTable
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
--keeppackagenames
--keep class com.opentok.** { *; }
--keep class com.vonage.** { *; }
+# Keep annotations, signatures, and metadata
+-keepattributes *Annotation*, Signature, InnerClasses, EnclosingMethod
+-keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations, AnnotationDefault
 
--dontwarn com.google.common.flogger.FluentLogger$Api
--dontwarn com.google.common.flogger.FluentLogger
--dontwarn com.google.common.flogger.LoggingApi
--dontwarn com.google.protobuf.GeneratedMessageLite$Builder
--dontwarn com.google.protobuf.GeneratedMessageLite$MethodToInvoke
--dontwarn com.google.protobuf.GeneratedMessageLite
--dontwarn com.google.protobuf.Internal$EnumLite
--dontwarn com.google.protobuf.Internal$EnumLiteMap
--dontwarn com.google.protobuf.Internal$EnumVerifier
--dontwarn com.google.protobuf.Internal$FloatList
--dontwarn com.google.protobuf.Internal$IntList
--dontwarn com.google.protobuf.Internal$ProtobufList
--dontwarn com.google.protobuf.MessageLiteOrBuilder
+# Keep Kotlin metadata
+-keep class kotlin.Metadata { *; }
 
--dontwarn com.vonage.android.kotlin.VonageVideoClient
--dontwarn com.vonage.android.kotlin.ext.**
--dontwarn com.vonage.android.kotlin.internal.**
--dontwarn com.vonage.android.kotlin.model.**
--dontwarn com.vonage.android.kotlin.signal.**
+# ================================================================================================
+# OpenTok/Vonage SDK
+# ================================================================================================
+
+-keep class com.opentok.android.** { *; }
+-keep class com.vonage.webrtc.** { *; }
+
+# ================================================================================================
+# Moshi (JSON Serialization)
+# ================================================================================================
+
+# Keep data classes used with Moshi
+-keep class com.vonage.android.data.network.** { *; }
+
+# Keep classes annotated with @JsonClass
+-keep @com.squareup.moshi.JsonClass class * { *; }
+-keepclassmembers @com.squareup.moshi.JsonClass class * {
+    <init>(...);
+    <fields>;
+}
+
+# Keep generated JsonAdapter classes
+-if @com.squareup.moshi.JsonClass class *
+-keep class <1>JsonAdapter {
+    <init>(...);
+    <fields>;
+}
+
+# Keep Moshi core classes
+-keep class com.squareup.moshi.** { *; }
+
+# ================================================================================================
+# Retrofit (HTTP Client)
+# ================================================================================================
+
+# Retain service method parameters
+-keepclassmembers,allowshrinking,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
+
+# Keep Retrofit interfaces
+-if interface * { @retrofit2.http.* <methods>; }
+-keep,allowobfuscation interface <1>
+
+# Keep inherited Retrofit services
+-if interface * { @retrofit2.http.* <methods>; }
+-keep,allowobfuscation interface * extends <1>
+
+# Keep response types for Retrofit methods
+-if interface * { @retrofit2.http.* public *** *(...); }
+-keep,allowoptimization,allowshrinking,allowobfuscation class <3>
+
+# Keep Retrofit core classes
+-keep,allowoptimization,allowshrinking,allowobfuscation class retrofit2.Response
+-keep,allowobfuscation,allowshrinking interface retrofit2.Call
+
+# ================================================================================================
+# Kotlin Coroutines
+# ================================================================================================
+
+-keep,allowoptimization,allowshrinking,allowobfuscation class kotlin.coroutines.Continuation
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.** { *; }
+
+# ================================================================================================
+# Warnings to Ignore
+# ================================================================================================
+
+-dontwarn kotlin.Unit
+-dontwarn retrofit2.KotlinExtensions
+-dontwarn retrofit2.KotlinExtensions$*
+-dontwarn javax.annotation.**
+-dontwarn org.codehaus.mojo.animal_sniffer.*
+-dontwarn okhttp3.internal.platform.**
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
