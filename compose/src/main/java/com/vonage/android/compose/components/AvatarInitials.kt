@@ -17,11 +17,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.vonage.android.compose.icons.PersonIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.components.AvatarInitialsTestTags.USER_INITIALS_ICON_TAG
 import com.vonage.android.compose.components.AvatarInitialsTestTags.USER_INITIALS_TEXT_TAG
 import com.vonage.android.compose.getParticipantColor
+import com.vonage.android.compose.icons.PersonIcon
 import com.vonage.android.shared.getInitials
 
 @Composable

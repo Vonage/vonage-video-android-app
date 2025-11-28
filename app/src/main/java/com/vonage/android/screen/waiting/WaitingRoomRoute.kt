@@ -90,6 +90,5 @@ data class WaitingRoomActions(
     val onCameraToggle: () -> Unit = {},
     val onCameraBlur: () -> Unit = {},
     val onCameraSwitch: () -> Unit = {},
-    val onAudioSwitch: () -> Unit = {},
     val onBack: () -> Unit = {},
 )
