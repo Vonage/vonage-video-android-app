@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -54,7 +53,6 @@ fun ArchivesContainer(
             text = stringResource(R.string.recording_title),
             style = VonageVideoTheme.typography.heading4,
             color = VonageVideoTheme.colors.textSecondary,
-            textAlign = TextAlign.Center,
         )
         when (uiState) {
             is GoodbyeScreenUiState.Content -> {
@@ -151,8 +149,8 @@ private fun ArchiveRow(
                     modifier = Modifier
                         .size(VonageVideoTheme.dimens.iconSizeDefault),
                     imageVector = VividIcons.Solid.Error,
-                    tint = VonageVideoTheme.colors.onSurface,
                     contentDescription = null,
+                    tint = VonageVideoTheme.colors.onSurface,
                 )
             }
         }

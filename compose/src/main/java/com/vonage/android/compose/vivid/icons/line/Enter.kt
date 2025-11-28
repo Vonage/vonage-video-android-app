@@ -14,7 +14,7 @@ public val VividIcons.Line.Enter: ImageVector
         if (current != null) return current
 
         return ImageVector.Builder(
-            name = "com.vonage.android.theme.VididTheme.EnterLine",
+            name = "VividIcons.Line.Enter",
             defaultWidth = 24.0.dp,
             defaultHeight = 24.0.dp,
             viewportWidth = 24.0f,

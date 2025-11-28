@@ -47,7 +47,7 @@ fun RejoiningContainer(
                     imageVector = VividIcons.Line.Enter,
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeSmall),
                 )
             }
         )
