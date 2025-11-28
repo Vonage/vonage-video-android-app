@@ -93,10 +93,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Accept Android SDK licenses
-        run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-
       - name: AVD cache
         uses: actions/cache@v4
         id: avd-cache
@@ -106,22 +102,9 @@ jobs:
             ~/.android/adb*
           key: avd-pixel-34-aosp-atd-arm64-v2
 
-      - name: Pre-download system image
-        run: |
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-34;aosp_atd;arm64-v8a"
-
       - name: Run UI Tests
         run: |
           ./gradlew pixelDebugAndroidTest --info --stacktrace --no-build-cache
-        env:
-          ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 90
-
-      - name: Cleanup before upload
-        if: always()
-        run: |
-          rm -rf ~/.gradle/caches/transforms-*
-          rm -rf ~/.gradle/caches/build-cache-*
-          df -h
 
       - name: Upload UI test reports
         uses: actions/upload-artifact@v4
