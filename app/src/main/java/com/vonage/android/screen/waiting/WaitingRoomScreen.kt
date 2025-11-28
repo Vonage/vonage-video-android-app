@@ -67,7 +67,7 @@ fun WaitingRoomScreen(
             Column(
                 modifier = Modifier
                     .padding(vertical = VonageVideoTheme.dimens.paddingDefault)
-                    .widthIn(0.dp, 380.dp),
+                    .widthIn(0.dp, MAX_PANE_WIDTH.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
             ) {
@@ -82,6 +82,8 @@ fun WaitingRoomScreen(
                     )
                 }
                 DeviceSelectionPanel(
+                    modifier = Modifier
+                        .padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
                     onMicDeviceSelect = { showAudioDeviceSelector = true },
                     onCameraDeviceSelect = actions.onCameraSwitch,
                 )
