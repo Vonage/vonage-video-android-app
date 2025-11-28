@@ -68,6 +68,15 @@ jobs:
     timeout-minutes: 45
 
     steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          df -h
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -103,9 +112,16 @@ jobs:
 
       - name: Run UI Tests
         run: |
-          ./gradlew pixelDebugAndroidTest --info --stacktrace
+          ./gradlew pixelDebugAndroidTest --info --stacktrace --no-build-cache
         env:
           ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL: 90
+
+      - name: Cleanup before upload
+        if: always()
+        run: |
+          rm -rf ~/.gradle/caches/transforms-*
+          rm -rf ~/.gradle/caches/build-cache-*
+          df -h
 
       - name: Upload UI test reports
         uses: actions/upload-artifact@v4
