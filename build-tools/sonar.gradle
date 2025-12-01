@@ -15,7 +15,8 @@ ext.sonar = [
                 "**/BuildConfig.*",
                 "**/Manifest*.*",
                 "**/*Test*.*",
-                "**/*Module.*"
+                "**/*Module.*",
+                "**/compose/vivid/icons/**"
         ]
 ]
 
