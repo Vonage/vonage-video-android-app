@@ -59,6 +59,23 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
 
+/**
+ * Main implementation of CallFacade managing a Vonage video call session.
+ *
+ * Handles:
+ * - Session lifecycle (connect, disconnect, pause, resume)
+ * - Participant management (subscribers, publishers, screen sharing)
+ * - Active speaker detection with audio level tracking
+ * - Signal handling (chat, reactions) via plugins
+ * - Captions support
+ * - Video visibility optimization based on UI state
+ *
+ * @param token Authentication token for the session
+ * @param session Vonage session instance
+ * @param publisherHolder Container for publisher instances
+ * @param signalPlugins List of plugins for handling custom signals
+ * @param coroutineDispatcher Dispatcher for coroutine operations (defaults to IO)
+ */
 @OptIn(FlowPreview::class)
 @Stable
 class Call internal constructor(
@@ -76,10 +93,19 @@ class Call internal constructor(
     private var activeSpeakerTrackerJob: Job? = null
     private var signalsJob: Job? = null
 
+    // Tracks active speaker based on audio levels across all participants
     private val activeSpeakerTracker = ActiveSpeakerTracker(coroutineScope = coroutineScope)
+    
+    // Thread-safe map of all participants (publishers and subscribers) keyed by stream ID
     private val participants = ConcurrentHashMap<String, Participant>()
 
+    // Internal flow that emits on every participant change, throttled before exposing
     private val _participantsInternalFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
+    
+    /**
+     * StateFlow of all participants sorted by creation time (newest first).
+     * Throttled to reduce UI updates and improve performance.
+     */
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsInternalFlow
         .sample(PARTICIPANTS_DEBOUNCE_MILLIS)
         .distinctUntilChanged()
@@ -90,6 +116,10 @@ class Call internal constructor(
             initialValue = persistentListOf(),
         )
 
+    /**
+     * StateFlow of the local publisher (the current user's camera/screen).
+     * Extracted from the participants list for convenient access.
+     */
     override val publisher: StateFlow<PublisherState?> = _participantsInternalFlow
         .map { participants -> participants.firstOrNull { it.id == PUBLISHER_ID }?.let { it as PublisherState } }
         .stateIn(
@@ -99,6 +129,11 @@ class Call internal constructor(
         )
 
     private val _activeSpeaker = MutableStateFlow<Participant?>(null)
+    
+    /**
+     * StateFlow of the currently active speaker based on audio level analysis.
+     * Debounced to prevent rapid changes when multiple people speak.
+     */
     override val activeSpeaker: StateFlow<Participant?> = _activeSpeaker
         .debounce(ACTIVE_SPEAKER_DEBOUNCE_MILLIS)
         .distinctUntilChanged()
@@ -135,6 +170,17 @@ class Call internal constructor(
             .stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)
 
     //region Session lifecycle
+    
+    /**
+     * Connects to the video session and returns a flow of session events.
+     *
+     * Establishes the session connection, publishes the local camera stream, and starts
+     * listening for remote streams and signals. The returned flow emits events for
+     * connection, stream changes, and errors.
+     *
+     * @param context Android context needed for subscriber creation
+     * @return Flow of SessionEvent indicating connection state and stream changes
+     */
     override fun connect(context: Context): Flow<SessionEvent> = callbackFlow {
         this@Call.context = context
         val sessionListener = object : Session.SessionListener {
@@ -179,16 +225,28 @@ class Call internal constructor(
         awaitClose { session.setSessionListener(null) }
     }
 
+    /**
+     * Pauses the session when the app goes to background.
+     * Reduces resource usage while maintaining the connection.
+     */
     override fun pauseSession() {
         Log.d(TAG, "Session paused")
         session.onPause()
     }
 
+    /**
+     * Resumes the session when the app returns to foreground.
+     * Restores full video and audio functionality.
+     */
     override fun resumeSession() {
         Log.d(TAG, "Session resumed")
         session.onResume()
     }
 
+    /**
+     * Ends the session and cleans up all resources.
+     * Unpublishes the local stream and disconnects from the session.
+     */
     override fun endSession() {
         // wait for PublisherListener#streamDestroyed before returning : VIDSOL-104
         session.unpublish(publisher()?.publisher)
@@ -200,14 +258,28 @@ class Call internal constructor(
     //endregion
 
     //region Signals
+    
+    /**
+     * Sends an emoji reaction that will be displayed to all participants.
+     *
+     * @param emoji The emoji character to send
+     */
     override fun sendEmoji(emoji: String) {
         sendSignal(SignalType.REACTION, emoji)
     }
 
+    /**
+     * Sends a chat message to all participants.
+     *
+     * @param message The text message to send
+     */
     override fun sendChatMessage(message: String) {
         sendSignal(SignalType.CHAT, message)
     }
 
+    /**
+     * Internal helper to route signals to appropriate plugins and send to session.
+     */
     private fun sendSignal(signalType: SignalType, data: String) {
         signalPlugins
             .filter { it.canHandle(signalType.signal) }
@@ -218,12 +290,20 @@ class Call internal constructor(
             }
     }
 
+    /**
+     * Enables or disables tracking of unread chat messages.
+     *
+     * @param enable True to start tracking unread messages, false to stop
+     */
     override fun listenUnreadChatMessages(enable: Boolean) {
         signalPlugins
             .filterIsInstance<ChatSignalPlugin>()
             .forEach { chatPlugin -> chatPlugin.listenUnread(enable) }
     }
 
+    /**
+     * Initializes signal listening by mapping plugin outputs to signal type flows.
+     */
     private fun startListeningSignals() {
         signalsJob?.cancel()
         signalsJob = coroutineScope.launch {
@@ -240,20 +320,37 @@ class Call internal constructor(
     //endregion
 
     //region Publisher
+    
+    /**
+     * Helper to get the current publisher from participants map.
+     */
     private fun publisher(): PublisherState? = (participants[PUBLISHER_ID] as? PublisherState)
 
+    /**
+     * Toggles the local video on/off.
+     */
     override fun toggleLocalVideo() {
         publisher()?.toggleVideo()
     }
 
+    /**
+     * Switches between front and back camera.
+     */
     override fun toggleLocalCamera() {
         publisher()?.cycleCamera()
     }
 
+    /**
+     * Toggles the local audio (microphone) on/off.
+     */
     override fun toggleLocalAudio() {
         publisher()?.toggleAudio()
     }
 
+    /**
+     * Publishes the local camera stream to the session.
+     * Called automatically when connecting to the session.
+     */
     private fun publishToSession() {
         coroutineScope.launch(Dispatchers.Default) {
             publisherHolder.let { holder ->
@@ -270,6 +367,14 @@ class Call internal constructor(
     //endregion
 
     //region Screen sharing
+    
+    /**
+     * Starts screen sharing using the provided MediaProjection.
+     *
+     * Creates a separate publisher for the screen stream with video only (no audio).
+     *
+     * @param mediaProjection Android MediaProjection for capturing screen content
+     */
     override fun startCapturingScreen(mediaProjection: MediaProjection) {
         coroutineScope.launch(Dispatchers.Default) {
             val name = "${publisherHolder.publisher.name}'s Screen" // translate this!
@@ -296,6 +401,9 @@ class Call internal constructor(
         }
     }
 
+    /**
+     * Stops screen sharing and removes the screen publisher.
+     */
     override fun stopCapturingScreen() {
         publisherHolder.screenPublisher?.let {
             session.unpublish(it)
@@ -306,6 +414,11 @@ class Call internal constructor(
     //endregion
 
     //region Captions
+    
+    /**
+     * Listener for receiving captions from remote participants.
+     * Updates the captions state flow with speaker name and text.
+     */
     private val captionsDelegate: SubscriberKit.CaptionsListener =
         SubscriberKit.CaptionsListener { subscriber, text, isFinal ->
             _captionsStateFlow.update { _ -> "${subscriber.name()}: $text" }
@@ -314,6 +427,11 @@ class Call internal constructor(
             }
         }
 
+    /**
+     * Enables or disables captions for all participants.
+     *
+     * @param enable True to enable captions, false to disable
+     */
     override fun enableCaptions(enable: Boolean) {
         coroutineScope.launch {
             publisher()?.publisher?.publishCaptions = enable
@@ -324,6 +442,11 @@ class Call internal constructor(
     //endregion
 
     //region Subscribers
+    
+    /**
+     * Creates and subscribes to a remote participant's stream.
+     * Adds the subscriber to the participants map and starts audio level monitoring.
+     */
     @Suppress("TooGenericExceptionCaught")
     private fun addSubscriber(stream: Stream) {
         coroutineScope.launch {
@@ -344,6 +467,9 @@ class Call internal constructor(
         }
     }
 
+    /**
+     * Observes audio levels for a participant and feeds them to the active speaker tracker.
+     */
     private fun observeSubscriberAudioLevel(participant: Participant) {
         coroutineScope.launch {
             participant.audioLevel.collect { movingAvg ->
@@ -352,6 +478,10 @@ class Call internal constructor(
         }
     }
 
+    /**
+     * Removes a subscriber when their stream is dropped.
+     * Cleans up resources and updates the active speaker if needed.
+     */
     private fun removeSubscriber(stream: Stream) {
         val subscriber = participants[stream.streamId] ?: return
         coroutineScope.launch {
@@ -363,6 +493,14 @@ class Call internal constructor(
     }
     //endregion
 
+    /**
+     * Updates participant visibility based on UI snapshot state.
+     *
+     * Optimizes bandwidth by disabling video for off-screen participants while
+     * ensuring the active speaker always has video enabled.
+     *
+     * @param snapshotFlow Flow emitting lists of currently visible participant IDs
+     */
     override fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>) {
         if (!VISIBILITY_MONITOR_ENABLED) return
         participantsOnScreenJob?.cancel()
@@ -380,6 +518,10 @@ class Call internal constructor(
         }
     }
 
+    /**
+     * Starts monitoring active speaker changes and updates visibility accordingly.
+     * Ensures the active speaker is always visible even if scrolled off screen.
+     */
     private fun startActiveSpeakerTracker() {
         activeSpeakerTrackerJob?.cancel()
         activeSpeakerTrackerJob = activeSpeakerTracker.activeSpeakerChanges
@@ -392,6 +534,9 @@ class Call internal constructor(
             .launchIn(coroutineScope)
     }
 
+    /**
+     * Updates the participants flow and count whenever the participants map changes.
+     */
     private fun updateParticipants() {
         _participantsInternalFlow.update { participants.values.toImmutableList() }
         _participantsCount.update { participants.size }
