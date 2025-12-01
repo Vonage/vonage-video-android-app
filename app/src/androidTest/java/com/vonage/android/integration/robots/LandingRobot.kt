@@ -3,11 +3,11 @@ package com.vonage.android.integration.robots
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import com.vonage.android.screen.join.JoinMeetingRoomScreenObject
+import com.vonage.android.screen.landing.LandingScreenObject
 
 class LandingRobot(compose: ComposeTestRule) {
 
-    val screen = JoinMeetingRoomScreenObject(compose)
+    val screen = LandingScreenObject(compose)
 
     fun enterRoomName(roomName: String) {
         screen.roomInput
