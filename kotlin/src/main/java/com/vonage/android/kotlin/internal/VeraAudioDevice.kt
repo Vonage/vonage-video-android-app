@@ -21,8 +21,25 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.Volatile
 
 /**
- * From https://github.com/opentok/opentok-android-sdk-samples/blob/main/Advanced-Audio-Driver-Kotlin/app/src/main/java/com/tokbox/sample/advancedaudiodriver/AdvancedAudioDevice.java
- * Removing bluetooth and audio output management, only contains audio capturing and rendering logic
+ * Custom audio device implementation for Vonage Video SDK.
+ *
+ * Provides low-level audio capture and rendering with acoustic echo cancellation
+ * and noise suppression. Manages separate threads for capturing (recording) and
+ * rendering (playback) audio streams.
+ *
+ * Based on OpenTok Advanced Audio Driver sample but simplified to remove Bluetooth
+ * and audio output routing management.
+ *
+ * Features:
+ * - Acoustic echo cancellation when available
+ * - Noise suppression when available
+ * - Dual-thread architecture for capture and render
+ * - Delay estimation for audio sync
+ * - Dynamic buffer sizing based on device capabilities
+ *
+ * @param context Android context for accessing AudioManager
+ *
+ * @see <a href="https://github.com/opentok/opentok-android-sdk-samples/blob/main/Advanced-Audio-Driver-Kotlin/app/src/main/java/com/tokbox/sample/advancedaudiodriver/AdvancedAudioDevice.java">Original implementation</a>
  */
 @Suppress("MagicNumber", "SwallowedException", "TooGenericExceptionThrown", "LoopWithTooManyJumpStatements")
 class VeraAudioDevice(
@@ -228,6 +245,15 @@ class VeraAudioDevice(
         isPaused = false
     }
 
+    /**
+     * Initializes the audio capturer (microphone).
+     *
+     * Creates AudioRecord instance with noise suppression and echo cancellation
+     * if available on the device. Starts the capture thread for processing audio.
+     *
+     * @return True if initialization succeeded
+     * @throws RuntimeException if AudioRecord cannot be initialized
+     */
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     override fun initCapturer(): Boolean {
         val minRecBufSize = AudioRecord.getMinBufferSize(
@@ -275,6 +301,11 @@ class VeraAudioDevice(
     }
 
     //region Capturer
+    /**
+     * Starts audio capture from the microphone.
+     *
+     * @return True if capture started successfully
+     */
     override fun startCapturer(): Boolean {
         Log.d(TAG, "Start capturer")
         checkNotNull(audioRecord) { "startCapturer(): startRecording() called on an uninitialized AudioRecord" }
@@ -286,6 +317,11 @@ class VeraAudioDevice(
         return true
     }
 
+    /**
+     * Stops audio capture from the microphone.
+     *
+     * @return True if capture stopped successfully
+     */
     override fun stopCapturer(): Boolean {
         Log.d(TAG, "Stop capturer")
         checkNotNull(audioRecord) { "stopCapturer(): stop() called on an uninitialized AudioRecord" }
@@ -298,6 +334,13 @@ class VeraAudioDevice(
         return true
     }
 
+    /**
+     * Destroys the audio capturer and releases all resources.
+     *
+     * Releases echo canceler, noise suppressor, and AudioRecord instance.
+     *
+     * @return True if destruction succeeded
+     */
     override fun destroyCapturer(): Boolean {
         Log.d(TAG, "Destroy capturer")
         captureLock.lock()
@@ -318,6 +361,13 @@ class VeraAudioDevice(
     //endregion
 
     //region Renderer
+    /**
+     * Initializes the audio renderer (speaker).
+     *
+     * Creates AudioTrack instance and starts the render thread for audio playback.
+     *
+     * @return True if initialization succeeded
+     */
     override fun initRenderer(): Boolean {
         Log.d(TAG, "Init Renderer")
         createAudioTrack()
@@ -327,6 +377,11 @@ class VeraAudioDevice(
         return true
     }
 
+    /**
+     * Starts audio rendering to the speaker.
+     *
+     * @return True if rendering started successfully
+     */
     override fun startRenderer(): Boolean {
         Log.d(TAG, "Start Renderer")
         checkNotNull(audioTrack) { "startRenderer(): play() called on uninitialized AudioTrack" }
@@ -338,6 +393,11 @@ class VeraAudioDevice(
         return true
     }
 
+    /**
+     * Stops audio rendering to the speaker.
+     *
+     * @return True if rendering stopped successfully
+     */
     override fun stopRenderer(): Boolean {
         Log.d(TAG, "Stop Renderer")
         checkNotNull(audioTrack) { "stopRenderer(): stop() called on uninitialized AudioTrack" }
@@ -351,6 +411,11 @@ class VeraAudioDevice(
         return true
     }
 
+    /**
+     * Destroys the audio renderer and releases all resources.
+     *
+     * @return True if destruction succeeded
+     */
     override fun destroyRenderer(): Boolean {
         Log.d(TAG, "Destroy Renderer")
         destroyAudioTrack()
@@ -358,19 +423,45 @@ class VeraAudioDevice(
     }
     //endregion
 
+    /**
+     * Gets the estimated capture delay in milliseconds.
+     *
+     * @return Estimated delay for audio capture
+     */
     override fun getEstimatedCaptureDelay(): Int = estimatedCaptureDelay
 
+    /**
+     * Gets the estimated render delay in milliseconds.
+     *
+     * @return Estimated delay for audio rendering
+     */
     override fun getEstimatedRenderDelay(): Int = estimatedRenderDelay
 
+    /**
+     * Gets the audio settings for capture.
+     *
+     * @return AudioSettings containing sample rate and channel configuration
+     */
     override fun getCaptureSettings(): AudioSettings = captureSettings
 
+    /**
+     * Gets the audio settings for rendering.
+     *
+     * @return AudioSettings containing sample rate and channel configuration
+     */
     override fun getRenderSettings(): AudioSettings = rendererSettings
 
+    /**
+     * Called when the app is paused.
+     */
     override fun onPause() {
         Log.d(TAG, "onPause() called")
         isPaused = true
     }
 
+    /**
+     * Called when the app is resumed.
+     */
     override fun onResume() {
         Log.d(TAG, "onResume() called")
         if (!isPaused) {
