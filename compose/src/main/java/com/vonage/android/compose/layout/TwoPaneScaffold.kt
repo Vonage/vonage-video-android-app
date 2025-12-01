@@ -126,7 +126,8 @@ private fun HorizontalLayout(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
-                .background(secondPaneBackground),
+                .background(secondPaneBackground)
+                .verticalScroll(rememberScrollState()),
             contentAlignment = Alignment.Center,
         ) {
             secondPane()
