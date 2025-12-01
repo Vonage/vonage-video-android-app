@@ -83,7 +83,7 @@ data class PublisherState(
         publisher.cycleCamera()
     }
 
-    // todo: pending add to UI
+    // TODO: Add to UI
     override fun cycleCameraBlur() {
         publisher.cycleBlur(_blurLevel.value) {
             _blurLevel.update { it }
@@ -164,6 +164,6 @@ data class PublisherState(
     }
 
     override fun onCameraError(publisher: Publisher, error: OpentokError) {
-        // do nothing by now
+        // No-op for now
     }
 }

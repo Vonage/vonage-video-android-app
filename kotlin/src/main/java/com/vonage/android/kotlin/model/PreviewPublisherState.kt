@@ -96,6 +96,6 @@ data class PreviewPublisherState(
     }
 
     override fun onCameraError(publisher: Publisher, error: OpentokError) {
-        // do nothing by now
+        // No-op for now
     }
 }

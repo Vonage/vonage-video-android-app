@@ -31,7 +31,6 @@ class VonageVideoClient(
     baseAudioDevice: VeraAudioDevice,
     private val signalPlugins: List<SignalPlugin>,
     private val publisherFactory: PublisherFactory = PublisherFactory(),
-    // configure log level of the entire SDK
 ) {
 
     init {

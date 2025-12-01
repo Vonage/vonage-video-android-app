@@ -49,7 +49,7 @@ class VeraAudioDevice(
     private var audioTrack: AudioTrack? = null
     private var audioRecord: AudioRecord? = null
 
-    // Capture & render buffers
+    /** Capture and render buffers */
     private var playBuffer: ByteBuffer? = null
     private var recBuffer: ByteBuffer? = null
     private var tempBufPlay: ByteArray
@@ -78,10 +78,10 @@ class VeraAudioDevice(
     private var noiseSuppressor: NoiseSuppressor? = null
     private var echoCanceler: AcousticEchoCanceler? = null
 
-    // Capturing delay estimation
+    /** Capturing delay estimation in milliseconds */
     private var estimatedCaptureDelay = 0
 
-    // Rendering delay estimation
+    /** Rendering delay estimation - tracks buffered samples */
     private var bufferedPlaySamples = 0
     private var playPosition = 0
     private var estimatedRenderDelay = 0
@@ -158,11 +158,11 @@ class VeraAudioDevice(
                     renderEvent.await()
                 } else {
                     rendererLock.unlock()
-                    // Don't lock on audioBus calls
+                    // Don't lock during audioBus calls
                     playBuffer?.clear()
                     val samplesRead = audioBus.readRenderData(playBuffer, samplesToPlay)
                     rendererLock.lock()
-                    // After acquiring the lock again we must check if we are still playing
+                    // Check if still playing after reacquiring lock
                     if (audioTrack == null || !isRendering) {
                         continue
                     }
@@ -172,21 +172,21 @@ class VeraAudioDevice(
                     val bytesWritten = audioTrack!!.write(tempBufPlay, 0, bytesRead)
 
                     if (bytesWritten > 0) {
-                        // increase by number of written samples
+                        // Increase by number of written samples
                         bufferedPlaySamples += (bytesWritten shr 1) / NUM_CHANNELS_RENDERING
 
-                        // decrease by number of played samples
+                        // Decrease by number of played samples
                         val pos = audioTrack!!.playbackHeadPosition
 
                         if (pos < playPosition) {
-                            // wrap or reset by driver
+                            // Wrap or reset by driver
                             playPosition = 0
                         }
 
                         bufferedPlaySamples -= (pos - playPosition)
                         playPosition = pos
 
-                        // we calculate the estimated delay based on the buffered samples
+                        // Calculate estimated delay based on buffered samples
                         estimatedRenderDelay = bufferedPlaySamples * 1000 / outputSamplingRate
                     } else {
                         when (bytesWritten) {
@@ -261,7 +261,7 @@ class VeraAudioDevice(
             AudioFormat.CHANNEL_IN_MONO,
             AudioFormat.ENCODING_PCM_16BIT
         )
-        // double size to be more safe
+        // Double size for safety margin
         val recBufSize = minRecBufSize * 2
 
         noiseSuppressor?.release()
@@ -289,7 +289,7 @@ class VeraAudioDevice(
             audioRecord?.let { echoCanceler = AcousticEchoCanceler.create(it.audioSessionId) }
         }
 
-        // Check that the audioRecord is ready to be used.
+        // Verify AudioRecord is ready to use
         if (audioRecord?.state != AudioRecord.STATE_INITIALIZED) {
             Log.e(TAG, "Audio capture could not be initialized")
             throw RuntimeException("Audio capture could not be initialized")
@@ -344,10 +344,10 @@ class VeraAudioDevice(
     override fun destroyCapturer(): Boolean {
         Log.d(TAG, "Destroy capturer")
         captureLock.lock()
-        // release echo canceler
+        // Release echo canceler
         echoCanceler?.release()
         echoCanceler = null
-        // release noise suppressor
+        // Release noise suppressor
         noiseSuppressor?.release()
         noiseSuppressor = null
 
