@@ -29,6 +29,7 @@ data class PublisherState(
     PublisherKit.MuteListener {
 
     override val id: String = publisherId
+    override val connectionId: String = publisher.stream?.connection?.connectionId ?: ""
     private val logTag = "Publisher[$id]"
     override val creationTime: Long = publisher.stream?.creationTime?.time ?: 0
     override val videoSource: VideoSource = publisher.stream?.toParticipantType() ?: VideoSource.CAMERA

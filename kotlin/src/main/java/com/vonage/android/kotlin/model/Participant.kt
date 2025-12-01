@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 @Stable
 interface Participant {
     val id: String
+    val connectionId: String
     val isPublisher: Boolean
     val creationTime: Long
     val videoSource: VideoSource

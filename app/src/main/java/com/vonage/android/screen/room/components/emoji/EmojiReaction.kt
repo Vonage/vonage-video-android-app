@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
@@ -27,7 +28,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -46,15 +46,13 @@ import kotlin.random.Random
 private const val ANIMATION_DURATION = EMOJI_LIFETIME_MILLIS.toInt()
 private const val OVERLAY_ZINDEX = 9F
 
-/**
- * todo: detected too much recompositions in this composable, need to review
- */
 @Composable
 fun EmojiReactionOverlay(
     call: CallFacade,
     modifier: Modifier = Modifier,
 ) {
-    val reactions by call.emojiSignalState().collectAsStateWithLifecycle()
+    val reactions by call.emojiSignalState.collectAsStateWithLifecycle()
+    val emojis by remember(reactions) { derivedStateOf { reactions?.reactions } }
     var size by remember { mutableStateOf(IntSize.Zero) }
 
     Box(
@@ -64,7 +62,7 @@ fun EmojiReactionOverlay(
             .onSizeChanged { size = it },
         contentAlignment = Alignment.BottomStart,
     ) {
-        reactions?.reactions?.forEach { reaction ->
+        emojis?.forEach { reaction ->
             key(reaction.id) {
                 EmojiAnimationItem(
                     emojiReaction = reaction,
@@ -135,36 +133,35 @@ private fun EmojiAnimationItem(
 private fun EmojiItem(
     emojiReaction: EmojiReaction,
 ) {
+    val emojiLabel = if (emojiReaction.isYou) {
+        stringResource(R.string.emoji_panel_you)
+    } else {
+        emojiReaction.sender
+    }
+
     Column(
         modifier = Modifier
-            .widthIn(max = 160.dp)
-            .padding(start = 16.dp),
+            .widthIn(max = 160.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = emojiReaction.emoji,
             fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
             modifier = Modifier
-                .padding(8.dp)
+                .padding(VonageVideoTheme.dimens.paddingSmall)
         )
         Box(
             modifier = Modifier
-                .padding(4.dp)
                 .background(
-                    Color.Black.copy(alpha = 0.6f),
+                    color = Color.Black.copy(alpha = 0.6f),
                     shape = VonageVideoTheme.shapes.medium,
                 )
-                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .padding(VonageVideoTheme.dimens.paddingSmall)
         ) {
             Text(
-                text = if (emojiReaction.isYou) {
-                    stringResource(R.string.emoji_panel_you)
-                } else {
-                    emojiReaction.sender
-                },
+                text = emojiLabel,
+                style = VonageVideoTheme.typography.caption,
                 color = Color.White,
-                fontSize = 12.sp,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
             )

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 fun buildPublisher() = object : PublisherParticipant {
 
     override val id: String = "preview-id"
+    override val connectionId: String = "connection-id"
     override val isPublisher: Boolean = true
     override val creationTime: Long = 1L
     override val videoSource: VideoSource = VideoSource.CAMERA

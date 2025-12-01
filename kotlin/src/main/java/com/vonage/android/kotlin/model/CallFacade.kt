@@ -23,7 +23,7 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
 
     fun signalState(signalType: SignalType): StateFlow<SignalStateContent?>
     fun chatSignalState(): StateFlow<ChatState?>
-    fun emojiSignalState(): StateFlow<EmojiState?>
+    val emojiSignalState: StateFlow<EmojiState?>
 
     val captionsStateFlow: StateFlow<String?>
 }
