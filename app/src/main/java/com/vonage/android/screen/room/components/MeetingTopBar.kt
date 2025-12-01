@@ -77,8 +77,8 @@ fun MeetingTopBar(
                     text = roomName,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = VonageVideoTheme.typography.bodyBase,
-                    color = VonageVideoTheme.colors.onSurface,
+                    style = VonageVideoTheme.typography.heading3,
+                    color = VonageVideoTheme.colors.textSecondary,
                 )
             }
         },
