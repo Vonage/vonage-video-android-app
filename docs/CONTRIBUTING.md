@@ -23,7 +23,7 @@ When you're ready to start coding, fork this repository to your own GitHub accou
 
 ### Branching
 
-Our *main* branch is the evergreen source of truth for the Vonage Video API Reference App for React. However, all new development should be done in the develop branch. Contributions should be made by branching off develop, and pull requests should be submitted against develop. Periodically, develop will be merged into main as a batch.
+Our *main* branch is the evergreen source of truth for the Vonage Video API Reference App for Android. However, all new development should be done in the develop branch. Contributions should be made by branching off develop, and pull requests should be submitted against develop. Periodically, develop will be merged into main as a batch.
 
 Internally, we use Jira for issue tracking. Issue and feature branches use the format DEVELOPERNAME/TICKETNUMBER-SHORTDESCRIPTION e.g. alicesmith/VIDCS-123-fix-broken-icon. If you'd like to contribute a pull request, please use a branch on your fork with a descriptive name e.g. fix-broken-icon.
 
