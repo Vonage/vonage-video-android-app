@@ -53,7 +53,7 @@ fun JoinRoomSection(
                 .testTag(USER_NAME_INPUT_TAG),
             placeholder = {
                 Text(
-                    text = stringResource(R.string.waiting_room_name_input_placeholder),
+                    text = stringResource(R.string.waiting_room_name_input_label),
                     color = VonageVideoTheme.colors.textDisabled,
                 )
             },
