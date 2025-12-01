@@ -42,9 +42,8 @@ This application provides features for common conferencing use cases, such as:
 - <details>
     <summary>
       Configurable features: adapt the app to your specific use cases and roles.
-      Configuration is handled through JSON files in the <em>config</em> folder (<em>app-config.json</em>, <em>theme.json</em>, <em>tokens.json</em>). The custom Gradle plugin reads these configuration files and generates the necessary build configuration at compile time.
+      Configuration is handled through JSON files in the <em>config</em> folder (<em>app-config.json</em>, <em>theme.json</em>). The custom Gradle plugin reads these configuration files and generates the necessary build configuration at compile time.
     </summary>
-    <img src="docs/assets/configFile.png" alt="Screenshot of a config.json">
   </details>
 
 - <details>
@@ -110,7 +109,6 @@ Configure the application by editing the JSON files in the `config` folder:
 
 - `app-config.json`: Feature flags and application settings
 - `theme.json`: UI theme configuration
-- `tokens.json`: API tokens (create if not exists)
 
 Open the project in Android Studio and let Gradle sync complete.
 
