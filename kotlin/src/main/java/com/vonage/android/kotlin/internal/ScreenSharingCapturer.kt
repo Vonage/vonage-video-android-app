@@ -45,7 +45,7 @@ class ScreenSharingCapturer(
      * Initializes the capturer (no-op for screen sharing).
      */
     override fun init() {
-        // not needed
+        // No-op
     }
 
     /**
@@ -82,7 +82,7 @@ class ScreenSharingCapturer(
      * Destroys the capturer (no-op for screen sharing).
      */
     override fun destroy() {
-        // not needed
+        // No-op
     }
 
     /**
@@ -109,21 +109,21 @@ class ScreenSharingCapturer(
      * Called when the app is paused (no-op for screen sharing).
      */
     override fun onPause() {
-        // not needed
+        // No-op
     }
 
     /**
      * Called when the app is resumed (no-op for screen sharing).
      */
     override fun onResume() {
-        // not needed
+        // No-op
     }
 
     private fun createVirtualDisplay() {
-        // this register is empty intentionally
-        // having a MediaProjection.Callback is mandatory for creating virtual displays
+        // Register empty callback (required for creating virtual displays)
         mediaProjection.registerCallback(object : MediaProjection.Callback() {}, null)
-        // create a virtual display with default values
+        
+        // Create virtual display with default values
         virtualDisplay = mediaProjection.createVirtualDisplay(
             VIRTUAL_SCREEN_NAME,
             WIDTH,
@@ -134,7 +134,8 @@ class ScreenSharingCapturer(
             null,
             backgroundHandler
         )
-        // send to the SDK every frame
+        
+        // Send each frame to the SDK
         imageReader.setOnImageAvailableListener({ reader: ImageReader ->
             reader.acquireLatestImage()?.let { frame ->
                 if (frame.planes.isNotEmpty()) {

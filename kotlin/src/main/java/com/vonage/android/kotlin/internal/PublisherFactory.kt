@@ -123,8 +123,13 @@ class PublisherFactory {
      * Default configuration values for publisher creation.
      */
     object Default {
-        val PUBLISHER_FRAME_RATE = Publisher.CameraCaptureFrameRate.FPS_15 // implement adaptative frame rate
+        /** Default frame rate for video capture (15 FPS for better performance) - TODO: Implement adaptive frame rate */
+        val PUBLISHER_FRAME_RATE = Publisher.CameraCaptureFrameRate.FPS_15
+        
+        /** Default camera index (0 = back camera) */
         const val PUBLISHER_CAMERA_INDEX = 0
+        
+        /** Default publisher name (empty string) */
         const val PUBLISHER_NAME = ""
     }
 

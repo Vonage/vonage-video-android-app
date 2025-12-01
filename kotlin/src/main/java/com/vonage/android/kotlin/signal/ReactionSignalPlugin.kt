@@ -31,7 +31,7 @@ class ReactionSignalPlugin(
 
     private val coroutineScope = CoroutineScope(coroutineDispatcher)
     
-    // Thread-safe list of active emoji reactions
+    /** Thread-safe list of active emoji reactions */
     private val reactions: MutableList<EmojiReaction> = CopyOnWriteArrayList()
 
     private val _output = MutableStateFlow(EmojiState(reactions = persistentListOf()))
@@ -63,7 +63,7 @@ class ReactionSignalPlugin(
         )
         reactions.add(0, emojiReaction)
 
-        // remove reaction after 5 seconds
+        // Remove reaction after 5 seconds
         coroutineScope.launch {
             delay(EMOJI_LIFETIME_MILLIS)
             reactions.removeAll { it.id == emojiReaction.id }

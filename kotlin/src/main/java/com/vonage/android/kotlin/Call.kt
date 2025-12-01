@@ -93,13 +93,13 @@ class Call internal constructor(
     private var activeSpeakerTrackerJob: Job? = null
     private var signalsJob: Job? = null
 
-    // Tracks active speaker based on audio levels across all participants
+    /** Tracks active speaker based on audio levels across all participants */
     private val activeSpeakerTracker = ActiveSpeakerTracker(coroutineScope = coroutineScope)
     
-    // Thread-safe map of all participants (publishers and subscribers) keyed by stream ID
+    /** Thread-safe map of all participants (publishers and subscribers) keyed by stream ID */
     private val participants = ConcurrentHashMap<String, Participant>()
 
-    // Internal flow that emits on every participant change, throttled before exposing
+    /** Internal flow that emits on every participant change, throttled before exposing */
     private val _participantsInternalFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
     
     /**
@@ -248,7 +248,7 @@ class Call internal constructor(
      * Unpublishes the local stream and disconnects from the session.
      */
     override fun endSession() {
-        // wait for PublisherListener#streamDestroyed before returning : VIDSOL-104
+        // Wait for PublisherListener#streamDestroyed before returning (VIDSOL-104)
         session.unpublish(publisher()?.publisher)
 
         session.setSessionListener(null)
@@ -548,7 +548,6 @@ class Call internal constructor(
         const val PUBLISHER_ID: String = "publisher"
         const val PUBLISHER_SCREEN_ID: String = "publisher-screen"
 
-        // Add the following parameters to a Config-kind object
         private const val PARTICIPANTS_DEBOUNCE_MILLIS = 100L
         private const val ACTIVE_SPEAKER_DEBOUNCE_MILLIS = 100L
         private const val VISIBILITY_MONITOR_ENABLED = true
