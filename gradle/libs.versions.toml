@@ -1,20 +1,20 @@
 [versions]
 accompanistPermissions = "0.37.3"
-activityCompose = "1.11.0"
+activityCompose = "1.12.0"
 agp = "8.13.1"
 appcompat = "1.7.1"
-composeBom = "2025.11.00"
+composeBom = "2025.11.01"
 appUpdate = "2.1.0"
 appUpdateKtx = "2.1.0"
 converterMoshi = "3.0.0"
 coreKtx = "1.17.0"
 coreTesting = "1.17.0"
-datastoreCore = "1.1.7"
+datastoreCore = "1.2.0"
 detekt = "1.23.8"
-detektCompose = "0.4.27"
+detektCompose = "0.4.28"
 espressoCore = "3.7.0"
-firebaseBom = "34.5.0"
-gradle = "8.13.0"
+firebaseBom = "34.6.0"
+gradle = "8.13.1"
 gson = "2.13.2"
 hiltAndroid = "2.57.2"
 hiltNavigationCompose = "1.3.0"
@@ -27,23 +27,23 @@ kotlinxCollectionsImmutable = "0.4.0"
 kotlinxCoroutinesTest = "1.10.2"
 kotlinxSerializationJson = "1.9.0"
 leakcanaryAndroid = "2.14"
-lifecycleRuntimeKtx = "2.9.4"
-loggingInterceptor = "5.3.0"
+lifecycleRuntimeKtx = "2.10.0"
+loggingInterceptor = "5.3.2"
 mockk = "1.14.6"
 moshiKotlin = "1.15.2"
 navigationCompose = "2.9.6"
 navigationRuntimeAndroid = "2.9.6"
-okhttp = "5.3.0"
-opentokAndroidSdk = "2.31.1"
-orchestrator = "1.6.1"
+okhttp = "5.3.2"
+opentokAndroidSdk = "2.32.0"
 retrofit = "3.0.0"
-runtimeAndroid = "1.9.4"
+runtimeAndroid = "1.9.5"
 testRules = "1.7.0"
 testRunner = "1.7.0"
 turbine = "1.2.1"
 material = "1.13.0"
-runtime = "1.9.4"
+runtime = "1.9.5"
 material3 = "1.4.0"
+adaptive = "1.2.0"
 uiTestJunit4 = "1.9.4"
 
 [libraries]
@@ -66,7 +66,6 @@ androidx-material-icons-extended = { module = "androidx.compose.material:materia
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-navigation-runtime-android = { group = "androidx.navigation", name = "navigation-runtime-android", version.ref = "navigationRuntimeAndroid" }
-androidx-orchestrator = { module = "androidx.test:orchestrator", version.ref = "orchestrator" }
 androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime-android", version.ref = "runtimeAndroid" }
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "testRules" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "testRunner" }
@@ -108,6 +107,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "uiTestJunit4" }
+androidx-compose-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive", version.ref = "adaptive" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -118,8 +118,8 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version = "2.2.21-2.0.4" }
 kover = { id = "org.jetbrains.kotlinx.kover", version = "0.9.3" }
-play-publisher = { id = "com.github.triplet.play", version = "3.12.1" }
+play-publisher = { id = "com.github.triplet.play", version = "3.12.2" }
 sonarqube = { id = "org.sonarqube", version = "6.3.1.5724" }
-stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version = "0.5.1" }
+stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version = "0.5.3" }
 google-services = { id = "com.google.gms.google-services", version = "4.4.4" }
 crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.6" }

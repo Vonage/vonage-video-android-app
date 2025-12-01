@@ -1,4 +1,4 @@
-package com.vonage.android.screen.join
+package com.vonage.android.screen.landing
 
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
@@ -18,11 +18,11 @@ class JoinMeetingRoomViewModelTest {
 
     private val roomNameGenerator: RoomNameGenerator = mockk()
 
-    private lateinit var sut: JoinMeetingRoomViewModel
+    private lateinit var sut: LandingScreenViewModel
 
     @Before
     fun setUp() {
-        sut = JoinMeetingRoomViewModel(
+        sut = LandingScreenViewModel(
             roomNameGenerator = roomNameGenerator,
         )
     }
@@ -32,7 +32,7 @@ class JoinMeetingRoomViewModelTest {
         sut.updateName("validroomname")
         sut.uiState.test {
             assertEquals(
-                JoinMeetingRoomUiState.Content(
+                LandingScreenUiState(
                     roomName = "validroomname",
                     isRoomNameWrong = false,
                 ),
@@ -46,7 +46,7 @@ class JoinMeetingRoomViewModelTest {
         sut.updateName("room@name")
         sut.uiState.test {
             assertEquals(
-                JoinMeetingRoomUiState.Content(
+                LandingScreenUiState(
                     roomName = "room@name",
                     isRoomNameWrong = true,
                 ),
@@ -63,7 +63,7 @@ class JoinMeetingRoomViewModelTest {
 
         sut.uiState.test {
             assertEquals(
-                JoinMeetingRoomUiState.Content(
+                LandingScreenUiState(
                     roomName = "vonage-rocks",
                     isSuccess = true,
                 ),
@@ -78,7 +78,7 @@ class JoinMeetingRoomViewModelTest {
             awaitItem() // initial state
             sut.joinRoom("validname")
             assertEquals(
-                JoinMeetingRoomUiState.Content(
+                LandingScreenUiState(
                     roomName = "validname",
                     isSuccess = true,
                 ),

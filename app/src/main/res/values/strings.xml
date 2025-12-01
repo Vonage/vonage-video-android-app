@@ -3,33 +3,37 @@
 
     <!-- Landing Screen -->
     <string name="landing_title">Upgrade video communication</string>
-    <string name="landing_subtitle">Power your business with video that transforms customer satisfaction.</string>
+    <string name="landing_subtitle">Power your business with video that transforms customer satisfaction</string>
+    <string name="landing_enter_room_name_title">Join existing meeting</string>
     <string name="landing_enter_room_name">Enter room name</string>
+    <string name="landing_enter_room_name_label">Room name</string>
     <string name="landing_join">Join waiting room</string>
+    <string name="landing_create_room_title">Start a new video meeting</string>
     <string name="landing_create_room">Create a new room</string>
     <string name="landing_or">or</string>
     <string name="landing_room_name_error_message">No spaces or special characters allowed</string>
     <string name="landing_room_generic_error_message">Unexpected error, please try again</string>
 
     <!-- Waiting Screen -->
-    <string name="waiting_room_prepare_to_join">Prepare to join:</string>
-    <string name="waiting_room_whats_your_name">What is your name?</string>
-    <string name="waiting_room_name_input_placeholder">Enter your name</string>
-    <string name="waiting_room_join">Join</string>
+    <string name="waiting_room_prepare_to_join">Prepare to join</string>
+    <string name="waiting_room_name_input_label">Name</string>
+    <string name="waiting_room_whats_your_name">Enter your name</string>
+    <string name="waiting_room_join">Join meeting</string>
     <string name="waiting_room_switch_camera">Switch camera</string>
     <string name="waiting_room_audio_output">Audio output</string>
     <string name="waiting_room_available_audio_outputs">Available Audio Outputs</string>
 
     <!-- Meeting Screen -->
-    <string name="meeting_room_participants_list_title">Participants</string>
+    <string name="meeting_room_participants_list_title">Participants (%d)</string>
     <string name="meeting_screen_session_creation_error">Error while creating room, please try again</string>
     <string name="meeting_room_share_room_link">Share room link</string>
 
     <!-- Goodbye Screen -->
-    <string name="goodbye_title">You left the room</string>
-    <string name="goodbye_subtitle">We hope you had fun</string>
-    <string name="goodbye_rejoin_button_label">Re-enter</string>
-    <string name="goodbye_return_home_button_label">Return to landing page</string>
+    <string name="goodbye_title">You have left the meeting</string>
+    <string name="goodbye_subtitle">Thank you for joining!</string>
+    <string name="goodbye_rejoin_title">Rejoining the room</string>
+    <string name="goodbye_rejoin_button_label">Go back to meeting</string>
+    <string name="goodbye_return_home_button_label">Go to landing page</string>
 
     <!-- Permissions -->
     <string name="camera_and_microphone_permissions_are_needed">Camera and microphone permissions are needed</string>
@@ -52,8 +56,8 @@
     <string name="emoji_panel_you">You</string>
 
     <!-- Recordings -->
-    <string name="recording_title">Recordings</string>
-    <string name="recording_empty_title">There are no recordings for this meeting</string>
+    <string name="recording_title">Download latest recording</string>
+    <string name="recording_empty_title">The meeting hasn’t been recorded</string>
     <string name="recording_stop_recording">Stop Recording</string>
     <string name="recording_start_recording">Start Recording</string>
 

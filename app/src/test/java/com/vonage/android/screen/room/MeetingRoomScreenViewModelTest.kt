@@ -10,10 +10,8 @@ import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
-import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.kotlin.model.VeraPublisher
-import com.vonage.android.kotlin.model.VideoSource
+import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import com.vonage.android.screensharing.ScreenSharingServiceListener
 import com.vonage.android.screensharing.VeraScreenSharingManager
@@ -100,7 +98,7 @@ class MeetingRoomScreenViewModelTest {
 
         sut.uiState.test {
             assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true, isError = false), awaitItem())
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true, isError = true), awaitItem())
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = false, isError = true), awaitItem())
         }
     }
 
@@ -717,23 +715,7 @@ class MeetingRoomScreenViewModelTest {
     )
 
     @Suppress("LongParameterList")
-    private fun buildMockPublisher() = VeraPublisher(
-        id = "publisher",
-        videoSource = VideoSource.CAMERA,
-        name = "I am a publisher",
-        isMicEnabled = MutableStateFlow(true),
-        isCameraEnabled = MutableStateFlow(true),
-        view = mockk(),
-        blurLevel = BlurLevel.NONE,
-        cycleCamera = {},
-        setCameraBlur = {},
-        cameraIndex = 0,
-        isTalking = MutableStateFlow(false),
-        toggleMic = { false },
-        toggleCamera = { false },
-        audioLevel = MutableStateFlow(0F),
-        creationTime = 123,
-    )
+    private fun buildMockPublisher() = mockk<PublisherState>()
 
     private fun buildMockCall(): CallFacade = mockk<CallFacade>(relaxed = true) {
         every { connect(any()) } returns flowOf()

@@ -15,7 +15,7 @@ import com.vonage.android.navigation.AppRoute.Landing
 import com.vonage.android.navigation.AppRoute.Meeting
 import com.vonage.android.navigation.AppRoute.Waiting
 import com.vonage.android.screen.goodbye.GoodbyeScreenRoute
-import com.vonage.android.screen.join.JoinMeetingRoomRoute
+import com.vonage.android.screen.landing.LandingScreenRoute
 import com.vonage.android.screen.room.MeetingRoomScreenRoute
 import com.vonage.android.screen.waiting.WaitingRoomRoute
 import com.vonage.android.util.navigateToShare
@@ -33,7 +33,7 @@ fun AppNavHost(
         startDestination = Landing,
     ) {
         composable<Landing> {
-            JoinMeetingRoomRoute(
+            LandingScreenRoute(
                 navigateToRoom = { params -> navController.navigate(Waiting(params.roomName)) },
             )
         }

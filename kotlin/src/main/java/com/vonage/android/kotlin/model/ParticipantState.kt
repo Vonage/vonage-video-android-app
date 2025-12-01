@@ -10,7 +10,7 @@ import com.vonage.android.kotlin.ext.mapTalking
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.observeAudioLevel
-import com.vonage.android.kotlin.internal.toParticipantType
+import com.vonage.android.kotlin.ext.toParticipantType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -24,6 +24,7 @@ data class ParticipantState(
     SubscriberKit.VideoListener {
 
     override val id: String = subscriber.stream.streamId
+    override val connectionId: String = subscriber.stream.connection.connectionId
 
     override val isPublisher: Boolean = false
 
