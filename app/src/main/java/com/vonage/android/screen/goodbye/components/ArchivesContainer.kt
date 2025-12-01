@@ -36,7 +36,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.text.SimpleDateFormat
 
-val dateFormat = SimpleDateFormat("dd MMM y HH:mm", Locale.current.platformLocale)
+private val dateFormat = SimpleDateFormat("dd MMM y HH:mm", Locale.current.platformLocale)
 
 @Composable
 fun ArchivesContainer(
