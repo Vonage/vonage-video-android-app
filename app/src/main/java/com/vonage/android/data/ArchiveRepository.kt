@@ -51,6 +51,8 @@ fun ServerArchive.toModel() =
         url = url.orEmpty(),
         status = status.toArchiveStatus(),
         createdAt = createdAt,
+        duration = duration,
+        size = size,
     )
 
 private fun String.toArchiveStatus(): ArchiveStatus =
@@ -62,6 +64,8 @@ private fun String.toArchiveStatus(): ArchiveStatus =
 
 data class Archive(
     val id: String,
+    val duration: Int,
+    val size: Int,
     val name: String,
     val url: String,
     val status: ArchiveStatus,
