@@ -11,6 +11,18 @@ import android.util.DisplayMetrics
 import android.view.WindowManager
 import com.opentok.android.BaseVideoCapturer
 
+/**
+ * Custom video capturer for screen sharing functionality.
+ *
+ * Uses Android's MediaProjection API to capture screen content and provide it
+ * as a video stream to the Vonage Video SDK. Creates a virtual display and
+ * captures frames using ImageReader.
+ *
+ * Captures at 1280x720 resolution at 15 FPS for optimal bandwidth usage.
+ *
+ * @param context Android context for accessing WindowManager
+ * @param mediaProjection MediaProjection instance obtained from user permission
+ */
 @Suppress("EmptyFunctionBlock")
 class ScreenSharingCapturer(
     context: Context,
@@ -29,10 +41,20 @@ class ScreenSharingCapturer(
         displayMetrics.densityDpi
     }
 
+    /**
+     * Initializes the capturer (no-op for screen sharing).
+     */
     override fun init() {
         // not needed
     }
 
+    /**
+     * Starts screen capture.
+     *
+     * Creates ImageReader, virtual display, and background thread for processing frames.
+     *
+     * @return 0 on success
+     */
     override fun startCapture(): Int {
         capturing = true
 
@@ -43,6 +65,11 @@ class ScreenSharingCapturer(
         return 0
     }
 
+    /**
+     * Stops screen capture and releases resources.
+     *
+     * @return 0 on success
+     */
     override fun stopCapture(): Int {
         capturing = false
         virtualDisplay?.release()
@@ -51,12 +78,25 @@ class ScreenSharingCapturer(
         return 0
     }
 
+    /**
+     * Destroys the capturer (no-op for screen sharing).
+     */
     override fun destroy() {
         // not needed
     }
 
+    /**
+     * Checks if screen capture is currently active.
+     *
+     * @return True if capturing, false otherwise
+     */
     override fun isCaptureStarted(): Boolean = capturing
 
+    /**
+     * Gets the capture settings for screen sharing.
+     *
+     * @return CaptureSettings with 1280x720 resolution at 15 FPS
+     */
     override fun getCaptureSettings(): CaptureSettings =
         CaptureSettings().apply {
             fps = FPS
@@ -65,10 +105,16 @@ class ScreenSharingCapturer(
             format = SDK_PIXEL_FORMAT
         }
 
+    /**
+     * Called when the app is paused (no-op for screen sharing).
+     */
     override fun onPause() {
         // not needed
     }
 
+    /**
+     * Called when the app is resumed (no-op for screen sharing).
+     */
     override fun onResume() {
         // not needed
     }
