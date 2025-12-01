@@ -177,14 +177,18 @@ class GoodbyeScreenViewModelTest {
         name = "recording 1",
         url = "https://cdn.recording.io/potatoe",
         status = ArchiveStatus.AVAILABLE,
-        createdAt = 123
+        createdAt = 123,
+        duration = 334,
+        size = 18123,
     )
     private val pendingArchive = Archive(
         id = "archive-id-pending",
         name = "recording 1",
         url = "https://cdn.recording.io/potatoe-pending",
         status = ArchiveStatus.PENDING,
-        createdAt = 123
+        createdAt = 123,
+        duration = 8123,
+        size = 7123,
     )
     private val archiveList = listOf(
         availableArchive,
