@@ -17,11 +17,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -53,7 +48,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.accompanist.permissions)
     implementation(libs.kotlinx.collections.immutable)
-    implementation(libs.opentok.android.sdk)
+    implementation(libs.androidx.compose.adaptive)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

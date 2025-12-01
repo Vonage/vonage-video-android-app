@@ -71,10 +71,7 @@ fun buildCallWithParticipants(
         return MutableStateFlow(chatState)
     }
 
-    override fun emojiSignalState(): StateFlow<EmojiState?> {
-        val emojiState = signalStateFlow.value.signals[SignalType.REACTION.signal] as? EmojiState
-        return MutableStateFlow(emojiState)
-    }
+    override val emojiSignalState: StateFlow<EmojiState?> = MutableStateFlow(null)
 
     override fun sendChatMessage(message: String) { /* empty on purpose */ }
     override fun listenUnreadChatMessages(enable: Boolean) { /* empty on purpose */ }

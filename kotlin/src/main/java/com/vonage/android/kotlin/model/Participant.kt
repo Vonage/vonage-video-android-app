@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 @Stable
 interface Participant {
     val id: String
+    val connectionId: String
     val isPublisher: Boolean
     val creationTime: Long
     val videoSource: VideoSource
@@ -21,41 +22,31 @@ interface Participant {
     fun clean(session: Session) {}
 }
 
+@Stable
+interface PublisherParticipant : Participant {
+    override val isPublisher: Boolean
+        get() = true
+    val camera: StateFlow<CameraType>
+    val blurLevel: StateFlow<BlurLevel>
+    fun toggleVideo()
+    fun toggleAudio()
+    fun cycleCamera()
+    fun cycleCameraBlur()
+    fun clean()
+}
+
+enum class CameraType(val index: Int) {
+    UNKNOWN(-1),
+    BACK(0),
+    FRONT(1);
+
+    companion object {
+        private val map = entries.toTypedArray().associateBy(CameraType::index)
+        infix fun fromInt(index: Int): CameraType? = map[index]
+    }
+}
+
 enum class VideoSource {
     CAMERA,
     SCREEN
-}
-
-data class VeraPublisher(
-    override val id: String,
-    override val videoSource: VideoSource,
-    override val name: String,
-    override val isMicEnabled: StateFlow<Boolean>,
-    override val isCameraEnabled: StateFlow<Boolean>,
-    override val view: View,
-    override val isTalking: StateFlow<Boolean>,
-    override val audioLevel: StateFlow<Float>,
-    override val creationTime: Long,
-    val cameraIndex: Int,
-    val cycleCamera: () -> Unit,
-    val blurLevel: BlurLevel,
-    val setCameraBlur: (BlurLevel) -> Unit,
-    val toggleMic: () -> Boolean,
-    val toggleCamera: () -> Boolean,
-) : Participant {
-    override val isPublisher: Boolean = true
-}
-
-data class VeraScreenPublisher(
-    override val id: String,
-    override val videoSource: VideoSource,
-    override val name: String,
-    override val isMicEnabled: StateFlow<Boolean>,
-    override val isCameraEnabled: StateFlow<Boolean>,
-    override val view: View,
-    override val isTalking: StateFlow<Boolean>,
-    override val audioLevel: StateFlow<Float>,
-    override val creationTime: Long,
-) : Participant {
-    override val isPublisher: Boolean = true
 }

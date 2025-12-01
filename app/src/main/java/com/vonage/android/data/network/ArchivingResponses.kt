@@ -25,10 +25,14 @@ data class GetArchivesResponse(
 data class ServerArchive(
     @field:Json(name = "id")
     val id: String,
+    @field:Json(name = "duration")
+    val duration: Int,
     @field:Json(name = "name")
     val name: String,
     @field:Json(name = "url")
     val url: String?,
+    @field:Json(name = "size")
+    val size: Int,
     @field:Json(name = "status")
     val status: String,
     @field:Json(name = "createdAt")

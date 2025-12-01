@@ -117,6 +117,8 @@ class ArchiveRepositoryTest {
             url = "url",
             status = "available",
             createdAt = 123,
+            duration = 789,
+            size = 456,
         ),
         ServerArchive(
             id = "id",
@@ -124,6 +126,8 @@ class ArchiveRepositoryTest {
             url = "url",
             status = "started",
             createdAt = 123,
+            duration = 789,
+            size = 456,
         ),
         ServerArchive(
             id = "id",
@@ -131,6 +135,8 @@ class ArchiveRepositoryTest {
             url = "url",
             status = "stopped",
             createdAt = 123,
+            duration = 789,
+            size = 456,
         ),
         ServerArchive(
             id = "id",
@@ -138,6 +144,8 @@ class ArchiveRepositoryTest {
             url = "url",
             status = "uploaded",
             createdAt = 123,
+            duration = 789,
+            size = 456,
         ),
         ServerArchive(
             id = "id",
@@ -145,6 +153,8 @@ class ArchiveRepositoryTest {
             url = "url",
             status = "paused",
             createdAt = 123,
+            duration = 789,
+            size = 456,
         ),
         ServerArchive(
             id = "id",
@@ -152,6 +162,8 @@ class ArchiveRepositoryTest {
             url = "url",
             status = "failed",
             createdAt = 123,
+            duration = 789,
+            size = 456,
         ),
     )
     private val archives = listOf(
@@ -160,42 +172,54 @@ class ArchiveRepositoryTest {
             name = "name",
             url = "url",
             status = ArchiveStatus.AVAILABLE,
-            createdAt = 123
+            createdAt = 123,
+            duration = 789,
+            size = 456,
         ),
         Archive(
             id = "id",
             name = "name",
             url = "url",
             status = ArchiveStatus.PENDING,
-            createdAt = 123
+            createdAt = 123,
+            duration = 789,
+            size = 456,
         ),
         Archive(
             id = "id",
             name = "name",
             url = "url",
             status = ArchiveStatus.PENDING,
-            createdAt = 123
+            createdAt = 123,
+            duration = 789,
+            size = 456,
         ),
         Archive(
             id = "id",
             name = "name",
             url = "url",
             status = ArchiveStatus.PENDING,
-            createdAt = 123
+            createdAt = 123,
+            duration = 789,
+            size = 456,
         ),
         Archive(
             id = "id",
             name = "name",
             url = "url",
             status = ArchiveStatus.PENDING,
-            createdAt = 123
+            createdAt = 123,
+            duration = 789,
+            size = 456,
         ),
         Archive(
             id = "id",
             name = "name",
             url = "url",
             status = ArchiveStatus.FAILED,
-            createdAt = 123
+            createdAt = 123,
+            duration = 789,
+            size = 456,
         ),
     )
 }
