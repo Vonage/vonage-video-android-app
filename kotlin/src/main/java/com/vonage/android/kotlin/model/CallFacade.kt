@@ -36,7 +36,7 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
     /** StateFlow of the currently active speaker based on audio levels */
     val activeSpeaker: StateFlow<Participant?>
 
-    /** StateFlow of signal state (deprecated, use specific signal state methods) */
+    /** StateFlow of signal state (use specific signal state methods) */
     val signalStateFlow: StateFlow<SignalState?>
 
     /**
