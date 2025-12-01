@@ -63,7 +63,7 @@ fun ShareIcon(
     Icon(
         imageVector = VividIcons.Solid.Share2,
         contentDescription = contentDescription,
-        tint = VonageVideoTheme.colors.surface,
+        tint = VonageVideoTheme.colors.onSurface,
         modifier = modifier.size(VonageVideoTheme.dimens.iconSizeDefault)
     )
 }

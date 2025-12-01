@@ -6,9 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.util.ext.debouncedClickable
@@ -30,9 +28,8 @@ fun EmojiSelector(
             Text(
                 text = emoji,
                 fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(VonageVideoTheme.dimens.paddingSmall)
                     .debouncedClickable(
                         debounceTime = DEBOUNCE_CLICK_MILLIS, // debounce 500 milliseconds
                     ) { onEmojiClick(emoji) }

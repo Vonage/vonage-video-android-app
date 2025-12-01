@@ -64,31 +64,14 @@ fun ChatPanel(
 
     Column(
         modifier = modifier
-            .fillMaxSize()
-            .background(VonageVideoTheme.colors.surface),
+            .background(VonageVideoTheme.colors.surface, VonageVideoTheme.shapes.medium)
+            .padding(8.dp)
+            .fillMaxSize(),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                modifier = Modifier
-                    .weight(1f),
-                text = title,
-                color = VonageVideoTheme.colors.onSurface,
-                style = VonageVideoTheme.typography.bodyBase,
-            )
-            IconButton(
-                onClick = onCloseChat,
-            ) {
-                Icon(
-                    imageVector = VividIcons.Line.Close,
-                    tint = VonageVideoTheme.colors.onSurface,
-                    contentDescription = null,
-                )
-            }
-        }
+        ChatPanelTitle(
+            title = title,
+            onCloseChat = onCloseChat,
+        )
         ChatPanelMessages(
             modifier = Modifier
                 .fillMaxSize()
@@ -104,6 +87,35 @@ fun ChatPanel(
                 .padding(8.dp),
             onSendMessage = onSendMessage,
         )
+    }
+}
+
+@Composable
+private fun ChatPanelTitle(
+    title: String,
+    onCloseChat: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            modifier = Modifier
+                .weight(1f),
+            text = title,
+            color = VonageVideoTheme.colors.textSecondary,
+            style = VonageVideoTheme.typography.heading3,
+        )
+        IconButton(
+            onClick = onCloseChat,
+        ) {
+            Icon(
+                imageVector = VividIcons.Line.Close,
+                tint = VonageVideoTheme.colors.secondary,
+                contentDescription = null,
+            )
+        }
     }
 }
 
@@ -162,7 +174,7 @@ private fun ChatPanelMessages(
 }
 
 @Composable
-fun ChatPanelInput(
+private fun ChatPanelInput(
     sendLabel: String,
     onSendMessage: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -188,7 +200,7 @@ fun ChatPanelInput(
             placeholder = {
                 Text(
                     text = sendLabel,
-                    color = VonageVideoTheme.colors.primary,
+                    color = VonageVideoTheme.colors.textTertiary,
                 )
             },
         )
