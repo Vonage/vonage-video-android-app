@@ -60,7 +60,6 @@ fun TwoPaneScaffold(
                     .consumeWindowInsets(contentPadding),
                 firstPaneBackground = firstPaneBackground,
                 firstPane = firstPane,
-                secondPaneBackground = secondPaneBackground,
                 secondPane = secondPane
             )
         }
@@ -71,32 +70,21 @@ fun TwoPaneScaffold(
 private fun VerticalLayout(
     firstPaneBackground: Color,
     firstPane: @Composable (() -> Unit),
-    secondPaneBackground: Color,
     secondPane: @Composable (() -> Unit),
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
-            .padding(top = VonageVideoTheme.dimens.spaceXXLarge)
-            .verticalScroll(rememberScrollState()),
+            .background(firstPaneBackground)
+            .fillMaxHeight(),
         verticalArrangement = Arrangement.Center,
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(firstPaneBackground)
-                .padding(VonageVideoTheme.dimens.paddingLarge),
-            contentAlignment = Alignment.Center,
+                .verticalScroll(rememberScrollState()),
         ) {
             firstPane()
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(secondPaneBackground)
-                .padding(VonageVideoTheme.dimens.paddingLarge),
-            contentAlignment = Alignment.Center,
-        ) {
             secondPane()
         }
     }
@@ -138,7 +126,8 @@ private fun HorizontalLayout(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
-                .background(secondPaneBackground),
+                .background(secondPaneBackground)
+                .verticalScroll(rememberScrollState()),
             contentAlignment = Alignment.Center,
         ) {
             secondPane()
