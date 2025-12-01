@@ -164,7 +164,7 @@ class Call internal constructor(
             .map { it as? ChatState }
             .stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)
 
-    override fun emojiSignalState(): StateFlow<EmojiState?> =
+    override val emojiSignalState: StateFlow<EmojiState?> =
         signalState(SignalType.REACTION)
             .map { it as? EmojiState }
             .stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)
@@ -212,7 +212,7 @@ class Call internal constructor(
         session.setSessionListener(sessionListener)
         session.setSignalListener { _, type, data, conn ->
             signalPlugins.forEach { plugin ->
-                val isYou = publisher()?.publisher?.stream?.connection == conn
+                val isYou = publisher()?.connectionId == conn.connectionId
                 val senderName = if (!isYou) {
                     conn.extractSenderName(participants.values)
                 } else {

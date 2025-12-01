@@ -32,6 +32,7 @@ data class ParticipantState(
     SubscriberKit.VideoListener {
 
     override val id: String = subscriber.stream.streamId
+    override val connectionId: String = subscriber.stream.connection.connectionId
 
     override val isPublisher: Boolean = false
 

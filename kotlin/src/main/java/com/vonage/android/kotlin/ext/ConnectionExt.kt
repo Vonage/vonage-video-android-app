@@ -12,9 +12,9 @@ import com.vonage.android.kotlin.model.Participant
  * @param subs Collection of participants to search through
  * @return The participant's display name, or empty string if not found
  */
-fun Connection.extractSenderName(subs: Collection<Participant>): String =
+internal fun Connection.extractSenderName(subs: Collection<Participant>): String =
     subs
-        .filter { it.id == connectionId }
-        .map { it.name }
+        .filter { participant -> participant.connectionId == connectionId }
+        .map { participant -> participant.name }
         .firstOrNull()
         .orEmpty()

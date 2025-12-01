@@ -29,13 +29,13 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
 
     /** StateFlow of all participants in the call */
     val participantsStateFlow: StateFlow<ImmutableList<Participant>>
-    
+
     /** StateFlow of the current participant count */
     val participantsCount: StateFlow<Int>
-    
+
     /** StateFlow of the currently active speaker based on audio levels */
     val activeSpeaker: StateFlow<Participant?>
-    
+
     /** StateFlow of signal state (deprecated, use specific signal state methods) */
     val signalStateFlow: StateFlow<SignalState?>
 
@@ -46,20 +46,20 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
      * @return StateFlow emitting signal content for the specified type
      */
     fun signalState(signalType: SignalType): StateFlow<SignalStateContent?>
-    
+
     /**
      * Gets the state flow for chat messages.
      *
      * @return StateFlow emitting chat state including messages and unread count
      */
     fun chatSignalState(): StateFlow<ChatState?>
-    
+
     /**
      * Gets the state flow for emoji reactions.
      *
      * @return StateFlow emitting emoji state with active reactions
      */
-    fun emojiSignalState(): StateFlow<EmojiState?>
+    val emojiSignalState: StateFlow<EmojiState?>
 
     /** StateFlow of captions text from remote participants */
     val captionsStateFlow: StateFlow<String?>
