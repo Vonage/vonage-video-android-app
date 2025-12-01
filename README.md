@@ -112,14 +112,6 @@ Configure the application by editing the JSON files in the `config` folder:
 - `theme.json`: UI theme configuration
 - `tokens.json`: API tokens (create if not exists)
 
-Alternatively, you can configure via `local.properties`:
-
-```properties
-vonage.api.key=your_api_key_here
-vonage.session.id=your_session_id_here
-vonage.token=your_token_here
-```
-
 Open the project in Android Studio and let Gradle sync complete.
 
 Modify the base URL constant in your configuration to point to your deployed backend.
@@ -176,9 +168,6 @@ We use Detekt for static analysis and Spotless for code formatting. Check and fi
 ```bash
 # Check code style
 ./gradlew detekt
-
-# Format code
-./gradlew spotlessApply
 
 # Run all quality checks
 ./gradlew check
