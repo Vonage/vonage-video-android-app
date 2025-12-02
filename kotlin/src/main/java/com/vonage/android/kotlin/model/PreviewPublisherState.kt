@@ -13,6 +13,15 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 
+/**
+ * Represents a preview-only publisher used before joining a call.
+ *
+ * Provides camera preview functionality with controls for testing video and audio
+ * settings before entering a video session. Uses MicVolumeListener for direct
+ * microphone monitoring since it's not connected to a session.
+ *
+ * @param publisher The OpenTok Publisher instance for preview
+ */
 @Stable
 data class PreviewPublisherState(
     private val publisher: Publisher,
@@ -65,6 +74,11 @@ data class PreviewPublisherState(
         publisher.cycleCamera()
     }
 
+    /**
+     * Initializes preview monitoring including camera listener and microphone volume.
+     *
+     * Must be called before using the preview to start audio level monitoring.
+     */
     suspend fun setup() {
         publisher.setCameraListener(this)
         micVolumeListener.start()
@@ -83,6 +97,6 @@ data class PreviewPublisherState(
     }
 
     override fun onCameraError(publisher: Publisher, error: OpentokError) {
-        // do nothing by now
+        // No-op for now
     }
 }

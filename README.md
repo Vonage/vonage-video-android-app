@@ -1,173 +1,200 @@
-# 📱 Vonage Video Android App
+# Vonage Video API Reference App for Android
 
-<div align="center">
-  
-[![Android](https://img.shields.io/badge/Platform-Android-green.svg)](https://android.com)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.2.0-blue.svg)](https://kotlinlang.org)
-[![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-2025.06.01-brightgreen.svg)](https://developer.android.com/jetpack/compose)
-[![API Level](https://img.shields.io/badge/API-24%2B-orange.svg)](https://android-arsenal.com/api?level=24)
-[![License](https://img.shields.io/badge/License-Apache%202.0-red.svg)](LICENSE)
+<img src="https://developer.nexmo.com/assets/images/Vonage_Nexmo.svg" height="48px" alt="Nexmo is now known as Vonage" />
 
-*A modern Android reference application showcasing Vonage Video API integration with Jetpack Compose*
+## Welcome to Vonage
 
-</div>
+If you're new to Vonage, you can [sign up for a Vonage API account](https://dashboard.nexmo.com/sign-up?utm_source=DEV_REL&utm_medium=github&utm_campaign=vonage-video-android-app) and get some free credit to get you started.
 
----
+## What is it?
 
-## ✨ Features
+The Vonage Video API Reference App for Android is an open-source video conferencing reference application for the [Vonage Video API](https://developer.vonage.com/en/video/client-sdks/web/overview) using the Android SDK.
 
-- 🎥 **Video Calling** - Integrated Vonage Video API for real-time video communication
-- 🎨 **Modern UI** - Built with Jetpack Compose and Material Design 3
-- 🌙 **Dark/Light Theme** - Adaptive theming with dynamic colors (Android 12+)
-- 🏗️ **Clean Architecture** - Modular design with separate compose library
-- 🧪 **Testing Ready** - Comprehensive test setup with JUnit and Espresso
-- 📱 **Edge-to-Edge** - Modern Android UI with edge-to-edge display support
+The Reference App demonstrates the best practices for integrating the [Vonage Video API](https://developer.vonage.com/en/video/client-sdks/web/overview) with your application for various use cases, from one-to-one and multi-participant video calling to foreground services integration and more.
 
-## 🛠️ Tech Stack
+## Why use it?
 
-### Core Technologies
-- **Language**: Kotlin 2.2.0
-- **UI Framework**: Jetpack Compose (BOM 2025.06.01)
-- **Architecture**: Material Design 3
-- **Build System**: Gradle with Kotlin DSL
-- **Minimum SDK**: API 24 (Android 7.0)
-- **Target SDK**: API 36
+The Vonage Video API Reference App for Android provides developers an easy-to-setup way to get started with using our APIs with the Android SDK.
 
-### Key Dependencies
-- `androidx.activity:activity-compose` - Compose integration
-- `androidx.compose.material3:material3` - Material Design 3 components
-- `androidx.lifecycle:lifecycle-runtime-ktx` - Lifecycle-aware components
-- `androidx.core:core-ktx` - Android KTX extensions
+The application is open-source, so you can not only get started quickly, but easily extend it with features needed for your use case. Any features already implemented in the Reference App use best practices for scalability and security.
 
-### Development Tools
-- **Code Quality**: Detekt static analysis
-- **Testing**: JUnit, Espresso, Compose UI testing
-- **Build Tools**: AGP 8.11.0
+As a commercial open-source project, you can also count on a solid information security architecture. While no packaged solution can guarantee absolute security, the transparency that comes with open-source software, combined with the proactive and responsive open-source community and vendors, provides significant advantages in addressing information security challenges compared to closed-source alternatives.
 
-## 🚀 Getting Started
+This application provides features for common conferencing use cases, such as:
 
-### Prerequisites
-- Android Studio Ladybug or newer
-- JDK 11 or higher
-- Android SDK 36
-- Gradle 8.11.0+
+- <details>
+    <summary>A landing page for users to create and join meeting rooms.</summary>
+    <img src="docs/assets/Welcome.png" alt="Screenshot of landing page">
+  </details>
 
-### Installation
+- <details>
+    <summary>A waiting room for users to preview their audio and video device settings and set their name before entering a meeting room.</summary>
+    <img src="docs/assets/WaitingRoom.png" alt="Screenshot of waiting room">
+  </details>
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-username/vonage-video-android-app.git
-   cd vonage-video-android-app
-   ```
+- <details>
+    <summary>A post-call page to navigate users to the landing page, re-enter the left room, and display archive(s), if any.</summary>
+    <img src="docs/assets/Goodbye.png" alt="Screenshot of goodbye page">
+  </details>
 
-2. **Open in Android Studio**
-   - Launch Android Studio
-   - Select "Open an existing project"
-   - Navigate to the cloned directory
+- A video conferencing "room" supporting up to 25 participants and the following features:
 
-3. **Build the project**
-   ```bash
-   ./gradlew build
-   ```
+- <details>
+    <summary>
+      Configurable features: adapt the app to your specific use cases and roles.
+      Configuration is handled through JSON files in the <em>config</em> folder (<em>app-config.json</em>, <em>theme.json</em>). The custom Gradle plugin reads these configuration files and generates the necessary build configuration at compile time.
+    </summary>
+  </details>
 
-4. **Run the app**
-   ```bash
-   ./gradlew installDebug
-   ```
+- <details>
+    <summary>Call participant list with audio on/off indicator.</summary>
+    <img src="docs/assets/ParticipantList.png" alt="Screenshot of participant list">
+  </details>
 
-### Configuration
+- Screen sharing integration.
 
-To integrate your Vonage Video API credentials:
+- Active speaker detection.
 
-1. Create a `local.properties` file in the root directory
-2. Add your Vonage API credentials:
-   ```properties
-   vonage.api.key=your_api_key_here
-   vonage.session.id=your_session_id_here
-   vonage.token=your_token_here
-   ```
+- Layout manager with options to display active speaker, or all participants in a grid view.
 
-## 📁 Project Structure
+- The dynamic display adjusts to show new joiners, hide video tiles to conserve bandwidth, and show the "next" participant when someone previously speaking leaves.
 
-```
-vonage-video-android-app/
-├── app/                          # Main application module
-│   ├── src/main/java/com/vonage/android/
-│   │   └── MainActivity.kt       # Main entry point
-│   └── build.gradle.kts         # App-level build configuration
-├── compose/                      # Reusable Compose components
-│   ├── src/main/java/com/vonage/android/compose/
-│   │   ├── components/          # Custom Compose components
-│   │   └── theme/              # Material Design 3 theming
-│   └── build.gradle.kts        # Compose module configuration
-├── kotlin/                      # Shared Kotlin utilities
-├── build-tools/                 # Code quality tools (Detekt)
-├── gradle/                      # Gradle version catalog
-└── scripts/                     # Build and deployment scripts
-```
+- Foreground Service: Keeps the video call running in the background with proper Android notification handling.
 
-## 🎨 UI Components
+## Project Architecture
 
-The app features a modular Compose design system:
+This reference app requires the user to deploy a backend and then use the backend API URL as the base URL in the app configuration. You can find backend code and deploying instructions in the [vonage-video-react-app](https://github.com/Vonage/vonage-video-react-app) repository.
 
-- **Theme System**: Dynamic Material Design 3 theming
-- **Color Schemes**: Light/Dark mode with Android 12+ dynamic colors
-- **Typography**: Custom typography scales
-- **Components**: Reusable UI components in the `compose` module
+The backend communicates with the Vonage video platform using the Vonage Server SDK and is responsible for generating the session IDs and tokens used to connect to the video rooms by the Vonage Client SDK.
 
-## 🧪 Testing
+## Module Overview
 
-Run the test suite:
+The Vonage Android reference app is built with a modular architecture. The app is organized into the following modules:
+
+- **app**: Main application module and composition root
+- **kotlin**: Vonage Video SDK integration and core business logic
+  - `VonageVideoClient`: Main SDK client
+  - `Call`: Call lifecycle management
+  - `model`: Domain models (CallFacade, Participant, PublisherState, etc.)
+  - `signal`: Signal plugins (chat, reactions)
+  - `internal`: Internal implementations (audio device, active speaker tracking, screen sharing)
+  - `ext`: Extension functions for reactive programming
+- **compose**: Reusable Compose UI components and Material Design 3 theme
+- **shared**: Shared utilities and domain models
+- **vonage-feature-chat**: Meeting room chat (optional feature module)
+- **build-tools**: Custom Gradle plugins for configuration generation
+
+## Platforms supported
+
+The current minimum deployment target for the reference app is Android 7.0 (API 24+). The app is optimized for phones and tablets and supports the following architectures: ARM64-v8a, ARMv7, x86, and x86_64.
+
+## Requirements
+
+- **Android Studio**: Ladybug (2024.2.1) or newer
+- **JDK**: Version 17 or higher
+- **Gradle**: 8.11.0+ (via wrapper)
+
+## Running Locally
+
+First follow the steps to create the Vonage account, application and backend set up and deployment at the [vonage-video-react-app](https://github.com/Vonage/vonage-video-react-app?tab=readme-ov-file#running-locally) URL.
+
+Clone the repository:
 
 ```bash
-# Unit tests
-./gradlew test
-
-# Instrumentation tests
-./gradlew connectedAndroidTest
-
-# Code quality checks
-./gradlew detekt
+git clone https://github.com/Vonage/vonage-video-android-app.git
+cd vonage-video-android-app
 ```
 
-## 📱 Supported Devices
+Configure the application by editing the JSON files in the `config` folder:
 
-- **Minimum**: Android 7.0 (API level 24)
-- **Target**: Android 14+ (API level 36)
-- **Architecture**: ARM64, x86_64
-- **Screen sizes**: Phone, Tablet, Foldable
+- `app-config.json`: Feature flags and application settings
+- `theme.json`: UI theme configuration
 
-## 🤝 Contributing
+Open the project in Android Studio and let Gradle sync complete.
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+Modify the base URL constant in your configuration to point to your deployed backend.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Build and run the app:
 
-## 📄 License
+```bash
+./gradlew installDebug
+```
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+Or use Android Studio's run button (▶️) to build and deploy to a connected device or emulator.
 
-## 🔗 Links
+## Feature configuration
 
-- [Vonage Video API Documentation](https://tokbox.com/developer/)
-- [Jetpack Compose Documentation](https://developer.android.com/jetpack/compose)
-- [Material Design 3](https://m3.material.io/)
-- [Android Development](https://developer.android.com/)
+You can fork the repository and start modifying it for your needs. Or you can modify the configuration files in the `config` folder:
 
-## 📞 Support
+- `app-config.json`: Configure feature flags like chat, captions, screen sharing, background blur, etc.
+- The custom Gradle plugin (`JsonConfigPlugin`) reads these configuration files at build time
+- Features can be enabled/disabled without code changes
+- Some features use product flavors (e.g., chat module with enabled/disabled variants)
 
-For support and questions:
+See [docs/CONFIG-SYSTEM.md](docs/CONFIG-SYSTEM.md) for detailed configuration documentation.
 
-- 📧 Email: [support@vonage.com](mailto:support@vonage.com)
-- 📖 Documentation: [Vonage Developer Portal](https://developer.vonage.com/)
-- 💬 Community: [Vonage Developer Community](https://developer.vonage.com/community)
+## Theme customization
 
----
+You can customize the app colors by editing the `config/theme.json` file with your desired color scheme values. The `ThemeGeneratorPlugin` Gradle plugin will generate the necessary theme resources in the `compose` module at build time.
 
-<div align="center">
-  <strong>Made with ❤️ using Vonage Video API and Jetpack Compose</strong>
-</div>
+## Testing
+
+This project uses JUnit for unit tests, MockK for mocking, Turbine for Flow testing, and Espresso for instrumentation tests.
+
+Run tests from the command line:
+
+```bash
+# Run all unit tests
+./gradlew test
+
+# Run instrumentation tests (requires connected device/emulator)
+./gradlew connectedAndroidTest
+
+# Run tests for specific module
+./gradlew :kotlin:test
+
+# Generate code coverage report
+./gradlew koverHtmlReport
+```
+
+Or run tests in Android Studio by right-clicking on test files or packages and selecting "Run Tests".
+
+## Code style
+
+We use Detekt for static analysis and Spotless for code formatting. Check and fix code style by running:
+
+```bash
+# Check code style
+./gradlew detekt
+
+# Run all quality checks
+./gradlew check
+```
+
+## Code of Conduct
+
+Please read our [Code of Conduct](docs/CODE_OF_CONDUCT.md).
+
+## Getting Involved
+
+If you wish to contribute to this project, read how in [Contributing](docs/CONTRIBUTING.md).
+
+## Known Issues
+
+We track known issues in [Known Issues](docs/KNOWN_ISSUES.md). Please refer to it for details.
+
+## Report Issues
+
+If you have any issues, feel free to open an issue or reach out to support via [support@api.vonage.com](mailto:support@api.vonage.com).
+
+## Getting Help
+
+We love to hear from you so if you have questions, comments or find a bug in the project, let us know! You can either:
+
+* Open an issue on this repository
+* Tweet at us! We're [@VonageDev on Twitter](https://twitter.com/VonageDev)
+* Or [join the Vonage Developer Community Slack](https://developer.vonage.com/community/slack)
+
+## Further Reading
+
+* Check out the Developer Documentation at <https://developer.vonage.com/>
