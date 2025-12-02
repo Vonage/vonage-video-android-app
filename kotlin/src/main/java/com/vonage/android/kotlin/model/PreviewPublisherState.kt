@@ -57,7 +57,7 @@ data class PreviewPublisherState(
 
     override fun cycleCameraBlur() {
         publisher.cycleBlur(_blurLevel.value) {
-            _blurLevel.update { it }
+            _blurLevel.value = it
         }
     }
 
