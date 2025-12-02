@@ -13,20 +13,44 @@ import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherState
 
+/**
+ * Factory for creating and managing Publisher instances.
+ *
+ * Handles publisher lifecycle including creation, configuration, and cleanup.
+ * Automatically selects optimal video resolution based on device memory.
+ */
 class PublisherFactory {
 
     var publisherHolder: VeraPublisherHolder? = null
     private var publisherConfig: PublisherConfig? = null
 
+    /**
+     * Initializes the factory with publisher configuration.
+     *
+     * @param config Configuration for publisher creation
+     */
     fun init(config: PublisherConfig) {
         publisherConfig = config
     }
 
+    /**
+     * Creates a preview-only publisher for camera preview.
+     *
+     * @param context Android context
+     * @param name Display name for the publisher
+     * @return PreviewPublisherState wrapping the publisher
+     */
     fun createPreviewPublisher(context: Context, name: String): PreviewPublisherState {
         val publisher = createPublisher(context, name)
         return PreviewPublisherState(publisher)
     }
 
+    /**
+     * Creates a full publisher for the video call.
+     *
+     * @param context Android context
+     * @return PublisherState ready to be published to the session
+     */
     fun createPublisher(context: Context): PublisherState {
         Log.d(TAG, "build publisher with $publisherConfig")
         val name = publisherConfig?.name ?: Default.PUBLISHER_NAME
@@ -38,6 +62,9 @@ class PublisherFactory {
         return participant
     }
 
+    /**
+     * Destroys the current publisher and releases resources.
+     */
     fun destroyPublisher() {
         publisherHolder?.publisher?.let {
             it.destroy()
@@ -47,6 +74,11 @@ class PublisherFactory {
         Log.i(TAG, "Destroy publisher")
     }
 
+    /**
+     * Determines optimal video resolution based on device memory.
+     *
+     * @return HIGH for 512MB+, MEDIUM for 256MB+, LOW otherwise
+     */
     @Suppress("MagicNumber")
     private fun Context.getOptimalResolution(): Publisher.CameraCaptureResolution {
         val memoryClass = (getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).memoryClass
@@ -57,6 +89,9 @@ class PublisherFactory {
         }
     }
 
+    /**
+     * Internal helper to create a configured Publisher instance.
+     */
     private fun createPublisher(context: Context, name: String): Publisher =
         Publisher.Builder(context)
             .name(name)
@@ -84,9 +119,17 @@ class PublisherFactory {
                 publisherVideoType = PublisherKit.PublisherKitVideoType.PublisherKitVideoTypeCamera
             }
 
+    /**
+     * Default configuration values for publisher creation.
+     */
     object Default {
-        val PUBLISHER_FRAME_RATE = Publisher.CameraCaptureFrameRate.FPS_15 // implement adaptative frame rate
+        /** Default frame rate for video capture (15 FPS for better performance) - TODO: Implement adaptive frame rate */
+        val PUBLISHER_FRAME_RATE = Publisher.CameraCaptureFrameRate.FPS_15
+        
+        /** Default camera index (0 = back camera) */
         const val PUBLISHER_CAMERA_INDEX = 0
+        
+        /** Default publisher name (empty string) */
         const val PUBLISHER_NAME = ""
     }
 

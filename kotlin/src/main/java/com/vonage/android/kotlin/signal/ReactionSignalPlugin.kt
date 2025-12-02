@@ -17,11 +17,21 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.util.concurrent.CopyOnWriteArrayList
 
+/**
+ * Signal plugin for handling emoji reactions in video calls.
+ *
+ * Manages emoji reactions sent by participants, displaying them temporarily
+ * and automatically removing them after a defined lifetime.
+ *
+ * @param coroutineDispatcher Dispatcher for coroutine operations (defaults to Default)
+ */
 class ReactionSignalPlugin(
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : SignalPlugin {
 
     private val coroutineScope = CoroutineScope(coroutineDispatcher)
+    
+    /** Thread-safe list of active emoji reactions */
     private val reactions: MutableList<EmojiReaction> = CopyOnWriteArrayList()
 
     private val _output = MutableStateFlow(EmojiState(reactions = persistentListOf()))
@@ -29,6 +39,12 @@ class ReactionSignalPlugin(
 
     override fun canHandle(signalType: String): Boolean = signalType == SignalType.REACTION.signal
 
+    /**
+     * Processes an incoming emoji reaction signal.
+     *
+     * Deserializes the signal, creates an EmojiReaction, and schedules its removal
+     * after EMOJI_LIFETIME_MILLIS.
+     */
     override fun handleSignal(type: String, data: String, senderName: String, isYou: Boolean) {
         if (!canHandle(type)) return
 
@@ -47,7 +63,7 @@ class ReactionSignalPlugin(
         )
         reactions.add(0, emojiReaction)
 
-        // remove reaction after 5 seconds
+        // Remove reaction after 5 seconds
         coroutineScope.launch {
             delay(EMOJI_LIFETIME_MILLIS)
             reactions.removeAll { it.id == emojiReaction.id }
@@ -57,6 +73,13 @@ class ReactionSignalPlugin(
         _output.value = EmojiState(reactions = reactions.toImmutableList())
     }
 
+    /**
+     * Formats an emoji into a reaction signal for sending.
+     *
+     * @param senderName Display name of the sender (unused in serialization)
+     * @param message The emoji character to send
+     * @return RawSignal containing type and JSON-encoded reaction data
+     */
     override fun sendSignal(senderName: String, message: String): RawSignal {
         val signal = Json.encodeToString(
             ReactionSignal(
@@ -68,8 +91,18 @@ class ReactionSignalPlugin(
     }
 }
 
+/** Duration in milliseconds that emoji reactions are displayed before auto-removal */
 const val EMOJI_LIFETIME_MILLIS = 5000L
 
+/**
+ * Represents a displayed emoji reaction from a participant.
+ *
+ * @property id Unique identifier for the reaction (timestamp)
+ * @property emoji The emoji character
+ * @property sender Display name of the sender
+ * @property isYou True if sent by the local user
+ * @property startTime Timestamp when the reaction was created
+ */
 data class EmojiReaction(
     val id: Long,
     val emoji: String,
@@ -78,6 +111,12 @@ data class EmojiReaction(
     val startTime: Long,
 )
 
+/**
+ * Internal serializable format for emoji reaction signals.
+ *
+ * @property emoji The emoji character
+ * @property time Timestamp for uniqueness and ordering
+ */
 @Serializable
 internal data class ReactionSignal(
     val emoji: String,

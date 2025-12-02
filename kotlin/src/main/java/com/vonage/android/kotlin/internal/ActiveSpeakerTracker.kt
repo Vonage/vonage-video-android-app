@@ -11,18 +11,40 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 
+/** Type alias for mapping subscriber IDs to their audio levels */
 typealias SubscriberAudioLevels = MutableMap<String, Float>
 
+/**
+ * Information about an active speaker.
+ *
+ * @property streamId The stream ID of the speaker, or null if no one is speaking
+ * @property movingAvg The moving average audio level
+ */
 data class ActiveSpeakerInfo(
     val streamId: String?,
     val movingAvg: Float
 )
 
+/**
+ * Payload for active speaker change events.
+ *
+ * @property previousActiveSpeaker The previously active speaker
+ * @property newActiveSpeaker The newly active speaker
+ */
 data class ActiveSpeakerChangedPayload(
     val previousActiveSpeaker: ActiveSpeakerInfo,
     val newActiveSpeaker: ActiveSpeakerInfo
 )
 
+/**
+ * Tracks active speaker based on audio levels from all participants.
+ *
+ * Continuously monitors audio levels and determines the active speaker based on
+ * a threshold. Emits events when the active speaker changes.
+ *
+ * @param throttleTimeMs Minimum time between speaker change calculations (default 1000ms)
+ * @param coroutineScope Scope for running audio level calculations
+ */
 @OptIn(FlowPreview::class)
 class ActiveSpeakerTracker(
     throttleTimeMs: Long = 1000L,
@@ -44,6 +66,11 @@ class ActiveSpeakerTracker(
             .launchIn(coroutineScope)
     }
 
+    /**
+     * Notifies the tracker that a subscriber has been removed.
+     *
+     * @param subscriberId The ID of the removed subscriber
+     */
     suspend fun onSubscriberDestroyed(subscriberId: String) {
         subscriberAudioLevelsBySubscriberId.remove(subscriberId)
         if (_activeSpeaker.value.streamId == subscriberId) {
@@ -52,6 +79,12 @@ class ActiveSpeakerTracker(
         calculateActiveSpeaker()
     }
 
+    /**
+     * Updates the audio level for a subscriber.
+     *
+     * @param streamId The subscriber's stream ID
+     * @param movingAvg The moving average audio level
+     */
     suspend fun onSubscriberAudioLevelUpdated(streamId: String, movingAvg: Float) {
         subscriberAudioLevelsBySubscriberId[streamId] = movingAvg
         calculateActiveSpeaker()
