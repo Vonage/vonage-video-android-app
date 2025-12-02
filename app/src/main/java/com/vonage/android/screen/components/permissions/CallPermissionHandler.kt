@@ -1,6 +1,7 @@
 package com.vonage.android.screen.components.permissions
 
 import android.Manifest
+import android.os.Build
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,16 +18,15 @@ fun CallPermissionHandler(
 ) {
     if (LocalInspectionMode.current) return
 
-    val state = rememberMultiplePermissionsState(
-        mutableListOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.FOREGROUND_SERVICE, // split permissions by sdk version
-            Manifest.permission.BLUETOOTH_CONNECT,
-            Manifest.permission.POST_NOTIFICATIONS,
-            Manifest.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION,
-        )
+    val permissions = mutableListOf(
+        Manifest.permission.CAMERA,
+        Manifest.permission.RECORD_AUDIO,
     )
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        permissions += Manifest.permission.BLUETOOTH_CONNECT
+        permissions += Manifest.permission.POST_NOTIFICATIONS
+    }
+    val state = rememberMultiplePermissionsState(permissions)
     LaunchedEffect(state) {
         state.launchMultiplePermissionRequest()
     }
