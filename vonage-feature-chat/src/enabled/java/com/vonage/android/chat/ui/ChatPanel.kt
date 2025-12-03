@@ -31,6 +31,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.components.VonageTextField
+import com.vonage.android.compose.modifier.clearFocusOnKeyboardDismiss
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.line.Close
@@ -190,7 +191,8 @@ private fun ChatPanelInput(
         VonageTextField(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 8.dp),
+                .padding(end = 8.dp)
+                .clearFocusOnKeyboardDismiss(),
             value = chatInputValue,
             onValueChange = {
                 chatInputValue = it
