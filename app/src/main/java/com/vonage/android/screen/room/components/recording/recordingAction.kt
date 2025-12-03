@@ -8,15 +8,16 @@ import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Inbox3
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.RecordingState
-import com.vonage.android.screen.room.components.ExtraAction
+import com.vonage.android.screen.room.components.bottombar.BottomBarAction
+import com.vonage.android.screen.room.components.bottombar.BottomBarActionType
 
 @Composable
 fun recordingAction(
     actions: MeetingRoomActions,
     recordingState: RecordingState,
-): ExtraAction =
-    ExtraAction(
-        id = 1,
+): BottomBarAction =
+    BottomBarAction(
+        type = BottomBarActionType.RECORD_SESSION,
         icon = VividIcons.Solid.Inbox3,
         label = when (recordingState) {
             RecordingState.IDLE,

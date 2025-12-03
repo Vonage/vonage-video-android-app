@@ -1,4 +1,4 @@
-package com.vonage.android.compose.components
+package com.vonage.android.compose.components.bottombar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,8 +19,8 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 fun ControlButton(
     icon: ImageVector,
     onClick: () -> Unit,
-    isActive: Boolean,
     modifier: Modifier = Modifier,
+    isActive: Boolean = false,
 ) {
     val iconColor = if (isActive) Color.White else Color.Gray
 

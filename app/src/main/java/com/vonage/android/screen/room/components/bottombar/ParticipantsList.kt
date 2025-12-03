@@ -1,4 +1,4 @@
-package com.vonage.android.screen.room.components
+package com.vonage.android.screen.room.components.bottombar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,18 +19,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.compose.components.AvatarInitials
+import com.vonage.android.compose.components.bottombar.ControlButton
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.Group2
 import com.vonage.android.compose.vivid.icons.solid.MicMute
 import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.screen.room.components.bottombar.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BADGE
+import com.vonage.android.screen.room.components.bottombar.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BUTTON
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -68,8 +76,8 @@ private fun ParticipantListTitle(participantsCount: Int) {
             bottom = VonageVideoTheme.dimens.paddingSmall,
         ),
         text = title,
-        color = VonageVideoTheme.colors.onSurface,
-        style = VonageVideoTheme.typography.heading1,
+        color = VonageVideoTheme.colors.textSecondary,
+        style = VonageVideoTheme.typography.heading2,
     )
 }
 
@@ -123,6 +131,49 @@ private fun ParticipantRow(participant: Participant) {
         }
     }
 }
+
+@Composable
+fun ParticipantsBadgeButton(
+    participantsCount: Int,
+    onToggleParticipants: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    BadgedBox(
+        modifier = modifier,
+        badge = {
+            Badge(
+                containerColor = Color.Gray,
+                contentColor = Color.White,
+            ) {
+                Text(
+                    modifier = Modifier
+                        .testTag(BOTTOM_BAR_PARTICIPANTS_BADGE),
+                    text = "$participantsCount",
+                )
+            }
+        }
+    ) {
+        ControlButton(
+            modifier = Modifier
+                .testTag(BOTTOM_BAR_PARTICIPANTS_BUTTON),
+            onClick = onToggleParticipants,
+            icon = VividIcons.Solid.Group2,
+        )
+    }
+}
+
+@Composable
+fun participantsAction(
+    participantsCount: Int,
+    onToggleParticipants: () -> Unit,
+): BottomBarAction =
+    BottomBarAction(
+        type = BottomBarActionType.PARTICIPANTS,
+        icon = VividIcons.Solid.Group2,
+        label = "Participants",
+        badgeCount = participantsCount,
+        onClick = onToggleParticipants,
+    )
 
 @PreviewLightDark
 @Composable
