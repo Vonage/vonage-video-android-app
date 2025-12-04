@@ -17,6 +17,7 @@
     <!-- Waiting Screen -->
     <string name="waiting_room_prepare_to_join">Prepare to join</string>
     <string name="waiting_room_name_input_label">Name</string>
+    <string name="waiting_room_name_error_message">Name length must be between 1 and 60</string>
     <string name="waiting_room_whats_your_name">Enter your name</string>
     <string name="waiting_room_join">Join meeting</string>
     <string name="waiting_room_switch_camera">Switch camera</string>
