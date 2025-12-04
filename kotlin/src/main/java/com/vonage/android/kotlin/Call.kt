@@ -159,7 +159,7 @@ class Call internal constructor(
             .map { it.output }
             .firstOrNull() ?: MutableStateFlow(null)
 
-    override fun chatSignalState(): StateFlow<ChatState?> =
+    override val chatSignalState: StateFlow<ChatState?> =
         signalState(SignalType.CHAT)
             .map { it as? ChatState }
             .stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)

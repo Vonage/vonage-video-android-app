@@ -32,10 +32,17 @@ class LandingScreenViewModel @Inject constructor(
     }
 
     fun joinRoom(roomName: String) {
-        _uiState.value = LandingScreenUiState(
-            roomName = roomName,
-            isSuccess = true,
-        )
+        if (roomName.isValidRoomName()) {
+            _uiState.value = LandingScreenUiState(
+                roomName = roomName,
+                isSuccess = true,
+            )
+        } else {
+            _uiState.value = LandingScreenUiState(
+                roomName = roomName,
+                isRoomNameWrong = true,
+            )
+        }
     }
 }
 

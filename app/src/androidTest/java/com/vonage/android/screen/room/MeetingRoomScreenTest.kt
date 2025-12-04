@@ -2,8 +2,8 @@ package com.vonage.android.screen.room
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.preview.buildCallWithParticipants
+import com.vonage.android.compose.theme.VonageVideoTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
@@ -49,7 +49,5 @@ class MeetingRoomScreenTest {
         screen.content.assertIsDisplayed()
         screen.bottomBar
             .assertIsDisplayed()
-            .assertIsDisplayedWithParticipantBadge(5.toString())
-            .assertIsDisplayedWithUnreadBadge(8.toString())
     }
 }

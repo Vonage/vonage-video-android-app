@@ -22,6 +22,7 @@ import com.vonage.android.screen.waiting.WaitingRoomTestTags.PREPARE_TO_JOIN_TEX
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.ROOM_NAME_TEXT_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_NAME_INPUT_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.WHATS_YOU_NAME_TEXT_TAG
+import com.vonage.android.compose.modifier.clearFocusOnKeyboardDismiss
 
 @Composable
 fun JoinRoomSection(
@@ -50,6 +51,7 @@ fun JoinRoomSection(
         VonageTextField(
             modifier = Modifier
                 .fillMaxWidth()
+                .clearFocusOnKeyboardDismiss()
                 .testTag(USER_NAME_INPUT_TAG),
             value = username,
             label = { Text(text = stringResource(R.string.waiting_room_name_input_label)) },

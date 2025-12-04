@@ -1,4 +1,4 @@
-package com.vonage.android.screen.room.components
+package com.vonage.android.screen.room.components.bottombar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -68,8 +68,8 @@ private fun ParticipantListTitle(participantsCount: Int) {
             bottom = VonageVideoTheme.dimens.paddingSmall,
         ),
         text = title,
-        color = VonageVideoTheme.colors.onSurface,
-        style = VonageVideoTheme.typography.heading1,
+        color = VonageVideoTheme.colors.textSecondary,
+        style = VonageVideoTheme.typography.heading2,
     )
 }
 

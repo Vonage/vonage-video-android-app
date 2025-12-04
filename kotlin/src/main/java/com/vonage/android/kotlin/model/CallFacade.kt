@@ -52,7 +52,7 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
      *
      * @return StateFlow emitting chat state including messages and unread count
      */
-    fun chatSignalState(): StateFlow<ChatState?>
+    val chatSignalState: StateFlow<ChatState?>
 
     /**
      * Gets the state flow for emoji reactions.
