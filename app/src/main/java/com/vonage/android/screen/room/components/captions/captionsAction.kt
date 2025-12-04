@@ -8,15 +8,16 @@ import com.vonage.android.compose.vivid.icons.solid.ClosedCaptioningOff
 import com.vonage.android.compose.vivid.icons.solid.ClosedCaptioning
 import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
-import com.vonage.android.screen.room.components.ExtraAction
+import com.vonage.android.screen.room.components.bottombar.BottomBarAction
+import com.vonage.android.screen.room.components.bottombar.BottomBarActionType
 
 @Composable
 fun captionsAction(
     actions: MeetingRoomActions,
     captionsState: CaptionsState,
-): ExtraAction =
-    ExtraAction(
-        id = 3,
+): BottomBarAction =
+    BottomBarAction(
+        type = BottomBarActionType.CAPTIONS,
         icon = when (captionsState) {
             CaptionsState.IDLE,
             CaptionsState.DISABLING -> VividIcons.Solid.ClosedCaptioning
