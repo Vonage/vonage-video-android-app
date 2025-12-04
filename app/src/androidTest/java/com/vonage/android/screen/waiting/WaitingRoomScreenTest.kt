@@ -7,6 +7,7 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -225,6 +226,37 @@ class WaitingRoomScreenTest {
             .performScrollTo()
             .assertIsDisplayed()
             .assertIsEnabled()
+    }
+
+    @Test
+    fun given_state_with_wrong_user_name_THEN_components_are_displayed() {
+        compose.setContent {
+            VonageVideoTheme {
+                WaitingRoomScreen(
+                    uiState = WaitingRoomUiState(
+                        roomName = "room-name",
+                        userName = "",
+                        isUserNameValid = false,
+                        publisher = buildPublisher(
+                            isMicEnabled = false,
+                            isCameraEnabled = false,
+                        ),
+                    ),
+                    actions = WaitingRoomActions(),
+                )
+            }
+        }
+        screen.userNameInput
+            .performScrollTo()
+            .assertIsDisplayed()
+            .assert(hasText(""))
+        screen.joinButton
+            .performScrollTo()
+            .assertIsDisplayed()
+            .assertIsNotEnabled()
+        screen.userNameInputError
+            .performScrollTo()
+            .assertIsDisplayed()
     }
 
     @Suppress("EmptyFunctionBlock")
