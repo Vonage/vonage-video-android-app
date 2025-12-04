@@ -12,15 +12,16 @@ import com.vonage.android.screen.room.ScreenSharingState.IDLE
 import com.vonage.android.screen.room.ScreenSharingState.SHARING
 import com.vonage.android.screen.room.ScreenSharingState.STARTING
 import com.vonage.android.screen.room.ScreenSharingState.STOPPING
-import com.vonage.android.screen.room.components.ExtraAction
+import com.vonage.android.screen.room.components.bottombar.BottomBarAction
+import com.vonage.android.screen.room.components.bottombar.BottomBarActionType
 
 @Composable
 fun screenSharingAction(
     actions: MeetingRoomActions,
     screenSharingState: ScreenSharingState,
-): ExtraAction =
-    ExtraAction(
-        id = 2,
+): BottomBarAction =
+    BottomBarAction(
+        type = BottomBarActionType.SCREEN_SHARING,
         icon = when (screenSharingState) {
             STOPPING,
             IDLE -> VividIcons.Solid.ScreenShare
@@ -46,7 +47,7 @@ fun screenSharingAction(
             when (screenSharingState) {
                 IDLE -> actions.onToggleScreenSharing(true)
                 SHARING -> actions.onToggleScreenSharing(false)
-                else -> null
+                else -> {}
             }
         },
     )
