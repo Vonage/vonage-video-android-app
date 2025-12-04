@@ -25,15 +25,15 @@ class BottomBarElement(
     val participantsBadge: SemanticsNodeInteraction
         get() = element(BOTTOM_BAR_PARTICIPANTS_BADGE)
     val endCallButton: SemanticsNodeInteraction
-        get() = child(BOTTOM_BAR_END_CALL_BUTTON)
+        get() = element(BOTTOM_BAR_END_CALL_BUTTON)
     val chatButton: SemanticsNodeInteraction
         get() = child("BOTTOM_BAR_CHAT_BUTTON")
     val chatUnreadBadge: SemanticsNodeInteraction
         get() = element("BOTTOM_BAR_CHAT_BADGE")
     val cameraButton: SemanticsNodeInteraction
-        get() = child(BOTTOM_BAR_CAMERA_BUTTON)
+        get() = element(BOTTOM_BAR_CAMERA_BUTTON)
     val micButton: SemanticsNodeInteraction
-        get() = child(BOTTOM_BAR_MIC_BUTTON)
+        get() = element(BOTTOM_BAR_MIC_BUTTON)
 
     fun assertIsDisplayed(): BottomBarElement {
         micButton.assertIsDisplayed()
