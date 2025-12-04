@@ -97,7 +97,7 @@ fun BottomBar(
         derivedStateOf { (availableWidthForActions / (actionWidth + spacingWidth)).toInt() }
     }
 
-    val realActions = actionsFactory(
+    val bottomBarActions = actionsFactory(
         actions = actions,
         state = state,
         roomActions = roomActions,
@@ -124,8 +124,8 @@ fun BottomBar(
             }
         }
     )
-    val visibleActions = realActions.take(actionsVisibleCount)
-    val moreActions = realActions.drop(actionsVisibleCount)
+    val visibleActions = bottomBarActions.take(actionsVisibleCount)
+    val overflowActions = bottomBarActions.drop(actionsVisibleCount)
 
     Row(
         modifier = modifier
@@ -159,7 +159,7 @@ fun BottomBar(
                 onEmojiClick = { emoji -> roomActions.onEmojiSent(emoji) },
             )
             MoreActionsGrid(
-                actions = moreActions.toImmutableList(),
+                actions = overflowActions.toImmutableList(),
             )
         }
     }
@@ -199,7 +199,7 @@ private fun actionsFactory(
     onShowReporting: () -> Unit,
     onShowParticipants: () -> Unit,
     onShowChat: () -> Unit,
-): List<BottomBarAction> {
+): ImmutableList<BottomBarAction> {
     val participantsCount by call.participantsCount.collectAsStateWithLifecycle()
     val chatState by call.chatSignalState.collectAsStateWithLifecycle()
 
@@ -243,7 +243,7 @@ private fun actionsFactory(
                 onClick = onShowReporting,
             )
         }
-    }
+    }.toImmutableList()
 }
 
 object BottomBarTestTags {
