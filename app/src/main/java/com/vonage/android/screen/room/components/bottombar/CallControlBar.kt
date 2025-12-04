@@ -55,38 +55,71 @@ fun CallControlBar(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        ControlButton(
-            modifier = Modifier
-                .testTag(BOTTOM_BAR_MIC_BUTTON),
-            onClick = roomActions.onToggleMic,
-            icon = if (isMicEnabled) VividIcons.Solid.Microphone2 else VividIcons.Solid.MicMute,
-            isActive = isMicEnabled,
+        MicButton(
+            roomActions = roomActions,
+            isMicEnabled = isMicEnabled,
         )
 
-        ControlButton(
-            modifier = Modifier
-                .testTag(BOTTOM_BAR_CAMERA_BUTTON),
-            onClick = roomActions.onToggleCamera,
-            icon = if (isCameraEnabled) VividIcons.Solid.Video else VividIcons.Solid.VideoOff,
-            isActive = isCameraEnabled,
+        CameraButton(
+            roomActions = roomActions,
+            isCameraEnabled = isCameraEnabled,
         )
 
         content()
 
-        ControlButton(
-            onClick = onShowMore,
-            icon = VividIcons.Solid.MoreVertical,
+        MenuButton(
+            onShowMore = onShowMore
         )
 
-        ControlButton(
-            modifier = Modifier
-                .background(Color.Red, CircleShape)
-                .testTag(BOTTOM_BAR_END_CALL_BUTTON),
-            onClick = roomActions.onEndCall,
-            icon = VividIcons.Solid.EndCall,
-            isActive = true,
+        EndCallButton(
+            roomActions = roomActions
         )
     }
+}
+
+@Composable
+private fun MicButton(
+    roomActions: MeetingRoomActions,
+    isMicEnabled: Boolean,
+) {
+    ControlButton(
+        modifier = Modifier
+            .testTag(BOTTOM_BAR_MIC_BUTTON),
+        onClick = roomActions.onToggleMic,
+        icon = if (isMicEnabled) VividIcons.Solid.Microphone2 else VividIcons.Solid.MicMute,
+        isActive = isMicEnabled,
+    )
+}
+
+@Composable
+private fun CameraButton(roomActions: MeetingRoomActions, isCameraEnabled: Boolean) {
+    ControlButton(
+        modifier = Modifier
+            .testTag(BOTTOM_BAR_CAMERA_BUTTON),
+        onClick = roomActions.onToggleCamera,
+        icon = if (isCameraEnabled) VividIcons.Solid.Video else VividIcons.Solid.VideoOff,
+        isActive = isCameraEnabled,
+    )
+}
+
+@Composable
+private fun MenuButton(onShowMore: () -> Unit) {
+    ControlButton(
+        onClick = onShowMore,
+        icon = VividIcons.Solid.MoreVertical,
+    )
+}
+
+@Composable
+private fun EndCallButton(roomActions: MeetingRoomActions) {
+    ControlButton(
+        modifier = Modifier
+            .background(Color.Red, CircleShape)
+            .testTag(BOTTOM_BAR_END_CALL_BUTTON),
+        onClick = roomActions.onEndCall,
+        icon = VividIcons.Solid.EndCall,
+        isActive = true,
+    )
 }
 
 @Preview

@@ -21,32 +21,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.vonage.android.chat.ui.ChatBadgeButton
+import com.vonage.android.R
 import com.vonage.android.compose.components.bottombar.ControlButton
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
-import com.vonage.android.compose.vivid.icons.solid.Apps
 import com.vonage.android.compose.vivid.icons.solid.Chat2
-import com.vonage.android.compose.vivid.icons.solid.Layout2
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.reporting.ReportIssueScreen
+import com.vonage.android.screen.reporting.components.reportingAction
 import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.RecordingState
 import com.vonage.android.screen.room.ScreenSharingState
-import com.vonage.android.screen.room.components.bottombar.BottomBarTestTags.BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON
-import com.vonage.android.screen.room.components.bottombar.BottomBarTestTags.BOTTOM_BAR_GRID_LAYOUT_BUTTON
+import com.vonage.android.screen.room.components.captions.captionsAction
 import com.vonage.android.screen.room.components.emoji.EmojiSelector
+import com.vonage.android.screen.room.components.recording.recordingAction
 import com.vonage.android.screen.room.noOpCallFacade
+import com.vonage.android.screensharing.ui.screenSharingAction
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -63,6 +62,10 @@ data class BottomBarState(
     val participants: ImmutableList<Participant>,
 )
 
+// 4 because mic + camera + menu + end
+const val DEFAULT_ACTIONS_COUNT = 4
+
+@Suppress("LongMethod")
 @Composable
 fun BottomBar(
     roomActions: MeetingRoomActions,
@@ -80,27 +83,49 @@ fun BottomBar(
     var showReporting by remember { mutableStateOf(false) }
     val reportSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val participantsCount by call.participantsCount.collectAsStateWithLifecycle()
-    val chatState by call.chatSignalState.collectAsStateWithLifecycle()
+    val density = LocalDensity.current
+    val actionWidth = with(density) { VonageVideoTheme.dimens.minTouchTarget.toPx() }
+    val spacingWidth = with(density) { VonageVideoTheme.dimens.spaceSmall.toPx() }
+    val containerSpacing = with(density) { VonageVideoTheme.dimens.spaceXLarge.toPx() }
 
     var availableWidth by remember { mutableIntStateOf(0) }
-
-    val density = LocalDensity.current
-    val actionWidth = with(density) { 48.dp.toPx() }
-    val spacingWidth = with(density) { 8.dp.toPx() }
-    val containerSpacing = with(density) { 32.dp.toPx() }
-
-    // 4 because mic + camera + menu + end
-    val pinnedActionsWidth = 4 * actionWidth + (4 - 1) * spacingWidth
-    val widthForActions by remember(availableWidth) {
+    val pinnedActionsWidth = DEFAULT_ACTIONS_COUNT * actionWidth + (DEFAULT_ACTIONS_COUNT - 1) * spacingWidth
+    val availableWidthForActions by remember(availableWidth) {
         derivedStateOf { (availableWidth - pinnedActionsWidth - containerSpacing).coerceAtLeast(0F) }
     }
-    val actionsVisibleCount by remember(widthForActions) {
-        derivedStateOf { (widthForActions / (actionWidth + spacingWidth)).toInt() }
+    val actionsVisibleCount by remember(availableWidthForActions) {
+        derivedStateOf { (availableWidthForActions / (actionWidth + spacingWidth)).toInt() }
     }
 
-    val visibleActions = actions.take(actionsVisibleCount)
-    val moreActions = actions.drop(actionsVisibleCount)
+    val realActions = actionsFactory(
+        actions = actions,
+        state = state,
+        roomActions = roomActions,
+        call = call,
+        onShowParticipants = {
+            scope.launch {
+                showParticipants = showParticipants.toggle()
+                moreActionsSheetState.hide()
+                showMoreActions = false
+            }
+        },
+        onShowChat = {
+            scope.launch {
+                state.onShowChat()
+                moreActionsSheetState.hide()
+                showMoreActions = false
+            }
+        },
+        onShowReporting = {
+            scope.launch {
+                showReporting = showReporting.toggle()
+                moreActionsSheetState.hide()
+                showMoreActions = false
+            }
+        }
+    )
+    val visibleActions = realActions.take(actionsVisibleCount)
+    val moreActions = realActions.drop(actionsVisibleCount)
 
     Row(
         modifier = modifier
@@ -114,26 +139,13 @@ fun BottomBar(
             roomActions = roomActions,
             onShowMore = { showMoreActions = showMoreActions.toggle() },
         ) {
-            visibleActions.forEach { type ->
-                when (type) {
-                    BottomBarActionType.CHANGE_LAYOUT -> LayoutSelectorButton(
-                        state = state,
-                        actions = roomActions,
-                    )
-
-                    BottomBarActionType.PARTICIPANTS -> ParticipantsBadgeButton(
-                        participantsCount = participantsCount,
-                        onToggleParticipants = { showParticipants = showParticipants.toggle() },
-                    )
-
-                    BottomBarActionType.CHAT -> ChatBadgeButton(
-                        unreadCount = chatState?.unreadCount ?: 0,
-                        onShowChat = state.onShowChat,
-                        isChatShow = state.isChatShow,
-                    )
-
-                    else -> {}
-                }
+            visibleActions.forEach { action ->
+                ControlButton(
+                    icon = action.icon,
+                    onClick = action.onClick,
+                    badgeCount = action.badgeCount,
+                    isActive = action.isSelected,
+                )
             }
         }
     }
@@ -146,48 +158,8 @@ fun BottomBar(
             EmojiSelector(
                 onEmojiClick = { emoji -> roomActions.onEmojiSent(emoji) },
             )
-
             MoreActionsGrid(
-                recordingState = state.recordingState,
-                screenSharingState = state.screenSharingState,
-                captionsState = state.captionsState,
-                onShowReporting = {
-                    scope.launch {
-                        showReporting = showReporting.toggle()
-                        moreActionsSheetState.hide()
-                        showMoreActions = false
-                    }
-                },
-                roomActions = roomActions,
-                overflowActions = moreActions.mapNotNull { type ->
-                    when (type) {
-                        BottomBarActionType.CHANGE_LAYOUT -> layoutSelectorAction(state, roomActions)
-                        BottomBarActionType.PARTICIPANTS -> participantsAction(participantsCount) {
-                            scope.launch {
-                                showParticipants = showParticipants.toggle()
-                                moreActionsSheetState.hide()
-                                showMoreActions = false
-                            }
-                        }
-
-                        BottomBarActionType.CHAT -> BottomBarAction(
-                            type = BottomBarActionType.CHAT,
-                            icon = VividIcons.Solid.Chat2,
-                            label = "Chat",
-                            isSelected = state.isChatShow,
-                            badgeCount = chatState?.unreadCount ?: 0,
-                            onClick = {
-                                scope.launch {
-                                    state.onShowChat()
-                                    moreActionsSheetState.hide()
-                                    showMoreActions = false
-                                }
-                            },
-                        )
-
-                        else -> null
-                    }
-                }.toImmutableList()
+                actions = moreActions.toImmutableList(),
             )
         }
     }
@@ -219,51 +191,58 @@ fun BottomBar(
 }
 
 @Composable
-fun layoutSelectorAction(
+private fun actionsFactory(
+    actions: ImmutableList<BottomBarActionType>,
     state: BottomBarState,
-    actions: MeetingRoomActions,
-): BottomBarAction =
-    when (state.layoutType) {
-        CallLayoutType.SPEAKER_LAYOUT -> BottomBarAction(
-            type = BottomBarActionType.CHANGE_LAYOUT,
-            icon = VividIcons.Solid.Layout2,
-            label = "Change layout",
-            onClick = { actions.onChangeLayout(CallLayoutType.GRID) },
-        )
+    roomActions: MeetingRoomActions,
+    call: CallFacade,
+    onShowReporting: () -> Unit,
+    onShowParticipants: () -> Unit,
+    onShowChat: () -> Unit,
+): List<BottomBarAction> {
+    val participantsCount by call.participantsCount.collectAsStateWithLifecycle()
+    val chatState by call.chatSignalState.collectAsStateWithLifecycle()
 
-        else -> BottomBarAction(
-            type = BottomBarActionType.CHANGE_LAYOUT,
-            icon = VividIcons.Solid.Apps,
-            label = "Change layout",
-            onClick = { actions.onChangeLayout(CallLayoutType.SPEAKER_LAYOUT) },
-        )
-    }
+    return actions.map { type ->
+        when (type) {
+            BottomBarActionType.CHANGE_LAYOUT -> layoutSelectorAction(
+                layoutType = state.layoutType,
+                roomActions = roomActions,
+            )
 
-@Composable
-private fun LayoutSelectorButton(
-    state: BottomBarState,
-    actions: MeetingRoomActions,
-) {
-    when (state.layoutType) {
-        CallLayoutType.GRID -> {
-            ControlButton(
-                modifier = Modifier
-                    .testTag(BOTTOM_BAR_GRID_LAYOUT_BUTTON),
-                onClick = { actions.onChangeLayout(CallLayoutType.SPEAKER_LAYOUT) },
-                icon = VividIcons.Solid.Apps,
+            BottomBarActionType.PARTICIPANTS -> participantsAction(
+                participantsCount = participantsCount,
+                onToggleParticipants = onShowParticipants,
+            )
+
+            BottomBarActionType.CHAT -> BottomBarAction(
+                type = BottomBarActionType.CHAT,
+                icon = VividIcons.Solid.Chat2,
+                label = stringResource(R.string.chat),
+                isSelected = state.isChatShow,
+                badgeCount = chatState?.unreadCount ?: 0,
+                onClick = onShowChat,
+            )
+
+            BottomBarActionType.SCREEN_SHARING -> screenSharingAction(
+                actions = roomActions,
+                screenSharingState = state.screenSharingState,
+            )
+
+            BottomBarActionType.RECORD_SESSION -> recordingAction(
+                actions = roomActions,
+                recordingState = state.recordingState,
+            )
+
+            BottomBarActionType.CAPTIONS -> captionsAction(
+                actions = roomActions,
+                captionsState = state.captionsState,
+            )
+
+            BottomBarActionType.REPORT -> reportingAction(
+                onClick = onShowReporting,
             )
         }
-
-        CallLayoutType.SPEAKER_LAYOUT -> {
-            ControlButton(
-                modifier = Modifier
-                    .testTag(BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON),
-                onClick = { actions.onChangeLayout(CallLayoutType.GRID) },
-                icon = VividIcons.Solid.Layout2,
-            )
-        }
-
-        else -> {}
     }
 }
 
