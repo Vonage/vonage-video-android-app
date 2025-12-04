@@ -23,6 +23,8 @@ import com.vonage.android.screen.waiting.WaitingRoomTestTags.ROOM_NAME_TEXT_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_NAME_INPUT_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.WHATS_YOU_NAME_TEXT_TAG
 import com.vonage.android.compose.modifier.clearFocusOnKeyboardDismiss
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_NAME_INPUT_ERROR_TAG
+import com.vonage.android.util.MAX_USER_NAME_LENGTH
 
 @Composable
 fun JoinRoomSection(
@@ -57,11 +59,13 @@ fun JoinRoomSection(
             value = username,
             label = { Text(text = stringResource(R.string.waiting_room_name_input_label)) },
             onValueChange = onUsernameChange,
+            maxLength = MAX_USER_NAME_LENGTH,
             supportingText = {
                 if (isUserNameValid.not()) {
                     Text(
                         modifier = Modifier
-                            .padding(vertical = VonageVideoTheme.dimens.paddingSmall),
+                            .padding(vertical = VonageVideoTheme.dimens.paddingSmall)
+                            .testTag(USER_NAME_INPUT_ERROR_TAG),
                         text = stringResource(R.string.waiting_room_name_error_message),
                         color = VonageVideoTheme.colors.error,
                     )
