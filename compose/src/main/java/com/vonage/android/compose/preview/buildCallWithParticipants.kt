@@ -66,10 +66,7 @@ fun buildCallWithParticipants(
         return MutableStateFlow(signalState)
     }
 
-    override fun chatSignalState(): StateFlow<ChatState?> {
-        val chatState = signalStateFlow.value.signals[SignalType.CHAT.signal] as? ChatState
-        return MutableStateFlow(chatState)
-    }
+    override val chatSignalState: StateFlow<ChatState?> = MutableStateFlow(null)
 
     override val emojiSignalState: StateFlow<EmojiState?> = MutableStateFlow(null)
 
