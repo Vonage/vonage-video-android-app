@@ -7,7 +7,6 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -82,7 +81,7 @@ class WaitingRoomScreenTest {
         screen.joinButton
             .performScrollTo()
             .assertIsDisplayed()
-            .assertIsNotEnabled()
+            .assertIsEnabled()
     }
 
     @Test
@@ -194,7 +193,7 @@ class WaitingRoomScreenTest {
         screen.joinButton
             .performScrollTo()
             .assertIsDisplayed()
-            .assertIsNotEnabled()
+            .assertIsEnabled()
     }
 
     @Test
@@ -225,7 +224,7 @@ class WaitingRoomScreenTest {
         screen.joinButton
             .performScrollTo()
             .assertIsDisplayed()
-            .assertIsNotEnabled()
+            .assertIsEnabled()
     }
 
     @Suppress("EmptyFunctionBlock")
