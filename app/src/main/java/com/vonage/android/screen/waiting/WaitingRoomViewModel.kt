@@ -8,6 +8,7 @@ import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherParticipant
+import com.vonage.android.util.isValidUserName
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -45,7 +46,10 @@ class WaitingRoomViewModel @AssistedInject constructor(
     }
 
     fun updateUserName(userName: String) {
-        _uiState.update { uiState -> uiState.copy(userName = userName) }
+        _uiState.update { uiState -> uiState.copy(
+            userName = userName.trim(),
+            isUserNameValid = userName.isValidUserName(),
+        ) }
     }
 
     fun onMicToggle() {
@@ -66,6 +70,10 @@ class WaitingRoomViewModel @AssistedInject constructor(
 
     fun joinRoom(userName: String) {
         viewModelScope.launch {
+            if (userName.isValidUserName().not()) {
+                _uiState.update { uiState -> uiState.copy(isUserNameValid = false) }
+                return@launch
+            }
             userRepository.saveUserName(userName)
             currentPublisher()?.let { publisher ->
                 videoClient.configurePublisher(
@@ -104,6 +112,7 @@ fun interface WaitingRoomViewModelFactory {
 data class WaitingRoomUiState(
     val roomName: String,
     val userName: String = "",
+    val isUserNameValid: Boolean = true,
     val publisher: PublisherParticipant? = null,
     val isSuccess: Boolean = false,
 )

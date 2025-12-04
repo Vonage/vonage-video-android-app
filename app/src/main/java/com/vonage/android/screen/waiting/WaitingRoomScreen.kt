@@ -95,6 +95,7 @@ fun WaitingRoomScreen(
                     .widthIn(0.dp, MAX_PANE_WIDTH.dp),
                 roomName = uiState.roomName,
                 username = uiState.userName,
+                isUserNameValid = uiState.isUserNameValid,
                 onUsernameChange = actions.onUserNameChange,
                 onJoinRoom = actions.onJoinRoom,
             )
