@@ -42,7 +42,6 @@ fun ControlButton(
                 ) {
                     Text(
                         modifier = Modifier,
-                        //.testTag(BOTTOM_BAR_PARTICIPANTS_BADGE),
                         text = "$badgeCount",
                     )
                 }
