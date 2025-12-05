@@ -9,6 +9,7 @@ import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.util.isValidUserName
+import com.vonage.android.util.sanitizeUserName
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -47,7 +48,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
 
     fun updateUserName(userName: String) {
         _uiState.update { uiState -> uiState.copy(
-            userName = userName.trim(),
+            userName = userName,
             isUserNameValid = userName.isValidUserName(),
         ) }
     }
@@ -70,15 +71,16 @@ class WaitingRoomViewModel @AssistedInject constructor(
 
     fun joinRoom(userName: String) {
         viewModelScope.launch {
+            val sanitizedUserName = userName.sanitizeUserName()
             if (userName.isValidUserName().not()) {
                 _uiState.update { uiState -> uiState.copy(isUserNameValid = false) }
                 return@launch
             }
-            userRepository.saveUserName(userName)
+            userRepository.saveUserName(sanitizedUserName)
             currentPublisher()?.let { publisher ->
                 videoClient.configurePublisher(
                     PublisherConfig(
-                        name = userName,
+                        name = sanitizedUserName,
                         publishVideo = publisher.isCameraEnabled.value,
                         publishAudio = publisher.isMicEnabled.value,
                         blurLevel = publisher.blurLevel.value,
