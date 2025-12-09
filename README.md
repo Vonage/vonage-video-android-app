@@ -1,4 +1,4 @@
-# Vonage Video API Reference App for Android
+# Vonage Video API Reference App for Android (Beta)
 
 <img src="https://developer.nexmo.com/assets/images/Vonage_Nexmo.svg" height="48px" alt="Nexmo is now known as Vonage" />
 
