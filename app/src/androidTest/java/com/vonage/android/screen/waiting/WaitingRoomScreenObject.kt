@@ -9,6 +9,7 @@ import com.vonage.android.screen.waiting.WaitingRoomTestTags.MIC_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.PREPARE_TO_JOIN_TEXT_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.ROOM_NAME_TEXT_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_INITIALS_TAG
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_NAME_INPUT_ERROR_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_NAME_INPUT_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.VOLUME_INDICATOR_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.WHATS_YOU_NAME_TEXT_TAG
@@ -21,6 +22,7 @@ class WaitingRoomScreenObject(
     val roomNameText = compose.onNodeWithTag(ROOM_NAME_TEXT_TAG)
     val whatsYourNameText = compose.onNodeWithTag(WHATS_YOU_NAME_TEXT_TAG)
     val userNameInput = compose.onNodeWithTag(USER_NAME_INPUT_TAG, useUnmergedTree = true)
+    val userNameInputError = compose.onNodeWithTag(USER_NAME_INPUT_ERROR_TAG, useUnmergedTree = true)
     val cameraButtonEnabled = compose.onNodeWithTag("$CAMERA_BUTTON_TAG-on")
     val cameraButtonDisabled = compose.onNodeWithTag("$CAMERA_BUTTON_TAG-off")
     val micButtonEnabled = compose.onNodeWithTag("$MIC_BUTTON_TAG-on")
