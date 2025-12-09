@@ -1,4 +1,4 @@
-package com.vonage.android.compose.components
+package com.vonage.android.compose.components.bottombar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -8,12 +8,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.compose.modifier.conditional
@@ -28,8 +35,10 @@ fun ActionCell(
     isSelected: Boolean,
     onClickCell: () -> Unit,
     modifier: Modifier = Modifier,
+    badgeCount: Int = 0,
 ) {
     val defaultColor = VonageVideoTheme.colors.secondary
+    val badgeVisible by remember(badgeCount) { derivedStateOf { badgeCount > 0 } }
 
     Column(
         modifier = modifier
@@ -55,12 +64,29 @@ fun ActionCell(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall, Alignment.CenterVertically),
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = defaultColor,
-            modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeDefault),
-        )
+        BadgedBox(
+            badge = {
+                if (badgeVisible) {
+                    Badge(
+                        containerColor = VonageVideoTheme.colors.primary,
+                        contentColor = Color.White,
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .testTag("BOTTOM_BAR_CHAT_BADGE"),
+                            text = "$badgeCount",
+                        )
+                    }
+                }
+            },
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = defaultColor,
+                modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeDefault),
+            )
+        }
 
         Text(
             text = label,
@@ -86,6 +112,7 @@ internal fun MoreActionsGridPreview() {
                 icon = VividIcons.Solid.Blur,
                 label = "Sample label",
                 isSelected = false,
+                badgeCount = 12,
                 onClickCell = {},
             )
             ActionCell(

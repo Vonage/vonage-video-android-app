@@ -16,6 +16,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 
+/**
+ * Represents a remote participant (subscriber) in the video call.
+ *
+ * Manages the subscriber's stream state, audio level tracking, and video visibility.
+ * Implements listener interfaces to react to stream and video state changes.
+ *
+ * @param subscriber The OpenTok Subscriber instance for this remote participant
+ */
 @Stable
 data class ParticipantState(
     val subscriber: Subscriber,
@@ -24,6 +32,7 @@ data class ParticipantState(
     SubscriberKit.VideoListener {
 
     override val id: String = subscriber.stream.streamId
+    override val connectionId: String = subscriber.stream.connection.connectionId
 
     override val isPublisher: Boolean = false
 
@@ -56,6 +65,12 @@ data class ParticipantState(
         }
     }
 
+    /**
+     * Initializes audio level monitoring and talking detection.
+     *
+     * Sets up listeners and starts collecting audio level data with moving average
+     * to determine when the participant is speaking.
+     */
     suspend fun setup() {
         subscriber.setStreamListener(this)
         subscriber.setVideoListener(this)
