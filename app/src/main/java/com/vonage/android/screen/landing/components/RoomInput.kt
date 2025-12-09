@@ -22,6 +22,7 @@ import com.vonage.android.screen.landing.LandingScreenTestTags.JOIN_BUTTON_TAG
 import com.vonage.android.screen.landing.LandingScreenTestTags.ROOM_INPUT_ERROR_TAG
 import com.vonage.android.screen.landing.LandingScreenTestTags.ROOM_INPUT_TAG
 import com.vonage.android.compose.modifier.clearFocusOnKeyboardDismiss
+import com.vonage.android.util.MAX_ROOM_NAME_LENGTH
 
 @Composable
 internal fun RoomInput(
@@ -43,6 +44,7 @@ internal fun RoomInput(
             onValueChange = actions.onRoomNameChange,
             isError = isRoomNameWrong,
             label = { Text(text = stringResource(R.string.landing_enter_room_name_label)) },
+            maxLength = MAX_ROOM_NAME_LENGTH,
             supportingText = {
                 if (isRoomNameWrong) {
                     Text(

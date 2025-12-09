@@ -82,7 +82,7 @@ class WaitingRoomScreenTest {
         screen.joinButton
             .performScrollTo()
             .assertIsDisplayed()
-            .assertIsNotEnabled()
+            .assertIsEnabled()
     }
 
     @Test
@@ -194,7 +194,7 @@ class WaitingRoomScreenTest {
         screen.joinButton
             .performScrollTo()
             .assertIsDisplayed()
-            .assertIsNotEnabled()
+            .assertIsEnabled()
     }
 
     @Test
@@ -225,7 +225,38 @@ class WaitingRoomScreenTest {
         screen.joinButton
             .performScrollTo()
             .assertIsDisplayed()
+            .assertIsEnabled()
+    }
+
+    @Test
+    fun given_state_with_wrong_user_name_THEN_components_are_displayed() {
+        compose.setContent {
+            VonageVideoTheme {
+                WaitingRoomScreen(
+                    uiState = WaitingRoomUiState(
+                        roomName = "room-name",
+                        userName = "",
+                        isUserNameValid = false,
+                        publisher = buildPublisher(
+                            isMicEnabled = false,
+                            isCameraEnabled = false,
+                        ),
+                    ),
+                    actions = WaitingRoomActions(),
+                )
+            }
+        }
+        screen.userNameInput
+            .performScrollTo()
+            .assertIsDisplayed()
+            .assert(hasText(""))
+        screen.joinButton
+            .performScrollTo()
+            .assertIsDisplayed()
             .assertIsNotEnabled()
+        screen.userNameInputError
+            .performScrollTo()
+            .assertIsDisplayed()
     }
 
     @Suppress("EmptyFunctionBlock")
