@@ -2,6 +2,7 @@ package com.vonage.android.screen.landing.components
 
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,6 +36,7 @@ internal fun LandingScreenContent(
         VonageButton(
             text = stringResource(R.string.landing_create_room),
             modifier = Modifier
+                .fillMaxWidth()
                 .testTag(CREATE_ROOM_BUTTON_TAG),
             onClick = actions.onCreateRoomClick,
             leadingIcon = { PlusIcon() },

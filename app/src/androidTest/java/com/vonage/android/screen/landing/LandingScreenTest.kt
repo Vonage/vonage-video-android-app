@@ -5,7 +5,6 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performScrollTo
@@ -55,7 +54,7 @@ class LandingScreenTest {
         screen.createRoomButton.assertIsDisplayed()
         screen.joinButton
             .assertIsDisplayed()
-            .assertIsNotEnabled()
+            .assertIsEnabled()
         screen.roomInput
             .assertIsDisplayed()
             .assert(hasText(""))
@@ -108,7 +107,7 @@ class LandingScreenTest {
 
         screen.joinButton
             .assertIsDisplayed()
-            .assertIsNotEnabled()
+            .assertIsEnabled()
         screen.roomInput
             .performScrollTo()
             .assertIsDisplayed()

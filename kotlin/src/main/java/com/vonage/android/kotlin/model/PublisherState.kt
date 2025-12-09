@@ -18,6 +18,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 
+/**
+ * Represents the local publisher (current user's camera/screen) in the video call.
+ *
+ * Manages the publisher's stream state, camera controls, blur effects, and audio monitoring.
+ * Implements listener interfaces to react to publisher state changes.
+ *
+ * @param publisherId Unique identifier for this publisher (e.g., "publisher" or "publisher-screen")
+ * @param publisher The OpenTok Publisher instance
+ */
 @Stable
 data class PublisherState(
     private val publisherId: String,
@@ -29,6 +38,7 @@ data class PublisherState(
     PublisherKit.MuteListener {
 
     override val id: String = publisherId
+    override val connectionId: String = publisher.stream?.connection?.connectionId ?: ""
     private val logTag = "Publisher[$id]"
     override val creationTime: Long = publisher.stream?.creationTime?.time ?: 0
     override val videoSource: VideoSource = publisher.stream?.toParticipantType() ?: VideoSource.CAMERA
@@ -74,13 +84,18 @@ data class PublisherState(
         publisher.cycleCamera()
     }
 
-    // todo: pending add to UI
+    // TODO: Add to UI
     override fun cycleCameraBlur() {
         publisher.cycleBlur(_blurLevel.value) {
             _blurLevel.update { it }
         }
     }
 
+    /**
+     * Initializes publisher listeners and audio level monitoring.
+     *
+     * Sets up all necessary listeners and starts collecting audio level data.
+     */
     suspend fun setup() {
         publisher.setVideoListener(this)
         publisher.setPublisherListener(this)
@@ -150,6 +165,6 @@ data class PublisherState(
     }
 
     override fun onCameraError(publisher: Publisher, error: OpentokError) {
-        // do nothing by now
+        // No-op for now
     }
 }

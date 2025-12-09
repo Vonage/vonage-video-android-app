@@ -34,6 +34,7 @@ if (!rootProject.ext.sonar.ignoreModules.contains(name)) {
                             "androidx.compose.runtime.Composable",
                             "androidx.compose.ui.tooling.preview.Preview",
                             "androidx.compose.ui.tooling.preview.PreviewLightDark",
+                            "androidx.compose.ui.tooling.preview.PreviewScreenSizes",
                             "javax.annotation.processing.Generated",
                             "dagger.hilt.processor.internal.aggregateddeps.AggregatedDeps"
                     )
