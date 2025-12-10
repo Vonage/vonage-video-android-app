@@ -1,10 +1,17 @@
 name: Publish to Play Store
 
+permissions:
+  contents: read
+  actions: read
+
 on:
   push:
     branches:
       - develop
   workflow_dispatch:
+
+env:
+  BASE_API_URL: ${{ secrets.BASE_API_URL }}
 
 jobs:
   publish:
