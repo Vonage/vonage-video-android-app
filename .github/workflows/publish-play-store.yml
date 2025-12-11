@@ -10,9 +10,6 @@ on:
       - develop
   workflow_dispatch:
 
-env:
-  BASE_API_URL: ${{ secrets.BASE_API_URL }}
-
 jobs:
   publish:
     name: Build and Publish
@@ -72,7 +69,9 @@ jobs:
           sed -i "s/versionName = \".*\"/versionName = \"$VERSION_NAME\"/" app/build.gradle.kts
 
       - name: Build release AAB
-        run: ./gradlew bundleRelease --stacktrace
+        env:
+          BASE_API_URL: ${{ secrets.BASE_API_URL }}
+        run: ./gradlew generateVonageConfig && ./gradlew bundleRelease --stacktrace
 
       - name: Publish to Play Store
         run: ./gradlew publishReleaseBundle
