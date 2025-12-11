@@ -60,7 +60,7 @@ data class PublisherState(
     private val _blurLevel: MutableStateFlow<BlurLevel> = MutableStateFlow(BlurLevel.NONE)
     override val blurLevel: StateFlow<BlurLevel> = _blurLevel
 
-    private val _camera: MutableStateFlow<CameraType> = MutableStateFlow(CameraType.BACK)
+    private val _camera: MutableStateFlow<CameraType> = MutableStateFlow(CameraType.FRONT)
     override val camera: StateFlow<CameraType> = _camera
 
     override fun changeVisibility(visible: Boolean) {
