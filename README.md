@@ -110,9 +110,24 @@ Configure the application by editing the JSON files in the `config` folder:
 - `app-config.json`: Feature flags and application settings
 - `theme.json`: UI theme configuration
 
-Open the project in Android Studio and let Gradle sync complete.
-
 Modify the base URL constant in your configuration to point to your deployed backend.
+
+You could create `local.properties` in the project root (good for local development):
+```properties
+BASE_API_URL=https://your-backend-url.com
+```
+or create a environment variable named `BASE_API_URL` (good for CI/CD pipelines):
+```bash
+export BASE_API_URL=https://your-backend-url.com
+```
+or even modify `app-config.json` replacing the current placeholder with your URL.
+
+Then regenerate the configuration:
+```bash
+./gradlew generateVonageConfig
+```
+
+Open the project in Android Studio and let Gradle sync complete.
 
 Build and run the app:
 
@@ -121,6 +136,8 @@ Build and run the app:
 ```
 
 Or use Android Studio's run button (▶️) to build and deploy to a connected device or emulator.
+
+Note: If you need to run the app in an emulator consuming a local backend, you could set `BASE_API_URL` to the special alias `10.0.2.2`
 
 ## Feature configuration
 
