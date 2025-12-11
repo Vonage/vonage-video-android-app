@@ -43,7 +43,8 @@ android {
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
 
-        buildConfigField("String", "BASE_API_URL", "\"https://vonage.video.backend\"")
+        val baseApiUrl = configProps.getProperty("vonage.baseApiUrl", "")
+        buildConfigField("String", "BASE_API_URL", "\"$baseApiUrl\"")
 
         val chatProperty = configProps.getProperty("vonage.meetingRoom.allow_chat", "true")
         buildConfigField("boolean", "FEATURE_CHAT_ENABLED", "$chatProperty")

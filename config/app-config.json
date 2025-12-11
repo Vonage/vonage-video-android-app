@@ -1,4 +1,5 @@
 {
+  "baseApiUrl": "${BASE_API_URL}",
   "videoSettings": {
     "allowBackgroundEffects": true,
     "allowCameraControl": true,

@@ -23,6 +23,7 @@ concurrency:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GITHUB_PR_NUM: ${{ github.event.pull_request.number }}
+  BASE_API_URL: ${{ secrets.BASE_API_URL }}
 
 jobs:
 
