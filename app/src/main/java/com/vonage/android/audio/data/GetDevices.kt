@@ -31,12 +31,12 @@ class GetDevices @Inject constructor(
             devices.add(AudioDevice(id = 2, type = AudioDeviceType.WIRED_HEADSET))
         }
 
-        if (hasEarpiece() && bluetoothManager.wiredState == WiredState.UnPlugged) {
-            devices.add(AudioDevice(id = 3, type = AudioDeviceType.EARPIECE))
+        if (hasSpeaker()) {
+            devices.add(AudioDevice(id = 3, type = AudioDeviceType.SPEAKER))
         }
 
-        if (hasSpeaker()) {
-            devices.add(AudioDevice(id = 4, type = AudioDeviceType.SPEAKER))
+        if (hasEarpiece() && bluetoothManager.wiredState == WiredState.UnPlugged) {
+            devices.add(AudioDevice(id = 4, type = AudioDeviceType.EARPIECE))
         }
 
         return devices
