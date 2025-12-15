@@ -11,7 +11,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class JoinMeetingRoomViewModelTest {
+class LandingScreenViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
@@ -32,7 +32,7 @@ class JoinMeetingRoomViewModelTest {
         sut.updateName("validroomname")
         sut.uiState.test {
             assertEquals(
-                LandingScreenUiState(
+                LandingScreenUiState.Content(
                     roomName = "validroomname",
                     isRoomNameWrong = false,
                 ),
@@ -46,7 +46,7 @@ class JoinMeetingRoomViewModelTest {
         sut.updateName("room@name")
         sut.uiState.test {
             assertEquals(
-                LandingScreenUiState(
+                LandingScreenUiState.Content(
                     roomName = "room@name",
                     isRoomNameWrong = true,
                 ),
@@ -63,9 +63,8 @@ class JoinMeetingRoomViewModelTest {
 
         sut.uiState.test {
             assertEquals(
-                LandingScreenUiState(
+                LandingScreenUiState.Success(
                     roomName = "vonage-rocks",
-                    isSuccess = true,
                 ),
                 awaitItem()
             )
@@ -78,9 +77,23 @@ class JoinMeetingRoomViewModelTest {
             awaitItem() // initial state
             sut.joinRoom("validname")
             assertEquals(
-                LandingScreenUiState(
+                LandingScreenUiState.Success(
                     roomName = "validname",
-                    isSuccess = true,
+                ),
+                awaitItem()
+            )
+        }
+    }
+
+    @Test
+    fun `given viewmodel when join room fails then state is correct`() = runTest {
+        sut.uiState.test {
+            awaitItem() // initial state
+            sut.joinRoom("invalid name")
+            assertEquals(
+                LandingScreenUiState.Content(
+                    roomName = "invalid name",
+                    isRoomNameWrong = true,
                 ),
                 awaitItem()
             )

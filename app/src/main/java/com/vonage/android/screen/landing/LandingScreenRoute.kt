@@ -13,16 +13,16 @@ import com.vonage.android.util.pip.pipEffect
 internal fun LandingScreenRoute(
     modifier: Modifier = Modifier,
     viewModel: LandingScreenViewModel = hiltViewModel(),
-    navigateToRoom: (JoinMeetingRoomRouteParams) -> Unit,
+    navigateToRoom: (LandingScreenRouteParams) -> Unit,
 ) {
     val pipModifier = pipEffect(shouldEnterPipMode = false)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val actions = remember {
-        JoinMeetingRoomActions(
+        LandingScreenActions(
             onJoinRoomClick = viewModel::joinRoom,
             onCreateRoomClick = viewModel::createRoom,
-            onRoomNameChange = viewModel::updateName
+            onRoomNameChange = viewModel::updateName,
         )
     }
 
@@ -45,12 +45,12 @@ object LandingScreenTestTags {
 }
 
 @Stable
-data class JoinMeetingRoomActions(
+data class LandingScreenActions(
     val onJoinRoomClick: (String) -> Unit = {},
     val onCreateRoomClick: () -> Unit = {},
     val onRoomNameChange: (String) -> Unit = {},
 )
 
-data class JoinMeetingRoomRouteParams(
+data class LandingScreenRouteParams(
     val roomName: String,
 )
