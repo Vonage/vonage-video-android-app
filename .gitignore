@@ -2,7 +2,10 @@
 # Gradle files
 .gradle/
 build/
+
+# Generated config
 gradle/generated-config.properties
+build-tools/gradle-config-plugin/bin
 
 # Local configuration file (sdk path, etc)
 local.properties

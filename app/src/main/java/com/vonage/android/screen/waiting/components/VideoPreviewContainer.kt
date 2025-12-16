@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -57,29 +58,35 @@ fun VideoPreviewContainer(
 ) {
     val isCameraEnabled by publisher.isCameraEnabled.collectAsStateWithLifecycle()
 
-    Box(
+    Card(
         modifier = modifier,
-        contentAlignment = Alignment.BottomCenter,
+        shape = VonageVideoTheme.shapes.none,
     ) {
-        if (isCameraEnabled) {
-            ParticipantVideoRenderer(
-                modifier = Modifier
-                    .fillMaxSize(),
-                participant = publisher,
-            )
-        } else {
-            AvatarInitials(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .testTag(USER_INITIALS_TAG),
-                userName = name,
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+            if (isCameraEnabled) {
+                ParticipantVideoRenderer(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    participant = publisher,
+                )
+            } else {
+                AvatarInitials(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .testTag(USER_INITIALS_TAG),
+                    userName = name,
+                )
+            }
+            VideoControlPanel(
+                modifier = Modifier.padding(bottom = VonageVideoTheme.dimens.paddingSmall),
+                publisher = publisher,
+                actions = actions,
             )
         }
-        VideoControlPanel(
-            modifier = Modifier.padding(bottom = VonageVideoTheme.dimens.paddingSmall),
-            publisher = publisher,
-            actions = actions,
-        )
     }
 }
 

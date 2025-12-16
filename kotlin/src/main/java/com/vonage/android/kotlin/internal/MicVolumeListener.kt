@@ -36,7 +36,16 @@ class MicVolumeListener {
         )
     }
 
-    fun start(samplingMillis: Long = 100): Flow<Float> = flow {
+    /**
+     * Starts listening to microphone volume and emits normalized audio levels.
+     *
+     * Creates a flow that continuously reads from the microphone and calculates
+     * RMS (Root Mean Square) values, normalized to 0.0-1.0 range.
+     *
+     * @param samplingMillis Delay between volume samples in milliseconds (default 60ms)
+     * @return Flow emitting normalized audio level values (0.0 to 1.0)
+     */
+    fun start(samplingMillis: Long = 60): Flow<Float> = flow {
         audioRecord.startRecording()
 
         val buffer = ShortArray(bufferSize)
@@ -55,6 +64,11 @@ class MicVolumeListener {
         }
     }
 
+    /**
+     * Stops listening to microphone volume.
+     *
+     * Stops the AudioRecord and ends the volume monitoring flow.
+     */
     fun stop() {
         audioRecord.stop()
     }

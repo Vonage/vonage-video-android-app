@@ -6,29 +6,29 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.R
 import com.vonage.android.compose.components.VonageOutlinedButton
 import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.landing.JoinMeetingRoomActions
+import com.vonage.android.screen.landing.LandingScreenActions
 import com.vonage.android.screen.landing.LandingScreenTestTags.JOIN_BUTTON_TAG
 import com.vonage.android.screen.landing.LandingScreenTestTags.ROOM_INPUT_ERROR_TAG
 import com.vonage.android.screen.landing.LandingScreenTestTags.ROOM_INPUT_TAG
+import com.vonage.android.compose.modifier.clearFocusOnKeyboardDismiss
+import com.vonage.android.util.MAX_ROOM_NAME_LENGTH
 
 @Composable
-internal fun RoomInput(
+internal fun LandingRoomInput(
     roomName: String,
     isRoomNameWrong: Boolean,
-    actions: JoinMeetingRoomActions,
+    actions: LandingScreenActions,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -38,13 +38,13 @@ internal fun RoomInput(
             modifier = Modifier
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = VonageVideoTheme.dimens.spaceXXLarge)
+                .clearFocusOnKeyboardDismiss()
                 .testTag(ROOM_INPUT_TAG),
             value = roomName,
             onValueChange = actions.onRoomNameChange,
             isError = isRoomNameWrong,
-            placeholder = { Text(text = stringResource(R.string.landing_enter_room_name)) },
             label = { Text(text = stringResource(R.string.landing_enter_room_name_label)) },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+            maxLength = MAX_ROOM_NAME_LENGTH,
             supportingText = {
                 if (isRoomNameWrong) {
                     Text(
@@ -65,7 +65,6 @@ internal fun RoomInput(
                 .height(VonageVideoTheme.dimens.buttonHeight)
                 .testTag(JOIN_BUTTON_TAG),
             onClick = { actions.onJoinRoomClick(roomName) },
-            enabled = isRoomNameWrong.not() && roomName.isNotEmpty(),
             text = stringResource(R.string.landing_join),
         )
     }
@@ -73,16 +72,16 @@ internal fun RoomInput(
 
 @PreviewLightDark
 @Composable
-internal fun RoomInputPreview() {
+internal fun LandingRoomInputPreview() {
     VonageVideoTheme {
         Surface(
             modifier = Modifier
                 .background(VonageVideoTheme.colors.background)
         ) {
-            RoomInput(
+            LandingRoomInput(
                 roomName = "room-name",
                 isRoomNameWrong = false,
-                actions = JoinMeetingRoomActions(),
+                actions = LandingScreenActions(),
             )
         }
     }

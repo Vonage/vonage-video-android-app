@@ -5,7 +5,6 @@
     <string name="landing_title">Upgrade video communication</string>
     <string name="landing_subtitle">Power your business with video that transforms customer satisfaction</string>
     <string name="landing_enter_room_name_title">Join existing meeting</string>
-    <string name="landing_enter_room_name">Enter room name</string>
     <string name="landing_enter_room_name_label">Room name</string>
     <string name="landing_join">Join waiting room</string>
     <string name="landing_create_room_title">Start a new video meeting</string>
@@ -17,6 +16,7 @@
     <!-- Waiting Screen -->
     <string name="waiting_room_prepare_to_join">Prepare to join</string>
     <string name="waiting_room_name_input_label">Name</string>
+    <string name="waiting_room_name_error_message">Name length must be between 1 and 60</string>
     <string name="waiting_room_whats_your_name">Enter your name</string>
     <string name="waiting_room_join">Join meeting</string>
     <string name="waiting_room_switch_camera">Switch camera</string>
@@ -87,5 +87,7 @@
     <!-- Generic -->
     <string name="generic_retry">Retry</string>
     <string name="report_issue">Report issue</string>
+    <string name="change_layout">Change layout</string>
+    <string name="chat">Chat</string>
 
 </resources>

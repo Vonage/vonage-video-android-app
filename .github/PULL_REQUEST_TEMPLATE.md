@@ -8,5 +8,10 @@
 
 [VIDSOL-](https://jira.vonage.com/browse/VIDSOL-)
 
+#### Checklist
+- [ ] Branch is based on `develop` (not `main`).
+- [ ] Resolves a `Known Issue`.
+- [ ] If yes, did you remove the item from the `docs/KNOWN_ISSUES.md`?
+- [ ] Resolves an item reported in `Issues`.
 
 #### Justification for skipping ci, if applied?

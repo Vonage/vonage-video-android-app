@@ -10,6 +10,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
+import java.util.Properties
 
 @Suppress("NestedBlockDepth")
 abstract class GenerateConfigTask : DefaultTask() {
@@ -33,7 +34,9 @@ abstract class GenerateConfigTask : DefaultTask() {
 
         require(configFile.exists())
 
-        val jsonContent = configFile.readText()
+        val props = loadProps()
+        val jsonContent = resolvePlaceholders(configFile.readText(), props)
+
         val gson = Gson()
         val jsonObject = gson.fromJson(jsonContent, JsonObject::class.java)
 
@@ -60,6 +63,56 @@ abstract class GenerateConfigTask : DefaultTask() {
 
         logger.info("Generated config class: ${outputFile.absolutePath}")
         logger.info("Generated gradle properties: ${gradlePropsFile.absolutePath}")
+    }
+
+    /**
+     * Load properties from environment variables and local.properties
+     */
+    private fun loadProps(): Map<String, String> {
+        val properties = mutableMapOf<String, String>()
+
+        // Load from local.properties (for local development)
+        val localPropertiesFile = File(project.rootDir, "local.properties")
+        if (localPropertiesFile.exists()) {
+            val localProperties = Properties()
+            localPropertiesFile.inputStream().use { localProperties.load(it) }
+            localProperties.forEach { (key, value) ->
+                properties[key.toString()] = value.toString()
+            }
+        }
+
+        // Override with environment variables (for CI/CD)
+        System.getenv("BASE_API_URL")?.let {
+            properties["BASE_API_URL"] = it
+        }
+
+        // Validate required secrets
+        if (!properties.containsKey("BASE_API_URL")) {
+            throw IllegalStateException(
+                """
+                BASE_API_URL is not configured!
+                
+                For local development, add to local.properties:
+                    BASE_API_URL=https://your-backend-url.com
+                
+                For CI/CD, set environment variable:
+                    export BASE_API_URL=https://your-backend-url.com
+                """.trimIndent()
+            )
+        }
+
+        return properties
+    }
+
+    /**
+     * Replace ${VARIABLE} placeholders with actual values
+     */
+    private fun resolvePlaceholders(text: String, properties: Map<String, String>): String {
+        var result = text
+        properties.forEach { (key, value) ->
+            result = result.replace("\${$key}", value)
+        }
+        return result
     }
 
     private fun resolveConfigFile(): String {
@@ -202,6 +255,13 @@ abstract class GenerateConfigTask : DefaultTask() {
         sb.appendLine("# Generated Gradle properties from JSON config")
         sb.appendLine("# Do not modify this file manually")
         sb.appendLine()
+
+        // Base api URL
+        jsonObject.get("baseApiUrl")?.let { value ->
+            sb.appendLine("# Video Settings")
+            sb.appendProp("vonage.baseApiUrl", value)
+            sb.appendLine()
+        }
 
         // Video Settings
         val videoSettings = jsonObject.getAsJsonObject("videoSettings")

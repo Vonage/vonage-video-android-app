@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import com.vonage.android.R
 import com.vonage.android.audio.AudioDeviceSelector.AudioDevice
 import com.vonage.android.audio.AudioDeviceSelector.AudioDeviceType
@@ -86,12 +85,11 @@ private fun AudioDeviceCell(
     isSelected: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val defaultColor = VonageVideoTheme.colors.onSurface
-    val selectedColor = VonageVideoTheme.colors.surface
+    val defaultColor = VonageVideoTheme.colors.secondary
 
     Column(
         modifier = modifier
-            .height(96.dp)
+            .height(VonageVideoTheme.dimens.avatarSizeXLarge)
             .clickable { selectDevice(audioDevice) }
             .conditional(
                 isSelected,
@@ -109,7 +107,7 @@ private fun AudioDeviceCell(
                     )
                 },
             )
-            .padding(vertical = 8.dp, horizontal = 16.dp),
+            .padding(vertical = VonageVideoTheme.dimens.paddingSmall, horizontal = VonageVideoTheme.dimens.paddingDefault),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(
             space = VonageVideoTheme.dimens.spaceSmall,
@@ -119,13 +117,13 @@ private fun AudioDeviceCell(
         Icon(
             imageVector = audioDevice.type.toImageVector(),
             contentDescription = null,
-            tint = if (isSelected) selectedColor else defaultColor,
-            modifier = Modifier.size(24.dp),
+            tint = defaultColor,
+            modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeDefault),
         )
 
         Text(
             text = audioDevice.toLabel(),
-            color = if (isSelected) selectedColor else defaultColor,
+            color = defaultColor,
             style = VonageVideoTheme.typography.bodyBase,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

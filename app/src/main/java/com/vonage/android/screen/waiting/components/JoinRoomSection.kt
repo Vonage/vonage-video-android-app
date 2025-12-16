@@ -22,11 +22,15 @@ import com.vonage.android.screen.waiting.WaitingRoomTestTags.PREPARE_TO_JOIN_TEX
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.ROOM_NAME_TEXT_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_NAME_INPUT_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.WHATS_YOU_NAME_TEXT_TAG
+import com.vonage.android.compose.modifier.clearFocusOnKeyboardDismiss
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_NAME_INPUT_ERROR_TAG
+import com.vonage.android.util.MAX_USER_NAME_LENGTH
 
 @Composable
 fun JoinRoomSection(
     roomName: String,
     username: String,
+    isUserNameValid: Boolean,
     onUsernameChange: (String) -> Unit,
     onJoinRoom: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -50,6 +54,7 @@ fun JoinRoomSection(
         VonageTextField(
             modifier = Modifier
                 .fillMaxWidth()
+                .clearFocusOnKeyboardDismiss()
                 .testTag(USER_NAME_INPUT_TAG),
             placeholder = {
                 Text(
@@ -60,6 +65,18 @@ fun JoinRoomSection(
             value = username,
             label = { Text(text = stringResource(R.string.waiting_room_name_input_label)) },
             onValueChange = onUsernameChange,
+            maxLength = MAX_USER_NAME_LENGTH,
+            supportingText = {
+                if (isUserNameValid.not()) {
+                    Text(
+                        modifier = Modifier
+                            .padding(vertical = VonageVideoTheme.dimens.paddingSmall)
+                            .testTag(USER_NAME_INPUT_ERROR_TAG),
+                        text = stringResource(R.string.waiting_room_name_error_message),
+                        color = VonageVideoTheme.colors.error,
+                    )
+                }
+            }
         )
 
         HorizontalDivider()
@@ -84,7 +101,7 @@ fun JoinRoomSection(
                 .testTag(JOIN_BUTTON_TAG),
             text = stringResource(R.string.waiting_room_join),
             onClick = { onJoinRoom(username) },
-            enabled = username.isNotEmpty(),
+            enabled = isUserNameValid,
         )
     }
 }
@@ -97,6 +114,7 @@ internal fun JoinRoomSectionPreview() {
             modifier = Modifier.background(VonageVideoTheme.colors.surface),
             roomName = "your-name-is-a-room",
             username = "Slim shady",
+            isUserNameValid = true,
             onUsernameChange = { },
             onJoinRoom = { },
         )

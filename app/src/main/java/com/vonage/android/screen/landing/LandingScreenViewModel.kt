@@ -15,12 +15,12 @@ class LandingScreenViewModel @Inject constructor(
     private val roomNameGenerator: RoomNameGenerator,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(LandingScreenUiState())
+    private val _uiState = MutableStateFlow<LandingScreenUiState>(LandingScreenUiState.Content())
     val uiState: StateFlow<LandingScreenUiState> = _uiState.asStateFlow()
 
     fun updateName(roomName: String) {
         val roomNameError = roomName.isValidRoomName().not()
-        _uiState.value = LandingScreenUiState(
+        _uiState.value = LandingScreenUiState.Content(
             roomName = roomName,
             isRoomNameWrong = roomNameError,
         )
@@ -32,17 +32,28 @@ class LandingScreenViewModel @Inject constructor(
     }
 
     fun joinRoom(roomName: String) {
-        _uiState.value = LandingScreenUiState(
-            roomName = roomName,
-            isSuccess = true,
-        )
+        if (roomName.isValidRoomName()) {
+            _uiState.value = LandingScreenUiState.Success(
+                roomName = roomName,
+            )
+        } else {
+            _uiState.value = LandingScreenUiState.Content(
+                roomName = roomName,
+                isRoomNameWrong = true,
+            )
+        }
     }
 }
 
 @Immutable
-data class LandingScreenUiState(
-    val roomName: String = "",
-    val isRoomNameWrong: Boolean = false,
-    val isError: Boolean = false,
-    val isSuccess: Boolean = false,
-)
+sealed interface LandingScreenUiState {
+    data class Content(
+        val roomName: String = "",
+        val isRoomNameWrong: Boolean = false,
+        val isError: Boolean = false,
+    ) : LandingScreenUiState
+
+    data class Success(
+        val roomName: String = "",
+    ) : LandingScreenUiState
+}

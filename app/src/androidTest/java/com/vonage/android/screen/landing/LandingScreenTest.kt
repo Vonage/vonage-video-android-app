@@ -5,7 +5,6 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performScrollTo
@@ -43,7 +42,7 @@ class LandingScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 LandingScreen(
-                    uiState = LandingScreenUiState(),
+                    uiState = LandingScreenUiState.Content(),
                     actions = NO_OP_JOIN_MEETING_ROOM_ACTIONS,
                 )
             }
@@ -55,7 +54,7 @@ class LandingScreenTest {
         screen.createRoomButton.assertIsDisplayed()
         screen.joinButton
             .assertIsDisplayed()
-            .assertIsNotEnabled()
+            .assertIsEnabled()
         screen.roomInput
             .assertIsDisplayed()
             .assert(hasText(""))
@@ -68,7 +67,7 @@ class LandingScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 LandingScreen(
-                    uiState = LandingScreenUiState(
+                    uiState = LandingScreenUiState.Content(
                         roomName = "hithere",
                     ),
                     actions = NO_OP_JOIN_MEETING_ROOM_ACTIONS,
@@ -97,7 +96,7 @@ class LandingScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 LandingScreen(
-                    uiState = LandingScreenUiState(
+                    uiState = LandingScreenUiState.Content(
                         roomName = "hi@there",
                         isRoomNameWrong = true,
                     ),
@@ -108,7 +107,7 @@ class LandingScreenTest {
 
         screen.joinButton
             .assertIsDisplayed()
-            .assertIsNotEnabled()
+            .assertIsEnabled()
         screen.roomInput
             .performScrollTo()
             .assertIsDisplayed()
@@ -120,7 +119,7 @@ class LandingScreenTest {
     }
 
     companion object {
-        val NO_OP_JOIN_MEETING_ROOM_ACTIONS = JoinMeetingRoomActions(
+        val NO_OP_JOIN_MEETING_ROOM_ACTIONS = LandingScreenActions(
             onJoinRoomClick = {},
             onCreateRoomClick = {},
             onRoomNameChange = {},
