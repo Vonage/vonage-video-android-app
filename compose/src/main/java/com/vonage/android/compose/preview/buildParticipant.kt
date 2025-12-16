@@ -17,6 +17,7 @@ fun buildParticipants(count: Int): List<Participant> {
             override val connectionId: String = "connection-id-$i"
             override val isPublisher: Boolean = false
             override val creationTime: Long = 1L
+            override val isScreenShare: Boolean = false
             override val videoSource: VideoSource = VideoSource.CAMERA
             override var name: String = "Name Sample $i"
             override val isMicEnabled: StateFlow<Boolean> = MutableStateFlow(false)
