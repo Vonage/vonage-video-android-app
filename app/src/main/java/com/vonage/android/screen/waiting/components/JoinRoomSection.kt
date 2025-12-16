@@ -16,14 +16,14 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.R
 import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.components.VonageTextField
+import com.vonage.android.compose.modifier.clearFocusOnKeyboardDismiss
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.JOIN_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.PREPARE_TO_JOIN_TEXT_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.ROOM_NAME_TEXT_TAG
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_NAME_INPUT_ERROR_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_NAME_INPUT_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.WHATS_YOU_NAME_TEXT_TAG
-import com.vonage.android.compose.modifier.clearFocusOnKeyboardDismiss
-import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_NAME_INPUT_ERROR_TAG
 import com.vonage.android.util.MAX_USER_NAME_LENGTH
 
 @Composable
@@ -56,12 +56,6 @@ fun JoinRoomSection(
                 .fillMaxWidth()
                 .clearFocusOnKeyboardDismiss()
                 .testTag(USER_NAME_INPUT_TAG),
-            placeholder = {
-                Text(
-                    text = stringResource(R.string.waiting_room_name_input_label),
-                    color = VonageVideoTheme.colors.textDisabled,
-                )
-            },
             value = username,
             label = { Text(text = stringResource(R.string.waiting_room_name_input_label)) },
             onValueChange = onUsernameChange,
