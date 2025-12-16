@@ -17,7 +17,7 @@ import com.vonage.android.R
 import com.vonage.android.compose.components.VonageOutlinedButton
 import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.landing.JoinMeetingRoomActions
+import com.vonage.android.screen.landing.LandingScreenActions
 import com.vonage.android.screen.landing.LandingScreenTestTags.JOIN_BUTTON_TAG
 import com.vonage.android.screen.landing.LandingScreenTestTags.ROOM_INPUT_ERROR_TAG
 import com.vonage.android.screen.landing.LandingScreenTestTags.ROOM_INPUT_TAG
@@ -25,10 +25,10 @@ import com.vonage.android.compose.modifier.clearFocusOnKeyboardDismiss
 import com.vonage.android.util.MAX_ROOM_NAME_LENGTH
 
 @Composable
-internal fun RoomInput(
+internal fun LandingRoomInput(
     roomName: String,
     isRoomNameWrong: Boolean,
-    actions: JoinMeetingRoomActions,
+    actions: LandingScreenActions,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -72,16 +72,16 @@ internal fun RoomInput(
 
 @PreviewLightDark
 @Composable
-internal fun RoomInputPreview() {
+internal fun LandingRoomInputPreview() {
     VonageVideoTheme {
         Surface(
             modifier = Modifier
                 .background(VonageVideoTheme.colors.background)
         ) {
-            RoomInput(
+            LandingRoomInput(
                 roomName = "room-name",
                 isRoomNameWrong = false,
-                actions = JoinMeetingRoomActions(),
+                actions = LandingScreenActions(),
             )
         }
     }

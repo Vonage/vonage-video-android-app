@@ -42,7 +42,7 @@ class LandingScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 LandingScreen(
-                    uiState = LandingScreenUiState(),
+                    uiState = LandingScreenUiState.Content(),
                     actions = NO_OP_JOIN_MEETING_ROOM_ACTIONS,
                 )
             }
@@ -67,7 +67,7 @@ class LandingScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 LandingScreen(
-                    uiState = LandingScreenUiState(
+                    uiState = LandingScreenUiState.Content(
                         roomName = "hithere",
                     ),
                     actions = NO_OP_JOIN_MEETING_ROOM_ACTIONS,
@@ -96,7 +96,7 @@ class LandingScreenTest {
         compose.setContent {
             VonageVideoTheme {
                 LandingScreen(
-                    uiState = LandingScreenUiState(
+                    uiState = LandingScreenUiState.Content(
                         roomName = "hi@there",
                         isRoomNameWrong = true,
                     ),
@@ -119,7 +119,7 @@ class LandingScreenTest {
     }
 
     companion object {
-        val NO_OP_JOIN_MEETING_ROOM_ACTIONS = JoinMeetingRoomActions(
+        val NO_OP_JOIN_MEETING_ROOM_ACTIONS = LandingScreenActions(
             onJoinRoomClick = {},
             onCreateRoomClick = {},
             onRoomNameChange = {},

@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.landing.LandingScreenTestTags.SUBTITLE_TAG
@@ -81,5 +82,13 @@ internal fun LandingScreenHeader(
             color = VonageVideoTheme.colors.textTertiary,
             textAlign = TextAlign.Start,
         )
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun LandingScreenHeaderPreview() {
+    VonageVideoTheme {
+        LandingScreenHeader()
     }
 }
