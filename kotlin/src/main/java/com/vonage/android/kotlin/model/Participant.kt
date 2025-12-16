@@ -18,11 +18,15 @@ interface Participant {
 
     /** True if this is the local publisher, false if remote subscriber */
     val isPublisher: Boolean
+
     /** Stream connection id identifier */
     val connectionId: String
 
     /** Timestamp when the participant joined (milliseconds since epoch) */
     val creationTime: Long
+
+    /** True if VideoSource equals SCREEN */
+    val isScreenShare: Boolean
 
     /** Source of the video stream (camera or screen share) */
     val videoSource: VideoSource

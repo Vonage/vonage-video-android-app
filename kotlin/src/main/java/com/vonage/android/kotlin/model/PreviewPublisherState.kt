@@ -33,6 +33,7 @@ data class PreviewPublisherState(
     override val id: String = "preview-publisher"
     override val connectionId: String = "preview-publisher-connection-id"
     override val creationTime: Long = 0
+    override val isScreenShare: Boolean = false
     override val videoSource: VideoSource = VideoSource.CAMERA
     override val name: String = publisher.name
     override val view: View = publisher.view

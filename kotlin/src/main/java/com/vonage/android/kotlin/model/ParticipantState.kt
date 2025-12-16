@@ -32,6 +32,7 @@ data class ParticipantState(
     SubscriberKit.VideoListener {
 
     override val id: String = subscriber.stream.streamId
+
     override val connectionId: String = subscriber.stream.connection.connectionId
 
     override val isPublisher: Boolean = false
@@ -39,6 +40,9 @@ data class ParticipantState(
     override val creationTime: Long = subscriber.stream.creationTime.time
 
     override val videoSource: VideoSource = subscriber.stream.toParticipantType()
+
+    override val isScreenShare: Boolean
+        get() = videoSource == VideoSource.SCREEN
 
     override val name: String = subscriber.name()
 

@@ -13,6 +13,8 @@ import com.opentok.android.Stream
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
 import com.vonage.android.kotlin.ext.extractSenderName
+import com.vonage.android.kotlin.ext.firstScreenSharing
+import com.vonage.android.kotlin.ext.mapSorted
 import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
 import com.vonage.android.kotlin.internal.ScreenSharingCapturer
@@ -103,13 +105,13 @@ class Call internal constructor(
     private val _participantsInternalFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
     
     /**
-     * StateFlow of all participants sorted by creation time (newest first).
+     * StateFlow of all participants sorted with screen sharing first, then by creation time (newest first).
      * Throttled to reduce UI updates and improve performance.
      */
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsInternalFlow
         .sample(PARTICIPANTS_DEBOUNCE_MILLIS)
         .distinctUntilChanged()
-        .map { participants -> participants.sortedByDescending { it.creationTime }.toImmutableList() }
+        .mapSorted()
         .stateIn(
             scope = coroutineScope,
             started = WhileSubscribed(SUBSCRIBE_TIMEOUT_MILLIS),
@@ -521,6 +523,7 @@ class Call internal constructor(
     /**
      * Starts monitoring active speaker changes and updates visibility accordingly.
      * Ensures the active speaker is always visible even if scrolled off screen.
+     * Screen sharing participants are automatically set as the active speaker.
      */
     private fun startActiveSpeakerTracker() {
         activeSpeakerTrackerJob?.cancel()
@@ -528,7 +531,9 @@ class Call internal constructor(
             .onEach { payload ->
                 participants[payload.newActiveSpeaker.streamId]?.let { mainSpeaker ->
                     mainSpeaker.changeVisibility(true)
-                    _activeSpeaker.update { mainSpeaker }
+                    // Override active speaker if someone is screen sharing
+                    val screenSharingParticipant = participants.values.firstScreenSharing()
+                    _activeSpeaker.update { screenSharingParticipant ?: mainSpeaker }
                 }
             }
             .launchIn(coroutineScope)
@@ -536,10 +541,23 @@ class Call internal constructor(
 
     /**
      * Updates the participants flow and count whenever the participants map changes.
+     * Also updates active speaker if a screen sharing participant is present.
+     * If the current active speaker left, clears it or sets to screen sharing participant.
      */
     private fun updateParticipants() {
         _participantsInternalFlow.update { participants.values.toImmutableList() }
         _participantsCount.update { participants.size }
+
+        // Set screen sharing participant as active speaker
+        val screenSharingParticipant = participants.values.firstScreenSharing()
+        // Update active speaker: prioritize screen sharing, or clear if current speaker left
+        _activeSpeaker.update { currentSpeaker ->
+            when {
+                screenSharingParticipant != null -> screenSharingParticipant
+                currentSpeaker != null && participants.containsKey(currentSpeaker.id) -> currentSpeaker
+                else -> null
+            }
+        }
     }
 
     companion object {
