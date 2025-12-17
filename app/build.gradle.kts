@@ -40,7 +40,8 @@ android {
         versionCode = 100
         versionName = "1.0.0"
 
-        testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
+//        testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
 
         val baseApiUrl = configProps.getProperty("vonage.baseApiUrl", "")
@@ -77,6 +78,7 @@ android {
                 }
             }
         }
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
     val signFile: File = rootProject.file(".sign/keystore.properties")
@@ -212,6 +214,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.hilt.android.testing)
     kspAndroidTest(libs.hilt.android.compiler)
+    androidTestUtil("androidx.test:orchestrator:1.1.0")
 
     debugImplementation(libs.leakcanary.android)
     debugImplementation(libs.androidx.ui.tooling)
