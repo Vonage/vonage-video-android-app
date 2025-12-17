@@ -278,6 +278,7 @@ class WaitingRoomScreenTest {
             override val id: String = "publisher"
             override val connectionId: String = "publisher-connection-id"
             override val creationTime: Long = 1L
+            override val isScreenShare: Boolean = false
             override val videoSource: VideoSource = VideoSource.CAMERA
             override val name: String = "test publisher"
             override val isMicEnabled: StateFlow<Boolean> = MutableStateFlow(isMicEnabled)

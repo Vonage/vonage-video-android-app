@@ -42,6 +42,8 @@ data class PublisherState(
     private val logTag = "Publisher[$id]"
     override val creationTime: Long = publisher.stream?.creationTime?.time ?: 0
     override val videoSource: VideoSource = publisher.stream?.toParticipantType() ?: VideoSource.CAMERA
+    override val isScreenShare: Boolean
+        get() = videoSource == VideoSource.SCREEN
     override val name: String = publisher.stream?.name ?: ""
     override val view: View = publisher.view
 

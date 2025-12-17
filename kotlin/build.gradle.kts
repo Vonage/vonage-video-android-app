@@ -27,6 +27,15 @@ android {
             isIncludeAndroidResources = true
         }
     }
+    
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
+            )
+        }
+    }
 }
 
 dependencies {
@@ -43,4 +52,11 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
+    
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.mockk)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.turbine)
 }

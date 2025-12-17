@@ -16,6 +16,7 @@ fun buildPublisher() = object : PublisherParticipant {
     override val connectionId: String = "connection-id"
     override val isPublisher: Boolean = true
     override val creationTime: Long = 1L
+    override val isScreenShare: Boolean = false
     override val videoSource: VideoSource = VideoSource.CAMERA
     override val camera: StateFlow<CameraType> = MutableStateFlow(CameraType.FRONT)
     override val blurLevel: StateFlow<BlurLevel> = MutableStateFlow(BlurLevel.NONE)
