@@ -19,7 +19,3 @@ sealed interface AppRoute {
     @Serializable
     data class Goodbye(val roomName: String) : AppRoute
 }
-
-object UrlParams {
-    const val MEETING_ROOM_PARAM = "room"
-}

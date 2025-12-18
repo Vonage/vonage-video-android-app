@@ -14,7 +14,6 @@ import com.vonage.android.navigation.AppRoute.Goodbye
 import com.vonage.android.navigation.AppRoute.Landing
 import com.vonage.android.navigation.AppRoute.Meeting
 import com.vonage.android.navigation.AppRoute.Waiting
-import com.vonage.android.navigation.UrlParams.MEETING_ROOM_PARAM
 import com.vonage.android.screen.goodbye.GoodbyeScreenRoute
 import com.vonage.android.screen.landing.LandingScreenRoute
 import com.vonage.android.screen.room.MeetingRoomScreenRoute
@@ -62,7 +61,7 @@ fun AppNavHost(
         }
         composable<Meeting>(
             deepLinks = listOf(
-                navDeepLink<Meeting>("${BuildConfig.BASE_API_URL}/${MEETING_ROOM_PARAM}"),
+                navDeepLink<Meeting>("${BuildConfig.BASE_API_URL}/room"),
             )
         ) { backStackEntry ->
             val roomName = backStackEntry.toRoute<Meeting>().roomName

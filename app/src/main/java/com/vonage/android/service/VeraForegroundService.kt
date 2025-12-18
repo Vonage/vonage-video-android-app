@@ -18,9 +18,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.vonage.android.R
-import com.vonage.android.navigation.UrlParams.MEETING_ROOM_PARAM
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.Companion.CHANNEL_ID
 import com.vonage.android.service.VeraForegroundServiceHandler.Companion.HANG_UP_ACTION
+import com.vonage.android.service.VeraForegroundServiceHandler.Companion.ROOM_INTENT_EXTRA_NAME
 
 class VeraForegroundService : Service() {
 
@@ -45,7 +45,7 @@ class VeraForegroundService : Service() {
             return START_REDELIVER_INTENT
         }
 
-        val roomName = intent.extras?.getString(MEETING_ROOM_PARAM)
+        val roomName = intent.extras?.getString(ROOM_INTENT_EXTRA_NAME)
 
         val notification = buildInCallNotification(roomName.orEmpty())
 
