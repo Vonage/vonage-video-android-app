@@ -9,6 +9,7 @@ import com.opentok.android.Session
 import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.internal.VeraAudioDevice
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.signal.SignalPlugin
@@ -84,7 +85,7 @@ class VonageVideoClient(
      * @param name Display name for the preview publisher
      * @return PreviewPublisherState for camera preview
      */
-    fun createPreviewPublisher(context: Context, name: String) =
+    fun createPreviewPublisher(context: Context, name: String): PreviewPublisherState =
         publisherFactory.createPreviewPublisher(context, name)
 
     /**
