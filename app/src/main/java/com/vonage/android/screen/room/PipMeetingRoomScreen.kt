@@ -16,9 +16,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.chat.ui.ChatBadgeButton
 import com.vonage.android.compose.components.BasicAlertDialog
+import com.vonage.android.compose.components.GenericLoading
 import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.compose.components.GenericLoading
 import com.vonage.android.screen.room.components.ParticipantVideoCard
 import com.vonage.android.util.pip.findActivity
 
@@ -32,12 +32,17 @@ fun PipMeetingRoomScreen(
     when {
         (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
             val chatState by uiState.call.chatSignalState.collectAsStateWithLifecycle()
-            val participant by uiState.call.publisher.collectAsStateWithLifecycle()
+            val activeSpeakerParticipant by uiState.call.activeSpeaker.collectAsStateWithLifecycle()
+            val publisher by uiState.call.publisher.collectAsStateWithLifecycle()
 
             Box(
                 modifier = modifier
                     .fillMaxWidth()
             ) {
+                val participant = when (activeSpeakerParticipant) {
+                    null -> publisher
+                    else -> activeSpeakerParticipant
+                }
                 participant?.let { participant ->
                     ParticipantVideoCard(
                         participant = participant,
