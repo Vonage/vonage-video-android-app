@@ -32,7 +32,6 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -121,7 +120,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         connect(sessionInfo, roomName)
     }
 
-    @OptIn(FlowPreview::class)
     private fun connect(sessionInfo: SessionInfo, roomName: String) {
         viewModelScope.launch {
             videoClient.buildPublisher(context)
