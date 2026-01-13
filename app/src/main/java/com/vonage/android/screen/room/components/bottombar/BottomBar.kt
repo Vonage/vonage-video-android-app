@@ -26,6 +26,10 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
+import com.vonage.android.archiving.RecordingState
+import com.vonage.android.archiving.ui.recordingAction
+import com.vonage.android.compose.components.bottombar.BottomBarAction
+import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.compose.components.bottombar.ControlButton
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -39,11 +43,9 @@ import com.vonage.android.screen.reporting.components.reportingAction
 import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
-import com.vonage.android.screen.room.RecordingState
 import com.vonage.android.screen.room.ScreenSharingState
 import com.vonage.android.screen.room.components.captions.captionsAction
 import com.vonage.android.screen.room.components.emoji.EmojiSelector
-import com.vonage.android.screen.room.components.recording.recordingAction
 import com.vonage.android.screen.room.noOpCallFacade
 import com.vonage.android.screensharing.ui.screenSharingAction
 import kotlinx.collections.immutable.ImmutableList
@@ -230,7 +232,10 @@ private fun actionsFactory(
             )
 
             BottomBarActionType.RECORD_SESSION -> recordingAction(
-                actions = roomActions,
+                onStartRecording = { roomActions.onToggleRecording(true) },
+                onStopRecording = { roomActions.onToggleRecording(false) },
+                startRecordingLabel = stringResource(R.string.recording_start_recording),
+                stopRecordingLabel = stringResource(R.string.recording_stop_recording),
                 recordingState = state.recordingState,
             )
 

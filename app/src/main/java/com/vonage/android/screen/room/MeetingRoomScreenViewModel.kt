@@ -6,7 +6,9 @@ import android.media.projection.MediaProjection
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vonage.android.data.ArchiveRepository
+import com.vonage.android.archiving.RecordingState
+import com.vonage.android.archiving.VonageArchiving
+import com.vonage.android.archiving.data.ArchiveRepository
 import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
@@ -48,7 +50,7 @@ import kotlinx.coroutines.launch
 class MeetingRoomScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
     private val sessionRepository: SessionRepository,
-    private val archiveRepository: ArchiveRepository,
+    private val vonageArchiving: VonageArchiving,
     private val captionsRepository: CaptionsRepository,
     private val videoClient: VonageVideoClient,
     private val screenSharingManager: VeraScreenSharingManager,
@@ -72,7 +74,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     )
 
     private var call: CallFacade? = null
-    private var currentArchiveId: String? = null
     private var currentCaptionsId: String? = null
 
     init {
@@ -83,7 +84,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     fun setup(context: Context) {
         // Set the activity context in the provider for future use
         activityContextProvider.setActivityContext(context)
-        
+
         viewModelScope.launch {
             _uiState.update { uiState -> uiState.copy(isLoading = true) }
             sessionRepository.getSession(roomName)
@@ -144,18 +145,21 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                         isError = false,
                     )
                 }
-                
+
                 call.connect(context)
                     .onEach { sessionEvent ->
                         when (sessionEvent) {
                             is SessionEvent.Disconnected -> {
                                 endCall()
                             }
+
                             is SessionEvent.Error -> {
-                                _uiState.update { uiState -> uiState.copy(
-                                    isError = true,
-                                    errorMessage = sessionEvent.error.message,
-                                ) }
+                                _uiState.update { uiState ->
+                                    uiState.copy(
+                                        isError = true,
+                                        errorMessage = sessionEvent.error.message,
+                                    )
+                                }
                             }
 
                             else -> {}
@@ -212,23 +216,19 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         }
         viewModelScope.launch {
             if (enable) {
-                archiveRepository.startArchive(roomName)
+                vonageArchiving.startArchive(roomName)
                     .onSuccess {
-                        currentArchiveId = it
                         _uiState.update { uiState -> uiState.copy(recordingState = RecordingState.RECORDING) }
                     }.onFailure {
                         _uiState.update { uiState -> uiState.copy(recordingState = RecordingState.IDLE) }
                     }
             } else {
-                currentArchiveId?.let { archiveId ->
-                    archiveRepository.stopArchive(roomName, archiveId)
-                        .onSuccess {
-                            currentArchiveId = null
-                            _uiState.update { uiState -> uiState.copy(recordingState = RecordingState.IDLE) }
-                        }.onFailure {
-                            _uiState.update { uiState -> uiState.copy(recordingState = RecordingState.RECORDING) }
-                        }
-                }
+                vonageArchiving.stopArchive(roomName)
+                    .onSuccess {
+                        _uiState.update { uiState -> uiState.copy(recordingState = RecordingState.IDLE) }
+                    }.onFailure {
+                        _uiState.update { uiState -> uiState.copy(recordingState = RecordingState.RECORDING) }
+                    }
             }
         }
     }
@@ -330,13 +330,6 @@ enum class CallLayoutType {
     ADAPTIVE_GRID,
 }
 
-enum class RecordingState {
-    IDLE,
-    STARTING,
-    RECORDING,
-    STOPPING,
-}
-
 enum class CaptionsState {
     IDLE,
     ENABLING,
@@ -360,25 +353,48 @@ val noOpCallFacade = object : CallFacade {
     override val activeSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
     override val signalStateFlow: StateFlow<SignalState?> = MutableStateFlow(null)
     override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
+    override val archivingStateFlow: StateFlow<String?> = MutableStateFlow(null)
 
     override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> = MutableStateFlow(null)
     override val chatSignalState: StateFlow<ChatState?> = MutableStateFlow(null)
     override val emojiSignalState: StateFlow<EmojiState?> = MutableStateFlow(null)
 
     override fun connect(context: Context): Flow<SessionEvent> = flowOf()
-    override fun enableCaptions(enable: Boolean) { /* empty on purpose */ }
-    override fun pauseSession() { /* empty on purpose */ }
-    override fun resumeSession() { /* empty on purpose */ }
-    override fun endSession() { /* empty on purpose */ }
+    override fun enableCaptions(enable: Boolean) { /* empty on purpose */
+    }
+
+    override fun pauseSession() { /* empty on purpose */
+    }
+
+    override fun resumeSession() { /* empty on purpose */
+    }
+
+    override fun endSession() { /* empty on purpose */
+    }
 
     override val publisher: StateFlow<PublisherState?> = MutableStateFlow(null)
 
-    override fun toggleLocalVideo() { /* empty on purpose */ }
-    override fun toggleLocalCamera() { /* empty on purpose */ }
-    override fun toggleLocalAudio() { /* empty on purpose */ }
-    override fun sendChatMessage(message: String) { /* empty on purpose */ }
-    override fun listenUnreadChatMessages(enable: Boolean) { /* empty on purpose */ }
-    override fun sendEmoji(emoji: String) { /* empty on purpose */ }
-    override fun startCapturingScreen(mediaProjection: MediaProjection) { /* empty on purpose */ }
-    override fun stopCapturingScreen() { /* empty on purpose */ }
+    override fun toggleLocalVideo() { /* empty on purpose */
+    }
+
+    override fun toggleLocalCamera() { /* empty on purpose */
+    }
+
+    override fun toggleLocalAudio() { /* empty on purpose */
+    }
+
+    override fun sendChatMessage(message: String) { /* empty on purpose */
+    }
+
+    override fun listenUnreadChatMessages(enable: Boolean) { /* empty on purpose */
+    }
+
+    override fun sendEmoji(emoji: String) { /* empty on purpose */
+    }
+
+    override fun startCapturingScreen(mediaProjection: MediaProjection) { /* empty on purpose */
+    }
+
+    override fun stopCapturingScreen() { /* empty on purpose */
+    }
 }

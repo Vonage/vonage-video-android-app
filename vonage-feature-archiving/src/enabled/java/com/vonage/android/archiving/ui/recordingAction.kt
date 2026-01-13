@@ -1,19 +1,19 @@
-package com.vonage.android.screen.room.components.recording
+package com.vonage.android.archiving.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.res.stringResource
-import com.vonage.android.R
+import com.vonage.android.archiving.RecordingState
+import com.vonage.android.compose.components.bottombar.BottomBarAction
+import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Inbox3
-import com.vonage.android.screen.room.MeetingRoomActions
-import com.vonage.android.screen.room.RecordingState
-import com.vonage.android.screen.room.components.bottombar.BottomBarAction
-import com.vonage.android.screen.room.components.bottombar.BottomBarActionType
 
 @Composable
 fun recordingAction(
-    actions: MeetingRoomActions,
+    onStartRecording: () -> Unit,
+    onStopRecording: () -> Unit,
+    startRecordingLabel: String,
+    stopRecordingLabel: String,
     recordingState: RecordingState,
 ): BottomBarAction =
     BottomBarAction(
@@ -22,9 +22,9 @@ fun recordingAction(
         label = when (recordingState) {
             RecordingState.IDLE,
             RecordingState.STARTING,
-            RecordingState.STOPPING -> stringResource(R.string.recording_start_recording)
+            RecordingState.STOPPING -> startRecordingLabel
 
-            RecordingState.RECORDING -> stringResource(R.string.recording_stop_recording)
+            RecordingState.RECORDING -> stopRecordingLabel
         },
         isSelected = when (recordingState) {
             RecordingState.IDLE,
@@ -36,8 +36,8 @@ fun recordingAction(
         onClick = remember {
             {
                 when (recordingState) {
-                    RecordingState.IDLE -> actions.onToggleRecording(true)
-                    RecordingState.RECORDING -> actions.onToggleRecording(false)
+                    RecordingState.IDLE -> onStartRecording()
+                    RecordingState.RECORDING -> onStopRecording()
                     RecordingState.STARTING,
                     RecordingState.STOPPING -> null
                 }

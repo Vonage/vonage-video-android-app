@@ -2,9 +2,9 @@ package com.vonage.android.screen.goodbye
 
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
-import com.vonage.android.data.Archive
-import com.vonage.android.data.ArchiveRepository
-import com.vonage.android.data.ArchiveStatus
+import com.vonage.android.archiving.Archive
+import com.vonage.android.archiving.ArchiveStatus
+import com.vonage.android.archiving.data.ArchiveRepository
 import com.vonage.android.util.DownloadManager
 import com.vonage.android.util.coroutines.CoroutinePoller
 import com.vonage.android.util.coroutines.CoroutinePollerProvider

@@ -3,9 +3,9 @@ package com.vonage.android.screen.goodbye
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vonage.android.data.Archive
-import com.vonage.android.data.ArchiveRepository
-import com.vonage.android.data.ArchiveStatus
+import com.vonage.android.archiving.Archive
+import com.vonage.android.archiving.ArchiveStatus
+import com.vonage.android.archiving.data.ArchiveRepository
 import com.vonage.android.di.IODispatcher
 import com.vonage.android.util.DownloadManager
 import com.vonage.android.util.coroutines.CoroutinePollerProvider
@@ -62,9 +62,7 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
 
     fun downloadArchive(archive: Archive) {
         if (archive.status == ArchiveStatus.AVAILABLE) {
-            downloadManager.downloadByUrl(
-                url = archive.url,
-            )
+            downloadManager.downloadByUrl(archive.url)
         }
     }
 

@@ -1,11 +1,12 @@
-package com.vonage.android.data
+package com.vonage.android.archiving.data
 
-import com.vonage.android.data.network.APIService
-import com.vonage.android.data.network.ServerArchive
+import com.vonage.android.archiving.Archive
+import com.vonage.android.archiving.ArchiveId
+import com.vonage.android.archiving.ArchiveStatus
 import javax.inject.Inject
 
 class ArchiveRepository @Inject constructor(
-    private val apiService: APIService,
+    private val apiService: ArchivingApi,
 ) {
 
     @Suppress("TooGenericExceptionCaught")
@@ -21,21 +22,21 @@ class ArchiveRepository @Inject constructor(
             }
         }
 
-    suspend fun startArchive(roomName: String): Result<String> =
+    suspend fun startArchive(roomName: String): Result<ArchiveId> =
         runCatching {
             val response = apiService.startArchiving(roomName)
             return if (response.isSuccessful) {
                 response.body()?.let {
-                    Result.success(it.archiveId)
+                    Result.success(ArchiveId(it.archiveId))
                 } ?: Result.failure(Exception("Empty response"))
             } else {
                 Result.failure(Exception("Failed to start archiving"))
             }
         }
 
-    suspend fun stopArchive(roomName: String, archiveId: String): Result<Boolean> =
+    suspend fun stopArchive(roomName: String, archiveId: ArchiveId): Result<Boolean> =
         runCatching {
-            val response = apiService.stopArchiving(roomName, archiveId)
+            val response = apiService.stopArchiving(roomName, archiveId.id)
             return if (response.isSuccessful) {
                 Result.success(true)
             } else {
@@ -44,9 +45,9 @@ class ArchiveRepository @Inject constructor(
         }
 }
 
-fun ServerArchive.toModel() =
+private fun ServerArchive.toModel() =
     Archive(
-        id = id,
+        id = ArchiveId(id),
         name = name,
         url = url.orEmpty(),
         status = status.toArchiveStatus(),
@@ -61,19 +62,3 @@ private fun String.toArchiveStatus(): ArchiveStatus =
         "started", "stopped", "uploaded", "paused" -> ArchiveStatus.PENDING
         else -> ArchiveStatus.FAILED
     }
-
-data class Archive(
-    val id: String,
-    val duration: Int,
-    val size: Int,
-    val name: String,
-    val url: String,
-    val status: ArchiveStatus,
-    val createdAt: Long,
-)
-
-enum class ArchiveStatus {
-    AVAILABLE,
-    PENDING,
-    FAILED
-}

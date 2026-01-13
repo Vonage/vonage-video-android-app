@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
+import com.vonage.android.archiving.RecordingState
 import com.vonage.android.audio.ui.AudioDevices
 import com.vonage.android.audio.ui.AudioDevicesEffect
 import com.vonage.android.chat.ui.ChatPanel

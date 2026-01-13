@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
+import com.vonage.android.archiving.RecordingState
 import com.vonage.android.audio.ui.rememberAudioDeviceSelector
 import com.vonage.android.audio.ui.toImageVector
 import com.vonage.android.compose.components.VonageTopAppBar
@@ -28,12 +29,11 @@ import com.vonage.android.compose.icons.CameraSwitchIcon
 import com.vonage.android.compose.icons.ShareIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.room.MeetingRoomActions
-import com.vonage.android.screen.room.RecordingState
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_AUDIO_SELECTOR_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_CAMERA_SWITCH_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_SHARE_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_TITLE
-import com.vonage.android.screen.room.components.recording.RecordingIndicator
+import com.vonage.android.archiving.ui.RecordingIndicator
 
 @Composable
 fun MeetingTopBar(

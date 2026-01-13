@@ -154,6 +154,9 @@ class Call internal constructor(
     private val _captionsStateFlow = MutableStateFlow<String?>(null)
     override val captionsStateFlow: StateFlow<String?> = _captionsStateFlow
 
+    private val _archivingStateFlow = MutableStateFlow<String?>(null)
+    override val archivingStateFlow: StateFlow<String?> = _archivingStateFlow
+
     private val signalState: SignalFlows = mutableMapOf()
     override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> =
         signalPlugins
@@ -223,6 +226,15 @@ class Call internal constructor(
                 plugin.handleSignal(type, data, senderName, isYou)
             }
         }
+        session.setArchiveListener(object : Session.ArchiveListener {
+            override fun onArchiveStarted(session: Session, id: String, name: String?) {
+                _archivingStateFlow.update { "started" }
+            }
+
+            override fun onArchiveStopped(session: Session, id: String) {
+                _archivingStateFlow.update { "stopped" }
+            }
+        })
         session.connect(token)
         awaitClose { session.setSessionListener(null) }
     }

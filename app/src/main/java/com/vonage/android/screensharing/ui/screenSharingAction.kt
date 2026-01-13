@@ -12,8 +12,8 @@ import com.vonage.android.screen.room.ScreenSharingState.IDLE
 import com.vonage.android.screen.room.ScreenSharingState.SHARING
 import com.vonage.android.screen.room.ScreenSharingState.STARTING
 import com.vonage.android.screen.room.ScreenSharingState.STOPPING
-import com.vonage.android.screen.room.components.bottombar.BottomBarAction
-import com.vonage.android.screen.room.components.bottombar.BottomBarActionType
+import com.vonage.android.compose.components.bottombar.BottomBarAction
+import com.vonage.android.compose.components.bottombar.BottomBarActionType
 
 @Composable
 fun screenSharingAction(

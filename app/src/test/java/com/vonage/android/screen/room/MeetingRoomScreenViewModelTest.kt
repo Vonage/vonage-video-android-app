@@ -5,7 +5,8 @@ import android.content.Intent
 import android.media.projection.MediaProjection
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
-import com.vonage.android.data.ArchiveRepository
+import com.vonage.android.archiving.RecordingState
+import com.vonage.android.archiving.data.ArchiveRepository
 import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository

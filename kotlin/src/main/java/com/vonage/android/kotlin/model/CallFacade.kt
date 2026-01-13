@@ -63,6 +63,9 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
 
     /** StateFlow of captions text from remote participants */
     val captionsStateFlow: StateFlow<String?>
+
+    /** StateFlow of archiving of the session */
+    val archivingStateFlow: StateFlow<String?>
 }
 
 /**

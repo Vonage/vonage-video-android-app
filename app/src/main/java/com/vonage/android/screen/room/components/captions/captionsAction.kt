@@ -8,8 +8,8 @@ import com.vonage.android.compose.vivid.icons.solid.ClosedCaptioningOff
 import com.vonage.android.compose.vivid.icons.solid.ClosedCaptioning
 import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
-import com.vonage.android.screen.room.components.bottombar.BottomBarAction
-import com.vonage.android.screen.room.components.bottombar.BottomBarActionType
+import com.vonage.android.compose.components.bottombar.BottomBarAction
+import com.vonage.android.compose.components.bottombar.BottomBarActionType
 
 @Composable
 fun captionsAction(

@@ -11,12 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import com.vonage.android.archiving.Archive
+import com.vonage.android.archiving.ArchiveStatus
 import com.vonage.android.compose.layout.TwoPaneScaffold
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.data.Archive
-import com.vonage.android.data.ArchiveStatus.AVAILABLE
-import com.vonage.android.data.ArchiveStatus.FAILED
-import com.vonage.android.data.ArchiveStatus.PENDING
 import com.vonage.android.screen.components.TopBanner
 import com.vonage.android.screen.goodbye.components.ArchivesContainer
 import com.vonage.android.screen.goodbye.components.GoodbyeScreenHeader
@@ -78,7 +76,7 @@ internal fun GoodbyeScreenPreview() {
                         id = "1",
                         name = "Recording 1",
                         url = "url",
-                        status = AVAILABLE,
+                        status = ArchiveStatus.AVAILABLE,
                         createdAt = 1231,
                         duration = 123,
                         size = 123123,
@@ -87,7 +85,7 @@ internal fun GoodbyeScreenPreview() {
                         id = "2",
                         name = "Recording 2",
                         url = "url",
-                        status = PENDING,
+                        status = ArchiveStatus.PENDING,
                         createdAt = 1231,
                         duration = 123,
                         size = 123123,
@@ -96,7 +94,7 @@ internal fun GoodbyeScreenPreview() {
                         id = "3",
                         name = "Recording 3",
                         url = "url",
-                        status = FAILED,
+                        status = ArchiveStatus.FAILED,
                         createdAt = 1231,
                         duration = 123,
                         size = 123123,
