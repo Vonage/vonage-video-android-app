@@ -5,8 +5,9 @@ import android.content.Intent
 import android.media.projection.MediaProjection
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
+import com.vonage.android.archiving.ArchiveId
 import com.vonage.android.archiving.ArchivingUiState
-import com.vonage.android.archiving.data.ArchiveRepository
+import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
@@ -42,7 +43,7 @@ class MeetingRoomScreenViewModelTest {
     private val context: Context = mockk(relaxed = true)
     private val activityContextProvider: ActivityContextProvider = mockk(relaxed = true)
     private val sessionRepository: SessionRepository = mockk()
-    private val archiveRepository: ArchiveRepository = mockk()
+    private val vonageArchiving: VonageArchiving = mockk()
     private val captionsRepository: CaptionsRepository = mockk()
     private val screenSharingManager: VeraScreenSharingManager = mockk()
     private val videoClient: VonageVideoClient = mockk()
@@ -59,7 +60,7 @@ class MeetingRoomScreenViewModelTest {
         sut = MeetingRoomScreenViewModel(
             roomName = ANY_ROOM_NAME,
             sessionRepository = sessionRepository,
-            archiveRepository = archiveRepository,
+            vonageArchiving = vonageArchiving,
             screenSharingManager = screenSharingManager,
             captionsRepository = captionsRepository,
             videoClient = videoClient,
@@ -296,7 +297,7 @@ class MeetingRoomScreenViewModelTest {
     @Test
     fun `given viewmodel when archiveCall true then emit correct state`() = runTest {
         val mockCall = givenMockCall()
-        coEvery { archiveRepository.startArchive(ANY_ROOM_NAME) } returns success("archiveId")
+        coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(ArchiveId("archiveId"))
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
@@ -325,15 +326,15 @@ class MeetingRoomScreenViewModelTest {
                     archivingUiState = ArchivingUiState.RECORDING,
                 ), awaitItem()
             )
-            coVerify { archiveRepository.startArchive(ANY_ROOM_NAME) }
+            coVerify { vonageArchiving.startArchive(ANY_ROOM_NAME) }
         }
     }
 
     @Test
     fun `given viewmodel when archiveCall false then emit correct state`() = runTest {
         val mockCall = givenMockCall()
-        coEvery { archiveRepository.startArchive(ANY_ROOM_NAME) } returns success("archiveId")
-        coEvery { archiveRepository.stopArchive(ANY_ROOM_NAME, "archiveId") } returns success(true)
+        coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(ArchiveId("archiveId"))
+        coEvery { vonageArchiving.stopArchive(ANY_ROOM_NAME) } returns success(true)
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
@@ -355,7 +356,7 @@ class MeetingRoomScreenViewModelTest {
                     archivingUiState = ArchivingUiState.STARTING,
                 ), awaitItem()
             )
-            coVerify { archiveRepository.startArchive(ANY_ROOM_NAME) }
+            coVerify { vonageArchiving.startArchive(ANY_ROOM_NAME) }
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
@@ -371,7 +372,7 @@ class MeetingRoomScreenViewModelTest {
                     archivingUiState = ArchivingUiState.STOPPING,
                 ), awaitItem()
             )
-            coVerify { archiveRepository.stopArchive(ANY_ROOM_NAME, "archiveId") }
+            coVerify { vonageArchiving.stopArchive(ANY_ROOM_NAME) }
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
