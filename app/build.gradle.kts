@@ -54,7 +54,7 @@ android {
         missingDimensionStrategy("chat", chatProperty.toEnabledString())
 
         // Archiving/recording feature
-        val archivingProperty = configProps.getProperty("vonage.meetingRoom.allowArchiving", "true")
+        val archivingProperty = configProps.getProperty("vonage.meetingRoom.allow_archiving", "true")
         buildConfigField("boolean", "FEATURE_ARCHIVING_ENABLED", "$archivingProperty")
         missingDimensionStrategy("archiving", archivingProperty.toEnabledString())
     }

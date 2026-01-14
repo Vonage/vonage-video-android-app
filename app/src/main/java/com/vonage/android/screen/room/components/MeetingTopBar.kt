@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
-import com.vonage.android.archiving.RecordingState
+import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.audio.ui.rememberAudioDeviceSelector
 import com.vonage.android.audio.ui.toImageVector
 import com.vonage.android.compose.components.VonageTopAppBar
@@ -38,7 +38,7 @@ import com.vonage.android.archiving.ui.RecordingIndicator
 @Composable
 fun MeetingTopBar(
     roomName: String,
-    recordingState: RecordingState,
+    archivingUiState: ArchivingUiState,
     actions: MeetingRoomActions,
     onToggleAudioDeviceSelector: () -> Unit,
     modifier: Modifier = Modifier,
@@ -55,17 +55,17 @@ fun MeetingTopBar(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                when (recordingState) {
-                    RecordingState.IDLE -> null
-                    RecordingState.STARTING,
-                    RecordingState.STOPPING -> CircularProgressIndicator(
+                when (archivingUiState) {
+                    ArchivingUiState.IDLE -> null
+                    ArchivingUiState.STARTING,
+                    ArchivingUiState.STOPPING -> CircularProgressIndicator(
                         color = Color.Red,
                         modifier = Modifier
                             .size(24.dp)
                             .padding(end = 4.dp)
                     )
 
-                    RecordingState.RECORDING -> RecordingIndicator(
+                    ArchivingUiState.RECORDING -> RecordingIndicator(
                         modifier = Modifier
                             .size(24.dp)
                             .padding(end = 4.dp)
@@ -132,7 +132,7 @@ internal fun MeetingTopBarPreview() {
     VonageVideoTheme {
         MeetingTopBar(
             roomName = "sample-name",
-            recordingState = RecordingState.RECORDING,
+            archivingUiState = ArchivingUiState.RECORDING,
             actions = MeetingRoomActions(),
             onToggleAudioDeviceSelector = { },
         )

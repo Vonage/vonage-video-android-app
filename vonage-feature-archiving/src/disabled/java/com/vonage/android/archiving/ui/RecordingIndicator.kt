@@ -1,14 +1,11 @@
-package com.vonage.android.chat.ui
+package com.vonage.android.archiving.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Suppress("UnusedParameter", "EmptyFunctionBlock")
 @Composable
-fun ChatBadgeButton(
-    unreadCount: Int,
-    onShowChat: () -> Unit,
-    isChatShow: Boolean,
+fun RecordingIndicator(
     modifier: Modifier = Modifier,
 ) {
 }

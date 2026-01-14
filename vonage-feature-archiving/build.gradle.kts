@@ -39,6 +39,8 @@ android {
     }
 }
 
+val enabledImplementation by configurations
+
 dependencies {
     implementation(project(":compose"))
     implementation(project(":kotlin"))
@@ -53,10 +55,10 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.opentok.android.sdk)
-    implementation(libs.retrofit)
-    implementation(libs.okhttp)
-    implementation(libs.moshi.kotlin)
+
+    enabledImplementation(libs.retrofit)
+    enabledImplementation(libs.okhttp)
+    enabledImplementation(libs.moshi.kotlin)
 
     ksp(libs.hilt.android.compiler)
 
@@ -64,8 +66,5 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
-
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(kotlin("test"))
 }

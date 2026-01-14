@@ -5,7 +5,7 @@ import android.content.Intent
 import android.media.projection.MediaProjection
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
-import com.vonage.android.archiving.RecordingState
+import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.data.ArchiveRepository
 import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
@@ -81,7 +81,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.IDLE,
+                    archivingUiState = ArchivingUiState.IDLE,
                 ), awaitItem()
             )
         }
@@ -115,7 +115,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.IDLE,
+                    archivingUiState = ArchivingUiState.IDLE,
                 ), awaitItem()
             )
             sut.onToggleMic()
@@ -136,7 +136,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.IDLE,
+                    archivingUiState = ArchivingUiState.IDLE,
                 ), awaitItem()
             )
             sut.onToggleCamera()
@@ -158,7 +158,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.IDLE,
+                    archivingUiState = ArchivingUiState.IDLE,
                 ), awaitItem()
             )
             sut.endCall()
@@ -180,7 +180,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.IDLE,
+                    archivingUiState = ArchivingUiState.IDLE,
                 ), awaitItem()
             )
             sut.onPause()
@@ -201,7 +201,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.IDLE,
+                    archivingUiState = ArchivingUiState.IDLE,
                 ), awaitItem()
             )
             sut.onResume()
@@ -222,7 +222,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.IDLE,
+                    archivingUiState = ArchivingUiState.IDLE,
                 ), awaitItem()
             )
             sut.onSwitchCamera()
@@ -243,7 +243,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.IDLE,
+                    archivingUiState = ArchivingUiState.IDLE,
                 ), awaitItem()
             )
             sut.sendMessage("hi there!")
@@ -264,7 +264,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.IDLE,
+                    archivingUiState = ArchivingUiState.IDLE,
                 ), awaitItem()
             )
             sut.listenUnread(false)
@@ -285,7 +285,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.IDLE,
+                    archivingUiState = ArchivingUiState.IDLE,
                 ), awaitItem()
             )
             sut.sendEmoji("emoji :)")
@@ -307,7 +307,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.IDLE,
+                    archivingUiState = ArchivingUiState.IDLE,
                 ), awaitItem()
             )
             sut.archiveCall(true)
@@ -315,14 +315,14 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.STARTING,
+                    archivingUiState = ArchivingUiState.STARTING,
                 ), awaitItem()
             )
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.RECORDING,
+                    archivingUiState = ArchivingUiState.RECORDING,
                 ), awaitItem()
             )
             coVerify { archiveRepository.startArchive(ANY_ROOM_NAME) }
@@ -344,7 +344,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.IDLE,
+                    archivingUiState = ArchivingUiState.IDLE,
                 ), awaitItem()
             )
             sut.archiveCall(true)
@@ -352,7 +352,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.STARTING,
+                    archivingUiState = ArchivingUiState.STARTING,
                 ), awaitItem()
             )
             coVerify { archiveRepository.startArchive(ANY_ROOM_NAME) }
@@ -360,7 +360,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.RECORDING,
+                    archivingUiState = ArchivingUiState.RECORDING,
                 ), awaitItem()
             )
             sut.archiveCall(false)
@@ -368,7 +368,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.STOPPING,
+                    archivingUiState = ArchivingUiState.STOPPING,
                 ), awaitItem()
             )
             coVerify { archiveRepository.stopArchive(ANY_ROOM_NAME, "archiveId") }
@@ -376,7 +376,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    recordingState = RecordingState.IDLE,
+                    archivingUiState = ArchivingUiState.IDLE,
                 ), awaitItem()
             )
         }

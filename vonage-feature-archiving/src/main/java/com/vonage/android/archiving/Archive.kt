@@ -13,6 +13,9 @@ data class Archive(
     val createdAt: Long,
 )
 
+@JvmInline
+value class ArchiveId(val id: String)
+
 enum class ArchiveStatus {
     AVAILABLE,
     PENDING,

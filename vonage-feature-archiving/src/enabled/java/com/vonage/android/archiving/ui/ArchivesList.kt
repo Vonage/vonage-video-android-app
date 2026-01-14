@@ -12,25 +12,18 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import com.vonage.android.archiving.Archive
+import com.vonage.android.archiving.ArchiveListStyle
 import com.vonage.android.archiving.ArchiveStatus
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Download
 import com.vonage.android.compose.vivid.icons.solid.Error
 import kotlinx.collections.immutable.ImmutableList
-import java.text.SimpleDateFormat
-
-@Immutable
-data class ArchiveListStyle(
-    val dateFormat: SimpleDateFormat,
-    val emptyLabel: String,
-)
 
 @Composable
 fun ArchivesList(
@@ -61,8 +54,8 @@ fun ArchivesList(
 
 @Composable
 private fun ArchiveEmptyRow(
-    modifier: Modifier = Modifier,
     style: ArchiveListStyle,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -87,11 +80,18 @@ private fun ArchiveRow(
     onDownloadArchive: (Archive) -> Unit,
 ) {
     val title = remember(archive) {
-        listOf(
-            formatElapsedTime(archive.duration.toLong()),
-            bytesToHumanReadableSize(archive.size.toFloat()),
-            style.dateFormat.format(archive.createdAt),
-        ).joinToString(separator = " • ")
+        when (archive.status) {
+            ArchiveStatus.AVAILABLE -> {
+                listOf(
+                    formatElapsedTime(archive.duration.toLong()),
+                    bytesToHumanReadableSize(archive.size.toFloat()),
+                    style.dateFormat.format(archive.createdAt),
+                ).joinToString(separator = " • ")
+            }
+
+            ArchiveStatus.PENDING,
+            ArchiveStatus.FAILED -> null
+        }
     }
     Row(
         modifier = Modifier
@@ -116,11 +116,13 @@ private fun ArchiveRow(
                 style = VonageVideoTheme.typography.heading3,
                 color = VonageVideoTheme.colors.onSurface,
             )
-            Text(
-                text = title,
-                style = VonageVideoTheme.typography.bodyBase,
-                color = VonageVideoTheme.colors.textSecondary,
-            )
+            title?.let {
+                Text(
+                    text = it,
+                    style = VonageVideoTheme.typography.bodyBase,
+                    color = VonageVideoTheme.colors.textSecondary,
+                )
+            }
         }
 
         when (archive.status) {

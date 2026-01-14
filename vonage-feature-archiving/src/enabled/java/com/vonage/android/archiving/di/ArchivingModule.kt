@@ -1,5 +1,8 @@
 package com.vonage.android.archiving.di
 
+import com.vonage.android.archiving.EnabledVonageArchiving
+import com.vonage.android.archiving.VonageArchiving
+import com.vonage.android.archiving.data.ArchiveRepository
 import com.vonage.android.archiving.data.ArchivingApi
 import dagger.Module
 import dagger.Provides
@@ -17,4 +20,10 @@ object ArchivingModule {
     fun provideApiService(retrofit: Retrofit): ArchivingApi = retrofit
         .create(ArchivingApi::class.java)
 
+    @Provides
+    @Singleton
+    fun provideVonageArchiving(archiveRepository: ArchiveRepository): VonageArchiving =
+        EnabledVonageArchiving(
+            archiveRepository = archiveRepository
+        )
 }

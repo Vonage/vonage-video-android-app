@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
-import com.vonage.android.archiving.RecordingState
+import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.ui.recordingAction
 import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
@@ -35,6 +35,7 @@ import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Chat2
+import com.vonage.android.config.AppConfig
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
@@ -58,7 +59,7 @@ data class BottomBarState(
     val onShowChat: () -> Unit,
     val isChatShow: Boolean,
     val layoutType: CallLayoutType,
-    val recordingState: RecordingState,
+    val archivingUiState: ArchivingUiState,
     val screenSharingState: ScreenSharingState,
     val captionsState: CaptionsState,
     val participants: ImmutableList<Participant>,
@@ -205,7 +206,7 @@ private fun actionsFactory(
     val participantsCount by call.participantsCount.collectAsStateWithLifecycle()
     val chatState by call.chatSignalState.collectAsStateWithLifecycle()
 
-    return actions.map { type ->
+    return actions.mapNotNull { type ->
         when (type) {
             BottomBarActionType.CHANGE_LAYOUT -> layoutSelectorAction(
                 layoutType = state.layoutType,
@@ -231,13 +232,17 @@ private fun actionsFactory(
                 screenSharingState = state.screenSharingState,
             )
 
-            BottomBarActionType.RECORD_SESSION -> recordingAction(
-                onStartRecording = { roomActions.onToggleRecording(true) },
-                onStopRecording = { roomActions.onToggleRecording(false) },
-                startRecordingLabel = stringResource(R.string.recording_start_recording),
-                stopRecordingLabel = stringResource(R.string.recording_stop_recording),
-                recordingState = state.recordingState,
-            )
+            BottomBarActionType.RECORD_SESSION -> {
+                if (AppConfig.MeetingRoomSettings.ALLOW_ARCHIVING) {
+                    recordingAction(
+                        onStartRecording = { roomActions.onToggleRecording(true) },
+                        onStopRecording = { roomActions.onToggleRecording(false) },
+                        startRecordingLabel = stringResource(R.string.recording_start_recording),
+                        stopRecordingLabel = stringResource(R.string.recording_stop_recording),
+                        archivingUiState = state.archivingUiState,
+                    )
+                } else null
+            }
 
             BottomBarActionType.CAPTIONS -> captionsAction(
                 actions = roomActions,
@@ -275,7 +280,7 @@ internal fun BottomBarPreview() {
                 onShowChat = {},
                 isChatShow = false,
                 layoutType = CallLayoutType.SPEAKER_LAYOUT,
-                recordingState = RecordingState.RECORDING,
+                archivingUiState = ArchivingUiState.RECORDING,
                 captionsState = CaptionsState.IDLE,
                 screenSharingState = ScreenSharingState.IDLE,
             ),

@@ -2,7 +2,7 @@ package com.vonage.android.archiving.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.vonage.android.archiving.RecordingState
+import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.compose.vivid.icons.VividIcons
@@ -14,32 +14,32 @@ fun recordingAction(
     onStopRecording: () -> Unit,
     startRecordingLabel: String,
     stopRecordingLabel: String,
-    recordingState: RecordingState,
+    archivingUiState: ArchivingUiState,
 ): BottomBarAction =
     BottomBarAction(
         type = BottomBarActionType.RECORD_SESSION,
         icon = VividIcons.Solid.Inbox3,
-        label = when (recordingState) {
-            RecordingState.IDLE,
-            RecordingState.STARTING,
-            RecordingState.STOPPING -> startRecordingLabel
+        label = when (archivingUiState) {
+            ArchivingUiState.IDLE,
+            ArchivingUiState.STARTING,
+            ArchivingUiState.STOPPING -> startRecordingLabel
 
-            RecordingState.RECORDING -> stopRecordingLabel
+            ArchivingUiState.RECORDING -> stopRecordingLabel
         },
-        isSelected = when (recordingState) {
-            RecordingState.IDLE,
-            RecordingState.STOPPING -> false
+        isSelected = when (archivingUiState) {
+            ArchivingUiState.IDLE,
+            ArchivingUiState.STOPPING -> false
 
-            RecordingState.STARTING,
-            RecordingState.RECORDING -> true
+            ArchivingUiState.STARTING,
+            ArchivingUiState.RECORDING -> true
         },
-        onClick = remember {
+        onClick = remember(archivingUiState) {
             {
-                when (recordingState) {
-                    RecordingState.IDLE -> onStartRecording()
-                    RecordingState.RECORDING -> onStopRecording()
-                    RecordingState.STARTING,
-                    RecordingState.STOPPING -> null
+                when (archivingUiState) {
+                    ArchivingUiState.IDLE -> onStartRecording()
+                    ArchivingUiState.RECORDING -> onStopRecording()
+                    ArchivingUiState.STARTING,
+                    ArchivingUiState.STOPPING -> null
                 }
             }
         },

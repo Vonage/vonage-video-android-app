@@ -3,6 +3,7 @@ package com.vonage.android.compose.preview
 import android.content.Context
 import android.media.projection.MediaProjection
 import androidx.compose.runtime.Composable
+import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.EmojiState
@@ -60,6 +61,7 @@ fun buildCallWithParticipants(
         )
     )
     override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
+    override val archivingStateFlow: StateFlow<ArchivingState> = MutableStateFlow(ArchivingState.Idle)
 
     override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> {
         val signalState = signalStateFlow.value.signals[signalType.signal]

@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
-import com.vonage.android.archiving.RecordingState
+import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.audio.ui.AudioDevices
 import com.vonage.android.audio.ui.AudioDevicesEffect
 import com.vonage.android.chat.ui.ChatPanel
@@ -94,7 +94,7 @@ fun MeetingRoomScreen(
                         modifier = Modifier
                             .testTag(MEETING_ROOM_TOP_BAR),
                         roomName = uiState.roomName,
-                        recordingState = uiState.recordingState,
+                        archivingUiState = uiState.archivingUiState,
                         actions = actions,
                         onToggleAudioDeviceSelector = { showAudioOutputs = showAudioOutputs.toggle() },
                     )
@@ -111,7 +111,7 @@ fun MeetingRoomScreen(
                             publisher = publisher,
                             participants = participants,
                             layoutType = uiState.layoutType,
-                            recordingState = uiState.recordingState,
+                            archivingUiState = uiState.archivingUiState,
                             screenSharingState = uiState.screenSharingState,
                             captionsState = uiState.captionsState,
                         ),
@@ -247,7 +247,7 @@ internal fun MeetingRoomScreenSessionPreview() {
         MeetingRoomScreen(
             uiState = MeetingRoomUiState(
                 roomName = "sample-room-name",
-                recordingState = RecordingState.RECORDING,
+                archivingUiState = ArchivingUiState.RECORDING,
                 call = buildCallWithParticipants(10),
                 isLoading = false,
                 isError = false,

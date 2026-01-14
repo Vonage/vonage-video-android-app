@@ -9,7 +9,6 @@ class ArchiveRepository @Inject constructor(
     private val apiService: ArchivingApi,
 ) {
 
-    @Suppress("TooGenericExceptionCaught")
     suspend fun getRecordings(roomName: String): Result<List<Archive>> =
         runCatching {
             val response = apiService.getArchives(roomName)
