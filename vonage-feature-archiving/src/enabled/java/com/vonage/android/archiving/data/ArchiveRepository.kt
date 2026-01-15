@@ -6,12 +6,12 @@ import com.vonage.android.archiving.ArchiveStatus
 import javax.inject.Inject
 
 class ArchiveRepository @Inject constructor(
-    private val apiService: ArchivingApi,
+    private val archivingApi: ArchivingApi,
 ) {
 
     suspend fun getRecordings(roomName: String): Result<List<Archive>> =
         runCatching {
-            val response = apiService.getArchives(roomName)
+            val response = archivingApi.getArchives(roomName)
             return if (response.isSuccessful) {
                 response.body()?.let {
                     Result.success(it.archives.map { a -> a.toModel() })
@@ -23,7 +23,7 @@ class ArchiveRepository @Inject constructor(
 
     suspend fun startArchive(roomName: String): Result<ArchiveId> =
         runCatching {
-            val response = apiService.startArchiving(roomName)
+            val response = archivingApi.startArchiving(roomName)
             return if (response.isSuccessful) {
                 response.body()?.let {
                     Result.success(ArchiveId(it.archiveId))
@@ -35,7 +35,7 @@ class ArchiveRepository @Inject constructor(
 
     suspend fun stopArchive(roomName: String, archiveId: ArchiveId): Result<Boolean> =
         runCatching {
-            val response = apiService.stopArchiving(roomName, archiveId.id)
+            val response = archivingApi.stopArchiving(roomName, archiveId.id)
             return if (response.isSuccessful) {
                 Result.success(true)
             } else {

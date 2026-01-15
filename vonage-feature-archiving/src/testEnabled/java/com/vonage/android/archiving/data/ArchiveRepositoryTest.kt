@@ -16,7 +16,7 @@ class ArchiveRepositoryTest {
 
     val apiService: ArchivingApi = mockk()
     val sut = ArchiveRepository(
-        apiService = apiService,
+        archivingApi = apiService,
     )
 
     @Test
