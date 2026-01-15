@@ -60,10 +60,6 @@
     <string name="recording_empty_title">The meeting hasn’t been recorded</string>
     <string name="recording_stop_recording">Stop Recording</string>
     <string name="recording_start_recording">Start Recording</string>
-    <string name="recording_start_notice_title">Start Recording?</string>
-    <string name="recording_start_notice_body">Make sure everyone is ready! You can download the recording from the "Goodbye" page after you leave the room.</string>
-    <string name="recording_stop_notice_title">Stop Recording?</string>
-    <string name="recording_stop_notice_body">You can download the recording from the "Goodbye" page after you leave the room.</string>
 
     <!-- Screen Share -->
     <string name="screen_share_start">Share screen</string>
