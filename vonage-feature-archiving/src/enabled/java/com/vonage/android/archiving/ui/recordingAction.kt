@@ -39,7 +39,7 @@ fun recordingAction(
                     ArchivingUiState.IDLE -> onStartRecording()
                     ArchivingUiState.RECORDING -> onStopRecording()
                     ArchivingUiState.STARTING,
-                    ArchivingUiState.STOPPING -> null
+                    ArchivingUiState.STOPPING -> Unit
                 }
             }
         },

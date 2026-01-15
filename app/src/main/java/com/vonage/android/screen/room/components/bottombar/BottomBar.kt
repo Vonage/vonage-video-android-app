@@ -25,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.BuildConfig
 import com.vonage.android.R
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.ui.recordingAction
@@ -35,7 +36,6 @@ import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Chat2
-import com.vonage.android.config.AppConfig
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
@@ -233,7 +233,7 @@ private fun actionsFactory(
             )
 
             BottomBarActionType.RECORD_SESSION -> {
-                if (AppConfig.MeetingRoomSettings.ALLOW_ARCHIVING) {
+                if (BuildConfig.FEATURE_ARCHIVING_ENABLED) {
                     recordingAction(
                         onStartRecording = { roomActions.onToggleRecording(true) },
                         onStopRecording = { roomActions.onToggleRecording(false) },

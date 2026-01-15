@@ -11,12 +11,12 @@ class DisabledVonageArchiving : VonageArchiving {
         flowOf(ArchivingState.Idle)
 
     override suspend fun startArchive(roomName: String): Result<ArchiveId> =
-        Result.failure(Exception("Not implemented"))
+        Result.failure(Exception("Archiving feature is disabled"))
 
     override suspend fun stopArchive(roomName: String): Result<Boolean> =
-        Result.failure(Exception("Not implemented"))
+        Result.failure(Exception("Archiving feature is disabled"))
 
     override suspend fun getRecordings(roomName: String): Result<List<Archive>> =
-        Result.failure(Exception("Not implemented"))
+        Result.failure(Exception("Archiving feature is disabled"))
 
 }

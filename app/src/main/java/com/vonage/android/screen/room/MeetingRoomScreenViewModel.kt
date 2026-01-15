@@ -119,7 +119,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     ) {
         currentCaptionsId = sessionInfo.captionsId
         connect(sessionInfo, roomName)
-        listenRemoteArchiving()
     }
 
     private fun connect(sessionInfo: SessionInfo, roomName: String) {
@@ -130,6 +129,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                 sessionId = sessionInfo.sessionId,
                 token = sessionInfo.token,
             )
+            listenRemoteArchiving()
             call?.let { call ->
                 // Update UI state after call is properly initialized
                 _uiState.update { uiState ->

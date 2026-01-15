@@ -5,6 +5,8 @@ import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * EnabledVonageArchiving is the active implementation of VonageArchiving for call recording.
@@ -17,6 +19,7 @@ class EnabledVonageArchiving(
     private val archiveRepository: ArchiveRepository,
 ) : VonageArchiving {
 
+    val mutex = Mutex()
     /**
      * Tracks the current active archive session ID.
      * Set when archiving starts, cleared when it stops.
@@ -36,12 +39,14 @@ class EnabledVonageArchiving(
     override fun bind(call: CallFacade): Flow<ArchivingState> =
         call.archivingStateFlow
             .map {
-                when (it) {
-                    is ArchivingState.Started -> currentArchiveId = ArchiveId(it.id)
-                    is ArchivingState.Stopped -> currentArchiveId = null
-                    else -> {}
+                mutex.withLock {
+                    when (it) {
+                        is ArchivingState.Started -> currentArchiveId = ArchiveId(it.id)
+                        is ArchivingState.Stopped -> currentArchiveId = null
+                        else -> {}
+                    }
+                    it
                 }
-                it
             }
 
     /**
@@ -54,8 +59,10 @@ class EnabledVonageArchiving(
     override suspend fun startArchive(roomName: String): Result<ArchiveId> =
         archiveRepository.startArchive(roomName)
             .map { id ->
-                currentArchiveId = id
-                id
+                mutex.withLock {
+                    currentArchiveId = id
+                    id
+                }
             }
 
     /**
@@ -69,8 +76,10 @@ class EnabledVonageArchiving(
         currentArchiveId?.let { archiveId ->
             archiveRepository.stopArchive(roomName, archiveId)
                 .map {
-                    currentArchiveId = null
-                    it
+                    mutex.withLock {
+                        currentArchiveId = null
+                        it
+                    }
                 }
         } ?: Result.failure(Exception("No current archive id"))
 
