@@ -389,41 +389,19 @@ val noOpCallFacade = object : CallFacade {
     override val emojiSignalState: StateFlow<EmojiState?> = MutableStateFlow(null)
 
     override fun connect(context: Context): Flow<SessionEvent> = flowOf()
-    override fun enableCaptions(enable: Boolean) { /* empty on purpose */
-    }
-
-    override fun pauseSession() { /* empty on purpose */
-    }
-
-    override fun resumeSession() { /* empty on purpose */
-    }
-
-    override fun endSession() { /* empty on purpose */
-    }
+    override fun enableCaptions(enable: Boolean) { /* empty on purpose */ }
+    override fun pauseSession() { /* empty on purpose */ }
+    override fun resumeSession() { /* empty on purpose */ }
+    override fun endSession() { /* empty on purpose */ }
 
     override val publisher: StateFlow<PublisherState?> = MutableStateFlow(null)
 
-    override fun toggleLocalVideo() { /* empty on purpose */
-    }
-
-    override fun toggleLocalCamera() { /* empty on purpose */
-    }
-
-    override fun toggleLocalAudio() { /* empty on purpose */
-    }
-
-    override fun sendChatMessage(message: String) { /* empty on purpose */
-    }
-
-    override fun listenUnreadChatMessages(enable: Boolean) { /* empty on purpose */
-    }
-
-    override fun sendEmoji(emoji: String) { /* empty on purpose */
-    }
-
-    override fun startCapturingScreen(mediaProjection: MediaProjection) { /* empty on purpose */
-    }
-
-    override fun stopCapturingScreen() { /* empty on purpose */
-    }
+    override fun toggleLocalVideo() { /* empty on purpose */ }
+    override fun toggleLocalCamera() { /* empty on purpose */ }
+    override fun toggleLocalAudio() { /* empty on purpose */ }
+    override fun sendChatMessage(message: String) { /* empty on purpose */ }
+    override fun listenUnreadChatMessages(enable: Boolean) { /* empty on purpose */ }
+    override fun sendEmoji(emoji: String) { /* empty on purpose */ }
+    override fun startCapturingScreen(mediaProjection: MediaProjection) { /* empty on purpose */ }
+    override fun stopCapturingScreen() { /* empty on purpose */ }
 }
