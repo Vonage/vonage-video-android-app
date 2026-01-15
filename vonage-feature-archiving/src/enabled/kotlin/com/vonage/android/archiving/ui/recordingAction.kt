@@ -15,7 +15,7 @@ fun recordingAction(
     startRecordingLabel: String,
     stopRecordingLabel: String,
     archivingUiState: ArchivingUiState,
-): BottomBarAction =
+): BottomBarAction? =
     BottomBarAction(
         type = BottomBarActionType.RECORD_SESSION,
         icon = VividIcons.Solid.Inbox3,

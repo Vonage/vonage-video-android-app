@@ -25,7 +25,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.vonage.android.BuildConfig
 import com.vonage.android.R
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.ui.recordingAction
@@ -232,17 +231,13 @@ private fun actionsFactory(
                 screenSharingState = state.screenSharingState,
             )
 
-            BottomBarActionType.RECORD_SESSION -> {
-                if (BuildConfig.FEATURE_ARCHIVING_ENABLED) {
-                    recordingAction(
-                        onStartRecording = { roomActions.onToggleRecording(true) },
-                        onStopRecording = { roomActions.onToggleRecording(false) },
-                        startRecordingLabel = stringResource(R.string.recording_start_recording),
-                        stopRecordingLabel = stringResource(R.string.recording_stop_recording),
-                        archivingUiState = state.archivingUiState,
-                    )
-                } else null
-            }
+            BottomBarActionType.RECORD_SESSION -> recordingAction(
+                onStartRecording = { roomActions.onToggleRecording(true) },
+                onStopRecording = { roomActions.onToggleRecording(false) },
+                startRecordingLabel = stringResource(R.string.recording_start_recording),
+                stopRecordingLabel = stringResource(R.string.recording_stop_recording),
+                archivingUiState = state.archivingUiState,
+            )
 
             BottomBarActionType.CAPTIONS -> captionsAction(
                 actions = roomActions,
