@@ -220,12 +220,18 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             if (enable) {
                 // Start recording the call session
                 vonageArchiving.startArchive(roomName)
+                    .onSuccess {
+                        _uiState.update { uiState -> uiState.copy(archivingUiState = ArchivingUiState.RECORDING) }
+                    }
                     .onFailure {
                         _uiState.update { uiState -> uiState.copy(archivingUiState = ArchivingUiState.IDLE) }
                     }
             } else {
                 // Stop recording the call session
                 vonageArchiving.stopArchive(roomName)
+                    .onSuccess {
+                        _uiState.update { uiState -> uiState.copy(archivingUiState = ArchivingUiState.IDLE) }
+                    }
                     .onFailure {
                         _uiState.update { uiState -> uiState.copy(archivingUiState = ArchivingUiState.RECORDING) }
                     }

@@ -12,6 +12,7 @@ import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
+import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
@@ -43,7 +44,7 @@ class MeetingRoomScreenViewModelTest {
     private val context: Context = mockk(relaxed = true)
     private val activityContextProvider: ActivityContextProvider = mockk(relaxed = true)
     private val sessionRepository: SessionRepository = mockk()
-    private val vonageArchiving: VonageArchiving = mockk()
+    private val vonageArchiving: VonageArchiving = mockk(relaxed = true)
     private val captionsRepository: CaptionsRepository = mockk()
     private val screenSharingManager: VeraScreenSharingManager = mockk()
     private val videoClient: VonageVideoClient = mockk()
@@ -373,6 +374,68 @@ class MeetingRoomScreenViewModelTest {
                 ), awaitItem()
             )
             coVerify { vonageArchiving.stopArchive(ANY_ROOM_NAME) }
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    archivingUiState = ArchivingUiState.IDLE,
+                ), awaitItem()
+            )
+        }
+    }
+
+    @Test
+    fun `given viewmodel when other participant start archiving then emit correct state`() = runTest {
+        val mockCall = givenMockCall()
+        val archivingStateFlow = MutableSharedFlow<ArchivingState>()
+        every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+        coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(ArchiveId("archiveId"))
+
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    archivingUiState = ArchivingUiState.IDLE,
+                ), awaitItem()
+            )
+            archivingStateFlow.emit(ArchivingState.Started("any-archiving-id"))
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    archivingUiState = ArchivingUiState.RECORDING,
+                ), awaitItem()
+            )
+        }
+    }
+
+    @Test
+    fun `given viewmodel when other participant stops archiving then emit correct state`() = runTest {
+        val mockCall = givenMockCall()
+        val archivingStateFlow = MutableSharedFlow<ArchivingState>()
+        every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+        coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(ArchiveId("archiveId"))
+
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        sut.uiState.test {
+            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    archivingUiState = ArchivingUiState.IDLE,
+                ), awaitItem()
+            )
+            archivingStateFlow.emit(ArchivingState.Started("any-archiving-id"))
+            awaitItem()
+            archivingStateFlow.emit(ArchivingState.Stopped("any-archiving-id"))
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
