@@ -12,13 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check base branch
+        env:
+          BASE_BRANCH: ${{ github.base_ref }}
+          HEAD_BRANCH: ${{ github.head_ref }}
         run: |
-          BASE_BRANCH="${{ github.base_ref }}"
-          HEAD_BRANCH="${{ github.head_ref }}"
-          
-          echo "Base branch: $BASE_BRANCH"
-          echo "Head branch: $HEAD_BRANCH"
-          
           # Check if head branch starts with 'release-'
           if [[ "$HEAD_BRANCH" == release-* ]]; then
             echo "Release branch detected: $HEAD_BRANCH"
