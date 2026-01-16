@@ -19,6 +19,7 @@ import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
 import com.vonage.android.kotlin.internal.ScreenSharingCapturer
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
+import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.EmojiState
@@ -154,6 +155,9 @@ class Call internal constructor(
     private val _captionsStateFlow = MutableStateFlow<String?>(null)
     override val captionsStateFlow: StateFlow<String?> = _captionsStateFlow
 
+    private val _archivingStateFlow = MutableStateFlow<ArchivingState>(ArchivingState.Idle)
+    override val archivingStateFlow: StateFlow<ArchivingState> = _archivingStateFlow
+
     private val signalState: SignalFlows = mutableMapOf()
     override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> =
         signalPlugins
@@ -223,6 +227,15 @@ class Call internal constructor(
                 plugin.handleSignal(type, data, senderName, isYou)
             }
         }
+        session.setArchiveListener(object : Session.ArchiveListener {
+            override fun onArchiveStarted(session: Session, id: String, name: String?) {
+                _archivingStateFlow.update { ArchivingState.Started(id) }
+            }
+
+            override fun onArchiveStopped(session: Session, id: String) {
+                _archivingStateFlow.update { ArchivingState.Stopped(id) }
+            }
+        })
         session.connect(token)
         awaitClose { session.setSessionListener(null) }
     }

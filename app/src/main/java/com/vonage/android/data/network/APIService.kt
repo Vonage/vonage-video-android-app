@@ -11,18 +11,6 @@ interface APIService {
     @GET("session/{room}")
     suspend fun getSession(@Path("room") room: String): Response<GetSessionResponse>
 
-    @POST("session/{room}/startArchive")
-    suspend fun startArchiving(@Path("room") room: String): Response<StartArchivingResponse>
-
-    @POST("session/{room}/{archiveId}/stopArchive")
-    suspend fun stopArchiving(
-        @Path("room") room: String,
-        @Path("archiveId") archiveId: String,
-    ): Response<StopArchivingResponse>
-
-    @GET("session/{room}/archives")
-    suspend fun getArchives(@Path("room") room: String): Response<GetArchivesResponse>
-
     @POST("session/{room}/enableCaptions")
     suspend fun enableCaptions(@Path("room") room: String): Response<EnableCaptionsResponse>
 

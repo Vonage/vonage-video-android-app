@@ -1,10 +1,8 @@
-package com.vonage.android.data
+package com.vonage.android.archiving.data
 
-import com.vonage.android.data.network.APIService
-import com.vonage.android.data.network.GetArchivesResponse
-import com.vonage.android.data.network.ServerArchive
-import com.vonage.android.data.network.StartArchivingResponse
-import com.vonage.android.data.network.StopArchivingResponse
+import com.vonage.android.archiving.Archive
+import com.vonage.android.archiving.ArchiveId
+import com.vonage.android.archiving.ArchiveStatus
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -13,13 +11,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.Response
-import kotlin.Result.Companion.success
 
 class ArchiveRepositoryTest {
 
-    val apiService: APIService = mockk()
+    val apiService: ArchivingApi = mockk()
     val sut = ArchiveRepository(
-        apiService = apiService,
+        archivingApi = apiService,
     )
 
     @Test
@@ -28,7 +25,7 @@ class ArchiveRepositoryTest {
             GetArchivesResponse(archives = serverArchives)
         )
         val response = sut.getRecordings("any-room-name")
-        assertEquals(success(archives), response)
+        assertEquals(Result.success(archives), response)
     }
 
     @Test
@@ -60,7 +57,7 @@ class ArchiveRepositoryTest {
             StartArchivingResponse(archiveId = "archive-id")
         )
         val response = sut.startArchive("any-room-name")
-        assertEquals(success("archive-id"), response)
+        assertEquals(Result.success(ArchiveId("archive-id")), response)
     }
 
     @Test
@@ -90,8 +87,8 @@ class ArchiveRepositoryTest {
     fun `given repository when stopArchiving api success returns success`() = runTest {
         coEvery { apiService.stopArchiving("any-room-name", "archive-id") } returns
                 Response<StartArchivingResponse>.success(StopArchivingResponse(archiveId = "archive-id"))
-        val response = sut.stopArchive("any-room-name", "archive-id")
-        assertEquals(success(true), response)
+        val response = sut.stopArchive("any-room-name", ArchiveId("archive-id"))
+        assertEquals(Result.success(true), response)
     }
 
     @Test
@@ -99,14 +96,14 @@ class ArchiveRepositoryTest {
         coEvery { apiService.stopArchiving("any-room-name", "archive-id") } returns Response.error(
             500, ResponseBody.EMPTY
         )
-        val response = sut.stopArchive("any-room-name", "archive-id")
+        val response = sut.stopArchive("any-room-name", ArchiveId("archive-id"))
         assertTrue(response.isFailure)
     }
 
     @Test
     fun `given repository when stopArchiving api fails with exception returns error`() = runTest {
         coEvery { apiService.stopArchiving("any-room-name", "archive-id") } throws Exception("Network error")
-        val response = sut.stopArchive("any-room-name", "archive-id")
+        val response = sut.stopArchive("any-room-name", ArchiveId("archive-id"))
         assertTrue(response.isFailure)
     }
 
@@ -168,7 +165,7 @@ class ArchiveRepositoryTest {
     )
     private val archives = listOf(
         Archive(
-            id = "id",
+            id = ArchiveId("id"),
             name = "name",
             url = "url",
             status = ArchiveStatus.AVAILABLE,
@@ -177,7 +174,7 @@ class ArchiveRepositoryTest {
             size = 456,
         ),
         Archive(
-            id = "id",
+            id = ArchiveId("id"),
             name = "name",
             url = "url",
             status = ArchiveStatus.PENDING,
@@ -186,7 +183,7 @@ class ArchiveRepositoryTest {
             size = 456,
         ),
         Archive(
-            id = "id",
+            id = ArchiveId("id"),
             name = "name",
             url = "url",
             status = ArchiveStatus.PENDING,
@@ -195,7 +192,7 @@ class ArchiveRepositoryTest {
             size = 456,
         ),
         Archive(
-            id = "id",
+            id = ArchiveId("id"),
             name = "name",
             url = "url",
             status = ArchiveStatus.PENDING,
@@ -204,7 +201,7 @@ class ArchiveRepositoryTest {
             size = 456,
         ),
         Archive(
-            id = "id",
+            id = ArchiveId("id"),
             name = "name",
             url = "url",
             status = ArchiveStatus.PENDING,
@@ -213,7 +210,7 @@ class ArchiveRepositoryTest {
             size = 456,
         ),
         Archive(
-            id = "id",
+            id = ArchiveId("id"),
             name = "name",
             url = "url",
             status = ArchiveStatus.FAILED,

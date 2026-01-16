@@ -1,4 +1,4 @@
-package com.vonage.android.screen.room.components.bottombar
+package com.vonage.android.compose.components.bottombar
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

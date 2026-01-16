@@ -8,20 +8,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import com.vonage.android.R
+import com.vonage.android.archiving.Archive
+import com.vonage.android.archiving.ArchiveId
+import com.vonage.android.archiving.ArchiveListStyle
+import com.vonage.android.archiving.ArchiveStatus
+import com.vonage.android.archiving.ui.ArchivesContainer
 import com.vonage.android.compose.layout.TwoPaneScaffold
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.data.Archive
-import com.vonage.android.data.ArchiveStatus.AVAILABLE
-import com.vonage.android.data.ArchiveStatus.FAILED
-import com.vonage.android.data.ArchiveStatus.PENDING
 import com.vonage.android.screen.components.TopBanner
-import com.vonage.android.screen.goodbye.components.ArchivesContainer
 import com.vonage.android.screen.goodbye.components.GoodbyeScreenHeader
 import com.vonage.android.screen.goodbye.components.RejoiningContainer
 import kotlinx.collections.immutable.persistentListOf
+import java.text.SimpleDateFormat
+
+private val dateFormat = SimpleDateFormat("dd MMM y HH:mm", Locale.current.platformLocale)
 
 @Composable
 fun GoodbyeScreen(
@@ -51,13 +57,24 @@ fun GoodbyeScreen(
                         .padding(VonageVideoTheme.dimens.paddingLarge),
                     actions = actions,
                 )
-                ArchivesContainer(
-                    modifier = Modifier
-                        .background(VonageVideoTheme.colors.surface, VonageVideoTheme.shapes.small)
-                        .padding(VonageVideoTheme.dimens.paddingLarge),
-                    actions = actions,
-                    uiState = uiState,
-                )
+                when (uiState) {
+                    is GoodbyeScreenUiState.Content -> {
+                        ArchivesContainer(
+                            modifier = Modifier
+                                .background(VonageVideoTheme.colors.surface, VonageVideoTheme.shapes.small)
+                                .padding(VonageVideoTheme.dimens.paddingLarge),
+                            onDownloadArchive = actions.onDownloadArchive,
+                            archives = uiState.archives,
+                            style = ArchiveListStyle(
+                                containerTitle = stringResource(R.string.recording_title),
+                                emptyLabel = stringResource(R.string.recording_empty_title),
+                                dateFormat = dateFormat,
+                            )
+                        )
+                    }
+
+                    else -> {}
+                }
             }
         }
     )
@@ -75,28 +92,28 @@ internal fun GoodbyeScreenPreview() {
             uiState = GoodbyeScreenUiState.Content(
                 archives = persistentListOf(
                     Archive(
-                        id = "1",
+                        id = ArchiveId("1"),
                         name = "Recording 1",
                         url = "url",
-                        status = AVAILABLE,
+                        status = ArchiveStatus.AVAILABLE,
                         createdAt = 1231,
                         duration = 123,
                         size = 123123,
                     ),
                     Archive(
-                        id = "2",
+                        id = ArchiveId("2"),
                         name = "Recording 2",
                         url = "url",
-                        status = PENDING,
+                        status = ArchiveStatus.PENDING,
                         createdAt = 1231,
                         duration = 123,
                         size = 123123,
                     ),
                     Archive(
-                        id = "3",
+                        id = ArchiveId("3"),
                         name = "Recording 3",
                         url = "url",
-                        status = FAILED,
+                        status = ArchiveStatus.FAILED,
                         createdAt = 1231,
                         duration = 123,
                         size = 123123,

@@ -48,9 +48,15 @@ android {
         buildConfigField("String", "BASE_API_URL", "\"$baseApiUrl\"")
         manifestPlaceholders["hostName"] = baseApiUrl
 
+        // Chat feature
         val chatProperty = configProps.getProperty("vonage.meetingRoom.allow_chat", "true")
         buildConfigField("boolean", "FEATURE_CHAT_ENABLED", "$chatProperty")
         missingDimensionStrategy("chat", chatProperty.toEnabledString())
+
+        // Archiving/recording feature
+        val archivingProperty = configProps.getProperty("vonage.meetingRoom.allow_archiving", "true")
+        buildConfigField("boolean", "FEATURE_ARCHIVING_ENABLED", "$archivingProperty")
+        missingDimensionStrategy("archiving", archivingProperty.toEnabledString())
     }
 
     compileOptions {
@@ -157,6 +163,7 @@ dependencies {
     implementation(project(":kotlin"))
     implementation(project(":shared"))
     implementation(project(":vonage-feature-chat"))
+    implementation(project(":vonage-feature-archiving"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

@@ -1,4 +1,4 @@
-package com.vonage.android.screen.room.components.recording
+package com.vonage.android.archiving.ui
 
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable

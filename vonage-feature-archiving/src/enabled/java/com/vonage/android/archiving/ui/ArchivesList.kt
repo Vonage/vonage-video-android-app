@@ -1,10 +1,8 @@
-package com.vonage.android.screen.goodbye.components
+package com.vonage.android.archiving.ui
 
 import android.text.format.DateUtils.formatElapsedTime
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,61 +15,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.vonage.android.R
+import com.vonage.android.archiving.Archive
+import com.vonage.android.archiving.ArchiveListStyle
+import com.vonage.android.archiving.ArchiveStatus
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Download
 import com.vonage.android.compose.vivid.icons.solid.Error
-import com.vonage.android.data.Archive
-import com.vonage.android.data.ArchiveStatus.AVAILABLE
-import com.vonage.android.data.ArchiveStatus.FAILED
-import com.vonage.android.data.ArchiveStatus.PENDING
-import com.vonage.android.screen.goodbye.GoodbyeScreenActions
-import com.vonage.android.screen.goodbye.GoodbyeScreenUiState
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import java.text.SimpleDateFormat
-
-private val dateFormat = SimpleDateFormat("dd MMM y HH:mm", Locale.current.platformLocale)
 
 @Composable
-fun ArchivesContainer(
-    uiState: GoodbyeScreenUiState,
-    actions: GoodbyeScreenActions,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.Start,
-    ) {
-        Text(
-            modifier = Modifier
-                .padding(bottom = VonageVideoTheme.dimens.paddingSmall),
-            text = stringResource(R.string.recording_title),
-            style = VonageVideoTheme.typography.heading4,
-            color = VonageVideoTheme.colors.textSecondary,
-        )
-        when (uiState) {
-            is GoodbyeScreenUiState.Content -> {
-                ArchivesList(
-                    archives = uiState.archives,
-                    actions = actions,
-                )
-            }
-
-            is GoodbyeScreenUiState.Idle -> null
-        }
-    }
-}
-
-@Composable
-private fun ArchivesList(
+fun ArchivesList(
     archives: ImmutableList<Archive>,
-    actions: GoodbyeScreenActions,
+    onDownloadArchive: (Archive) -> Unit,
+    archiveListStyle: ArchiveListStyle,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -79,12 +37,15 @@ private fun ArchivesList(
         verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall)
     ) {
         if (archives.isEmpty()) {
-            ArchiveEmptyRow()
+            ArchiveEmptyRow(
+                style = archiveListStyle,
+            )
         } else {
             archives.forEach { archive ->
                 ArchiveRow(
                     archive = archive,
-                    actions = actions,
+                    onDownloadArchive = onDownloadArchive,
+                    style = archiveListStyle,
                 )
             }
         }
@@ -93,6 +54,7 @@ private fun ArchivesList(
 
 @Composable
 private fun ArchiveEmptyRow(
+    style: ArchiveListStyle,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -104,7 +66,7 @@ private fun ArchiveEmptyRow(
     ) {
         RecordingIcon()
         Text(
-            text = stringResource(R.string.recording_empty_title),
+            text = style.emptyLabel,
             style = VonageVideoTheme.typography.bodyExtended,
             color = VonageVideoTheme.colors.onSurface,
         )
@@ -114,18 +76,26 @@ private fun ArchiveEmptyRow(
 @Composable
 private fun ArchiveRow(
     archive: Archive,
-    actions: GoodbyeScreenActions,
+    style: ArchiveListStyle,
+    onDownloadArchive: (Archive) -> Unit,
 ) {
     val title = remember(archive) {
-        listOf(
-            formatElapsedTime(archive.duration.toLong()),
-            bytesToHumanReadableSize(archive.size.toFloat()),
-            dateFormat.format(archive.createdAt),
-        ).joinToString(separator = " • ")
+        when (archive.status) {
+            ArchiveStatus.AVAILABLE -> {
+                listOf(
+                    formatElapsedTime(archive.duration.toLong()),
+                    bytesToHumanReadableSize(archive.size.toFloat()),
+                    style.dateFormat.format(archive.createdAt),
+                ).joinToString(separator = " • ")
+            }
+
+            ArchiveStatus.PENDING,
+            ArchiveStatus.FAILED -> null
+        }
     }
     Row(
         modifier = Modifier
-            .clickable(onClick = { actions.onDownloadArchive(archive) })
+            .clickable(onClick = { onDownloadArchive(archive) })
             .fillMaxWidth()
             .padding(VonageVideoTheme.dimens.paddingSmall),
         verticalAlignment = Alignment.CenterVertically,
@@ -146,15 +116,17 @@ private fun ArchiveRow(
                 style = VonageVideoTheme.typography.heading3,
                 color = VonageVideoTheme.colors.onSurface,
             )
-            Text(
-                text = title,
-                style = VonageVideoTheme.typography.bodyBase,
-                color = VonageVideoTheme.colors.textSecondary,
-            )
+            title?.let {
+                Text(
+                    text = it,
+                    style = VonageVideoTheme.typography.bodyBase,
+                    color = VonageVideoTheme.colors.textSecondary,
+                )
+            }
         }
 
         when (archive.status) {
-            AVAILABLE -> {
+            ArchiveStatus.AVAILABLE -> {
                 Icon(
                     modifier = Modifier
                         .size(VonageVideoTheme.dimens.iconSizeDefault),
@@ -164,14 +136,14 @@ private fun ArchiveRow(
                 )
             }
 
-            PENDING -> {
+            ArchiveStatus.PENDING -> {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .size(VonageVideoTheme.dimens.iconSizeDefault),
                 )
             }
 
-            FAILED -> {
+            ArchiveStatus.FAILED -> {
                 Icon(
                     modifier = Modifier
                         .size(VonageVideoTheme.dimens.iconSizeDefault),
@@ -180,51 +152,6 @@ private fun ArchiveRow(
                     tint = VonageVideoTheme.colors.error,
                 )
             }
-        }
-    }
-}
-
-@PreviewLightDark
-@Composable
-internal fun ArchiveListPreview() {
-    VonageVideoTheme {
-        Box(
-            modifier = Modifier.background(VonageVideoTheme.colors.surface)
-        ) {
-            ArchivesContainer(
-                actions = GoodbyeScreenActions(),
-                uiState = GoodbyeScreenUiState.Content(
-                    archives = persistentListOf(
-                        Archive(
-                            id = "1",
-                            name = "Recording Available",
-                            url = "url",
-                            status = AVAILABLE,
-                            createdAt = 1231,
-                            duration = 123,
-                            size = 13,
-                        ),
-                        Archive(
-                            id = "2",
-                            name = "Recording Pending",
-                            url = "url",
-                            status = PENDING,
-                            createdAt = 1231,
-                            duration = 123,
-                            size = 13,
-                        ),
-                        Archive(
-                            id = "3",
-                            name = "Recording Failed",
-                            url = "url",
-                            status = FAILED,
-                            createdAt = 1231,
-                            duration = 123,
-                            size = 13,
-                        ),
-                    )
-                ),
-            )
         }
     }
 }

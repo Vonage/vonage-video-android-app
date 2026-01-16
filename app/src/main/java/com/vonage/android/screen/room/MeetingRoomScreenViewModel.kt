@@ -6,11 +6,13 @@ import android.media.projection.MediaProjection
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vonage.android.data.ArchiveRepository
+import com.vonage.android.archiving.ArchivingUiState
+import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
+import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.EmojiState
@@ -48,7 +50,7 @@ import kotlinx.coroutines.launch
 class MeetingRoomScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
     private val sessionRepository: SessionRepository,
-    private val archiveRepository: ArchiveRepository,
+    private val vonageArchiving: VonageArchiving,
     private val captionsRepository: CaptionsRepository,
     private val videoClient: VonageVideoClient,
     private val screenSharingManager: VeraScreenSharingManager,
@@ -72,7 +74,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     )
 
     private var call: CallFacade? = null
-    private var currentArchiveId: String? = null
     private var currentCaptionsId: String? = null
 
     init {
@@ -83,7 +84,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     fun setup(context: Context) {
         // Set the activity context in the provider for future use
         activityContextProvider.setActivityContext(context)
-        
+
         viewModelScope.launch {
             _uiState.update { uiState -> uiState.copy(isLoading = true) }
             sessionRepository.getSession(roomName)
@@ -128,13 +129,14 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                 sessionId = sessionInfo.sessionId,
                 token = sessionInfo.token,
             )
+            listenRemoteArchiving()
             call?.let { call ->
                 // Update UI state after call is properly initialized
                 _uiState.update { uiState ->
                     uiState.copy(
                         roomName = roomName,
                         call = call,
-                        recordingState = RecordingState.IDLE,
+                        archivingUiState = ArchivingUiState.IDLE,
                         captionsState = if (sessionInfo.captionsId.isNullOrBlank()) {
                             CaptionsState.IDLE
                         } else {
@@ -144,18 +146,21 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                         isError = false,
                     )
                 }
-                
+
                 call.connect(context)
                     .onEach { sessionEvent ->
                         when (sessionEvent) {
                             is SessionEvent.Disconnected -> {
                                 endCall()
                             }
+
                             is SessionEvent.Error -> {
-                                _uiState.update { uiState -> uiState.copy(
-                                    isError = true,
-                                    errorMessage = sessionEvent.error.message,
-                                ) }
+                                _uiState.update { uiState ->
+                                    uiState.copy(
+                                        isError = true,
+                                        errorMessage = sessionEvent.error.message,
+                                    )
+                                }
                             }
 
                             else -> {}
@@ -204,34 +209,58 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         call?.sendEmoji(emoji)
     }
 
+    //region Archiving
     fun archiveCall(enable: Boolean) {
         if (enable) {
-            _uiState.update { uiState -> uiState.copy(recordingState = RecordingState.STARTING) }
+            _uiState.update { uiState -> uiState.copy(archivingUiState = ArchivingUiState.STARTING) }
         } else {
-            _uiState.update { uiState -> uiState.copy(recordingState = RecordingState.STOPPING) }
+            _uiState.update { uiState -> uiState.copy(archivingUiState = ArchivingUiState.STOPPING) }
         }
         viewModelScope.launch {
             if (enable) {
-                archiveRepository.startArchive(roomName)
+                // Start recording the call session
+                vonageArchiving.startArchive(roomName)
                     .onSuccess {
-                        currentArchiveId = it
-                        _uiState.update { uiState -> uiState.copy(recordingState = RecordingState.RECORDING) }
-                    }.onFailure {
-                        _uiState.update { uiState -> uiState.copy(recordingState = RecordingState.IDLE) }
+                        _uiState.update { uiState -> uiState.copy(archivingUiState = ArchivingUiState.RECORDING) }
+                    }
+                    .onFailure {
+                        _uiState.update { uiState -> uiState.copy(archivingUiState = ArchivingUiState.IDLE) }
                     }
             } else {
-                currentArchiveId?.let { archiveId ->
-                    archiveRepository.stopArchive(roomName, archiveId)
-                        .onSuccess {
-                            currentArchiveId = null
-                            _uiState.update { uiState -> uiState.copy(recordingState = RecordingState.IDLE) }
-                        }.onFailure {
-                            _uiState.update { uiState -> uiState.copy(recordingState = RecordingState.RECORDING) }
-                        }
-                }
+                // Stop recording the call session
+                vonageArchiving.stopArchive(roomName)
+                    .onSuccess {
+                        _uiState.update { uiState -> uiState.copy(archivingUiState = ArchivingUiState.IDLE) }
+                    }
+                    .onFailure {
+                        _uiState.update { uiState -> uiState.copy(archivingUiState = ArchivingUiState.RECORDING) }
+                    }
             }
         }
     }
+
+    private fun listenRemoteArchiving() {
+        viewModelScope.launch {
+            call?.let {
+                // Listen for remote archiving state changes from other participants
+                vonageArchiving.bind(it)
+                    .onEach { archivingState ->
+                        when (archivingState) {
+                            is ArchivingState.Idle -> {}
+                            is ArchivingState.Started -> {
+                                _uiState.update { uiState -> uiState.copy(archivingUiState = ArchivingUiState.RECORDING) }
+                            }
+
+                            is ArchivingState.Stopped -> {
+                                _uiState.update { uiState -> uiState.copy(archivingUiState = ArchivingUiState.IDLE) }
+                            }
+                        }
+                    }
+                    .collect()
+            }
+        }
+    }
+    //endregion
 
     fun captions(enable: Boolean) {
         viewModelScope.launch {
@@ -313,7 +342,7 @@ fun interface MeetingRoomViewModelFactory {
 @Immutable
 data class MeetingRoomUiState(
     val roomName: String,
-    val recordingState: RecordingState = RecordingState.IDLE,
+    val archivingUiState: ArchivingUiState = ArchivingUiState.IDLE,
     val captionsState: CaptionsState = CaptionsState.IDLE,
     val screenSharingState: ScreenSharingState = ScreenSharingState.IDLE,
     val call: CallFacade = noOpCallFacade,
@@ -328,13 +357,6 @@ enum class CallLayoutType {
     GRID,
     SPEAKER_LAYOUT,
     ADAPTIVE_GRID,
-}
-
-enum class RecordingState {
-    IDLE,
-    STARTING,
-    RECORDING,
-    STOPPING,
 }
 
 enum class CaptionsState {
@@ -360,6 +382,7 @@ val noOpCallFacade = object : CallFacade {
     override val activeSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
     override val signalStateFlow: StateFlow<SignalState?> = MutableStateFlow(null)
     override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
+    override val archivingStateFlow: StateFlow<ArchivingState> = MutableStateFlow(ArchivingState.Idle)
 
     override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> = MutableStateFlow(null)
     override val chatSignalState: StateFlow<ChatState?> = MutableStateFlow(null)

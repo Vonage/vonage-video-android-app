@@ -1,4 +1,4 @@
-package com.vonage.android.screen.goodbye.components
+package com.vonage.android.archiving.ui
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
