@@ -2,13 +2,13 @@ name: check-pull-request-base-branch
 
 on:
   pull_request:
-    types: [edited, opened]
+    types: [edited, opened, reopened, synchronize]
 
 permissions:
   contents: read
 
 jobs:
-  check-base-branch:
+  validate-base-branch:
     runs-on: ubuntu-latest
     steps:
       - name: Check base branch
