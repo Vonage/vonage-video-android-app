@@ -24,6 +24,7 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.line.AudioMid
 import com.vonage.android.compose.vivid.icons.line.CameraSwitch
+import com.vonage.android.config.Config
 
 @Composable
 fun DeviceSelectionPanel(
@@ -36,19 +37,23 @@ fun DeviceSelectionPanel(
         horizontalArrangement = spacedBy(VonageVideoTheme.dimens.spaceSmall),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        DeviceSelector(
-            modifier = Modifier.weight(1f),
-            icon = VividIcons.Line.AudioMid,
-            label = stringResource(R.string.waiting_room_audio_output),
-            onClick = onMicDeviceSelect,
-        )
+        if (Config.isAllowMicrophoneControl()) {
+            DeviceSelector(
+                modifier = Modifier.weight(1f),
+                icon = VividIcons.Line.AudioMid,
+                label = stringResource(R.string.waiting_room_audio_output),
+                onClick = onMicDeviceSelect,
+            )
+        }
 
-        DeviceSelector(
-            modifier = Modifier.weight(1f),
-            icon = VividIcons.Line.CameraSwitch,
-            label = stringResource(R.string.waiting_room_switch_camera),
-            onClick = onCameraDeviceSelect,
-        )
+        if (Config.isAllowCameraControl()) {
+            DeviceSelector(
+                modifier = Modifier.weight(1f),
+                icon = VividIcons.Line.CameraSwitch,
+                label = stringResource(R.string.waiting_room_switch_camera),
+                onClick = onCameraDeviceSelect,
+            )
+        }
     }
 }
 

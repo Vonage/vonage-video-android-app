@@ -35,6 +35,7 @@ import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Chat2
+import com.vonage.android.config.Config
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
@@ -166,7 +167,7 @@ fun BottomBar(
         }
     }
 
-    if (showParticipants) {
+    if (showParticipants && Config.isShowParticipantList()) {
         ModalBottomSheet(
             onDismissRequest = { showParticipants = false },
             sheetState = participantsSheetState,
@@ -212,10 +213,12 @@ private fun actionsFactory(
                 roomActions = roomActions,
             )
 
-            BottomBarActionType.PARTICIPANTS -> participantsAction(
-                participantsCount = participantsCount,
-                onToggleParticipants = onShowParticipants,
-            )
+            BottomBarActionType.PARTICIPANTS -> if (Config.isShowParticipantList()) {
+                participantsAction(
+                    participantsCount = participantsCount,
+                    onToggleParticipants = onShowParticipants,
+                )
+            } else null
 
             BottomBarActionType.CHAT -> BottomBarAction(
                 type = BottomBarActionType.CHAT,

@@ -32,6 +32,7 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.TopBanner
 import com.vonage.android.screen.waiting.components.DeviceSelectionPanel
 import com.vonage.android.screen.waiting.components.JoinRoomSection
+import com.vonage.android.screen.waiting.components.VideoControlPanel
 import com.vonage.android.screen.waiting.components.VideoPreviewContainer
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -92,8 +93,13 @@ fun WaitingRoomScreen(
                             .requiredHeight(245.dp),
                         publisher = uiState.publisher,
                         name = uiState.userName,
-                        actions = actions,
-                    )
+                    ) {
+                        VideoControlPanel(
+                            modifier = Modifier.padding(bottom = VonageVideoTheme.dimens.paddingSmall),
+                            publisher = uiState.publisher,
+                            actions = actions,
+                        )
+                    }
                 }
                 DeviceSelectionPanel(
                     modifier = Modifier
