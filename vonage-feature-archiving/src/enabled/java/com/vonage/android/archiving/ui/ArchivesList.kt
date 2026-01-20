@@ -64,7 +64,7 @@ private fun ArchiveEmptyRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceDefault)
     ) {
-        RecordingIcon()
+        ArchiveIcon()
         Text(
             text = style.emptyLabel,
             style = VonageVideoTheme.typography.bodyExtended,
@@ -101,7 +101,7 @@ private fun ArchiveRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceDefault),
     ) {
-        RecordingIcon()
+        ArchiveIcon()
         Column(
             modifier = Modifier
                 .weight(1f),
