@@ -9,7 +9,7 @@ import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.line.VideoActive
 
 @Composable
-fun RecordingIcon(
+fun ArchiveIcon(
     modifier: Modifier = Modifier,
 ) {
     Icon(
