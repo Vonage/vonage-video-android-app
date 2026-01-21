@@ -4,7 +4,6 @@ import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.signal.RawSignal
-import com.vonage.android.kotlin.signal.SignalPlugin
 import com.vonage.android.shared.EmojiReaction
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -28,9 +27,9 @@ import java.util.concurrent.CopyOnWriteArrayList
  *
  * @param coroutineDispatcher Dispatcher for coroutine operations (defaults to Default)
  */
-class ReactionSignalPlugin(
+class EnabledReactionSignalPlugin(
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
-) : SignalPlugin {
+) : ReactionSignalPlugin {
 
     private val coroutineScope = CoroutineScope(coroutineDispatcher)
 

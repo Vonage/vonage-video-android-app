@@ -27,6 +27,7 @@ object SdkModule {
     fun provideVonageVideoClient(
         @ApplicationContext context: Context,
         chatSignalPlugin: ChatSignalPlugin,
+        reactionSignalPlugin: ReactionSignalPlugin,
         baseAudioDevice: VeraAudioDevice,
     ): VonageVideoClient =
         VonageVideoClient(
@@ -34,7 +35,7 @@ object SdkModule {
             baseAudioDevice = baseAudioDevice,
             signalPlugins = listOfNotNull(
                 chatSignalPlugin,
-                ReactionSignalPlugin(),
+                reactionSignalPlugin,
             )
         )
 

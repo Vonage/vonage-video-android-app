@@ -27,14 +27,14 @@ class ReactionSignalPluginTest {
 
     @Test
     fun `canHandle should return true for reaction signal type`() {
-        val plugin = ReactionSignalPlugin(testDispatcher)
+        val plugin = EnabledReactionSignalPlugin(testDispatcher)
 
         assertTrue(plugin.canHandle("emoji"))
     }
 
     @Test
     fun `canHandle should return false for other signal types`() {
-        val plugin = ReactionSignalPlugin(testDispatcher)
+        val plugin = EnabledReactionSignalPlugin(testDispatcher)
 
         assertFalse(plugin.canHandle("chat"))
         assertFalse(plugin.canHandle("notification"))
@@ -43,7 +43,7 @@ class ReactionSignalPluginTest {
 
     @Test
     fun `sendSignal should create RawSignal with reaction type`() {
-        val plugin = ReactionSignalPlugin(testDispatcher)
+        val plugin = EnabledReactionSignalPlugin(testDispatcher)
 
         val rawSignal = plugin.sendSignal("John Doe", "👍")
 
@@ -53,7 +53,7 @@ class ReactionSignalPluginTest {
 
     @Test
     fun `sendSignal should serialize emoji and timestamp to JSON`() {
-        val plugin = ReactionSignalPlugin(testDispatcher)
+        val plugin = EnabledReactionSignalPlugin(testDispatcher)
 
         val rawSignal = plugin.sendSignal("Alice", "❤️")
 
@@ -64,7 +64,7 @@ class ReactionSignalPluginTest {
 
     @Test
     fun `handleSignal should add reaction to state`() = runTest(testDispatcher) {
-        val plugin = ReactionSignalPlugin(testDispatcher)
+        val plugin = EnabledReactionSignalPlugin(testDispatcher)
         val reactionData = Json.encodeToString(
             ReactionSignal.serializer(),
             ReactionSignal("🎉", System.currentTimeMillis())
@@ -89,7 +89,7 @@ class ReactionSignalPluginTest {
 
     @Test
     fun `handleSignal should mark reaction as isYou when flag is true`() = runTest(testDispatcher) {
-        val plugin = ReactionSignalPlugin(testDispatcher)
+        val plugin = EnabledReactionSignalPlugin(testDispatcher)
         val reactionData = Json.encodeToString(
             ReactionSignal.serializer(),
             ReactionSignal("👏", System.currentTimeMillis())
@@ -117,7 +117,7 @@ class ReactionSignalPluginTest {
 
     @Test
     fun `handleSignal should ignore invalid JSON`() = runTest(testDispatcher) {
-        val plugin = ReactionSignalPlugin(testDispatcher)
+        val plugin = EnabledReactionSignalPlugin(testDispatcher)
         val invalidData = "not valid json"
 
         plugin.output.test {
@@ -134,7 +134,7 @@ class ReactionSignalPluginTest {
 
     @Test
     fun `handleSignal should ignore non-reaction signal types`() = runTest(testDispatcher) {
-        val plugin = ReactionSignalPlugin(testDispatcher)
+        val plugin = EnabledReactionSignalPlugin(testDispatcher)
         val reactionData = Json.encodeToString(
             ReactionSignal.serializer(),
             ReactionSignal("👍", System.currentTimeMillis())
@@ -154,7 +154,7 @@ class ReactionSignalPluginTest {
 
     @Test
     fun `handleSignal should add reactions in reverse order`() = runTest(testDispatcher) {
-        val plugin = ReactionSignalPlugin(testDispatcher)
+        val plugin = EnabledReactionSignalPlugin(testDispatcher)
 
         plugin.output.test {
             skipItems(1) // Skip initial state
@@ -187,7 +187,7 @@ class ReactionSignalPluginTest {
 
     @Test
     fun `output should emit EmojiState`() = runTest(testDispatcher) {
-        val plugin = ReactionSignalPlugin(testDispatcher)
+        val plugin = EnabledReactionSignalPlugin(testDispatcher)
 
         plugin.output.test {
             val state = awaitItem()

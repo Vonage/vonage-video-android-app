@@ -2,12 +2,11 @@ package com.vonage.android.reactions
 
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.signal.RawSignal
-import com.vonage.android.kotlin.signal.SignalPlugin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Suppress("EmptyFunctionBlock")
-class ReactionSignalPlugin : SignalPlugin {
+class DisabledReactionSignalPlugin : ReactionSignalPlugin {
 
     override val output: StateFlow<SignalStateContent?> = MutableStateFlow(null)
 
