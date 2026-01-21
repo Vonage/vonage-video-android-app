@@ -1,5 +1,7 @@
 package com.vonage.android.screen.room
 
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.vonage.android.compose.preview.buildCallWithParticipants
@@ -47,7 +49,54 @@ class MeetingRoomScreenTest {
 
         screen.topBar.assertIsDisplayedWithTitle("sample-name")
         screen.content.assertIsDisplayed()
-        screen.bottomBar
-            .assertIsDisplayed()
+        screen.bottomBar.assertIsDisplayed()
+    }
+
+    @Test
+    fun given_initial_state_with_allowMicrophoneControl_false_THEN_components_are_displayed() {
+        compose.setContent {
+            VonageVideoTheme {
+                MeetingRoomScreen(
+                    uiState = MeetingRoomUiState(
+                        roomName = "sample-name",
+                        call = buildCallWithParticipants(
+                            participantCount = 5,
+                            unreadCount = 8,
+                        ),
+                        allowMicrophoneControl = false,
+                    ),
+                    actions = MeetingRoomActions(),
+                )
+            }
+        }
+
+        screen.topBar.assertIsDisplayedWithTitle("sample-name")
+        screen.content.assertIsDisplayed()
+        screen.bottomBar.cameraButton.assertIsDisplayed()
+        screen.bottomBar.micButton.assertIsNotDisplayed()
+    }
+
+    @Test
+    fun given_initial_state_with_allowCameraControl_false_THEN_components_are_displayed() {
+        compose.setContent {
+            VonageVideoTheme {
+                MeetingRoomScreen(
+                    uiState = MeetingRoomUiState(
+                        roomName = "sample-name",
+                        call = buildCallWithParticipants(
+                            participantCount = 5,
+                            unreadCount = 8,
+                        ),
+                        allowCameraControl = false,
+                    ),
+                    actions = MeetingRoomActions(),
+                )
+            }
+        }
+
+        screen.topBar.assertIsDisplayedWithTitle("sample-name")
+        screen.content.assertIsDisplayed()
+        screen.bottomBar.cameraButton.assertIsNotDisplayed()
+        screen.bottomBar.micButton.assertIsDisplayed()
     }
 }

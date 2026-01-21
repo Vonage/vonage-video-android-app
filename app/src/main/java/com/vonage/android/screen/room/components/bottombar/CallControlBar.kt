@@ -26,7 +26,6 @@ import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.compose.vivid.icons.solid.MoreVertical
 import com.vonage.android.compose.vivid.icons.solid.Video
 import com.vonage.android.compose.vivid.icons.solid.VideoOff
-import com.vonage.android.config.Config
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.components.bottombar.BottomBarTestTags.BOTTOM_BAR_CAMERA_BUTTON
@@ -39,6 +38,8 @@ fun CallControlBar(
     publisher: Participant?,
     roomActions: MeetingRoomActions,
     onShowMore: () -> Unit,
+    allowMicrophoneControl: Boolean,
+    allowCameraControl: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit,
 ) {
@@ -56,14 +57,14 @@ fun CallControlBar(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (Config.isAllowMicrophoneControl()) {
+        if (allowMicrophoneControl) {
             MicButton(
                 roomActions = roomActions,
                 isMicEnabled = isMicEnabled,
             )
         }
 
-        if (Config.isAllowCameraControl()) {
+        if (allowCameraControl) {
             CameraButton(
                 roomActions = roomActions,
                 isCameraEnabled = isCameraEnabled,
@@ -134,6 +135,8 @@ internal fun CallControlBarPreview() {
         CallControlBar(
             publisher = buildParticipants(1).first(),
             roomActions = MeetingRoomActions(),
+            allowMicrophoneControl = true,
+            allowCameraControl = true,
             onShowMore = {},
         ) { }
     }

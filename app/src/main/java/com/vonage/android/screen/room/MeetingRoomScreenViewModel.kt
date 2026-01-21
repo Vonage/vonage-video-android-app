@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.VonageArchiving
+import com.vonage.android.config.GetConfig
 import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
@@ -46,6 +47,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@Suppress("LongParameterList")
 @HiltViewModel(assistedFactory = MeetingRoomViewModelFactory::class)
 class MeetingRoomScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
@@ -56,6 +58,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private val screenSharingManager: VeraScreenSharingManager,
     private val foregroundServiceHandler: VeraForegroundServiceHandler,
     private val activityContextProvider: ActivityContextProvider,
+    private val getConfig: GetConfig,
 ) : ViewModel() {
 
     private val context: Context
@@ -86,7 +89,13 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         activityContextProvider.setActivityContext(context)
 
         viewModelScope.launch {
-            _uiState.update { uiState -> uiState.copy(isLoading = true) }
+            val config = getConfig()
+            _uiState.update { uiState -> uiState.copy(
+                isLoading = true,
+                allowCameraControl = config.allowCameraControl,
+                allowMicrophoneControl = config.allowMicrophoneControl,
+                allowShowParticipantList = config.allowShowParticipantList,
+            ) }
             sessionRepository.getSession(roomName)
                 .onSuccess { sessionInfo ->
                     onSessionCreated(
@@ -351,6 +360,10 @@ data class MeetingRoomUiState(
     val errorMessage: String? = null,
     val isEndCall: Boolean = false,
     val layoutType: CallLayoutType = CallLayoutType.GRID,
+    // feature flags based on configuration files
+    val allowMicrophoneControl: Boolean = true,
+    val allowCameraControl: Boolean = true,
+    val allowShowParticipantList: Boolean = true,
 )
 
 enum class CallLayoutType {

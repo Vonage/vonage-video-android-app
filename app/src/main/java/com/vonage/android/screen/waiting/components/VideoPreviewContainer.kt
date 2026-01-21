@@ -39,7 +39,6 @@ import com.vonage.android.compose.vivid.icons.solid.MicMute
 import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.compose.vivid.icons.solid.Video
 import com.vonage.android.compose.vivid.icons.solid.VideoOff
-import com.vonage.android.config.Config
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.screen.components.CircularControlButton
@@ -92,6 +91,8 @@ fun VideoPreviewContainer(
 internal fun VideoControlPanel(
     publisher: PublisherParticipant,
     actions: WaitingRoomActions,
+    allowMicrophoneControl: Boolean,
+    allowCameraControl: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val isCameraEnabled by publisher.isCameraEnabled.collectAsStateWithLifecycle()
@@ -114,7 +115,7 @@ internal fun VideoControlPanel(
         Row(
             horizontalArrangement = spacedBy(VonageVideoTheme.dimens.spaceDefault),
         ) {
-            if (Config.isAllowMicrophoneControl()) {
+            if (allowMicrophoneControl) {
                 CircularControlButton(
                     modifier = Modifier
                         .conditional(
@@ -131,7 +132,7 @@ internal fun VideoControlPanel(
                 )
             }
 
-            if (Config.isAllowCameraControl()) {
+            if (allowCameraControl) {
                 CircularControlButton(
                     modifier = Modifier
                         .conditional(

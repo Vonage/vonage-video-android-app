@@ -35,7 +35,6 @@ import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Chat2
-import com.vonage.android.config.Config
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
@@ -63,6 +62,9 @@ data class BottomBarState(
     val screenSharingState: ScreenSharingState,
     val captionsState: CaptionsState,
     val participants: ImmutableList<Participant>,
+    val allowShowParticipantList: Boolean,
+    val allowMicrophoneControl: Boolean,
+    val allowCameraControl: Boolean,
 )
 
 // 4 because mic + camera + menu + end
@@ -92,7 +94,8 @@ fun BottomBar(
     val containerSpacing = with(density) { VonageVideoTheme.dimens.spaceXLarge.toPx() }
 
     var availableWidth by remember { mutableIntStateOf(0) }
-    val pinnedActionsWidth = DEFAULT_ACTIONS_COUNT * actionWidth + (DEFAULT_ACTIONS_COUNT - 1) * spacingWidth
+    val pinnedActionsWidth =
+        DEFAULT_ACTIONS_COUNT * actionWidth + (DEFAULT_ACTIONS_COUNT - 1) * spacingWidth
     val availableWidthForActions by remember(availableWidth) {
         derivedStateOf { (availableWidth - pinnedActionsWidth - containerSpacing).coerceAtLeast(0F) }
     }
@@ -140,6 +143,8 @@ fun BottomBar(
         CallControlBar(
             publisher = state.publisher,
             roomActions = roomActions,
+            allowMicrophoneControl = state.allowMicrophoneControl,
+            allowCameraControl = state.allowCameraControl,
             onShowMore = { showMoreActions = showMoreActions.toggle() },
         ) {
             visibleActions.forEach { action ->
@@ -167,7 +172,7 @@ fun BottomBar(
         }
     }
 
-    if (showParticipants && Config.isShowParticipantList()) {
+    if (showParticipants && state.allowShowParticipantList) {
         ModalBottomSheet(
             onDismissRequest = { showParticipants = false },
             sheetState = participantsSheetState,
@@ -213,7 +218,7 @@ private fun actionsFactory(
                 roomActions = roomActions,
             )
 
-            BottomBarActionType.PARTICIPANTS -> if (Config.isShowParticipantList()) {
+            BottomBarActionType.PARTICIPANTS -> if (state.allowShowParticipantList) {
                 participantsAction(
                     participantsCount = participantsCount,
                     onToggleParticipants = onShowParticipants,
@@ -281,6 +286,9 @@ internal fun BottomBarPreview() {
                 archivingUiState = ArchivingUiState.RECORDING,
                 captionsState = CaptionsState.IDLE,
                 screenSharingState = ScreenSharingState.IDLE,
+                allowShowParticipantList = true,
+                allowMicrophoneControl = true,
+                allowCameraControl = true,
             ),
         )
     }

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.archiving.ArchivingUiState
+import com.vonage.android.archiving.ui.RecordingIndicator
 import com.vonage.android.audio.ui.rememberAudioDeviceSelector
 import com.vonage.android.audio.ui.toImageVector
 import com.vonage.android.compose.components.VonageTopAppBar
@@ -33,8 +34,6 @@ import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_AUDIO_SE
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_CAMERA_SWITCH_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_SHARE_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_TITLE
-import com.vonage.android.archiving.ui.RecordingIndicator
-import com.vonage.android.config.Config
 
 @Composable
 fun MeetingTopBar(
@@ -84,33 +83,29 @@ fun MeetingTopBar(
             }
         },
         actions = {
-            if (Config.isAllowCameraControl()) {
-                IconButton(
-                    modifier = Modifier
-                        .testTag(TOP_BAR_CAMERA_SWITCH_ACTION),
-                    onClick = actions.onCameraSwitch,
-                ) {
-                    CameraSwitchIcon()
-                }
+            IconButton(
+                modifier = Modifier
+                    .testTag(TOP_BAR_CAMERA_SWITCH_ACTION),
+                onClick = actions.onCameraSwitch,
+            ) {
+                CameraSwitchIcon()
             }
 
-            if (Config.isAllowMicrophoneControl()) {
-                IconButton(
-                    modifier = Modifier
-                        .testTag(TOP_BAR_AUDIO_SELECTOR_ACTION),
-                    onClick = onToggleAudioDeviceSelector,
-                ) {
-                    activeDevice?.let {
-                        Icon(
-                            imageVector = it.type.toImageVector(),
-                            contentDescription = null,
-                            tint = VonageVideoTheme.colors.onSurface,
-                            modifier = Modifier.size(24.dp),
-                        )
-                    } ?: AudioSelectorIcon(
-                        contentDescription = stringResource(R.string.audio_device_selector_change_audio_output)
+            IconButton(
+                modifier = Modifier
+                    .testTag(TOP_BAR_AUDIO_SELECTOR_ACTION),
+                onClick = onToggleAudioDeviceSelector,
+            ) {
+                activeDevice?.let {
+                    Icon(
+                        imageVector = it.type.toImageVector(),
+                        contentDescription = null,
+                        tint = VonageVideoTheme.colors.onSurface,
+                        modifier = Modifier.size(24.dp),
                     )
-                }
+                } ?: AudioSelectorIcon(
+                    contentDescription = stringResource(R.string.audio_device_selector_change_audio_output)
+                )
             }
 
             IconButton(

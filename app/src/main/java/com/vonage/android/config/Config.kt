@@ -1,24 +1,18 @@
 package com.vonage.android.config
 
-object Config {
+import javax.inject.Inject
 
-    fun isAllowVideoOnJoin(): Boolean {
-        return AppConfig.VideoSettings.ALLOW_VIDEO_ON_JOIN
-    }
+class GetConfig @Inject constructor() {
 
-    fun isAllowAudioOnJoin(): Boolean {
-        return AppConfig.AudioSettings.ALLOW_AUDIO_ON_JOIN
-    }
-
-    fun isAllowCameraControl(): Boolean {
-        return AppConfig.VideoSettings.ALLOW_CAMERA_CONTROL
-    }
-
-    fun isAllowMicrophoneControl(): Boolean {
-        return AppConfig.AudioSettings.ALLOW_MICROPHONE_CONTROL
-    }
-
-    fun isShowParticipantList(): Boolean {
-        return AppConfig.MeetingRoomSettings.SHOW_PARTICIPANT_LIST
-    }
+    operator fun invoke(): Config = Config(
+        allowCameraControl = AppConfig.VideoSettings.ALLOW_CAMERA_CONTROL,
+        allowMicrophoneControl = AppConfig.AudioSettings.ALLOW_MICROPHONE_CONTROL,
+        allowShowParticipantList = AppConfig.MeetingRoomSettings.SHOW_PARTICIPANT_LIST,
+    )
 }
+
+data class Config(
+    val allowCameraControl: Boolean,
+    val allowMicrophoneControl: Boolean,
+    val allowShowParticipantList: Boolean,
+)

@@ -97,6 +97,8 @@ fun WaitingRoomScreen(
                         VideoControlPanel(
                             modifier = Modifier.padding(bottom = VonageVideoTheme.dimens.paddingSmall),
                             publisher = uiState.publisher,
+                            allowMicrophoneControl = uiState.allowMicrophoneControl,
+                            allowCameraControl = uiState.allowCameraControl,
                             actions = actions,
                         )
                     }

@@ -114,6 +114,9 @@ fun MeetingRoomScreen(
                             archivingUiState = uiState.archivingUiState,
                             screenSharingState = uiState.screenSharingState,
                             captionsState = uiState.captionsState,
+                            allowShowParticipantList = uiState.allowShowParticipantList,
+                            allowMicrophoneControl = uiState.allowMicrophoneControl,
+                            allowCameraControl = uiState.allowCameraControl,
                         ),
                     )
                 }
