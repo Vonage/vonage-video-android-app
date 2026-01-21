@@ -45,7 +45,7 @@ import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.ScreenSharingState
 import com.vonage.android.screen.room.components.captions.captionsAction
-import com.vonage.android.screen.room.components.emoji.EmojiSelector
+import com.vonage.android.reactions.ui.EmojiSelector
 import com.vonage.android.screen.room.noOpCallFacade
 import com.vonage.android.screensharing.ui.screenSharingAction
 import kotlinx.collections.immutable.ImmutableList

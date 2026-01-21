@@ -52,9 +52,6 @@
     <string name="chat_panel_input_text_placeholder">Send a message</string>
     <string name="chat_panel_jump_to_bottom">Jump to bottom</string>
 
-    <!-- Emoji reactions -->
-    <string name="emoji_panel_you">You</string>
-
     <!-- Recordings -->
     <string name="recording_title">Download latest recording</string>
     <string name="recording_empty_title">The meeting hasn’t been recorded</string>

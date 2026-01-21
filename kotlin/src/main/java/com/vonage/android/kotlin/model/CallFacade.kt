@@ -4,8 +4,8 @@ import android.content.Context
 import android.media.projection.MediaProjection
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import com.vonage.android.kotlin.signal.EmojiReaction
 import com.vonage.android.shared.ChatMessage
+import com.vonage.android.shared.EmojiReaction
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
