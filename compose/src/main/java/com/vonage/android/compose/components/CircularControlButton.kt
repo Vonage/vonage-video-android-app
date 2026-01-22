@@ -1,4 +1,4 @@
-package com.vonage.android.screen.components
+package com.vonage.android.compose.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -31,8 +32,11 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.MicMute
 import com.vonage.android.compose.vivid.icons.solid.Microphone2
+import com.vonage.android.fx.ui.BlurIndicator
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.kotlin.model.VideoSource
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BLUR_BUTTON_TAG
 
 @Composable
 fun ParticipantVideoCard(
@@ -40,6 +44,7 @@ fun ParticipantVideoCard(
     modifier: Modifier = Modifier,
 ) {
     val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
+    val isCameraEnabled by participant.isCameraEnabled.collectAsStateWithLifecycle()
     val isSpeaking by participant.isTalking.collectAsStateWithLifecycle()
 
     ParticipantContainer(
@@ -64,6 +69,21 @@ fun ParticipantVideoCard(
                 isMicEnabled = isMicEnabled,
                 participant = participant,
                 isShowVolumeIndicator = participant.isPublisher,
+            )
+        }
+
+        if (participant.isPublisher) {
+            val blurLevel by (participant as PublisherParticipant).blurLevel.collectAsStateWithLifecycle()
+
+            BlurIndicator(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .size(24.dp),
+                isCameraEnabled = isCameraEnabled,
+                blurLevel = blurLevel,
+                onCameraBlur = {
+                    participant.cycleCameraBlur()
+                },
             )
         }
     }

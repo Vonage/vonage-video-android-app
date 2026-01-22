@@ -86,7 +86,6 @@ data class PublisherState(
         publisher.cycleCamera()
     }
 
-    // TODO: Add to UI
     override fun cycleCameraBlur() {
         publisher.cycleBlur(_blurLevel.value) {
             _blurLevel.update { it }

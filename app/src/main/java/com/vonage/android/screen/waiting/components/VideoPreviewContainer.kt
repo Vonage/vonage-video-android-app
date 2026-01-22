@@ -16,12 +16,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -31,16 +29,13 @@ import com.vonage.android.compose.components.ParticipantVideoRenderer
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
-import com.vonage.android.compose.vivid.icons.line.Blur
-import com.vonage.android.compose.vivid.icons.line.BlurOff
-import com.vonage.android.compose.vivid.icons.solid.Blur
 import com.vonage.android.compose.vivid.icons.solid.MicMute
 import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.compose.vivid.icons.solid.Video
 import com.vonage.android.compose.vivid.icons.solid.VideoOff
-import com.vonage.android.kotlin.model.BlurLevel
+import com.vonage.android.fx.ui.BlurIndicator
 import com.vonage.android.kotlin.model.PublisherParticipant
-import com.vonage.android.screen.components.CircularControlButton
+import com.vonage.android.compose.components.CircularControlButton
 import com.vonage.android.screen.waiting.WaitingRoomActions
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BLUR_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BUTTON_TAG
@@ -148,9 +143,11 @@ private fun VideoControlPanel(
         }
 
         BlurIndicator(
+            modifier = Modifier
+                .testTag(CAMERA_BLUR_BUTTON_TAG),
             isCameraEnabled = isCameraEnabled,
             blurLevel = blurLevel,
-            actions = actions,
+            onCameraBlur = actions.onCameraBlur,
         )
     }
 }
@@ -169,33 +166,5 @@ private fun MicVolumeIndicator(
         )
     } else {
         Spacer(modifier = Modifier.size(VonageVideoTheme.dimens.spaceXLarge))
-    }
-}
-
-@Composable
-private fun BlurIndicator(
-    isCameraEnabled: Boolean,
-    blurLevel: BlurLevel,
-    actions: WaitingRoomActions,
-) {
-    if (isCameraEnabled) {
-        CircularControlButton(
-            modifier = Modifier
-                .border(BorderStroke(1.dp, Color.White), CircleShape)
-                .testTag(CAMERA_BLUR_BUTTON_TAG),
-            onClick = actions.onCameraBlur,
-            icon = rememberBlurIcon(blurLevel),
-        )
-    } else {
-        Spacer(modifier = Modifier.size(56.dp))
-    }
-}
-
-@Composable
-private fun rememberBlurIcon(level: BlurLevel): ImageVector = remember(level) {
-    when (level) {
-        BlurLevel.HIGH -> VividIcons.Solid.Blur
-        BlurLevel.LOW -> VividIcons.Line.Blur
-        BlurLevel.NONE -> VividIcons.Line.BlurOff
     }
 }
