@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,9 +48,9 @@ import com.vonage.android.util.buildTestTag
 @Composable
 fun VideoPreviewContainer(
     name: String,
-    actions: WaitingRoomActions,
     publisher: PublisherParticipant,
     modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit,
 ) {
     val isCameraEnabled by publisher.isCameraEnabled.collectAsStateWithLifecycle()
 
@@ -76,19 +77,17 @@ fun VideoPreviewContainer(
                     userName = name,
                 )
             }
-            VideoControlPanel(
-                modifier = Modifier.padding(bottom = VonageVideoTheme.dimens.paddingSmall),
-                publisher = publisher,
-                actions = actions,
-            )
+            content()
         }
     }
 }
 
 @Composable
-private fun VideoControlPanel(
+internal fun VideoControlPanel(
     publisher: PublisherParticipant,
     actions: WaitingRoomActions,
+    allowMicrophoneControl: Boolean,
+    allowCameraControl: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val isCameraEnabled by publisher.isCameraEnabled.collectAsStateWithLifecycle()
@@ -111,35 +110,39 @@ private fun VideoControlPanel(
         Row(
             horizontalArrangement = spacedBy(VonageVideoTheme.dimens.spaceDefault),
         ) {
-            CircularControlButton(
-                modifier = Modifier
-                    .conditional(
-                        isMicEnabled,
-                        ifTrue = {
-                            background(Color.Unspecified)
-                                .border(BorderStroke(1.dp, Color.White), CircleShape)
-                        },
-                        ifFalse = { background(VonageVideoTheme.colors.error) }
-                    )
-                    .testTag(MIC_BUTTON_TAG.buildTestTag(isMicEnabled)),
-                onClick = actions.onMicToggle,
-                icon = if (isMicEnabled) VividIcons.Solid.Microphone2 else VividIcons.Solid.MicMute,
-            )
+            if (allowMicrophoneControl) {
+                CircularControlButton(
+                    modifier = Modifier
+                        .conditional(
+                            isMicEnabled,
+                            ifTrue = {
+                                background(Color.Unspecified)
+                                    .border(BorderStroke(1.dp, Color.White), CircleShape)
+                            },
+                            ifFalse = { background(VonageVideoTheme.colors.error) }
+                        )
+                        .testTag(MIC_BUTTON_TAG.buildTestTag(isMicEnabled)),
+                    onClick = actions.onMicToggle,
+                    icon = if (isMicEnabled) VividIcons.Solid.Microphone2 else VividIcons.Solid.MicMute,
+                )
+            }
 
-            CircularControlButton(
-                modifier = Modifier
-                    .conditional(
-                        isCameraEnabled,
-                        ifTrue = {
-                            background(Color.Unspecified)
-                                .border(BorderStroke(1.dp, Color.White), CircleShape)
-                        },
-                        ifFalse = { background(VonageVideoTheme.colors.error) }
-                    )
-                    .testTag(CAMERA_BUTTON_TAG.buildTestTag(isCameraEnabled)),
-                onClick = actions.onCameraToggle,
-                icon = if (isCameraEnabled) VividIcons.Solid.Video else VividIcons.Solid.VideoOff,
-            )
+            if (allowCameraControl) {
+                CircularControlButton(
+                    modifier = Modifier
+                        .conditional(
+                            isCameraEnabled,
+                            ifTrue = {
+                                background(Color.Unspecified)
+                                    .border(BorderStroke(1.dp, Color.White), CircleShape)
+                            },
+                            ifFalse = { background(VonageVideoTheme.colors.error) }
+                        )
+                        .testTag(CAMERA_BUTTON_TAG.buildTestTag(isCameraEnabled)),
+                    onClick = actions.onCameraToggle,
+                    icon = if (isCameraEnabled) VividIcons.Solid.Video else VividIcons.Solid.VideoOff,
+                )
+            }
         }
 
         BlurIndicator(

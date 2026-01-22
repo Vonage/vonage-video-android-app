@@ -8,6 +8,8 @@ import com.vonage.android.MainDispatcherRule
 import com.vonage.android.archiving.ArchiveId
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.VonageArchiving
+import com.vonage.android.config.Config
+import com.vonage.android.config.GetConfig
 import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
@@ -48,6 +50,7 @@ class MeetingRoomScreenViewModelTest {
     private val captionsRepository: CaptionsRepository = mockk()
     private val screenSharingManager: VeraScreenSharingManager = mockk()
     private val videoClient: VonageVideoClient = mockk()
+    private val getConfig: GetConfig = mockk()
     private val foregroundServiceHandler: VeraForegroundServiceHandler = mockk {
         every { startForegroundService(any()) } returns Unit
         every { stopForegroundService() } returns Unit
@@ -67,6 +70,13 @@ class MeetingRoomScreenViewModelTest {
             videoClient = videoClient,
             foregroundServiceHandler = foregroundServiceHandler,
             activityContextProvider = activityContextProvider,
+            getConfig = getConfig,
+        )
+
+        every { getConfig.invoke() } returns Config(
+            allowCameraControl = true,
+            allowMicrophoneControl = true,
+            allowShowParticipantList = true,
         )
     }
 
