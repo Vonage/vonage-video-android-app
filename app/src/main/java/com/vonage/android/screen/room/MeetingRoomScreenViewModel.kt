@@ -360,7 +360,6 @@ data class MeetingRoomUiState(
     val errorMessage: String? = null,
     val isEndCall: Boolean = false,
     val layoutType: CallLayoutType = CallLayoutType.GRID,
-    // feature flags based on configuration files
     val allowMicrophoneControl: Boolean = true,
     val allowCameraControl: Boolean = true,
     val allowShowParticipantList: Boolean = true,
