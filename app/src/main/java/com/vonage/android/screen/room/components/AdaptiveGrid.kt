@@ -21,6 +21,7 @@ import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.noOpCallFacade
 import com.vonage.android.util.lazyStateVisibilityTracker
 import kotlinx.collections.immutable.ImmutableList
@@ -30,6 +31,7 @@ import kotlinx.collections.immutable.toImmutableList
 fun AdaptiveGrid(
     participants: ImmutableList<Participant>,
     call: CallFacade,
+    actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
     columns: Int = 2,
     rows: Int = 3,
@@ -76,6 +78,7 @@ fun AdaptiveGrid(
                         .width(itemWidth)
                         .height(itemHeight),
                     participant = participant,
+                    actions = actions,
                 )
             }
             if (participants.size > takeCount) {
@@ -102,6 +105,7 @@ internal fun AdaptiveGridPreview() {
         AdaptiveGrid(
             participants = buildParticipants(10).toImmutableList(),
             call = noOpCallFacade,
+            actions = MeetingRoomActions(),
         )
     }
 }

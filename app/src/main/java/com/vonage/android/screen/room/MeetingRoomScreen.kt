@@ -139,6 +139,7 @@ fun MeetingRoomScreen(
                                 modifier = Modifier
                                     .testTag(MEETING_ROOM_CONTENT),
                                 call = uiState.call,
+                                actions = actions,
                                 participants = participants,
                                 layoutType = uiState.layoutType,
                             )

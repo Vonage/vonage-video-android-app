@@ -363,6 +363,13 @@ class Call internal constructor(
     }
 
     /**
+     * Cycle local camera blur level
+     */
+    override fun cycleLocalCameraBlur() {
+        publisher()?.cycleCameraBlur()
+    }
+
+    /**
      * Publishes the local camera stream to the session.
      * Called automatically when connecting to the session.
      */

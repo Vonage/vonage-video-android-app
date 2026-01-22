@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.components.CircularControlButton
 import com.vonage.android.compose.vivid.icons.VividIcons
@@ -24,6 +25,8 @@ fun BlurIndicator(
     blurLevel: BlurLevel,
     onCameraBlur: () -> Unit,
     modifier: Modifier = Modifier,
+    size: Dp = 56.dp,
+    iconSize: Dp = 24.dp,
 ) {
     if (isCameraEnabled) {
         CircularControlButton(
@@ -31,9 +34,11 @@ fun BlurIndicator(
                 .border(BorderStroke(1.dp, Color.White), CircleShape),
             onClick = onCameraBlur,
             icon = rememberBlurIcon(blurLevel),
+            size = size,
+            iconSize = iconSize,
         )
     } else {
-        Spacer(modifier = Modifier.size(56.dp))
+        Spacer(modifier = Modifier.size(size))
     }
 }
 

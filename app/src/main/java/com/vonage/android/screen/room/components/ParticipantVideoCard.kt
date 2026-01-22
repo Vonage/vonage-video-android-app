@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -36,11 +35,12 @@ import com.vonage.android.fx.ui.BlurIndicator
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.kotlin.model.VideoSource
-import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BLUR_BUTTON_TAG
+import com.vonage.android.screen.room.MeetingRoomActions
 
 @Composable
 fun ParticipantVideoCard(
     participant: Participant,
+    actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
 ) {
     val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
@@ -78,12 +78,12 @@ fun ParticipantVideoCard(
             BlurIndicator(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .size(24.dp),
+                    .padding(VonageVideoTheme.dimens.paddingSmall),
                 isCameraEnabled = isCameraEnabled,
                 blurLevel = blurLevel,
-                onCameraBlur = {
-                    participant.cycleCameraBlur()
-                },
+                onCameraBlur = actions.onCycleCameraBlur,
+                size = VonageVideoTheme.dimens.minTouchTarget,
+                iconSize = VonageVideoTheme.dimens.iconSizeSmall,
             )
         }
     }
@@ -151,9 +151,17 @@ private fun BoxScope.ParticipantLabel(
     Box(
         modifier = modifier
             .align(Alignment.BottomStart)
-            .padding(4.dp)
+            .padding(
+                top = VonageVideoTheme.dimens.paddingXSmall,
+                bottom = VonageVideoTheme.dimens.paddingXSmall,
+                start = VonageVideoTheme.dimens.paddingXSmall,
+                end = 48.dp,
+            )
             .background(backgroundColor, VonageVideoTheme.shapes.medium)
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .padding(
+                horizontal = VonageVideoTheme.dimens.paddingSmall,
+                vertical = VonageVideoTheme.dimens.paddingXSmall,
+            )
     ) {
         Text(
             text = name,
@@ -233,6 +241,7 @@ internal fun ParticipantVideoCardPreview() {
         ParticipantVideoCard(
             modifier = Modifier.height(300.dp),
             participant = buildParticipants(1).first(),
+            actions = MeetingRoomActions(),
         )
     }
 }

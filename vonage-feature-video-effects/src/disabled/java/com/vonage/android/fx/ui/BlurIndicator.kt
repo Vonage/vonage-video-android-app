@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.vonage.android.kotlin.model.BlurLevel
 
+@Suppress("UnusedParameter")
 @Composable
 fun BlurIndicator(
     isCameraEnabled: Boolean,

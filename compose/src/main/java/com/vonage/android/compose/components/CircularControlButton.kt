@@ -12,6 +12,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
@@ -22,10 +23,12 @@ fun CircularControlButton(
     icon: ImageVector,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    size: Dp = 56.dp,
+    iconSize: Dp = 24.dp,
 ) {
     Box(
         modifier = Modifier
-            .size(56.dp)
+            .size(size)
             .clip(CircleShape)
             .then(modifier)
             .clickable { onClick() },
@@ -35,7 +38,7 @@ fun CircularControlButton(
             imageVector = icon,
             contentDescription = null,
             tint = Color.White,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(iconSize)
         )
     }
 }

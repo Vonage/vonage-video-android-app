@@ -71,6 +71,7 @@ fun MeetingRoomScreenRoute(
             onToggleMic = viewModel::onToggleMic,
             onToggleCamera = viewModel::onToggleCamera,
             onCameraSwitch = viewModel::onSwitchCamera,
+            onCycleCameraBlur = viewModel::onCycleLocalCameraBlur,
             onEndCall = {
                 viewModel.endCall()
                 if (!inPipMode) {
@@ -152,6 +153,7 @@ data class MeetingRoomActions(
     val onEndCall: () -> Unit = {},
     val onBack: () -> Unit = {},
     val onCameraSwitch: () -> Unit = {},
+    val onCycleCameraBlur: () -> Unit = {},
     val onAudioSwitch: () -> Unit = {},
     val onMessageSent: (String) -> Unit = {},
     val onListenUnread: (Boolean) -> Unit = {},

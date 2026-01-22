@@ -48,6 +48,7 @@ fun buildCallWithParticipants(
     override fun toggleLocalVideo() { /* empty on purpose */ }
     override fun toggleLocalCamera() { /* empty on purpose */ }
     override fun toggleLocalAudio() { /* empty on purpose */ }
+    override fun cycleLocalCameraBlur() { /* empty on purpose */ }
 
     // Chat related methods
     override val signalStateFlow: StateFlow<SignalState> = MutableStateFlow(

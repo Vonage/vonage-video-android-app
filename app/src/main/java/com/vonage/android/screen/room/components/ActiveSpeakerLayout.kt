@@ -33,6 +33,7 @@ import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.noOpCallFacade
 import com.vonage.android.util.lazyStateVisibilityTracker
 import kotlinx.collections.immutable.ImmutableList
@@ -43,6 +44,7 @@ import kotlinx.collections.immutable.toImmutableList
 fun ActiveSpeakerLayout(
     participants: ImmutableList<Participant>,
     call: CallFacade,
+    actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
     spotlightWeight: Float = 0.7f,
     otherParticipantsWeight: Float = 0.3f,
@@ -62,6 +64,7 @@ fun ActiveSpeakerLayout(
             Configuration.ORIENTATION_LANDSCAPE -> {
                 ActiveSpeakerHorizontalLayout(
                     mainParticipant = mainParticipant,
+                    actions = actions,
                     spotlightWeight = spotlightWeight,
                     listState = listState,
                     otherParticipantsWeight = otherParticipantsWeight,
@@ -73,6 +76,7 @@ fun ActiveSpeakerLayout(
             else -> {
                 ActiveSpeakerVerticalLayout(
                     mainParticipant = mainParticipant,
+                    actions = actions,
                     spotlightWeight = spotlightWeight,
                     listState = listState,
                     otherParticipantsWeight = otherParticipantsWeight,
@@ -87,6 +91,7 @@ fun ActiveSpeakerLayout(
 @Composable
 private fun ActiveSpeakerVerticalLayout(
     mainParticipant: Participant?,
+    actions: MeetingRoomActions,
     spotlightWeight: Float,
     listState: LazyListState,
     otherParticipantsWeight: Float,
@@ -100,6 +105,7 @@ private fun ActiveSpeakerVerticalLayout(
             SpotlightSpeaker(
                 modifier = Modifier.weight(spotlightWeight),
                 participant = it,
+                actions = actions,
             )
         } ?: Spacer(modifier = Modifier.weight(spotlightWeight))
         LazyRow(
@@ -118,6 +124,7 @@ private fun ActiveSpeakerVerticalLayout(
                         .width(otherParticipantsSize)
                         .height(otherParticipantsSize),
                     participant = participant,
+                    actions = actions,
                 )
             }
         }
@@ -128,6 +135,7 @@ private fun ActiveSpeakerVerticalLayout(
 @Composable
 private fun ActiveSpeakerHorizontalLayout(
     mainParticipant: Participant?,
+    actions: MeetingRoomActions,
     spotlightWeight: Float,
     listState: LazyListState,
     otherParticipantsWeight: Float,
@@ -141,6 +149,7 @@ private fun ActiveSpeakerHorizontalLayout(
             SpotlightSpeaker(
                 modifier = Modifier.weight(spotlightWeight),
                 participant = it,
+                actions = actions,
             )
         } ?: Spacer(modifier = Modifier.weight(spotlightWeight))
         LazyColumn(
@@ -159,6 +168,7 @@ private fun ActiveSpeakerHorizontalLayout(
                         .height(otherParticipantsSize)
                         .aspectRatio(ASPECT_RATIO_16_9),
                     participant = participant,
+                    actions = actions,
                 )
             }
         }
@@ -170,12 +180,14 @@ const val ASPECT_RATIO_16_9 = 16f / 9f
 @Composable
 private fun SpotlightSpeaker(
     participant: Participant,
+    actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
 ) {
     ParticipantVideoCard(
         modifier = modifier
             .padding(VonageVideoTheme.dimens.paddingSmall),
         participant = participant,
+        actions = actions,
     )
 }
 
@@ -187,6 +199,7 @@ internal fun ActiveSpeakerLayoutPreview() {
         ActiveSpeakerLayout(
             participants = buildParticipants(10).toImmutableList(),
             call = noOpCallFacade,
+            actions = MeetingRoomActions(),
         )
     }
 }
