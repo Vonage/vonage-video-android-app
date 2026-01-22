@@ -38,7 +38,7 @@ fun BlurIndicator(
             iconSize = iconSize,
         )
     } else {
-        Spacer(modifier = Modifier.size(size))
+        Spacer(modifier = modifier.size(size))
     }
 }
 
