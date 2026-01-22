@@ -1,4 +1,4 @@
-package com.vonage.android.screen.room.components.emoji
+package com.vonage.android.reactions.ui
 
 import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.animateFloatAsState
@@ -36,11 +36,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.kotlin.signal.EMOJI_LIFETIME_MILLIS
-import com.vonage.android.kotlin.signal.EmojiReaction
+import com.vonage.android.reactions.EMOJI_LIFETIME_MILLIS
+import com.vonage.android.reactions.R
+import com.vonage.android.shared.EmojiReaction
 import kotlin.random.Random
 
 private const val ANIMATION_DURATION = EMOJI_LIFETIME_MILLIS.toInt()

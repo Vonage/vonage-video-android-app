@@ -1,4 +1,4 @@
-package com.vonage.android.util.ext
+package com.vonage.android.compose.modifier
 
 import android.os.SystemClock
 import androidx.compose.foundation.clickable
