@@ -48,7 +48,7 @@ import com.vonage.android.screen.room.components.bottombar.BottomBarState
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.MeetingTopBar
 import com.vonage.android.screen.room.components.captions.CaptionsOverlay
-import com.vonage.android.screen.room.components.emoji.EmojiReactionOverlay
+import com.vonage.android.reactions.ui.EmojiReactionOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
 import kotlinx.collections.immutable.toImmutableList
@@ -114,6 +114,9 @@ fun MeetingRoomScreen(
                             archivingUiState = uiState.archivingUiState,
                             screenSharingState = uiState.screenSharingState,
                             captionsState = uiState.captionsState,
+                            allowShowParticipantList = uiState.allowShowParticipantList,
+                            allowMicrophoneControl = uiState.allowMicrophoneControl,
+                            allowCameraControl = uiState.allowCameraControl,
                         ),
                     )
                 }
@@ -136,6 +139,7 @@ fun MeetingRoomScreen(
                                 modifier = Modifier
                                     .testTag(MEETING_ROOM_CONTENT),
                                 call = uiState.call,
+                                actions = actions,
                                 participants = participants,
                                 layoutType = uiState.layoutType,
                             )

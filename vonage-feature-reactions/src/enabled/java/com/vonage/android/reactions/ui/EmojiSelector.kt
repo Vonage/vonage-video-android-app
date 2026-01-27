@@ -1,4 +1,4 @@
-package com.vonage.android.screen.room.components.emoji
+package com.vonage.android.reactions.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -8,8 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import com.vonage.android.compose.modifier.debouncedClickable
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.util.ext.debouncedClickable
+import com.vonage.android.reactions.EmojiData
 
 private const val DEBOUNCE_CLICK_MILLIS = 500L
 

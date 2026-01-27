@@ -1,8 +1,10 @@
-package com.vonage.android.kotlin.signal
+package com.vonage.android.reactions
 
 import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
+import com.vonage.android.kotlin.signal.RawSignal
+import com.vonage.android.shared.EmojiReaction
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,12 +27,12 @@ import java.util.concurrent.CopyOnWriteArrayList
  *
  * @param coroutineDispatcher Dispatcher for coroutine operations (defaults to Default)
  */
-class ReactionSignalPlugin(
+class EnabledReactionSignalPlugin(
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
-) : SignalPlugin {
+) : ReactionSignalPlugin {
 
     private val coroutineScope = CoroutineScope(coroutineDispatcher)
-    
+
     /** Thread-safe list of active emoji reactions */
     private val reactions: MutableList<EmojiReaction> = CopyOnWriteArrayList()
 
@@ -93,23 +95,6 @@ class ReactionSignalPlugin(
 
 /** Duration in milliseconds that emoji reactions are displayed before auto-removal */
 const val EMOJI_LIFETIME_MILLIS = 5000L
-
-/**
- * Represents a displayed emoji reaction from a participant.
- *
- * @property id Unique identifier for the reaction (timestamp)
- * @property emoji The emoji character
- * @property sender Display name of the sender
- * @property isYou True if sent by the local user
- * @property startTime Timestamp when the reaction was created
- */
-data class EmojiReaction(
-    val id: Long,
-    val emoji: String,
-    val sender: String,
-    val isYou: Boolean,
-    val startTime: Long,
-)
 
 /**
  * Internal serializable format for emoji reaction signals.

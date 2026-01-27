@@ -1,4 +1,4 @@
-package com.vonage.android.screen.room.components.emoji
+package com.vonage.android.reactions
 
 object EmojiData {
 

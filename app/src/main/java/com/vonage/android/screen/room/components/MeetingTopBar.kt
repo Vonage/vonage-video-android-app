@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.archiving.ArchivingUiState
+import com.vonage.android.archiving.ui.RecordingIndicator
 import com.vonage.android.audio.ui.rememberAudioDeviceSelector
 import com.vonage.android.audio.ui.toImageVector
 import com.vonage.android.compose.components.VonageTopAppBar
@@ -33,7 +34,6 @@ import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_AUDIO_SE
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_CAMERA_SWITCH_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_SHARE_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_TITLE
-import com.vonage.android.archiving.ui.RecordingIndicator
 
 @Composable
 fun MeetingTopBar(
@@ -90,6 +90,7 @@ fun MeetingTopBar(
             ) {
                 CameraSwitchIcon()
             }
+
             IconButton(
                 modifier = Modifier
                     .testTag(TOP_BAR_AUDIO_SELECTOR_ACTION),
@@ -106,6 +107,7 @@ fun MeetingTopBar(
                     contentDescription = stringResource(R.string.audio_device_selector_change_audio_output)
                 )
             }
+
             IconButton(
                 modifier = Modifier
                     .testTag(TOP_BAR_SHARE_ACTION),
