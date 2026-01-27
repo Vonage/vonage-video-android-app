@@ -178,7 +178,7 @@ class WaitingRoomViewModelTest {
     }
 
     @Test
-    fun `given viewmodel when setBlur then publisher set camera blur`() = runTest {
+    fun `given viewmodel when onCycleCameraBlur then publisher set camera blur`() = runTest {
         val publisher = buildMockPublisher()
         every { videoClient.createPreviewPublisher(context, any()) } returns publisher
         coEvery { userRepository.getUserName() } returns "not relevant"
@@ -189,7 +189,7 @@ class WaitingRoomViewModelTest {
             awaitItem() // initial state
             awaitItem() // after init
 
-            sut.setBlur()
+            sut.onCycleCameraBlur()
         }
 
         verify { publisher.cycleCameraBlur() }

@@ -77,7 +77,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
         currentPublisher()?.cycleCamera()
     }
 
-    fun setBlur() {
+    fun onCycleCameraBlur() {
         currentPublisher()?.cycleCameraBlur()
     }
 
@@ -129,7 +129,6 @@ data class WaitingRoomUiState(
     val isUserNameValid: Boolean = true,
     val publisher: PublisherParticipant? = null,
     val isSuccess: Boolean = false,
-    // feature flags based on configuration files
     val allowMicrophoneControl: Boolean = true,
     val allowCameraControl: Boolean = true,
 )

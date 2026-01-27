@@ -11,6 +11,7 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.room.CallLayoutType
+import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT
 import com.vonage.android.screen.room.noOpCallFacade
@@ -20,6 +21,7 @@ import kotlinx.collections.immutable.toImmutableList
 @Composable
 fun MeetingRoomContent(
     call: CallFacade,
+    actions: MeetingRoomActions,
     participants: ImmutableList<Participant>,
     layoutType: CallLayoutType,
     modifier: Modifier = Modifier,
@@ -36,6 +38,7 @@ fun MeetingRoomContent(
                         .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
                     participants = participants,
                     call = call,
+                    actions = actions,
                 )
             }
 
@@ -43,6 +46,7 @@ fun MeetingRoomContent(
                 AdaptiveGrid(
                     call = call,
                     participants = participants,
+                    actions = actions,
                     modifier = Modifier
                         .fillMaxSize(),
                 )
@@ -52,6 +56,7 @@ fun MeetingRoomContent(
                 ActiveSpeakerLayout(
                     call = call,
                     participants = participants,
+                    actions = actions,
                     modifier = Modifier
                         .fillMaxSize()
                         .testTag(MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT),
@@ -72,6 +77,7 @@ internal fun MeetingRoomContentPreview() {
     VonageVideoTheme {
         MeetingRoomContent(
             call = noOpCallFacade,
+            actions = MeetingRoomActions(),
             participants = buildParticipants(25).toImmutableList(),
             layoutType = CallLayoutType.GRID,
         )

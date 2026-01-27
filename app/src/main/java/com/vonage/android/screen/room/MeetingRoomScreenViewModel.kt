@@ -192,6 +192,10 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         call?.toggleLocalCamera()
     }
 
+    fun onCycleLocalCameraBlur() {
+        call?.cycleLocalCameraBlur()
+    }
+
     fun endCall() {
         foregroundServiceHandler.stopForegroundService()
         screenSharingManager.stopSharingScreen()
@@ -411,6 +415,8 @@ val noOpCallFacade = object : CallFacade {
     override fun toggleLocalVideo() { /* empty on purpose */ }
     override fun toggleLocalCamera() { /* empty on purpose */ }
     override fun toggleLocalAudio() { /* empty on purpose */ }
+    override fun cycleLocalCameraBlur() { /* empty on purpose */ }
+
     override fun sendChatMessage(message: String) { /* empty on purpose */ }
     override fun listenUnreadChatMessages(enable: Boolean) { /* empty on purpose */ }
     override fun sendEmoji(emoji: String) { /* empty on purpose */ }

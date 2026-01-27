@@ -76,6 +76,7 @@ interface PublisherFacade {
     fun toggleLocalVideo()
     fun toggleLocalCamera()
     fun toggleLocalAudio()
+    fun cycleLocalCameraBlur()
 }
 
 interface SessionFacade {
