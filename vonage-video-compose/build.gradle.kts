@@ -36,7 +36,7 @@ themeGenerator {
 }
 
 dependencies {
-    implementation(project(":kotlin"))
+    implementation(project(":vonage-video-core"))
     implementation(project(":shared"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
