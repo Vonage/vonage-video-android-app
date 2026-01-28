@@ -169,7 +169,7 @@ play {
 }
 
 dependencies {
-    implementation(project(":vonage-video-compose"))
+    implementation(project(":vonage-video-ui-compose"))
     implementation(project(":vonage-video-core"))
     implementation(project(":shared"))
     implementation(project(":vonage-feature-chat"))

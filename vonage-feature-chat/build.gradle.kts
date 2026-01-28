@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":vonage-video-compose"))
+    implementation(project(":vonage-video-ui-compose"))
     implementation(project(":vonage-video-core"))
     implementation(project(":shared"))
     implementation(libs.hilt.android)
