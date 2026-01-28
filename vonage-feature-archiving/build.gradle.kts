@@ -44,7 +44,7 @@ val enabledImplementation by configurations
 dependencies {
     implementation(project(":vonage-video-ui-compose"))
     implementation(project(":vonage-video-core"))
-    implementation(project(":shared"))
+    implementation(project(":vonage-video-shared"))
     implementation(libs.hilt.android)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
