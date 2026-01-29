@@ -169,9 +169,9 @@ play {
 }
 
 dependencies {
-    implementation(project(":compose"))
-    implementation(project(":kotlin"))
-    implementation(project(":shared"))
+    implementation(project(":vonage-video-ui-compose"))
+    implementation(project(":vonage-video-core"))
+    implementation(project(":vonage-video-shared"))
     implementation(project(":vonage-feature-chat"))
     implementation(project(":vonage-feature-archiving"))
     implementation(project(":vonage-feature-reactions"))

@@ -23,10 +23,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "Vonage Video Android"
 include(":app")
-include(":compose")
-include(":kotlin")
+include(":vonage-video-ui-compose")
+include(":vonage-video-core")
 include(":vonage-feature-chat")
 include(":vonage-feature-archiving")
 include(":vonage-feature-reactions")
 include(":vonage-feature-video-effects")
-include(":shared")
+include(":vonage-video-shared")
