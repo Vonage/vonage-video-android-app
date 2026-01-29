@@ -1,0 +1,10 @@
+<resources>
+
+    <!-- Audio device selector -->
+    <string name="audio_device_selector_change_audio_output">Change audio output</string>
+    <string name="audio_device_selector_earpiece_audio_device">Earpiece</string>
+    <string name="audio_device_selector_bluetooth_audio_device">Bluetooth</string>
+    <string name="audio_device_selector_speaker_audio_device">Speaker</string>
+    <string name="audio_device_selector_headset_audio_device">Headset</string>
+
+</resources>

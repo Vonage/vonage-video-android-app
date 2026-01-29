@@ -1,18 +1,23 @@
-package com.vonage.android.audio.ui
+package com.vonage.audioselector.ui
 
+import android.bluetooth.BluetoothManager
 import android.content.Context
+import android.media.AudioManager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.vonage.android.di.VeraAudioEntryPoint
-import dagger.hilt.android.EntryPointAccessors
+import com.vonage.audioselector.AudioDeviceSelector
+import com.vonage.audioselector.data.CurrentDevice
+import com.vonage.audioselector.data.GetDevices
+import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager
+import com.vonage.audioselector.util.AudioFocusRequester
+import kotlinx.coroutines.Dispatchers
 
 @Composable
 fun AudioDevicesEffect() {
@@ -58,8 +63,29 @@ fun AudioDevices(
 }
 
 @Composable
-fun rememberAudioDeviceSelector(context: Context) = remember(Unit) {
-    EntryPointAccessors
-        .fromApplication(context.applicationContext, VeraAudioEntryPoint::class.java)
-        .audioDeviceSelector()
+fun rememberAudioDeviceSelector(context: Context): AudioDeviceSelector {
+    val bluetoothManager = VeraBluetoothManager(
+        context = context,
+        audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager,
+        bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager,
+    )
+    val audioDeviceManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    val getDevices = GetDevices(
+        context = context,
+        bluetoothManager = bluetoothManager,
+        audioManager = audioDeviceManager,
+    )
+    return AudioDeviceSelector(
+        audioFocusRequester = AudioFocusRequester(
+            audioManager = audioDeviceManager,
+        ),
+        bluetoothManager = bluetoothManager,
+        getDevicesCommand = getDevices,
+        currentDevice = CurrentDevice(
+            bluetoothManager = bluetoothManager,
+            audioManager = audioDeviceManager,
+            getDevices = getDevices,
+        ),
+        dispatcher = Dispatchers.Default,
+    )
 }

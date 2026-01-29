@@ -24,8 +24,6 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.vonage.android.R
-import com.vonage.android.audio.ui.AudioDevices
-import com.vonage.android.audio.ui.AudioDevicesEffect
 import com.vonage.android.compose.layout.TwoPaneScaffold
 import com.vonage.android.compose.preview.buildPublisher
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -34,6 +32,8 @@ import com.vonage.android.screen.waiting.components.DeviceSelectionPanel
 import com.vonage.android.screen.waiting.components.JoinRoomSection
 import com.vonage.android.screen.waiting.components.VideoControlPanel
 import com.vonage.android.screen.waiting.components.VideoPreviewContainer
+import com.vonage.audioselector.ui.AudioDevices
+import com.vonage.audioselector.ui.AudioDevicesEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

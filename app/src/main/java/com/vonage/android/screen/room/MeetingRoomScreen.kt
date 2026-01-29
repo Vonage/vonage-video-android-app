@@ -31,8 +31,6 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.archiving.ArchivingUiState
-import com.vonage.android.audio.ui.AudioDevices
-import com.vonage.android.audio.ui.AudioDevicesEffect
 import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.components.GenericLoading
@@ -51,6 +49,8 @@ import com.vonage.android.screen.room.components.captions.CaptionsOverlay
 import com.vonage.android.reactions.ui.EmojiReactionOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
+import com.vonage.audioselector.ui.AudioDevices
+import com.vonage.audioselector.ui.AudioDevicesEffect
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 

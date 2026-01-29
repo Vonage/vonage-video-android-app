@@ -1,25 +1,23 @@
-package com.vonage.android.audio.data
+package com.vonage.audioselector.data
 
 import android.media.AudioManager
-import com.vonage.android.audio.AudioDeviceSelector.AudioDevice
-import com.vonage.android.audio.AudioDeviceSelector.AudioDeviceType
-import com.vonage.android.audio.data.bluetooth.VeraBluetoothManager
-import javax.inject.Inject
+import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager
+import com.vonage.audioselector.AudioDeviceSelector
 
-class CurrentDevice @Inject constructor(
+class CurrentDevice constructor(
     private val bluetoothManager: VeraBluetoothManager,
     private val audioManager: AudioManager,
     private val getDevices: GetDevices,
 ) {
 
-    private var userSelectedDevice: AudioDevice? = null
+    private var userSelectedDevice: AudioDeviceSelector.AudioDevice? = null
 
-    fun userSelectDevice(device: AudioDevice) {
+    fun userSelectDevice(device: AudioDeviceSelector.AudioDevice) {
         userSelectedDevice = device
         performSwitchTo(device)
     }
 
-    fun getCurrentActiveDevice(): AudioDevice? =
+    fun getCurrentActiveDevice(): AudioDeviceSelector.AudioDevice? =
         if (userSelectedDevice != null) {
             userSelectedDevice
         } else {
@@ -31,10 +29,10 @@ class CurrentDevice @Inject constructor(
             null
         }
 
-    private fun performSwitchTo(audioDevice: AudioDevice) {
+    private fun performSwitchTo(audioDevice: AudioDeviceSelector.AudioDevice) {
         when (audioDevice.type) {
-            AudioDeviceType.EARPIECE,
-            AudioDeviceType.WIRED_HEADSET -> {
+            AudioDeviceSelector.AudioDeviceType.EARPIECE,
+            AudioDeviceSelector.AudioDeviceType.WIRED_HEADSET -> {
                 bluetoothManager.stopBluetooth()
                 audioManager.apply {
                     isSpeakerphoneOn = false
@@ -42,7 +40,7 @@ class CurrentDevice @Inject constructor(
                 }
             }
 
-            AudioDeviceType.BLUETOOTH -> {
+            AudioDeviceSelector.AudioDeviceType.BLUETOOTH -> {
                 bluetoothManager.startBluetooth()
                 audioManager.apply {
                     isSpeakerphoneOn = false
@@ -50,7 +48,7 @@ class CurrentDevice @Inject constructor(
                 }
             }
 
-            AudioDeviceType.SPEAKER -> {
+            AudioDeviceSelector.AudioDeviceType.SPEAKER -> {
                 bluetoothManager.stopBluetooth()
                 audioManager.apply {
                     isSpeakerphoneOn = true

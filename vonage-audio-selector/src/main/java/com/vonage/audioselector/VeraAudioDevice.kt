@@ -1,4 +1,4 @@
-package com.vonage.android.kotlin.internal
+package com.vonage.audioselector
 
 import android.Manifest
 import android.content.Context

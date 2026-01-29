@@ -1,4 +1,4 @@
-package com.vonage.android.audio.data.bluetooth
+package com.vonage.audioselector.data.bluetooth
 
 import android.Manifest.permission
 import android.annotation.SuppressLint
@@ -15,16 +15,12 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.media.AudioManager
 import android.os.Build
 import android.util.Log
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class VeraBluetoothManager @Inject constructor(
-    @param:ApplicationContext private val context: Context,
+class VeraBluetoothManager constructor(
+    private val context: Context,
     private val audioManager: AudioManager,
     bluetoothManager: BluetoothManager,
 ) {

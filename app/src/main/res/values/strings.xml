@@ -40,13 +40,6 @@
     <string name="request_permissions">Request permissions</string>
     <string name="request_permissions_to_system">Request permissions to system</string>
 
-    <!-- Audio device selector -->
-    <string name="audio_device_selector_change_audio_output">Change audio output</string>
-    <string name="audio_device_selector_earpiece_audio_device">Earpiece</string>
-    <string name="audio_device_selector_bluetooth_audio_device">Bluetooth</string>
-    <string name="audio_device_selector_speaker_audio_device">Speaker</string>
-    <string name="audio_device_selector_headset_audio_device">Headset</string>
-
     <!-- Chat -->
     <string name="chat_panel_title">Chat</string>
     <string name="chat_panel_input_text_placeholder">Send a message</string>

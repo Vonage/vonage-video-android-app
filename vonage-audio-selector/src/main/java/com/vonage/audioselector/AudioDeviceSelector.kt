@@ -1,11 +1,10 @@
-package com.vonage.android.audio
+package com.vonage.audioselector
 
 import android.util.Log
-import com.vonage.android.audio.data.CurrentDevice
-import com.vonage.android.audio.data.GetDevices
-import com.vonage.android.audio.data.bluetooth.VeraBluetoothManager
-import com.vonage.android.audio.util.AudioFocusRequester
-import com.vonage.android.di.DefaultDispatcher
+import com.vonage.audioselector.data.CurrentDevice
+import com.vonage.audioselector.data.GetDevices
+import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager
+import com.vonage.audioselector.util.AudioFocusRequester
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -16,16 +15,13 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class AudioDeviceSelector @Inject constructor(
+class AudioDeviceSelector constructor(
     private val audioFocusRequester: AudioFocusRequester,
     private val bluetoothManager: VeraBluetoothManager,
     private val getDevicesCommand: GetDevices,
     private val currentDevice: CurrentDevice,
-    @param:DefaultDispatcher private val dispatcher: CoroutineDispatcher,
+    private val dispatcher: CoroutineDispatcher,
 ) {
 
     val coroutineScope = CoroutineScope(dispatcher)

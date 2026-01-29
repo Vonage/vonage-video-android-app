@@ -2,7 +2,7 @@ package com.vonage.android.di
 
 import android.content.Context
 import com.vonage.android.kotlin.VonageVideoClient
-import com.vonage.android.kotlin.internal.VeraAudioDevice
+import com.vonage.audioselector.VeraAudioDevice
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.reactions.ReactionSignalPlugin
 import dagger.Module

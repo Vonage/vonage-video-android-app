@@ -1,4 +1,4 @@
-package com.vonage.android.audio.ui
+package com.vonage.audioselector.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,21 +24,20 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.vonage.android.R
-import com.vonage.android.audio.AudioDeviceSelector.AudioDevice
-import com.vonage.android.audio.AudioDeviceSelector.AudioDeviceType
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.AudioMid
 import com.vonage.android.compose.vivid.icons.solid.Call
 import com.vonage.android.compose.vivid.icons.solid.Headset2
+import com.vonage.audioselector.AudioDeviceSelector
+import com.vonage.audioselector.R
 
 @Composable
 fun AudioDeviceList(
-    availableDevices: List<AudioDevice>,
-    activeDevice: AudioDevice?,
-    selectDevice: (AudioDevice) -> Unit,
+    availableDevices: List<AudioDeviceSelector.AudioDevice>,
+    activeDevice: AudioDeviceSelector.AudioDevice?,
+    selectDevice: (AudioDeviceSelector.AudioDevice) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyVerticalGrid(
@@ -57,7 +56,7 @@ fun AudioDeviceList(
                         start = VonageVideoTheme.dimens.paddingSmall,
                         bottom = VonageVideoTheme.dimens.paddingSmall,
                     ),
-                text = stringResource(R.string.waiting_room_available_audio_outputs),
+                text = "R.string.waiting_room_available_audio_outputs",
                 color = VonageVideoTheme.colors.textSecondary,
                 style = VonageVideoTheme.typography.heading2,
                 maxLines = 1,
@@ -80,8 +79,8 @@ fun AudioDeviceList(
 
 @Composable
 private fun AudioDeviceCell(
-    audioDevice: AudioDevice,
-    selectDevice: (AudioDevice) -> Unit,
+    audioDevice: AudioDeviceSelector.AudioDevice,
+    selectDevice: (AudioDeviceSelector.AudioDevice) -> Unit,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -107,7 +106,10 @@ private fun AudioDeviceCell(
                     )
                 },
             )
-            .padding(vertical = VonageVideoTheme.dimens.paddingSmall, horizontal = VonageVideoTheme.dimens.paddingDefault),
+            .padding(
+                vertical = VonageVideoTheme.dimens.paddingSmall,
+                horizontal = VonageVideoTheme.dimens.paddingDefault
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(
             space = VonageVideoTheme.dimens.spaceSmall,
@@ -132,21 +134,21 @@ private fun AudioDeviceCell(
 }
 
 @Composable
-private fun AudioDevice.toLabel(): String =
+private fun AudioDeviceSelector.AudioDevice.toLabel(): String =
     when (this.type) {
-        AudioDeviceType.EARPIECE -> stringResource(R.string.audio_device_selector_earpiece_audio_device)
-        AudioDeviceType.BLUETOOTH -> stringResource(R.string.audio_device_selector_bluetooth_audio_device)
-        AudioDeviceType.SPEAKER -> stringResource(R.string.audio_device_selector_speaker_audio_device)
-        AudioDeviceType.WIRED_HEADSET -> stringResource(R.string.audio_device_selector_headset_audio_device)
+        AudioDeviceSelector.AudioDeviceType.EARPIECE -> stringResource(R.string.audio_device_selector_earpiece_audio_device)
+        AudioDeviceSelector.AudioDeviceType.BLUETOOTH -> stringResource(R.string.audio_device_selector_bluetooth_audio_device)
+        AudioDeviceSelector.AudioDeviceType.SPEAKER -> stringResource(R.string.audio_device_selector_speaker_audio_device)
+        AudioDeviceSelector.AudioDeviceType.WIRED_HEADSET -> stringResource(R.string.audio_device_selector_headset_audio_device)
     }
 
 @Composable
-internal fun AudioDeviceType.toImageVector(): ImageVector =
+fun AudioDeviceSelector.AudioDeviceType.toImageVector(): ImageVector =
     when (this) {
-        AudioDeviceType.EARPIECE -> VividIcons.Solid.Call
-        AudioDeviceType.BLUETOOTH -> Icons.Default.Bluetooth
-        AudioDeviceType.SPEAKER -> VividIcons.Solid.AudioMid
-        AudioDeviceType.WIRED_HEADSET -> VividIcons.Solid.Headset2
+        AudioDeviceSelector.AudioDeviceType.EARPIECE -> VividIcons.Solid.Call
+        AudioDeviceSelector.AudioDeviceType.BLUETOOTH -> Icons.Default.Bluetooth
+        AudioDeviceSelector.AudioDeviceType.SPEAKER -> VividIcons.Solid.AudioMid
+        AudioDeviceSelector.AudioDeviceType.WIRED_HEADSET -> VividIcons.Solid.Headset2
     }
 
 @PreviewLightDark
@@ -156,12 +158,18 @@ internal fun AudioDeviceListPreview() {
         AudioDeviceList(
             modifier = Modifier.background(VonageVideoTheme.colors.surface),
             availableDevices = listOf(
-                AudioDevice(1, AudioDeviceType.BLUETOOTH),
-                AudioDevice(2, AudioDeviceType.EARPIECE),
-                AudioDevice(3, AudioDeviceType.SPEAKER),
-                AudioDevice(4, AudioDeviceType.WIRED_HEADSET),
+                AudioDeviceSelector.AudioDevice(1, AudioDeviceSelector.AudioDeviceType.BLUETOOTH),
+                AudioDeviceSelector.AudioDevice(2, AudioDeviceSelector.AudioDeviceType.EARPIECE),
+                AudioDeviceSelector.AudioDevice(3, AudioDeviceSelector.AudioDeviceType.SPEAKER),
+                AudioDeviceSelector.AudioDevice(
+                    4,
+                    AudioDeviceSelector.AudioDeviceType.WIRED_HEADSET
+                ),
             ),
-            activeDevice = AudioDevice(3, AudioDeviceType.SPEAKER),
+            activeDevice = AudioDeviceSelector.AudioDevice(
+                3,
+                AudioDeviceSelector.AudioDeviceType.SPEAKER
+            ),
             selectDevice = {},
         )
     }
