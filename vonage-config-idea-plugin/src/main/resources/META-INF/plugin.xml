@@ -5,7 +5,7 @@
     <vendor email="support@vonage.com" url="https://www.vonage.com">Vonage</vendor>
 
     <description><![CDATA[
-    A simple plugin that refresh the project after a config change
+    A simple plugin that refreshes the project after a config change
     in Vonage Android Reference App
     ]]></description>
 

@@ -1,4 +1,4 @@
-# List Panel Plugin
+# Vonage Reference App Config Plugin
 
 An Android Studio / IntelliJ IDEA plugin that helps to work with configurable features in Vonage Reference App.
 
@@ -33,4 +33,4 @@ Once installed, you can access the "Vonage" tool window from:
 ## TODO
 - [ ] Auto detect vonage repository to auto-enable/disable
 - [ ] Rebuild theme when theme file changes
-- [ ] Use Kotlin UI DLS for the panel UI
+- [ ] Use Kotlin UI DSL for the panel UI

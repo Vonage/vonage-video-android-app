@@ -23,7 +23,8 @@ internal class ColorPreviewTreeCellRenderer : DefaultTreeCellRenderer() {
         row: Int,
         hasFocus: Boolean
     ): Component {
-        val component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus)
+        val component =
+            super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus)
 
         if (value is DefaultMutableTreeNode) {
             val nodeText = value.userObject?.toString() ?: ""
@@ -38,8 +39,6 @@ internal class ColorPreviewTreeCellRenderer : DefaultTreeCellRenderer() {
     }
 
     private fun extractColorValue(text: String): String? {
-        // Match patterns like "key: #RRGGBB" or "key: #RRGGBBAA"
-        val hexPattern = ".*:\\s*(#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?)".toRegex()
         val match = hexPattern.find(text)
         return match?.groupValues?.get(1)
     }
@@ -66,6 +65,11 @@ internal class ColorPreviewTreeCellRenderer : DefaultTreeCellRenderer() {
         } catch (_: Exception) {
             null
         }
+
+    companion object {
+        // Match patterns like "key: #RRGGBB" or "key: #RRGGBBAA"
+        val hexPattern = ".*:\\s*(#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?)".toRegex()
+    }
 }
 
 @Suppress("MagicNumber")

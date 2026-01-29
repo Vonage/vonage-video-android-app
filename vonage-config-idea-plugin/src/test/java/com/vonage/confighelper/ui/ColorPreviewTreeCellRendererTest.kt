@@ -39,19 +39,6 @@ class ColorPreviewTreeCellRendererTest {
     }
 
     @Test
-    fun `should not set icon for non-color values`() {
-        val renderer = ColorPreviewTreeCellRenderer()
-        val node = DefaultMutableTreeNode("name: John Doe")
-
-        renderer.getTreeCellRendererComponent(
-            tree, node, false, false, true, 0, false
-        )
-
-        // Icon might be null or default, but should not be a color icon
-        // This is a basic check - in a real scenario, we'd check the icon type
-    }
-
-    @Test
     fun `should handle nodes without color patterns`() {
         val node = DefaultMutableTreeNode("simple text")
 
