@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<idea-plugin>
+    <id>com.vonage.confighelper</id>
+    <name>Vonage Reference App Config</name>
+    <vendor email="support@vonage.com" url="https://www.vonage.com">Vonage</vendor>
+
+    <description><![CDATA[
+    A simple plugin that refresh the project after a config change
+    in Vonage Android Reference App
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.gradle</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Tool Window -->
+        <toolWindow id="Vonage" secondary="false" icon="/icons/toolWindow.svg" anchor="right"
+                    factoryClass="com.vonage.confighelper.ui.MainPanelToolWindowFactory"/>
+        
+        <!-- Settings Configurable -->
+        <projectConfigurable parentId="tools" instance="com.vonage.confighelper.VonageConfigurable"
+            displayName="Vonage Reference App Config" />
+    </extensions>
+</idea-plugin>
