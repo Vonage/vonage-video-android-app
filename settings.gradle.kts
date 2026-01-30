@@ -13,7 +13,7 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
     repositories {
         google()
         mavenCentral()
@@ -30,3 +30,4 @@ include(":vonage-feature-archiving")
 include(":vonage-feature-reactions")
 include(":vonage-feature-video-effects")
 include(":vonage-video-shared")
+include(":vonage-config-idea-plugin")
