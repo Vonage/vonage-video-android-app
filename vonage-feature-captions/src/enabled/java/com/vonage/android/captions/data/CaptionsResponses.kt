@@ -1,4 +1,4 @@
-package com.vonage.android.data.network
+package com.vonage.android.captions.data
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

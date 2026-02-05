@@ -8,9 +8,10 @@ import com.vonage.android.MainDispatcherRule
 import com.vonage.android.archiving.ArchiveId
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.VonageArchiving
+import com.vonage.android.captions.CaptionsUiState
+import com.vonage.android.captions.VonageCaptions
 import com.vonage.android.config.Config
 import com.vonage.android.config.GetConfig
-import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
@@ -47,7 +48,7 @@ class MeetingRoomScreenViewModelTest {
     private val activityContextProvider: ActivityContextProvider = mockk(relaxed = true)
     private val sessionRepository: SessionRepository = mockk()
     private val vonageArchiving: VonageArchiving = mockk(relaxed = true)
-    private val captionsRepository: CaptionsRepository = mockk()
+    private val vonageCaptions: VonageCaptions = mockk(relaxed = true)
     private val screenSharingManager: VeraScreenSharingManager = mockk()
     private val videoClient: VonageVideoClient = mockk()
     private val getConfig: GetConfig = mockk()
@@ -66,7 +67,7 @@ class MeetingRoomScreenViewModelTest {
             sessionRepository = sessionRepository,
             vonageArchiving = vonageArchiving,
             screenSharingManager = screenSharingManager,
-            captionsRepository = captionsRepository,
+            vonageCaptions = vonageCaptions,
             videoClient = videoClient,
             foregroundServiceHandler = foregroundServiceHandler,
             activityContextProvider = activityContextProvider,
@@ -592,7 +593,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    captionsState = CaptionsState.ENABLED,
+                    captionsUiState = CaptionsUiState.ENABLED,
                 ), awaitItem()
             )
         }
@@ -601,7 +602,7 @@ class MeetingRoomScreenViewModelTest {
     @Test
     fun `given viewmodel when enable captions then emit correct state`() = runTest {
         val mockCall = givenMockCall()
-        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns success("captionsId")
+        coEvery { vonageCaptions.enable() } returns success(Unit)
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
@@ -614,17 +615,24 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    captionsState = CaptionsState.ENABLED,
+                    captionsUiState = CaptionsUiState.ENABLING,
                 ), awaitItem()
             )
-            verify { mockCall.enableCaptions(true) }
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    captionsUiState = CaptionsUiState.ENABLED,
+                ), awaitItem()
+            )
+            coVerify { vonageCaptions.enable() }
         }
     }
 
     @Test
     fun `given viewmodel when enable captions fails then emit correct state`() = runTest {
         val mockCall = givenMockCall()
-        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns Result.failure(Exception("KO"))
+        coEvery { vonageCaptions.enable() } returns Result.failure(Exception("KO"))
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
@@ -636,7 +644,7 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    captionsState = CaptionsState.IDLE,
+                    captionsUiState = CaptionsUiState.IDLE,
                 ), awaitItem()
             )
             verify(exactly = 0) { mockCall.enableCaptions(true) }
@@ -646,8 +654,8 @@ class MeetingRoomScreenViewModelTest {
     @Test
     fun `given viewmodel when disable captions then emit correct state`() = runTest {
         val mockCall = givenMockCall()
-        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns success("captionsId")
-        coEvery { captionsRepository.disableCaptions(ANY_ROOM_NAME, "captionsId") } returns success("OK")
+        coEvery { vonageCaptions.enable() } returns success(Unit)
+        coEvery { vonageCaptions.disable() } returns success(Unit)
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
@@ -660,29 +668,42 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    captionsState = CaptionsState.ENABLED,
+                    captionsUiState = CaptionsUiState.ENABLING,
                 ), awaitItem()
             )
-            verify { mockCall.enableCaptions(true) }
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    captionsUiState = CaptionsUiState.ENABLED,
+                ), awaitItem()
+            )
+            coVerify { vonageCaptions.enable() }
             // disable captions
             sut.captions(false)
             assertEquals(
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    captionsState = CaptionsState.IDLE,
+                    captionsUiState = CaptionsUiState.DISABLING,
                 ), awaitItem()
             )
-            verify { mockCall.enableCaptions(false) }
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    captionsUiState = CaptionsUiState.IDLE,
+                ), awaitItem()
+            )
+            coVerify { vonageCaptions.disable() }
         }
     }
 
     @Test
     fun `given viewmodel when disable captions fails then emit correct state`() = runTest {
         val mockCall = givenMockCall()
-        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns success("captionsId")
-        coEvery { captionsRepository.disableCaptions(ANY_ROOM_NAME, "captionsId") } returns
-                Result.failure(Exception("KO"))
+        coEvery { vonageCaptions.enable() } returns success(Unit)
+        coEvery { vonageCaptions.disable() } returns Result.failure(Exception("KO"))
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
@@ -696,7 +717,14 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    captionsState = CaptionsState.ENABLED,
+                    captionsUiState = CaptionsUiState.ENABLING,
+                ), awaitItem()
+            )
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    call = mockCall,
+                    captionsUiState = CaptionsUiState.ENABLED,
                 ), awaitItem()
             )
         }
@@ -707,12 +735,11 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(
                     roomName = ANY_ROOM_NAME,
                     call = mockCall,
-                    captionsState = CaptionsState.ENABLED,
+                    captionsUiState = CaptionsUiState.ENABLED,
                 ), awaitItem()
             )
         }
-        verify { mockCall.enableCaptions(true) }
-        verify(exactly = 0) { mockCall.enableCaptions(false) }
+        coVerify { vonageCaptions.enable() }
     }
 
     @Test

@@ -28,6 +28,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.ui.recordingAction
+import com.vonage.android.captions.CaptionsUiState
 import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.compose.components.bottombar.ControlButton
@@ -41,10 +42,9 @@ import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.reporting.ReportIssueScreen
 import com.vonage.android.screen.reporting.components.reportingAction
 import com.vonage.android.screen.room.CallLayoutType
-import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.ScreenSharingState
-import com.vonage.android.screen.room.components.captions.captionsAction
+import com.vonage.android.captions.ui.captionsAction
 import com.vonage.android.reactions.ui.EmojiSelector
 import com.vonage.android.screen.room.noOpCallFacade
 import com.vonage.android.screensharing.ui.screenSharingAction
@@ -60,7 +60,7 @@ data class BottomBarState(
     val layoutType: CallLayoutType,
     val archivingUiState: ArchivingUiState,
     val screenSharingState: ScreenSharingState,
-    val captionsState: CaptionsState,
+    val captionsUiState: CaptionsUiState,
     val participants: ImmutableList<Participant>,
     val allowShowParticipantList: Boolean,
     val allowMicrophoneControl: Boolean,
@@ -248,8 +248,11 @@ private fun actionsFactory(
             )
 
             BottomBarActionType.CAPTIONS -> captionsAction(
-                actions = roomActions,
-                captionsState = state.captionsState,
+                onEnableCaptions = { roomActions.onToggleCaptions(true) },
+                onDisableCaptions = { roomActions.onToggleCaptions(false) },
+                enableCaptionsLabel = stringResource(R.string.captions_start),
+                disableCaptionsLabel = stringResource(R.string.captions_stop),
+                captionsUiState = state.captionsUiState,
             )
 
             BottomBarActionType.REPORT -> reportingAction(
@@ -284,7 +287,7 @@ internal fun BottomBarPreview() {
                 isChatShow = false,
                 layoutType = CallLayoutType.SPEAKER_LAYOUT,
                 archivingUiState = ArchivingUiState.RECORDING,
-                captionsState = CaptionsState.IDLE,
+                captionsUiState = CaptionsUiState.IDLE,
                 screenSharingState = ScreenSharingState.IDLE,
                 allowShowParticipantList = true,
                 allowMicrophoneControl = true,

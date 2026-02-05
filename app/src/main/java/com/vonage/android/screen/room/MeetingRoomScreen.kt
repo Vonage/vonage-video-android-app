@@ -47,7 +47,7 @@ import com.vonage.android.screen.room.components.bottombar.BottomBar
 import com.vonage.android.screen.room.components.bottombar.BottomBarState
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.MeetingTopBar
-import com.vonage.android.screen.room.components.captions.CaptionsOverlay
+import com.vonage.android.captions.ui.CaptionsOverlay
 import com.vonage.android.reactions.ui.EmojiReactionOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
@@ -113,7 +113,7 @@ fun MeetingRoomScreen(
                             layoutType = uiState.layoutType,
                             archivingUiState = uiState.archivingUiState,
                             screenSharingState = uiState.screenSharingState,
-                            captionsState = uiState.captionsState,
+                            captionsUiState = uiState.captionsUiState,
                             allowShowParticipantList = uiState.allowShowParticipantList,
                             allowMicrophoneControl = uiState.allowMicrophoneControl,
                             allowCameraControl = uiState.allowCameraControl,

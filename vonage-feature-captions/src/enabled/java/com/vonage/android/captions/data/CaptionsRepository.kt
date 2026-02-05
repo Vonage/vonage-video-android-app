@@ -1,10 +1,9 @@
-package com.vonage.android.data
+package com.vonage.android.captions.data
 
-import com.vonage.android.data.network.APIService
 import javax.inject.Inject
 
 class CaptionsRepository @Inject constructor(
-    private val apiService: APIService,
+    private val apiService: CaptionsApi,
 ) {
 
     suspend fun enableCaptions(roomName: String): Result<String> =
