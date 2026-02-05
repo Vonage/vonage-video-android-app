@@ -4,6 +4,9 @@ import android.media.AudioManager
 import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager
 import com.vonage.audioselector.AudioDeviceSelector
 
+/**
+ * Manages the current active audio device selection and routing configuration.
+ */
 internal class CurrentDevice(
     private val bluetoothManager: VeraBluetoothManager,
     private val audioManager: AudioManager,

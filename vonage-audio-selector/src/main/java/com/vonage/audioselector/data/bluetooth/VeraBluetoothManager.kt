@@ -19,6 +19,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/**
+ * Manages Bluetooth audio connections and state.
+ * Tracks Bluetooth SCO connections and wired headset presence via broadcast receivers.
+ */
 internal class VeraBluetoothManager(
     private val context: Context,
     private val audioManager: AudioManager,

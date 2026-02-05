@@ -20,6 +20,34 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * Manages audio device selection and routing for Vonage Video SDK.
+ *
+ * Provides reactive APIs for discovering, tracking, and selecting audio output devices
+ * (Bluetooth, wired headsets, speaker, earpiece). Automatically handles audio focus and
+ * device-specific audio routing configuration.
+ *
+ * Usage:
+ * ```
+ * val selector = AudioDeviceSelector(context, dispatcher)
+ * selector.start()
+ *
+ * // Listen to available devices
+ * selector.availableDevices.collect { devices ->
+ *     // Update UI with available devices
+ * }
+ *
+ * // Select a device
+ * selector.selectDevice(selectedDevice)
+ *
+ * // Listen to active device changes
+ * selector.activeDevice.collect { device ->
+ *     // Respond to device changes
+ * }
+ *
+ * selector.stop()
+ * ```
+ */
 class AudioDeviceSelector {
 
     private val coroutineScope: CoroutineScope
@@ -76,12 +104,20 @@ class AudioDeviceSelector {
         this.currentDevice = currentDevice
     }
 
+    /**
+     * Represents an audio output device.
+     * @param id Unique device identifier
+     * @param type The type of audio device
+     */
     @Stable
     data class AudioDevice(
         val id: Int,
         val type: AudioDeviceType,
     )
 
+    /**
+     * Types of audio output devices.
+     */
     enum class AudioDeviceType {
         EARPIECE,
         BLUETOOTH,
@@ -90,11 +126,21 @@ class AudioDeviceSelector {
     }
 
     private val _availableDevices = MutableStateFlow<ImmutableList<AudioDevice>>(persistentListOf())
+    /**
+     * Flow emitting the list of currently available audio devices.
+     */
     val availableDevices: StateFlow<ImmutableList<AudioDevice>> = _availableDevices
 
     private val _activeDevice = MutableStateFlow<AudioDevice?>(null)
+    /**
+     * Flow emitting the currently active audio device.
+     */
     val activeDevice: StateFlow<AudioDevice?> = _activeDevice
 
+    /**
+     * Starts audio device monitoring and management.
+     * Must be called before using the selector. Requests audio focus and initializes device tracking.
+     */
     fun start() {
         Log.d(TAG, "start")
         coroutineScope.launch {
@@ -112,11 +158,18 @@ class AudioDeviceSelector {
         }
     }
 
+    /**
+     * Stops audio device monitoring and releases resources.
+     */
     fun stop() {
         Log.d(TAG, "stop")
         veraBluetoothManager.onStop()
     }
 
+    /**
+     * Selects the specified audio device for voice communication.
+     * @param device The device to select
+     */
     fun selectDevice(device: AudioDevice) {
         currentDevice.userSelectDevice(device)
             .let { _activeDevice.value = device }

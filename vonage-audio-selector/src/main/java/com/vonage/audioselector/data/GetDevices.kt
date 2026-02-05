@@ -8,6 +8,10 @@ import android.os.Build
 import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager
 import com.vonage.audioselector.AudioDeviceSelector
 
+/**
+ * Discovers available audio output devices based on current hardware state.
+ * Returns devices in priority order: Bluetooth → Wired → Speaker → Earpiece.
+ */
 internal class GetDevices(
     private val context: Context,
     private val bluetoothManager: VeraBluetoothManager,
