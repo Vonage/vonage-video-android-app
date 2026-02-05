@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.18.1"
 }
 
 android {
@@ -34,7 +35,6 @@ android {
     }
     buildFeatures {
         compose = true
-        buildConfig = true
     }
 }
 
@@ -44,13 +44,12 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.kotlinx.collections.immutable)
-    implementation(project(":vonage-video-ui-compose"))
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.ui.tooling.preview)
 
     testImplementation(libs.junit.junit)
+    testImplementation(libs.junit.jupiter.params)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -202,6 +202,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.material.icons.extended)
     ksp(libs.hilt.android.compiler)
     // InApp Updates
     implementation(libs.app.update)

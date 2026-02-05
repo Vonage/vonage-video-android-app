@@ -8,7 +8,7 @@ Supports 4 types of device output
 - Speaker
 
 ## Expected behavior
-Note: Currently the audio device priority queue is fixed as: `BLUETOOTH -> WIRED_HEADSET -> EARPIECE -> SPEAKER`
+Note: Currently the audio device priority queue is fixed as: `BLUETOOTH -> WIRED_HEADSET -> SPEAKER -> EARPIECE`
 
 - Bluetooth enabled -> enter to meeting room
   - Audio goes to Bluetooth

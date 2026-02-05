@@ -8,7 +8,7 @@ import android.os.Build
 import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager
 import com.vonage.audioselector.AudioDeviceSelector
 
-class GetDevices constructor(
+internal class GetDevices(
     private val context: Context,
     private val bluetoothManager: VeraBluetoothManager,
     private val audioManager: AudioManager,

@@ -1,15 +1,15 @@
-package com.vonage.android.audio.data
+package com.vonage.audioselector.data
 
 import android.media.AudioManager
-import com.vonage.android.audio.AudioDeviceSelector.AudioDevice
-import com.vonage.android.audio.AudioDeviceSelector.AudioDeviceType
-import com.vonage.android.audio.data.bluetooth.VeraBluetoothManager
+import com.vonage.audioselector.AudioDeviceSelector.AudioDevice
+import com.vonage.audioselector.AudioDeviceSelector.AudioDeviceType
+import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
+import org.junit.Test
 
 class CurrentDeviceTest {
 
@@ -28,22 +28,24 @@ class CurrentDeviceTest {
     private val speaker = AudioDevice(4, AudioDeviceType.SPEAKER)
 
     @Test
-    fun `given no user selected device when getCurrentActiveDevice returns first available device`() = runTest {
-        every { getDevices.invoke() } returns listOf(wiredHeadset, speaker)
-        assertEquals(
-            wiredHeadset,
-            sut.getCurrentActiveDevice(),
-        )
-    }
+    fun `given no user selected device when getCurrentActiveDevice returns first available device`() =
+        runTest {
+            every { getDevices.invoke() } returns listOf(wiredHeadset, speaker)
+            assertEquals(
+                wiredHeadset,
+                sut.getCurrentActiveDevice(),
+            )
+        }
 
     @Test
-    fun `given no user selected device when getCurrentActiveDevice returns null when no available devices`() = runTest {
-        every { getDevices.invoke() } returns listOf()
-        assertEquals(
-            null,
-            sut.getCurrentActiveDevice(),
-        )
-    }
+    fun `given no user selected device when getCurrentActiveDevice returns null when no available devices`() =
+        runTest {
+            every { getDevices.invoke() } returns listOf()
+            assertEquals(
+                null,
+                sut.getCurrentActiveDevice(),
+            )
+        }
 
     @Test
     fun `given user selected returns user selected`() = runTest {

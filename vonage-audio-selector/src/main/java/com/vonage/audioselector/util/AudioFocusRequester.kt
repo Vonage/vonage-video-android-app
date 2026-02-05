@@ -10,7 +10,7 @@ import android.os.Build
  * Using focus gain AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE by default
  * because the system shouldn't play any notifications and media playback should have paused
  */
-class AudioFocusRequester constructor(
+internal class AudioFocusRequester(
     private val audioManager: AudioManager,
 ) {
 

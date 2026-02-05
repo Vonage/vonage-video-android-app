@@ -49,8 +49,7 @@ import com.vonage.android.screen.room.components.captions.CaptionsOverlay
 import com.vonage.android.reactions.ui.EmojiReactionOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
-import com.vonage.audioselector.ui.AudioDevices
-import com.vonage.audioselector.ui.AudioDevicesEffect
+import com.vonage.android.screen.components.audio.AudioDevicesMenu
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
@@ -76,7 +75,7 @@ fun MeetingRoomScreen(
         actions.onListenUnread(navigator.isExtraPaneShow().not())
     }
 
-    AudioDevicesEffect()
+//    AudioDevicesEffect()
 
     val isChatShow by remember(navigator.scaffoldValue) {
         derivedStateOf { navigator.isExtraPaneShow() }
@@ -96,7 +95,10 @@ fun MeetingRoomScreen(
                         roomName = uiState.roomName,
                         archivingUiState = uiState.archivingUiState,
                         actions = actions,
-                        onToggleAudioDeviceSelector = { showAudioOutputs = showAudioOutputs.toggle() },
+                        onToggleAudioDeviceSelector = {
+                            showAudioOutputs = showAudioOutputs.toggle()
+                        },
+                        audioDevicesState = uiState.audioDevicesState,
                     )
                 },
                 bottomBar = {
@@ -161,9 +163,17 @@ fun MeetingRoomScreen(
                     onDismissRequest = { showAudioOutputs = false },
                     sheetState = audioOutputsSheetState,
                 ) {
-                    AudioDevices(
-                        onDismissRequest = { showAudioOutputs = false },
-                    )
+                    uiState.audioDevicesState?.let {
+                        AudioDevicesMenu(
+                            audioDevicesState = uiState.audioDevicesState,
+                            onDismissRequest = {
+                                scope.launch {
+                                    audioOutputsSheetState.hide()
+                                    showAudioOutputs = false
+                                }
+                            },
+                        )
+                    }
                 }
             }
         }

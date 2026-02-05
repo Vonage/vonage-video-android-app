@@ -511,7 +511,7 @@ class VeraAudioDevice(
         rendererLock.unlock()
     }
 
-    companion object {
+    private companion object {
         const val TAG = "VeraAudioDevice"
 
         const val NUM_CHANNELS_CAPTURING = 1

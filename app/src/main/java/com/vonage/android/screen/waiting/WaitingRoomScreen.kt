@@ -16,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,12 +29,12 @@ import com.vonage.android.compose.layout.TwoPaneScaffold
 import com.vonage.android.compose.preview.buildPublisher
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.TopBanner
+import com.vonage.android.screen.components.audio.AudioDevicesMenu
 import com.vonage.android.screen.waiting.components.DeviceSelectionPanel
 import com.vonage.android.screen.waiting.components.JoinRoomSection
 import com.vonage.android.screen.waiting.components.VideoControlPanel
 import com.vonage.android.screen.waiting.components.VideoPreviewContainer
-import com.vonage.audioselector.ui.AudioDevices
-import com.vonage.audioselector.ui.AudioDevicesEffect
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,6 +44,7 @@ fun WaitingRoomScreen(
     modifier: Modifier = Modifier,
     navigateToRoom: (String) -> Unit = {},
 ) {
+    val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
     var showAudioDeviceSelector by remember { mutableStateOf(false) }
 
@@ -52,15 +54,22 @@ fun WaitingRoomScreen(
         }
     }
 
-    AudioDevicesEffect()
     if (showAudioDeviceSelector) {
         ModalBottomSheet(
             onDismissRequest = { showAudioDeviceSelector = false },
             sheetState = sheetState,
         ) {
-            AudioDevices(
-                onDismissRequest = { showAudioDeviceSelector = false },
-            )
+            uiState.audioDevicesState?.let { audioDevicesState ->
+                AudioDevicesMenu(
+                    audioDevicesState = audioDevicesState,
+                    onDismissRequest = {
+                        scope.launch {
+                            sheetState.hide()
+                            showAudioDeviceSelector = false
+                        }
+                    },
+                )
+            }
         }
     }
 

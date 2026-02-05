@@ -1,16 +1,16 @@
-package com.vonage.android.audio
+package com.vonage.audioselector
 
 import app.cash.turbine.test
-import com.vonage.android.audio.AudioDeviceSelector.AudioDevice
-import com.vonage.android.audio.AudioDeviceSelector.AudioDeviceType
-import com.vonage.android.audio.data.CurrentDevice
-import com.vonage.android.audio.data.GetDevices
-import com.vonage.android.audio.data.bluetooth.VeraBluetoothManager
-import com.vonage.android.audio.data.bluetooth.VeraBluetoothManager.BluetoothState
-import com.vonage.android.audio.util.AudioFocusRequester
+import com.vonage.audioselector.AudioDeviceSelector.*
+import com.vonage.audioselector.data.CurrentDevice
+import com.vonage.audioselector.data.GetDevices
+import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager
+import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager.*
+import com.vonage.audioselector.util.AudioFocusRequester
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +19,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AudioDeviceSelectorTest {

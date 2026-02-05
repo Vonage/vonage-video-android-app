@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class VeraBluetoothManager constructor(
+internal class VeraBluetoothManager(
     private val context: Context,
     private val audioManager: AudioManager,
     bluetoothManager: BluetoothManager,
@@ -210,7 +210,7 @@ class VeraBluetoothManager constructor(
         Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
                 context.checkSelfPermission(permission.BLUETOOTH_CONNECT) == PERMISSION_GRANTED
 
-    companion object {
+    private companion object {
         const val TAG = "VeraBluetoothManager"
 
         const val HEADSET_PLUG_STATE_KEY = "state"
