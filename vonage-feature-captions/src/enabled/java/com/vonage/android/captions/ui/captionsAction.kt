@@ -1,6 +1,7 @@
 package com.vonage.android.captions.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import com.vonage.android.captions.CaptionsUiState
 import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
@@ -39,12 +40,14 @@ fun captionsAction(
             CaptionsUiState.ENABLING,
             CaptionsUiState.ENABLED -> true
         },
-        onClick = {
-            when (captionsUiState) {
-                CaptionsUiState.IDLE -> onEnableCaptions()
-                CaptionsUiState.ENABLED -> onDisableCaptions()
-                CaptionsUiState.ENABLING,
-                CaptionsUiState.DISABLING -> null
+        onClick = remember(captionsUiState) {
+            {
+                when (captionsUiState) {
+                    CaptionsUiState.IDLE -> onEnableCaptions()
+                    CaptionsUiState.ENABLED -> onDisableCaptions()
+                    CaptionsUiState.ENABLING,
+                    CaptionsUiState.DISABLING -> null
+                }
             }
         },
     )
