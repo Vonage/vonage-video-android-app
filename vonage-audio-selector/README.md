@@ -1,5 +1,11 @@
 # Audio Device Selector
 
+This module includes two tools:
+- `AudioDeviceSelector` to make easier to choose between different Android audio outputs
+- `VeraAudioDevice` is a Vonage `AudioDevice` class to override default behavior in Vonage Video SDK
+
+`VeraAudioDevice` is needed to allow `AudioDeviceSelector` to switch between different audio outputs.
+
 ## How it works
 Supports 4 types of device output
 - Bluetooth headset devices

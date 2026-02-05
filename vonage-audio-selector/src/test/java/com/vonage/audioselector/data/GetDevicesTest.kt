@@ -36,8 +36,8 @@ internal class GetDevicesTest {
     ) {
         every { bluetoothManager.bluetoothState } returns bluetoothState
         every { bluetoothManager.wiredState } returns wiredState
-        every { context.packageManager } returns mockk {
-            every { PackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY) } returns hasEarpiece
+        every { context.packageManager } returns mockk<PackageManager> {
+            every { hasSystemFeature(PackageManager.FEATURE_TELEPHONY) } returns hasEarpiece
         }
 
         val devices = sut.invoke()

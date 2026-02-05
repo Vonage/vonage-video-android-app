@@ -2,9 +2,10 @@ package com.vonage.audioselector
 
 import android.bluetooth.BluetoothManager
 import android.content.Context
+import android.content.Context.AUDIO_SERVICE
+import android.content.Context.BLUETOOTH_SERVICE
 import android.media.AudioManager
 import android.util.Log
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.vonage.audioselector.data.CurrentDevice
 import com.vonage.audioselector.data.GetDevices
@@ -16,39 +17,64 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class AudioDeviceSelector(
-    private val context: Context,
-    dispatcher: CoroutineDispatcher,
-) {
+class AudioDeviceSelector {
 
-    private val appContext = context.applicationContext
-    private val coroutineScope = CoroutineScope(dispatcher)
+    private val coroutineScope: CoroutineScope
 
-    private val audioManager = appContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    private val bluetoothManager = appContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-    private val veraBluetoothManager: VeraBluetoothManager = VeraBluetoothManager(
-        context = appContext,
-        audioManager = audioManager,
-        bluetoothManager = bluetoothManager,
-    )
-    private val audioFocusRequester = AudioFocusRequester(
-        audioManager = audioManager,
-    )
-    private val getDevices = GetDevices(
-        context = appContext,
-        bluetoothManager = veraBluetoothManager,
-        audioManager = audioManager,
-    )
-    private val currentDevice = CurrentDevice(
-        bluetoothManager = veraBluetoothManager,
-        audioManager = audioManager,
-        getDevices = getDevices,
-    )
+    private val audioManager: AudioManager
+    private val bluetoothManager: BluetoothManager
+    private val veraBluetoothManager: VeraBluetoothManager
+    private val audioFocusRequester: AudioFocusRequester
+    private val getDevices: GetDevices
+    private val currentDevice: CurrentDevice
+
+    constructor(
+        context: Context,
+        dispatcher: CoroutineDispatcher,
+    ) {
+        coroutineScope = CoroutineScope(dispatcher)
+        audioManager = context.getSystemService(AUDIO_SERVICE) as AudioManager
+        bluetoothManager = context.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
+        veraBluetoothManager = VeraBluetoothManager(
+            context = context,
+            audioManager = audioManager,
+            bluetoothManager = bluetoothManager,
+        )
+        audioFocusRequester = AudioFocusRequester(
+            audioManager = audioManager,
+        )
+        getDevices = GetDevices(
+            context = context,
+            bluetoothManager = veraBluetoothManager,
+            audioManager = audioManager,
+        )
+        currentDevice = CurrentDevice(
+            bluetoothManager = veraBluetoothManager,
+            audioManager = audioManager,
+            getDevices = getDevices,
+        )
+    }
+
+    // internal constructor for testing purposes
+    internal constructor(
+        context: Context,
+        dispatcher: CoroutineDispatcher,
+        audioFocusRequester: AudioFocusRequester,
+        bluetoothManager: VeraBluetoothManager,
+        getDevices: GetDevices,
+        currentDevice: CurrentDevice,
+    ) {
+        this.coroutineScope = CoroutineScope(dispatcher)
+        this.audioManager = context.getSystemService(AUDIO_SERVICE) as AudioManager
+        this.bluetoothManager = context.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
+        this.veraBluetoothManager = bluetoothManager
+        this.audioFocusRequester = audioFocusRequester
+        this.getDevices = getDevices
+        this.currentDevice = currentDevice
+    }
 
     @Stable
     data class AudioDevice(
@@ -64,18 +90,10 @@ class AudioDeviceSelector(
     }
 
     private val _availableDevices = MutableStateFlow<ImmutableList<AudioDevice>>(persistentListOf())
-    val availableDevices: StateFlow<ImmutableList<AudioDevice>> = _availableDevices.stateIn(
-        scope = coroutineScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
-        initialValue = persistentListOf(),
-    )
+    val availableDevices: StateFlow<ImmutableList<AudioDevice>> = _availableDevices
 
     private val _activeDevice = MutableStateFlow<AudioDevice?>(null)
-    val activeDevice: StateFlow<AudioDevice?> = _activeDevice.stateIn(
-        scope = coroutineScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
-        initialValue = null,
-    )
+    val activeDevice: StateFlow<AudioDevice?> = _activeDevice
 
     fun start() {
         Log.d(TAG, "start")
@@ -122,6 +140,5 @@ class AudioDeviceSelector(
 
     private companion object {
         const val TAG = "AudioDeviceSelector"
-        const val STOP_TIMEOUT_MILLIS = 5000L
     }
 }
