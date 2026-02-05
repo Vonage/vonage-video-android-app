@@ -1,11 +1,9 @@
 public final class com/vonage/audioselector/AudioDeviceSelector {
 	public static final field $stable I
-	public static final field STOP_TIMEOUT_MILLIS J
 	public static final field TAG Ljava/lang/String;
 	public fun <init> (Landroid/content/Context;Lkotlinx/coroutines/CoroutineDispatcher;)V
 	public final fun getActiveDevice ()Lkotlinx/coroutines/flow/StateFlow;
 	public final fun getAvailableDevices ()Lkotlinx/coroutines/flow/StateFlow;
-	public final fun getCoroutineScope ()Lkotlinx/coroutines/CoroutineScope;
 	public final fun selectDevice (Lcom/vonage/audioselector/AudioDeviceSelector$AudioDevice;)V
 	public final fun start ()V
 	public final fun stop ()V

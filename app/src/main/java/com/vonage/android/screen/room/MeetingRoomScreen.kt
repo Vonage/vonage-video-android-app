@@ -75,8 +75,6 @@ fun MeetingRoomScreen(
         actions.onListenUnread(navigator.isExtraPaneShow().not())
     }
 
-//    AudioDevicesEffect()
-
     val isChatShow by remember(navigator.scaffoldValue) {
         derivedStateOf { navigator.isExtraPaneShow() }
     }
