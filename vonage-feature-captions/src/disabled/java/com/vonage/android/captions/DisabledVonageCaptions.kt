@@ -2,6 +2,7 @@ package com.vonage.android.captions
 
 import com.vonage.android.kotlin.model.CallFacade
 
+@Suppress("EmptyFunctionBlock")
 class DisabledVonageCaptions : VonageCaptions {
 
     override fun init(

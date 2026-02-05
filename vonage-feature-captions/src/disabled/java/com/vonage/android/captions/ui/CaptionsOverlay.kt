@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.vonage.android.kotlin.model.CallFacade
 
+@Suppress("UnusedParameter", "EmptyFunctionBlock")
 @Composable
 fun CaptionsOverlay(
     call: CallFacade,
