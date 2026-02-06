@@ -12,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -22,32 +21,30 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.ui.RecordingIndicator
-import com.vonage.android.audio.ui.rememberAudioDeviceSelector
-import com.vonage.android.audio.ui.toImageVector
 import com.vonage.android.compose.components.VonageTopAppBar
 import com.vonage.android.compose.icons.AudioSelectorIcon
 import com.vonage.android.compose.icons.CameraSwitchIcon
 import com.vonage.android.compose.icons.ShareIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.screen.components.audio.AudioDevicesState
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_AUDIO_SELECTOR_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_CAMERA_SWITCH_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_SHARE_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_TITLE
+import com.vonage.android.screen.components.audio.toImageVector
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun MeetingTopBar(
     roomName: String,
     archivingUiState: ArchivingUiState,
+    audioDevicesState: AudioDevicesState?,
     actions: MeetingRoomActions,
     onToggleAudioDeviceSelector: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val audioDeviceSelector = rememberAudioDeviceSelector(context)
-
-    val activeDevice by audioDeviceSelector.activeDevice.collectAsStateWithLifecycle()
-
     VonageTopAppBar(
         modifier = modifier,
         onBack = actions.onBack,
@@ -91,21 +88,22 @@ fun MeetingTopBar(
                 CameraSwitchIcon()
             }
 
-            IconButton(
-                modifier = Modifier
-                    .testTag(TOP_BAR_AUDIO_SELECTOR_ACTION),
-                onClick = onToggleAudioDeviceSelector,
-            ) {
-                activeDevice?.let {
-                    Icon(
-                        imageVector = it.type.toImageVector(),
-                        contentDescription = null,
-                        tint = VonageVideoTheme.colors.onSurface,
-                        modifier = Modifier.size(24.dp),
-                    )
-                } ?: AudioSelectorIcon(
-                    contentDescription = stringResource(R.string.audio_device_selector_change_audio_output)
-                )
+            audioDevicesState?.let {
+                val activeDevice by audioDevicesState.activeDevice.collectAsStateWithLifecycle()
+                IconButton(
+                    modifier = Modifier
+                        .testTag(TOP_BAR_AUDIO_SELECTOR_ACTION),
+                    onClick = onToggleAudioDeviceSelector,
+                ) {
+                    activeDevice?.let {
+                        Icon(
+                            imageVector = it.type.toImageVector(),
+                            contentDescription = null,
+                            tint = VonageVideoTheme.colors.onSurface,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    } ?: AudioSelectorIcon()
+                }
             }
 
             IconButton(
@@ -135,6 +133,11 @@ internal fun MeetingTopBarPreview() {
         MeetingTopBar(
             roomName = "sample-name",
             archivingUiState = ArchivingUiState.RECORDING,
+            audioDevicesState = AudioDevicesState(
+                availableDevices = MutableStateFlow(persistentListOf()),
+                activeDevice = MutableStateFlow(null),
+                selectDevice = {},
+            ),
             actions = MeetingRoomActions(),
             onToggleAudioDeviceSelector = { },
         )

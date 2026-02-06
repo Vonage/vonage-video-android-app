@@ -5,9 +5,9 @@ import android.os.Build
 import android.util.Log
 import androidx.compose.runtime.Stable
 import com.opentok.android.AudioDeviceManager
+import com.opentok.android.BaseAudioDevice
 import com.opentok.android.Session
 import com.vonage.android.kotlin.internal.PublisherFactory
-import com.vonage.android.kotlin.internal.VeraAudioDevice
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.PublisherConfig
@@ -29,7 +29,7 @@ import com.vonage.android.kotlin.signal.SignalPlugin
 @Stable
 class VonageVideoClient(
     private val context: Context,
-    baseAudioDevice: VeraAudioDevice,
+    baseAudioDevice: BaseAudioDevice,
     private val signalPlugins: List<SignalPlugin>,
     private val publisherFactory: PublisherFactory = PublisherFactory(),
 ) {

@@ -9,6 +9,8 @@ import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherParticipant
+import com.vonage.android.screen.components.audio.AudioDevicesHandler
+import com.vonage.android.screen.components.audio.AudioDevicesState
 import com.vonage.android.util.isValidUserName
 import com.vonage.android.util.sanitizeUserName
 import dagger.assisted.Assisted
@@ -28,6 +30,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     private val getConfig: GetConfig,
     private val userRepository: UserRepository,
     private val videoClient: VonageVideoClient,
+    private val audioDevicesHandler: AudioDevicesHandler,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WaitingRoomUiState(roomName = roomName))
@@ -49,11 +52,13 @@ class WaitingRoomViewModel @AssistedInject constructor(
                             publisher = publisher,
                             allowCameraControl = config.allowCameraControl,
                             allowMicrophoneControl = config.allowMicrophoneControl,
+                            audioDevicesState = audioDevicesHandler.audioDevicesState,
                         )
                     }
                     publisher.setup()
                 }
         }
+        audioDevicesHandler.start()
     }
 
     fun updateUserName(userName: String) {
@@ -131,4 +136,5 @@ data class WaitingRoomUiState(
     val isSuccess: Boolean = false,
     val allowMicrophoneControl: Boolean = true,
     val allowCameraControl: Boolean = true,
+    val audioDevicesState: AudioDevicesState? = null,
 )

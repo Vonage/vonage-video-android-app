@@ -1,4 +1,4 @@
-package com.vonage.android.audio.data.bluetooth
+package com.vonage.audioselector.data.bluetooth
 
 import android.Manifest.permission
 import android.annotation.SuppressLint
@@ -15,16 +15,16 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.media.AudioManager
 import android.os.Build
 import android.util.Log
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class VeraBluetoothManager @Inject constructor(
-    @param:ApplicationContext private val context: Context,
+/**
+ * Manages Bluetooth audio connections and state.
+ * Tracks Bluetooth SCO connections and wired headset presence via broadcast receivers.
+ */
+internal class VeraBluetoothManager(
+    private val context: Context,
     private val audioManager: AudioManager,
     bluetoothManager: BluetoothManager,
 ) {
@@ -214,7 +214,7 @@ class VeraBluetoothManager @Inject constructor(
         Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
                 context.checkSelfPermission(permission.BLUETOOTH_CONNECT) == PERMISSION_GRANTED
 
-    companion object {
+    private companion object {
         const val TAG = "VeraBluetoothManager"
 
         const val HEADSET_PLUG_STATE_KEY = "state"
