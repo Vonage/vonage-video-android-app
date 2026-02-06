@@ -647,7 +647,6 @@ class MeetingRoomScreenViewModelTest {
                     captionsUiState = CaptionsUiState.IDLE,
                 ), awaitItem()
             )
-            verify(exactly = 0) { mockCall.enableCaptions(true) }
         }
     }
 

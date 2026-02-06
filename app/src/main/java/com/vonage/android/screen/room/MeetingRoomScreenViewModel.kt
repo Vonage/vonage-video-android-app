@@ -376,7 +376,8 @@ val noOpCallFacade = object : CallFacade {
     override val emojiSignalState: StateFlow<EmojiState?> = MutableStateFlow(null)
 
     override fun connect(context: Context): Flow<SessionEvent> = flowOf()
-    override fun enableCaptions(enable: Boolean) { /* empty on purpose */ }
+    override fun enableCaptions() { /* empty on purpose */ }
+    override fun disableCaptions() { /* empty on purpose */ }
     override fun pauseSession() { /* empty on purpose */ }
     override fun resumeSession() { /* empty on purpose */ }
     override fun endSession() { /* empty on purpose */ }

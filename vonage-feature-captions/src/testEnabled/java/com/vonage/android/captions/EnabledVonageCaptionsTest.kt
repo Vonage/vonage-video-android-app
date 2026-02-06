@@ -35,7 +35,7 @@ class EnabledVonageCaptionsTest {
         assertTrue(result.isSuccess)
         assertEquals(Unit, result.getOrNull())
         coVerify { captionsRepository.enableCaptions(roomName) }
-        verify { callFacade.enableCaptions(true) }
+        verify { callFacade.enableCaptions() }
     }
 
     @Test
@@ -52,7 +52,7 @@ class EnabledVonageCaptionsTest {
         assertTrue(result.isFailure)
         assertEquals("Network error", result.exceptionOrNull()?.message)
         coVerify { captionsRepository.enableCaptions(roomName) }
-        verify(exactly = 0) { callFacade.enableCaptions(any()) }
+        verify(exactly = 0) { callFacade.enableCaptions() }
     }
 
     @Test
@@ -61,7 +61,6 @@ class EnabledVonageCaptionsTest {
         val captionsId = "captions-789"
 
         coEvery { captionsRepository.enableCaptions(roomName) } returns success(captionsId)
-        coEvery { captionsRepository.disableCaptions(roomName, captionsId) } returns success("")
 
         sut.init(callFacade, roomName, captionsId)
         sut.enable()
@@ -69,8 +68,7 @@ class EnabledVonageCaptionsTest {
 
         assertTrue(result.isSuccess)
         assertEquals(Unit, result.getOrNull())
-        coVerify { captionsRepository.disableCaptions(roomName, captionsId) }
-        verify { callFacade.enableCaptions(false) }
+        verify { callFacade.disableCaptions() }
     }
 
     @Test
@@ -81,26 +79,7 @@ class EnabledVonageCaptionsTest {
         val result = sut.disable()
 
         assertTrue(result.isFailure)
-        coVerify(exactly = 0) { captionsRepository.disableCaptions(any(), any()) }
-        verify(exactly = 0) { callFacade.enableCaptions(any()) }
-    }
-
-    @Test
-    fun `when disable fails then returns failure`() = runTest {
-        val roomName = "test-room"
-        val captionsId = "captions-999"
-        val exception = Exception("API error")
-
-        coEvery { captionsRepository.enableCaptions(roomName) } returns success(captionsId)
-        coEvery { captionsRepository.disableCaptions(roomName, captionsId) } returns failure(exception)
-
-        sut.init(callFacade, roomName, null)
-        sut.enable()
-        val result = sut.disable()
-
-        assertTrue(result.isFailure)
-        assertEquals("API error", result.exceptionOrNull()?.message)
-        verify(exactly = 0) { callFacade.enableCaptions(false) }
+        verify(exactly = 0) { callFacade.disableCaptions() }
     }
 
     @Test
@@ -113,7 +92,6 @@ class EnabledVonageCaptionsTest {
             success(firstCaptionsId),
             success(secondCaptionsId)
         )
-        coEvery { captionsRepository.disableCaptions(roomName, any()) } returns success("")
 
         sut.init(callFacade, roomName, null)
 
@@ -132,14 +110,11 @@ class EnabledVonageCaptionsTest {
         val roomName = "test-room"
         val captionsId = "existing-captions-id"
 
-        coEvery { captionsRepository.disableCaptions(roomName, captionsId) } returns success("")
-
         sut.init(callFacade, roomName, captionsId)
         val result = sut.disable()
 
         assertTrue(result.isSuccess)
-        coVerify { captionsRepository.disableCaptions(roomName, captionsId) }
-        verify { callFacade.enableCaptions(false) }
+        verify { callFacade.disableCaptions() }
     }
 
     @Test
@@ -152,7 +127,6 @@ class EnabledVonageCaptionsTest {
         sut.init(callFacade, roomName, null)
         sut.enable()
 
-        verify { callFacade.enableCaptions(true) }
+        verify { callFacade.enableCaptions() }
     }
-
 }

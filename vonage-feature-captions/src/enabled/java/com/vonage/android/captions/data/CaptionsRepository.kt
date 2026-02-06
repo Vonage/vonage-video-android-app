@@ -1,5 +1,7 @@
 package com.vonage.android.captions.data
 
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import javax.inject.Inject
 
 class CaptionsRepository @Inject constructor(
@@ -17,16 +19,10 @@ class CaptionsRepository @Inject constructor(
                 Result.failure(Exception("Failed enabling captions"))
             }
         }
-
-    suspend fun disableCaptions(roomName: String, captionsId: String): Result<String> =
-        runCatching {
-            val response = apiService.disableCaptions(roomName, captionsId)
-            return if (response.isSuccessful) {
-                response.body()?.let {
-                    Result.success(it.disableResponse)
-                } ?: Result.failure(Exception("Empty response"))
-            } else {
-                Result.failure(Exception("Failed enabling captions"))
-            }
-        }
 }
+
+@JsonClass(generateAdapter = true)
+data class EnableCaptionsResponse(
+    @field:Json(name = "captionsId")
+    val captionsId: String,
+)

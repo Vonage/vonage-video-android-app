@@ -450,15 +450,24 @@ class Call internal constructor(
         }
 
     /**
-     * Enables or disables captions for all participants.
-     *
-     * @param enable True to enable captions, false to disable
+     * Enables captions.
      */
-    override fun enableCaptions(enable: Boolean) {
+    override fun enableCaptions() {
+        setCaptions(true)
+    }
+
+    /**
+     * Disables captions.
+     */
+    override fun disableCaptions() {
+        setCaptions(false)
+    }
+
+    private fun setCaptions(enable: Boolean) {
         coroutineScope.launch {
             publisher()?.publisher?.publishCaptions = enable
-            participants.values.filterIsInstance<ParticipantState>()
-                .forEach { participant -> participant.subscriber.subscribeToCaptions = enable }
+                participants.values.filterIsInstance<ParticipantState>()
+                    .forEach { participant -> participant.subscriber.subscribeToCaptions = enable }
         }
     }
     //endregion

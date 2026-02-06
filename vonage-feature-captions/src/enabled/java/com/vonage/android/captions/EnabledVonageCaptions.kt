@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 class EnabledVonageCaptions @Inject constructor(
     private val captionsRepository: CaptionsRepository,
-): VonageCaptions {
+) : VonageCaptions {
 
     private var call: CallFacade? = null
     private var currentCaptionsId: String? = null
@@ -22,17 +22,14 @@ class EnabledVonageCaptions @Inject constructor(
         captionsRepository.enableCaptions(roomName)
             .map {
                 currentCaptionsId = it
-                call?.enableCaptions(true)
+                call?.enableCaptions()
             }
 
     override suspend fun disable(): Result<Unit> =
-        currentCaptionsId?.let { captionsId ->
-            captionsRepository.disableCaptions(roomName, captionsId)
-                .map {
-                    currentCaptionsId = null
-                    call?.enableCaptions(false)
-                    Unit
-                }
+        currentCaptionsId?.let { _ ->
+            currentCaptionsId = null
+            call?.disableCaptions()
+            Result.success(Unit)
         } ?: Result.failure(Exception("No current captions id"))
 
 }

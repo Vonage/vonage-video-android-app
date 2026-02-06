@@ -9,10 +9,4 @@ interface CaptionsApi {
     @POST("session/{room}/enableCaptions")
     suspend fun enableCaptions(@Path("room") room: String): Response<EnableCaptionsResponse>
 
-    @POST("session/{room}/{captionsId}/disableCaptions")
-    suspend fun disableCaptions(
-        @Path("room") room: String,
-        @Path("captionsId") captionsId: String,
-    ): Response<DisableCaptionsResponse>
-
 }
