@@ -1,21 +1,21 @@
-package com.vonage.android.audio.data
+package com.vonage.audioselector.data
 
 import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioManager
-import com.vonage.android.audio.AudioDeviceSelector.AudioDevice
-import com.vonage.android.audio.AudioDeviceSelector.AudioDeviceType
-import com.vonage.android.audio.data.bluetooth.VeraBluetoothManager
-import com.vonage.android.audio.data.bluetooth.VeraBluetoothManager.BluetoothState
-import com.vonage.android.audio.data.bluetooth.VeraBluetoothManager.WiredState
+import com.vonage.audioselector.AudioDeviceSelector.AudioDevice
+import com.vonage.audioselector.AudioDeviceSelector.AudioDeviceType
+import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager
+import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager.BluetoothState
+import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager.WiredState
 import io.mockk.every
 import io.mockk.mockk
+import junit.framework.TestCase.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments.of
 import org.junit.jupiter.params.provider.MethodSource
-import kotlin.test.assertEquals
 
-class GetDevicesTest {
+internal class GetDevicesTest {
 
     private val context: Context = mockk(relaxed = true)
     private val bluetoothManager: VeraBluetoothManager = mockk()
@@ -36,7 +36,7 @@ class GetDevicesTest {
     ) {
         every { bluetoothManager.bluetoothState } returns bluetoothState
         every { bluetoothManager.wiredState } returns wiredState
-        every { context.packageManager } returns mockk {
+        every { context.packageManager } returns mockk<PackageManager> {
             every { hasSystemFeature(PackageManager.FEATURE_TELEPHONY) } returns hasEarpiece
         }
 

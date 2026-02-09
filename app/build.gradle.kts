@@ -182,6 +182,7 @@ dependencies {
     implementation(project(":vonage-feature-reactions"))
     implementation(project(":vonage-feature-video-effects"))
     implementation(project(":vonage-feature-captions"))
+    implementation(project(":vonage-audio-selector"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -189,11 +190,10 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material3)
     implementation(libs.hilt.android)
     implementation(libs.androidx.navigation.runtime.android)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.hilt.navigation.fragment)
     implementation(libs.retrofit)
@@ -204,11 +204,11 @@ dependencies {
     implementation(libs.androidx.adaptive)
     implementation(libs.androidx.adaptive.layout)
     implementation(libs.androidx.adaptive.navigation)
-    implementation(libs.androidx.material3)
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.material.icons.extended)
     ksp(libs.hilt.android.compiler)
     // InApp Updates
     implementation(libs.app.update)
@@ -219,7 +219,7 @@ dependencies {
     releaseImplementation(libs.firebase.crashlytics.ndk)
     releaseImplementation(libs.firebase.analytics)
 
-    // to be removed when extracting to module all the audio stuff
+    // Vonage Video Android SDK, needed to customize Audio Device
     implementation(libs.opentok.android.sdk)
 
     testImplementation(kotlin("test"))

@@ -26,6 +26,8 @@ import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
+import com.vonage.android.screen.components.audio.AudioDevicesHandler
+import com.vonage.android.screen.components.audio.AudioDevicesState
 import com.vonage.android.screensharing.ScreenSharingServiceListener
 import com.vonage.android.screensharing.VeraScreenSharingManager
 import com.vonage.android.service.VeraForegroundServiceHandler
@@ -60,6 +62,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private val foregroundServiceHandler: VeraForegroundServiceHandler,
     private val activityContextProvider: ActivityContextProvider,
     private val getConfig: GetConfig,
+    private val audioDevicesHandler: AudioDevicesHandler,
 ) : ViewModel() {
 
     private val context: Context
@@ -96,6 +99,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                     allowCameraControl = config.allowCameraControl,
                     allowMicrophoneControl = config.allowMicrophoneControl,
                     allowShowParticipantList = config.allowShowParticipantList,
+                    audioDevicesState = audioDevicesHandler.audioDevicesState,
                 )
             }
             sessionRepository.getSession(roomName)
@@ -122,6 +126,8 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                 }
             }
             .launchIn(viewModelScope)
+
+        audioDevicesHandler.start()
     }
 
     private fun connect(sessionInfo: SessionInfo, roomName: String) {
@@ -194,6 +200,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     fun endCall() {
         foregroundServiceHandler.stopForegroundService()
         screenSharingManager.stopSharingScreen()
+        audioDevicesHandler.stop()
         call?.endSession()
     }
 
@@ -336,6 +343,7 @@ data class MeetingRoomUiState(
     val archivingUiState: ArchivingUiState = ArchivingUiState.IDLE,
     val captionsUiState: CaptionsUiState = CaptionsUiState.IDLE,
     val screenSharingState: ScreenSharingState = ScreenSharingState.IDLE,
+    val audioDevicesState: AudioDevicesState? = null,
     val call: CallFacade = noOpCallFacade,
     val isLoading: Boolean = false,
     val isError: Boolean = false,

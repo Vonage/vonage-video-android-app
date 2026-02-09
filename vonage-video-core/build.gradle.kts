@@ -43,7 +43,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.opentok.android.sdk)
-    implementation(libs.androidx.runtime.android)
+    implementation(libs.androidx.compose.runtime)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
 

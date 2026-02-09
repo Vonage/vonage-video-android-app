@@ -1,4 +1,4 @@
-package com.vonage.android.audio.ui
+package com.vonage.android.screen.components.audio
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,18 +25,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.R
-import com.vonage.android.audio.AudioDeviceSelector.AudioDevice
-import com.vonage.android.audio.AudioDeviceSelector.AudioDeviceType
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.AudioMid
 import com.vonage.android.compose.vivid.icons.solid.Call
 import com.vonage.android.compose.vivid.icons.solid.Headset2
+import com.vonage.audioselector.AudioDeviceSelector.AudioDevice
+import com.vonage.audioselector.AudioDeviceSelector.AudioDeviceType
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
-fun AudioDeviceList(
-    availableDevices: List<AudioDevice>,
+internal fun AudioDeviceList(
+    availableDevices: ImmutableList<AudioDevice>,
     activeDevice: AudioDevice?,
     selectDevice: (AudioDevice) -> Unit,
     modifier: Modifier = Modifier,
@@ -107,7 +109,10 @@ private fun AudioDeviceCell(
                     )
                 },
             )
-            .padding(vertical = VonageVideoTheme.dimens.paddingSmall, horizontal = VonageVideoTheme.dimens.paddingDefault),
+            .padding(
+                vertical = VonageVideoTheme.dimens.paddingSmall,
+                horizontal = VonageVideoTheme.dimens.paddingDefault
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(
             space = VonageVideoTheme.dimens.spaceSmall,
@@ -155,7 +160,7 @@ internal fun AudioDeviceListPreview() {
     VonageVideoTheme {
         AudioDeviceList(
             modifier = Modifier.background(VonageVideoTheme.colors.surface),
-            availableDevices = listOf(
+            availableDevices = persistentListOf(
                 AudioDevice(1, AudioDeviceType.BLUETOOTH),
                 AudioDevice(2, AudioDeviceType.EARPIECE),
                 AudioDevice(3, AudioDeviceType.SPEAKER),

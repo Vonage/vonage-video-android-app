@@ -1,5 +1,11 @@
 # Audio Device Selector
 
+This module includes two tools:
+- `AudioDeviceSelector` to make easier to choose between different Android audio outputs
+- `VeraAudioDevice` is a Vonage `AudioDevice` class to override default behavior in Vonage Video SDK
+
+`VeraAudioDevice` is needed to allow `AudioDeviceSelector` to switch between different audio outputs.
+
 ## How it works
 Supports 4 types of device output
 - Bluetooth headset devices
@@ -8,7 +14,7 @@ Supports 4 types of device output
 - Speaker
 
 ## Expected behavior
-Note: Currently the audio device priority queue is fixed as: `BLUETOOTH -> WIRED_HEADSET -> EARPIECE -> SPEAKER`
+Note: Currently the audio device priority queue is fixed as: `BLUETOOTH -> WIRED_HEADSET -> SPEAKER -> EARPIECE`
 
 - Bluetooth enabled -> enter to meeting room
   - Audio goes to Bluetooth
