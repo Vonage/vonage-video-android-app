@@ -6,12 +6,11 @@ import com.vonage.android.kotlin.model.CallFacade
 
 interface VonageScreenSharing {
 
-    fun bind(call: CallFacade)
-
     fun startScreenSharing(
         intent: Intent,
+        call: CallFacade,
         onStarted: () -> Unit,
-        onStopped: () -> Unit
+        onStopped: () -> Unit,
     )
 
     fun stopSharingScreen()

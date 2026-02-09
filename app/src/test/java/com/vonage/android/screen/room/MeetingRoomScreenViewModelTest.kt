@@ -2,7 +2,6 @@ package com.vonage.android.screen.room
 
 import android.content.Context
 import android.content.Intent
-import android.media.projection.MediaProjection
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
 import com.vonage.android.archiving.ArchiveId
@@ -21,8 +20,8 @@ import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
 import com.vonage.android.screen.components.audio.AudioDevicesState
-import com.vonage.android.screensharing.ScreenSharingServiceListener
-import com.vonage.android.screensharing.EnabledScreenSharing
+import com.vonage.android.screensharing.ScreenSharingState
+import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.service.VeraForegroundServiceHandler
 import com.vonage.android.util.ActivityContextProvider
 import io.mockk.coEvery
@@ -52,7 +51,7 @@ class MeetingRoomScreenViewModelTest {
     private val sessionRepository: SessionRepository = mockk()
     private val vonageArchiving: VonageArchiving = mockk(relaxed = true)
     private val vonageCaptions: VonageCaptions = mockk(relaxed = true)
-    private val screenSharingManager: VeraScreenSharingManager = mockk()
+    private val vonageScreenSharing: VonageScreenSharing = mockk(relaxed = true)
     private val videoClient: VonageVideoClient = mockk()
     private val getConfig: GetConfig = mockk()
     private val audioDevicesStateMock: AudioDevicesState = mockk()
@@ -73,7 +72,7 @@ class MeetingRoomScreenViewModelTest {
             roomName = ANY_ROOM_NAME,
             sessionRepository = sessionRepository,
             vonageArchiving = vonageArchiving,
-            screenSharingManager = screenSharingManager,
+            vonageScreenSharing = vonageScreenSharing,
             vonageCaptions = vonageCaptions,
             videoClient = videoClient,
             foregroundServiceHandler = foregroundServiceHandler,
@@ -174,7 +173,7 @@ class MeetingRoomScreenViewModelTest {
     @Test
     fun `given viewmodel when endCall then delegate to call`() = runTest {
         val mockCall = givenMockCall()
-        every { screenSharingManager.stopSharingScreen() } returns Unit
+        every { vonageScreenSharing.stopSharingScreen() } returns Unit
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
@@ -187,7 +186,7 @@ class MeetingRoomScreenViewModelTest {
             awaitItem()
             sut.endCall()
             verify { mockCall.endSession() }
-            verify { screenSharingManager.stopSharingScreen() }
+            verify { vonageScreenSharing.stopSharingScreen() }
         }
     }
 
@@ -316,7 +315,7 @@ class MeetingRoomScreenViewModelTest {
 
     @Test
     fun `given viewmodel when archiveCall false then emit correct state`() = runTest {
-        val mockCall = givenMockCall()
+        givenMockCall()
         coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(ArchiveId("archiveId"))
         coEvery { vonageArchiving.stopArchive(ANY_ROOM_NAME) } returns success(true)
 
@@ -389,12 +388,16 @@ class MeetingRoomScreenViewModelTest {
     @Test
     fun `given viewmodel when startScreenSharing started then emit correct state`() = runTest {
         val mockCall = givenMockCall()
-        val mediaProjection: MediaProjection = mockk(relaxed = true)
         val mockIntent: Intent = mockk(relaxed = true)
-        val listenerSpy = slot<ScreenSharingServiceListener>()
+        val onStartSlot = slot<() -> Unit>()
+        val onStopSlot = slot<() -> Unit>()
+
         every {
-            screenSharingManager.startScreenSharing(
-                mockIntent, capture<ScreenSharingServiceListener>(listenerSpy)
+            vonageScreenSharing.startScreenSharing(
+                intent = mockIntent,
+                call = mockCall,
+                onStarted = capture(onStartSlot),
+                onStopped = capture(onStopSlot),
             )
         } returns Unit
 
@@ -409,10 +412,9 @@ class MeetingRoomScreenViewModelTest {
             assertEquals(ScreenSharingState.IDLE, awaitItem().screenSharingState)
             sut.startScreenSharing(mockIntent)
             assertEquals(ScreenSharingState.STARTING, awaitItem().screenSharingState)
-            listenerSpy.captured.onStarted(mediaProjection)
-            testScheduler.advanceUntilIdle()  // Ensure callback processing completes
+            onStartSlot.captured.invoke()
             assertEquals(ScreenSharingState.SHARING, awaitItem().screenSharingState)
-            verify { mockCall.startCapturingScreen(mediaProjection) }
+            verify { vonageScreenSharing.startScreenSharing(mockIntent, mockCall, any(), any()) }
         }
     }
 
@@ -420,10 +422,15 @@ class MeetingRoomScreenViewModelTest {
     fun `given viewmodel when startScreenSharing stopped then emit correct state`() = runTest {
         val mockCall = givenMockCall()
         val mockIntent: Intent = mockk(relaxed = true)
-        val listenerSpy = slot<ScreenSharingServiceListener>()
+        val onStartSlot = slot<() -> Unit>()
+        val onStopSlot = slot<() -> Unit>()
+
         every {
-            screenSharingManager.startScreenSharing(
-                mockIntent, capture<ScreenSharingServiceListener>(listenerSpy)
+            vonageScreenSharing.startScreenSharing(
+                intent = mockIntent,
+                call = mockCall,
+                onStarted = capture(onStartSlot),
+                onStopped = capture(onStopSlot),
             )
         } returns Unit
 
@@ -438,17 +445,15 @@ class MeetingRoomScreenViewModelTest {
             assertEquals(ScreenSharingState.IDLE, awaitItem().screenSharingState)
             sut.startScreenSharing(mockIntent)
             assertEquals(ScreenSharingState.STARTING, awaitItem().screenSharingState)
-            listenerSpy.captured.onStopped()
-            testScheduler.advanceUntilIdle()  // Ensure callback processing completes
+            onStopSlot.captured.invoke()
             assertEquals(ScreenSharingState.IDLE, awaitItem().screenSharingState)
-            verify { mockCall.stopCapturingScreen() }
         }
     }
 
     @Test
     fun `given viewmodel when stopScreenSharing stopped then emit correct state`() = runTest {
         givenMockCall()
-        every { screenSharingManager.stopSharingScreen() } returns Unit
+        every { vonageScreenSharing.stopSharingScreen() } returns Unit
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
@@ -461,7 +466,7 @@ class MeetingRoomScreenViewModelTest {
             assertEquals(ScreenSharingState.IDLE, awaitItem().screenSharingState)
             sut.stopScreenSharing()
             assertEquals(ScreenSharingState.STOPPING, awaitItem().screenSharingState)
-            verify { screenSharingManager.stopSharingScreen() }
+            verify { vonageScreenSharing.stopSharingScreen() }
         }
     }
 

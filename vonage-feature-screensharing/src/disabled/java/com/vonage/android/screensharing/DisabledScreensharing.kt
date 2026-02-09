@@ -9,17 +9,15 @@ class DisabledScreensharing : VonageScreenSharing {
 
     override fun startScreenSharing(
         intent: Intent,
-        onStarted: (MediaProjection) -> Unit,
+        call: CallFacade,
+        onStarted: () -> Unit,
         onStopped: () -> Unit
     ) {
-
     }
 
     override fun stopSharingScreen() {
-
     }
 
     override fun createNotificationChannel(manager: NotificationManager) {
-
     }
 }

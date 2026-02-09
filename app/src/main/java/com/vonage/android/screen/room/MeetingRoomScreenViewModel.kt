@@ -57,8 +57,8 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private val sessionRepository: SessionRepository,
     private val vonageArchiving: VonageArchiving,
     private val vonageCaptions: VonageCaptions,
-    private val videoClient: VonageVideoClient,
     private val vonageScreenSharing: VonageScreenSharing,
+    private val videoClient: VonageVideoClient,
     private val foregroundServiceHandler: VeraForegroundServiceHandler,
     private val activityContextProvider: ActivityContextProvider,
     private val getConfig: GetConfig,
@@ -141,7 +141,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             listenRemoteArchiving()
             call?.let { call ->
                 vonageCaptions.init(call, roomName, sessionInfo.captionsId)
-                vonageScreenSharing.bind(call)
                 // Update UI state after call is properly initialized
                 _uiState.update { uiState ->
                     uiState.copy(
@@ -302,11 +301,14 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     //region Screensharing
     fun startScreenSharing(intent: Intent) {
         _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.STARTING) }
-        vonageScreenSharing.startScreenSharing(
-            intent = intent,
-            onStarted = { _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.SHARING) } },
-            onStopped = { _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.IDLE) } },
-        )
+        call?.let {
+            vonageScreenSharing.startScreenSharing(
+                call = it,
+                intent = intent,
+                onStarted = { _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.SHARING) } },
+                onStopped = { _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.IDLE) } },
+            )
+        }
     }
 
     fun stopScreenSharing() {

@@ -28,17 +28,15 @@ class EnabledScreenSharing(
     private var currentMediaProjection: MediaProjection? = null
     private var screenSharingServiceConnection: ServiceConnection? = null
 
-    private lateinit var call: CallFacade
-
-    override fun bind(call: CallFacade) {
-        this.call = call
-    }
+    private var call: CallFacade? = null
 
     override fun startScreenSharing(
         intent: Intent,
+        call: CallFacade,
         onStarted: () -> Unit,
         onStopped: () -> Unit
     ) {
+        this.call = call
         val mediaProjectionCallback = object : MediaProjection.Callback() {
             override fun onStop() {
                 super.onStop()
@@ -84,8 +82,9 @@ class EnabledScreenSharing(
             screenSharingServiceConnection = null
         }
         context.stopService(serviceIntent)
-        call.stopCapturingScreen()
+        call?.stopCapturingScreen()
         currentMediaProjection = null
+        call = null
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

@@ -39,8 +39,6 @@ android {
     }
 }
 
-val enabledImplementation by configurations
-
 dependencies {
     implementation(project(":vonage-video-ui-compose"))
     implementation(project(":vonage-video-core"))
@@ -53,10 +51,6 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.tooling.preview)
-
-    enabledImplementation(libs.retrofit)
-    enabledImplementation(libs.okhttp)
-    enabledImplementation(libs.moshi.kotlin)
 
     ksp(libs.hilt.android.compiler)
 
