@@ -1,7 +1,9 @@
 package com.vonage.android.compose.components.bottombar
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.vector.ImageVector
 
+@Stable
 data class BottomBarAction(
     val type: BottomBarActionType,
     val icon: ImageVector,

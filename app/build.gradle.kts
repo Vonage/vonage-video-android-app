@@ -63,6 +63,11 @@ android {
         buildConfigField("boolean", "FEATURE_ARCHIVING_ENABLED", "$archivingProperty")
         missingDimensionStrategy("archiving", archivingProperty.toEnabledString())
 
+        // Captions feature
+        val captionsProperty = configProps.getProperty("vonage.meetingRoom.allow_captions", "true")
+        buildConfigField("boolean", "FEATURE_CAPTIONS_ENABLED", "$captionsProperty")
+        missingDimensionStrategy("captions", captionsProperty.toEnabledString())
+
         // Background (video) effects feature
         val videoFxProperty = configProps.getProperty("vonage.video.allow_background_effects", "true")
         buildConfigField("boolean", "FEATURE_VIDEO_EFFECTS_ENABLED", "$videoFxProperty")
@@ -176,6 +181,7 @@ dependencies {
     implementation(project(":vonage-feature-archiving"))
     implementation(project(":vonage-feature-reactions"))
     implementation(project(":vonage-feature-video-effects"))
+    implementation(project(":vonage-feature-captions"))
     implementation(project(":vonage-audio-selector"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
