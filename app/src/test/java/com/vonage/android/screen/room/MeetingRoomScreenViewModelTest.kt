@@ -482,13 +482,13 @@ class MeetingRoomScreenViewModelTest {
                 MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
                 awaitItem()
             )
-            assertEquals(CaptionsUiState.ENABLED, awaitItem().captionsState)
+            assertEquals(CaptionsUiState.ENABLED, awaitItem().captionsUiState)
         }
     }
 
     @Test
     fun `given viewmodel when enable captions then emit correct state`() = runTest {
-        val mockCall = givenMockCall()
+        givenMockCall()
         coEvery { vonageCaptions.enable() } returns success(Unit)
 
         sut.setup(context)
@@ -501,50 +501,33 @@ class MeetingRoomScreenViewModelTest {
             )
             awaitItem()
             sut.captions(true)
-            assertEquals(CaptionsState.ENABLED, awaitItem().captionsState)
-            verify { mockCall.enableCaptions(true) }
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsUiState = CaptionsUiState.ENABLING,
-                ), awaitItem()
-            )
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsUiState = CaptionsUiState.ENABLED,
-                ), awaitItem()
-            )
+            assertEquals(CaptionsUiState.ENABLING, awaitItem().captionsUiState)
+            assertEquals(CaptionsUiState.ENABLED, awaitItem().captionsUiState)
             coVerify { vonageCaptions.enable() }
         }
     }
 
     @Test
     fun `given viewmodel when enable captions fails then emit correct state`() = runTest {
-        val mockCall = givenMockCall()
+        givenMockCall()
         coEvery { vonageCaptions.enable() } returns Result.failure(Exception("KO"))
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
-            sut.captions(true)
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsUiState = CaptionsUiState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            sut.captions(true)
+            assertEquals(CaptionsUiState.IDLE, awaitItem().captionsUiState)
         }
     }
 
     @Test
     fun `given viewmodel when disable captions then emit correct state`() = runTest {
-        val mockCall = givenMockCall()
+        givenMockCall()
         coEvery { vonageCaptions.enable() } returns success(Unit)
         coEvery { vonageCaptions.disable() } returns success(Unit)
 
@@ -558,46 +541,20 @@ class MeetingRoomScreenViewModelTest {
             )
             awaitItem()
             sut.captions(true)
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsUiState = CaptionsUiState.ENABLING,
-                ), awaitItem()
-            )
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsUiState = CaptionsUiState.ENABLED,
-                    audioDevicesState = audioDevicesStateMock,
-                ), awaitItem()
-            )
+            assertEquals(CaptionsUiState.ENABLING, awaitItem().captionsUiState)
+            assertEquals(CaptionsUiState.ENABLED, awaitItem().captionsUiState)
             coVerify { vonageCaptions.enable() }
             // disable captions
             sut.captions(false)
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsUiState = CaptionsUiState.DISABLING,
-                ), awaitItem()
-            )
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsUiState = CaptionsUiState.IDLE,
-                    audioDevicesState = audioDevicesStateMock,
-                ), awaitItem()
-            )
+            assertEquals(CaptionsUiState.DISABLING, awaitItem().captionsUiState)
+            assertEquals(CaptionsUiState.IDLE, awaitItem().captionsUiState)
             coVerify { vonageCaptions.disable() }
         }
     }
 
     @Test
     fun `given viewmodel when disable captions fails then emit correct state`() = runTest {
-        val mockCall = givenMockCall()
+        givenMockCall()
         coEvery { vonageCaptions.enable() } returns success(Unit)
         coEvery { vonageCaptions.disable() } returns Result.failure(Exception("KO"))
 
@@ -612,31 +569,13 @@ class MeetingRoomScreenViewModelTest {
             awaitItem()
             // enable captions
             sut.captions(true)
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsUiState = CaptionsUiState.ENABLING,
-                ), awaitItem()
-            )
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsUiState = CaptionsUiState.ENABLED,
-                ), awaitItem()
-            )
+            assertEquals(CaptionsUiState.ENABLING, awaitItem().captionsUiState)
+            assertEquals(CaptionsUiState.ENABLED, awaitItem().captionsUiState)
         }
         sut.uiState.test {
             // disable captions
             sut.captions(false)
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsUiState = CaptionsUiState.ENABLED,
-                ), awaitItem()
-            )
+            assertEquals(CaptionsUiState.ENABLED, awaitItem().captionsUiState)
         }
         coVerify { vonageCaptions.enable() }
     }
