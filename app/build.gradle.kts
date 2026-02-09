@@ -63,6 +63,11 @@ android {
         buildConfigField("boolean", "FEATURE_ARCHIVING_ENABLED", "$archivingProperty")
         missingDimensionStrategy("archiving", archivingProperty.toEnabledString())
 
+        // Captions feature
+        val captionsProperty = configProps.getProperty("vonage.meetingRoom.allow_captions", "true")
+        buildConfigField("boolean", "FEATURE_CAPTIONS_ENABLED", "$captionsProperty")
+        missingDimensionStrategy("captions", captionsProperty.toEnabledString())
+
         // Screensharing feature
         val screenSharingProperty = configProps.getProperty("vonage.meetingRoom.allow_screen_share", "true")
         buildConfigField("boolean", "FEATURE_SCREENSHARING_ENABLED", "$screenSharingProperty")
@@ -182,6 +187,7 @@ dependencies {
     implementation(project(":vonage-feature-screensharing"))
     implementation(project(":vonage-feature-reactions"))
     implementation(project(":vonage-feature-video-effects"))
+    implementation(project(":vonage-feature-captions"))
     implementation(project(":vonage-audio-selector"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

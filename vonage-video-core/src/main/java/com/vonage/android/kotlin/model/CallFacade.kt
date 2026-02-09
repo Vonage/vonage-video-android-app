@@ -81,7 +81,8 @@ interface PublisherFacade {
 
 interface SessionFacade {
     fun connect(context: Context): Flow<SessionEvent>
-    fun enableCaptions(enable: Boolean)
+    fun enableCaptions()
+    fun disableCaptions()
     fun pauseSession()
     fun resumeSession()
     fun endSession()

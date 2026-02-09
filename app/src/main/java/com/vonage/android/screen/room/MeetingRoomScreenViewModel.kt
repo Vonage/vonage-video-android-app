@@ -8,8 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.VonageArchiving
+import com.vonage.android.captions.CaptionsUiState
+import com.vonage.android.captions.VonageCaptions
 import com.vonage.android.config.GetConfig
-import com.vonage.android.data.CaptionsRepository
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
@@ -55,7 +56,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
     private val sessionRepository: SessionRepository,
     private val vonageArchiving: VonageArchiving,
-    private val captionsRepository: CaptionsRepository,
+    private val vonageCaptions: VonageCaptions,
     private val videoClient: VonageVideoClient,
     private val vonageScreenSharing: VonageScreenSharing,
     private val foregroundServiceHandler: VeraForegroundServiceHandler,
@@ -80,7 +81,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     )
 
     private var call: CallFacade? = null
-    private var currentCaptionsId: String? = null
 
     init {
         foregroundServiceHandler
@@ -104,7 +104,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             }
             sessionRepository.getSession(roomName)
                 .onSuccess { sessionInfo ->
-                    onSessionCreated(
+                    connect(
                         roomName = roomName,
                         sessionInfo = sessionInfo,
                     )
@@ -130,14 +130,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         audioDevicesHandler.start()
     }
 
-    private fun onSessionCreated(
-        roomName: String,
-        sessionInfo: SessionInfo,
-    ) {
-        currentCaptionsId = sessionInfo.captionsId
-        connect(sessionInfo, roomName)
-    }
-
     private fun connect(sessionInfo: SessionInfo, roomName: String) {
         viewModelScope.launch {
             videoClient.buildPublisher(context)
@@ -148,6 +140,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             )
             listenRemoteArchiving()
             call?.let { call ->
+                vonageCaptions.init(call, roomName, sessionInfo.captionsId)
                 vonageScreenSharing.bind(call)
                 // Update UI state after call is properly initialized
                 _uiState.update { uiState ->
@@ -155,10 +148,10 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                         roomName = roomName,
                         call = call,
                         archivingUiState = ArchivingUiState.IDLE,
-                        captionsState = if (sessionInfo.captionsId.isNullOrBlank()) {
-                            CaptionsState.IDLE
+                        captionsUiState = if (sessionInfo.captionsId.isNullOrBlank()) {
+                            CaptionsUiState.IDLE
                         } else {
-                            CaptionsState.ENABLED
+                            CaptionsUiState.ENABLED
                         },
                         isLoading = false,
                         isError = false,
@@ -285,43 +278,26 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     }
     //endregion
 
+    //region Captions
     fun captions(enable: Boolean) {
+        if (enable) {
+            _uiState.update { uiState -> uiState.copy(captionsUiState = CaptionsUiState.ENABLING) }
+        } else {
+            _uiState.update { uiState -> uiState.copy(captionsUiState = CaptionsUiState.DISABLING) }
+        }
         viewModelScope.launch {
             if (enable) {
-                enableCaptions()
+                vonageCaptions.enable()
+                    .onSuccess { _uiState.update { uiState -> uiState.copy(captionsUiState = CaptionsUiState.ENABLED) } }
+                    .onFailure { _uiState.update { uiState -> uiState.copy(captionsUiState = CaptionsUiState.IDLE) } }
             } else {
-                disableCaptions()
+                vonageCaptions.disable()
+                    .onSuccess { _uiState.update { uiState -> uiState.copy(captionsUiState = CaptionsUiState.IDLE) } }
+                    .onFailure { _uiState.update { uiState -> uiState.copy(captionsUiState = CaptionsUiState.ENABLED) } }
             }
         }
     }
-
-    private suspend fun enableCaptions() {
-        _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.ENABLING) }
-        captionsRepository.enableCaptions(roomName)
-            .onSuccess {
-                currentCaptionsId = it
-                call?.enableCaptions(true)
-                _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.ENABLED) }
-            }
-            .onFailure {
-                _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.IDLE) }
-            }
-    }
-
-    private suspend fun disableCaptions() {
-        _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.DISABLING) }
-        currentCaptionsId?.let {
-            captionsRepository.disableCaptions(roomName, it)
-                .onSuccess {
-                    currentCaptionsId = null
-                    call?.enableCaptions(false)
-                    _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.IDLE) }
-                }
-                .onFailure {
-                    _uiState.update { uiState -> uiState.copy(captionsState = CaptionsState.ENABLED) }
-                }
-        }
-    }
+    //endregion
 
     //region Screensharing
     fun startScreenSharing(intent: Intent) {
@@ -362,7 +338,7 @@ fun interface MeetingRoomViewModelFactory {
 data class MeetingRoomUiState(
     val roomName: String,
     val archivingUiState: ArchivingUiState = ArchivingUiState.IDLE,
-    val captionsState: CaptionsState = CaptionsState.IDLE,
+    val captionsUiState: CaptionsUiState = CaptionsUiState.IDLE,
     val screenSharingState: ScreenSharingState = ScreenSharingState.IDLE,
     val audioDevicesState: AudioDevicesState? = null,
     val call: CallFacade = noOpCallFacade,
@@ -382,13 +358,6 @@ enum class CallLayoutType {
     ADAPTIVE_GRID,
 }
 
-enum class CaptionsState {
-    IDLE,
-    ENABLING,
-    ENABLED,
-    DISABLING,
-}
-
 @Suppress("EmptyFunctionBlock")
 val noOpCallFacade = object : CallFacade {
     override fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>) {}
@@ -405,7 +374,8 @@ val noOpCallFacade = object : CallFacade {
     override val emojiSignalState: StateFlow<EmojiState?> = MutableStateFlow(null)
 
     override fun connect(context: Context): Flow<SessionEvent> = flowOf()
-    override fun enableCaptions(enable: Boolean) { /* empty on purpose */ }
+    override fun enableCaptions() { /* empty on purpose */ }
+    override fun disableCaptions() { /* empty on purpose */ }
     override fun pauseSession() { /* empty on purpose */ }
     override fun resumeSession() { /* empty on purpose */ }
     override fun endSession() { /* empty on purpose */ }
