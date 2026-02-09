@@ -1,69 +1,68 @@
-# Vonage Feature Archiving
+# Vonage Feature Screensharing
 
-This module provides call recording and archiving functionality for Vonage video sessions.
+This module provides screen sharing functionality for Vonage video sessions.
 
 ## Overview
 
-The archiving feature allows you to record video call sessions and manage their lifecycle. This module handles:
+The screensharing feature allows participants to share their device screen during a video call. This module handles:
 
-- Starting and stopping archive recordings
-- Monitoring archiving state changes
-- Managing archive IDs for active sessions
+- Starting and stopping screen sharing
+- Managing media projection permissions
+- Handling foreground service for screen capture
+- Managing screen sharing state transitions
+- Notification channel creation for screen sharing service
 
 ## Key Components
 
-- **VonageArchiving**: Interface for managing archiving operations (start, stop, bind, retrieve)
-- **ArchiveRepository**: Data layer for interacting with archiving backend
-- **ArchivingState**: States include `Idle`, `Started`, and `Stopped`
-- **ArchivingUiState**: UI states for recording flow (`IDLE`, `STARTING`, `RECORDING`, `STOPPING`)
-- **Archive**: Model representing a recorded session with metadata
-- **ArchiveId**: Unique identifier for active or completed archives
+- **VonageScreenSharing**: Interface for managing screen sharing operations (bind, start, stop, notifications)
+- **ScreenSharingService**: Foreground service that handles the screen capture lifecycle
+- **ScreenSharingState**: States include `IDLE`, `STARTING`, `SHARING`, and `STOPPING`
+- **screenSharingAction**: Composable UI component for bottom bar integration
+- **MediaProjectionManager**: Android system service for capturing screen content
 
 ## Usage
 
 ```kotlin
-// Inject VonageArchiving
-@Inject lateinit var vonageArchiving: VonageArchiving
+// Inject VonageScreenSharing
+@Inject lateinit var vonageScreenSharing: VonageScreenSharing
 
-// Bind to a call to listen for archiving state changes
-vonageArchiving.bind(call)
-    .onEach { state ->
-        when (state) {
-            is ArchivingState.Started -> // Handle recording started
-            is ArchivingState.Stopped -> // Handle recording stopped
-            is ArchivingState.Idle -> // Handle idle state
-        }
-    }
-    .collect()
+// Bind to a call
+vonageScreenSharing.bind(call)
 
-// Start recording
-vonageArchiving.startArchive(roomName)
-    .onSuccess { archiveId -> 
-        // Recording started successfully
-    }
-    .onFailure { error ->
-        // Handle error
-    }
+// Create notification channel (required for Android O+)
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    vonageScreenSharing.createNotificationChannel(notificationManager)
+}
 
-// Stop recording
-vonageArchiving.stopArchive(roomName)
-    .onSuccess {
-        // Recording stopped successfully
+// Start screen sharing with MediaProjection intent
+// (obtained from MediaProjectionManager.createScreenCaptureIntent())
+vonageScreenSharing.startScreenSharing(
+    intent = mediaProjectionIntent,
+    onStarted = {
+        // Screen sharing started successfully
+    },
+    onStopped = {
+        // Screen sharing stopped
     }
-    .onFailure { error ->
-        // Handle error
-    }
+)
 
-// Retrieve past recordings
-vonageArchiving.getRecordings(roomName)
-    .onSuccess { archives ->
-        archives.forEach { archive ->
-            // Display or process archive
-        }
-    }
-    .onFailure { error ->
-        // Handle error
-    }
+// Stop screen sharing
+vonageScreenSharing.stopSharingScreen()
+```
+
+## UI Integration
+
+The module provides a Compose UI action for bottom bar integration:
+
+```kotlin
+val action = screenSharingAction(
+    onStartScreenSharing = { /* Request media projection */ },
+    onStopScreenSharing = { vonageScreenSharing.stopSharingScreen() },
+    startScreenSharingLabel = "Share Screen",
+    stopScreenSharingLabel = "Stop Sharing",
+    screenSharingState = currentState
+)
 ```
 
 ## Build Variants
