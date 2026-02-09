@@ -21,7 +21,7 @@ import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallActi
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
 import com.vonage.android.screen.components.audio.AudioDevicesState
 import com.vonage.android.screensharing.ScreenSharingServiceListener
-import com.vonage.android.screensharing.VeraScreenSharingManager
+import com.vonage.android.screensharing.EnabledScreenSharing
 import com.vonage.android.service.VeraForegroundServiceHandler
 import com.vonage.android.util.ActivityContextProvider
 import io.mockk.coEvery
@@ -51,7 +51,7 @@ class MeetingRoomScreenViewModelTest {
     private val sessionRepository: SessionRepository = mockk()
     private val vonageArchiving: VonageArchiving = mockk(relaxed = true)
     private val captionsRepository: CaptionsRepository = mockk()
-    private val screenSharingManager: VeraScreenSharingManager = mockk()
+    private val screenSharingManager: EnabledScreenSharing = mockk()
     private val videoClient: VonageVideoClient = mockk()
     private val getConfig: GetConfig = mockk()
     private val audioDevicesStateMock: AudioDevicesState = mockk()
@@ -72,7 +72,7 @@ class MeetingRoomScreenViewModelTest {
             roomName = ANY_ROOM_NAME,
             sessionRepository = sessionRepository,
             vonageArchiving = vonageArchiving,
-            screenSharingManager = screenSharingManager,
+            vonageScreenSharing = screenSharingManager,
             captionsRepository = captionsRepository,
             videoClient = videoClient,
             foregroundServiceHandler = foregroundServiceHandler,

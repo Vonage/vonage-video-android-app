@@ -27,8 +27,8 @@ import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
 import com.vonage.android.screen.components.audio.AudioDevicesState
-import com.vonage.android.screensharing.ScreenSharingServiceListener
-import com.vonage.android.screensharing.VeraScreenSharingManager
+import com.vonage.android.screensharing.ScreenSharingState
+import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.service.VeraForegroundServiceHandler
 import com.vonage.android.util.ActivityContextProvider
 import dagger.assisted.Assisted
@@ -57,7 +57,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private val vonageArchiving: VonageArchiving,
     private val captionsRepository: CaptionsRepository,
     private val videoClient: VonageVideoClient,
-    private val screenSharingManager: VeraScreenSharingManager,
+    private val vonageScreenSharing: VonageScreenSharing,
     private val foregroundServiceHandler: VeraForegroundServiceHandler,
     private val activityContextProvider: ActivityContextProvider,
     private val getConfig: GetConfig,
@@ -93,13 +93,15 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
         viewModelScope.launch {
             val config = getConfig()
-            _uiState.update { uiState -> uiState.copy(
-                isLoading = true,
-                allowCameraControl = config.allowCameraControl,
-                allowMicrophoneControl = config.allowMicrophoneControl,
-                allowShowParticipantList = config.allowShowParticipantList,
-                audioDevicesState = audioDevicesHandler.audioDevicesState,
-            ) }
+            _uiState.update { uiState ->
+                uiState.copy(
+                    isLoading = true,
+                    allowCameraControl = config.allowCameraControl,
+                    allowMicrophoneControl = config.allowMicrophoneControl,
+                    allowShowParticipantList = config.allowShowParticipantList,
+                    audioDevicesState = audioDevicesHandler.audioDevicesState,
+                )
+            }
             sessionRepository.getSession(roomName)
                 .onSuccess { sessionInfo ->
                     onSessionCreated(
@@ -146,6 +148,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             )
             listenRemoteArchiving()
             call?.let { call ->
+                vonageScreenSharing.bind(call)
                 // Update UI state after call is properly initialized
                 _uiState.update { uiState ->
                     uiState.copy(
@@ -204,7 +207,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
     fun endCall() {
         foregroundServiceHandler.stopForegroundService()
-        screenSharingManager.stopSharingScreen()
+        vonageScreenSharing.stopSharingScreen()
         audioDevicesHandler.stop()
         call?.endSession()
     }
@@ -320,25 +323,21 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         }
     }
 
-    fun startScreenSharing(data: Intent) {
+    //region Screensharing
+    fun startScreenSharing(intent: Intent) {
         _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.STARTING) }
-        screenSharingManager.startScreenSharing(data, object : ScreenSharingServiceListener {
-            override fun onStarted(mediaProjection: MediaProjection) {
-                call?.startCapturingScreen(mediaProjection)
-                _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.SHARING) }
-            }
-
-            override fun onStopped() {
-                call?.stopCapturingScreen()
-                _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.IDLE) }
-            }
-        })
+        vonageScreenSharing.startScreenSharing(
+            intent = intent,
+            onStarted = { _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.SHARING) } },
+            onStopped = { _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.IDLE) } },
+        )
     }
 
     fun stopScreenSharing() {
         _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.STOPPING) }
-        screenSharingManager.stopSharingScreen()
+        vonageScreenSharing.stopSharingScreen()
     }
+    //endregion
 
     fun changeLayout(layoutType: CallLayoutType) {
         _uiState.update { uiState -> uiState.copy(layoutType = layoutType) }
@@ -388,13 +387,6 @@ enum class CaptionsState {
     ENABLING,
     ENABLED,
     DISABLING,
-}
-
-enum class ScreenSharingState {
-    IDLE,
-    STARTING,
-    SHARING,
-    STOPPING,
 }
 
 @Suppress("EmptyFunctionBlock")

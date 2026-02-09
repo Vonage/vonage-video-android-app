@@ -1,25 +1,25 @@
 package com.vonage.android.screensharing.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.vonage.android.R
-import com.vonage.android.compose.vivid.icons.VividIcons
-import com.vonage.android.compose.vivid.icons.solid.ScreenShareOff
-import com.vonage.android.compose.vivid.icons.solid.ScreenShare
-import com.vonage.android.screen.room.MeetingRoomActions
-import com.vonage.android.screen.room.ScreenSharingState
-import com.vonage.android.screen.room.ScreenSharingState.IDLE
-import com.vonage.android.screen.room.ScreenSharingState.SHARING
-import com.vonage.android.screen.room.ScreenSharingState.STARTING
-import com.vonage.android.screen.room.ScreenSharingState.STOPPING
 import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.ScreenShare
+import com.vonage.android.compose.vivid.icons.solid.ScreenShareOff
+import com.vonage.android.screensharing.ScreenSharingState
+import com.vonage.android.screensharing.ScreenSharingState.IDLE
+import com.vonage.android.screensharing.ScreenSharingState.SHARING
+import com.vonage.android.screensharing.ScreenSharingState.STARTING
+import com.vonage.android.screensharing.ScreenSharingState.STOPPING
 
 @Composable
 fun screenSharingAction(
-    actions: MeetingRoomActions,
+    onStartScreenSharing: () -> Unit,
+    onStopScreenSharing: () -> Unit,
+    startScreenSharingLabel: String,
+    stopScreenSharingLabel: String,
     screenSharingState: ScreenSharingState,
-): BottomBarAction =
+): BottomBarAction? =
     BottomBarAction(
         type = BottomBarActionType.SCREEN_SHARING,
         icon = when (screenSharingState) {
@@ -32,9 +32,9 @@ fun screenSharingAction(
         label = when (screenSharingState) {
             IDLE,
             STARTING,
-            STOPPING -> stringResource(R.string.screen_share_start)
+            STOPPING -> startScreenSharingLabel
 
-            SHARING -> stringResource(R.string.screen_share_stop)
+            SHARING -> stopScreenSharingLabel
         },
         isSelected = when (screenSharingState) {
             IDLE,
@@ -45,8 +45,8 @@ fun screenSharingAction(
         },
         onClick = {
             when (screenSharingState) {
-                IDLE -> actions.onToggleScreenSharing(true)
-                SHARING -> actions.onToggleScreenSharing(false)
+                IDLE -> onStartScreenSharing()
+                SHARING -> onStopScreenSharing()
                 else -> {}
             }
         },

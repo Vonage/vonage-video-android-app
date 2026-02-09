@@ -38,15 +38,15 @@ import com.vonage.android.compose.vivid.icons.solid.Chat2
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.reactions.ui.EmojiSelector
 import com.vonage.android.screen.reporting.ReportIssueScreen
 import com.vonage.android.screen.reporting.components.reportingAction
 import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
-import com.vonage.android.screen.room.ScreenSharingState
 import com.vonage.android.screen.room.components.captions.captionsAction
-import com.vonage.android.reactions.ui.EmojiSelector
 import com.vonage.android.screen.room.noOpCallFacade
+import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.ui.screenSharingAction
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -235,7 +235,10 @@ private fun actionsFactory(
             )
 
             BottomBarActionType.SCREEN_SHARING -> screenSharingAction(
-                actions = roomActions,
+                onStartScreenSharing = { roomActions.onToggleScreenSharing(true) },
+                onStopScreenSharing = { roomActions.onToggleScreenSharing(false) },
+                startScreenSharingLabel = stringResource(R.string.screen_share_start),
+                stopScreenSharingLabel = stringResource(R.string.screen_share_stop),
                 screenSharingState = state.screenSharingState,
             )
 
