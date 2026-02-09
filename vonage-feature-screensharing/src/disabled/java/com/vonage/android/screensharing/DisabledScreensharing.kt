@@ -2,7 +2,7 @@ package com.vonage.android.screensharing
 
 import android.app.NotificationManager
 import android.content.Intent
-import android.media.projection.MediaProjection
+import com.vonage.android.kotlin.model.CallFacade
 
 @Suppress("EmptyFunctionBlock")
 class DisabledScreensharing : VonageScreenSharing {
