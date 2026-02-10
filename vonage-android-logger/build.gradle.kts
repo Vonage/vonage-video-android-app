@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.18.1"
+    alias(libs.plugins.binary.compatibility.validator)
 }
 
 android {
