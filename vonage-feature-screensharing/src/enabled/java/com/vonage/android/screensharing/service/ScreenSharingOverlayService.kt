@@ -25,6 +25,9 @@ class ScreenSharingOverlayService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int =
+        START_NOT_STICKY
+
     override fun onCreate() {
         super.onCreate()
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
@@ -73,8 +76,8 @@ class ScreenSharingOverlayService : Service() {
             WindowManager.LayoutParams.MATCH_PARENT,
             layoutType,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-                or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                    or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                    or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
             PixelFormat.TRANSLUCENT,
         )
 
@@ -89,10 +92,7 @@ class ScreenSharingOverlayService : Service() {
     }
 
     companion object {
-        /** Border thickness in pixels. */
         private const val BORDER_WIDTH_PX = 8f
-
-        /** Border colour — a vivid red matching common screen-share indicators. */
         private val BORDER_COLOR = "#00FF00".toColorInt()
 
         fun intent(context: Context): Intent =
