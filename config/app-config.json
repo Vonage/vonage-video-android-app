@@ -20,7 +20,7 @@
     "allowChat": true,
     "allowDeviceSelection": true,
     "allowEmojis": true,
-    "allowScreenShare": false,
+    "allowScreenShare": true,
     "defaultLayoutMode": "activespeaker",
     "showParticipantList": true
   }
