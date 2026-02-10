@@ -11,10 +11,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -32,14 +35,24 @@ import com.vonage.android.kotlin.model.Participant
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
+
 @Composable
 fun ParticipantsList(
     participants: ImmutableList<Participant>,
     modifier: Modifier = Modifier,
 ) {
+    var searchQuery by remember { mutableStateOf("") }
     val sortedParticipants by remember(participants) {
-        derivedStateOf { participants.sortedBy { participant -> participant.name } }
+        derivedStateOf {
+            if (searchQuery.isBlank()) {
+                participants.sortedBy { participant -> participant.name }
+            }
+            participants.filter {
+                it.name.contains(searchQuery,ignoreCase = true)
+            }.sortedBy { it.name }
+        }
     }
+
     val participantsCount = remember(participants) { participants.size }
 
     LazyColumn(
@@ -50,12 +63,28 @@ fun ParticipantsList(
         item {
             ParticipantListTitle(participantsCount)
         }
-        items(
-            items = sortedParticipants,
-            key = { participant -> participant.id },
-        ) { participantState ->
-            ParticipantRow(participantState)
+        item {
+            TextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                label = { Text("Search") },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
+        if(sortedParticipants.isEmpty()){
+            item{
+                Text("Participant not found")
+            }
+        }
+        else{
+            items(
+                items = sortedParticipants,
+                key = { participant -> participant.id },
+            ) {
+                    participantState -> ParticipantRow(participantState)
+            }
+        }
+
     }
 }
 
