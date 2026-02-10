@@ -2,7 +2,6 @@ package com.vonage.android.screen.room
 
 import android.content.Context
 import android.content.Intent
-import android.media.projection.MediaProjection
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,15 +15,7 @@ import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.kotlin.model.ChatState
-import com.vonage.android.kotlin.model.EmojiState
-import com.vonage.android.kotlin.model.Participant
-import com.vonage.android.kotlin.model.ParticipantState
-import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
-import com.vonage.android.kotlin.model.SignalState
-import com.vonage.android.kotlin.model.SignalStateContent
-import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
 import com.vonage.android.screen.components.audio.AudioDevicesState
@@ -32,18 +23,15 @@ import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.service.VeraForegroundServiceHandler
 import com.vonage.android.util.ActivityContextProvider
+import com.vonage.android.util.noOpCall
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -104,10 +92,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             }
             sessionRepository.getSession(roomName)
                 .onSuccess { sessionInfo ->
-                    connect(
-                        roomName = roomName,
-                        sessionInfo = sessionInfo,
-                    )
+                    connect(roomName = roomName, sessionInfo = sessionInfo)
                 }
                 .onFailure {
                     _uiState.update { uiState -> uiState.copy(isLoading = false, isError = true) }
@@ -168,7 +153,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                                 _uiState.update { uiState ->
                                     uiState.copy(
                                         isError = true,
-                                        errorMessage = sessionEvent.error.message,
+                                        errorMessage = sessionEvent.error.message
                                     )
                                 }
                             }
@@ -222,6 +207,10 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
     fun sendEmoji(emoji: String) {
         call?.sendEmoji(emoji)
+    }
+
+    fun changeLayout(layoutType: CallLayoutType) {
+        _uiState.update { uiState -> uiState.copy(layoutType = layoutType) }
     }
 
     //region Archiving
@@ -300,8 +289,8 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
     //region Screensharing
     fun startScreenSharing(intent: Intent) {
-        _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.STARTING) }
         call?.let {
+            _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.STARTING) }
             vonageScreenSharing.startScreenSharing(
                 call = it,
                 intent = intent,
@@ -316,10 +305,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         vonageScreenSharing.stopSharingScreen()
     }
     //endregion
-
-    fun changeLayout(layoutType: CallLayoutType) {
-        _uiState.update { uiState -> uiState.copy(layoutType = layoutType) }
-    }
 
     override fun onCleared() {
         super.onCleared()
@@ -343,7 +328,7 @@ data class MeetingRoomUiState(
     val captionsUiState: CaptionsUiState = CaptionsUiState.IDLE,
     val screenSharingState: ScreenSharingState = ScreenSharingState.IDLE,
     val audioDevicesState: AudioDevicesState? = null,
-    val call: CallFacade = noOpCallFacade,
+    val call: CallFacade = noOpCall,
     val isLoading: Boolean = false,
     val isError: Boolean = false,
     val errorMessage: String? = null,
@@ -358,40 +343,4 @@ enum class CallLayoutType {
     GRID,
     SPEAKER_LAYOUT,
     ADAPTIVE_GRID,
-}
-
-@Suppress("EmptyFunctionBlock")
-val noOpCallFacade = object : CallFacade {
-    override fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>) {}
-
-    override val participantsStateFlow: StateFlow<ImmutableList<ParticipantState>> = MutableStateFlow(persistentListOf())
-    override val participantsCount: StateFlow<Int> = MutableStateFlow(1)
-    override val activeSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
-    override val signalStateFlow: StateFlow<SignalState?> = MutableStateFlow(null)
-    override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
-    override val archivingStateFlow: StateFlow<ArchivingState> = MutableStateFlow(ArchivingState.Idle)
-
-    override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> = MutableStateFlow(null)
-    override val chatSignalState: StateFlow<ChatState?> = MutableStateFlow(null)
-    override val emojiSignalState: StateFlow<EmojiState?> = MutableStateFlow(null)
-
-    override fun connect(context: Context): Flow<SessionEvent> = flowOf()
-    override fun enableCaptions() { /* empty on purpose */ }
-    override fun disableCaptions() { /* empty on purpose */ }
-    override fun pauseSession() { /* empty on purpose */ }
-    override fun resumeSession() { /* empty on purpose */ }
-    override fun endSession() { /* empty on purpose */ }
-
-    override val publisher: StateFlow<PublisherState?> = MutableStateFlow(null)
-
-    override fun toggleLocalVideo() { /* empty on purpose */ }
-    override fun toggleLocalCamera() { /* empty on purpose */ }
-    override fun toggleLocalAudio() { /* empty on purpose */ }
-    override fun cycleLocalCameraBlur() { /* empty on purpose */ }
-
-    override fun sendChatMessage(message: String) { /* empty on purpose */ }
-    override fun listenUnreadChatMessages(enable: Boolean) { /* empty on purpose */ }
-    override fun sendEmoji(emoji: String) { /* empty on purpose */ }
-    override fun startCapturingScreen(mediaProjection: MediaProjection) { /* empty on purpose */ }
-    override fun stopCapturingScreen() { /* empty on purpose */ }
 }

@@ -45,9 +45,9 @@ import com.vonage.android.screen.reporting.ReportIssueScreen
 import com.vonage.android.screen.reporting.components.reportingAction
 import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.MeetingRoomActions
-import com.vonage.android.screen.room.noOpCallFacade
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.ui.screenSharingAction
+import com.vonage.android.util.noOpCall
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -282,7 +282,7 @@ internal fun BottomBarPreview() {
     VonageVideoTheme {
         BottomBar(
             roomActions = MeetingRoomActions(),
-            call = noOpCallFacade,
+            call = noOpCall,
             state = BottomBarState(
                 publisher = buildParticipants(15).first(),
                 participants = buildParticipants(15).toImmutableList(),

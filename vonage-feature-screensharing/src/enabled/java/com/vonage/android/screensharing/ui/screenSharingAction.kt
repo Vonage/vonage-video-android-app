@@ -5,7 +5,6 @@ import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.ScreenShare
-import com.vonage.android.compose.vivid.icons.solid.ScreenShareOff
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.ScreenSharingState.IDLE
 import com.vonage.android.screensharing.ScreenSharingState.SHARING
@@ -24,10 +23,9 @@ fun screenSharingAction(
         type = BottomBarActionType.SCREEN_SHARING,
         icon = when (screenSharingState) {
             STOPPING,
-            IDLE -> VividIcons.Solid.ScreenShare
-
+            IDLE,
             STARTING,
-            SHARING -> VividIcons.Solid.ScreenShareOff
+            SHARING -> VividIcons.Solid.ScreenShare
         },
         label = when (screenSharingState) {
             IDLE,

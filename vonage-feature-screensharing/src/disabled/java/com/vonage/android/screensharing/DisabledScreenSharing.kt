@@ -5,7 +5,7 @@ import android.content.Intent
 import com.vonage.android.kotlin.model.CallFacade
 
 @Suppress("EmptyFunctionBlock")
-class DisabledScreensharing : VonageScreenSharing {
+class DisabledScreenSharing : VonageScreenSharing {
 
     override fun startScreenSharing(
         intent: Intent,

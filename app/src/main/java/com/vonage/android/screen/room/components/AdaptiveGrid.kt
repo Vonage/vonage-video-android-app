@@ -22,8 +22,8 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.screen.room.MeetingRoomActions
-import com.vonage.android.screen.room.noOpCallFacade
 import com.vonage.android.util.lazyStateVisibilityTracker
+import com.vonage.android.util.noOpCall
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -104,7 +104,7 @@ internal fun AdaptiveGridPreview() {
     VonageVideoTheme {
         AdaptiveGrid(
             participants = buildParticipants(10).toImmutableList(),
-            call = noOpCallFacade,
+            call = noOpCall,
             actions = MeetingRoomActions(),
         )
     }

@@ -1,6 +1,6 @@
 package com.vonage.android.screensharing.di
 
-import com.vonage.android.screensharing.DisabledScreensharing
+import com.vonage.android.screensharing.DisabledScreenSharing
 import com.vonage.android.screensharing.VonageScreenSharing
 import dagger.Module
 import dagger.Provides
@@ -10,11 +10,11 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ScreensharingModule {
+object ScreenSharingModule {
 
     @Provides
     @Singleton
     fun provideVonageScreenSharing(): VonageScreenSharing =
-        DisabledScreensharing()
+        DisabledScreenSharing()
 
 }

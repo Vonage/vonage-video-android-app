@@ -14,7 +14,7 @@ The screensharing feature allows participants to share their device screen durin
 
 ## Key Components
 
-- **VonageScreenSharing**: Interface for managing screen sharing operations (bind, start, stop, notifications)
+- **VonageScreenSharing**: Interface for managing screen sharing operations (start, stop, notifications)
 - **ScreenSharingService**: Foreground service that handles the screen capture lifecycle
 - **ScreenSharingState**: States include `IDLE`, `STARTING`, `SHARING`, and `STOPPING`
 - **screenSharingAction**: Composable UI component for bottom bar integration
@@ -26,9 +26,6 @@ The screensharing feature allows participants to share their device screen durin
 // Inject VonageScreenSharing
 @Inject lateinit var vonageScreenSharing: VonageScreenSharing
 
-// Bind to a call
-vonageScreenSharing.bind(call)
-
 // Create notification channel (required for Android O+)
 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
     val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -39,6 +36,7 @@ if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 // (obtained from MediaProjectionManager.createScreenCaptureIntent())
 vonageScreenSharing.startScreenSharing(
     intent = mediaProjectionIntent,
+    call = callFacade,
     onStarted = {
         // Screen sharing started successfully
     },
