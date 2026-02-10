@@ -72,7 +72,7 @@ fun ParticipantVideoCard(
             )
         }
 
-        if (participant.isPublisher) {
+        if (participant.isPublisher && participant.isScreenShare.not()) {
             val blurLevel by (participant as PublisherParticipant).blurLevel.collectAsStateWithLifecycle()
 
             BlurIndicator(

@@ -68,6 +68,11 @@ android {
         buildConfigField("boolean", "FEATURE_CAPTIONS_ENABLED", "$captionsProperty")
         missingDimensionStrategy("captions", captionsProperty.toEnabledString())
 
+        // Screensharing feature
+        val screenSharingProperty = configProps.getProperty("vonage.meetingRoom.allow_screen_share", "true")
+        buildConfigField("boolean", "FEATURE_SCREENSHARING_ENABLED", "$screenSharingProperty")
+        missingDimensionStrategy("screensharing", screenSharingProperty.toEnabledString())
+
         // Background (video) effects feature
         val videoFxProperty = configProps.getProperty("vonage.video.allow_background_effects", "true")
         buildConfigField("boolean", "FEATURE_VIDEO_EFFECTS_ENABLED", "$videoFxProperty")
@@ -179,6 +184,7 @@ dependencies {
     implementation(project(":vonage-video-shared"))
     implementation(project(":vonage-feature-chat"))
     implementation(project(":vonage-feature-archiving"))
+    implementation(project(":vonage-feature-screensharing"))
     implementation(project(":vonage-feature-reactions"))
     implementation(project(":vonage-feature-video-effects"))
     implementation(project(":vonage-feature-captions"))

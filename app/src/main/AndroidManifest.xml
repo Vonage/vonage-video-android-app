@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
@@ -46,11 +45,6 @@
                 <data android:host="${hostName}" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name=".screensharing.ScreenSharingService"
-            android:exported="false"
-            android:foregroundServiceType="mediaProjection" />
 
         <service
             android:name=".service.VeraForegroundService"

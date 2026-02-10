@@ -1,7 +1,7 @@
-package com.vonage.android.screensharing
+package com.vonage.android.screensharing.service
 
 import android.app.Notification
-import android.app.NotificationManager.IMPORTANCE_DEFAULT
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -45,11 +45,11 @@ class ScreenSharingService : Service() {
     private fun buildNotification(): Notification =
         NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setOngoing(true)
-            .setPriority(IMPORTANCE_DEFAULT)
+            .setPriority(NotificationManager.IMPORTANCE_DEFAULT)
             .setCategory(Notification.CATEGORY_SERVICE)
             .build()
 
-    inner class LocalBinder : Binder()
+    class LocalBinder : Binder()
 
     companion object {
         const val NOTIFICATION_ID = 112233

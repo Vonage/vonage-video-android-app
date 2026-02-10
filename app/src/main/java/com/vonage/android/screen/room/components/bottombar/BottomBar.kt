@@ -29,6 +29,7 @@ import com.vonage.android.R
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.ui.recordingAction
 import com.vonage.android.captions.CaptionsUiState
+import com.vonage.android.captions.ui.captionsAction
 import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.compose.components.bottombar.ControlButton
@@ -39,15 +40,14 @@ import com.vonage.android.compose.vivid.icons.solid.Chat2
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.reactions.ui.EmojiSelector
 import com.vonage.android.screen.reporting.ReportIssueScreen
 import com.vonage.android.screen.reporting.components.reportingAction
 import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.MeetingRoomActions
-import com.vonage.android.screen.room.ScreenSharingState
-import com.vonage.android.captions.ui.captionsAction
-import com.vonage.android.reactions.ui.EmojiSelector
-import com.vonage.android.screen.room.noOpCallFacade
+import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.ui.screenSharingAction
+import com.vonage.android.util.noOpCall
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -235,7 +235,10 @@ private fun actionsFactory(
             )
 
             BottomBarActionType.SCREEN_SHARING -> screenSharingAction(
-                actions = roomActions,
+                onStartScreenSharing = { roomActions.onToggleScreenSharing(true) },
+                onStopScreenSharing = { roomActions.onToggleScreenSharing(false) },
+                startScreenSharingLabel = stringResource(R.string.screen_share_start),
+                stopScreenSharingLabel = stringResource(R.string.screen_share_stop),
                 screenSharingState = state.screenSharingState,
             )
 
@@ -279,7 +282,7 @@ internal fun BottomBarPreview() {
     VonageVideoTheme {
         BottomBar(
             roomActions = MeetingRoomActions(),
-            call = noOpCallFacade,
+            call = noOpCall,
             state = BottomBarState(
                 publisher = buildParticipants(15).first(),
                 participants = buildParticipants(15).toImmutableList(),

@@ -14,7 +14,7 @@ import com.vonage.android.screen.room.CallLayoutType
 import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
 import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT
-import com.vonage.android.screen.room.noOpCallFacade
+import com.vonage.android.util.noOpCall
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -76,7 +76,7 @@ object MeetingRoomContentTestTags {
 internal fun MeetingRoomContentPreview() {
     VonageVideoTheme {
         MeetingRoomContent(
-            call = noOpCallFacade,
+            call = noOpCall,
             actions = MeetingRoomActions(),
             participants = buildParticipants(25).toImmutableList(),
             layoutType = CallLayoutType.GRID,
