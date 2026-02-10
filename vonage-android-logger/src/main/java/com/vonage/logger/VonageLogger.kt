@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 
+@Suppress("ReturnCount", "UseCheckOrError")
 class VonageLogger private constructor(
     private val interceptors: List<LogInterceptor>,
 ) {
