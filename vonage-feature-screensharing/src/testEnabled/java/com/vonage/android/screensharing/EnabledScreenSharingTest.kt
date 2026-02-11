@@ -11,6 +11,7 @@ import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.IBinder
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.screensharing.service.ScreenSharingOverlayService
 import com.vonage.android.screensharing.service.ScreenSharingService
 import io.mockk.Runs
 import io.mockk.called
@@ -26,6 +27,8 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertNotNull
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class EnabledScreenSharingTest {
 
@@ -35,6 +38,7 @@ class EnabledScreenSharingTest {
     private val mediaProjection: MediaProjection = mockk(relaxed = true)
     private val notificationManager: NotificationManager = mockk(relaxed = true)
     private val serviceIntent: Intent = mockk()
+    private val overlayIntent: Intent = mockk()
     private val mediaProjectionIntent: Intent = mockk()
     private val binder: IBinder = mockk()
 
@@ -43,9 +47,13 @@ class EnabledScreenSharingTest {
     @Before
     fun setup() {
         mockkStatic("androidx.core.content.ContextCompat")
+        mockkStatic(android.provider.Settings::class)
         mockkObject(ScreenSharingService.Companion)
+        mockkObject(ScreenSharingOverlayService.Companion)
 
         every { ScreenSharingService.intent(context) } returns serviceIntent
+        every { ScreenSharingOverlayService.intent(context) } returns overlayIntent
+        every { android.provider.Settings.canDrawOverlays(context) } returns true
         every {
             androidx.core.content.ContextCompat.getSystemService(
                 context,
@@ -345,5 +353,108 @@ class EnabledScreenSharingTest {
         sut.createNotificationChannel(notificationManager)
 
         verify { notificationManager.createNotificationChannel(any()) }
+    }
+
+    @Test
+    fun `canDrawOverlays returns true when permission granted`() {
+        every { android.provider.Settings.canDrawOverlays(context) } returns true
+
+        assertTrue(sut.canDrawOverlays())
+    }
+
+    @Test
+    fun `canDrawOverlays returns false when permission denied`() {
+        every { android.provider.Settings.canDrawOverlays(context) } returns false
+
+        assertFalse(sut.canDrawOverlays())
+    }
+
+    @Test
+    fun `showOverlay starts overlay service when permission granted`() {
+        every { android.provider.Settings.canDrawOverlays(context) } returns true
+        every { context.startService(overlayIntent) } returns mockk<ComponentName>()
+
+        sut.showOverlay()
+
+        verify { context.startService(overlayIntent) }
+    }
+
+    @Test
+    fun `showOverlay does not start overlay service when permission denied`() {
+        every { android.provider.Settings.canDrawOverlays(context) } returns false
+
+        sut.showOverlay()
+
+        verify(exactly = 0) { context.startService(overlayIntent) }
+    }
+
+    @Test
+    fun `hideOverlay stops overlay service`() {
+        every { context.stopService(overlayIntent) } returns true
+
+        sut.hideOverlay()
+
+        verify { context.stopService(overlayIntent) }
+    }
+
+    @Test
+    fun `startScreenSharing shows overlay when service connects`() {
+        val onStarted = mockk<() -> Unit>(relaxed = true)
+        val onStopped = mockk<() -> Unit>(relaxed = true)
+        val serviceConnectionSlot = slot<ServiceConnection>()
+
+        every {
+            context.bindService(
+                serviceIntent,
+                capture(serviceConnectionSlot),
+                Context.BIND_AUTO_CREATE
+            )
+        } returns true
+        every { context.startService(serviceIntent) } returns mockk<ComponentName>()
+        every { context.startService(overlayIntent) } returns mockk<ComponentName>()
+        every {
+            mediaProjectionManager.getMediaProjection(
+                any(),
+                mediaProjectionIntent
+            )
+        } returns mediaProjection
+
+        sut.startScreenSharing(mediaProjectionIntent, callFacade, onStarted, onStopped)
+        serviceConnectionSlot.captured.onServiceConnected(mockk<ComponentName>(), binder)
+
+        verify { context.startService(overlayIntent) }
+    }
+
+    @Test
+    fun `stopSharingScreen hides overlay`() {
+        val onStarted = mockk<() -> Unit>(relaxed = true)
+        val onStopped = mockk<() -> Unit>(relaxed = true)
+        val serviceConnectionSlot = slot<ServiceConnection>()
+
+        every {
+            context.bindService(
+                serviceIntent,
+                capture(serviceConnectionSlot),
+                Context.BIND_AUTO_CREATE
+            )
+        } returns true
+        every { context.startService(serviceIntent) } returns mockk<ComponentName>()
+        every { context.startService(overlayIntent) } returns mockk<ComponentName>()
+        every {
+            mediaProjectionManager.getMediaProjection(
+                any(),
+                mediaProjectionIntent
+            )
+        } returns mediaProjection
+        every { mediaProjection.stop() } just Runs
+        every { context.unbindService(any()) } just Runs
+        every { context.stopService(serviceIntent) } returns true
+        every { context.stopService(overlayIntent) } returns true
+
+        sut.startScreenSharing(mediaProjectionIntent, callFacade, onStarted, onStopped)
+        serviceConnectionSlot.captured.onServiceConnected(mockk<ComponentName>(), binder)
+        sut.stopSharingScreen()
+
+        verify { context.stopService(overlayIntent) }
     }
 }
