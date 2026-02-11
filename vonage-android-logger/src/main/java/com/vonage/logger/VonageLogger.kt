@@ -108,7 +108,6 @@ class VonageLogger private constructor(
     /**
      * ```kotlin
      * val logger = VonageLogger.Builder()
-     *     .addInterceptor(LogLevelFilterInterceptor(LogLevel.DEBUG))
      *     .addInterceptor(AndroidLogInterceptor())
      *     .build()
      * ```
