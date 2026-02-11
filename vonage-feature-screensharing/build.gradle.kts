@@ -28,6 +28,10 @@ android {
         buildConfig = true
     }
 
+    testOptions {
+        unitTests { isReturnDefaultValues = true }
+    }
+
     flavorDimensions += "screensharing"
     productFlavors {
         create("enabled") {

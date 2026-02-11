@@ -14,10 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.vonage.android.util.pip.findActivity
 import com.vonage.android.util.pip.pipEffect
 import com.vonage.android.util.pip.rememberIsInPipMode
 import kotlinx.coroutines.launch
@@ -34,21 +31,9 @@ fun MeetingRoomScreenRoute(
             factory.create(roomName)
         },
 ) {
-    val currentActivity = LocalContext.current.findActivity()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val inPipMode = rememberIsInPipMode()
     val pipModifier = pipEffect()
-
-    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
-        if (!currentActivity.isInPictureInPictureMode) {
-            viewModel.onPause()
-        }
-    }
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        if (!currentActivity.isInPictureInPictureMode) {
-            viewModel.onResume()
-        }
-    }
 
     val scope = rememberCoroutineScope()
 

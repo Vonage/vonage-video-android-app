@@ -189,14 +189,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         call?.endSession()
     }
 
-    fun onPause() {
-        call?.pauseSession()
-    }
-
-    fun onResume() {
-        call?.resumeSession()
-    }
-
     fun sendMessage(message: String) {
         call?.sendChatMessage(message)
     }

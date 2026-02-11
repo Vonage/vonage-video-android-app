@@ -30,6 +30,23 @@ interface VonageScreenSharing {
     fun stopSharingScreen()
 
     /**
+     * Returns `true` when the app has the `SYSTEM_ALERT_WINDOW` permission
+     * needed to render the screen-sharing border overlay.
+     */
+    fun canDrawOverlays(): Boolean
+
+    /**
+     * Shows a coloured border overlay to remind the user that screen sharing
+     * is in progress. Requires [canDrawOverlays] to return `true`.
+     */
+    fun showOverlay()
+
+    /**
+     * Hides the screen-sharing border overlay.
+     */
+    fun hideOverlay()
+
+    /**
      * Creates a notification channel required for screen sharing foreground service.
      *
      * @param manager [NotificationManager] used to register the channel.

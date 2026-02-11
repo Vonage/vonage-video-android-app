@@ -191,36 +191,6 @@ class MeetingRoomScreenViewModelTest {
     }
 
     @Test
-    fun `given viewmodel when onPause then delegate to call`() = runTest {
-        val mockCall = givenMockCall()
-
-        sut.setup(context)
-        testScheduler.advanceUntilIdle()
-
-        sut.uiState.test {
-            awaitItem()
-            awaitItem()
-            sut.onPause()
-            verify { mockCall.pauseSession() }
-        }
-    }
-
-    @Test
-    fun `given viewmodel when onResume then delegate to call`() = runTest {
-        val mockCall = givenMockCall()
-
-        sut.setup(context)
-        testScheduler.advanceUntilIdle()
-
-        sut.uiState.test {
-            awaitItem()
-            awaitItem()
-            sut.onResume()
-            verify { mockCall.resumeSession() }
-        }
-    }
-
-    @Test
     fun `given viewmodel when onSwitchCamera then delegate to call`() = runTest {
         val mockCall = givenMockCall()
 
