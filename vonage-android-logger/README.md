@@ -7,19 +7,15 @@ A lightweight logging library for Android. Call log methods directly on `VonageL
 ```mermaid
 flowchart TD
     A["<b>VonageLogger</b><br/>v() · d() · i() · w() · e()"]
-    B["<b>LogEvent</b><br/>level · tag · message · throwable"]
+    B["<b>LogEvent</b><br/>level · tag · message · throwable · timestamp · thread"]
     C["<b>Interceptor Pipeline</b>"]
-    D["LogLevelFilterInterceptor"]
     E["FileLogInterceptor"]
-    F["HttpLogInterceptor"]
     G["AndroidLogInterceptor"]
 
     A --> B
     B --> C
-    C --> D
-    D --> E
-    D --> F
-    D --> G
+    C --> E
+    C --> G
 ```
 
 ## Quick Start
@@ -30,6 +26,14 @@ flowchart TD
 val logger = VonageLogger.Builder()
     .addInterceptor(AndroidLogInterceptor())
     .build()
+```
+
+Or use the provided default instance:
+
+```kotlin
+// Uses AndroidLogInterceptor out of the box
+val logger = vonageLogger
+logger.d("MyApp", "User logged in")
 ```
 
 ### 2. Use It
@@ -50,6 +54,19 @@ logger.e("MyApp", "Something failed", error)  // E/MyApp: Something failed  (wit
 | `w(tag, message, throwable?)` | `WARN` |
 | `e(tag, message, throwable?)` | `ERROR` |
 | `log(level, tag, message, throwable?)` | Explicit level |
+
+## LogEvent
+
+Each log call produces a `LogEvent` data class:
+
+| Field       | Type         | Description                                      |
+|-------------|--------------|--------------------------------------------------|
+| `level`     | `LogLevel`   | `VERBOSE`, `DEBUG`, `INFO`, `WARN`, or `ERROR`.  |
+| `tag`       | `String`     | Caller-supplied tag.                              |
+| `message`   | `String`     | Log message.                                     |
+| `throwable` | `Throwable?` | Optional exception (default `null`).              |
+| `timestamp` | `Long`       | Epoch millis, captured automatically.             |
+| `thread`    | `String`     | Thread name, captured automatically.              |
 
 ## Interceptors
 
@@ -83,7 +100,7 @@ val logger = VonageLogger.Builder()
 Each line is written as:
 
 ```
-2026-02-10 14:30:05.123 [ERROR] MyTag: something failed
+2026-02-10 14:30:05.123 [main] [ERROR] MyTag: something failed
 java.lang.RuntimeException: boom
 ```
 
@@ -99,7 +116,7 @@ java.lang.RuntimeException: boom
 class TimestampInterceptor : LogInterceptor {
     override fun intercept(event: LogEvent): LogEvent {
         return event.copy(
-            message = "[${System.currentTimeMillis()}] ${event.message}"
+            message = "[${event.timestamp}] ${event.message}"
         )
     }
 }
@@ -137,8 +154,22 @@ class MinLevelInterceptor(private val minLevel: LogLevel) : LogInterceptor {
 | `addInterceptor(LogInterceptor)`     | Adds an interceptor to the pipeline (in order).           |
 | `build(): VonageLogger`             | Constructs the `VonageLogger` instance.                   |
 
+### `DefaultVonageLogger`
+
+A pre-configured singleton with `AndroidLogInterceptor`. Access via:
+
+```kotlin
+val logger = vonageLogger
+```
+
 ### `LogInterceptor`
 
 | Method                              | Description                                               |
 |---------------------------------------|-----------------------------------------------------------|
 | `intercept(event: LogEvent): LogEvent?` | Process a log event; return it to continue, `null` to drop. |
+
+### `LogLevel`
+
+```
+VERBOSE < DEBUG < INFO < WARN < ERROR
+```

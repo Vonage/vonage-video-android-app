@@ -114,7 +114,6 @@ class VonageVideoClient(
 
         session = Session.Builder(context, apiKey, sessionId)
             .setSinglePeerConnection(true)
-            .setSessionMigration(true)
             .build()
 
         session?.capabilities?.let { capabilities ->
