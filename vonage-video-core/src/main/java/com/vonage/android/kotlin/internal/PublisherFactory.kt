@@ -2,7 +2,6 @@ package com.vonage.android.kotlin.internal
 
 import android.app.ActivityManager
 import android.content.Context
-import android.util.Log
 import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit
@@ -12,6 +11,7 @@ import com.vonage.android.kotlin.ext.applyVideoBlur
 import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherState
+import com.vonage.logger.vonageLogger
 
 /**
  * Factory for creating and managing Publisher instances.
@@ -52,7 +52,7 @@ class PublisherFactory {
      * @return PublisherState ready to be published to the session
      */
     fun createPublisher(context: Context): PublisherState {
-        Log.d(TAG, "build publisher with $publisherConfig")
+        vonageLogger.d(TAG, "build publisher with $publisherConfig")
         val name = publisherConfig?.name ?: Default.PUBLISHER_NAME
         val publisher = createPublisher(context, name)
         val participant = PublisherState(PUBLISHER_ID, publisher)
@@ -71,7 +71,7 @@ class PublisherFactory {
             it.onStop()
         }
         publisherHolder = null
-        Log.i(TAG, "Destroy publisher")
+        vonageLogger.i(TAG, "Destroy publisher")
     }
 
     /**

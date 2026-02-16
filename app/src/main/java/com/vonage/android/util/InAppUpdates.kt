@@ -2,7 +2,6 @@ package com.vonage.android.util
 
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResult
@@ -13,6 +12,7 @@ import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.ActivityResult.RESULT_IN_APP_UPDATE_FAILED
 import com.google.android.play.core.ktx.AppUpdateResult
 import com.google.android.play.core.ktx.requestUpdateFlow
+import com.vonage.logger.vonageLogger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -40,13 +40,13 @@ class InAppUpdates(
         updateFlow.collectLatest { appUpdateResult ->
             when (appUpdateResult) {
                 is AppUpdateResult.Available -> {
-                    Log.d(TAG, "Update available! Starting update...")
+                    vonageLogger.d(TAG, "Update available! Starting update...")
                     appUpdateResult.startImmediateUpdate(activityResultLauncher)
                 }
 
-                is AppUpdateResult.Downloaded -> Log.d(TAG, "Update downloaded")
-                is AppUpdateResult.InProgress -> Log.d(TAG, "Update in progress...")
-                is AppUpdateResult.NotAvailable -> Log.d(TAG, "Update not available")
+                is AppUpdateResult.Downloaded -> vonageLogger.d(TAG, "Update downloaded")
+                is AppUpdateResult.InProgress -> vonageLogger.d(TAG, "Update in progress...")
+                is AppUpdateResult.NotAvailable -> vonageLogger.d(TAG, "Update not available")
             }
         }
     }

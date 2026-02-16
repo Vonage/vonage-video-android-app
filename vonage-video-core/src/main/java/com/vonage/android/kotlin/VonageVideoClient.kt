@@ -2,7 +2,6 @@ package com.vonage.android.kotlin
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.compose.runtime.Stable
 import com.opentok.android.AudioDeviceManager
 import com.opentok.android.BaseAudioDevice
@@ -13,6 +12,7 @@ import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.signal.SignalPlugin
+import com.vonage.logger.vonageLogger
 
 /**
  * Main entry point for Vonage Video SDK functionality.
@@ -108,9 +108,9 @@ class VonageVideoClient(
      * @return CallFacade interface for managing the video call
      */
     fun initializeSession(apiKey: String, sessionId: String, token: String): CallFacade {
-        Log.i(TAG, "apiKey: $apiKey")
-        Log.i(TAG, "sessionId: $sessionId")
-        Log.i(TAG, "token: $token")
+        vonageLogger.i(TAG, "apiKey: $apiKey")
+        vonageLogger.i(TAG, "sessionId: $sessionId")
+        vonageLogger.i(TAG, "token: $token")
 
         session = Session.Builder(context, apiKey, sessionId)
             .setSinglePeerConnection(true)
@@ -118,8 +118,8 @@ class VonageVideoClient(
             .build()
 
         session?.capabilities?.let { capabilities ->
-            Log.i(TAG, "Session capabilities:")
-            Log.i(TAG, capabilities.toString())
+            vonageLogger.i(TAG, "Session capabilities:")
+            vonageLogger.i(TAG, capabilities.toString())
         }
 
         return Call(

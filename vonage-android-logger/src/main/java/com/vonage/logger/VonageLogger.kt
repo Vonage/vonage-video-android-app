@@ -1,5 +1,6 @@
 package com.vonage.logger
 
+import com.vonage.logger.interceptor.AndroidLogInterceptor
 import com.vonage.logger.interceptor.LogInterceptor
 
 /**
@@ -58,3 +59,11 @@ class VonageLogger private constructor(
         fun build(): VonageLogger = VonageLogger(interceptors.toList())
     }
 }
+
+object DefaultVonageLogger {
+    val log = VonageLogger.Builder()
+        .addInterceptor(AndroidLogInterceptor())
+        .build()
+}
+
+val vonageLogger = DefaultVonageLogger.log

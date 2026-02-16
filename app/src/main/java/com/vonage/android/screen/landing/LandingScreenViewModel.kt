@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import com.vonage.android.util.RoomNameGenerator
 import com.vonage.android.util.isValidRoomName
-import com.vonage.android.vonageLogger
+import com.vonage.logger.vonageLogger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

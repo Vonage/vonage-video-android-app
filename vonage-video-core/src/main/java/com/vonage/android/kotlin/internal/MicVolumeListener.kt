@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
-import android.util.Log
+import com.vonage.logger.vonageLogger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -58,7 +58,7 @@ class MicVolumeListener {
             )
             if (bufferReadSize <= 0) continue
             val rms = normalizeAudioLevel(buffer, bufferReadSize)
-            Log.d(TAG, "mic volume RMS $rms")
+            vonageLogger.d(TAG, "mic volume RMS $rms")
             emit(rms.coerceIn(0f, 1f))
             delay(samplingMillis)
         }

@@ -2,7 +2,6 @@ package com.vonage.android.kotlin
 
 import android.content.Context
 import android.media.projection.MediaProjection
-import android.util.Log
 import androidx.compose.runtime.Stable
 import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.OpentokError
@@ -33,6 +32,7 @@ import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.kotlin.signal.SignalPlugin
+import com.vonage.logger.vonageLogger
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -245,7 +245,7 @@ class Call internal constructor(
      * Reduces resource usage while maintaining the connection.
      */
     override fun pauseSession() {
-        Log.d(TAG, "Session paused")
+        vonageLogger.d(TAG, "Session paused")
         session.onPause()
     }
 
@@ -254,7 +254,7 @@ class Call internal constructor(
      * Restores full video and audio functionality.
      */
     override fun resumeSession() {
-        Log.d(TAG, "Session resumed")
+        vonageLogger.d(TAG, "Session resumed")
         session.onResume()
     }
 
@@ -493,7 +493,7 @@ class Call internal constructor(
                 updateParticipants()
                 observeSubscriberAudioLevel(participant)
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to add subscriber ${stream.streamId}", e)
+                vonageLogger.e(TAG, "Failed to add subscriber ${stream.streamId}", e)
             }
         }
     }
