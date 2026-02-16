@@ -13,10 +13,11 @@ class FileLogInterceptor(
     private val dateFormat: String = DEFAULT_DATE_FORMAT,
 ) : LogInterceptor {
 
-    override fun intercept(chain: LogInterceptor.Chain): LogEvent {
-        val event = chain.event()
+    private val lock = Any()
+
+    override fun intercept(event: LogEvent): LogEvent {
         writeToFile(event)
-        return chain.proceed(event)
+        return event
     }
 
     /**
@@ -24,12 +25,9 @@ class FileLogInterceptor(
      *
      * Visible for testing.
      */
-    internal fun formatEvent(
-        event: LogEvent,
-        timestamp: Long = System.currentTimeMillis()
-    ): String {
-        val time = SimpleDateFormat(dateFormat, Locale.US).format(Date(timestamp))
-        val base = "$time [${event.level}] ${event.tag}: ${event.message}"
+    internal fun formatEvent(event: LogEvent): String {
+        val time = SimpleDateFormat(dateFormat, Locale.US).format(Date(event.timestamp))
+        val base = "$time [${event.thread}] [${event.level}] ${event.tag}: ${event.message}"
         return if (event.throwable != null) {
             "$base\n${event.throwable}"
         } else {
@@ -39,10 +37,11 @@ class FileLogInterceptor(
 
     private fun writeToFile(event: LogEvent) {
         try {
-            synchronized(file) {
+            val line = formatEvent(event) + "\n"
+            synchronized(lock) {
                 ensureFileExists()
                 rotateIfNeeded()
-                file.appendText(formatEvent(event) + "\n")
+                file.appendText(line)
             }
         } catch (_: IOException) {
             // Silently ignore — logging should never crash the app.

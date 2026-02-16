@@ -2,9 +2,6 @@ package com.vonage.logger.interceptor
 
 import com.vonage.logger.LogEvent
 import com.vonage.logger.LogLevel
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -33,11 +30,15 @@ class FileLogInterceptorTest {
     @Test
     fun `formatEvent produces expected format without throwable`() {
         val interceptor = FileLogInterceptor(logFile)
-        val event = LogEvent(LogLevel.DEBUG, "MyTag", "hello world")
+        val event = LogEvent(
+            LogLevel.DEBUG, "MyTag", "hello world",
+            timestamp = 1_000_000_000_000L, thread = "test-thread"
+        )
 
-        val line = interceptor.formatEvent(event, timestamp = 1_000_000_000_000L)
+        val line = interceptor.formatEvent(event)
 
         assertTrue(line.contains("[DEBUG]"))
+        assertTrue(line.contains("[test-thread]"))
         assertTrue(line.contains("MyTag"))
         assertTrue(line.contains("hello world"))
         assertFalse(line.contains("\n"))
@@ -47,11 +48,15 @@ class FileLogInterceptorTest {
     fun `formatEvent includes throwable on new line`() {
         val interceptor = FileLogInterceptor(logFile)
         val error = RuntimeException("boom")
-        val event = LogEvent(LogLevel.ERROR, "Err", "failed", error)
+        val event = LogEvent(
+            LogLevel.ERROR, "Err", "failed", error,
+            timestamp = 1_000_000_000_000L, thread = "err-thread"
+        )
 
-        val line = interceptor.formatEvent(event, timestamp = 1_000_000_000_000L)
+        val line = interceptor.formatEvent(event)
 
         assertTrue(line.contains("[ERROR]"))
+        assertTrue(line.contains("[err-thread]"))
         assertTrue(line.contains("Err: failed"))
         assertTrue(line.contains("RuntimeException"))
         assertTrue(line.contains("boom"))
@@ -64,11 +69,7 @@ class FileLogInterceptorTest {
         val interceptor = FileLogInterceptor(logFile)
         val event = LogEvent(LogLevel.INFO, "Tag", "test message")
 
-        val chain = mockk<LogInterceptor.Chain>()
-        every { chain.event() } returns event
-        every { chain.proceed(event) } returns event
-
-        interceptor.intercept(chain)
+        interceptor.intercept(event)
 
         val content = logFile.readText()
         assertTrue(content.contains("[INFO]"))
@@ -76,17 +77,13 @@ class FileLogInterceptorTest {
     }
 
     @Test
-    fun `intercept proceeds chain after writing`() {
+    fun `intercept returns the event`() {
         val interceptor = FileLogInterceptor(logFile)
         val event = LogEvent(LogLevel.DEBUG, "Tag", "msg")
 
-        val chain = mockk<LogInterceptor.Chain>()
-        every { chain.event() } returns event
-        every { chain.proceed(event) } returns event
+        val result = interceptor.intercept(event)
 
-        interceptor.intercept(chain)
-
-        verify(exactly = 1) { chain.proceed(event) }
+        assertEquals(event, result)
     }
 
     @Test
@@ -100,10 +97,7 @@ class FileLogInterceptorTest {
         )
 
         events.forEach { event ->
-            val chain = mockk<LogInterceptor.Chain>()
-            every { chain.event() } returns event
-            every { chain.proceed(event) } returns event
-            interceptor.intercept(chain)
+            interceptor.intercept(event)
         }
 
         val lines = logFile.readLines().filter { it.isNotBlank() }
@@ -123,11 +117,7 @@ class FileLogInterceptorTest {
         val interceptor = FileLogInterceptor(logFile)
         val event = LogEvent(LogLevel.INFO, "Tag", "create me")
 
-        val chain = mockk<LogInterceptor.Chain>()
-        every { chain.event() } returns event
-        every { chain.proceed(event) } returns event
-
-        interceptor.intercept(chain)
+        interceptor.intercept(event)
 
         assertTrue(logFile.exists())
         assertTrue(logFile.readText().contains("create me"))
@@ -145,11 +135,8 @@ class FileLogInterceptorTest {
         assertTrue(logFile.length() > smallMax)
 
         val event = LogEvent(LogLevel.DEBUG, "T", "after rotation")
-        val chain = mockk<LogInterceptor.Chain>()
-        every { chain.event() } returns event
-        every { chain.proceed(event) } returns event
 
-        interceptor.intercept(chain)
+        interceptor.intercept(event)
 
         // File should have been rotated — only the new event remains
         val content = logFile.readText()
@@ -164,11 +151,8 @@ class FileLogInterceptorTest {
         logFile.writeText("existing content\n")
 
         val event = LogEvent(LogLevel.INFO, "T", "new entry")
-        val chain = mockk<LogInterceptor.Chain>()
-        every { chain.event() } returns event
-        every { chain.proceed(event) } returns event
 
-        interceptor.intercept(chain)
+        interceptor.intercept(event)
 
         val content = logFile.readText()
         assertTrue(content.contains("existing content"))

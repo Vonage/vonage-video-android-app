@@ -5,4 +5,6 @@ data class LogEvent(
     val tag: String,
     val message: String,
     val throwable: Throwable? = null,
+    val timestamp: Long = System.currentTimeMillis(),
+    val thread: String = Thread.currentThread().name,
 )

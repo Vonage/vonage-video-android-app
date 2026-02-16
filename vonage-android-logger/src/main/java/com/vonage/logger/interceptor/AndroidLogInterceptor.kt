@@ -6,8 +6,7 @@ import com.vonage.logger.LogLevel
 
 class AndroidLogInterceptor : LogInterceptor {
 
-    override fun intercept(chain: LogInterceptor.Chain): LogEvent {
-        val event = chain.event()
+    override fun intercept(event: LogEvent): LogEvent {
         when (event.level) {
             LogLevel.VERBOSE -> log(Log::v, event)
             LogLevel.DEBUG -> log(Log::d, event)

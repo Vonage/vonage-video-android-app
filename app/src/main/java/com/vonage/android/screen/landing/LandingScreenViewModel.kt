@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import com.vonage.android.util.RoomNameGenerator
 import com.vonage.android.util.isValidRoomName
+import com.vonage.android.vonageLogger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +18,10 @@ class LandingScreenViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<LandingScreenUiState>(LandingScreenUiState.Content())
     val uiState: StateFlow<LandingScreenUiState> = _uiState.asStateFlow()
+
+    init {
+        vonageLogger.d("LandingScreen", "Init")
+    }
 
     fun updateName(roomName: String) {
         val roomNameError = roomName.isValidRoomName().not()

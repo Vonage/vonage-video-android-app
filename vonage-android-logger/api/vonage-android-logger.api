@@ -28,42 +28,32 @@ public final class com/vonage/logger/LogLevel : java/lang/Enum {
 }
 
 public final class com/vonage/logger/VonageLogger {
-	public synthetic fun <init> (Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun create (Ljava/lang/Class;)Ljava/lang/Object;
+	public synthetic fun <init> (Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun d (Ljava/lang/String;Ljava/lang/Throwable;)V
+	public static synthetic fun d$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
+	public final fun e (Ljava/lang/String;Ljava/lang/Throwable;)V
+	public static synthetic fun e$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
+	public final fun getTag ()Ljava/lang/String;
+	public final fun i (Ljava/lang/String;Ljava/lang/Throwable;)V
+	public static synthetic fun i$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
+	public final fun log (Lcom/vonage/logger/LogLevel;Ljava/lang/String;Ljava/lang/Throwable;)V
+	public static synthetic fun log$default (Lcom/vonage/logger/VonageLogger;Lcom/vonage/logger/LogLevel;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
+	public final fun v (Ljava/lang/String;Ljava/lang/Throwable;)V
+	public static synthetic fun v$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
+	public final fun w (Ljava/lang/String;Ljava/lang/Throwable;)V
+	public static synthetic fun w$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
 }
 
 public final class com/vonage/logger/VonageLogger$Builder {
 	public fun <init> ()V
 	public final fun addInterceptor (Lcom/vonage/logger/interceptor/LogInterceptor;)Lcom/vonage/logger/VonageLogger$Builder;
 	public final fun build ()Lcom/vonage/logger/VonageLogger;
+	public final fun tag (Ljava/lang/String;)Lcom/vonage/logger/VonageLogger$Builder;
 }
 
-public abstract interface annotation class com/vonage/logger/annotations/Debug : java/lang/annotation/Annotation {
-}
-
-public abstract interface annotation class com/vonage/logger/annotations/Error : java/lang/annotation/Annotation {
-}
-
-public abstract interface annotation class com/vonage/logger/annotations/Info : java/lang/annotation/Annotation {
-}
-
-public abstract interface annotation class com/vonage/logger/annotations/Log : java/lang/annotation/Annotation {
-	public abstract fun level ()Lcom/vonage/logger/LogLevel;
-}
-
-public abstract interface annotation class com/vonage/logger/annotations/Tag : java/lang/annotation/Annotation {
-	public abstract fun value ()Ljava/lang/String;
-}
-
-public abstract interface annotation class com/vonage/logger/annotations/Verbose : java/lang/annotation/Annotation {
-}
-
-public abstract interface annotation class com/vonage/logger/annotations/Warn : java/lang/annotation/Annotation {
-}
-
-public final class com/vonage/logger/interceptor/AndroidLogInterceptor : com/vonage/logger/interceptor/LogInterceptor {
+public abstract interface class com/vonage/logger/interceptor/AndroidLogInterceptor : com/vonage/logger/interceptor/LogInterceptor {
 	public fun <init> ()V
-	public fun intercept (Lcom/vonage/logger/interceptor/LogInterceptor$Chain;)Lcom/vonage/logger/LogEvent;
+	public fun intercept (Lcom/vonage/logger/LogEvent;)Lcom/vonage/logger/LogEvent;
 }
 
 public final class com/vonage/logger/interceptor/FileLogInterceptor : com/vonage/logger/interceptor/LogInterceptor {
@@ -72,35 +62,13 @@ public final class com/vonage/logger/interceptor/FileLogInterceptor : com/vonage
 	public static final field DEFAULT_MAX_FILE_SIZE J
 	public fun <init> (Ljava/io/File;JLjava/lang/String;)V
 	public synthetic fun <init> (Ljava/io/File;JLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun intercept (Lcom/vonage/logger/interceptor/LogInterceptor$Chain;)Lcom/vonage/logger/LogEvent;
+	public fun intercept (Lcom/vonage/logger/LogEvent;)Lcom/vonage/logger/LogEvent;
 }
 
 public final class com/vonage/logger/interceptor/FileLogInterceptor$Companion {
 }
 
-public final class com/vonage/logger/interceptor/HttpLogInterceptor : com/vonage/logger/interceptor/LogInterceptor {
-	public static final field CONTENT_TYPE_JSON Ljava/lang/String;
-	public static final field DEFAULT_TIMEOUT I
-	public static final field FAILURE_CODE I
-	public static final field HEADER_ACCEPT Ljava/lang/String;
-	public static final field HEADER_CONTENT_TYPE Ljava/lang/String;
-	public static final field POST_METHOD Ljava/lang/String;
-	public fun <init> (Ljava/lang/String;Ljava/util/concurrent/ExecutorService;II)V
-	public synthetic fun <init> (Ljava/lang/String;Ljava/util/concurrent/ExecutorService;IIILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun intercept (Lcom/vonage/logger/interceptor/LogInterceptor$Chain;)Lcom/vonage/logger/LogEvent;
-}
-
 public abstract interface class com/vonage/logger/interceptor/LogInterceptor {
-	public abstract fun intercept (Lcom/vonage/logger/interceptor/LogInterceptor$Chain;)Lcom/vonage/logger/LogEvent;
-}
-
-public abstract interface class com/vonage/logger/interceptor/LogInterceptor$Chain {
-	public abstract fun event ()Lcom/vonage/logger/LogEvent;
-	public abstract fun proceed (Lcom/vonage/logger/LogEvent;)Lcom/vonage/logger/LogEvent;
-}
-
-public final class com/vonage/logger/interceptor/LogLevelFilterInterceptor : com/vonage/logger/interceptor/LogInterceptor {
-	public fun <init> (Lcom/vonage/logger/LogLevel;)V
-	public fun intercept (Lcom/vonage/logger/interceptor/LogInterceptor$Chain;)Lcom/vonage/logger/LogEvent;
+	public abstract fun intercept (Lcom/vonage/logger/LogEvent;)Lcom/vonage/logger/LogEvent;
 }
 
