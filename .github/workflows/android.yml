@@ -57,7 +57,7 @@ jobs:
 
       - name: Run unit tests and code quality checks
         run: |
-          ./gradlew clean :koverXmlReportDebug detekt --info
+          ./gradlew clean koverXmlReportDebug detekt --info
 
       - name: Send report to sonar
         env:
