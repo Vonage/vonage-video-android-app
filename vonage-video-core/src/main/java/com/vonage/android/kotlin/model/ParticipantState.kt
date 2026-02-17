@@ -1,6 +1,5 @@
 package com.vonage.android.kotlin.model
 
-import android.util.Log
 import android.view.View
 import androidx.compose.runtime.Stable
 import com.opentok.android.Session
@@ -11,6 +10,7 @@ import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.ext.toParticipantType
+import com.vonage.logger.vonageLogger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -99,42 +99,42 @@ data class ParticipantState(
     }
 
     override fun onReconnected(subscriber: SubscriberKit) {
-        Log.d(logTag, "Subscriber reconnected")
+        vonageLogger.d(logTag, "Subscriber reconnected")
     }
 
     override fun onDisconnected(subscriber: SubscriberKit) {
-        Log.d(logTag, "Subscriber disconnected")
+        vonageLogger.d(logTag, "Subscriber disconnected")
     }
 
     override fun onAudioDisabled(subscriber: SubscriberKit) {
-        Log.d(logTag, "Subscriber audio disabled")
+        vonageLogger.d(logTag, "Subscriber audio disabled")
         _isMicEnabled.value = false
     }
 
     override fun onAudioEnabled(subscriber: SubscriberKit) {
-        Log.d(logTag, "Subscriber audio enabled")
+        vonageLogger.d(logTag, "Subscriber audio enabled")
         _isMicEnabled.value = true
     }
 
     override fun onVideoDataReceived(subscriber: SubscriberKit) {
-        Log.d(logTag, "Subscriber video data received")
+        vonageLogger.d(logTag, "Subscriber video data received")
     }
 
     override fun onVideoDisabled(subscriber: SubscriberKit, reason: String) {
-        Log.d(logTag, "Subscriber video disabled")
+        vonageLogger.d(logTag, "Subscriber video disabled")
         _isCameraEnabled.value = false
     }
 
     override fun onVideoEnabled(subscriber: SubscriberKit, reason: String) {
-        Log.d(logTag, "Subscriber video enabled")
+        vonageLogger.d(logTag, "Subscriber video enabled")
         _isCameraEnabled.value = true
     }
 
     override fun onVideoDisableWarning(subscriber: SubscriberKit) {
-        Log.d(logTag, "Subscriber video disable warning")
+        vonageLogger.d(logTag, "Subscriber video disable warning")
     }
 
     override fun onVideoDisableWarningLifted(subscriber: SubscriberKit) {
-        Log.d(logTag, "Subscriber video disable warning lifted")
+        vonageLogger.d(logTag, "Subscriber video disable warning lifted")
     }
 }

@@ -13,7 +13,6 @@ import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
@@ -21,6 +20,7 @@ import com.vonage.android.R
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.Companion.CHANNEL_ID
 import com.vonage.android.service.VeraForegroundServiceHandler.Companion.HANG_UP_ACTION
 import com.vonage.android.service.VeraForegroundServiceHandler.Companion.ROOM_INTENT_EXTRA_NAME
+import com.vonage.logger.vonageLogger
 
 class VeraForegroundService : Service() {
 
@@ -37,7 +37,7 @@ class VeraForegroundService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         if (ContextCompat.checkSelfPermission(this, permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            Log.e(TAG, "Cannot use microphone on background without RECORD_AUDIO permission")
+            vonageLogger.e(TAG, "Cannot use microphone on background without RECORD_AUDIO permission")
             stopSelf()
         }
 

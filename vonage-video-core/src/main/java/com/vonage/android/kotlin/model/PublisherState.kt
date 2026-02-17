@@ -1,6 +1,5 @@
 package com.vonage.android.kotlin.model
 
-import android.util.Log
 import android.view.View
 import androidx.compose.runtime.Stable
 import com.opentok.android.OpentokError
@@ -13,6 +12,7 @@ import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.ext.toParticipantType
 import com.vonage.android.kotlin.ext.toggle
+import com.vonage.logger.vonageLogger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -125,37 +125,37 @@ data class PublisherState(
     }
 
     override fun onVideoDisabled(publisher: PublisherKit, reason: String) {
-        Log.d(logTag, "Publisher video disabled - $reason")
+        vonageLogger.d(logTag, "Publisher video disabled - $reason")
         _isCameraEnabled.value = false
     }
 
     override fun onVideoEnabled(publisher: PublisherKit, reason: String) {
-        Log.d(logTag, "Publisher video enabled - $reason")
+        vonageLogger.d(logTag, "Publisher video enabled - $reason")
         _isCameraEnabled.value = true
     }
 
     override fun onVideoDisableWarning(publisher: PublisherKit) {
-        Log.d(logTag, "Publisher video disable warning")
+        vonageLogger.d(logTag, "Publisher video disable warning")
     }
 
     override fun onVideoDisableWarningLifted(publisher: PublisherKit) {
-        Log.d(logTag, "Publisher video disable warning lifted")
+        vonageLogger.d(logTag, "Publisher video disable warning lifted")
     }
 
     override fun onStreamCreated(publisher: PublisherKit, stream: Stream) {
-        Log.d(logTag, "Publisher stream created")
+        vonageLogger.d(logTag, "Publisher stream created")
     }
 
     override fun onStreamDestroyed(publisher: PublisherKit, stream: Stream) {
-        Log.d(logTag, "Publisher stream destroyed")
+        vonageLogger.d(logTag, "Publisher stream destroyed")
     }
 
     override fun onError(publisher: PublisherKit, error: OpentokError) {
-        Log.e(logTag, "Publisher error ${error.message}")
+        vonageLogger.e(logTag, "Publisher error ${error.message}")
     }
 
     override fun onMuteForced(publisher: PublisherKit) {
-        Log.d(logTag, "Publisher mute forced")
+        vonageLogger.d(logTag, "Publisher mute forced")
         _isMicEnabled.value = false
     }
 
