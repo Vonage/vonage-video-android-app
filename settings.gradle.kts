@@ -13,7 +13,7 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
     repositories {
         google()
         mavenCentral()
@@ -23,7 +23,15 @@ dependencyResolutionManagement {
 
 rootProject.name = "Vonage Video Android"
 include(":app")
-include(":compose")
-include(":kotlin")
+include(":vonage-video-ui-compose")
+include(":vonage-video-core")
+include(":vonage-video-shared")
 include(":vonage-feature-chat")
-include(":shared")
+include(":vonage-feature-archiving")
+include(":vonage-feature-screensharing")
+include(":vonage-feature-reactions")
+include(":vonage-feature-video-effects")
+include(":vonage-feature-captions")
+include(":vonage-audio-selector")
+include(":vonage-android-logger")
+include(":vonage-config-idea-plugin")

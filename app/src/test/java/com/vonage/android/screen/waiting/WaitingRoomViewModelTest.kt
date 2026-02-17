@@ -3,11 +3,14 @@ package com.vonage.android.screen.waiting
 import android.content.Context
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
+import com.vonage.android.config.Config
+import com.vonage.android.config.GetConfig
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CameraType
 import com.vonage.android.kotlin.model.PreviewPublisherState
+import com.vonage.android.screen.components.audio.AudioDevicesHandler
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -29,6 +32,8 @@ class WaitingRoomViewModelTest {
     private val context: Context = mockk(relaxed = true)
     private val videoClient: VonageVideoClient = mockk()
     private val userRepository: UserRepository = mockk()
+    private val getConfig: GetConfig = mockk()
+    private val audioDevicesHandler: AudioDevicesHandler = mockk(relaxed = true)
 
     private lateinit var sut: WaitingRoomViewModel
 
@@ -38,6 +43,14 @@ class WaitingRoomViewModelTest {
             roomName = ANY_ROOM_NAME,
             userRepository = userRepository,
             videoClient = videoClient,
+            getConfig = getConfig,
+            audioDevicesHandler = audioDevicesHandler,
+        )
+
+        every { getConfig.invoke() } returns Config(
+            allowCameraControl = true,
+            allowMicrophoneControl = true,
+            allowShowParticipantList = true,
         )
     }
 
@@ -168,7 +181,7 @@ class WaitingRoomViewModelTest {
     }
 
     @Test
-    fun `given viewmodel when setBlur then publisher set camera blur`() = runTest {
+    fun `given viewmodel when onCycleCameraBlur then publisher set camera blur`() = runTest {
         val publisher = buildMockPublisher()
         every { videoClient.createPreviewPublisher(context, any()) } returns publisher
         coEvery { userRepository.getUserName() } returns "not relevant"
@@ -179,7 +192,7 @@ class WaitingRoomViewModelTest {
             awaitItem() // initial state
             awaitItem() // after init
 
-            sut.setBlur()
+            sut.onCycleCameraBlur()
         }
 
         verify { publisher.cycleCameraBlur() }

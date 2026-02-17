@@ -30,6 +30,8 @@ output-metadata.json
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
+.vscode/
+.intellijPlatform/
 
 # Keystore files
 .sign/keystore.properties

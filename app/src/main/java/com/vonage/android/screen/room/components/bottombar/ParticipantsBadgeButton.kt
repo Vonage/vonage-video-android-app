@@ -1,6 +1,8 @@
 package com.vonage.android.screen.room.components.bottombar
 
 import androidx.compose.runtime.Composable
+import com.vonage.android.compose.components.bottombar.BottomBarAction
+import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Group2
 

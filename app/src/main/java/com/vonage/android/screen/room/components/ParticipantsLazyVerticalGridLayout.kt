@@ -21,8 +21,9 @@ import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
-import com.vonage.android.screen.room.noOpCallFacade
+import com.vonage.android.screen.room.MeetingRoomActions
 import com.vonage.android.util.lazyStateVisibilityTracker
+import com.vonage.android.util.noOpCall
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -30,6 +31,7 @@ import kotlinx.collections.immutable.toImmutableList
 fun ParticipantsLazyVerticalGridLayout(
     participants: ImmutableList<Participant>,
     call: CallFacade,
+    actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
     columns: Int = 2,
     rows: Int = 3,
@@ -60,6 +62,7 @@ fun ParticipantsLazyVerticalGridLayout(
             ) { participant ->
                 ParticipantVideoCard(
                     participant = participant,
+                    actions = actions,
                     modifier = Modifier
                         .height(itemHeight)
                         .width(itemWidth)
@@ -75,7 +78,8 @@ internal fun ParticipantsLazyVerticalGridLayoutPreview() {
     VonageVideoTheme {
         ParticipantsLazyVerticalGridLayout(
             participants = buildParticipants(10).toImmutableList(),
-            call = noOpCallFacade,
+            call = noOpCall,
+            actions = MeetingRoomActions(),
         )
     }
 }

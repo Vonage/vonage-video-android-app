@@ -12,6 +12,15 @@ The Vonage Video API Reference App for Android is an open-source video conferenc
 
 The Reference App demonstrates the best practices for integrating the [Vonage Video API](https://developer.vonage.com/en/video/client-sdks/web/overview) with your application for various use cases, from one-to-one and multi-participant video calling to foreground services integration and more.
 
+## Cross-Platform Support
+
+Looking to build on other platforms? The Vonage Video API Reference App is also available for:
+
+- **Web (React)**: [vonage-video-react-app](https://github.com/Vonage/vonage-video-react-app)
+- **iOS**: [vonage-video-ios-app](https://github.com/Vonage/vonage-video-ios-app)
+
+These reference apps share the same backend infrastructure and demonstrate consistent best practices across all platforms, making it easy to build unified video experiences for your users.
+
 ## Why use it?
 
 The Vonage Video API Reference App for Android provides developers an easy-to-setup way to get started with using our APIs with the Android SDK.

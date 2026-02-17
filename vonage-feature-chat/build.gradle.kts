@@ -40,16 +40,14 @@ android {
 }
 
 dependencies {
-    implementation(project(":compose"))
-    implementation(project(":kotlin"))
-    implementation(project(":shared"))
+    implementation(project(":vonage-video-ui-compose"))
+    implementation(project(":vonage-video-core"))
+    implementation(project(":vonage-video-shared"))
     implementation(libs.hilt.android)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.androidx.runtime.android)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.tooling.preview)

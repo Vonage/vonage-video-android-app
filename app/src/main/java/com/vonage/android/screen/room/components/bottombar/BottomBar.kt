@@ -26,6 +26,12 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
+import com.vonage.android.archiving.ArchivingUiState
+import com.vonage.android.archiving.ui.recordingAction
+import com.vonage.android.captions.CaptionsUiState
+import com.vonage.android.captions.ui.captionsAction
+import com.vonage.android.compose.components.bottombar.BottomBarAction
+import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.compose.components.bottombar.ControlButton
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -34,18 +40,14 @@ import com.vonage.android.compose.vivid.icons.solid.Chat2
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.reactions.ui.EmojiSelector
 import com.vonage.android.screen.reporting.ReportIssueScreen
 import com.vonage.android.screen.reporting.components.reportingAction
 import com.vonage.android.screen.room.CallLayoutType
-import com.vonage.android.screen.room.CaptionsState
 import com.vonage.android.screen.room.MeetingRoomActions
-import com.vonage.android.screen.room.RecordingState
-import com.vonage.android.screen.room.ScreenSharingState
-import com.vonage.android.screen.room.components.captions.captionsAction
-import com.vonage.android.screen.room.components.emoji.EmojiSelector
-import com.vonage.android.screen.room.components.recording.recordingAction
-import com.vonage.android.screen.room.noOpCallFacade
+import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.ui.screenSharingAction
+import com.vonage.android.util.noOpCall
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -56,10 +58,13 @@ data class BottomBarState(
     val onShowChat: () -> Unit,
     val isChatShow: Boolean,
     val layoutType: CallLayoutType,
-    val recordingState: RecordingState,
+    val archivingUiState: ArchivingUiState,
     val screenSharingState: ScreenSharingState,
-    val captionsState: CaptionsState,
+    val captionsUiState: CaptionsUiState,
     val participants: ImmutableList<Participant>,
+    val allowShowParticipantList: Boolean,
+    val allowMicrophoneControl: Boolean,
+    val allowCameraControl: Boolean,
 )
 
 // 4 because mic + camera + menu + end
@@ -89,7 +94,8 @@ fun BottomBar(
     val containerSpacing = with(density) { VonageVideoTheme.dimens.spaceXLarge.toPx() }
 
     var availableWidth by remember { mutableIntStateOf(0) }
-    val pinnedActionsWidth = DEFAULT_ACTIONS_COUNT * actionWidth + (DEFAULT_ACTIONS_COUNT - 1) * spacingWidth
+    val pinnedActionsWidth =
+        DEFAULT_ACTIONS_COUNT * actionWidth + (DEFAULT_ACTIONS_COUNT - 1) * spacingWidth
     val availableWidthForActions by remember(availableWidth) {
         derivedStateOf { (availableWidth - pinnedActionsWidth - containerSpacing).coerceAtLeast(0F) }
     }
@@ -137,6 +143,8 @@ fun BottomBar(
         CallControlBar(
             publisher = state.publisher,
             roomActions = roomActions,
+            allowMicrophoneControl = state.allowMicrophoneControl,
+            allowCameraControl = state.allowCameraControl,
             onShowMore = { showMoreActions = showMoreActions.toggle() },
         ) {
             visibleActions.forEach { action ->
@@ -164,7 +172,7 @@ fun BottomBar(
         }
     }
 
-    if (showParticipants) {
+    if (showParticipants && state.allowShowParticipantList) {
         ModalBottomSheet(
             onDismissRequest = { showParticipants = false },
             sheetState = participantsSheetState,
@@ -203,17 +211,19 @@ private fun actionsFactory(
     val participantsCount by call.participantsCount.collectAsStateWithLifecycle()
     val chatState by call.chatSignalState.collectAsStateWithLifecycle()
 
-    return actions.map { type ->
+    return actions.mapNotNull { type ->
         when (type) {
             BottomBarActionType.CHANGE_LAYOUT -> layoutSelectorAction(
                 layoutType = state.layoutType,
                 roomActions = roomActions,
             )
 
-            BottomBarActionType.PARTICIPANTS -> participantsAction(
-                participantsCount = participantsCount,
-                onToggleParticipants = onShowParticipants,
-            )
+            BottomBarActionType.PARTICIPANTS -> if (state.allowShowParticipantList) {
+                participantsAction(
+                    participantsCount = participantsCount,
+                    onToggleParticipants = onShowParticipants,
+                )
+            } else null
 
             BottomBarActionType.CHAT -> BottomBarAction(
                 type = BottomBarActionType.CHAT,
@@ -225,18 +235,27 @@ private fun actionsFactory(
             )
 
             BottomBarActionType.SCREEN_SHARING -> screenSharingAction(
-                actions = roomActions,
+                onStartScreenSharing = { roomActions.onToggleScreenSharing(true) },
+                onStopScreenSharing = { roomActions.onToggleScreenSharing(false) },
+                startScreenSharingLabel = stringResource(R.string.screen_share_start),
+                stopScreenSharingLabel = stringResource(R.string.screen_share_stop),
                 screenSharingState = state.screenSharingState,
             )
 
             BottomBarActionType.RECORD_SESSION -> recordingAction(
-                actions = roomActions,
-                recordingState = state.recordingState,
+                onStartRecording = { roomActions.onToggleRecording(true) },
+                onStopRecording = { roomActions.onToggleRecording(false) },
+                startRecordingLabel = stringResource(R.string.recording_start_recording),
+                stopRecordingLabel = stringResource(R.string.recording_stop_recording),
+                archivingUiState = state.archivingUiState,
             )
 
             BottomBarActionType.CAPTIONS -> captionsAction(
-                actions = roomActions,
-                captionsState = state.captionsState,
+                onEnableCaptions = { roomActions.onToggleCaptions(true) },
+                onDisableCaptions = { roomActions.onToggleCaptions(false) },
+                enableCaptionsLabel = stringResource(R.string.captions_start),
+                disableCaptionsLabel = stringResource(R.string.captions_stop),
+                captionsUiState = state.captionsUiState,
             )
 
             BottomBarActionType.REPORT -> reportingAction(
@@ -263,16 +282,19 @@ internal fun BottomBarPreview() {
     VonageVideoTheme {
         BottomBar(
             roomActions = MeetingRoomActions(),
-            call = noOpCallFacade,
+            call = noOpCall,
             state = BottomBarState(
                 publisher = buildParticipants(15).first(),
                 participants = buildParticipants(15).toImmutableList(),
                 onShowChat = {},
                 isChatShow = false,
                 layoutType = CallLayoutType.SPEAKER_LAYOUT,
-                recordingState = RecordingState.RECORDING,
-                captionsState = CaptionsState.IDLE,
+                archivingUiState = ArchivingUiState.RECORDING,
+                captionsUiState = CaptionsUiState.IDLE,
                 screenSharingState = ScreenSharingState.IDLE,
+                allowShowParticipantList = true,
+                allowMicrophoneControl = true,
+                allowCameraControl = true,
             ),
         )
     }

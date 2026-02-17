@@ -3,8 +3,9 @@ apply plugin: "org.sonarqube"
 ext.sonar = [
         ignoreModules: [
                 // add here any module you want to ignore
-                "compose",
-                "kotlin"
+                "vonage-video-ui-compose",
+                "vonage-video-core",
+                "vonage-config-idea-plugin"
         ],
         excludeFilter: [
                 // add here any regex you want to ignore
