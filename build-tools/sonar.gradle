@@ -32,7 +32,7 @@ sonarqube {
         property("sonar.organization", "vonage")
         property("sonar.projectName", "vonage-video-android-app")
         property("sonar.java.coveragePlugin", "jacoco")
-        property("sonar.coverage.jacoco.xmlReportPaths", "${rootDir}/app/build/reports/kover/reportDebug.xml")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${rootDir}/build/reports/kover/reportDebug.xml")
         // this value stays the same for both jacoco and kover
         property("sonar.sourceEncoding", "UTF-8")
         property("sonar.java.binaries", "${rootDir}/**/build/tmp/kotlin-classes/debug")

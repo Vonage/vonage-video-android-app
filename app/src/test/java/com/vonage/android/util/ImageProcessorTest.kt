@@ -12,8 +12,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.Before
+import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import kotlin.test.assertEquals
@@ -28,7 +28,7 @@ class ImageProcessorTest {
     private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
     private lateinit var imageProcessor: ImageProcessor
 
-    @BeforeEach
+    @Before
     fun setUp() {
         every { context.contentResolver } returns contentResolver
         imageProcessor = ImageProcessor(context, testDispatcher)
