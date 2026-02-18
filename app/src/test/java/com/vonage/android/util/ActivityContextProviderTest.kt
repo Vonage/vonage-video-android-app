@@ -3,9 +3,9 @@ package com.vonage.android.util
 import android.content.Context
 import io.mockk.clearAllMocks
 import io.mockk.mockk
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
@@ -14,12 +14,12 @@ class ActivityContextProviderTest {
     private lateinit var provider: ActivityContextProvider
     private val mockContext: Context = mockk(relaxed = true)
 
-    @BeforeEach
+    @Before
     fun setUp() {
         provider = ActivityContextProvider()
     }
 
-    @AfterEach
+    @After
     fun tearDown() {
         clearAllMocks()
     }
