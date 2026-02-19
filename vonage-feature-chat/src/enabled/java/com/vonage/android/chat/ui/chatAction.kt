@@ -6,7 +6,6 @@ import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Chat2
 
-@Suppress("UnusedParameter", "FunctionOnlyReturningConstant")
 @Composable
 fun chatAction(
     onShowChat: () -> Unit,
