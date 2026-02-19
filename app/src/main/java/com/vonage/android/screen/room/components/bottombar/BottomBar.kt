@@ -30,13 +30,12 @@ import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.ui.recordingAction
 import com.vonage.android.captions.CaptionsUiState
 import com.vonage.android.captions.ui.captionsAction
+import com.vonage.android.chat.ui.chatAction
 import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.compose.components.bottombar.ControlButton
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.compose.vivid.icons.VividIcons
-import com.vonage.android.compose.vivid.icons.solid.Chat2
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
@@ -225,13 +224,11 @@ private fun actionsFactory(
                 )
             } else null
 
-            BottomBarActionType.CHAT -> BottomBarAction(
-                type = BottomBarActionType.CHAT,
-                icon = VividIcons.Solid.Chat2,
+            BottomBarActionType.CHAT -> chatAction(
                 label = stringResource(R.string.chat),
                 isSelected = state.isChatShow,
                 badgeCount = chatState?.unreadCount ?: 0,
-                onClick = onShowChat,
+                onShowChat = onShowChat,
             )
 
             BottomBarActionType.SCREEN_SHARING -> screenSharingAction(
