@@ -1,9 +1,9 @@
 [versions]
 accompanistPermissions = "0.37.3"
-activityCompose = "1.12.3"
-agp = "8.13.1"
+activityCompose = "1.12.4"
+agp = "8.13.2"
 appcompat = "1.7.1"
-composeBom = "2026.01.01"
+composeBom = "2026.02.00"
 appUpdate = "2.1.0"
 appUpdateKtx = "2.1.0"
 converterMoshi = "3.0.0"
@@ -33,12 +33,12 @@ moshiKotlin = "1.15.2"
 navigationCompose = "2.9.7"
 navigationRuntimeAndroid = "2.9.7"
 okhttp = "5.3.2"
-opentokAndroidSdk = "2.32.1"
+opentokAndroidSdk = "2.33.0"
 retrofit = "3.0.0"
 testRules = "1.7.0"
 testRunner = "1.7.0"
 turbine = "1.2.1"
-runtime = "1.10.2"
+runtime = "1.10.3"
 material3 = "1.4.0"
 adaptive = "1.2.0"
 
@@ -111,9 +111,9 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version = "2.2.21-2.0.4" }
-kover = { id = "org.jetbrains.kotlinx.kover", version = "0.9.6" }
+kover = { id = "org.jetbrains.kotlinx.kover", version = "0.9.7" }
 play-publisher = { id = "com.github.triplet.play", version = "3.12.2" }
 sonarqube = { id = "org.sonarqube", version = "6.3.1.5724" }
-stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version = "0.6.6" }
+stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version = "0.7.0" }
 google-services = { id = "com.google.gms.google-services", version = "4.4.4" }
 crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.6" }
