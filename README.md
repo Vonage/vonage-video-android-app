@@ -1,4 +1,4 @@
-# Vonage Video API Reference App for Android (Beta)
+# Vonage Video API Reference App for Android
 
 <img src="https://developer.nexmo.com/assets/images/Vonage_Nexmo.svg" height="48px" alt="Nexmo is now known as Vonage" />
 
@@ -81,17 +81,19 @@ The backend communicates with the Vonage video platform using the Vonage Server 
 The Vonage Android reference app is built with a modular architecture. The app is organized into the following modules:
 
 - **app**: Main application module and composition root
-- **kotlin**: Vonage Video SDK integration and core business logic
-  - `VonageVideoClient`: Main SDK client
-  - `Call`: Call lifecycle management
-  - `model`: Domain models (CallFacade, Participant, PublisherState, etc.)
-  - `signal`: Signal plugins (chat, reactions)
-  - `internal`: Internal implementations (audio device, active speaker tracking, screen sharing)
-  - `ext`: Extension functions for reactive programming
-- **compose**: Reusable Compose UI components and Material Design 3 theme
-- **shared**: Shared utilities and domain models
-- **vonage-feature-chat**: Meeting room chat (optional feature module)
-- **build-tools**: Custom Gradle plugins for configuration generation
+- **vonage-video-core**: Core video SDK wrapper providing the `VonageVideoClient`, `Call` abstraction, signaling, and domain models on top of the OpenTok Android SDK
+- **vonage-video-ui-compose**: Jetpack Compose UI component library with a JSON-driven theme generator, reusable widgets, and permission handling
+- **vonage-video-shared**: Shared utilities and common code used across all other modules
+- **vonage-feature-chat**: In-call text chat using OpenTok signaling (optional feature module)
+- **vonage-feature-reactions**: In-call emoji reactions (optional feature module)
+- **vonage-feature-captions**: Live captions and subtitles (optional feature module)
+- **vonage-feature-archiving**: Call recording and archive management (optional feature module)
+- **vonage-feature-screensharing**: Screen sharing via MediaProjection and foreground service (optional feature module)
+- **vonage-feature-video-effects**: Video effects such as background blur and replacement (optional feature module)
+- **vonage-audio-selector**: Audio output device selector with support for Bluetooth, wired headset, earpiece, and speaker
+- **vonage-android-logger**: Lightweight logging library with an interceptor pipeline and structured log events
+- **vonage-config-idea-plugin**: Android Studio / IntelliJ plugin for managing configurable features
+- **build-tools**: Custom Gradle plugins for JSON-to-Kotlin config generation, theme generation, Detekt, Kover, and SonarQube integration
 
 ## Platforms supported
 
@@ -101,7 +103,7 @@ The current minimum deployment target for the reference app is Android 7.0 (API 
 
 - **Android Studio**: Ladybug (2024.2.1) or newer
 - **JDK**: Version 17 or higher
-- **Gradle**: 8.11.0+ (via wrapper)
+- **Gradle**: 8.13.0+ (via wrapper)
 
 ## Running Locally
 
@@ -165,7 +167,13 @@ You can customize the app colors by editing the `config/theme.json` file with yo
 
 ## Testing
 
-This project uses JUnit for unit tests, MockK for mocking, Turbine for Flow testing, and Espresso for instrumentation tests.
+This project uses a combination of frameworks for comprehensive test coverage:
+
+- **Unit tests**: JUnit 4/5, MockK, Turbine (Flow testing), Kotlinx Coroutines Test, and AndroidX Core Testing
+- **UI / Instrumented tests**: Compose UI Test, Espresso, Hilt Testing, and AndroidX Test Runner/Rules
+- **Coverage**: Kover for code coverage reports, integrated with SonarQube
+
+Unit tests are spread across multiple modules (`app`, `vonage-video-core`, `vonage-audio-selector`, `vonage-video-shared`, `vonage-android-logger`, `vonage-feature-chat`, and `vonage-config-idea-plugin`). Instrumented tests live in the `app` module and follow a Page Object / Screen Object pattern with a custom `HiltTestRunner` for dependency injection support.
 
 Run tests from the command line:
 
@@ -173,11 +181,14 @@ Run tests from the command line:
 # Run all unit tests
 ./gradlew test
 
-# Run instrumentation tests (requires connected device/emulator)
+# Run tests for a specific module
+./gradlew :vonage-video-core:test
+
+# Run instrumented tests (requires connected device/emulator)
 ./gradlew connectedAndroidTest
 
-# Run tests for specific module
-./gradlew :kotlin:test
+# Run instrumented tests on Gradle Managed Devices (no physical device needed)
+./gradlew pixelDebugAndroidTest
 
 # Generate code coverage report
 ./gradlew koverHtmlReport
