@@ -25,6 +25,8 @@
 
     <!-- Meeting Screen -->
     <string name="meeting_room_participants_list_title">Participants (%d)</string>
+    <string name="meeting_room_participants_list_search_placeholder">Search</string>
+    <string name="meeting_room_participants_list_search_not_found">Participant not found</string>
     <string name="meeting_screen_session_creation_error">Error while creating room, please try again</string>
     <string name="meeting_room_share_room_link">Share room link</string>
 

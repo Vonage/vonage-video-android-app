@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.compose.components.AvatarInitials
+import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
@@ -34,7 +35,6 @@ import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.kotlin.model.Participant
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-
 
 @Composable
 fun ParticipantsList(
@@ -64,16 +64,16 @@ fun ParticipantsList(
             ParticipantListTitle(participantsCount)
         }
         item {
-            TextField(
+            VonageTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                label = { Text("Search") },
+                label = { R.string.meeting_room_participants_list_search_placeholder },
                 modifier = Modifier.fillMaxWidth()
             )
         }
         if(sortedParticipants.isEmpty()){
             item{
-                Text("Participant not found")
+                R.string.meeting_room_participants_list_search_not_found
             }
         }
         else{
