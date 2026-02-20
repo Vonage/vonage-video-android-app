@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -67,13 +66,14 @@ fun ParticipantsList(
             VonageTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                label = { R.string.meeting_room_participants_list_search_placeholder },
+
+                label = { Text(text = stringResource(R.string.meeting_room_participants_list_search_placeholder)) },
                 modifier = Modifier.fillMaxWidth()
             )
         }
         if(sortedParticipants.isEmpty()){
             item{
-                R.string.meeting_room_participants_list_search_not_found
+                Text(text = stringResource(R.string.meeting_room_participants_list_search_not_found))
             }
         }
         else{
