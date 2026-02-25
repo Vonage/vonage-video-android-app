@@ -14,15 +14,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.compose.components.AvatarInitials
+import com.vonage.android.compose.components.VonageTextField
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
@@ -32,14 +36,25 @@ import com.vonage.android.kotlin.model.Participant
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
+const val PARTICIPANT_ITEM_TAG = "ParticipantItemTestTag"
+const val SEARCH_TAG = "SearchTestTag"
 @Composable
 fun ParticipantsList(
     participants: ImmutableList<Participant>,
     modifier: Modifier = Modifier,
 ) {
+    var searchQuery by remember { mutableStateOf("") }
     val sortedParticipants by remember(participants) {
-        derivedStateOf { participants.sortedBy { participant -> participant.name } }
+        derivedStateOf {
+            if (searchQuery.isBlank()) {
+                participants.sortedBy { participant -> participant.name }
+            }
+            participants.filter {
+                it.name.contains(searchQuery,ignoreCase = true)
+            }.sortedBy { it.name }
+        }
     }
+
     val participantsCount = remember(participants) { participants.size }
 
     LazyColumn(
@@ -50,12 +65,29 @@ fun ParticipantsList(
         item {
             ParticipantListTitle(participantsCount)
         }
-        items(
-            items = sortedParticipants,
-            key = { participant -> participant.id },
-        ) { participantState ->
-            ParticipantRow(participantState)
+        item {
+            VonageTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+
+                label = { Text(text = stringResource(R.string.meeting_room_participants_list_search_placeholder)) },
+                modifier = Modifier.fillMaxWidth().testTag(SEARCH_TAG)
+            )
         }
+        if(sortedParticipants.isEmpty()){
+            item{
+                Text(text = stringResource(R.string.meeting_room_participants_list_search_not_found))
+            }
+        }
+        else{
+            items(
+                items = sortedParticipants,
+                key = { participant -> participant.id },
+            ) {
+                    participantState -> ParticipantRow(participantState)
+            }
+        }
+
     }
 }
 
@@ -76,13 +108,15 @@ private fun ParticipantListTitle(participantsCount: Int) {
 @Composable
 private fun ParticipantRow(participant: Participant) {
     val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
+
     Row(
         modifier = Modifier
             .padding(
                 bottom = VonageVideoTheme.dimens.paddingXSmall,
                 end = VonageVideoTheme.dimens.paddingSmall,
             )
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .testTag(PARTICIPANT_ITEM_TAG),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
     ) {
