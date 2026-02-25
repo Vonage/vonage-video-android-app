@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -35,6 +36,8 @@ import com.vonage.android.kotlin.model.Participant
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
+const val PARTICIPANT_ITEM_TAG = "ParticipantItemTestTag"
+const val SEARCH_TAG = "SearchTestTag"
 @Composable
 fun ParticipantsList(
     participants: ImmutableList<Participant>,
@@ -68,7 +71,7 @@ fun ParticipantsList(
                 onValueChange = { searchQuery = it },
 
                 label = { Text(text = stringResource(R.string.meeting_room_participants_list_search_placeholder)) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().testTag(SEARCH_TAG)
             )
         }
         if(sortedParticipants.isEmpty()){
@@ -105,13 +108,15 @@ private fun ParticipantListTitle(participantsCount: Int) {
 @Composable
 private fun ParticipantRow(participant: Participant) {
     val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
+
     Row(
         modifier = Modifier
             .padding(
                 bottom = VonageVideoTheme.dimens.paddingXSmall,
                 end = VonageVideoTheme.dimens.paddingSmall,
             )
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .testTag(PARTICIPANT_ITEM_TAG),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
     ) {
