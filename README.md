@@ -99,6 +99,12 @@ The Vonage Android reference app is built with a modular architecture. The app i
 
 The current minimum deployment target for the reference app is Android 7.0 (API 24+). The app is optimized for phones and tablets and supports the following architectures: ARM64-v8a, ARMv7, x86, and x86_64.
 
+### Vonage Video SDK Compatibility
+
+This reference app has been tested with **Vonage Video SDK 2.32** and **2.33**. We strongly recommend using the latest available SDK version to take advantage of the newest features and avoid potential issues with older releases.
+
+The SDK version is declared in the version catalog file (`gradle/libs.versions.toml`) and can be adjusted there if needed.
+
 ## Requirements
 
 - **Android Studio**: Ladybug (2024.2.1) or newer
@@ -164,6 +170,10 @@ See [docs/CONFIG-SYSTEM.md](docs/CONFIG-SYSTEM.md) for detailed configuration do
 ## Theme customization
 
 You can customize the app colors by editing the `config/theme.json` file with your desired color scheme values. The `ThemeGeneratorPlugin` Gradle plugin will generate the necessary theme resources in the `compose` module at build time.
+
+## Multi-Language Support
+
+The app is fully prepared for internationalization using Android's **string resources** (`strings.xml`). All user-facing strings are localized through `stringResource()` in Jetpack Compose, making it straightforward to add support for new languages.
 
 ## Testing
 
