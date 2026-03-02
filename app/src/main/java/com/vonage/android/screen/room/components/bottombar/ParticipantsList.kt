@@ -35,9 +35,16 @@ import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.kotlin.model.Participant
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import java.text.Normalizer
 
 const val PARTICIPANT_ITEM_TAG = "ParticipantItemTestTag"
 const val SEARCH_TAG = "SearchTestTag"
+
+//enable normalization for diacritics
+fun String.normalize() =
+    Normalizer.normalize(this, Normalizer.Form.NFD)
+        .replace("\\p{Mn}+".toRegex(), "")
+
 @Composable
 fun ParticipantsList(
     participants: ImmutableList<Participant>,
@@ -50,7 +57,7 @@ fun ParticipantsList(
                 participants.sortedBy { participant -> participant.name }
             }
             participants.filter {
-                it.name.contains(searchQuery,ignoreCase = true)
+                it.name.normalize().contains(searchQuery.normalize(),ignoreCase = true)
             }.sortedBy { it.name }
         }
     }
