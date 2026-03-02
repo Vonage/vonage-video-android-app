@@ -1,10 +1,12 @@
 package com.vonage.android.kotlin.model
 
+import android.util.Log
 import android.view.View
 import androidx.compose.runtime.Stable
 import com.opentok.android.Session
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
+import com.vonage.android.kotlin.ext.id
 import com.vonage.android.kotlin.ext.mapTalking
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.name
@@ -62,6 +64,12 @@ data class ParticipantState(
 
     private val logTag = "Subscriber[$id]"
 
+    private val _videoStats: MutableStateFlow<SubscriberVideoStats?> = MutableStateFlow(null)
+    val videoStats: StateFlow<SubscriberVideoStats?> = _videoStats
+
+    private val _audioStats: MutableStateFlow<SubscriberAudioStats?> = MutableStateFlow(null)
+    val audioStats: StateFlow<SubscriberAudioStats?> = _audioStats
+
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
             true -> subscriber.subscribeToVideo = subscriber.stream.hasVideo()
@@ -78,6 +86,30 @@ data class ParticipantState(
     suspend fun setup() {
         subscriber.setStreamListener(this)
         subscriber.setVideoListener(this)
+        subscriber.setVideoStatsListener { _, stats ->
+            Log.d("STATS", "-> ${stats.videoPacketsReceived}")
+            _videoStats.value = SubscriberVideoStats(
+                videoPacketsReceived = stats.videoPacketsReceived,
+                videoPacketsLost = stats.videoPacketsLost,
+                videoBytesReceived = stats.videoBytesReceived,
+                width = stats.width,
+                height = stats.height,
+                codec = stats.codec.orEmpty(),
+                decodedFrameRate = stats.decodedFrameRate,
+                bitrate = stats.bitrate,
+                freezeCount = stats.freezeCount,
+                totalFreezesDuration = stats.totalFreezesDuration,
+                estimatedBandwidthInBps = stats.senderStats?.connectionEstimatedBandwidth ?: 0L,
+            )
+        }
+        subscriber.setAudioStatsListener { _, stats ->
+            _audioStats.value = SubscriberAudioStats(
+                audioPacketsReceived = stats.audioPacketsReceived,
+                audioPacketsLost = stats.audioPacketsLost,
+                audioBytesReceived = stats.audioBytesReceived,
+                estimatedBandwidthInBps = stats.senderStats?.connectionEstimatedBandwidth ?: 0L,
+            )
+        }
 
         subscriber.observeAudioLevel()
             .movingAverage(windowSize = 5)
@@ -94,6 +126,8 @@ data class ParticipantState(
     override fun clean(session: Session) {
         subscriber.setVideoListener(null)
         subscriber.setStreamListener(null)
+        subscriber.setVideoStatsListener(null)
+        subscriber.setAudioStatsListener(null)
         subscriber.setAudioLevelListener(null)
         session.unsubscribe(subscriber)
     }
@@ -137,4 +171,25 @@ data class ParticipantState(
     override fun onVideoDisableWarningLifted(subscriber: SubscriberKit) {
         vonageLogger.d(logTag, "Subscriber video disable warning lifted")
     }
+
+    data class SubscriberVideoStats(
+        val videoPacketsReceived: Int,
+        val videoPacketsLost: Int,
+        val videoBytesReceived: Int,
+        val width: Int,
+        val height: Int,
+        val codec: String,
+        val decodedFrameRate: Double,
+        val bitrate: Long,
+        val freezeCount: Long,
+        val totalFreezesDuration: Long,
+        val estimatedBandwidthInBps: Long,
+    )
+
+    data class SubscriberAudioStats(
+        val audioPacketsReceived: Int,
+        val audioPacketsLost: Int,
+        val audioBytesReceived: Int,
+        val estimatedBandwidthInBps: Long,
+    )
 }

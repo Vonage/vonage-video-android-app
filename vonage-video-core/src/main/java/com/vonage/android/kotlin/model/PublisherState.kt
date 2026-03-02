@@ -2,6 +2,7 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.toString
 import com.opentok.android.OpentokError
 import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit
@@ -65,6 +66,12 @@ data class PublisherState(
     private val _camera: MutableStateFlow<CameraType> = MutableStateFlow(CameraType.FRONT)
     override val camera: StateFlow<CameraType> = _camera
 
+    private val _videoStats: MutableStateFlow<VideoStats?> = MutableStateFlow(null)
+    val videoStats: StateFlow<VideoStats?> = _videoStats
+
+    private val _audioStats: MutableStateFlow<AudioStats?> = MutableStateFlow(null)
+    val audioStats: StateFlow<AudioStats?> = _audioStats
+
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
             true -> publisher.publishVideo = publisher.stream.hasVideo()
@@ -92,6 +99,60 @@ data class PublisherState(
         }
     }
 
+    data class VideoStats(
+        val duration: Double,
+        val videoPacketsSent: Long,
+        val videoPacketsLost: Long,
+        val videoBytesSent: Long,
+        val estimatedBandwidthInBps: Long,
+        val videoLayerStats: Array<VideoLayerStats>,
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as VideoStats
+
+            if (duration != other.duration) return false
+            if (videoPacketsSent != other.videoPacketsSent) return false
+            if (videoPacketsLost != other.videoPacketsLost) return false
+            if (videoBytesSent != other.videoBytesSent) return false
+            if (estimatedBandwidthInBps != other.estimatedBandwidthInBps) return false
+            if (!videoLayerStats.contentEquals(other.videoLayerStats)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = duration.hashCode()
+            result = 31 * result + videoPacketsSent.hashCode()
+            result = 31 * result + videoPacketsLost.hashCode()
+            result = 31 * result + videoBytesSent.hashCode()
+            result = 31 * result + estimatedBandwidthInBps.hashCode()
+            result = 31 * result + videoLayerStats.contentHashCode()
+            return result
+        }
+    }
+
+    data class VideoLayerStats(
+        val height: Int,
+        val width: Int,
+        val codec: String,
+        val encodedFrameRate: Double,
+        val qualityLimitationReason: String,
+        val scalabilityMode: String?,
+        val bitrate: Long,
+        val totalBitrate: Long,
+    )
+
+    data class AudioStats(
+        val duration: Double,
+        val audioPacketsSent: Long,
+        val audioPacketsLost: Long,
+        val audioBytesSent: Long,
+        val estimatedBandwidthInBps: Long,
+    )
+
     /**
      * Initializes publisher listeners and audio level monitoring.
      *
@@ -102,6 +163,43 @@ data class PublisherState(
         publisher.setPublisherListener(this)
         publisher.setMuteListener(this)
         publisher.setCameraListener(this)
+
+        publisher.setVideoStatsListener { _, stats ->
+            if (stats.isNotEmpty()) {
+                val s = stats[0]
+                _videoStats.value = VideoStats(
+                    duration = (s.timeStamp - s.startTime) / 1000,
+                    videoPacketsSent = s.videoPacketsSent,
+                    videoPacketsLost = s.videoPacketsLost,
+                    videoBytesSent = s.videoBytesSent,
+                    estimatedBandwidthInBps = s.transport.connectionEstimatedBandwidth,
+                    videoLayerStats = s.videoLayers.map { layer ->
+                        VideoLayerStats(
+                            height = layer.height,
+                            width = layer.width,
+                            codec = layer.codec,
+                            encodedFrameRate = layer.encodedFrameRate,
+                            qualityLimitationReason = layer.qualityLimitationReason,
+                            scalabilityMode = layer.scalabilityMode,
+                            bitrate = layer.bitrate,
+                            totalBitrate = layer.totalBitrate,
+                        )
+                    }.toTypedArray(),
+                )
+            }
+        }
+        publisher.setAudioStatsListener { _, stats ->
+            if (stats.isNotEmpty()) {
+                val s = stats[0]
+                _audioStats.value = AudioStats(
+                    duration = (s.timeStamp - s.startTime) / 1000,
+                    audioPacketsSent = s.audioPacketsSent,
+                    audioPacketsLost = s.audioPacketsLost,
+                    audioBytesSent = s.audioBytesSent,
+                    estimatedBandwidthInBps = s.transport.connectionEstimatedBandwidth,
+                )
+            }
+        }
 
         publisher.observeAudioLevel()
             .movingAverage(windowSize = 2)

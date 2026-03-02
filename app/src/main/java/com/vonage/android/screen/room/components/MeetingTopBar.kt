@@ -3,6 +3,8 @@ package com.vonage.android.screen.room.components
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +35,7 @@ import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_CAMERA_S
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_SHARE_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_TITLE
 import com.vonage.android.screen.components.audio.toImageVector
+import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_SETTINGS_ACTION
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -115,6 +118,19 @@ fun MeetingTopBar(
                     contentDescription = stringResource(R.string.meeting_room_share_room_link)
                 )
             }
+
+            IconButton(
+                modifier = Modifier
+                    .testTag(TOP_BAR_SETTINGS_ACTION),
+                onClick = actions.onSettings,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings",
+                    tint = VonageVideoTheme.colors.onSurface,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
         }
     )
 }
@@ -124,6 +140,7 @@ object TopBarTestTags {
     const val TOP_BAR_SHARE_ACTION = "top_bar_share_action"
     const val TOP_BAR_CAMERA_SWITCH_ACTION = "top_bar_camera_switch_action"
     const val TOP_BAR_AUDIO_SELECTOR_ACTION = "top_bar_audio_selector_action"
+    const val TOP_BAR_SETTINGS_ACTION = "top_bar_settings_action"
 }
 
 @PreviewLightDark

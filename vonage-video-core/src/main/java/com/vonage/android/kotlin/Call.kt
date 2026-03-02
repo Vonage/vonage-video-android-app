@@ -483,7 +483,8 @@ class Call internal constructor(
         coroutineScope.launch {
             try {
                 val participant = withContext(Dispatchers.Main) {
-                    val subscriber = Subscriber.Builder(context, stream).build()
+                    val subscriber = Subscriber.Builder(context, stream)
+                        .build()
                     subscriber.setCaptionsListener(captionsDelegate)
                     session.subscribe(subscriber)
                     ParticipantState(subscriber = subscriber)

@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.vonage.android.BuildConfig
@@ -17,6 +18,7 @@ import com.vonage.android.navigation.AppRoute.Waiting
 import com.vonage.android.screen.goodbye.GoodbyeScreenRoute
 import com.vonage.android.screen.landing.LandingScreenRoute
 import com.vonage.android.screen.room.MeetingRoomScreenRoute
+import com.vonage.android.settings.ui.SettingsScreenRoute
 import com.vonage.android.screen.waiting.WaitingRoomRoute
 import com.vonage.android.util.navigateToShare
 import com.vonage.android.util.navigateToSystemPermissions
@@ -35,6 +37,7 @@ fun AppNavHost(
         composable<Landing> {
             LandingScreenRoute(
                 navigateToRoom = { params -> navController.navigate(Waiting(params.roomName)) },
+                navigateToSettings = { navController.navigate(AppRoute.Settings) }
             )
         }
         composable<Waiting>(
@@ -69,6 +72,7 @@ fun AppNavHost(
                 roomName = roomName,
                 navigateToGoodBye = { navController.navigate(Goodbye(roomName = roomName)) },
                 navigateToShare = { roomName -> context.navigateToShare(roomName) },
+                navigateToSettings = { navController.navigate(AppRoute.Settings) },
                 onBack = {
                     navController.navigate(Waiting(roomName = roomName)) {
                         popUpTo(Waiting(roomName = roomName)) { inclusive = true }
@@ -87,6 +91,9 @@ fun AppNavHost(
                     }
                 },
             )
+        }
+        dialog<AppRoute.Settings> {
+            SettingsScreenRoute()
         }
     }
 }

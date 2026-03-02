@@ -14,6 +14,7 @@ internal fun LandingScreenRoute(
     modifier: Modifier = Modifier,
     viewModel: LandingScreenViewModel = hiltViewModel(),
     navigateToRoom: (LandingScreenRouteParams) -> Unit,
+    navigateToSettings: () -> Unit,
 ) {
     val pipModifier = pipEffect(shouldEnterPipMode = false)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -31,6 +32,7 @@ internal fun LandingScreenRoute(
         actions = actions,
         modifier = modifier.then(pipModifier),
         navigateToRoom = navigateToRoom,
+        navigateToSettings = navigateToSettings,
     )
 }
 

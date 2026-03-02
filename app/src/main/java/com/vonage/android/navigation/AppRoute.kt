@@ -18,4 +18,7 @@ sealed interface AppRoute {
 
     @Serializable
     data class Goodbye(val roomName: String) : AppRoute
+
+    @Serializable
+    object Settings : AppRoute
 }
