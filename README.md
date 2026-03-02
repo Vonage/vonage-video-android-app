@@ -99,7 +99,7 @@ The Vonage Android reference app is built with a modular architecture. The app i
 
 The current minimum deployment target for the reference app is Android 7.0 (API 24+). The app is optimized for phones and tablets and supports the following architectures: ARM64-v8a, ARMv7, x86, and x86_64.
 
-### Vonage Video SDK Compatibility
+## Vonage Video SDK Compatibility
 
 This reference app has been tested with **Vonage Video SDK 2.32** and **2.33**. We strongly recommend using the latest available SDK version to take advantage of the newest features and avoid potential issues with older releases.
 
