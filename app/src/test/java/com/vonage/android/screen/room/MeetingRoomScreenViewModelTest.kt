@@ -23,6 +23,7 @@ import com.vonage.android.screen.components.audio.AudioDevicesState
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.service.VeraForegroundServiceHandler
+import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.util.ActivityContextProvider
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -55,6 +56,7 @@ class MeetingRoomScreenViewModelTest {
     private val videoClient: VonageVideoClient = mockk()
     private val getConfig: GetConfig = mockk()
     private val audioDevicesStateMock: AudioDevicesState = mockk()
+    private val callSettingsHolder: CallSettingsHolder = mockk(relaxed = true)
     private val audioDevicesHandler: AudioDevicesHandler = mockk(relaxed = true) {
         every { audioDevicesState } returns audioDevicesStateMock
     }
@@ -79,6 +81,7 @@ class MeetingRoomScreenViewModelTest {
             activityContextProvider = activityContextProvider,
             getConfig = getConfig,
             audioDevicesHandler = audioDevicesHandler,
+            callSettingsHolder = callSettingsHolder,
         )
 
         every { getConfig.invoke() } returns Config(
