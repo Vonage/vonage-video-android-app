@@ -14,6 +14,9 @@ import com.vonage.android.kotlin.ext.observeAudioLevel
 import com.vonage.android.kotlin.ext.toParticipantType
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.logger.vonageLogger
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -105,34 +108,8 @@ data class PublisherState(
         val videoPacketsLost: Long,
         val videoBytesSent: Long,
         val estimatedBandwidthInBps: Long,
-        val videoLayerStats: Array<VideoLayerStats>,
-    ) {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as VideoStats
-
-            if (duration != other.duration) return false
-            if (videoPacketsSent != other.videoPacketsSent) return false
-            if (videoPacketsLost != other.videoPacketsLost) return false
-            if (videoBytesSent != other.videoBytesSent) return false
-            if (estimatedBandwidthInBps != other.estimatedBandwidthInBps) return false
-            if (!videoLayerStats.contentEquals(other.videoLayerStats)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = duration.hashCode()
-            result = 31 * result + videoPacketsSent.hashCode()
-            result = 31 * result + videoPacketsLost.hashCode()
-            result = 31 * result + videoBytesSent.hashCode()
-            result = 31 * result + estimatedBandwidthInBps.hashCode()
-            result = 31 * result + videoLayerStats.contentHashCode()
-            return result
-        }
-    }
+        val videoLayerStats: ImmutableList<VideoLayerStats>,
+    )
 
     data class VideoLayerStats(
         val height: Int,
@@ -173,7 +150,7 @@ data class PublisherState(
                     videoPacketsLost = s.videoPacketsLost,
                     videoBytesSent = s.videoBytesSent,
                     estimatedBandwidthInBps = s.transport.connectionEstimatedBandwidth,
-                    videoLayerStats = s.videoLayers.map { layer ->
+                    videoLayerStats = s.videoLayers?.map { layer ->
                         VideoLayerStats(
                             height = layer.height,
                             width = layer.width,
@@ -184,7 +161,7 @@ data class PublisherState(
                             bitrate = layer.bitrate,
                             totalBitrate = layer.totalBitrate,
                         )
-                    }.toTypedArray(),
+                    }?.toImmutableList() ?: persistentListOf(),
                 )
             }
         }
