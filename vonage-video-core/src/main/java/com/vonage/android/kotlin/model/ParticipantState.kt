@@ -162,6 +162,7 @@ data class ParticipantState(
         vonageLogger.d(logTag, "Subscriber video disable warning lifted")
     }
 
+    @Stable
     data class SubscriberVideoStats(
         val videoPacketsReceived: Int,
         val videoPacketsLost: Int,
@@ -176,6 +177,7 @@ data class ParticipantState(
         val estimatedBandwidthInBps: Long,
     )
 
+    @Stable
     data class SubscriberAudioStats(
         val audioPacketsReceived: Int,
         val audioPacketsLost: Int,

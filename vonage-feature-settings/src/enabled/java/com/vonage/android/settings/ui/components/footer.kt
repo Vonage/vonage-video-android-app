@@ -29,7 +29,7 @@ fun LazyListScope.footer(uiState: SettingsUiState) {
             )
             Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
             Text(
-                text = "OpenTok SDK: ${uiState.sdkVersion}",
+                text = "Vonage SDK: ${uiState.sdkVersion}",
                 style = VonageVideoTheme.typography.caption,
                 color = VonageVideoTheme.colors.tertiary,
             )

@@ -5,7 +5,7 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.config.GetConfig
-import com.vonage.android.settings.PublisherStatsHolder
+import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.PublisherConfig
@@ -32,7 +32,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     private val userRepository: UserRepository,
     private val videoClient: VonageVideoClient,
     private val audioDevicesHandler: AudioDevicesHandler,
-    private val publisherStatsHolder: PublisherStatsHolder,
+    private val callSettingsHolder: CallSettingsHolder,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WaitingRoomUiState(roomName = roomName))
@@ -104,7 +104,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
                         publishAudio = publisher.isMicEnabled.value,
                         blurLevel = publisher.blurLevel.value,
                         cameraIndex = publisher.camera.value.index,
-                        senderStatsTrack = publisherStatsHolder.senderStatsEnabled.value,
+                        senderStatsTrack = callSettingsHolder.senderStatsEnabled.value,
                     )
                 )
             }

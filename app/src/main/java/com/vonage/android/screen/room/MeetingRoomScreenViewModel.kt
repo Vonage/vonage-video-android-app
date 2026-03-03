@@ -10,14 +10,11 @@ import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.captions.CaptionsUiState
 import com.vonage.android.captions.VonageCaptions
 import com.vonage.android.config.GetConfig
-import com.vonage.android.settings.PublisherStatsHolder
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
-import com.vonage.android.settings.SubscriberStatsSnapshot
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.kotlin.model.ParticipantState
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
@@ -25,6 +22,7 @@ import com.vonage.android.screen.components.audio.AudioDevicesState
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.service.VeraForegroundServiceHandler
+import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.util.ActivityContextProvider
 import com.vonage.android.util.noOpCall
 import dagger.assisted.Assisted
@@ -35,10 +33,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -57,7 +52,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private val activityContextProvider: ActivityContextProvider,
     private val getConfig: GetConfig,
     private val audioDevicesHandler: AudioDevicesHandler,
-    private val publisherStatsHolder: PublisherStatsHolder,
+    private val callSettingsHolder: CallSettingsHolder,
 ) : ViewModel() {
 
     private val context: Context
@@ -133,7 +128,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             listenRemoteArchiving()
             call?.let { call ->
                 vonageCaptions.init(call, roomName, sessionInfo.captionsId)
-                observePublisherStats(call)
+                callSettingsHolder.bind(call)
                 // Update UI state after call is properly initialized
                 _uiState.update { uiState ->
                     uiState.copy(
@@ -194,7 +189,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         foregroundServiceHandler.stopForegroundService()
         vonageScreenSharing.stopSharingScreen()
         audioDevicesHandler.stop()
-        publisherStatsHolder.clear()
+        callSettingsHolder.clear()
         call?.endSession()
     }
 
@@ -304,36 +299,6 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     fun stopScreenSharing() {
         _uiState.update { uiState -> uiState.copy(screenSharingState = ScreenSharingState.STOPPING) }
         vonageScreenSharing.stopSharingScreen()
-    }
-    //endregion
-
-    //region Publisher Stats
-    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    private fun observePublisherStats(call: CallFacade) {
-        call.publisher
-            .filterNotNull()
-            .flatMapLatest { publisher -> publisher.videoStats }
-            .onEach { publisherStatsHolder.updateVideoStats(it) }
-            .launchIn(viewModelScope)
-
-        call.publisher
-            .filterNotNull()
-            .flatMapLatest { publisher -> publisher.audioStats }
-            .onEach { publisherStatsHolder.updateAudioStats(it) }
-            .launchIn(viewModelScope)
-
-        call.participantsStateFlow
-            .map { participants ->
-                participants.filterIsInstance<ParticipantState>().map { participant ->
-                    SubscriberStatsSnapshot(
-                        name = participant.name,
-                        videoStats = participant.videoStats.value,
-                        audioStats = participant.audioStats.value,
-                    )
-                }
-            }
-            .onEach { publisherStatsHolder.updateSubscriberStats(it) }
-            .launchIn(viewModelScope)
     }
     //endregion
 

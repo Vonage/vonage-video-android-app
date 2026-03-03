@@ -103,6 +103,7 @@ data class PublisherState(
         }
     }
 
+    @Stable
     data class VideoStats(
         val duration: Double,
         val videoPacketsSent: Long,
@@ -112,6 +113,7 @@ data class PublisherState(
         val videoLayerStats: ImmutableList<VideoLayerStats>,
     )
 
+    @Stable
     data class VideoLayerStats(
         val height: Int,
         val width: Int,
@@ -123,6 +125,7 @@ data class PublisherState(
         val totalBitrate: Long,
     )
 
+    @Stable
     data class AudioStats(
         val duration: Double,
         val audioPacketsSent: Long,

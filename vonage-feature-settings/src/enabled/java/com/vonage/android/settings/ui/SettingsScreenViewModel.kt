@@ -1,12 +1,10 @@
 package com.vonage.android.settings.ui
 
-import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vonage.android.kotlin.model.PublisherState
-import com.vonage.android.settings.PublisherStatsHolder
-import com.vonage.android.settings.SubscriberStatsSnapshot
+import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.settings.CallSettingsHolder
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -22,7 +20,7 @@ import kotlinx.coroutines.flow.update
 class SettingsScreenViewModel @AssistedInject constructor(
     @Assisted("appVersion") val appVersion: String,
     @Assisted("sdkVersion") val sdkVersion: String,
-    private val publisherStatsHolder: PublisherStatsHolder,
+    private val callSettingsHolder: CallSettingsHolder,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -34,30 +32,17 @@ class SettingsScreenViewModel @AssistedInject constructor(
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
     init {
-        publisherStatsHolder.senderStatsEnabled
+        callSettingsHolder.senderStatsEnabled
             .onEach { enabled -> _uiState.update { it.copy(senderStatsEnabled = enabled) } }
             .launchIn(viewModelScope)
 
-        publisherStatsHolder.videoStats
-            .onEach { stats -> _uiState.update { it.copy(videoStats = stats) } }
-            .launchIn(viewModelScope)
-
-        publisherStatsHolder.audioStats
-            .onEach { stats -> _uiState.update { it.copy(audioStats = stats) } }
-            .launchIn(viewModelScope)
-
-        publisherStatsHolder.subscriberStats
-            .onEach { stats ->
-                Log.d("UI STATS", " stats to draw $stats")
-                _uiState.update {
-                    it.copy(subscriberStats = stats)
-                }
-            }
+        callSettingsHolder.call
+            .onEach { call -> _uiState.update { it.copy(call = call) } }
             .launchIn(viewModelScope)
     }
 
     fun toggleSenderStatsTrack(enabled: Boolean) {
-        publisherStatsHolder.updateSenderStatsEnabled(enabled)
+        callSettingsHolder.updateSenderStatsEnabled(enabled)
     }
 }
 
@@ -71,10 +56,8 @@ fun interface SettingsScreenViewModelFactory {
 
 @Stable
 data class SettingsUiState(
-    val senderStatsEnabled: Boolean = true,
     val appVersion: String = "",
     val sdkVersion: String = "",
-    val videoStats: PublisherState.VideoStats? = null,
-    val audioStats: PublisherState.AudioStats? = null,
-    val subscriberStats: List<SubscriberStatsSnapshot> = emptyList(),
+    val call: CallFacade? = null,
+    val senderStatsEnabled: Boolean = true,
 )
