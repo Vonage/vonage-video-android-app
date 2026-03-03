@@ -1,10 +1,12 @@
 package com.vonage.android.settings.ui
 
 import android.util.Log
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vonage.android.settings.BuildConfig
+import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.settings.PublisherStatsHolder
+import com.vonage.android.settings.SubscriberStatsSnapshot
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -15,7 +17,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
 @HiltViewModel(assistedFactory = SettingsScreenViewModelFactory::class)
 class SettingsScreenViewModel @AssistedInject constructor(
@@ -48,8 +49,10 @@ class SettingsScreenViewModel @AssistedInject constructor(
         publisherStatsHolder.subscriberStats
             .onEach { stats ->
                 Log.d("UI STATS", " stats to draw $stats")
-                _uiState.update { it.copy(subscriberStats = stats)
-                } }
+                _uiState.update {
+                    it.copy(subscriberStats = stats)
+                }
+            }
             .launchIn(viewModelScope)
     }
 
@@ -65,3 +68,13 @@ fun interface SettingsScreenViewModelFactory {
         @Assisted("sdkVersion") sdkVersion: String,
     ): SettingsScreenViewModel
 }
+
+@Stable
+data class SettingsUiState(
+    val senderStatsEnabled: Boolean = true,
+    val appVersion: String = "",
+    val sdkVersion: String = "",
+    val videoStats: PublisherState.VideoStats? = null,
+    val audioStats: PublisherState.AudioStats? = null,
+    val subscriberStats: List<SubscriberStatsSnapshot> = emptyList(),
+)

@@ -19,8 +19,8 @@ import com.vonage.android.screen.landing.LandingScreenTestTags.VONAGE_ICON_TAG
 fun TopBanner(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
-    content: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
+    content: @Composable () -> Unit = {},
 ) {
     VonageTopAppBar(
         modifier = modifier,

@@ -14,6 +14,7 @@ import com.vonage.android.settings.util.formatBitrate
 import com.vonage.android.settings.util.formatBytes
 import java.util.Locale
 
+@Suppress("NestedBlockDepth")
 fun LazyListScope.subscribersStats(uiState: SettingsUiState) {
     uiState.subscriberStats.forEach { sub ->
         if (sub.videoStats != null || sub.audioStats != null) {

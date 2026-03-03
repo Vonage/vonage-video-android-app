@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -25,23 +24,15 @@ import com.vonage.android.settings.ui.components.stats.publisherStats
 import com.vonage.android.settings.ui.components.stats.subscribersStats
 import kotlinx.collections.immutable.persistentListOf
 
-@Stable
-data class SettingsUiState(
-    val senderStatsEnabled: Boolean = true,
-    val appVersion: String = "",
-    val sdkVersion: String = "",
-    val videoStats: PublisherState.VideoStats? = null,
-    val audioStats: PublisherState.AudioStats? = null,
-    val subscriberStats: List<SubscriberStatsSnapshot> = emptyList(),
-)
-
 @Composable
 fun SettingsScreen(
     uiState: SettingsUiState,
+    modifier: Modifier = Modifier,
     onSenderStatsTrackToggle: (Boolean) -> Unit = {},
     onDismiss: () -> Unit = {},
 ) {
     Scaffold(
+        modifier = modifier,
         topBar = { SettingsTopBar(onDismiss) },
         containerColor = VonageVideoTheme.colors.surface,
     ) { innerPadding ->
@@ -81,7 +72,7 @@ fun SettingsScreen(
 
 @PreviewLightDark
 @Composable
-private fun SettingsScreenPreview() {
+internal fun SettingsScreenPreview() {
     VonageVideoTheme {
         SettingsScreen(
             uiState = SettingsUiState(
