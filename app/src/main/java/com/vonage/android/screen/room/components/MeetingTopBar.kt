@@ -36,6 +36,7 @@ import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_SHARE_AC
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_TITLE
 import com.vonage.android.screen.components.audio.toImageVector
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_SETTINGS_ACTION
+import com.vonage.android.settings.ui.SettingsIcon
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -119,18 +120,9 @@ fun MeetingTopBar(
                 )
             }
 
-            IconButton(
-                modifier = Modifier
-                    .testTag(TOP_BAR_SETTINGS_ACTION),
-                onClick = actions.onSettings,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings",
-                    tint = VonageVideoTheme.colors.onSurface,
-                    modifier = Modifier.size(24.dp),
-                )
-            }
+            SettingsIcon(
+                navigateToSettings = actions.onSettings,
+            )
         }
     )
 }

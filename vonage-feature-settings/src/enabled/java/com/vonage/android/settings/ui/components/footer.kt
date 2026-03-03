@@ -9,8 +9,10 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.settings.ui.SettingsUiState
+import com.vonage.android.settings.R
+import com.vonage.android.settings.SettingsUiState
 
 fun LazyListScope.footer(uiState: SettingsUiState) {
     item { Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceDefault)) }
@@ -23,13 +25,13 @@ fun LazyListScope.footer(uiState: SettingsUiState) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "App version: ${uiState.appVersion}",
+                text = stringResource(R.string.settings_app_version, uiState.appVersion),
                 style = VonageVideoTheme.typography.caption,
                 color = VonageVideoTheme.colors.tertiary,
             )
             Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
             Text(
-                text = "Vonage SDK: ${uiState.sdkVersion}",
+                text = stringResource(R.string.settings_vonage_sdk, uiState.sdkVersion),
                 style = VonageVideoTheme.typography.caption,
                 color = VonageVideoTheme.colors.tertiary,
             )

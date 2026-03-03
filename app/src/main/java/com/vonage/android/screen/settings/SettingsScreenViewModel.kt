@@ -1,10 +1,9 @@
-package com.vonage.android.settings.ui
+package com.vonage.android.screen.settings
 
-import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.settings.CallSettingsHolder
+import com.vonage.android.settings.SettingsUiState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -53,11 +52,3 @@ fun interface SettingsScreenViewModelFactory {
         @Assisted("sdkVersion") sdkVersion: String,
     ): SettingsScreenViewModel
 }
-
-@Stable
-data class SettingsUiState(
-    val appVersion: String = "",
-    val sdkVersion: String = "",
-    val call: CallFacade? = null,
-    val senderStatsEnabled: Boolean = true,
-)

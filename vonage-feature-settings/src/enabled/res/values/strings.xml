@@ -5,6 +5,8 @@
     <string name="settings_sender_stats_title">Sender stats</string>
     <string name="settings_sender_stats_description">Enable extra stats for subscribers</string>
     <string name="settings_close">Close settings</string>
+    <string name="settings_app_version">App version: %1$s</string>
+    <string name="settings_vonage_sdk">Vonage SDK: %1$s</string>
     <!-- Stats -->
     <string name="settings_stats_publisher_stats_header">Publisher Stats</string>
     <string name="settings_stats_publisher_video_header">Video</string>

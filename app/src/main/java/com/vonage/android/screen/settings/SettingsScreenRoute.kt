@@ -6,8 +6,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.BuildConfig
 import com.vonage.android.settings.ui.SettingsScreen
-import com.vonage.android.settings.ui.SettingsScreenViewModel
-import com.vonage.android.settings.ui.SettingsScreenViewModelFactory
 
 @Composable
 fun SettingsScreenRoute(

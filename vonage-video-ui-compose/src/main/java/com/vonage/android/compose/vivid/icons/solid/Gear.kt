@@ -1,6 +1,6 @@
+@file:Suppress("MaxLineLength")
 package com.vonage.android.compose.vivid.icons.solid
 
-import android.graphics.Color.BLACK
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -22,7 +22,7 @@ public val VividIcons.Solid.Gear: ImageVector
         ).apply {
             // m19.95 7.8 1.65 -3.15 -2.1 -2.1 -3.15 1.65 a5 5 0 0 0 -1.65 -.6 L13.5 0 h-3 L9.3 3.45 c-.45 .15 -1.05 .3 -1.5 .6 L4.65 2.4 2.4 4.65 4.05 7.8 c-.3 .45 -.45 1.05 -.6 1.5 L0 10.5 v3 l3.45 1.2 c.15 .6 .45 1.05 .6 1.65 L2.4 19.5 l2.1 2.1 3.15 -1.65 c.45 .3 1.05 .45 1.65 .6 L10.5 24 h3 l1.2 -3.45 c.6 -.15 1.05 -.45 1.65 -.6 l3.15 1.65 2.1 -2.1 -1.65 -3.15 c.3 -.45 .45 -1.05 .6 -1.65 L24 13.5 v-3 l-3.45 -1.2 c-.15 -.45 -.3 -1.05 -.6 -1.5 M12 16.5 A4.4 4.4 0 0 1 7.5 12 c0 -2.55 1.95 -4.5 4.5 -4.5 s4.5 1.95 4.5 4.5 -1.95 4.5 -4.5 4.5
             path(
-                fill = SolidColor(Color(BLACK)),
+                fill = SolidColor(Color.Black),
             ) {
                 // M 19.95 7.8
                 moveTo(x = 19.95f, y = 7.8f)

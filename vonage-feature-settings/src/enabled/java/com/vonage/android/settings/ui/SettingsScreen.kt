@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.settings.R
+import com.vonage.android.settings.SettingsUiState
 import com.vonage.android.settings.ui.components.SectionHeader
 import com.vonage.android.settings.ui.components.SettingsToggleRow
 import com.vonage.android.settings.ui.components.SettingsTopBar
