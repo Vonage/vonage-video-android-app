@@ -35,7 +35,6 @@ fun LandingScreen(
     actions: LandingScreenActions,
     modifier: Modifier = Modifier,
     navigateToRoom: (LandingScreenRouteParams) -> Unit = {},
-    navigateToSettings: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val errorMessage = stringResource(R.string.landing_room_generic_error_message)
@@ -50,19 +49,7 @@ fun LandingScreen(
 
             TwoPaneScaffold(
                 modifier = modifier.fillMaxSize(),
-                topBar = { TopBanner {
-                    IconButton(
-                        modifier = Modifier,
-                        onClick = navigateToSettings,
-                    ) {
-                        Icon(
-                            imageVector = VividIcons.Solid.Gear,
-                            contentDescription = null,
-                            tint = VonageVideoTheme.colors.onSurface,
-                            modifier = modifier.size(VonageVideoTheme.dimens.iconSizeDefault)
-                        )
-                    }
-                } },
+                topBar = { TopBanner() },
                 firstPane = {
                     LandingScreenHeader(
                         modifier = Modifier

@@ -2,12 +2,16 @@ package com.vonage.android.screen.waiting
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -28,6 +32,8 @@ import com.vonage.android.R
 import com.vonage.android.compose.layout.TwoPaneScaffold
 import com.vonage.android.compose.preview.buildPublisher
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.Gear
 import com.vonage.android.screen.components.TopBanner
 import com.vonage.android.screen.components.audio.AudioDevicesMenu
 import com.vonage.android.screen.waiting.components.DeviceSelectionPanel
@@ -43,6 +49,7 @@ fun WaitingRoomScreen(
     actions: WaitingRoomActions,
     modifier: Modifier = Modifier,
     navigateToRoom: (String) -> Unit = {},
+    navigateToSettings: () -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
@@ -84,6 +91,19 @@ fun WaitingRoomScreen(
                         style = VonageVideoTheme.typography.heading4,
                         color = VonageVideoTheme.colors.textSecondary,
                     )
+                },
+                actions = {
+                    IconButton(
+                        modifier = Modifier,
+                        onClick = navigateToSettings,
+                    ) {
+                        Icon(
+                            imageVector = VividIcons.Solid.Gear,
+                            contentDescription = null,
+                            tint = VonageVideoTheme.colors.onSurface,
+                            modifier = modifier.size(VonageVideoTheme.dimens.iconSizeDefault)
+                        )
+                    }
                 }
             )
         },

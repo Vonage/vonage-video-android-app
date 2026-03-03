@@ -3,6 +3,7 @@ package com.vonage.android.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
@@ -14,6 +15,7 @@ import com.vonage.android.BuildConfig
 import com.vonage.android.navigation.AppRoute.Goodbye
 import com.vonage.android.navigation.AppRoute.Landing
 import com.vonage.android.navigation.AppRoute.Meeting
+import com.vonage.android.navigation.AppRoute.Settings
 import com.vonage.android.navigation.AppRoute.Waiting
 import com.vonage.android.screen.goodbye.GoodbyeScreenRoute
 import com.vonage.android.screen.landing.LandingScreenRoute
@@ -37,7 +39,6 @@ fun AppNavHost(
         composable<Landing> {
             LandingScreenRoute(
                 navigateToRoom = { params -> navController.navigate(Waiting(params.roomName)) },
-                navigateToSettings = { navController.navigate(AppRoute.Settings) }
             )
         }
         composable<Waiting>(
@@ -55,6 +56,7 @@ fun AppNavHost(
                     )
                 },
                 navigateToPermissions = { context.navigateToSystemPermissions() },
+                navigateToSettings = { navController.navigate(Settings) },
                 onBack = {
                     navController.navigate(Landing) {
                         popUpTo(Landing) { inclusive = true }
@@ -72,7 +74,7 @@ fun AppNavHost(
                 roomName = roomName,
                 navigateToGoodBye = { navController.navigate(Goodbye(roomName = roomName)) },
                 navigateToShare = { roomName -> context.navigateToShare(roomName) },
-                navigateToSettings = { navController.navigate(AppRoute.Settings) },
+                navigateToSettings = { navController.navigate(Settings) },
                 onBack = {
                     navController.navigate(Waiting(roomName = roomName)) {
                         popUpTo(Waiting(roomName = roomName)) { inclusive = true }
@@ -92,8 +94,15 @@ fun AppNavHost(
                 },
             )
         }
-        dialog<AppRoute.Settings> {
-            SettingsScreenRoute()
+        dialog<Settings>(
+            dialogProperties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+            )
+        ){
+            SettingsScreenRoute(
+                onDismiss = { navController.popBackStack() }
+            )
         }
     }
 }

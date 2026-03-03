@@ -2,6 +2,7 @@ package com.vonage.android.screen.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ fun TopBanner(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
     content: @Composable () -> Unit = {},
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     VonageTopAppBar(
         modifier = modifier,
@@ -35,7 +37,8 @@ fun TopBanner(
                 )
                 content()
             }
-        }
+        },
+        actions = actions,
     )
 }
 

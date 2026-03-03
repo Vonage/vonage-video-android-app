@@ -20,6 +20,7 @@ fun WaitingRoomRoute(
     roomName: String,
     navigateToRoom: (String) -> Unit,
     navigateToPermissions: () -> Unit,
+    navigateToSettings: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: WaitingRoomViewModel = hiltViewModel<WaitingRoomViewModel, WaitingRoomViewModelFactory> { factory ->
@@ -66,6 +67,7 @@ fun WaitingRoomRoute(
         actions = actions,
         modifier = modifier.then(pipModifier),
         navigateToRoom = navigateToRoom,
+        navigateToSettings = navigateToSettings,
     )
 }
 
