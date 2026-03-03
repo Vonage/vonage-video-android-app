@@ -5,6 +5,11 @@ import com.opentok.android.PublisherKit
 import com.vonage.android.kotlin.model.BackgroundBlur.KEY
 import com.vonage.android.kotlin.model.BackgroundBlur.params
 import com.vonage.android.kotlin.model.BlurLevel
+import com.vonage.android.kotlin.model.PublisherState.AudioStats
+import com.vonage.android.kotlin.model.PublisherState.VideoLayerStats
+import com.vonage.android.kotlin.model.PublisherState.VideoStats
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -63,4 +68,52 @@ internal fun Publisher.observeAudioLevel(): Flow<Float> = callbackFlow {
     awaitClose {
         setAudioLevelListener(null)
     }
+}
+
+internal fun Publisher.observeVideoStats(): Flow<VideoStats> = callbackFlow {
+    setVideoStatsListener { _, stats ->
+        if (stats.isNotEmpty()) {
+            val s = stats[0]
+            trySend(
+                VideoStats(
+                    duration = (s.timeStamp - s.startTime) / 1000,
+                    videoPacketsSent = s.videoPacketsSent,
+                    videoPacketsLost = s.videoPacketsLost,
+                    videoBytesSent = s.videoBytesSent,
+                    estimatedBandwidthInBps = s.transport.connectionEstimatedBandwidth,
+                    videoLayerStats = s.videoLayers?.map { layer ->
+                        VideoLayerStats(
+                            height = layer.height,
+                            width = layer.width,
+                            codec = layer.codec,
+                            encodedFrameRate = layer.encodedFrameRate,
+                            qualityLimitationReason = layer.qualityLimitationReason,
+                            scalabilityMode = layer.scalabilityMode,
+                            bitrate = layer.bitrate,
+                            totalBitrate = layer.totalBitrate,
+                        )
+                    }?.toImmutableList() ?: persistentListOf(),
+                ),
+            )
+        }
+    }
+    awaitClose { setVideoStatsListener(null) }
+}
+
+internal fun Publisher.observeAudioStats(): Flow<AudioStats> = callbackFlow {
+    setAudioStatsListener { _, stats ->
+        if (stats.isNotEmpty()) {
+            val s = stats[0]
+            trySend(
+                AudioStats(
+                    duration = (s.timeStamp - s.startTime) / 1000,
+                    audioPacketsSent = s.audioPacketsSent,
+                    audioPacketsLost = s.audioPacketsLost,
+                    audioBytesSent = s.audioBytesSent,
+                    estimatedBandwidthInBps = s.transport.connectionEstimatedBandwidth,
+                ),
+            )
+        }
+    }
+    awaitClose { setAudioStatsListener(null) }
 }

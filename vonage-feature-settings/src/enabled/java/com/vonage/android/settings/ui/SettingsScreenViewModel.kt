@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.settings.BuildConfig
 import com.vonage.android.settings.PublisherStatsHolder
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,15 +17,17 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-@HiltViewModel
-class SettingsScreenViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = SettingsScreenViewModelFactory::class)
+class SettingsScreenViewModel @AssistedInject constructor(
+    @Assisted("appVersion") val appVersion: String,
+    @Assisted("sdkVersion") val sdkVersion: String,
     private val publisherStatsHolder: PublisherStatsHolder,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         SettingsUiState(
-            //appVersion = BuildConfig.VERSION_NAME,
-            //sdkVersion = BuildConfig.OPENTOK_SDK_VERSION,
+            appVersion = appVersion,
+            sdkVersion = sdkVersion,
         ),
     )
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
@@ -51,4 +56,12 @@ class SettingsScreenViewModel @Inject constructor(
     fun toggleSenderStatsTrack(enabled: Boolean) {
         publisherStatsHolder.updateSenderStatsEnabled(enabled)
     }
+}
+
+@AssistedFactory
+fun interface SettingsScreenViewModelFactory {
+    fun create(
+        @Assisted("appVersion") appVersion: String,
+        @Assisted("sdkVersion") sdkVersion: String,
+    ): SettingsScreenViewModel
 }

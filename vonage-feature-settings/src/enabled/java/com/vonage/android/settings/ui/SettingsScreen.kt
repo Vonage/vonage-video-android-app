@@ -23,6 +23,7 @@ import com.vonage.android.settings.ui.components.SettingsTopBar
 import com.vonage.android.settings.ui.components.footer
 import com.vonage.android.settings.ui.components.stats.publisherStats
 import com.vonage.android.settings.ui.components.stats.subscribersStats
+import kotlinx.collections.immutable.persistentListOf
 
 @Stable
 data class SettingsUiState(
@@ -93,7 +94,7 @@ private fun SettingsScreenPreview() {
                     videoPacketsLost = 12,
                     videoBytesSent = 15_000_000,
                     estimatedBandwidthInBps = 2_500_000,
-                    videoLayerStats = arrayOf(
+                    videoLayerStats = persistentListOf(
                         PublisherState.VideoLayerStats(
                             height = 720,
                             width = 1280,

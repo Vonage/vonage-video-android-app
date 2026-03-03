@@ -1,5 +1,6 @@
 package com.vonage.android.settings
 
+import android.util.Log
 import com.vonage.android.kotlin.model.ParticipantState
 import com.vonage.android.kotlin.model.PublisherState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,6 +41,7 @@ class PublisherStatsHolder @Inject constructor() {
     }
 
     fun updateSubscriberStats(stats: List<SubscriberStatsSnapshot>) {
+        Log.d("XXX", "updateSubscriberStats ${stats.size}")
         _subscriberStats.value = stats
     }
 

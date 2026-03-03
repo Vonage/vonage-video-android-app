@@ -2,7 +2,6 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.toString
 import com.opentok.android.OpentokError
 import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit
@@ -11,16 +10,18 @@ import com.opentok.android.Stream
 import com.vonage.android.kotlin.ext.cycleBlur
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.observeAudioLevel
+import com.vonage.android.kotlin.ext.observeAudioStats
+import com.vonage.android.kotlin.ext.observeVideoStats
 import com.vonage.android.kotlin.ext.toParticipantType
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.logger.vonageLogger
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 /**
  * Represents the local publisher (current user's camera/screen) in the video call.
@@ -141,49 +142,22 @@ data class PublisherState(
         publisher.setMuteListener(this)
         publisher.setCameraListener(this)
 
-        publisher.setVideoStatsListener { _, stats ->
-            if (stats.isNotEmpty()) {
-                val s = stats[0]
-                _videoStats.value = VideoStats(
-                    duration = (s.timeStamp - s.startTime) / 1000,
-                    videoPacketsSent = s.videoPacketsSent,
-                    videoPacketsLost = s.videoPacketsLost,
-                    videoBytesSent = s.videoBytesSent,
-                    estimatedBandwidthInBps = s.transport.connectionEstimatedBandwidth,
-                    videoLayerStats = s.videoLayers?.map { layer ->
-                        VideoLayerStats(
-                            height = layer.height,
-                            width = layer.width,
-                            codec = layer.codec,
-                            encodedFrameRate = layer.encodedFrameRate,
-                            qualityLimitationReason = layer.qualityLimitationReason,
-                            scalabilityMode = layer.scalabilityMode,
-                            bitrate = layer.bitrate,
-                            totalBitrate = layer.totalBitrate,
-                        )
-                    }?.toImmutableList() ?: persistentListOf(),
-                )
+        coroutineScope {
+            launch {
+                publisher.observeVideoStats()
+                    .collect { _videoStats.value = it }
             }
+            launch {
+                publisher.observeAudioStats()
+                    .collect { _audioStats.value = it }
+            }
+            publisher.observeAudioLevel()
+                .movingAverage(windowSize = 2)
+                .distinctUntilChanged()
+                .collect { audioLevel ->
+                    _audioLevel.value = audioLevel
+                }
         }
-        publisher.setAudioStatsListener { _, stats ->
-            if (stats.isNotEmpty()) {
-                val s = stats[0]
-                _audioStats.value = AudioStats(
-                    duration = (s.timeStamp - s.startTime) / 1000,
-                    audioPacketsSent = s.audioPacketsSent,
-                    audioPacketsLost = s.audioPacketsLost,
-                    audioBytesSent = s.audioBytesSent,
-                    estimatedBandwidthInBps = s.transport.connectionEstimatedBandwidth,
-                )
-            }
-        }
-
-        publisher.observeAudioLevel()
-            .movingAverage(windowSize = 2)
-            .distinctUntilChanged()
-            .collect { audioLevel ->
-                _audioLevel.value = audioLevel
-            }
     }
 
     override fun clean(session: Session) {

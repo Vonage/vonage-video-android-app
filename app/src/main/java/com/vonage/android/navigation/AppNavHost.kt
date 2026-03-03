@@ -20,7 +20,7 @@ import com.vonage.android.navigation.AppRoute.Waiting
 import com.vonage.android.screen.goodbye.GoodbyeScreenRoute
 import com.vonage.android.screen.landing.LandingScreenRoute
 import com.vonage.android.screen.room.MeetingRoomScreenRoute
-import com.vonage.android.settings.ui.SettingsScreenRoute
+import com.vonage.android.screen.settings.SettingsScreenRoute
 import com.vonage.android.screen.waiting.WaitingRoomRoute
 import com.vonage.android.util.navigateToShare
 import com.vonage.android.util.navigateToSystemPermissions

@@ -1,22 +1,24 @@
 package com.vonage.android.kotlin.model
 
-import android.util.Log
 import android.view.View
 import androidx.compose.runtime.Stable
 import com.opentok.android.Session
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
-import com.vonage.android.kotlin.ext.id
 import com.vonage.android.kotlin.ext.mapTalking
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.observeAudioLevel
+import com.vonage.android.kotlin.ext.observeAudioStats
+import com.vonage.android.kotlin.ext.observeVideoStats
 import com.vonage.android.kotlin.ext.toParticipantType
 import com.vonage.logger.vonageLogger
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 /**
  * Represents a remote participant (subscriber) in the video call.
@@ -48,10 +50,12 @@ data class ParticipantState(
 
     override val name: String = subscriber.name()
 
-    private val _isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(subscriber.stream.hasAudio())
+    private val _isMicEnabled: MutableStateFlow<Boolean> =
+        MutableStateFlow(subscriber.stream.hasAudio())
     override val isMicEnabled: StateFlow<Boolean> = _isMicEnabled
 
-    private val _isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(subscriber.stream.hasVideo())
+    private val _isCameraEnabled: MutableStateFlow<Boolean> =
+        MutableStateFlow(subscriber.stream.hasVideo())
     override val isCameraEnabled: StateFlow<Boolean> = _isCameraEnabled
 
     private val _audioLevel: MutableStateFlow<Float> = MutableStateFlow(0F)
@@ -86,41 +90,27 @@ data class ParticipantState(
     suspend fun setup() {
         subscriber.setStreamListener(this)
         subscriber.setVideoListener(this)
-        subscriber.setVideoStatsListener { _, stats ->
-            Log.d("STATS", "-> ${stats.videoPacketsReceived}")
-            _videoStats.value = SubscriberVideoStats(
-                videoPacketsReceived = stats.videoPacketsReceived,
-                videoPacketsLost = stats.videoPacketsLost,
-                videoBytesReceived = stats.videoBytesReceived,
-                width = stats.width,
-                height = stats.height,
-                codec = stats.codec.orEmpty(),
-                decodedFrameRate = stats.decodedFrameRate,
-                bitrate = stats.bitrate,
-                freezeCount = stats.freezeCount,
-                totalFreezesDuration = stats.totalFreezesDuration,
-                estimatedBandwidthInBps = stats.senderStats?.connectionEstimatedBandwidth ?: 0L,
-            )
-        }
-        subscriber.setAudioStatsListener { _, stats ->
-            _audioStats.value = SubscriberAudioStats(
-                audioPacketsReceived = stats.audioPacketsReceived,
-                audioPacketsLost = stats.audioPacketsLost,
-                audioBytesReceived = stats.audioBytesReceived,
-                estimatedBandwidthInBps = stats.senderStats?.connectionEstimatedBandwidth ?: 0L,
-            )
-        }
 
-        subscriber.observeAudioLevel()
-            .movingAverage(windowSize = 5)
-            .distinctUntilChanged()
-            .onEach { audioLevel ->
-                _audioLevel.emit(audioLevel)
+        coroutineScope {
+            launch {
+                subscriber.observeVideoStats()
+                    .collect { _videoStats.value = it }
             }
-            .mapTalking()
-            .collect { isTalking ->
-                _isTalking.value = isTalking
+            launch {
+                subscriber.observeAudioStats()
+                    .collect { _audioStats.value = it }
             }
+            subscriber.observeAudioLevel()
+                .movingAverage(windowSize = 5)
+                .distinctUntilChanged()
+                .onEach { audioLevel ->
+                    _audioLevel.emit(audioLevel)
+                }
+                .mapTalking()
+                .collect { isTalking ->
+                    _isTalking.value = isTalking
+                }
+        }
     }
 
     override fun clean(session: Session) {
