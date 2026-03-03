@@ -15,7 +15,7 @@
     "allowDeviceSelection": true
   },
   "meetingRoomSettings": {
-    "allowSettings": true,
+    "allowSettings": false,
     "allowArchiving": true,
     "allowCaptions": true,
     "allowChat": true,
