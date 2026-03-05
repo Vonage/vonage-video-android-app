@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.vonage.android.compose.components.DropdownItem
+import com.vonage.android.compose.components.DropdownSelector
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.settings.R
 
