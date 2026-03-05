@@ -97,6 +97,10 @@ class PublisherFactory {
             .name(name)
             .videoTrack(true)
             .audioTrack(true)
+            .senderStatsTrack(publisherConfig?.senderStatsTrack ?: false)
+            //.enableOpusDtx(true)
+            //.publisherAudioFallbackEnabled(true)
+            //.subscriberAudioFallbackEnabled(true)
             .capturer(
                 VeraCameraCapturer(
                     context = context,
@@ -117,6 +121,9 @@ class PublisherFactory {
                     applyVideoBlur(config.blurLevel)
                 }
                 publisherVideoType = PublisherKit.PublisherKitVideoType.PublisherKitVideoTypeCamera
+                //maxVideoBitrate = 9600
+                //videoBitratePreset = PublisherKit.VideoBitratePreset.VideoBitratePresetBwSaver
+                //degradationPreference = PublisherKit.DegradationPreference.DegradationPreferenceNotSet
             }
 
     /**

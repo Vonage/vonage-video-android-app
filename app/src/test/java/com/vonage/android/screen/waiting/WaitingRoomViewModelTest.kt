@@ -11,6 +11,7 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CameraType
 import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
+import com.vonage.android.settings.CallSettingsHolder
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -34,6 +35,9 @@ class WaitingRoomViewModelTest {
     private val userRepository: UserRepository = mockk()
     private val getConfig: GetConfig = mockk()
     private val audioDevicesHandler: AudioDevicesHandler = mockk(relaxed = true)
+    private val callSettingsHolder: CallSettingsHolder = mockk(relaxed = true) {
+        every { senderStatsEnabled } returns MutableStateFlow(true)
+    }
 
     private lateinit var sut: WaitingRoomViewModel
 
@@ -45,6 +49,7 @@ class WaitingRoomViewModelTest {
             videoClient = videoClient,
             getConfig = getConfig,
             audioDevicesHandler = audioDevicesHandler,
+            callSettingsHolder = callSettingsHolder,
         )
 
         every { getConfig.invoke() } returns Config(

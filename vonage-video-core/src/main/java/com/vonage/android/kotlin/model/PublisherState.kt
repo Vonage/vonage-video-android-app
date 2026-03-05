@@ -10,13 +10,18 @@ import com.opentok.android.Stream
 import com.vonage.android.kotlin.ext.cycleBlur
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.observeAudioLevel
+import com.vonage.android.kotlin.ext.observeAudioStats
+import com.vonage.android.kotlin.ext.observeVideoStats
 import com.vonage.android.kotlin.ext.toParticipantType
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.logger.vonageLogger
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 /**
  * Represents the local publisher (current user's camera/screen) in the video call.
@@ -65,6 +70,12 @@ data class PublisherState(
     private val _camera: MutableStateFlow<CameraType> = MutableStateFlow(CameraType.FRONT)
     override val camera: StateFlow<CameraType> = _camera
 
+    private val _videoStats: MutableStateFlow<VideoStats?> = MutableStateFlow(null)
+    val videoStats: StateFlow<VideoStats?> = _videoStats
+
+    private val _audioStats: MutableStateFlow<AudioStats?> = MutableStateFlow(null)
+    val audioStats: StateFlow<AudioStats?> = _audioStats
+
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
             true -> publisher.publishVideo = publisher.stream.hasVideo()
@@ -92,6 +103,37 @@ data class PublisherState(
         }
     }
 
+    @Stable
+    data class VideoStats(
+        val duration: Double,
+        val videoPacketsSent: Long,
+        val videoPacketsLost: Long,
+        val videoBytesSent: Long,
+        val estimatedBandwidthInBps: Long,
+        val videoLayerStats: ImmutableList<VideoLayerStats>,
+    )
+
+    @Stable
+    data class VideoLayerStats(
+        val height: Int,
+        val width: Int,
+        val codec: String,
+        val encodedFrameRate: Double,
+        val qualityLimitationReason: String,
+        val scalabilityMode: String?,
+        val bitrate: Long,
+        val totalBitrate: Long,
+    )
+
+    @Stable
+    data class AudioStats(
+        val duration: Double,
+        val audioPacketsSent: Long,
+        val audioPacketsLost: Long,
+        val audioBytesSent: Long,
+        val estimatedBandwidthInBps: Long,
+    )
+
     /**
      * Initializes publisher listeners and audio level monitoring.
      *
@@ -103,12 +145,22 @@ data class PublisherState(
         publisher.setMuteListener(this)
         publisher.setCameraListener(this)
 
-        publisher.observeAudioLevel()
-            .movingAverage(windowSize = 2)
-            .distinctUntilChanged()
-            .collect { audioLevel ->
-                _audioLevel.value = audioLevel
+        coroutineScope {
+            launch {
+                publisher.observeVideoStats()
+                    .collect { _videoStats.value = it }
             }
+            launch {
+                publisher.observeAudioStats()
+                    .collect { _audioStats.value = it }
+            }
+            publisher.observeAudioLevel()
+                .movingAverage(windowSize = 2)
+                .distinctUntilChanged()
+                .collect { audioLevel ->
+                    _audioLevel.value = audioLevel
+                }
+        }
     }
 
     override fun clean(session: Session) {

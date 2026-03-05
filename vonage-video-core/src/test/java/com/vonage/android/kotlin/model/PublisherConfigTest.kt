@@ -14,7 +14,8 @@ class PublisherConfigTest {
             publishVideo = true,
             publishAudio = false,
             blurLevel = BlurLevel.HIGH,
-            cameraIndex = 1
+            cameraIndex = 1,
+            senderStatsTrack = true,
         )
 
         assertEquals("John Doe", config.name)
@@ -22,6 +23,7 @@ class PublisherConfigTest {
         assertFalse(config.publishAudio)
         assertEquals(BlurLevel.HIGH, config.blurLevel)
         assertEquals(1, config.cameraIndex)
+        assertTrue(config.senderStatsTrack)
     }
 
     @Test
@@ -31,7 +33,7 @@ class PublisherConfigTest {
             publishVideo = false,
             publishAudio = true,
             blurLevel = BlurLevel.NONE,
-            cameraIndex = 0
+            cameraIndex = 0,
         )
 
         assertEquals("Jane Smith", config.name)
@@ -39,6 +41,7 @@ class PublisherConfigTest {
         assertTrue(config.publishAudio)
         assertEquals(BlurLevel.NONE, config.blurLevel)
         assertEquals(0, config.cameraIndex)
+        assertFalse(config.senderStatsTrack)
     }
 
     @Test
@@ -48,7 +51,8 @@ class PublisherConfigTest {
             publishVideo = true,
             publishAudio = true,
             blurLevel = BlurLevel.LOW,
-            cameraIndex = 1
+            cameraIndex = 1,
+            senderStatsTrack = true,
         )
 
         val copy = original.copy(publishVideo = false)
@@ -58,6 +62,24 @@ class PublisherConfigTest {
         assertTrue(copy.publishAudio)
         assertEquals(BlurLevel.LOW, copy.blurLevel)
         assertEquals(1, copy.cameraIndex)
+        assertTrue(copy.senderStatsTrack)
+    }
+
+    @Test
+    fun `should copy with senderStatsTrack changed`() {
+        val original = PublisherConfig(
+            name = "Test User",
+            publishVideo = true,
+            publishAudio = true,
+            blurLevel = BlurLevel.LOW,
+            cameraIndex = 1,
+            senderStatsTrack = false,
+        )
+
+        val copy = original.copy(senderStatsTrack = true)
+
+        assertTrue(copy.senderStatsTrack)
+        assertEquals(original.name, copy.name)
     }
 
     @Test
@@ -67,7 +89,8 @@ class PublisherConfigTest {
             publishVideo = true,
             publishAudio = false,
             blurLevel = BlurLevel.HIGH,
-            cameraIndex = 0
+            cameraIndex = 0,
+            senderStatsTrack = true,
         )
 
         val config2 = PublisherConfig(
@@ -75,7 +98,8 @@ class PublisherConfigTest {
             publishVideo = true,
             publishAudio = false,
             blurLevel = BlurLevel.HIGH,
-            cameraIndex = 0
+            cameraIndex = 0,
+            senderStatsTrack = true,
         )
 
         assertEquals(config1, config2)

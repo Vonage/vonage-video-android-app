@@ -9,12 +9,16 @@ import com.vonage.android.kotlin.ext.mapTalking
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.observeAudioLevel
+import com.vonage.android.kotlin.ext.observeAudioStats
+import com.vonage.android.kotlin.ext.observeVideoStats
 import com.vonage.android.kotlin.ext.toParticipantType
 import com.vonage.logger.vonageLogger
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 /**
  * Represents a remote participant (subscriber) in the video call.
@@ -46,10 +50,12 @@ data class ParticipantState(
 
     override val name: String = subscriber.name()
 
-    private val _isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(subscriber.stream.hasAudio())
+    private val _isMicEnabled: MutableStateFlow<Boolean> =
+        MutableStateFlow(subscriber.stream.hasAudio())
     override val isMicEnabled: StateFlow<Boolean> = _isMicEnabled
 
-    private val _isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(subscriber.stream.hasVideo())
+    private val _isCameraEnabled: MutableStateFlow<Boolean> =
+        MutableStateFlow(subscriber.stream.hasVideo())
     override val isCameraEnabled: StateFlow<Boolean> = _isCameraEnabled
 
     private val _audioLevel: MutableStateFlow<Float> = MutableStateFlow(0F)
@@ -61,6 +67,12 @@ data class ParticipantState(
     override val view: View = subscriber.view
 
     private val logTag = "Subscriber[$id]"
+
+    private val _videoStats: MutableStateFlow<SubscriberVideoStats?> = MutableStateFlow(null)
+    val videoStats: StateFlow<SubscriberVideoStats?> = _videoStats
+
+    private val _audioStats: MutableStateFlow<SubscriberAudioStats?> = MutableStateFlow(null)
+    val audioStats: StateFlow<SubscriberAudioStats?> = _audioStats
 
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
@@ -79,21 +91,33 @@ data class ParticipantState(
         subscriber.setStreamListener(this)
         subscriber.setVideoListener(this)
 
-        subscriber.observeAudioLevel()
-            .movingAverage(windowSize = 5)
-            .distinctUntilChanged()
-            .onEach { audioLevel ->
-                _audioLevel.emit(audioLevel)
+        coroutineScope {
+            launch {
+                subscriber.observeVideoStats()
+                    .collect { _videoStats.value = it }
             }
-            .mapTalking()
-            .collect { isTalking ->
-                _isTalking.value = isTalking
+            launch {
+                subscriber.observeAudioStats()
+                    .collect { _audioStats.value = it }
             }
+            subscriber.observeAudioLevel()
+                .movingAverage(windowSize = 5)
+                .distinctUntilChanged()
+                .onEach { audioLevel ->
+                    _audioLevel.emit(audioLevel)
+                }
+                .mapTalking()
+                .collect { isTalking ->
+                    _isTalking.value = isTalking
+                }
+        }
     }
 
     override fun clean(session: Session) {
         subscriber.setVideoListener(null)
         subscriber.setStreamListener(null)
+        subscriber.setVideoStatsListener(null)
+        subscriber.setAudioStatsListener(null)
         subscriber.setAudioLevelListener(null)
         session.unsubscribe(subscriber)
     }
@@ -137,4 +161,27 @@ data class ParticipantState(
     override fun onVideoDisableWarningLifted(subscriber: SubscriberKit) {
         vonageLogger.d(logTag, "Subscriber video disable warning lifted")
     }
+
+    @Stable
+    data class SubscriberVideoStats(
+        val videoPacketsReceived: Int,
+        val videoPacketsLost: Int,
+        val videoBytesReceived: Int,
+        val width: Int,
+        val height: Int,
+        val codec: String,
+        val decodedFrameRate: Double,
+        val bitrate: Long,
+        val freezeCount: Long,
+        val totalFreezesDuration: Long,
+        val estimatedBandwidthInBps: Long?,
+    )
+
+    @Stable
+    data class SubscriberAudioStats(
+        val audioPacketsReceived: Int,
+        val audioPacketsLost: Int,
+        val audioBytesReceived: Int,
+        val estimatedBandwidthInBps: Long?,
+    )
 }

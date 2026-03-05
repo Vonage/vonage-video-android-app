@@ -15,4 +15,5 @@ data class PublisherConfig(
     val publishAudio: Boolean,
     val blurLevel: BlurLevel,
     val cameraIndex: Int,
+    val senderStatsTrack: Boolean = false,
 )

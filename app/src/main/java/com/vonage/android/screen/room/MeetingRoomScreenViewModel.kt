@@ -22,6 +22,7 @@ import com.vonage.android.screen.components.audio.AudioDevicesState
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.service.VeraForegroundServiceHandler
+import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.util.ActivityContextProvider
 import com.vonage.android.util.noOpCall
 import dagger.assisted.Assisted
@@ -51,6 +52,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private val activityContextProvider: ActivityContextProvider,
     private val getConfig: GetConfig,
     private val audioDevicesHandler: AudioDevicesHandler,
+    private val callSettingsHolder: CallSettingsHolder,
 ) : ViewModel() {
 
     private val context: Context
@@ -126,6 +128,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             listenRemoteArchiving()
             call?.let { call ->
                 vonageCaptions.init(call, roomName, sessionInfo.captionsId)
+                callSettingsHolder.bind(call)
                 // Update UI state after call is properly initialized
                 _uiState.update { uiState ->
                     uiState.copy(
@@ -186,6 +189,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         foregroundServiceHandler.stopForegroundService()
         vonageScreenSharing.stopSharingScreen()
         audioDevicesHandler.stop()
+        callSettingsHolder.clear()
         call?.endSession()
     }
 
