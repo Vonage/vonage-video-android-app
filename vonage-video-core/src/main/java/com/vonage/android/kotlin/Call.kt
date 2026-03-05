@@ -21,6 +21,7 @@ import com.vonage.android.kotlin.internal.VeraPublisherHolder
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.ChatState
+import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.ParticipantState
@@ -30,6 +31,7 @@ import com.vonage.android.kotlin.model.SignalFlows
 import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
+import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.kotlin.signal.SignalPlugin
 import com.vonage.logger.vonageLogger
@@ -367,6 +369,20 @@ class Call internal constructor(
      */
     override fun cycleLocalCameraBlur() {
         publisher()?.cycleCameraBlur()
+    }
+
+    /**
+     * Applies a video bitrate configuration to the publisher at runtime.
+     */
+    override fun setVideoBitrate(config: VideoBitrateConfig) {
+        publisher()?.applyVideoBitrate(config)
+    }
+
+    /**
+     * Applies a degradation preference to the publisher at runtime.
+     */
+    override fun setDegradationPreference(preference: DegradationPreference) {
+        publisher()?.applyDegradationPreference(preference)
     }
 
     /**

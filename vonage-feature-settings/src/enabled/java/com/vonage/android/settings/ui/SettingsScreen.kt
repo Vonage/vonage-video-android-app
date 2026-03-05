@@ -12,11 +12,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.model.CaptureFrameRate
+import com.vonage.android.kotlin.model.CaptureResolution
+import com.vonage.android.kotlin.model.DegradationPreference
+import com.vonage.android.kotlin.model.VideoBitrateConfig
+import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.settings.R
 import com.vonage.android.settings.SettingsUiState
 import com.vonage.android.settings.ui.components.SectionHeader
 import com.vonage.android.settings.ui.components.SettingsToggleRow
 import com.vonage.android.settings.ui.components.SettingsTopBar
+import com.vonage.android.settings.ui.components.DegradationPreferenceSelector
+import com.vonage.android.settings.ui.components.FrameRateSelector
+import com.vonage.android.settings.ui.components.ResolutionSelector
+import com.vonage.android.settings.ui.components.VideoBitrateSelector
 import com.vonage.android.settings.ui.components.footer
 import com.vonage.android.settings.ui.components.stats.PublisherStats
 import com.vonage.android.settings.ui.components.stats.SubscribersStats
@@ -26,6 +35,11 @@ fun SettingsScreen(
     uiState: SettingsUiState,
     modifier: Modifier = Modifier,
     onSenderStatsTrackToggle: (Boolean) -> Unit = {},
+    onOpusDtxToggle: (Boolean) -> Unit = {},
+    onVideoBitrateConfigChange: (VideoBitrateConfig) -> Unit = {},
+    onDegradationPreferenceChange: (DegradationPreference) -> Unit = {},
+    onFrameRateChange: (CaptureFrameRate) -> Unit = {},
+    onResolutionChange: (CaptureResolution?) -> Unit = {},
     onDismiss: () -> Unit = {},
 ) {
     Scaffold(
@@ -51,6 +65,65 @@ fun SettingsScreen(
                     description = stringResource(R.string.settings_sender_stats_description),
                     isChecked = uiState.senderStatsEnabled,
                     onCheckedChange = onSenderStatsTrackToggle,
+                )
+            }
+
+            item {
+                SettingsToggleRow(
+                    title = "Enable Opus Dtx",
+                    description = "Enabling Opus DTX can reduce bandwidth usage in streams that have long periods of silence",
+                    isChecked = uiState.opusDtxEnabled,
+                    onCheckedChange = onOpusDtxToggle,
+                )
+            }
+
+            item {
+                SettingsToggleRow(
+                    title = "Publisher audio fallback",
+                    description = "With the publisher audio-fallback feature enabled, " +
+                            "when publisher determines that a stream's quality has degraded significantly, it disables the video " +
+                            "in order to preserve audio quality",
+                    isChecked = uiState.opusDtxEnabled,
+                    onCheckedChange = onOpusDtxToggle,
+                )
+            }
+
+            item {
+                SettingsToggleRow(
+                    title = "Subscriber audio fallback",
+                    description = "With the subscriber audio-fallback feature enabled, when the SFU determines " +
+                            "that a stream's quality has degraded significantly for a specific subscriber, " +
+                            "it disables the video in that subscriber in order to preserve audio quality",
+                    isChecked = uiState.opusDtxEnabled,
+                    onCheckedChange = onOpusDtxToggle,
+                )
+            }
+
+            item {
+                VideoBitrateSelector(
+                    config = uiState.videoBitrateConfig,
+                    onConfigChange = onVideoBitrateConfigChange,
+                )
+            }
+
+            item {
+                DegradationPreferenceSelector(
+                    selected = uiState.degradationPreference,
+                    onSelectionChange = onDegradationPreferenceChange,
+                )
+            }
+
+            item {
+                FrameRateSelector(
+                    selected = uiState.captureFrameRate,
+                    onSelectionChange = onFrameRateChange,
+                )
+            }
+
+            item {
+                ResolutionSelector(
+                    selected = uiState.captureResolution,
+                    onSelectionChange = onResolutionChange,
                 )
             }
 

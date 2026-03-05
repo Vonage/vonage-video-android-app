@@ -7,6 +7,22 @@
     <string name="settings_close">Close settings</string>
     <string name="settings_app_version">App version: %1$s</string>
     <string name="settings_vonage_sdk">Vonage SDK: %1$s</string>
+    <!-- Video Bitrate -->
+    <string name="settings_bitrate_title">Video Bitrate</string>
+    <string name="settings_bitrate_preset_label">Preset</string>
+    <string name="settings_bitrate_max_label">Max bitrate (bps)</string>
+    <!-- Degradation Preference -->
+    <string name="settings_degradation_title">Degradation Preference</string>
+    <string name="settings_degradation_preset_label">Preference</string>
+    <!-- Frame Rate -->
+    <string name="settings_frame_rate_title">Capture Frame Rate</string>
+    <string name="settings_frame_rate_label">Frame rate</string>
+    <string name="settings_frame_rate_note">Build-time only — takes effect on next call</string>
+    <!-- Resolution -->
+    <string name="settings_resolution_title">Capture Resolution</string>
+    <string name="settings_resolution_label">Resolution</string>
+    <string name="settings_resolution_note">Build-time only — takes effect on next call</string>
+
     <!-- Stats -->
     <string name="settings_stats_publisher_stats_header">Publisher Stats</string>
     <string name="settings_stats_publisher_est_bandwidth">Est. bandwidth</string>

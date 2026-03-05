@@ -1,6 +1,11 @@
 package com.vonage.android.settings
 
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.CaptureFrameRate
+import com.vonage.android.kotlin.model.CaptureResolution
+import com.vonage.android.kotlin.model.DegradationPreference
+import com.vonage.android.kotlin.model.VideoBitrateConfig
+import com.vonage.android.kotlin.model.VideoBitratePreset
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,13 +21,62 @@ class CallSettingsHolder @Inject constructor() {
     private val _senderStatsEnabled = MutableStateFlow(true)
     val senderStatsEnabled: StateFlow<Boolean> = _senderStatsEnabled.asStateFlow()
 
+    private val _opusDtxEnabled = MutableStateFlow(true)
+    val opusDtxEnabled: StateFlow<Boolean> = _opusDtxEnabled.asStateFlow()
+
+    private val _videoBitrateConfig = MutableStateFlow(
+        VideoBitrateConfig(
+            preset = VideoBitratePreset.BW_SAVER,
+            maxBitrate = VideoBitratePreset.BW_SAVER.defaultMaxBitrate,
+        ),
+    )
+    val videoBitrateConfig: StateFlow<VideoBitrateConfig> = _videoBitrateConfig.asStateFlow()
+
+    private val _degradationPreference = MutableStateFlow(DegradationPreference.NOT_SET)
+    val degradationPreference: StateFlow<DegradationPreference> = _degradationPreference.asStateFlow()
+
+    private val _captureFrameRate = MutableStateFlow(CaptureFrameRate.FPS_15)
+    val captureFrameRate: StateFlow<CaptureFrameRate> = _captureFrameRate.asStateFlow()
+
+    private val _captureResolution = MutableStateFlow<CaptureResolution?>(null)
+    val captureResolution: StateFlow<CaptureResolution?> = _captureResolution.asStateFlow()
+
     fun updateSenderStatsEnabled(enabled: Boolean) {
         _senderStatsEnabled.value = enabled
+    }
+
+    fun updateOpusDtx(enabled: Boolean) {
+        _opusDtxEnabled.value = enabled
+    }
+
+    fun updateVideoBitrateConfig(config: VideoBitrateConfig) {
+        _videoBitrateConfig.value = config
+        _call.value?.setVideoBitrate(config)
+    }
+
+    fun updateDegradationPreference(preference: DegradationPreference) {
+        _degradationPreference.value = preference
+        _call.value?.setDegradationPreference(preference)
+    }
+
+    fun updateCaptureFrameRate(frameRate: CaptureFrameRate) {
+        _captureFrameRate.value = frameRate
+    }
+
+    fun updateCaptureResolution(resolution: CaptureResolution?) {
+        _captureResolution.value = resolution
     }
 
     fun clear() {
         _call.value = null
         _senderStatsEnabled.value = true
+        _videoBitrateConfig.value = VideoBitrateConfig(
+            preset = VideoBitratePreset.BW_SAVER,
+            maxBitrate = VideoBitratePreset.BW_SAVER.defaultMaxBitrate,
+        )
+        _degradationPreference.value = DegradationPreference.NOT_SET
+        _captureFrameRate.value = CaptureFrameRate.FPS_15
+        _captureResolution.value = null
     }
 
     fun bind(call: CallFacade) {

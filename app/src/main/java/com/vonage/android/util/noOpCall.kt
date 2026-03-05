@@ -13,6 +13,8 @@ import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
+import com.vonage.android.kotlin.model.DegradationPreference
+import com.vonage.android.kotlin.model.VideoBitrateConfig
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
@@ -48,6 +50,8 @@ val noOpCall = object : CallFacade {
     override fun toggleLocalCamera() { /* empty on purpose */ }
     override fun toggleLocalAudio() { /* empty on purpose */ }
     override fun cycleLocalCameraBlur() { /* empty on purpose */ }
+    override fun setVideoBitrate(config: VideoBitrateConfig) { /* empty on purpose */ }
+    override fun setDegradationPreference(preference: DegradationPreference) { /* empty on purpose */ }
 
     override fun sendChatMessage(message: String) { /* empty on purpose */ }
     override fun listenUnreadChatMessages(enable: Boolean) { /* empty on purpose */ }

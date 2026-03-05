@@ -22,6 +22,11 @@ fun SettingsScreenRoute(
     SettingsScreen(
         uiState = uiState,
         onSenderStatsTrackToggle = viewModel::toggleSenderStatsTrack,
+        onOpusDtxToggle = viewModel::toggleOpusDtx,
+        onVideoBitrateConfigChange = viewModel::updateVideoBitrateConfig,
+        onDegradationPreferenceChange = viewModel::updateDegradationPreference,
+        onFrameRateChange = viewModel::updateCaptureFrameRate,
+        onResolutionChange = viewModel::updateCaptureResolution,
         onDismiss = onDismiss,
     )
 }

@@ -103,6 +103,47 @@ data class PublisherState(
         }
     }
 
+    /**
+     * Applies a video bitrate configuration to the publisher at runtime.
+     *
+     * @param config The bitrate configuration to apply
+     */
+    fun applyVideoBitrate(config: VideoBitrateConfig) {
+        val sdkPreset = when (config.preset) {
+            VideoBitratePreset.DEFAULT -> PublisherKit.VideoBitratePreset.VideoBitratePresetDefault
+            VideoBitratePreset.BW_SAVER -> PublisherKit.VideoBitratePreset.VideoBitratePresetBwSaver
+            VideoBitratePreset.EXTRA_BW_SAVER -> PublisherKit.VideoBitratePreset.VideoBitratePresetExtraBwSaver
+            VideoBitratePreset.CUSTOM -> PublisherKit.VideoBitratePreset.VideoBitratePresetCustom
+        }
+        publisher.videoBitratePreset = sdkPreset
+        if (config.preset == VideoBitratePreset.CUSTOM) {
+            publisher.maxVideoBitrate = config.maxBitrate!!
+        }
+        vonageLogger.d(logTag, "Applied bitrate: preset=${config.preset.label}, max=${config.maxBitrate}")
+    }
+
+    /**
+     * Applies a degradation preference to the publisher at runtime.
+     *
+     * @param preference The degradation preference to apply
+     */
+    fun applyDegradationPreference(preference: DegradationPreference) {
+        val sdkPref = when (preference) {
+            DegradationPreference.NOT_SET ->
+                PublisherKit.DegradationPreference.DegradationPreferenceNotSet
+            DegradationPreference.MAINTAIN_FRAME_RATE_AND_RESOLUTION ->
+                PublisherKit.DegradationPreference.DegradationPreferenceMaintainFrameRateAndResolution
+            DegradationPreference.MAINTAIN_FRAME_RATE ->
+                PublisherKit.DegradationPreference.DegradationPreferenceMaintainFrameRate
+            DegradationPreference.MAINTAIN_RESOLUTION ->
+                PublisherKit.DegradationPreference.DegradationPreferenceMaintainResolution
+            DegradationPreference.BALANCED ->
+                PublisherKit.DegradationPreference.DegradationPreferenceBalanced
+        }
+        publisher.degradationPreference = sdkPref
+        vonageLogger.d(logTag, "Applied degradation preference: ${preference.label}")
+    }
+
     @Stable
     data class VideoStats(
         val duration: Double,

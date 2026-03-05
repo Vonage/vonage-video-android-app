@@ -8,9 +8,13 @@ import com.opentok.android.PublisherKit
 import com.opentok.android.VeraCameraCapturer
 import com.vonage.android.kotlin.Call.Companion.PUBLISHER_ID
 import com.vonage.android.kotlin.ext.applyVideoBlur
+import com.vonage.android.kotlin.model.CaptureFrameRate
+import com.vonage.android.kotlin.model.CaptureResolution
+import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherState
+import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.logger.vonageLogger
 
 /**
@@ -81,13 +85,38 @@ class PublisherFactory {
      */
     @Suppress("MagicNumber")
     private fun Context.getOptimalResolution(): Publisher.CameraCaptureResolution {
-        val memoryClass = (getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).memoryClass
+        val memoryClass =
+            (getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).memoryClass
         return when {
             memoryClass >= 512 -> Publisher.CameraCaptureResolution.HIGH
             memoryClass >= 256 -> Publisher.CameraCaptureResolution.MEDIUM
             else -> Publisher.CameraCaptureResolution.LOW
         }
     }
+
+    /**
+     * Maps the app-level [CaptureFrameRate] to the SDK enum.
+     */
+    private fun resolveFrameRate(): Publisher.CameraCaptureFrameRate =
+        when (publisherConfig?.captureFrameRate) {
+            CaptureFrameRate.FPS_1 -> Publisher.CameraCaptureFrameRate.FPS_1
+            CaptureFrameRate.FPS_7 -> Publisher.CameraCaptureFrameRate.FPS_7
+            CaptureFrameRate.FPS_15 -> Publisher.CameraCaptureFrameRate.FPS_15
+            CaptureFrameRate.FPS_30 -> Publisher.CameraCaptureFrameRate.FPS_30
+            null -> Default.PUBLISHER_FRAME_RATE
+        }
+
+    /**
+     * Resolves the capture resolution from config, falling back to device-optimal.
+     */
+    private fun Context.resolveResolution(): Publisher.CameraCaptureResolution =
+        when (publisherConfig?.captureResolution) {
+            CaptureResolution.LOW -> Publisher.CameraCaptureResolution.LOW
+            CaptureResolution.MEDIUM -> Publisher.CameraCaptureResolution.MEDIUM
+            CaptureResolution.HIGH -> Publisher.CameraCaptureResolution.HIGH
+            CaptureResolution.HIGH_1080P -> Publisher.CameraCaptureResolution.HIGH_1080P
+            null -> getOptimalResolution()
+        }
 
     /**
      * Internal helper to create a configured Publisher instance.
@@ -98,15 +127,16 @@ class PublisherFactory {
             .videoTrack(true)
             .audioTrack(true)
             .senderStatsTrack(publisherConfig?.senderStatsTrack ?: false)
-            //.enableOpusDtx(true)
-            //.publisherAudioFallbackEnabled(true)
-            //.subscriberAudioFallbackEnabled(true)
+            .enableOpusDtx(publisherConfig?.opusDtxEnabled ?: true)
+            .publisherAudioFallbackEnabled(publisherConfig?.publisherAudioFallback ?: true)
+            .subscriberAudioFallbackEnabled(publisherConfig?.subscriberAudioFallback ?: true)
             .capturer(
                 VeraCameraCapturer(
                     context = context,
-                    resolution = context.getOptimalResolution(),
-                    frameRate = Default.PUBLISHER_FRAME_RATE,
-                    initialCameraIndex = publisherConfig?.cameraIndex ?: Default.PUBLISHER_CAMERA_INDEX,
+                    resolution = context.resolveResolution(),
+                    frameRate = resolveFrameRate(),
+                    initialCameraIndex = publisherConfig?.cameraIndex
+                        ?: Default.PUBLISHER_CAMERA_INDEX,
                 )
             )
             .build()
@@ -121,9 +151,35 @@ class PublisherFactory {
                     applyVideoBlur(config.blurLevel)
                 }
                 publisherVideoType = PublisherKit.PublisherKitVideoType.PublisherKitVideoTypeCamera
-                //maxVideoBitrate = 9600
-                //videoBitratePreset = PublisherKit.VideoBitratePreset.VideoBitratePresetBwSaver
-                //degradationPreference = PublisherKit.DegradationPreference.DegradationPreferenceNotSet
+                val bitrateConfig = publisherConfig?.videoBitrateConfig
+                val sdkPreset = when (bitrateConfig?.preset) {
+                    VideoBitratePreset.DEFAULT -> PublisherKit.VideoBitratePreset.VideoBitratePresetDefault
+                    VideoBitratePreset.BW_SAVER -> PublisherKit.VideoBitratePreset.VideoBitratePresetBwSaver
+                    VideoBitratePreset.EXTRA_BW_SAVER -> PublisherKit.VideoBitratePreset.VideoBitratePresetExtraBwSaver
+                    VideoBitratePreset.CUSTOM -> PublisherKit.VideoBitratePreset.VideoBitratePresetCustom
+                    null -> PublisherKit.VideoBitratePreset.VideoBitratePresetBwSaver
+                }
+                videoBitratePreset = sdkPreset
+                if (bitrateConfig?.preset == VideoBitratePreset.CUSTOM) {
+                    maxVideoBitrate = bitrateConfig.maxBitrate!!
+                }
+                val sdkDegPref = when (publisherConfig?.degradationPreference) {
+                    DegradationPreference.NOT_SET, null ->
+                        PublisherKit.DegradationPreference.DegradationPreferenceNotSet
+
+                    DegradationPreference.MAINTAIN_FRAME_RATE_AND_RESOLUTION ->
+                        PublisherKit.DegradationPreference.DegradationPreferenceMaintainFrameRateAndResolution
+
+                    DegradationPreference.MAINTAIN_FRAME_RATE ->
+                        PublisherKit.DegradationPreference.DegradationPreferenceMaintainFrameRate
+
+                    DegradationPreference.MAINTAIN_RESOLUTION ->
+                        PublisherKit.DegradationPreference.DegradationPreferenceMaintainResolution
+
+                    DegradationPreference.BALANCED ->
+                        PublisherKit.DegradationPreference.DegradationPreferenceBalanced
+                }
+                degradationPreference = sdkDegPref
             }
 
     /**
