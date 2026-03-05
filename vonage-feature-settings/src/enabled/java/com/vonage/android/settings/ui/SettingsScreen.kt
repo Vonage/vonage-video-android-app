@@ -55,16 +55,33 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceXSmall),
         ) {
 
-            item { SectionHeader(text = stringResource(R.string.settings_stats_title)) }
-
-            item { Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceSmall)) }
+            item { SectionHeader(text = "Video") }
 
             item {
-                SettingsToggleRow(
-                    title = stringResource(R.string.settings_sender_stats_title),
-                    description = stringResource(R.string.settings_sender_stats_description),
-                    isChecked = uiState.senderStatsEnabled,
-                    onCheckedChange = onSenderStatsTrackToggle,
+                FrameRateSelector(
+                    selected = uiState.captureFrameRate,
+                    onSelectionChange = onFrameRateChange,
+                )
+            }
+
+            item {
+                ResolutionSelector(
+                    selected = uiState.captureResolution,
+                    onSelectionChange = onResolutionChange,
+                )
+            }
+
+            item {
+                VideoBitrateSelector(
+                    config = uiState.videoBitrateConfig,
+                    onConfigChange = onVideoBitrateConfigChange,
+                )
+            }
+
+            item {
+                DegradationPreferenceSelector(
+                    selected = uiState.degradationPreference,
+                    onSelectionChange = onDegradationPreferenceChange,
                 )
             }
 
@@ -76,6 +93,8 @@ fun SettingsScreen(
                     onCheckedChange = onOpusDtxToggle,
                 )
             }
+
+            item { SectionHeader(text = "Audio") }
 
             item {
                 SettingsToggleRow(
@@ -99,31 +118,14 @@ fun SettingsScreen(
                 )
             }
 
-            item {
-                VideoBitrateSelector(
-                    config = uiState.videoBitrateConfig,
-                    onConfigChange = onVideoBitrateConfigChange,
-                )
-            }
+            item { SectionHeader(text = stringResource(R.string.settings_stats_title)) }
 
             item {
-                DegradationPreferenceSelector(
-                    selected = uiState.degradationPreference,
-                    onSelectionChange = onDegradationPreferenceChange,
-                )
-            }
-
-            item {
-                FrameRateSelector(
-                    selected = uiState.captureFrameRate,
-                    onSelectionChange = onFrameRateChange,
-                )
-            }
-
-            item {
-                ResolutionSelector(
-                    selected = uiState.captureResolution,
-                    onSelectionChange = onResolutionChange,
+                SettingsToggleRow(
+                    title = stringResource(R.string.settings_sender_stats_title),
+                    description = stringResource(R.string.settings_sender_stats_description),
+                    isChecked = uiState.senderStatsEnabled,
+                    onCheckedChange = onSenderStatsTrackToggle,
                 )
             }
 
