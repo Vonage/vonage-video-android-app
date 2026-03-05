@@ -32,6 +32,12 @@ internal fun PublisherStats(
         ) {
             SectionDivider()
             SectionHeader(text = stringResource(R.string.settings_stats_publisher_stats_header))
+            videoStats?.let {
+                StatsRow(
+                    label = stringResource(R.string.settings_stats_publisher_est_bandwidth),
+                    value = it.estimatedBandwidthInBps.formatBitrate(),
+                )
+            }
             videoStats?.let { PublisherVideoStats(it) }
             audioStats?.let { PublisherAudioStats(it) }
         }
@@ -44,19 +50,11 @@ private fun PublisherAudioStats(audio: PublisherState.AudioStats) {
     StatsSubHeader(text = stringResource(R.string.settings_stats_publisher_audio_header))
     StatsRow(
         label = stringResource(R.string.settings_stats_publisher_audio_packets_sent),
-        value = audio.audioPacketsSent.toString(),
-    )
-    StatsRow(
-        label = stringResource(R.string.settings_stats_publisher_audio_packets_lost),
-        value = audio.audioPacketsLost.toString(),
+        value = "${audio.audioPacketsSent} / ${audio.audioPacketsLost}",
     )
     StatsRow(
         label = stringResource(R.string.settings_stats_publisher_audio_bytes_sent),
         value = audio.audioBytesSent.formatBytes(),
-    )
-    StatsRow(
-        label = stringResource(R.string.settings_stats_publisher_audio_est_bandwidth),
-        value = audio.estimatedBandwidthInBps.formatBitrate(),
     )
 }
 
@@ -65,19 +63,11 @@ private fun PublisherVideoStats(video: PublisherState.VideoStats) {
     StatsSubHeader(text = stringResource(R.string.settings_stats_publisher_video_header))
     StatsRow(
         label = stringResource(R.string.settings_stats_publisher_video_packets_sent),
-        value = video.videoPacketsSent.toString(),
-    )
-    StatsRow(
-        label = stringResource(R.string.settings_stats_publisher_video_packets_lost),
-        value = video.videoPacketsLost.toString(),
+        value = "${video.videoPacketsSent} / ${video.videoPacketsLost}",
     )
     StatsRow(
         label = stringResource(R.string.settings_stats_publisher_video_bytes_sent),
         value = video.videoBytesSent.formatBytes(),
-    )
-    StatsRow(
-        label = stringResource(R.string.settings_stats_publisher_video_est_bandwidth),
-        value = video.estimatedBandwidthInBps.formatBitrate(),
     )
     video.videoLayerStats.forEachIndexed { index, layer ->
         StatsRow(

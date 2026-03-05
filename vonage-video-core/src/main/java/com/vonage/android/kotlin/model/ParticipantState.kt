@@ -174,7 +174,7 @@ data class ParticipantState(
         val bitrate: Long,
         val freezeCount: Long,
         val totalFreezesDuration: Long,
-        val estimatedBandwidthInBps: Long,
+        val estimatedBandwidthInBps: Long?,
     )
 
     @Stable
@@ -182,6 +182,6 @@ data class ParticipantState(
         val audioPacketsReceived: Int,
         val audioPacketsLost: Int,
         val audioBytesReceived: Int,
-        val estimatedBandwidthInBps: Long,
+        val estimatedBandwidthInBps: Long?,
     )
 }

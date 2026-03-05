@@ -74,7 +74,7 @@ internal fun Subscriber.observeVideoStats(): Flow<SubscriberVideoStats> = callba
                 bitrate = stats.bitrate,
                 freezeCount = stats.freezeCount,
                 totalFreezesDuration = stats.totalFreezesDuration,
-                estimatedBandwidthInBps = stats.senderStats?.connectionEstimatedBandwidth ?: 0L,
+                estimatedBandwidthInBps = stats.senderStats?.connectionEstimatedBandwidth,
             ),
         )
     }
@@ -88,7 +88,7 @@ internal fun Subscriber.observeAudioStats(): Flow<SubscriberAudioStats> = callba
                 audioPacketsReceived = stats.audioPacketsReceived,
                 audioPacketsLost = stats.audioPacketsLost,
                 audioBytesReceived = stats.audioBytesReceived,
-                estimatedBandwidthInBps = stats.senderStats?.connectionEstimatedBandwidth ?: 0L,
+                estimatedBandwidthInBps = stats.senderStats?.connectionEstimatedBandwidth,
             ),
         )
     }

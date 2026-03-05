@@ -39,6 +39,12 @@ fun SubscribersStats(
                         sub.name,
                     )
                 )
+                videoStats?.estimatedBandwidthInBps?.let {
+                    StatsRow(
+                        label = stringResource(R.string.settings_stats_subscriber_est_bandwidth),
+                        value = it.formatBitrate(),
+                    )
+                }
                 videoStats?.let { SubscriberVideoStats(it) }
                 audioStats?.let { SubscriberAudioStats(it) }
             }
@@ -62,11 +68,7 @@ private fun SubscriberVideoStats(video: ParticipantState.SubscriberVideoStats) {
         )
         StatsRow(
             label = stringResource(R.string.settings_stats_subscriber_video_packets_received),
-            value = video.videoPacketsReceived.toString(),
-        )
-        StatsRow(
-            label = stringResource(R.string.settings_stats_subscriber_video_packets_lost),
-            value = video.videoPacketsLost.toString(),
+            value = "${video.videoPacketsReceived} / ${video.videoPacketsLost}",
         )
         StatsRow(
             label = stringResource(R.string.settings_stats_subscriber_video_bytes_received),
@@ -75,10 +77,6 @@ private fun SubscriberVideoStats(video: ParticipantState.SubscriberVideoStats) {
         StatsRow(
             label = stringResource(R.string.settings_stats_subscriber_video_bitrate),
             value = video.bitrate.formatBitrate(),
-        )
-        StatsRow(
-            label = stringResource(R.string.settings_stats_subscriber_video_est_bandwidth),
-            value = video.estimatedBandwidthInBps.formatBitrate(),
         )
         if (video.freezeCount > 0) {
             StatsRow(
@@ -96,19 +94,11 @@ private fun SubscriberAudioStats(audio: ParticipantState.SubscriberAudioStats) {
         StatsSubHeader(text = stringResource(R.string.settings_stats_subscriber_audio_header))
         StatsRow(
             label = stringResource(R.string.settings_stats_subscriber_audio_packets_received),
-            value = audio.audioPacketsReceived.toString(),
-        )
-        StatsRow(
-            label = stringResource(R.string.settings_stats_subscriber_audio_packets_lost),
-            value = audio.audioPacketsLost.toString(),
+            value = "${audio.audioPacketsReceived} / ${audio.audioPacketsLost}",
         )
         StatsRow(
             label = stringResource(R.string.settings_stats_subscriber_audio_bytes_received),
             value = audio.audioBytesReceived.toLong().formatBytes(),
-        )
-        StatsRow(
-            label = stringResource(R.string.settings_stats_subscriber_audio_est_bandwidth),
-            value = audio.estimatedBandwidthInBps.formatBitrate(),
         )
     }
 }
