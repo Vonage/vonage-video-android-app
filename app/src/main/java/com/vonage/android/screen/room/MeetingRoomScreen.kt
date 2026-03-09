@@ -30,8 +30,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
-import com.vonage.android.audio.ui.AudioDevices
-import com.vonage.android.audio.ui.AudioDevicesEffect
+import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.components.GenericLoading
@@ -46,10 +45,11 @@ import com.vonage.android.screen.room.components.bottombar.BottomBar
 import com.vonage.android.screen.room.components.bottombar.BottomBarState
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.MeetingTopBar
-import com.vonage.android.screen.room.components.captions.CaptionsOverlay
-import com.vonage.android.screen.room.components.emoji.EmojiReactionOverlay
+import com.vonage.android.captions.ui.CaptionsOverlay
+import com.vonage.android.reactions.ui.EmojiReactionOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
+import com.vonage.android.screen.components.audio.AudioDevicesMenu
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
@@ -75,8 +75,6 @@ fun MeetingRoomScreen(
         actions.onListenUnread(navigator.isExtraPaneShow().not())
     }
 
-    AudioDevicesEffect()
-
     val isChatShow by remember(navigator.scaffoldValue) {
         derivedStateOf { navigator.isExtraPaneShow() }
     }
@@ -93,9 +91,12 @@ fun MeetingRoomScreen(
                         modifier = Modifier
                             .testTag(MEETING_ROOM_TOP_BAR),
                         roomName = uiState.roomName,
-                        recordingState = uiState.recordingState,
+                        archivingUiState = uiState.archivingUiState,
                         actions = actions,
-                        onToggleAudioDeviceSelector = { showAudioOutputs = showAudioOutputs.toggle() },
+                        onToggleAudioDeviceSelector = {
+                            showAudioOutputs = showAudioOutputs.toggle()
+                        },
+                        audioDevicesState = uiState.audioDevicesState,
                     )
                 },
                 bottomBar = {
@@ -110,9 +111,12 @@ fun MeetingRoomScreen(
                             publisher = publisher,
                             participants = participants,
                             layoutType = uiState.layoutType,
-                            recordingState = uiState.recordingState,
+                            archivingUiState = uiState.archivingUiState,
                             screenSharingState = uiState.screenSharingState,
-                            captionsState = uiState.captionsState,
+                            captionsUiState = uiState.captionsUiState,
+                            allowShowParticipantList = uiState.allowShowParticipantList,
+                            allowMicrophoneControl = uiState.allowMicrophoneControl,
+                            allowCameraControl = uiState.allowCameraControl,
                         ),
                     )
                 }
@@ -135,6 +139,7 @@ fun MeetingRoomScreen(
                                 modifier = Modifier
                                     .testTag(MEETING_ROOM_CONTENT),
                                 call = uiState.call,
+                                actions = actions,
                                 participants = participants,
                                 layoutType = uiState.layoutType,
                             )
@@ -156,9 +161,17 @@ fun MeetingRoomScreen(
                     onDismissRequest = { showAudioOutputs = false },
                     sheetState = audioOutputsSheetState,
                 ) {
-                    AudioDevices(
-                        onDismissRequest = { showAudioOutputs = false },
-                    )
+                    uiState.audioDevicesState?.let {
+                        AudioDevicesMenu(
+                            audioDevicesState = uiState.audioDevicesState,
+                            onDismissRequest = {
+                                scope.launch {
+                                    audioOutputsSheetState.hide()
+                                    showAudioOutputs = false
+                                }
+                            },
+                        )
+                    }
                 }
             }
         }
@@ -246,7 +259,7 @@ internal fun MeetingRoomScreenSessionPreview() {
         MeetingRoomScreen(
             uiState = MeetingRoomUiState(
                 roomName = "sample-room-name",
-                recordingState = RecordingState.RECORDING,
+                archivingUiState = ArchivingUiState.RECORDING,
                 call = buildCallWithParticipants(10),
                 isLoading = false,
                 isError = false,

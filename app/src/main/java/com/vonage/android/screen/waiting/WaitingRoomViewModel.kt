@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vonage.android.config.GetConfig
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherParticipant
+import com.vonage.android.screen.components.audio.AudioDevicesHandler
+import com.vonage.android.screen.components.audio.AudioDevicesState
 import com.vonage.android.util.isValidUserName
 import com.vonage.android.util.sanitizeUserName
 import dagger.assisted.Assisted
@@ -24,8 +27,10 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = WaitingRoomViewModelFactory::class)
 class WaitingRoomViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
+    private val getConfig: GetConfig,
     private val userRepository: UserRepository,
     private val videoClient: VonageVideoClient,
+    private val audioDevicesHandler: AudioDevicesHandler,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WaitingRoomUiState(roomName = roomName))
@@ -37,20 +42,32 @@ class WaitingRoomViewModel @AssistedInject constructor(
 
     fun init(context: Context) {
         viewModelScope.launch {
+            val config = getConfig()
             val name = userRepository.getUserName()
             videoClient.createPreviewPublisher(context, name)
                 .also { publisher ->
-                    _uiState.update { uiState -> uiState.copy(userName = name, publisher = publisher) }
+                    _uiState.update { uiState ->
+                        uiState.copy(
+                            userName = name,
+                            publisher = publisher,
+                            allowCameraControl = config.allowCameraControl,
+                            allowMicrophoneControl = config.allowMicrophoneControl,
+                            audioDevicesState = audioDevicesHandler.audioDevicesState,
+                        )
+                    }
                     publisher.setup()
                 }
         }
+        audioDevicesHandler.start()
     }
 
     fun updateUserName(userName: String) {
-        _uiState.update { uiState -> uiState.copy(
-            userName = userName,
-            isUserNameValid = userName.isValidUserName(),
-        ) }
+        _uiState.update { uiState ->
+            uiState.copy(
+                userName = userName,
+                isUserNameValid = userName.isValidUserName(),
+            )
+        }
     }
 
     fun onMicToggle() {
@@ -65,7 +82,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
         currentPublisher()?.cycleCamera()
     }
 
-    fun setBlur() {
+    fun onCycleCameraBlur() {
         currentPublisher()?.cycleCameraBlur()
     }
 
@@ -117,4 +134,7 @@ data class WaitingRoomUiState(
     val isUserNameValid: Boolean = true,
     val publisher: PublisherParticipant? = null,
     val isSuccess: Boolean = false,
+    val allowMicrophoneControl: Boolean = true,
+    val allowCameraControl: Boolean = true,
+    val audioDevicesState: AudioDevicesState? = null,
 )

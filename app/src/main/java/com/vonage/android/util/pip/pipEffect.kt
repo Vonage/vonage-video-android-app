@@ -4,7 +4,6 @@ import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.ContextWrapper
 import android.os.Build
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -18,6 +17,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.PictureInPictureModeChangedInfo
 import androidx.core.util.Consumer
+import com.vonage.logger.vonageLogger
 
 @Composable
 fun pipEffect(
@@ -47,7 +47,7 @@ fun pipEffect(
             }
         }
     } else {
-        Log.i("PiP", "API does not support PiP")
+        vonageLogger.i("PiP", "API does not support PiP")
     }
 
     val pipModifier = modifier.onGloballyPositioned { _ ->

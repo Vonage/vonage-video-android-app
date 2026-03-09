@@ -38,7 +38,7 @@ fun WaitingRoomRoute(
             onCameraToggle = viewModel::onCameraToggle,
             onJoinRoom = { userName -> viewModel.joinRoom(userName) },
             onCameraSwitch = viewModel::onCameraSwitch,
-            onCameraBlur = viewModel::setBlur,
+            onCameraBlur = viewModel::onCycleCameraBlur,
             onBack = {
                 viewModel.onStop()
                 onBack()

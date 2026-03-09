@@ -2,7 +2,7 @@ name: check-pull-request-title
 
 on:
   pull_request:
-    types: [edited, opened]
+    types: [edited, opened, reopened, synchronize]
 
 permissions:
   contents: read

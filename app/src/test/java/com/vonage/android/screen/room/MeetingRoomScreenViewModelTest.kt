@@ -2,19 +2,26 @@ package com.vonage.android.screen.room
 
 import android.content.Context
 import android.content.Intent
-import android.media.projection.MediaProjection
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
-import com.vonage.android.data.ArchiveRepository
-import com.vonage.android.data.CaptionsRepository
+import com.vonage.android.archiving.ArchiveId
+import com.vonage.android.archiving.ArchivingUiState
+import com.vonage.android.archiving.VonageArchiving
+import com.vonage.android.captions.CaptionsUiState
+import com.vonage.android.captions.VonageCaptions
+import com.vonage.android.config.Config
+import com.vonage.android.config.GetConfig
 import com.vonage.android.data.SessionInfo
 import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
+import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
-import com.vonage.android.screensharing.ScreenSharingServiceListener
-import com.vonage.android.screensharing.VeraScreenSharingManager
+import com.vonage.android.screen.components.audio.AudioDevicesHandler
+import com.vonage.android.screen.components.audio.AudioDevicesState
+import com.vonage.android.screensharing.ScreenSharingState
+import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.service.VeraForegroundServiceHandler
 import com.vonage.android.util.ActivityContextProvider
 import io.mockk.coEvery
@@ -28,6 +35,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,10 +49,15 @@ class MeetingRoomScreenViewModelTest {
     private val context: Context = mockk(relaxed = true)
     private val activityContextProvider: ActivityContextProvider = mockk(relaxed = true)
     private val sessionRepository: SessionRepository = mockk()
-    private val archiveRepository: ArchiveRepository = mockk()
-    private val captionsRepository: CaptionsRepository = mockk()
-    private val screenSharingManager: VeraScreenSharingManager = mockk()
+    private val vonageArchiving: VonageArchiving = mockk(relaxed = true)
+    private val vonageCaptions: VonageCaptions = mockk(relaxed = true)
+    private val vonageScreenSharing: VonageScreenSharing = mockk(relaxed = true)
     private val videoClient: VonageVideoClient = mockk()
+    private val getConfig: GetConfig = mockk()
+    private val audioDevicesStateMock: AudioDevicesState = mockk()
+    private val audioDevicesHandler: AudioDevicesHandler = mockk(relaxed = true) {
+        every { audioDevicesState } returns audioDevicesStateMock
+    }
     private val foregroundServiceHandler: VeraForegroundServiceHandler = mockk {
         every { startForegroundService(any()) } returns Unit
         every { stopForegroundService() } returns Unit
@@ -58,12 +71,20 @@ class MeetingRoomScreenViewModelTest {
         sut = MeetingRoomScreenViewModel(
             roomName = ANY_ROOM_NAME,
             sessionRepository = sessionRepository,
-            archiveRepository = archiveRepository,
-            screenSharingManager = screenSharingManager,
-            captionsRepository = captionsRepository,
+            vonageArchiving = vonageArchiving,
+            vonageScreenSharing = vonageScreenSharing,
+            vonageCaptions = vonageCaptions,
             videoClient = videoClient,
             foregroundServiceHandler = foregroundServiceHandler,
             activityContextProvider = activityContextProvider,
+            getConfig = getConfig,
+            audioDevicesHandler = audioDevicesHandler,
+        )
+
+        every { getConfig.invoke() } returns Config(
+            allowCameraControl = true,
+            allowMicrophoneControl = true,
+            allowShowParticipantList = true,
         )
     }
 
@@ -75,14 +96,11 @@ class MeetingRoomScreenViewModelTest {
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState)
         }
 
         verify { activityContextProvider.setActivityContext(context) }
@@ -97,8 +115,22 @@ class MeetingRoomScreenViewModelTest {
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true, isError = false), awaitItem())
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = false, isError = true), awaitItem())
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    isLoading = true,
+                    isError = false,
+                    audioDevicesState = null,
+                ), awaitItem()
+            )
+            assertEquals(
+                MeetingRoomUiState(
+                    roomName = ANY_ROOM_NAME,
+                    isLoading = false,
+                    isError = true,
+                    audioDevicesState = audioDevicesStateMock,
+                ), awaitItem()
+            )
         }
     }
 
@@ -109,14 +141,12 @@ class MeetingRoomScreenViewModelTest {
         sut.setup(context)
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            awaitItem()
+            awaitItem()
             sut.onToggleMic()
             verify { mockCall.toggleLocalAudio() }
         }
@@ -130,14 +160,11 @@ class MeetingRoomScreenViewModelTest {
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            awaitItem()
             sut.onToggleCamera()
             verify { mockCall.toggleLocalVideo() }
         }
@@ -146,65 +173,20 @@ class MeetingRoomScreenViewModelTest {
     @Test
     fun `given viewmodel when endCall then delegate to call`() = runTest {
         val mockCall = givenMockCall()
-        every { screenSharingManager.stopSharingScreen() } returns Unit
+        every { vonageScreenSharing.stopSharingScreen() } returns Unit
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            awaitItem()
             sut.endCall()
             verify { mockCall.endSession() }
-            verify { screenSharingManager.stopSharingScreen() }
-        }
-    }
-
-    @Test
-    fun `given viewmodel when onPause then delegate to call`() = runTest {
-        val mockCall = givenMockCall()
-
-        sut.setup(context)
-        testScheduler.advanceUntilIdle()
-
-        sut.uiState.test {
-            awaitItem()
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.IDLE,
-                ), awaitItem()
-            )
-            sut.onPause()
-            verify { mockCall.pauseSession() }
-        }
-    }
-
-    @Test
-    fun `given viewmodel when onResume then delegate to call`() = runTest {
-        val mockCall = givenMockCall()
-
-        sut.setup(context)
-        testScheduler.advanceUntilIdle()
-
-        sut.uiState.test {
-            awaitItem()
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.IDLE,
-                ), awaitItem()
-            )
-            sut.onResume()
-            verify { mockCall.resumeSession() }
+            verify { vonageScreenSharing.stopSharingScreen() }
         }
     }
 
@@ -216,14 +198,11 @@ class MeetingRoomScreenViewModelTest {
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            awaitItem()
             sut.onSwitchCamera()
             verify { mockCall.toggleLocalCamera() }
         }
@@ -237,14 +216,11 @@ class MeetingRoomScreenViewModelTest {
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            awaitItem()
             sut.sendMessage("hi there!")
             verify { mockCall.sendChatMessage("hi there!") }
         }
@@ -258,14 +234,11 @@ class MeetingRoomScreenViewModelTest {
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            awaitItem()
             sut.listenUnread(false)
             verify { mockCall.listenUnreadChatMessages(false) }
         }
@@ -279,14 +252,11 @@ class MeetingRoomScreenViewModelTest {
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            awaitItem()
             sut.sendEmoji("emoji :)")
             verify { mockCall.sendEmoji("emoji :)") }
         }
@@ -294,102 +264,110 @@ class MeetingRoomScreenViewModelTest {
 
     @Test
     fun `given viewmodel when archiveCall true then emit correct state`() = runTest {
-        val mockCall = givenMockCall()
-        coEvery { archiveRepository.startArchive(ANY_ROOM_NAME) } returns success("archiveId")
+        givenMockCall()
+        coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(ArchiveId("archiveId"))
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState)
             sut.archiveCall(true)
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.STARTING,
-                ), awaitItem()
-            )
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.RECORDING,
-                ), awaitItem()
-            )
-            coVerify { archiveRepository.startArchive(ANY_ROOM_NAME) }
+            assertEquals(ArchivingUiState.STARTING, awaitItem().archivingUiState)
+            assertEquals(ArchivingUiState.RECORDING, awaitItem().archivingUiState)
+            coVerify { vonageArchiving.startArchive(ANY_ROOM_NAME) }
         }
     }
 
     @Test
     fun `given viewmodel when archiveCall false then emit correct state`() = runTest {
-        val mockCall = givenMockCall()
-        coEvery { archiveRepository.startArchive(ANY_ROOM_NAME) } returns success("archiveId")
-        coEvery { archiveRepository.stopArchive(ANY_ROOM_NAME, "archiveId") } returns success(true)
+        givenMockCall()
+        coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(ArchiveId("archiveId"))
+        coEvery { vonageArchiving.stopArchive(ANY_ROOM_NAME) } returns success(true)
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState)
             sut.archiveCall(true)
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.STARTING,
-                ), awaitItem()
-            )
-            coVerify { archiveRepository.startArchive(ANY_ROOM_NAME) }
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.RECORDING,
-                ), awaitItem()
-            )
+            assertEquals(ArchivingUiState.STARTING, awaitItem().archivingUiState)
+            coVerify { vonageArchiving.startArchive(ANY_ROOM_NAME) }
+            assertEquals(ArchivingUiState.RECORDING, awaitItem().archivingUiState)
             sut.archiveCall(false)
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.STOPPING,
-                ), awaitItem()
-            )
-            coVerify { archiveRepository.stopArchive(ANY_ROOM_NAME, "archiveId") }
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    recordingState = RecordingState.IDLE,
-                ), awaitItem()
-            )
+            assertEquals(ArchivingUiState.STOPPING, awaitItem().archivingUiState)
+            coVerify { vonageArchiving.stopArchive(ANY_ROOM_NAME) }
+            assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState)
         }
     }
 
     @Test
+    fun `given viewmodel when other participant start archiving then emit correct state`() =
+        runTest {
+            val mockCall = givenMockCall()
+            val archivingStateFlow = MutableSharedFlow<ArchivingState>()
+            every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+            coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(ArchiveId("archiveId"))
+
+            sut.setup(context)
+            testScheduler.advanceUntilIdle()
+
+            sut.uiState.test {
+                assertEquals(
+                    MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                    awaitItem()
+                )
+                assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState)
+                archivingStateFlow.emit(ArchivingState.Started("any-archiving-id"))
+                assertEquals(ArchivingUiState.RECORDING, awaitItem().archivingUiState)
+            }
+        }
+
+    @Test
+    fun `given viewmodel when other participant stops archiving then emit correct state`() =
+        runTest {
+            val mockCall = givenMockCall()
+            val archivingStateFlow = MutableSharedFlow<ArchivingState>()
+            every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+            coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(ArchiveId("archiveId"))
+
+            sut.setup(context)
+            testScheduler.advanceUntilIdle()
+
+            sut.uiState.test {
+                assertEquals(
+                    MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                    awaitItem()
+                )
+                assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState)
+                archivingStateFlow.emit(ArchivingState.Started("any-archiving-id"))
+                awaitItem()
+                archivingStateFlow.emit(ArchivingState.Stopped("any-archiving-id"))
+                assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState)
+            }
+        }
+
+    @Test
     fun `given viewmodel when startScreenSharing started then emit correct state`() = runTest {
         val mockCall = givenMockCall()
-        val mediaProjection: MediaProjection = mockk(relaxed = true)
         val mockIntent: Intent = mockk(relaxed = true)
-        val listenerSpy = slot<ScreenSharingServiceListener>()
+        val onStartSlot = slot<() -> Unit>()
+        val onStopSlot = slot<() -> Unit>()
+
         every {
-            screenSharingManager.startScreenSharing(
-                mockIntent, capture<ScreenSharingServiceListener>(listenerSpy)
+            vonageScreenSharing.startScreenSharing(
+                intent = mockIntent,
+                call = mockCall,
+                onStarted = capture(onStartSlot),
+                onStopped = capture(onStopSlot),
             )
         } returns Unit
 
@@ -397,32 +375,16 @@ class MeetingRoomScreenViewModelTest {
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    screenSharingState = ScreenSharingState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            assertEquals(ScreenSharingState.IDLE, awaitItem().screenSharingState)
             sut.startScreenSharing(mockIntent)
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    screenSharingState = ScreenSharingState.STARTING,
-                ), awaitItem()
-            )
-            listenerSpy.captured.onStarted(mediaProjection)
-            testScheduler.advanceUntilIdle()  // Ensure callback processing completes
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    screenSharingState = ScreenSharingState.SHARING,
-                ), awaitItem()
-            )
-            verify { mockCall.startCapturingScreen(mediaProjection) }
+            assertEquals(ScreenSharingState.STARTING, awaitItem().screenSharingState)
+            onStartSlot.captured.invoke()
+            assertEquals(ScreenSharingState.SHARING, awaitItem().screenSharingState)
+            verify { vonageScreenSharing.startScreenSharing(mockIntent, mockCall, any(), any()) }
         }
     }
 
@@ -430,10 +392,15 @@ class MeetingRoomScreenViewModelTest {
     fun `given viewmodel when startScreenSharing stopped then emit correct state`() = runTest {
         val mockCall = givenMockCall()
         val mockIntent: Intent = mockk(relaxed = true)
-        val listenerSpy = slot<ScreenSharingServiceListener>()
+        val onStartSlot = slot<() -> Unit>()
+        val onStopSlot = slot<() -> Unit>()
+
         every {
-            screenSharingManager.startScreenSharing(
-                mockIntent, capture<ScreenSharingServiceListener>(listenerSpy)
+            vonageScreenSharing.startScreenSharing(
+                intent = mockIntent,
+                call = mockCall,
+                onStarted = capture(onStartSlot),
+                onStopped = capture(onStopSlot),
             )
         } returns Unit
 
@@ -441,61 +408,35 @@ class MeetingRoomScreenViewModelTest {
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    screenSharingState = ScreenSharingState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            assertEquals(ScreenSharingState.IDLE, awaitItem().screenSharingState)
             sut.startScreenSharing(mockIntent)
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    screenSharingState = ScreenSharingState.STARTING,
-                ), awaitItem()
-            )
-            listenerSpy.captured.onStopped()
-            testScheduler.advanceUntilIdle()  // Ensure callback processing completes
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    screenSharingState = ScreenSharingState.IDLE,
-                ), awaitItem()
-            )
-            verify { mockCall.stopCapturingScreen() }
+            assertEquals(ScreenSharingState.STARTING, awaitItem().screenSharingState)
+            onStopSlot.captured.invoke()
+            assertEquals(ScreenSharingState.IDLE, awaitItem().screenSharingState)
         }
     }
 
     @Test
     fun `given viewmodel when stopScreenSharing stopped then emit correct state`() = runTest {
-        val mockCall = givenMockCall()
-        every { screenSharingManager.stopSharingScreen() } returns Unit
+        givenMockCall()
+        every { vonageScreenSharing.stopSharingScreen() } returns Unit
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    screenSharingState = ScreenSharingState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            assertEquals(ScreenSharingState.IDLE, awaitItem().screenSharingState)
             sut.stopScreenSharing()
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    screenSharingState = ScreenSharingState.STOPPING,
-                ), awaitItem()
-            )
-            verify { screenSharingManager.stopSharingScreen() }
+            assertEquals(ScreenSharingState.STOPPING, awaitItem().screenSharingState)
+            verify { vonageScreenSharing.stopSharingScreen() }
         }
     }
 
@@ -512,132 +453,106 @@ class MeetingRoomScreenViewModelTest {
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsState = CaptionsState.ENABLED,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
+            assertEquals(CaptionsUiState.ENABLED, awaitItem().captionsUiState)
         }
     }
 
     @Test
     fun `given viewmodel when enable captions then emit correct state`() = runTest {
-        val mockCall = givenMockCall()
-        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns success("captionsId")
+        givenMockCall()
+        coEvery { vonageCaptions.enable() } returns success(Unit)
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            assertEquals(
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
+            )
             awaitItem()
             sut.captions(true)
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsState = CaptionsState.ENABLED,
-                ), awaitItem()
-            )
-            verify { mockCall.enableCaptions(true) }
+            assertEquals(CaptionsUiState.ENABLING, awaitItem().captionsUiState)
+            assertEquals(CaptionsUiState.ENABLED, awaitItem().captionsUiState)
+            coVerify { vonageCaptions.enable() }
         }
     }
 
     @Test
     fun `given viewmodel when enable captions fails then emit correct state`() = runTest {
-        val mockCall = givenMockCall()
-        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns Result.failure(Exception("KO"))
+        givenMockCall()
+        coEvery { vonageCaptions.enable() } returns Result.failure(Exception("KO"))
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
-            sut.captions(true)
             assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsState = CaptionsState.IDLE,
-                ), awaitItem()
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
             )
-            verify(exactly = 0) { mockCall.enableCaptions(true) }
+            sut.captions(true)
+            assertEquals(CaptionsUiState.IDLE, awaitItem().captionsUiState)
         }
     }
 
     @Test
     fun `given viewmodel when disable captions then emit correct state`() = runTest {
-        val mockCall = givenMockCall()
-        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns success("captionsId")
-        coEvery { captionsRepository.disableCaptions(ANY_ROOM_NAME, "captionsId") } returns success("OK")
+        givenMockCall()
+        coEvery { vonageCaptions.enable() } returns success(Unit)
+        coEvery { vonageCaptions.disable() } returns success(Unit)
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            assertEquals(
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
+            )
             awaitItem()
             sut.captions(true)
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsState = CaptionsState.ENABLED,
-                ), awaitItem()
-            )
-            verify { mockCall.enableCaptions(true) }
+            assertEquals(CaptionsUiState.ENABLING, awaitItem().captionsUiState)
+            assertEquals(CaptionsUiState.ENABLED, awaitItem().captionsUiState)
+            coVerify { vonageCaptions.enable() }
             // disable captions
             sut.captions(false)
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsState = CaptionsState.IDLE,
-                ), awaitItem()
-            )
-            verify { mockCall.enableCaptions(false) }
+            assertEquals(CaptionsUiState.DISABLING, awaitItem().captionsUiState)
+            assertEquals(CaptionsUiState.IDLE, awaitItem().captionsUiState)
+            coVerify { vonageCaptions.disable() }
         }
     }
 
     @Test
     fun `given viewmodel when disable captions fails then emit correct state`() = runTest {
-        val mockCall = givenMockCall()
-        coEvery { captionsRepository.enableCaptions(ANY_ROOM_NAME) } returns success("captionsId")
-        coEvery { captionsRepository.disableCaptions(ANY_ROOM_NAME, "captionsId") } returns
-                Result.failure(Exception("KO"))
+        givenMockCall()
+        coEvery { vonageCaptions.enable() } returns success(Unit)
+        coEvery { vonageCaptions.disable() } returns Result.failure(Exception("KO"))
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            assertEquals(
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
+            )
             awaitItem()
             // enable captions
             sut.captions(true)
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsState = CaptionsState.ENABLED,
-                ), awaitItem()
-            )
+            assertEquals(CaptionsUiState.ENABLING, awaitItem().captionsUiState)
+            assertEquals(CaptionsUiState.ENABLED, awaitItem().captionsUiState)
         }
         sut.uiState.test {
             // disable captions
             sut.captions(false)
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    captionsState = CaptionsState.ENABLED,
-                ), awaitItem()
-            )
+            assertEquals(CaptionsUiState.ENABLED, awaitItem().captionsUiState)
         }
-        verify { mockCall.enableCaptions(true) }
-        verify(exactly = 0) { mockCall.enableCaptions(false) }
+        coVerify { vonageCaptions.enable() }
     }
 
     @Test
@@ -647,7 +562,7 @@ class MeetingRoomScreenViewModelTest {
 
     @Test
     fun `given viewmodel when receive CallActionHangUp then update state`() = runTest {
-        val mockCall = givenMockCall()
+        givenMockCall()
         val callActionsFlow = MutableStateFlow<CallAction?>(null)
         every { foregroundServiceHandler.actions } returns callActionsFlow
 
@@ -655,16 +570,13 @@ class MeetingRoomScreenViewModelTest {
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            assertEquals(
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
+            )
             awaitItem()
             callActionsFlow.value = CallAction.HangUp
-            assertEquals(
-                MeetingRoomUiState(
-                    roomName = ANY_ROOM_NAME,
-                    call = mockCall,
-                    isEndCall = true
-                ), awaitItem()
-            )
+            assertTrue(awaitItem().isEndCall)
         }
     }
 
@@ -676,7 +588,10 @@ class MeetingRoomScreenViewModelTest {
         testScheduler.advanceUntilIdle()
 
         sut.uiState.test {
-            assertEquals(MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true), awaitItem())
+            assertEquals(
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
+            )
             awaitItem()
             sut.changeLayout(CallLayoutType.SPEAKER_LAYOUT)
             assertEquals(

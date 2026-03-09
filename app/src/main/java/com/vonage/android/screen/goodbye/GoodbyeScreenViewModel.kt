@@ -3,9 +3,9 @@ package com.vonage.android.screen.goodbye
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vonage.android.data.Archive
-import com.vonage.android.data.ArchiveRepository
-import com.vonage.android.data.ArchiveStatus
+import com.vonage.android.archiving.Archive
+import com.vonage.android.archiving.ArchiveStatus
+import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.di.IODispatcher
 import com.vonage.android.util.DownloadManager
 import com.vonage.android.util.coroutines.CoroutinePollerProvider
@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = GoodbyeScreenViewModelFactory::class)
 class GoodbyeScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
-    private val archiveRepository: ArchiveRepository,
+    private val vonageArchiving: VonageArchiving,
     private val downloadManager: DownloadManager,
     private val coroutinePollerProvider: CoroutinePollerProvider<Unit>,
     @param:IODispatcher private val dispatcher: CoroutineDispatcher,
@@ -45,7 +45,7 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
             coroutinePollerProvider.get(
                 dispatcher = dispatcher,
                 fetchData = {
-                    archiveRepository.getRecordings(roomName)
+                    vonageArchiving.getRecordings(roomName)
                         .onSuccess { archives ->
                             archives
                                 .count { archive -> archive.status == ArchiveStatus.PENDING }
@@ -62,9 +62,7 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
 
     fun downloadArchive(archive: Archive) {
         if (archive.status == ArchiveStatus.AVAILABLE) {
-            downloadManager.downloadByUrl(
-                url = archive.url,
-            )
+            downloadManager.downloadByUrl(archive.url)
         }
     }
 

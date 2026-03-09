@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.dagger.hilt) apply false
     alias(libs.plugins.kotlin.ksp) apply false
     alias(libs.plugins.sonarqube) apply false
-    alias(libs.plugins.kover) apply false
+    alias(libs.plugins.kover)
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.crashlytics) apply false
     alias(libs.plugins.detekt)
@@ -25,6 +25,45 @@ afterEvaluate {
         commandLine("cp", "./scripts/git-hooks/pre-push", "./.git/hooks")
     }
     println("Added pre-push Git Hook Script.")
+}
+
+kover {
+    merge {
+        allProjects {
+            it.name !in listOf(
+                "vonage-video-ui-compose",
+                "vonage-video-core",
+                "vonage-config-idea-plugin"
+            )
+        }
+    }
+
+    reports {
+        filters {
+            excludes {
+                androidGeneratedClasses()
+                classes(
+                    "*_Factory*",
+                    "*Factory_Impl",
+                    "*_MembersInjector",
+                    "*Module",
+                    "*Module_*",
+                    "*_GeneratedInjector",
+                    "*ComposableSingletons*",
+                    "*MainApplication"
+                )
+                annotatedBy(
+                    "androidx.compose.runtime.Stable",
+                    "androidx.compose.runtime.Composable",
+                    "androidx.compose.ui.tooling.preview.Preview",
+                    "androidx.compose.ui.tooling.preview.PreviewLightDark",
+                    "androidx.compose.ui.tooling.preview.PreviewScreenSizes",
+                    "javax.annotation.processing.Generated",
+                    "dagger.hilt.processor.internal.aggregateddeps.AggregatedDeps"
+                )
+            }
+        }
+    }
 }
 
 apply(from = "${rootDir}/build-tools/sonar.gradle")

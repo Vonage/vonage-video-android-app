@@ -1,0 +1,62 @@
+public final class com/vonage/audioselector/AudioDeviceSelector {
+	public static final field $stable I
+	public static final field TAG Ljava/lang/String;
+	public fun <init> (Landroid/content/Context;Lkotlinx/coroutines/CoroutineDispatcher;)V
+	public final fun getActiveDevice ()Lkotlinx/coroutines/flow/StateFlow;
+	public final fun getAvailableDevices ()Lkotlinx/coroutines/flow/StateFlow;
+	public final fun selectDevice (Lcom/vonage/audioselector/AudioDeviceSelector$AudioDevice;)V
+	public final fun start ()V
+	public final fun stop ()V
+}
+
+public final class com/vonage/audioselector/AudioDeviceSelector$AudioDevice {
+	public static final field $stable I
+	public fun <init> (ILcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;)V
+	public final fun component1 ()I
+	public final fun component2 ()Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;
+	public final fun copy (ILcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;)Lcom/vonage/audioselector/AudioDeviceSelector$AudioDevice;
+	public static synthetic fun copy$default (Lcom/vonage/audioselector/AudioDeviceSelector$AudioDevice;ILcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;ILjava/lang/Object;)Lcom/vonage/audioselector/AudioDeviceSelector$AudioDevice;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getId ()I
+	public final fun getType ()Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/vonage/audioselector/AudioDeviceSelector$AudioDeviceType : java/lang/Enum {
+	public static final field BLUETOOTH Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;
+	public static final field EARPIECE Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;
+	public static final field SPEAKER Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;
+	public static final field WIRED_HEADSET Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;
+	public static fun values ()[Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;
+}
+
+public final class com/vonage/audioselector/VeraAudioDevice : com/opentok/android/BaseAudioDevice {
+	public static final field $stable I
+	public static final field DEFAULT_BUFFER_SIZE I
+	public static final field DEFAULT_SAMPLES_PER_BUFFER I
+	public static final field DEFAULT_SAMPLE_RATE I
+	public static final field NUM_CHANNELS_CAPTURING I
+	public static final field NUM_CHANNELS_RENDERING I
+	public static final field SAMPLE_SIZE_IN_BYTES I
+	public static final field STEREO_CHANNELS I
+	public static final field TAG Ljava/lang/String;
+	public fun <init> (Landroid/content/Context;)V
+	public fun destroyCapturer ()Z
+	public fun destroyRenderer ()Z
+	public fun getCaptureSettings ()Lcom/opentok/android/BaseAudioDevice$AudioSettings;
+	public fun getEstimatedCaptureDelay ()I
+	public fun getEstimatedRenderDelay ()I
+	public fun getRenderSettings ()Lcom/opentok/android/BaseAudioDevice$AudioSettings;
+	public fun initCapturer ()Z
+	public fun initRenderer ()Z
+	public fun onPause ()V
+	public fun onResume ()V
+	public fun startCapturer ()Z
+	public fun startRenderer ()Z
+	public fun stopCapturer ()Z
+	public fun stopRenderer ()Z
+}
+

@@ -5,7 +5,6 @@ import android.app.Notification
 import android.app.Notification.CallStyle
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.app.Person
 import android.app.Service
 import android.content.Intent
@@ -14,16 +13,14 @@ import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
-import com.vonage.android.BuildConfig
-import com.vonage.android.MainActivity
 import com.vonage.android.R
-import com.vonage.android.service.VeraForegroundServiceHandler.Companion.HANG_UP_ACTION
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.Companion.CHANNEL_ID
+import com.vonage.android.service.VeraForegroundServiceHandler.Companion.HANG_UP_ACTION
+import com.vonage.android.service.VeraForegroundServiceHandler.Companion.ROOM_INTENT_EXTRA_NAME
+import com.vonage.logger.vonageLogger
 
 class VeraForegroundService : Service() {
 
@@ -40,7 +37,7 @@ class VeraForegroundService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         if (ContextCompat.checkSelfPermission(this, permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            Log.e(TAG, "Cannot use microphone on background without RECORD_AUDIO permission")
+            vonageLogger.e(TAG, "Cannot use microphone on background without RECORD_AUDIO permission")
             stopSelf()
         }
 
@@ -48,13 +45,13 @@ class VeraForegroundService : Service() {
             return START_REDELIVER_INTENT
         }
 
-        val roomName = intent.extras?.getString("room")
+        val roomName = intent.extras?.getString(ROOM_INTENT_EXTRA_NAME)
 
         val notification = buildInCallNotification(roomName.orEmpty())
 
         ServiceCompat.startForeground(
             this,
-            NOTIFICATION_ID_MIC,
+            FOREGROUND_SERVICE_NOTIFICATION_ID,
             notification,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 FOREGROUND_SERVICE_TYPE_MICROPHONE or FOREGROUND_SERVICE_TYPE_CAMERA
@@ -66,19 +63,6 @@ class VeraForegroundService : Service() {
     }
 
     private fun buildInCallNotification(roomName: String): Notification {
-        // deeplink intent
-        val deepLinkIntent = Intent(
-            Intent.ACTION_VIEW,
-            "${BuildConfig.BASE_API_URL}/room/$roomName".toUri(),
-            this,
-            MainActivity::class.java
-        )
-        val deepLinkPendingIntent: PendingIntent? = PendingIntent.getActivity(
-            this,
-            CHAT_REQUEST_CODE,
-            deepLinkIntent,
-            FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
-        )
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             // caller
             val caller = Person.Builder()
@@ -88,35 +72,31 @@ class VeraForegroundService : Service() {
 
             // hangUp intent
             val hangupIntent = Intent(HANG_UP_ACTION)
-
             val hangupPendingIntent = PendingIntent.getBroadcast(
                 this,
-                REQUEST_CODE,
+                FOREGROUND_SERVICE_REQUEST_CODE,
                 hangupIntent,
                 FLAG_IMMUTABLE
             )
 
             Notification.Builder(this, CHANNEL_ID)
-                .setContentIntent(deepLinkPendingIntent)
                 .setSmallIcon(R.drawable.ic_vonage)
                 .setStyle(CallStyle.forOngoingCall(caller, hangupPendingIntent))
                 .setOngoing(true)
-                .setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
+                .setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_DEFAULT)
                 .build()
         } else {
             NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentIntent(deepLinkPendingIntent)
                 .setSmallIcon(R.drawable.ic_vonage)
                 .setOngoing(true)
-                .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+                .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_DEFAULT)
                 .build()
         }
     }
 
     private companion object {
-        const val NOTIFICATION_ID_MIC = 1
-        const val REQUEST_CODE = 999
-        const val CHAT_REQUEST_CODE = 998
+        const val FOREGROUND_SERVICE_NOTIFICATION_ID = 1
+        const val FOREGROUND_SERVICE_REQUEST_CODE = 999
         const val TAG: String = "VeraForegroundService"
     }
 }

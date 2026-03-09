@@ -38,6 +38,8 @@ fun CallControlBar(
     publisher: Participant?,
     roomActions: MeetingRoomActions,
     onShowMore: () -> Unit,
+    allowMicrophoneControl: Boolean,
+    allowCameraControl: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit,
 ) {
@@ -55,15 +57,19 @@ fun CallControlBar(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        MicButton(
-            roomActions = roomActions,
-            isMicEnabled = isMicEnabled,
-        )
+        if (allowMicrophoneControl) {
+            MicButton(
+                roomActions = roomActions,
+                isMicEnabled = isMicEnabled,
+            )
+        }
 
-        CameraButton(
-            roomActions = roomActions,
-            isCameraEnabled = isCameraEnabled,
-        )
+        if (allowCameraControl) {
+            CameraButton(
+                roomActions = roomActions,
+                isCameraEnabled = isCameraEnabled,
+            )
+        }
 
         content()
 
@@ -129,6 +135,8 @@ internal fun CallControlBarPreview() {
         CallControlBar(
             publisher = buildParticipants(1).first(),
             roomActions = MeetingRoomActions(),
+            allowMicrophoneControl = true,
+            allowCameraControl = true,
             onShowMore = {},
         ) { }
     }

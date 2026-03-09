@@ -259,6 +259,80 @@ class WaitingRoomScreenTest {
             .assertIsDisplayed()
     }
 
+    @Test
+    fun given_initial_state_with_allowMicrophoneControl_false_THEN_components_are_displayed() {
+        compose.setContent {
+            VonageVideoTheme {
+                WaitingRoomScreen(
+                    uiState = WaitingRoomUiState(
+                        roomName = "room-name",
+                        userName = "",
+                        publisher = buildPublisher(
+                            isMicEnabled = true,
+                            isCameraEnabled = true,
+                        ),
+                        allowMicrophoneControl = false,
+                    ),
+                    actions = WaitingRoomActions(),
+                )
+            }
+        }
+        screen.micButtonEnabled.assertIsNotDisplayed()
+        screen.micButtonDisabled.assertIsNotDisplayed()
+        screen.volumeIndicator.assertIsDisplayed()
+        screen.cameraButtonEnabled.assertIsDisplayed()
+        screen.prepareToJoinText.assertIsDisplayed()
+        screen.roomNameText
+            .assertIsDisplayed()
+            .assertTextEquals("room-name")
+        screen.whatsYourNameText.assertIsDisplayed()
+        screen.userNameInput
+            .performScrollTo()
+            .assertIsDisplayed()
+            .assert(hasText(""))
+        screen.joinButton
+            .performScrollTo()
+            .assertIsDisplayed()
+            .assertIsEnabled()
+    }
+
+    @Test
+    fun given_initial_state_with_allowCameraControl_false_THEN_components_are_displayed() {
+        compose.setContent {
+            VonageVideoTheme {
+                WaitingRoomScreen(
+                    uiState = WaitingRoomUiState(
+                        roomName = "room-name",
+                        userName = "",
+                        publisher = buildPublisher(
+                            isMicEnabled = true,
+                            isCameraEnabled = true,
+                        ),
+                        allowCameraControl = false,
+                    ),
+                    actions = WaitingRoomActions(),
+                )
+            }
+        }
+        screen.micButtonEnabled.assertIsDisplayed()
+        screen.volumeIndicator.assertIsDisplayed()
+        screen.cameraButtonEnabled.assertIsNotDisplayed()
+        screen.cameraButtonDisabled.assertIsNotDisplayed()
+        screen.prepareToJoinText.assertIsDisplayed()
+        screen.roomNameText
+            .assertIsDisplayed()
+            .assertTextEquals("room-name")
+        screen.whatsYourNameText.assertIsDisplayed()
+        screen.userNameInput
+            .performScrollTo()
+            .assertIsDisplayed()
+            .assert(hasText(""))
+        screen.joinButton
+            .performScrollTo()
+            .assertIsDisplayed()
+            .assertIsEnabled()
+    }
+
     @Suppress("EmptyFunctionBlock")
     @Composable
     private fun buildPublisher(
@@ -278,6 +352,7 @@ class WaitingRoomScreenTest {
             override val id: String = "publisher"
             override val connectionId: String = "publisher-connection-id"
             override val creationTime: Long = 1L
+            override val isScreenShare: Boolean = false
             override val videoSource: VideoSource = VideoSource.CAMERA
             override val name: String = "test publisher"
             override val isMicEnabled: StateFlow<Boolean> = MutableStateFlow(isMicEnabled)

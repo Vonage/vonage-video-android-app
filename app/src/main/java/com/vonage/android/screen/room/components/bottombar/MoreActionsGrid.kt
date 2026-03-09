@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.vonage.android.compose.components.bottombar.ActionCell
+import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.theme.VonageVideoTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

@@ -3,6 +3,8 @@ package com.vonage.android.screen.room.components.bottombar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.vonage.android.R
+import com.vonage.android.compose.components.bottombar.BottomBarAction
+import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Apps
 import com.vonage.android.compose.vivid.icons.solid.Layout2
