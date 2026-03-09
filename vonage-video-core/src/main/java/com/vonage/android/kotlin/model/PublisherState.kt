@@ -76,6 +76,10 @@ data class PublisherState(
     private val _audioStats: MutableStateFlow<AudioStats?> = MutableStateFlow(null)
     val audioStats: StateFlow<AudioStats?> = _audioStats
 
+    init {
+        publisher.capturer.captureSettings.fps
+    }
+
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
             true -> publisher.publishVideo = publisher.stream.hasVideo()

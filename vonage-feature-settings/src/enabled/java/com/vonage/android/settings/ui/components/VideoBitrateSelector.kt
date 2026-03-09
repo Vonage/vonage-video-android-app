@@ -18,15 +18,13 @@ import androidx.compose.ui.res.stringResource
 import com.vonage.android.compose.components.DropdownItem
 import com.vonage.android.compose.components.DropdownSelector
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.model.VONAGE_VIDEO_MAX_BITRATE
+import com.vonage.android.kotlin.model.VONAGE_VIDEO_MIN_BITRATE
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.settings.R
-import java.text.NumberFormat
-import java.util.Locale
+import com.vonage.android.settings.util.formatBitrate
 import kotlin.math.roundToInt
-
-private const val MIN_BITRATE = 5_000f
-private const val MAX_BITRATE = 10_000_000f
 
 @Composable
 internal fun VideoBitrateSelector(
@@ -67,11 +65,11 @@ private fun BitrateSlider(
 ) {
     var sliderValue by remember(config.maxBitrate) {
         mutableFloatStateOf(
-            config.maxBitrate?.toFloat()?.coerceIn(MIN_BITRATE, MAX_BITRATE) ?: MIN_BITRATE,
+            config.maxBitrate?.toFloat()
+                ?.coerceIn(VONAGE_VIDEO_MIN_BITRATE, VONAGE_VIDEO_MAX_BITRATE)
+                ?: VONAGE_VIDEO_MIN_BITRATE,
         )
     }
-    val numberFormat = remember { NumberFormat.getNumberInstance(Locale.getDefault()) }
-
     Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceSmall))
 
     Text(
@@ -88,7 +86,7 @@ private fun BitrateSlider(
         onValueChangeFinished = {
             onConfigChange(config.copy(maxBitrate = sliderValue.roundToInt()))
         },
-        valueRange = MIN_BITRATE..MAX_BITRATE,
+        valueRange = VONAGE_VIDEO_MIN_BITRATE..VONAGE_VIDEO_MAX_BITRATE,
         modifier = Modifier.fillMaxWidth(),
         colors = SliderDefaults.colors(
             thumbColor = VonageVideoTheme.colors.primary,
@@ -102,19 +100,19 @@ private fun BitrateSlider(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "${numberFormat.format(MIN_BITRATE.roundToInt())} bps",
+            text = VONAGE_VIDEO_MIN_BITRATE.formatBitrate(),
             style = VonageVideoTheme.typography.caption,
             color = VonageVideoTheme.colors.tertiary,
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = "${numberFormat.format(sliderValue.roundToInt())} bps",
+            text = sliderValue.formatBitrate(),
             style = VonageVideoTheme.typography.bodyBaseSemibold,
             color = VonageVideoTheme.colors.primary,
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = "${numberFormat.format(MAX_BITRATE.roundToInt())} bps",
+            text = VONAGE_VIDEO_MAX_BITRATE.formatBitrate(),
             style = VonageVideoTheme.typography.caption,
             color = VonageVideoTheme.colors.tertiary,
         )

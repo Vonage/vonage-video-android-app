@@ -7,6 +7,7 @@ import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
+import com.vonage.android.shared.ViewState
 
 @Stable
 data class SettingsUiState(
@@ -22,4 +23,4 @@ data class SettingsUiState(
     val degradationPreference: DegradationPreference = DegradationPreference.NOT_SET,
     val captureFrameRate: CaptureFrameRate = CaptureFrameRate.FPS_15,
     val captureResolution: CaptureResolution? = null,
-)
+) : ViewState

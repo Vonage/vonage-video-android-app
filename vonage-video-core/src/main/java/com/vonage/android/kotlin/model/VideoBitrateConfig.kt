@@ -6,6 +6,7 @@ import androidx.compose.runtime.Stable
  * App-level representation of the OpenTok video bitrate presets.
  *
  * Maps to [com.opentok.android.PublisherKit.VideoBitratePreset].
+ * https://developer.vonage.com/en/video/guides/publishing-streams/setting-bitrate
  *
  * @property label Human-readable name for the preset
  * @property description Short explanation of the preset behavior
@@ -37,6 +38,12 @@ enum class VideoBitratePreset(
         defaultMaxBitrate = 2_000,
     ),
 }
+
+/**
+ * https://developer.vonage.com/en/video/guides/publishing-streams/setting-bitrate#setting-raw-bitrate-values
+ */
+const val VONAGE_VIDEO_MIN_BITRATE = 5_000f // 5kbps
+const val VONAGE_VIDEO_MAX_BITRATE = 10_000_000f // 10Mbps
 
 /**
  * Configuration for the publisher video bitrate.

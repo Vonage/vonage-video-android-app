@@ -17,7 +17,7 @@ fun SettingsScreenRoute(
     },
     onDismiss: () -> Unit = {},
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     SettingsScreen(
         uiState = uiState,
