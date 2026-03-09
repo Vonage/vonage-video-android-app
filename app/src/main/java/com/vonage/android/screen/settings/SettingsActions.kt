@@ -48,6 +48,16 @@ class ObserveSettingsAction :
                 actionScope.setState { copy(captureResolution = res) }
             }
         }
+        scope.launch {
+            holder.publisherAudioFallbackEnabled.collect { enabled ->
+                actionScope.setState { copy(publisherAudioFallbackEnabled = enabled) }
+            }
+        }
+        scope.launch {
+            holder.subscriberAudioFallbackEnabled.collect { enabled ->
+                actionScope.setState { copy(subscriberAudioFallbackEnabled = enabled) }
+            }
+        }
     }
 }
 
@@ -70,6 +80,28 @@ class ToggleOpusDtxAction(
         actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
     ) {
         dependencies.callSettingsHolder.updateOpusDtx(enabled)
+    }
+}
+
+class TogglePublisherAudioFallback(
+    private val enabled: Boolean,
+) : ViewAction<SettingsActionDependencies, SettingsUiState, SettingsViewEvent> {
+    override suspend fun execute(
+        dependencies: SettingsActionDependencies,
+        actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
+    ) {
+        dependencies.callSettingsHolder.updatePublisherAudioFallback(enabled)
+    }
+}
+
+class ToggleSubscriberAudioFallback(
+    private val enabled: Boolean,
+) : ViewAction<SettingsActionDependencies, SettingsUiState, SettingsViewEvent> {
+    override suspend fun execute(
+        dependencies: SettingsActionDependencies,
+        actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
+    ) {
+        dependencies.callSettingsHolder.updateSubscriberAudioFallback(enabled)
     }
 }
 

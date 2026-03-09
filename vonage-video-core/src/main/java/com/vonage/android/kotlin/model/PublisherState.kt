@@ -7,6 +7,8 @@ import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit
 import com.opentok.android.Session
 import com.opentok.android.Stream
+import com.vonage.android.kotlin.ext.applyDegradationPreference
+import com.vonage.android.kotlin.ext.applyVideoBitrate
 import com.vonage.android.kotlin.ext.cycleBlur
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.observeAudioLevel
@@ -113,16 +115,7 @@ data class PublisherState(
      * @param config The bitrate configuration to apply
      */
     fun applyVideoBitrate(config: VideoBitrateConfig) {
-        val sdkPreset = when (config.preset) {
-            VideoBitratePreset.DEFAULT -> PublisherKit.VideoBitratePreset.VideoBitratePresetDefault
-            VideoBitratePreset.BW_SAVER -> PublisherKit.VideoBitratePreset.VideoBitratePresetBwSaver
-            VideoBitratePreset.EXTRA_BW_SAVER -> PublisherKit.VideoBitratePreset.VideoBitratePresetExtraBwSaver
-            VideoBitratePreset.CUSTOM -> PublisherKit.VideoBitratePreset.VideoBitratePresetCustom
-        }
-        publisher.videoBitratePreset = sdkPreset
-        if (config.preset == VideoBitratePreset.CUSTOM) {
-            publisher.maxVideoBitrate = config.maxBitrate!!
-        }
+        publisher.applyVideoBitrate(config)
         vonageLogger.d(logTag, "Applied bitrate: preset=${config.preset.label}, max=${config.maxBitrate}")
     }
 
@@ -132,19 +125,7 @@ data class PublisherState(
      * @param preference The degradation preference to apply
      */
     fun applyDegradationPreference(preference: DegradationPreference) {
-        val sdkPref = when (preference) {
-            DegradationPreference.NOT_SET ->
-                PublisherKit.DegradationPreference.DegradationPreferenceNotSet
-            DegradationPreference.MAINTAIN_FRAME_RATE_AND_RESOLUTION ->
-                PublisherKit.DegradationPreference.DegradationPreferenceMaintainFrameRateAndResolution
-            DegradationPreference.MAINTAIN_FRAME_RATE ->
-                PublisherKit.DegradationPreference.DegradationPreferenceMaintainFrameRate
-            DegradationPreference.MAINTAIN_RESOLUTION ->
-                PublisherKit.DegradationPreference.DegradationPreferenceMaintainResolution
-            DegradationPreference.BALANCED ->
-                PublisherKit.DegradationPreference.DegradationPreferenceBalanced
-        }
-        publisher.degradationPreference = sdkPref
+        publisher.applyDegradationPreference(preference)
         vonageLogger.d(logTag, "Applied degradation preference: ${preference.label}")
     }
 

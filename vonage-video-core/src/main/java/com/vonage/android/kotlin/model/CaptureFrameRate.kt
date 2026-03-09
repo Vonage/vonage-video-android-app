@@ -9,6 +9,7 @@ package com.vonage.android.kotlin.model
  * @property label Human-readable label shown in the UI
  * @property fps Numeric frames-per-second value
  */
+@Suppress("MagicNumber")
 enum class CaptureFrameRate(
     val label: String,
     val fps: Int,

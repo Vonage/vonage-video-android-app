@@ -1,9 +1,7 @@
 package com.vonage.android.settings.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
@@ -16,26 +14,28 @@ import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
-import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.settings.R
 import com.vonage.android.settings.SettingsUiState
-import com.vonage.android.settings.ui.components.SectionHeader
-import com.vonage.android.settings.ui.components.SettingsToggleRow
-import com.vonage.android.settings.ui.components.SettingsTopBar
 import com.vonage.android.settings.ui.components.DegradationPreferenceSelector
 import com.vonage.android.settings.ui.components.FrameRateSelector
 import com.vonage.android.settings.ui.components.ResolutionSelector
+import com.vonage.android.settings.ui.components.SectionHeader
+import com.vonage.android.settings.ui.components.SettingsToggleRow
+import com.vonage.android.settings.ui.components.SettingsTopBar
 import com.vonage.android.settings.ui.components.VideoBitrateSelector
 import com.vonage.android.settings.ui.components.footer
 import com.vonage.android.settings.ui.components.stats.PublisherStats
 import com.vonage.android.settings.ui.components.stats.SubscribersStats
 
+@Suppress("LongParameterList")
 @Composable
 fun SettingsScreen(
     uiState: SettingsUiState,
     modifier: Modifier = Modifier,
     onSenderStatsTrackToggle: (Boolean) -> Unit = {},
     onOpusDtxToggle: (Boolean) -> Unit = {},
+    onPublisherAudioFallbackToggle: (Boolean) -> Unit = {},
+    onSubscriberAudioFallbackToggle: (Boolean) -> Unit = {},
     onVideoBitrateConfigChange: (VideoBitrateConfig) -> Unit = {},
     onDegradationPreferenceChange: (DegradationPreference) -> Unit = {},
     onFrameRateChange: (CaptureFrameRate) -> Unit = {},
@@ -55,7 +55,7 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceXSmall),
         ) {
 
-            item { SectionHeader(text = "Video") }
+            item { SectionHeader(text = stringResource(R.string.settings_section_video)) }
 
             item {
                 FrameRateSelector(
@@ -87,38 +87,34 @@ fun SettingsScreen(
 
             item {
                 SettingsToggleRow(
-                    title = "Enable Opus Dtx",
-                    description = "Enabling Opus DTX can reduce bandwidth usage in streams that have long periods of silence",
+                    title = stringResource(R.string.settings_opus_dtx),
+                    description = stringResource(R.string.settings_opus_dtx_description),
                     isChecked = uiState.opusDtxEnabled,
                     onCheckedChange = onOpusDtxToggle,
                 )
             }
 
-            item { SectionHeader(text = "Audio") }
+            item { SectionHeader(text = stringResource(R.string.settings_section_audio)) }
 
             item {
                 SettingsToggleRow(
-                    title = "Publisher audio fallback",
-                    description = "With the publisher audio-fallback feature enabled, " +
-                            "when publisher determines that a stream's quality has degraded significantly, it disables the video " +
-                            "in order to preserve audio quality",
-                    isChecked = uiState.opusDtxEnabled,
-                    onCheckedChange = onOpusDtxToggle,
+                    title = stringResource(R.string.settings_publisher_audio_fallback),
+                    description = stringResource(R.string.settings_publisher_audio_fallback_description),
+                    isChecked = uiState.publisherAudioFallbackEnabled,
+                    onCheckedChange = onPublisherAudioFallbackToggle,
                 )
             }
 
             item {
                 SettingsToggleRow(
-                    title = "Subscriber audio fallback",
-                    description = "With the subscriber audio-fallback feature enabled, when the SFU determines " +
-                            "that a stream's quality has degraded significantly for a specific subscriber, " +
-                            "it disables the video in that subscriber in order to preserve audio quality",
-                    isChecked = uiState.opusDtxEnabled,
-                    onCheckedChange = onOpusDtxToggle,
+                    title = stringResource(R.string.settings_subscriber_audio_fallback),
+                    description = stringResource(R.string.settings_subscriber_audio_fallback_description),
+                    isChecked = uiState.subscriberAudioFallbackEnabled,
+                    onCheckedChange = onSubscriberAudioFallbackToggle,
                 )
             }
 
-            item { SectionHeader(text = stringResource(R.string.settings_stats_title)) }
+            item { SectionHeader(text = stringResource(R.string.settings_section_stats)) }
 
             item {
                 SettingsToggleRow(

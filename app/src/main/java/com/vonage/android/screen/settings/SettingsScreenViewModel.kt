@@ -35,6 +35,10 @@ class SettingsScreenViewModel @AssistedInject constructor(
 
     fun toggleOpusDtx(enabled: Boolean) = dispatch(ToggleOpusDtxAction(enabled))
 
+    fun togglePublisherAudioFallback(enabled: Boolean) = dispatch(TogglePublisherAudioFallback(enabled))
+
+    fun toggleSubscriberAudioFallback(enabled: Boolean) = dispatch(ToggleSubscriberAudioFallback(enabled))
+
     fun updateVideoBitrateConfig(config: VideoBitrateConfig) = dispatch(UpdateVideoBitrateConfigAction(config))
 
     fun updateDegradationPreference(preference: DegradationPreference) = dispatch(UpdateDegradationPreferenceAction(preference))

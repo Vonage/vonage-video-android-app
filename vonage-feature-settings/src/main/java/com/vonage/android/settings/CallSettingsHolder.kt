@@ -41,6 +41,12 @@ class CallSettingsHolder @Inject constructor() {
     private val _captureResolution = MutableStateFlow<CaptureResolution?>(null)
     val captureResolution: StateFlow<CaptureResolution?> = _captureResolution.asStateFlow()
 
+    private val _publisherAudioFallbackEnabled = MutableStateFlow(true)
+    val publisherAudioFallbackEnabled: StateFlow<Boolean> = _publisherAudioFallbackEnabled.asStateFlow()
+
+    private val _subscriberAudioFallbackEnabled = MutableStateFlow(true)
+    val subscriberAudioFallbackEnabled: StateFlow<Boolean> = _subscriberAudioFallbackEnabled.asStateFlow()
+
     fun updateSenderStatsEnabled(enabled: Boolean) {
         _senderStatsEnabled.value = enabled
     }
@@ -67,6 +73,14 @@ class CallSettingsHolder @Inject constructor() {
         _captureResolution.value = resolution
     }
 
+    fun updatePublisherAudioFallback(enabled: Boolean) {
+        _publisherAudioFallbackEnabled.value = enabled
+    }
+
+    fun updateSubscriberAudioFallback(enabled: Boolean) {
+        _subscriberAudioFallbackEnabled.value = enabled
+    }
+
     fun clear() {
         _call.value = null
         _senderStatsEnabled.value = true
@@ -77,6 +91,8 @@ class CallSettingsHolder @Inject constructor() {
         _degradationPreference.value = DegradationPreference.NOT_SET
         _captureFrameRate.value = CaptureFrameRate.FPS_15
         _captureResolution.value = null
+        _publisherAudioFallbackEnabled.value = true
+        _subscriberAudioFallbackEnabled.value = true
     }
 
     fun bind(call: CallFacade) {

@@ -16,6 +16,8 @@ data class SettingsUiState(
     val call: CallFacade? = null,
     val senderStatsEnabled: Boolean = true,
     val opusDtxEnabled: Boolean = true,
+    val publisherAudioFallbackEnabled: Boolean = true,
+    val subscriberAudioFallbackEnabled: Boolean = true,
     val videoBitrateConfig: VideoBitrateConfig = VideoBitrateConfig(
         preset = VideoBitratePreset.BW_SAVER,
         maxBitrate = VideoBitratePreset.BW_SAVER.defaultMaxBitrate,

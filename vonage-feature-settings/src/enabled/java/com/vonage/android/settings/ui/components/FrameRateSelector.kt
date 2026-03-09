@@ -8,6 +8,7 @@ import com.vonage.android.compose.components.DropdownItem
 import com.vonage.android.compose.components.DropdownSelector
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.settings.R
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 internal fun FrameRateSelector(
@@ -23,8 +24,8 @@ internal fun FrameRateSelector(
         title = stringResource(R.string.settings_frame_rate_title),
         selectedLabel = selected.label,
         dropdownLabel = stringResource(R.string.settings_frame_rate_label),
-        items = items,
-        onItemSelected = onSelectionChange,
+        items = items.toImmutableList(),
+        onSelectItem = onSelectionChange,
         modifier = modifier,
         note = stringResource(R.string.settings_frame_rate_note),
     )

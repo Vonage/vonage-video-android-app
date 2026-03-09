@@ -22,20 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
-
-/**
- * Represents a single item in a [DropdownSelector].
- *
- * @param T The type of the backing value
- * @property value The underlying value returned on selection
- * @property label Primary text displayed for the item
- * @property description Optional secondary text shown below the label
- */
-data class DropdownItem<out T>(
-    val value: T,
-    val label: String,
-    val description: String? = null,
-)
+import kotlinx.collections.immutable.ImmutableList
 
 /**
  * A reusable themed dropdown selector.
@@ -48,20 +35,21 @@ data class DropdownItem<out T>(
  * @param selectedLabel Text shown inside the closed dropdown field
  * @param dropdownLabel Label floating inside the text field
  * @param items List of selectable options
- * @param onItemSelected Callback when the user picks an item
+ * @param onSelectItem Callback when the user picks an item
  * @param modifier Modifier for the root column
  * @param note Optional helper text shown between the title and dropdown
  * @param selectedDescription Optional description shown below the dropdown
  * @param extraContent Optional composable rendered after the description (e.g. a slider)
  */
 @OptIn(ExperimentalMaterial3Api::class)
+@Suppress("LongParameterList")
 @Composable
 fun <T> DropdownSelector(
     title: String,
     selectedLabel: String,
     dropdownLabel: String,
-    items: List<DropdownItem<T>>,
-    onItemSelected: (T) -> Unit,
+    items: ImmutableList<DropdownItem<T>>,
+    onSelectItem: (T) -> Unit,
     modifier: Modifier = Modifier,
     note: String? = null,
     selectedDescription: String? = null,
@@ -80,7 +68,7 @@ fun <T> DropdownSelector(
             color = VonageVideoTheme.colors.secondary,
         )
 
-        if (note != null) {
+        note?.let {
             Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
             Text(
                 text = note,
@@ -91,75 +79,15 @@ fun <T> DropdownSelector(
 
         Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
 
-        ExposedDropdownMenuBox(
+        DropdownMenu(
             expanded = expanded,
-            onExpandedChange = { expanded = it },
-        ) {
-            OutlinedTextField(
-                value = selectedLabel,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier
-                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = VonageVideoTheme.colors.primary,
-                    unfocusedBorderColor = VonageVideoTheme.colors.border,
-                    focusedTextColor = VonageVideoTheme.colors.secondary,
-                    unfocusedTextColor = VonageVideoTheme.colors.secondary,
-                    focusedTrailingIconColor = VonageVideoTheme.colors.primary,
-                    unfocusedTrailingIconColor = VonageVideoTheme.colors.tertiary,
-                ),
-                textStyle = VonageVideoTheme.typography.bodyBaseSemibold,
-                label = {
-                    Text(
-                        text = dropdownLabel,
-                        style = VonageVideoTheme.typography.caption,
-                    )
-                },
-            )
+            selectedLabel = selectedLabel,
+            dropdownLabel = dropdownLabel,
+            items = items,
+            onSelectItem = onSelectItem,
+        )
 
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                containerColor = VonageVideoTheme.colors.surface,
-            ) {
-                items.forEach { item ->
-                    DropdownMenuItem(
-                        text = {
-                            if (item.description != null) {
-                                Column {
-                                    Text(
-                                        text = item.label,
-                                        style = VonageVideoTheme.typography.bodyBaseSemibold,
-                                        color = VonageVideoTheme.colors.secondary,
-                                    )
-                                    Text(
-                                        text = item.description,
-                                        style = VonageVideoTheme.typography.caption,
-                                        color = VonageVideoTheme.colors.tertiary,
-                                    )
-                                }
-                            } else {
-                                Text(
-                                    text = item.label,
-                                    style = VonageVideoTheme.typography.bodyBaseSemibold,
-                                    color = VonageVideoTheme.colors.secondary,
-                                )
-                            }
-                        },
-                        onClick = {
-                            expanded = false
-                            onItemSelected(item.value)
-                        },
-                    )
-                }
-            }
-        }
-
-        if (selectedDescription != null) {
+        selectedDescription?.let {
             Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
             Text(
                 text = selectedDescription,
@@ -168,8 +96,101 @@ fun <T> DropdownSelector(
             )
         }
 
-        if (extraContent != null) {
+        extraContent?.let {
             extraContent()
         }
     }
 }
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun <T> DropdownMenu(
+    expanded: Boolean,
+    selectedLabel: String,
+    dropdownLabel: String,
+    items: ImmutableList<DropdownItem<T>>,
+    onSelectItem: (T) -> Unit
+) {
+    var expanded1 = expanded
+    ExposedDropdownMenuBox(
+        expanded = expanded1,
+        onExpandedChange = { expanded1 = it },
+    ) {
+        OutlinedTextField(
+            value = selectedLabel,
+            onValueChange = {},
+            readOnly = true,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded1) },
+            modifier = Modifier
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = VonageVideoTheme.colors.primary,
+                unfocusedBorderColor = VonageVideoTheme.colors.border,
+                focusedTextColor = VonageVideoTheme.colors.secondary,
+                unfocusedTextColor = VonageVideoTheme.colors.secondary,
+                focusedTrailingIconColor = VonageVideoTheme.colors.primary,
+                unfocusedTrailingIconColor = VonageVideoTheme.colors.tertiary,
+            ),
+            textStyle = VonageVideoTheme.typography.bodyBaseSemibold,
+            label = {
+                Text(
+                    text = dropdownLabel,
+                    style = VonageVideoTheme.typography.caption,
+                )
+            },
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded1,
+            onDismissRequest = { expanded1 = false },
+            containerColor = VonageVideoTheme.colors.surface,
+        ) {
+            items.forEach { item ->
+                DropdownMenuItem(
+                    text = {
+                        if (item.description != null) {
+                            Column {
+                                Text(
+                                    text = item.label,
+                                    style = VonageVideoTheme.typography.bodyBaseSemibold,
+                                    color = VonageVideoTheme.colors.secondary,
+                                )
+                                Text(
+                                    text = item.description,
+                                    style = VonageVideoTheme.typography.caption,
+                                    color = VonageVideoTheme.colors.tertiary,
+                                )
+                            }
+                        } else {
+                            Text(
+                                text = item.label,
+                                style = VonageVideoTheme.typography.bodyBaseSemibold,
+                                color = VonageVideoTheme.colors.secondary,
+                            )
+                        }
+                    },
+                    onClick = {
+                        expanded1 = false
+                        onSelectItem(item.value)
+                    },
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Represents a single item in a [DropdownSelector].
+ *
+ * @param T The type of the backing value
+ * @property value The underlying value returned on selection
+ * @property label Primary text displayed for the item
+ * @property description Optional secondary text shown below the label
+ */
+data class DropdownItem<out T>(
+    val value: T,
+    val label: String,
+    val description: String? = null,
+)

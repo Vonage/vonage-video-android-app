@@ -7,14 +7,14 @@ import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit
 import com.opentok.android.VeraCameraCapturer
 import com.vonage.android.kotlin.Call.Companion.PUBLISHER_ID
+import com.vonage.android.kotlin.ext.applyDegradationPreference
+import com.vonage.android.kotlin.ext.applyVideoBitrate
 import com.vonage.android.kotlin.ext.applyVideoBlur
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
-import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherState
-import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.logger.vonageLogger
 
 /**
@@ -151,35 +151,8 @@ class PublisherFactory {
                     applyVideoBlur(config.blurLevel)
                 }
                 publisherVideoType = PublisherKit.PublisherKitVideoType.PublisherKitVideoTypeCamera
-                val bitrateConfig = publisherConfig?.videoBitrateConfig
-                val sdkPreset = when (bitrateConfig?.preset) {
-                    VideoBitratePreset.DEFAULT -> PublisherKit.VideoBitratePreset.VideoBitratePresetDefault
-                    VideoBitratePreset.BW_SAVER -> PublisherKit.VideoBitratePreset.VideoBitratePresetBwSaver
-                    VideoBitratePreset.EXTRA_BW_SAVER -> PublisherKit.VideoBitratePreset.VideoBitratePresetExtraBwSaver
-                    VideoBitratePreset.CUSTOM -> PublisherKit.VideoBitratePreset.VideoBitratePresetCustom
-                    null -> PublisherKit.VideoBitratePreset.VideoBitratePresetBwSaver
-                }
-                videoBitratePreset = sdkPreset
-                if (bitrateConfig?.preset == VideoBitratePreset.CUSTOM) {
-                    maxVideoBitrate = bitrateConfig.maxBitrate!!
-                }
-                val sdkDegPref = when (publisherConfig?.degradationPreference) {
-                    DegradationPreference.NOT_SET, null ->
-                        PublisherKit.DegradationPreference.DegradationPreferenceNotSet
-
-                    DegradationPreference.MAINTAIN_FRAME_RATE_AND_RESOLUTION ->
-                        PublisherKit.DegradationPreference.DegradationPreferenceMaintainFrameRateAndResolution
-
-                    DegradationPreference.MAINTAIN_FRAME_RATE ->
-                        PublisherKit.DegradationPreference.DegradationPreferenceMaintainFrameRate
-
-                    DegradationPreference.MAINTAIN_RESOLUTION ->
-                        PublisherKit.DegradationPreference.DegradationPreferenceMaintainResolution
-
-                    DegradationPreference.BALANCED ->
-                        PublisherKit.DegradationPreference.DegradationPreferenceBalanced
-                }
-                degradationPreference = sdkDegPref
+                applyVideoBitrate(publisherConfig?.videoBitrateConfig)
+                applyDegradationPreference(publisherConfig?.degradationPreference)
             }
 
     /**

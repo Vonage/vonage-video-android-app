@@ -8,6 +8,7 @@ import com.vonage.android.compose.components.DropdownItem
 import com.vonage.android.compose.components.DropdownSelector
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.settings.R
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 internal fun DegradationPreferenceSelector(
@@ -25,8 +26,8 @@ internal fun DegradationPreferenceSelector(
         title = stringResource(R.string.settings_degradation_title),
         selectedLabel = selected.label,
         dropdownLabel = stringResource(R.string.settings_degradation_preset_label),
-        items = items,
-        onItemSelected = onSelectionChange,
+        items = items.toImmutableList(),
+        onSelectItem = onSelectionChange,
         modifier = modifier,
         selectedDescription = selected.description,
     )

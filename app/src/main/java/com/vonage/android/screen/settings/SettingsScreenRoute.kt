@@ -23,6 +23,8 @@ fun SettingsScreenRoute(
         uiState = uiState,
         onSenderStatsTrackToggle = viewModel::toggleSenderStatsTrack,
         onOpusDtxToggle = viewModel::toggleOpusDtx,
+        onPublisherAudioFallbackToggle = viewModel::togglePublisherAudioFallback,
+        onSubscriberAudioFallbackToggle = viewModel::toggleSubscriberAudioFallback,
         onVideoBitrateConfigChange = viewModel::updateVideoBitrateConfig,
         onDegradationPreferenceChange = viewModel::updateDegradationPreference,
         onFrameRateChange = viewModel::updateCaptureFrameRate,

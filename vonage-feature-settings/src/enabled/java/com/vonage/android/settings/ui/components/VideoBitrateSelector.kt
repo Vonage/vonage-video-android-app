@@ -1,5 +1,6 @@
 package com.vonage.android.settings.ui.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +25,7 @@ import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.settings.R
 import com.vonage.android.settings.util.formatBitrate
+import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.roundToInt
 
 @Composable
@@ -42,8 +44,8 @@ internal fun VideoBitrateSelector(
         title = stringResource(R.string.settings_bitrate_title),
         selectedLabel = config.preset.label,
         dropdownLabel = stringResource(R.string.settings_bitrate_preset_label),
-        items = items,
-        onItemSelected = { preset ->
+        items = items.toImmutableList(),
+        onSelectItem = { preset ->
             onConfigChange(
                 VideoBitrateConfig(preset = preset, maxBitrate = preset.defaultMaxBitrate),
             )
@@ -70,51 +72,53 @@ private fun BitrateSlider(
                 ?: VONAGE_VIDEO_MIN_BITRATE,
         )
     }
-    Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceSmall))
+    Column {
+        Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceSmall))
 
-    Text(
-        text = stringResource(R.string.settings_bitrate_max_label),
-        style = VonageVideoTheme.typography.caption,
-        color = VonageVideoTheme.colors.tertiary,
-    )
-
-    Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
-
-    Slider(
-        value = sliderValue,
-        onValueChange = { sliderValue = it },
-        onValueChangeFinished = {
-            onConfigChange(config.copy(maxBitrate = sliderValue.roundToInt()))
-        },
-        valueRange = VONAGE_VIDEO_MIN_BITRATE..VONAGE_VIDEO_MAX_BITRATE,
-        modifier = Modifier.fillMaxWidth(),
-        colors = SliderDefaults.colors(
-            thumbColor = VonageVideoTheme.colors.primary,
-            activeTrackColor = VonageVideoTheme.colors.primary,
-            inactiveTrackColor = VonageVideoTheme.colors.border,
-        ),
-    )
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
         Text(
-            text = VONAGE_VIDEO_MIN_BITRATE.formatBitrate(),
+            text = stringResource(R.string.settings_bitrate_max_label),
             style = VonageVideoTheme.typography.caption,
             color = VonageVideoTheme.colors.tertiary,
         )
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = sliderValue.formatBitrate(),
-            style = VonageVideoTheme.typography.bodyBaseSemibold,
-            color = VonageVideoTheme.colors.primary,
+
+        Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
+
+        Slider(
+            value = sliderValue,
+            onValueChange = { sliderValue = it },
+            onValueChangeFinished = {
+                onConfigChange(config.copy(maxBitrate = sliderValue.roundToInt()))
+            },
+            valueRange = VONAGE_VIDEO_MIN_BITRATE..VONAGE_VIDEO_MAX_BITRATE,
+            modifier = Modifier.fillMaxWidth(),
+            colors = SliderDefaults.colors(
+                thumbColor = VonageVideoTheme.colors.primary,
+                activeTrackColor = VonageVideoTheme.colors.primary,
+                inactiveTrackColor = VonageVideoTheme.colors.border,
+            ),
         )
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = VONAGE_VIDEO_MAX_BITRATE.formatBitrate(),
-            style = VonageVideoTheme.typography.caption,
-            color = VonageVideoTheme.colors.tertiary,
-        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = VONAGE_VIDEO_MIN_BITRATE.formatBitrate(),
+                style = VonageVideoTheme.typography.caption,
+                color = VonageVideoTheme.colors.tertiary,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = sliderValue.formatBitrate(),
+                style = VonageVideoTheme.typography.bodyBaseSemibold,
+                color = VonageVideoTheme.colors.primary,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = VONAGE_VIDEO_MAX_BITRATE.formatBitrate(),
+                style = VonageVideoTheme.typography.caption,
+                color = VonageVideoTheme.colors.tertiary,
+            )
+        }
     }
 }

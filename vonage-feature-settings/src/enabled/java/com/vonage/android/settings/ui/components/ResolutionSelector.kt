@@ -8,6 +8,7 @@ import com.vonage.android.compose.components.DropdownItem
 import com.vonage.android.compose.components.DropdownSelector
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.settings.R
+import kotlinx.collections.immutable.toImmutableList
 
 private const val AUTO_LABEL = "Auto (device-optimal)"
 private const val AUTO_DESCRIPTION = "Selects resolution based on device memory"
@@ -43,8 +44,8 @@ internal fun ResolutionSelector(
         title = stringResource(R.string.settings_resolution_title),
         selectedLabel = selected?.label ?: AUTO_LABEL,
         dropdownLabel = stringResource(R.string.settings_resolution_label),
-        items = items,
-        onItemSelected = onSelectionChange,
+        items = items.toImmutableList(),
+        onSelectItem = onSelectionChange,
         modifier = modifier,
         note = stringResource(R.string.settings_resolution_note),
     )
