@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.adaptive)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.opentok.android.sdk)
 
