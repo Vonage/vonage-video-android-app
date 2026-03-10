@@ -43,12 +43,8 @@ import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Apps
 import com.vonage.android.compose.vivid.icons.solid.AudioMid
 import com.vonage.android.compose.vivid.icons.solid.Video
-import com.vonage.android.kotlin.model.CaptureFrameRate
-import com.vonage.android.kotlin.model.CaptureResolution
-import com.vonage.android.kotlin.model.DegradationPreference
-import com.vonage.android.kotlin.model.VideoBitrateConfig
-import com.vonage.android.kotlin.model.VideoCodec
 import com.vonage.android.settings.R
+import com.vonage.android.settings.SettingsScreenActions
 import com.vonage.android.settings.SettingsUiState
 import com.vonage.android.settings.ui.components.AudioBitrateSelector
 import com.vonage.android.settings.ui.components.DegradationPreferenceSelector
@@ -76,22 +72,11 @@ private val SettingsSection.icon: ImageVector
         SettingsSection.STATS -> VividIcons.Solid.Apps
     }
 
-@Suppress("LongParameterList")
 @Composable
 fun SettingsScreen(
     uiState: SettingsUiState,
     modifier: Modifier = Modifier,
-    onSenderStatsTrackToggle: (Boolean) -> Unit = {},
-    onOpusDtxToggle: (Boolean) -> Unit = {},
-    onPublisherAudioFallbackToggle: (Boolean) -> Unit = {},
-    onSubscriberAudioFallbackToggle: (Boolean) -> Unit = {},
-    onVideoBitrateConfigChange: (VideoBitrateConfig) -> Unit = {},
-    onDegradationPreferenceChange: (DegradationPreference) -> Unit = {},
-    onFrameRateChange: (CaptureFrameRate) -> Unit = {},
-    onResolutionChange: (CaptureResolution?) -> Unit = {},
-    onPreferredVideoCodecOrderChange: (List<VideoCodec>?) -> Unit = {},
-    onAudioBitrateChange: (Int?) -> Unit = {},
-    onDismiss: () -> Unit = {},
+    actions: SettingsScreenActions = SettingsScreenActions(),
 ) {
     val isWideLayout = currentWindowAdaptiveInfo()
         .windowSizeClass
@@ -99,42 +84,23 @@ fun SettingsScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = { SettingsTopBar(onDismiss) },
+        topBar = { SettingsTopBar(actions.onDismiss) },
         containerColor = VonageVideoTheme.colors.surface,
     ) { innerPadding ->
+        val contentModifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
         if (isWideLayout) {
             SettingsTabLayout(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
+                modifier = contentModifier,
                 uiState = uiState,
-                onFrameRateChange = onFrameRateChange,
-                onResolutionChange = onResolutionChange,
-                onVideoBitrateConfigChange = onVideoBitrateConfigChange,
-                onDegradationPreferenceChange = onDegradationPreferenceChange,
-                onPreferredVideoCodecOrderChange = onPreferredVideoCodecOrderChange,
-                onOpusDtxToggle = onOpusDtxToggle,
-                onAudioBitrateChange = onAudioBitrateChange,
-                onPublisherAudioFallbackToggle = onPublisherAudioFallbackToggle,
-                onSubscriberAudioFallbackToggle = onSubscriberAudioFallbackToggle,
-                onSenderStatsTrackToggle = onSenderStatsTrackToggle,
+                actions = actions,
             )
         } else {
             SettingsListLayout(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
+                modifier = contentModifier,
                 uiState = uiState,
-                onFrameRateChange = onFrameRateChange,
-                onResolutionChange = onResolutionChange,
-                onVideoBitrateConfigChange = onVideoBitrateConfigChange,
-                onDegradationPreferenceChange = onDegradationPreferenceChange,
-                onPreferredVideoCodecOrderChange = onPreferredVideoCodecOrderChange,
-                onOpusDtxToggle = onOpusDtxToggle,
-                onAudioBitrateChange = onAudioBitrateChange,
-                onPublisherAudioFallbackToggle = onPublisherAudioFallbackToggle,
-                onSubscriberAudioFallbackToggle = onSubscriberAudioFallbackToggle,
-                onSenderStatsTrackToggle = onSenderStatsTrackToggle,
+                actions = actions,
             )
         }
     }
@@ -142,21 +108,11 @@ fun SettingsScreen(
 
 // region Compact list layout (small screens)
 
-@Suppress("LongParameterList")
 @Composable
 private fun SettingsListLayout(
     uiState: SettingsUiState,
+    actions: SettingsScreenActions,
     modifier: Modifier = Modifier,
-    onFrameRateChange: (CaptureFrameRate) -> Unit = {},
-    onResolutionChange: (CaptureResolution?) -> Unit = {},
-    onVideoBitrateConfigChange: (VideoBitrateConfig) -> Unit = {},
-    onDegradationPreferenceChange: (DegradationPreference) -> Unit = {},
-    onPreferredVideoCodecOrderChange: (List<VideoCodec>?) -> Unit = {},
-    onOpusDtxToggle: (Boolean) -> Unit = {},
-    onAudioBitrateChange: (Int?) -> Unit = {},
-    onPublisherAudioFallbackToggle: (Boolean) -> Unit = {},
-    onSubscriberAudioFallbackToggle: (Boolean) -> Unit = {},
-    onSenderStatsTrackToggle: (Boolean) -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier
@@ -164,13 +120,13 @@ private fun SettingsListLayout(
         verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceXSmall),
     ) {
         item { SectionHeader(text = stringResource(R.string.settings_section_video)) }
-        videoSectionItems(uiState, onFrameRateChange, onResolutionChange, onVideoBitrateConfigChange, onDegradationPreferenceChange, onPreferredVideoCodecOrderChange)
+        videoSectionItems(uiState, actions)
 
         item { SectionHeader(text = stringResource(R.string.settings_section_audio)) }
-        audioSectionItems(uiState, onAudioBitrateChange, onPublisherAudioFallbackToggle, onSubscriberAudioFallbackToggle, onOpusDtxToggle)
+        audioSectionItems(uiState, actions)
 
         item { SectionHeader(text = stringResource(R.string.settings_section_stats)) }
-        statsSectionItems(uiState, onSenderStatsTrackToggle)
+        statsSectionItems(uiState, actions)
 
         footer(uiState)
     }
@@ -180,21 +136,11 @@ private fun SettingsListLayout(
 
 // region Vertical tabs layout (wide screens)
 
-@Suppress("LongParameterList")
 @Composable
 private fun SettingsTabLayout(
     uiState: SettingsUiState,
+    actions: SettingsScreenActions,
     modifier: Modifier = Modifier,
-    onFrameRateChange: (CaptureFrameRate) -> Unit = {},
-    onResolutionChange: (CaptureResolution?) -> Unit = {},
-    onVideoBitrateConfigChange: (VideoBitrateConfig) -> Unit = {},
-    onDegradationPreferenceChange: (DegradationPreference) -> Unit = {},
-    onPreferredVideoCodecOrderChange: (List<VideoCodec>?) -> Unit = {},
-    onOpusDtxToggle: (Boolean) -> Unit = {},
-    onAudioBitrateChange: (Int?) -> Unit = {},
-    onPublisherAudioFallbackToggle: (Boolean) -> Unit = {},
-    onSubscriberAudioFallbackToggle: (Boolean) -> Unit = {},
-    onSenderStatsTrackToggle: (Boolean) -> Unit = {},
 ) {
     var selectedSection by rememberSaveable { mutableStateOf(SettingsSection.VIDEO) }
 
@@ -216,16 +162,9 @@ private fun SettingsTabLayout(
             item { SectionHeader(text = stringResource(selectedSection.titleRes)) }
 
             when (selectedSection) {
-                SettingsSection.VIDEO -> videoSectionItems(
-                    uiState, onFrameRateChange, onResolutionChange, onVideoBitrateConfigChange,
-                    onDegradationPreferenceChange, onPreferredVideoCodecOrderChange,
-                )
-                SettingsSection.AUDIO -> audioSectionItems(
-                    uiState, onAudioBitrateChange, onPublisherAudioFallbackToggle, onSubscriberAudioFallbackToggle, onOpusDtxToggle,
-                )
-                SettingsSection.STATS -> statsSectionItems(
-                    uiState, onSenderStatsTrackToggle,
-                )
+                SettingsSection.VIDEO -> videoSectionItems(uiState, actions)
+                SettingsSection.AUDIO -> audioSectionItems(uiState, actions)
+                SettingsSection.STATS -> statsSectionItems(uiState, actions)
             }
 
             footer(uiState)
@@ -305,66 +244,58 @@ private fun SettingsTabItem(
 
 // region Section content
 
-@Suppress("LongParameterList")
 private fun LazyListScope.videoSectionItems(
     uiState: SettingsUiState,
-    onFrameRateChange: (CaptureFrameRate) -> Unit,
-    onResolutionChange: (CaptureResolution?) -> Unit,
-    onVideoBitrateConfigChange: (VideoBitrateConfig) -> Unit,
-    onDegradationPreferenceChange: (DegradationPreference) -> Unit,
-    onPreferredVideoCodecOrderChange: (List<VideoCodec>?) -> Unit,
+    actions: SettingsScreenActions,
 ) {
     item {
         FrameRateSelector(
             selected = uiState.captureFrameRate,
-            onSelectionChange = onFrameRateChange,
+            onSelectionChange = actions.onFrameRateChange,
         )
     }
     item {
         ResolutionSelector(
             selected = uiState.captureResolution,
-            onSelectionChange = onResolutionChange,
+            onSelectionChange = actions.onResolutionChange,
         )
     }
     item {
         VideoBitrateSelector(
             config = uiState.videoBitrateConfig,
-            onConfigChange = onVideoBitrateConfigChange,
+            onConfigChange = actions.onVideoBitrateConfigChange,
         )
     }
     item {
         DegradationPreferenceSelector(
             selected = uiState.degradationPreference,
-            onSelectionChange = onDegradationPreferenceChange,
+            onSelectionChange = actions.onDegradationPreferenceChange,
         )
     }
     item {
         PreferredCodecOrderSelector(
             selectedOrder = uiState.preferredVideoCodecOrder,
-            onOrderChange = onPreferredVideoCodecOrderChange,
+            onOrderChange = actions.onPreferredVideoCodecOrderChange,
         )
     }
 }
 
 private fun LazyListScope.audioSectionItems(
     uiState: SettingsUiState,
-    onAudioBitrateChange: (Int?) -> Unit,
-    onPublisherAudioFallbackToggle: (Boolean) -> Unit,
-    onSubscriberAudioFallbackToggle: (Boolean) -> Unit,
-    onOpusDtxToggle: (Boolean) -> Unit,
+    actions: SettingsScreenActions,
 ) {
     item {
         SettingsToggleRow(
             title = stringResource(R.string.settings_opus_dtx),
             description = stringResource(R.string.settings_opus_dtx_description),
             isChecked = uiState.opusDtxEnabled,
-            onCheckedChange = onOpusDtxToggle,
+            onCheckedChange = actions.onOpusDtxToggle,
         )
     }
     item {
         AudioBitrateSelector(
             audioBitrate = uiState.audioBitrate,
-            onAudioBitrateChange = onAudioBitrateChange,
+            onAudioBitrateChange = actions.onAudioBitrateChange,
         )
     }
     item {
@@ -372,7 +303,7 @@ private fun LazyListScope.audioSectionItems(
             title = stringResource(R.string.settings_publisher_audio_fallback),
             description = stringResource(R.string.settings_publisher_audio_fallback_description),
             isChecked = uiState.publisherAudioFallbackEnabled,
-            onCheckedChange = onPublisherAudioFallbackToggle,
+            onCheckedChange = actions.onPublisherAudioFallbackToggle,
         )
     }
     item {
@@ -380,21 +311,21 @@ private fun LazyListScope.audioSectionItems(
             title = stringResource(R.string.settings_subscriber_audio_fallback),
             description = stringResource(R.string.settings_subscriber_audio_fallback_description),
             isChecked = uiState.subscriberAudioFallbackEnabled,
-            onCheckedChange = onSubscriberAudioFallbackToggle,
+            onCheckedChange = actions.onSubscriberAudioFallbackToggle,
         )
     }
 }
 
 private fun LazyListScope.statsSectionItems(
     uiState: SettingsUiState,
-    onSenderStatsTrackToggle: (Boolean) -> Unit,
+    actions: SettingsScreenActions,
 ) {
     item {
         SettingsToggleRow(
             title = stringResource(R.string.settings_sender_stats_title),
             description = stringResource(R.string.settings_sender_stats_description),
             isChecked = uiState.senderStatsEnabled,
-            onCheckedChange = onSenderStatsTrackToggle,
+            onCheckedChange = actions.onSenderStatsTrackToggle,
         )
     }
     uiState.call?.let { call ->
