@@ -88,5 +88,6 @@
     <string name="report_issue">Report issue</string>
     <string name="change_layout">Change layout</string>
     <string name="chat">Chat</string>
+    <string name="advanced_noise_suppression">Advanced noise suppression</string>
 
 </resources>

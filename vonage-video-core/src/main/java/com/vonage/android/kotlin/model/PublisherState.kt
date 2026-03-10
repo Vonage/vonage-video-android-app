@@ -14,6 +14,7 @@ import com.vonage.android.kotlin.ext.observeAudioStats
 import com.vonage.android.kotlin.ext.observeVideoStats
 import com.vonage.android.kotlin.ext.toParticipantType
 import com.vonage.android.kotlin.ext.toggle
+import com.vonage.android.kotlin.ext.toggleNoiseSuppression
 import com.vonage.logger.vonageLogger
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.coroutineScope
@@ -76,6 +77,9 @@ data class PublisherState(
     private val _audioStats: MutableStateFlow<AudioStats?> = MutableStateFlow(null)
     val audioStats: StateFlow<AudioStats?> = _audioStats
 
+    private val _noiseSuppression: MutableStateFlow<NoiseSuppression> = MutableStateFlow(NoiseSuppression.DISABLED)
+    override val noiseSuppression: StateFlow<NoiseSuppression> = _noiseSuppression
+
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
             true -> publisher.publishVideo = publisher.stream.hasVideo()
@@ -101,6 +105,11 @@ data class PublisherState(
         publisher.cycleBlur(_blurLevel.value) {
             _blurLevel.value = it
         }
+    }
+
+    override fun toggleNoiseSuppression() {
+        publisher.toggleNoiseSuppression(_noiseSuppression.value)
+            .onSuccess { _noiseSuppression.value = it }
     }
 
     @Stable

@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.archiving.ArchivingUiState
+import com.vonage.android.captions.ui.CaptionsOverlay
 import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.components.GenericLoading
@@ -38,18 +39,18 @@ import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.reactions.ui.EmojiReactionOverlay
+import com.vonage.android.screen.components.audio.AudioDevicesMenu
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.screen.room.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
-import com.vonage.android.screen.room.components.bottombar.BottomBar
-import com.vonage.android.screen.room.components.bottombar.BottomBarState
 import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.MeetingTopBar
-import com.vonage.android.captions.ui.CaptionsOverlay
-import com.vonage.android.reactions.ui.EmojiReactionOverlay
+import com.vonage.android.screen.room.components.bottombar.BottomBar
+import com.vonage.android.screen.room.components.bottombar.BottomBarState
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
-import com.vonage.android.screen.components.audio.AudioDevicesMenu
+import com.vonage.android.util.rememberNoiseSuppression
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
@@ -162,6 +163,8 @@ fun MeetingRoomScreen(
                     sheetState = audioOutputsSheetState,
                 ) {
                     uiState.audioDevicesState?.let {
+                        val noiseSuppression by rememberNoiseSuppression(publisher)
+                            .collectAsStateWithLifecycle()
                         AudioDevicesMenu(
                             audioDevicesState = uiState.audioDevicesState,
                             onDismissRequest = {
@@ -170,6 +173,10 @@ fun MeetingRoomScreen(
                                     showAudioOutputs = false
                                 }
                             },
+                            noiseSuppressionEnabled = noiseSuppression.isEnabled(),
+                            onNoiseSuppressorToggle = {
+                                publisher?.toggleNoiseSuppression()
+                            }
                         )
                     }
                 }

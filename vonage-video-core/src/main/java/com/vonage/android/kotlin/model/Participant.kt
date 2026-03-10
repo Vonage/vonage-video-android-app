@@ -78,11 +78,16 @@ interface PublisherParticipant : Participant {
     /** StateFlow of current background blur level */
     val blurLevel: StateFlow<BlurLevel>
 
+    /** StateFlow of current noise suppression state */
+    val noiseSuppression: StateFlow<NoiseSuppression>
+
     /** Toggles video on/off */
     fun toggleVideo()
 
     /** Toggles audio on/off */
     fun toggleAudio()
+
+    fun toggleNoiseSuppression()
 
     /** Switches between front and back camera */
     fun cycleCamera()

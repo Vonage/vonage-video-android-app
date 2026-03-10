@@ -5,6 +5,7 @@ import com.opentok.android.PublisherKit
 import com.vonage.android.kotlin.model.BackgroundBlur.KEY
 import com.vonage.android.kotlin.model.BackgroundBlur.params
 import com.vonage.android.kotlin.model.BlurLevel
+import com.vonage.android.kotlin.model.NoiseSuppression
 import com.vonage.android.kotlin.model.PublisherState.AudioStats
 import com.vonage.android.kotlin.model.PublisherState.VideoLayerStats
 import com.vonage.android.kotlin.model.PublisherState.VideoStats
@@ -32,6 +33,25 @@ internal fun Publisher.applyVideoBlur(blurLevel: BlurLevel) {
     }.let {
         setVideoTransformers(it)
     }
+}
+
+internal fun Publisher.toggleNoiseSuppression(current: NoiseSuppression): Result<NoiseSuppression> =
+    when (current) {
+        NoiseSuppression.ENABLED -> applyNoiseSuppression()
+        NoiseSuppression.DISABLED -> removeNoiseSuppression()
+    }
+
+internal fun Publisher.applyNoiseSuppression(): Result<NoiseSuppression> =
+    runCatching {
+        setAudioTransformers(
+            arrayListOf(AudioTransformer("NoiseSuppression", ""))
+        )
+        NoiseSuppression.ENABLED
+    }
+
+internal fun Publisher.removeNoiseSuppression(): Result<NoiseSuppression> {
+    setAudioTransformers(arrayListOf())
+    return Result.success(NoiseSuppression.DISABLED)
 }
 
 /**
