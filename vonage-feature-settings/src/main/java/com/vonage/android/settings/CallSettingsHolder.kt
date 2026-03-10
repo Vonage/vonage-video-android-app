@@ -6,6 +6,7 @@ import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
+import com.vonage.android.kotlin.model.VideoCodec
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,6 +48,12 @@ class CallSettingsHolder @Inject constructor() {
     private val _subscriberAudioFallbackEnabled = MutableStateFlow(true)
     val subscriberAudioFallbackEnabled: StateFlow<Boolean> = _subscriberAudioFallbackEnabled.asStateFlow()
 
+    private val _preferredVideoCodecOrder = MutableStateFlow<List<VideoCodec>?>(null)
+    val preferredVideoCodecOrder: StateFlow<List<VideoCodec>?> = _preferredVideoCodecOrder.asStateFlow()
+
+    private val _audioBitrate = MutableStateFlow<Int?>(null)
+    val audioBitrate: StateFlow<Int?> = _audioBitrate.asStateFlow()
+
     fun updateSenderStatsEnabled(enabled: Boolean) {
         _senderStatsEnabled.value = enabled
     }
@@ -81,6 +88,14 @@ class CallSettingsHolder @Inject constructor() {
         _subscriberAudioFallbackEnabled.value = enabled
     }
 
+    fun updatePreferredVideoCodecOrder(order: List<VideoCodec>?) {
+        _preferredVideoCodecOrder.value = order
+    }
+
+    fun updateAudioBitrate(bitrate: Int?) {
+        _audioBitrate.value = bitrate
+    }
+
     fun clear() {
         _call.value = null
         _senderStatsEnabled.value = true
@@ -93,6 +108,8 @@ class CallSettingsHolder @Inject constructor() {
         _captureResolution.value = null
         _publisherAudioFallbackEnabled.value = true
         _subscriberAudioFallbackEnabled.value = true
+        _preferredVideoCodecOrder.value = null
+        _audioBitrate.value = null
     }
 
     fun bind(call: CallFacade) {

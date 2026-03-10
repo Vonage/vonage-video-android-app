@@ -20,6 +20,11 @@
     <!-- Subscriber audio fallback -->
     <string name="settings_subscriber_audio_fallback">Subscriber audio fallback</string>
     <string name="settings_subscriber_audio_fallback_description">With the subscriber audio-fallback feature enabled, when the SFU determines that a stream\'s quality has degraded significantly for a specific subscriber, it disables the video in that subscriber in order to preserve audio quality</string>
+    <!-- Audio Bitrate -->
+    <string name="settings_audio_bitrate_title">Audio Bitrate</string>
+    <string name="settings_audio_bitrate_note">Build-time only — takes effect on next call</string>
+    <string name="settings_audio_bitrate_default">Default (SDK decides)</string>
+    <string name="settings_audio_bitrate_label">Bitrate (bps)</string>
     <!-- Video Bitrate -->
     <string name="settings_bitrate_title">Video Bitrate</string>
     <string name="settings_bitrate_preset_label">Preset</string>
@@ -35,6 +40,10 @@
     <string name="settings_resolution_title">Capture Resolution</string>
     <string name="settings_resolution_label">Resolution</string>
     <string name="settings_resolution_note">Build-time only — takes effect on next call</string>
+    <!-- Preferred Video Codec Order -->
+    <string name="settings_codec_order_title">Preferred Video Codec Order</string>
+    <string name="settings_codec_order_note">Build-time only — takes effect on next call</string>
+    <string name="settings_codec_order_auto">Automatic (SDK decides)</string>
     <!-- Footer -->
     <string name="settings_app_version">App version: %1$s</string>
     <string name="settings_vonage_sdk">Vonage SDK: %1$s</string>

@@ -5,6 +5,7 @@ import com.vonage.android.core.BaseViewModel
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
+import com.vonage.android.kotlin.model.VideoCodec
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.settings.SettingsUiState
 import com.vonage.android.kotlin.model.VideoBitrateConfig
@@ -46,6 +47,10 @@ class SettingsScreenViewModel @AssistedInject constructor(
     fun updateCaptureFrameRate(frameRate: CaptureFrameRate) = dispatch(UpdateCaptureFrameRateAction(frameRate))
 
     fun updateCaptureResolution(resolution: CaptureResolution?) = dispatch(UpdateCaptureResolutionAction(resolution))
+
+    fun updatePreferredVideoCodecOrder(order: List<VideoCodec>?) = dispatch(UpdatePreferredVideoCodecOrderAction(order))
+
+    fun updateAudioBitrate(bitrate: Int?) = dispatch(UpdateAudioBitrateAction(bitrate))
 }
 
 @AssistedFactory

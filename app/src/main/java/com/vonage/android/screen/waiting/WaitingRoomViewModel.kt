@@ -105,6 +105,8 @@ class WaitingRoomViewModel @AssistedInject constructor(
                         blurLevel = publisher.blurLevel.value,
                         cameraIndex = publisher.camera.value.index,
                         senderStatsTrack = callSettingsHolder.senderStatsEnabled.value,
+                        preferredVideoCodecOrder = callSettingsHolder.preferredVideoCodecOrder.value,
+                        audioBitrate = callSettingsHolder.audioBitrate.value,
                     )
                 )
             }

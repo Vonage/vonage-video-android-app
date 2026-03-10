@@ -29,6 +29,8 @@ fun SettingsScreenRoute(
         onDegradationPreferenceChange = viewModel::updateDegradationPreference,
         onFrameRateChange = viewModel::updateCaptureFrameRate,
         onResolutionChange = viewModel::updateCaptureResolution,
+        onPreferredVideoCodecOrderChange = viewModel::updatePreferredVideoCodecOrder,
+        onAudioBitrateChange = viewModel::updateAudioBitrate,
         onDismiss = onDismiss,
     )
 }

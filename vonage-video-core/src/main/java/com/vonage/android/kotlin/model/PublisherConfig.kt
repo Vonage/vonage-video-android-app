@@ -26,4 +26,6 @@ data class PublisherConfig(
     val degradationPreference: DegradationPreference = DegradationPreference.NOT_SET,
     val captureFrameRate: CaptureFrameRate = CaptureFrameRate.FPS_15,
     val captureResolution: CaptureResolution? = null,
+    val preferredVideoCodecOrder: List<VideoCodec>? = null,
+    val audioBitrate: Int? = null,
 )

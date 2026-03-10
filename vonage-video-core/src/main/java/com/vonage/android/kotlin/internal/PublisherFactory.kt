@@ -15,6 +15,7 @@ import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherState
+import com.vonage.android.kotlin.model.toSdkValue
 import com.vonage.logger.vonageLogger
 
 /**
@@ -119,6 +120,15 @@ class PublisherFactory {
         }
 
     /**
+     * Resolves the preferred video codecs from config.
+     */
+    private fun resolvePreferredVideoCodecs(): PublisherKit.PreferredVideoCodecs {
+        val order = publisherConfig?.preferredVideoCodecOrder ?: return PublisherKit.PreferredVideoCodecs.automatic()
+        val sdkCodecs = ArrayList(order.map { it.toSdkValue() })
+        return PublisherKit.PreferredVideoCodecs.manual(sdkCodecs)
+    }
+
+    /**
      * Internal helper to create a configured Publisher instance.
      */
     private fun createPublisher(context: Context, name: String): Publisher =
@@ -130,6 +140,10 @@ class PublisherFactory {
             .enableOpusDtx(publisherConfig?.opusDtxEnabled ?: true)
             .publisherAudioFallbackEnabled(publisherConfig?.publisherAudioFallback ?: true)
             .subscriberAudioFallbackEnabled(publisherConfig?.subscriberAudioFallback ?: true)
+            .preferredVideoCodecs(resolvePreferredVideoCodecs())
+            .let { builder ->
+                publisherConfig?.audioBitrate?.let { builder.audioBitrate(it) } ?: builder
+            }
             .capturer(
                 VeraCameraCapturer(
                     context = context,

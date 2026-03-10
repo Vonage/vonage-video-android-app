@@ -6,6 +6,7 @@ import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
+import com.vonage.android.kotlin.model.VideoCodec
 import com.vonage.android.settings.SettingsUiState
 import kotlinx.coroutines.launch
 
@@ -56,6 +57,16 @@ class ObserveSettingsAction :
         scope.launch {
             holder.subscriberAudioFallbackEnabled.collect { enabled ->
                 actionScope.setState { copy(subscriberAudioFallbackEnabled = enabled) }
+            }
+        }
+        scope.launch {
+            holder.preferredVideoCodecOrder.collect { order ->
+                actionScope.setState { copy(preferredVideoCodecOrder = order) }
+            }
+        }
+        scope.launch {
+            holder.audioBitrate.collect { bitrate ->
+                actionScope.setState { copy(audioBitrate = bitrate) }
             }
         }
     }
@@ -146,5 +157,27 @@ class UpdateCaptureResolutionAction(
         actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
     ) {
         dependencies.callSettingsHolder.updateCaptureResolution(resolution)
+    }
+}
+
+class UpdatePreferredVideoCodecOrderAction(
+    private val order: List<VideoCodec>?,
+) : ViewAction<SettingsActionDependencies, SettingsUiState, SettingsViewEvent> {
+    override suspend fun execute(
+        dependencies: SettingsActionDependencies,
+        actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
+    ) {
+        dependencies.callSettingsHolder.updatePreferredVideoCodecOrder(order)
+    }
+}
+
+class UpdateAudioBitrateAction(
+    private val bitrate: Int?,
+) : ViewAction<SettingsActionDependencies, SettingsUiState, SettingsViewEvent> {
+    override suspend fun execute(
+        dependencies: SettingsActionDependencies,
+        actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
+    ) {
+        dependencies.callSettingsHolder.updateAudioBitrate(bitrate)
     }
 }

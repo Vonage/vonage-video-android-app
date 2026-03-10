@@ -14,14 +14,17 @@ import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
+import com.vonage.android.kotlin.model.VideoCodec
 import com.vonage.android.settings.R
 import com.vonage.android.settings.SettingsUiState
 import com.vonage.android.settings.ui.components.DegradationPreferenceSelector
 import com.vonage.android.settings.ui.components.FrameRateSelector
+import com.vonage.android.settings.ui.components.PreferredCodecOrderSelector
 import com.vonage.android.settings.ui.components.ResolutionSelector
 import com.vonage.android.settings.ui.components.SectionHeader
 import com.vonage.android.settings.ui.components.SettingsToggleRow
 import com.vonage.android.settings.ui.components.SettingsTopBar
+import com.vonage.android.settings.ui.components.AudioBitrateSelector
 import com.vonage.android.settings.ui.components.VideoBitrateSelector
 import com.vonage.android.settings.ui.components.footer
 import com.vonage.android.settings.ui.components.stats.PublisherStats
@@ -40,6 +43,8 @@ fun SettingsScreen(
     onDegradationPreferenceChange: (DegradationPreference) -> Unit = {},
     onFrameRateChange: (CaptureFrameRate) -> Unit = {},
     onResolutionChange: (CaptureResolution?) -> Unit = {},
+    onPreferredVideoCodecOrderChange: (List<VideoCodec>?) -> Unit = {},
+    onAudioBitrateChange: (Int?) -> Unit = {},
     onDismiss: () -> Unit = {},
 ) {
     Scaffold(
@@ -86,6 +91,13 @@ fun SettingsScreen(
             }
 
             item {
+                PreferredCodecOrderSelector(
+                    selectedOrder = uiState.preferredVideoCodecOrder,
+                    onOrderChange = onPreferredVideoCodecOrderChange,
+                )
+            }
+
+            item {
                 SettingsToggleRow(
                     title = stringResource(R.string.settings_opus_dtx),
                     description = stringResource(R.string.settings_opus_dtx_description),
@@ -95,6 +107,13 @@ fun SettingsScreen(
             }
 
             item { SectionHeader(text = stringResource(R.string.settings_section_audio)) }
+
+            item {
+                AudioBitrateSelector(
+                    audioBitrate = uiState.audioBitrate,
+                    onAudioBitrateChange = onAudioBitrateChange,
+                )
+            }
 
             item {
                 SettingsToggleRow(
