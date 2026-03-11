@@ -27,8 +27,8 @@ class CallSettingsHolder @Inject constructor() {
 
     private val _videoBitrateConfig = MutableStateFlow(
         VideoBitrateConfig(
-            preset = VideoBitratePreset.BW_SAVER,
-            maxBitrate = VideoBitratePreset.BW_SAVER.defaultMaxBitrate,
+            preset = VideoBitratePreset.DEFAULT,
+            maxBitrate = VideoBitratePreset.DEFAULT.defaultMaxBitrate,
         ),
     )
     val videoBitrateConfig: StateFlow<VideoBitrateConfig> = _videoBitrateConfig.asStateFlow()

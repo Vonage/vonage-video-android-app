@@ -8,6 +8,7 @@ import com.vonage.android.config.GetConfig
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
+import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
@@ -18,9 +19,13 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -35,6 +40,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     private val callSettingsHolder: CallSettingsHolder,
 ) : ViewModel() {
 
+    private var publisherSetupJob: Job? = null
     private val _uiState = MutableStateFlow(WaitingRoomUiState(roomName = roomName))
     val uiState: StateFlow<WaitingRoomUiState> = _uiState.stateIn(
         scope = viewModelScope,
@@ -46,7 +52,8 @@ class WaitingRoomViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val config = getConfig()
             val name = userRepository.getUserName()
-            videoClient.createPreviewPublisher(context, name)
+            videoClient.configurePublisher(buildPreviewConfig(name))
+            videoClient.createPreviewPublisher(context)
                 .also { publisher ->
                     _uiState.update { uiState ->
                         uiState.copy(
@@ -57,9 +64,10 @@ class WaitingRoomViewModel @AssistedInject constructor(
                             audioDevicesState = audioDevicesHandler.audioDevicesState,
                         )
                     }
-                    publisher.setup()
+                    publisherSetupJob = viewModelScope.launch { publisher.setup() }
                 }
         }
+        observeBuildTimeSettings(context)
         audioDevicesHandler.start()
     }
 
@@ -107,6 +115,9 @@ class WaitingRoomViewModel @AssistedInject constructor(
                         senderStatsTrack = callSettingsHolder.senderStatsEnabled.value,
                         preferredVideoCodecOrder = callSettingsHolder.preferredVideoCodecOrder.value,
                         audioBitrate = callSettingsHolder.audioBitrate.value,
+                        videoBitrateConfig = callSettingsHolder.videoBitrateConfig.value,
+                        captureResolution = callSettingsHolder.captureResolution.value,
+                        captureFrameRate = callSettingsHolder.captureFrameRate.value,
                     )
                 )
             }
@@ -116,9 +127,71 @@ class WaitingRoomViewModel @AssistedInject constructor(
     }
 
     fun onStop() {
+        publisherSetupJob?.cancel()
         currentPublisher()?.clean()
         videoClient.destroyPublisher()
     }
+
+    private fun observeBuildTimeSettings(context: Context) {
+        viewModelScope.launch {
+            combine(
+                listOf<Flow<Any?>>(
+                    callSettingsHolder.captureFrameRate,
+                    callSettingsHolder.captureResolution,
+                    callSettingsHolder.preferredVideoCodecOrder,
+                    callSettingsHolder.audioBitrate,
+                    callSettingsHolder.opusDtxEnabled,
+                    callSettingsHolder.publisherAudioFallbackEnabled,
+                    callSettingsHolder.subscriberAudioFallbackEnabled,
+                    callSettingsHolder.senderStatsEnabled,
+                ),
+            ) { it }
+                .drop(1)
+                .collect { refreshPreviewPublisher(context) }
+        }
+    }
+
+    private fun refreshPreviewPublisher(context: Context) {
+        val current = currentPublisher() ?: return
+        val name = _uiState.value.userName
+        val publishVideo = current.isCameraEnabled.value
+        val publishAudio = current.isMicEnabled.value
+        val blurLevel = current.blurLevel.value
+        val cameraIndex = current.camera.value.index
+
+        publisherSetupJob?.cancel()
+        current.clean()
+        videoClient.destroyPublisher()
+
+        videoClient.configurePublisher(
+            buildPreviewConfig(name, publishVideo, publishAudio, blurLevel, cameraIndex),
+        )
+        val newPublisher = videoClient.createPreviewPublisher(context)
+        _uiState.update { it.copy(publisher = newPublisher) }
+        publisherSetupJob = viewModelScope.launch { newPublisher.setup() }
+    }
+
+    private fun buildPreviewConfig(
+        name: String,
+        publishVideo: Boolean = true,
+        publishAudio: Boolean = true,
+        blurLevel: BlurLevel = BlurLevel.NONE,
+        cameraIndex: Int = 1,
+    ): PublisherConfig = PublisherConfig(
+        name = name,
+        publishVideo = publishVideo,
+        publishAudio = publishAudio,
+        blurLevel = blurLevel,
+        cameraIndex = cameraIndex,
+        captureFrameRate = callSettingsHolder.captureFrameRate.value,
+        captureResolution = callSettingsHolder.captureResolution.value,
+        preferredVideoCodecOrder = callSettingsHolder.preferredVideoCodecOrder.value,
+        audioBitrate = callSettingsHolder.audioBitrate.value,
+        senderStatsTrack = callSettingsHolder.senderStatsEnabled.value,
+        opusDtxEnabled = callSettingsHolder.opusDtxEnabled.value,
+        publisherAudioFallback = callSettingsHolder.publisherAudioFallbackEnabled.value,
+        subscriberAudioFallback = callSettingsHolder.subscriberAudioFallbackEnabled.value,
+    )
 
     private fun currentPublisher() = _uiState.value.publisher
 

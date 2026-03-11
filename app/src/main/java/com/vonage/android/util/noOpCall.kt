@@ -53,6 +53,8 @@ val noOpCall = object : CallFacade {
     override fun setVideoBitrate(config: VideoBitrateConfig) { /* empty on purpose */ }
     override fun setDegradationPreference(preference: DegradationPreference) { /* empty on purpose */ }
 
+    override fun refreshPublisher(context: Context) { /* empty on purpose */ }
+
     override fun sendChatMessage(message: String) { /* empty on purpose */ }
     override fun listenUnreadChatMessages(enable: Boolean) { /* empty on purpose */ }
     override fun sendEmoji(emoji: String) { /* empty on purpose */ }

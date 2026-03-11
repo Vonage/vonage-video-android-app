@@ -15,14 +15,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.components.AudioVolumeIndicator
 import com.vonage.android.compose.components.AvatarInitials
@@ -77,6 +80,14 @@ fun VideoPreviewContainer(
                     userName = name,
                 )
             }
+
+            if (publisher.captureInfoLabel.isNotBlank()) {
+                CaptureInfoBadge(
+                    label = publisher.captureInfoLabel,
+                    modifier = Modifier.align(Alignment.TopStart),
+                )
+            }
+
             content()
         }
     }
@@ -169,5 +180,30 @@ private fun MicVolumeIndicator(
         )
     } else {
         Spacer(modifier = Modifier.size(VonageVideoTheme.dimens.spaceXLarge))
+    }
+}
+
+@Composable
+private fun CaptureInfoBadge(
+    label: String,
+    modifier: Modifier = Modifier,
+) {
+    val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
+
+    Box(
+        modifier = modifier
+            .padding(VonageVideoTheme.dimens.paddingSmall)
+            .background(backgroundColor, VonageVideoTheme.shapes.medium)
+            .padding(
+                horizontal = VonageVideoTheme.dimens.paddingSmall,
+                vertical = VonageVideoTheme.dimens.paddingXSmall,
+            ),
+    ) {
+        Text(
+            text = label,
+            color = Color.White,
+            fontSize = 10.sp,
+            maxLines = 1,
+        )
     }
 }

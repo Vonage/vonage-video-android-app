@@ -81,6 +81,7 @@ fun <T> DropdownSelector(
 
         DropdownMenu(
             expanded = expanded,
+            onExpandedChange = { expanded = it },
             selectedLabel = selectedLabel,
             dropdownLabel = dropdownLabel,
             items = items,
@@ -106,21 +107,21 @@ fun <T> DropdownSelector(
 @OptIn(ExperimentalMaterial3Api::class)
 private fun <T> DropdownMenu(
     expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
     selectedLabel: String,
     dropdownLabel: String,
     items: ImmutableList<DropdownItem<T>>,
     onSelectItem: (T) -> Unit
 ) {
-    var expanded1 = expanded
     ExposedDropdownMenuBox(
-        expanded = expanded1,
-        onExpandedChange = { expanded1 = it },
+        expanded = expanded,
+        onExpandedChange = onExpandedChange,
     ) {
         OutlinedTextField(
             value = selectedLabel,
             onValueChange = {},
             readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded1) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                 .fillMaxWidth(),
@@ -143,8 +144,8 @@ private fun <T> DropdownMenu(
         )
 
         ExposedDropdownMenu(
-            expanded = expanded1,
-            onDismissRequest = { expanded1 = false },
+            expanded = expanded,
+            onDismissRequest = { onExpandedChange(false) },
             containerColor = VonageVideoTheme.colors.surface,
         ) {
             items.forEach { item ->
@@ -172,7 +173,7 @@ private fun <T> DropdownMenu(
                         }
                     },
                     onClick = {
-                        expanded1 = false
+                        onExpandedChange(false)
                         onSelectItem(item.value)
                     },
                 )

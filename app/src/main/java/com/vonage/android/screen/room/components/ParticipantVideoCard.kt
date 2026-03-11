@@ -58,8 +58,6 @@ fun ParticipantVideoCard(
 
         if (participant.name.isNotBlank()) {
             ParticipantLabel(participant.name)
-        } else {
-            ParticipantLabel(participant.id)
         }
 
         if (participant.videoSource == VideoSource.CAMERA) {
@@ -73,7 +71,14 @@ fun ParticipantVideoCard(
         }
 
         if (participant.isPublisher && participant.isScreenShare.not()) {
-            val blurLevel by (participant as PublisherParticipant).blurLevel.collectAsStateWithLifecycle()
+            val publisherParticipant = participant as PublisherParticipant
+
+            CaptureInfoBadge(
+                label = publisherParticipant.captureInfoLabel,
+                modifier = Modifier.align(Alignment.TopStart),
+            )
+
+            val blurLevel by publisherParticipant.blurLevel.collectAsStateWithLifecycle()
 
             BlurIndicator(
                 modifier = Modifier
@@ -229,6 +234,34 @@ private fun MicrophoneIcon(
                 contentDescription = null,
                 tint = Color.Red,
                 modifier = iconSize,
+            )
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.CaptureInfoBadge(
+    label: String,
+    modifier: Modifier = Modifier,
+) {
+    if (label.isNotBlank()) {
+        val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
+
+        Box(
+            modifier = modifier
+                .align(Alignment.TopStart)
+                .padding(VonageVideoTheme.dimens.paddingSmall)
+                .background(backgroundColor, VonageVideoTheme.shapes.medium)
+                .padding(
+                    horizontal = VonageVideoTheme.dimens.paddingSmall,
+                    vertical = VonageVideoTheme.dimens.paddingXSmall,
+                ),
+        ) {
+            Text(
+                text = label,
+                color = Color.White,
+                fontSize = 10.sp,
+                maxLines = 1,
             )
         }
     }

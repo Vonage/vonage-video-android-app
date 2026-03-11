@@ -29,6 +29,9 @@ class PublisherFactory {
     var publisherHolder: VeraPublisherHolder? = null
     private var publisherConfig: PublisherConfig? = null
 
+    val currentConfig: PublisherConfig?
+        get() = publisherConfig
+
     /**
      * Initializes the factory with publisher configuration.
      *
@@ -42,12 +45,11 @@ class PublisherFactory {
      * Creates a preview-only publisher for camera preview.
      *
      * @param context Android context
-     * @param name Display name for the publisher
      * @return PreviewPublisherState wrapping the publisher
      */
-    fun createPreviewPublisher(context: Context, name: String): PreviewPublisherState {
-        val publisher = createPublisher(context, name)
-        return PreviewPublisherState(publisher)
+    fun createPreviewPublisher(context: Context): PreviewPublisherState {
+        val publisher = createPublisher(context)
+        return PreviewPublisherState(publisher, captureInfoLabel = buildCaptureInfoLabel(context))
     }
 
     /**
@@ -56,11 +58,13 @@ class PublisherFactory {
      * @param context Android context
      * @return PublisherState ready to be published to the session
      */
-    fun createPublisher(context: Context): PublisherState {
-        vonageLogger.d(TAG, "build publisher with $publisherConfig")
-        val name = publisherConfig?.name ?: Default.PUBLISHER_NAME
-        val publisher = createPublisher(context, name)
-        val participant = PublisherState(PUBLISHER_ID, publisher)
+    fun createPublisherState(context: Context): PublisherState {
+        val publisher = createPublisher(context)
+        val participant = PublisherState(
+            publisherId = PUBLISHER_ID,
+            publisher = publisher,
+            captureInfoLabel = buildCaptureInfoLabel(context),
+        )
         publisherHolder = VeraPublisherHolder(
             publisher = publisher,
         )
@@ -123,33 +127,56 @@ class PublisherFactory {
      * Resolves the preferred video codecs from config.
      */
     private fun resolvePreferredVideoCodecs(): PublisherKit.PreferredVideoCodecs {
-        val order = publisherConfig?.preferredVideoCodecOrder ?: return PublisherKit.PreferredVideoCodecs.automatic()
+        val order = publisherConfig?.preferredVideoCodecOrder
+            ?: return PublisherKit.PreferredVideoCodecs.automatic()
         val sdkCodecs = ArrayList(order.map { it.toSdkValue() })
         return PublisherKit.PreferredVideoCodecs.manual(sdkCodecs)
     }
 
     /**
+     * Builds a human-readable label with the resolved capture resolution and frame rate.
+     * E.g. "720p / 15 FPS".
+     */
+    private fun buildCaptureInfoLabel(context: Context): String {
+        val resolutionLabel = when (context.resolveResolution()) {
+            Publisher.CameraCaptureResolution.LOW -> "288p"
+            Publisher.CameraCaptureResolution.MEDIUM -> "480p"
+            Publisher.CameraCaptureResolution.HIGH -> "720p"
+            Publisher.CameraCaptureResolution.HIGH_1080P -> "1080p"
+        }
+        val fpsValue = when (resolveFrameRate()) {
+            Publisher.CameraCaptureFrameRate.FPS_1 -> 1
+            Publisher.CameraCaptureFrameRate.FPS_7 -> 7
+            Publisher.CameraCaptureFrameRate.FPS_15 -> 15
+            Publisher.CameraCaptureFrameRate.FPS_30 -> 30
+        }
+        return "$resolutionLabel / ${fpsValue}fps"
+    }
+
+    /**
      * Internal helper to create a configured Publisher instance.
      */
-    private fun createPublisher(context: Context, name: String): Publisher =
+    private fun createPublisher(context: Context): Publisher =
         Publisher.Builder(context)
-            .name(name)
+            .name(currentConfig?.name)
             .videoTrack(true)
             .audioTrack(true)
-            .senderStatsTrack(publisherConfig?.senderStatsTrack ?: false)
-            .enableOpusDtx(publisherConfig?.opusDtxEnabled ?: true)
-            .publisherAudioFallbackEnabled(publisherConfig?.publisherAudioFallback ?: true)
-            .subscriberAudioFallbackEnabled(publisherConfig?.subscriberAudioFallback ?: true)
+            .senderStatsTrack(currentConfig?.senderStatsTrack ?: false)
+            .enableOpusDtx(currentConfig?.opusDtxEnabled ?: true)
+            .publisherAudioFallbackEnabled(currentConfig?.publisherAudioFallback ?: true)
+            .subscriberAudioFallbackEnabled(currentConfig?.subscriberAudioFallback ?: true)
             .preferredVideoCodecs(resolvePreferredVideoCodecs())
+            .frameRate(resolveFrameRate())
+            .resolution(context.resolveResolution())
             .let { builder ->
-                publisherConfig?.audioBitrate?.let { builder.audioBitrate(it) } ?: builder
+                currentConfig?.audioBitrate?.let { builder.audioBitrate(it) } ?: builder
             }
             .capturer(
                 VeraCameraCapturer(
                     context = context,
                     resolution = context.resolveResolution(),
                     frameRate = resolveFrameRate(),
-                    initialCameraIndex = publisherConfig?.cameraIndex
+                    initialCameraIndex = currentConfig?.cameraIndex
                         ?: Default.PUBLISHER_CAMERA_INDEX,
                 )
             )
@@ -159,14 +186,17 @@ class PublisherFactory {
                     BaseVideoRenderer.STYLE_VIDEO_SCALE,
                     BaseVideoRenderer.STYLE_VIDEO_FIT,
                 )
-                publisherConfig?.let { config ->
+                currentConfig?.let { config ->
                     publishVideo = config.publishVideo
                     publishAudio = config.publishAudio
                     applyVideoBlur(config.blurLevel)
                 }
                 publisherVideoType = PublisherKit.PublisherKitVideoType.PublisherKitVideoTypeCamera
-                applyVideoBitrate(publisherConfig?.videoBitrateConfig)
-                applyDegradationPreference(publisherConfig?.degradationPreference)
+                applyVideoBitrate(currentConfig?.videoBitrateConfig)
+                applyDegradationPreference(currentConfig?.degradationPreference)
+            }
+            .also {
+                vonageLogger.d("PublisherFactory", "publisher created with config $currentConfig")
             }
 
     /**
@@ -175,12 +205,9 @@ class PublisherFactory {
     object Default {
         /** Default frame rate for video capture (15 FPS for better performance) - TODO: Implement adaptive frame rate */
         val PUBLISHER_FRAME_RATE = Publisher.CameraCaptureFrameRate.FPS_15
-        
+
         /** Default camera index (1 = front camera) */
         const val PUBLISHER_CAMERA_INDEX = 1
-        
-        /** Default publisher name (empty string) */
-        const val PUBLISHER_NAME = ""
     }
 
     private companion object {

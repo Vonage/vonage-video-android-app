@@ -38,6 +38,7 @@ import kotlinx.coroutines.launch
 data class PublisherState(
     private val publisherId: String,
     val publisher: Publisher,
+    override val captureInfoLabel: String = "",
 ) : PublisherParticipant,
     Publisher.CameraListener,
     PublisherKit.VideoListener,
@@ -51,7 +52,7 @@ data class PublisherState(
     override val videoSource: VideoSource = publisher.stream?.toParticipantType() ?: VideoSource.CAMERA
     override val isScreenShare: Boolean
         get() = videoSource == VideoSource.SCREEN
-    override val name: String = publisher.stream?.name ?: ""
+    override val name: String = publisher.name
     override val view: View = publisher.view
 
     private val _isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(publisher.publishAudio)
@@ -77,10 +78,6 @@ data class PublisherState(
 
     private val _audioStats: MutableStateFlow<AudioStats?> = MutableStateFlow(null)
     val audioStats: StateFlow<AudioStats?> = _audioStats
-
-    init {
-        publisher.capturer.captureSettings.fps
-    }
 
     override fun changeVisibility(visible: Boolean) {
         when (visible) {

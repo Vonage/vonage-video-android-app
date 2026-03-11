@@ -54,6 +54,7 @@ fun buildCallWithParticipants(
     override fun cycleLocalCameraBlur() { /* empty on purpose */ }
     override fun setVideoBitrate(config: VideoBitrateConfig) { /* empty on purpose */ }
     override fun setDegradationPreference(preference: DegradationPreference) { /* empty on purpose */ }
+    override fun refreshPublisher(context: Context) { /* empty on purpose */ }
 
     // Chat related methods
     override val signalStateFlow: StateFlow<SignalState> = MutableStateFlow(

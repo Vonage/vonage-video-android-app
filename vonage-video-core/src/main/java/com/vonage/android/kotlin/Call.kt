@@ -16,8 +16,8 @@ import com.vonage.android.kotlin.ext.firstScreenSharing
 import com.vonage.android.kotlin.ext.mapSorted
 import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
+import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.internal.ScreenSharingCapturer
-import com.vonage.android.kotlin.internal.VeraPublisherHolder
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.ChatState
@@ -63,6 +63,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.set
 
 /**
  * Main implementation of CallFacade managing a Vonage video call session.
@@ -77,7 +78,7 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * @param token Authentication token for the session
  * @param session Vonage session instance
- * @param publisherHolder Container for publisher instances
+ * @param publisherFactory Publisher factory
  * @param signalPlugins List of plugins for handling custom signals
  * @param coroutineDispatcher Dispatcher for coroutine operations (defaults to IO)
  */
@@ -86,7 +87,7 @@ import java.util.concurrent.ConcurrentHashMap
 class Call internal constructor(
     private val token: String,
     private val session: Session,
-    private val publisherHolder: VeraPublisherHolder,
+    private val publisherFactory: PublisherFactory,
     private val signalPlugins: List<SignalPlugin>,
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : CallFacade {
@@ -386,20 +387,60 @@ class Call internal constructor(
     }
 
     /**
+     * Refreshes the publisher by unpublishing, destroying, recreating, and republishing.
+     * The publisher factory must be reconfigured with the new settings before calling.
+     */
+    override fun refreshPublisher(context: Context) {
+        vonageLogger.i("PublisherFactory", "Refresh publisher")
+        coroutineScope.launch(Dispatchers.Default) {
+            val old = publisher() ?: return@launch
+            val wasVideoOn = old.isCameraEnabled.value
+            val wasAudioOn = old.isMicEnabled.value
+            val blurLevel = old.blurLevel.value
+            val cameraIndex = old.camera.value.index
+            val name = old.name
+
+            old.clean()
+
+            publisherFactory.destroyPublisher()
+            participants.remove(PUBLISHER_ID)
+
+            vonageLogger.i("PublisherFactory", "Publisher name = $name")
+
+            publisherFactory.init(
+                publisherFactory.currentConfig!!.copy(
+                    name = name,
+                    publishVideo = wasVideoOn,
+                    publishAudio = wasAudioOn,
+                    blurLevel = blurLevel,
+                    cameraIndex = cameraIndex,
+                ),
+            )
+            val newPublisher = withContext(Dispatchers.Main) {
+                val publisherState = publisherFactory.createPublisherState(context)
+                session.publish(publisherState.publisher)
+                publisherState
+            }
+            participants[PUBLISHER_ID] = newPublisher
+            coroutineScope.launch { newPublisher.setup() }
+            updateParticipants()
+        }
+    }
+
+    /**
      * Publishes the local camera stream to the session.
      * Called automatically when connecting to the session.
      */
     private fun publishToSession() {
         coroutineScope.launch(Dispatchers.Default) {
-            publisherHolder.let { holder ->
-                val publisher = withContext(Dispatchers.Main) {
-                    session.publish(holder.publisher)
-                    PublisherState(publisherId = PUBLISHER_ID, publisher = holder.publisher)
-                }
-                participants[PUBLISHER_ID] = publisher
-                coroutineScope.launch { publisher.setup() }
-                updateParticipants()
+            val newPublisher = withContext(Dispatchers.Main) {
+                val publisherState = publisherFactory.createPublisherState(context)
+                session.publish(publisherState.publisher)
+                publisherState
             }
+            participants[PUBLISHER_ID] = newPublisher
+            coroutineScope.launch { newPublisher.setup() }
+            updateParticipants()
         }
     }
     //endregion
@@ -415,7 +456,7 @@ class Call internal constructor(
      */
     override fun startCapturingScreen(mediaProjection: MediaProjection) {
         coroutineScope.launch(Dispatchers.Default) {
-            val name = "${publisherHolder.publisher.name}'s Screen" // translate this!
+            val name = "${publisher()?.publisher?.name}'s Screen" // translate this!
             val publisher = withContext(Dispatchers.Main) {
                 val screenPublisher = Publisher.Builder(context)
                     .name(name)
@@ -428,7 +469,6 @@ class Call internal constructor(
                         publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeScreen
                     }
                 session.publish(screenPublisher)
-                publisherHolder.screenPublisher = screenPublisher
                 PublisherState(
                     publisherId = PUBLISHER_SCREEN_ID,
                     publisher = screenPublisher,
@@ -443,7 +483,7 @@ class Call internal constructor(
      * Stops screen sharing and removes the screen publisher.
      */
     override fun stopCapturingScreen() {
-        publisherHolder.screenPublisher?.let {
+        (participants[PUBLISHER_SCREEN_ID] as PublisherState).publisher.let {
             session.unpublish(it)
         }
         participants.remove(PUBLISHER_SCREEN_ID)
@@ -496,6 +536,7 @@ class Call internal constructor(
      */
     @Suppress("TooGenericExceptionCaught")
     private fun addSubscriber(stream: Stream) {
+        vonageLogger.d(TAG, "Add subscriber ${stream.name} [${stream.streamId}]")
         coroutineScope.launch {
             try {
                 val participant = withContext(Dispatchers.Main) {
@@ -607,7 +648,7 @@ class Call internal constructor(
     }
 
     companion object {
-        private const val TAG: String = "Call"
+        private const val TAG: String = "CallFacade"
         private const val SUBSCRIBE_TIMEOUT_MILLIS = 10000L
         const val PUBLISHER_ID: String = "publisher"
         const val PUBLISHER_SCREEN_ID: String = "publisher-screen"
