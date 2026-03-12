@@ -134,7 +134,7 @@ private fun CodecRow(
         ) {
             Icon(
                 imageVector = VividIcons.Line.ChevronUp,
-                contentDescription = "Move up",
+                contentDescription = null,
                 tint = if (canMoveUp) VonageVideoTheme.colors.primary else VonageVideoTheme.colors.border,
             )
         }
@@ -145,7 +145,7 @@ private fun CodecRow(
         ) {
             Icon(
                 imageVector = VividIcons.Line.ChevronDown,
-                contentDescription = "Move down",
+                contentDescription = null,
                 tint = if (canMoveDown) VonageVideoTheme.colors.primary else VonageVideoTheme.colors.border,
             )
         }

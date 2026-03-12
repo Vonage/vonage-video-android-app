@@ -49,6 +49,7 @@ class PublisherFactory {
      */
     fun createPreviewPublisher(context: Context): PreviewPublisherState {
         val publisher = createPublisher(context)
+        publisherHolder = VeraPublisherHolder(publisher = publisher)
         return PreviewPublisherState(publisher, captureInfoLabel = buildCaptureInfoLabel(context))
     }
 
@@ -159,7 +160,7 @@ class PublisherFactory {
      */
     private fun createPublisher(context: Context): Publisher =
         Publisher.Builder(context)
-            .name(currentConfig?.name)
+            .name(currentConfig?.name.orEmpty())
             .videoTrack(true)
             .audioTrack(true)
             .senderStatsTrack(currentConfig?.senderStatsTrack ?: false)

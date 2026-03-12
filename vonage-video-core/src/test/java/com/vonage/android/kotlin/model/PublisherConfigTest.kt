@@ -135,9 +135,9 @@ class PublisherConfigTest {
             cameraIndex = 1,
         )
 
-        assertEquals(VideoBitratePreset.BW_SAVER, config.videoBitrateConfig.preset)
+        assertEquals(VideoBitratePreset.DEFAULT, config.videoBitrateConfig.preset)
         assertEquals(
-            VideoBitratePreset.BW_SAVER.defaultMaxBitrate,
+            VideoBitratePreset.DEFAULT.defaultMaxBitrate,
             config.videoBitrateConfig.maxBitrate,
         )
     }

@@ -20,8 +20,8 @@ data class SettingsUiState(
     val publisherAudioFallbackEnabled: Boolean = true,
     val subscriberAudioFallbackEnabled: Boolean = true,
     val videoBitrateConfig: VideoBitrateConfig = VideoBitrateConfig(
-        preset = VideoBitratePreset.BW_SAVER,
-        maxBitrate = VideoBitratePreset.BW_SAVER.defaultMaxBitrate,
+        preset = VideoBitratePreset.DEFAULT,
+        maxBitrate = VideoBitratePreset.DEFAULT.defaultMaxBitrate,
     ),
     val degradationPreference: DegradationPreference = DegradationPreference.NOT_SET,
     val captureFrameRate: CaptureFrameRate = CaptureFrameRate.FPS_15,

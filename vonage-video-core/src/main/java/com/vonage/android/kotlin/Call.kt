@@ -541,7 +541,6 @@ class Call internal constructor(
             try {
                 val participant = withContext(Dispatchers.Main) {
                     val subscriber = Subscriber.Builder(context, stream).build()
-                    subscriber.subscribeToAudio
                     subscriber.setCaptionsListener(captionsDelegate)
                     session.subscribe(subscriber)
                     ParticipantState(subscriber = subscriber)

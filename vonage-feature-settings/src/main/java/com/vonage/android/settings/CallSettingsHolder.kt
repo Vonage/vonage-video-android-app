@@ -100,8 +100,8 @@ class CallSettingsHolder @Inject constructor() {
         _call.value = null
         _senderStatsEnabled.value = true
         _videoBitrateConfig.value = VideoBitrateConfig(
-            preset = VideoBitratePreset.BW_SAVER,
-            maxBitrate = VideoBitratePreset.BW_SAVER.defaultMaxBitrate,
+            preset = VideoBitratePreset.DEFAULT,
+            maxBitrate = VideoBitratePreset.DEFAULT.defaultMaxBitrate,
         )
         _degradationPreference.value = DegradationPreference.NOT_SET
         _captureFrameRate.value = CaptureFrameRate.FPS_15

@@ -144,6 +144,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
                     callSettingsHolder.publisherAudioFallbackEnabled,
                     callSettingsHolder.subscriberAudioFallbackEnabled,
                     callSettingsHolder.senderStatsEnabled,
+                    callSettingsHolder.degradationPreference,
                 ),
             ) { it }
                 .drop(1)
