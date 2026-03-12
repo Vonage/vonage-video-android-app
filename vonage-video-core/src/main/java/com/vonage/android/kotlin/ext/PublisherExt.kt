@@ -77,7 +77,9 @@ internal fun Publisher.applyVideoBitrate(config: VideoBitrateConfig?) {
     val sdkPreset = config.toSdkValue()
     videoBitratePreset = sdkPreset
     if (config?.preset == VideoBitratePreset.CUSTOM) {
-        maxVideoBitrate = config.maxBitrate!!
+        config.maxBitrate?.let { safeMaxBitrate ->
+            maxVideoBitrate = safeMaxBitrate
+        }
     }
 }
 

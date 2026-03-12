@@ -110,6 +110,7 @@ class CallSettingsHolder @Inject constructor() {
         _subscriberAudioFallbackEnabled.value = true
         _preferredVideoCodecOrder.value = null
         _audioBitrate.value = null
+        _opusDtxEnabled.value = true
     }
 
     fun bind(call: CallFacade) {

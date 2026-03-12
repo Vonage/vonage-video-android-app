@@ -34,7 +34,7 @@ enum class VideoBitratePreset(
     ),
     CUSTOM(
         label = "Custom",
-        description = "Manual max bitrate (kbps)",
+        description = "Manual max bitrate (bps)",
         defaultMaxBitrate = 2_000,
     ),
 }
@@ -49,7 +49,7 @@ const val VONAGE_VIDEO_MAX_BITRATE = 10_000_000f // 10Mbps
  * Configuration for the publisher video bitrate.
  *
  * @property preset The selected bitrate preset
- * @property maxBitrate Custom max bitrate in kbps (only used when [preset] is [VideoBitratePreset.CUSTOM])
+ * @property maxBitrate Custom max bitrate in bps (only used when [preset] is [VideoBitratePreset.CUSTOM])
  */
 @Stable
 data class VideoBitrateConfig(

@@ -38,7 +38,7 @@ enum class DegradationPreference(
 }
 
 fun DegradationPreference.toSdkValue(): PublisherKit.DegradationPreference = when (this) {
-    DegradationPreference.NOT_SET, null ->
+    DegradationPreference.NOT_SET ->
         PublisherKit.DegradationPreference.DegradationPreferenceNotSet
 
     DegradationPreference.MAINTAIN_FRAME_RATE_AND_RESOLUTION ->
