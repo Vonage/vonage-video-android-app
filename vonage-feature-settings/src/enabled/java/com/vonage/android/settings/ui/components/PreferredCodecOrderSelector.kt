@@ -21,8 +21,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
-import com.vonage.android.compose.vivid.icons.solid.Call
-import com.vonage.android.compose.vivid.icons.solid.Group2
+import com.vonage.android.compose.vivid.icons.line.ChevronDown
+import com.vonage.android.compose.vivid.icons.line.ChevronUp
 import com.vonage.android.kotlin.model.DEFAULT_VIDEO_CODEC_ORDER
 import com.vonage.android.kotlin.model.VideoCodec
 import com.vonage.android.settings.R
@@ -92,12 +92,14 @@ internal fun PreferredCodecOrderSelector(
                     canMoveDown = index < displayOrder.lastIndex,
                     onMoveUp = {
                         val mutable = displayOrder.toMutableList()
-                        mutable[index] = mutable[index - 1].also { mutable[index - 1] = mutable[index] }
+                        mutable[index] =
+                            mutable[index - 1].also { mutable[index - 1] = mutable[index] }
                         onOrderChange(mutable)
                     },
                     onMoveDown = {
                         val mutable = displayOrder.toMutableList()
-                        mutable[index] = mutable[index + 1].also { mutable[index + 1] = mutable[index] }
+                        mutable[index] =
+                            mutable[index + 1].also { mutable[index + 1] = mutable[index] }
                         onOrderChange(mutable)
                     },
                 )
@@ -139,7 +141,7 @@ private fun CodecRow(
             modifier = Modifier.size(36.dp),
         ) {
             Icon(
-                imageVector = VividIcons.Solid.Group2,
+                imageVector = VividIcons.Line.ChevronUp,
                 contentDescription = "Move up",
                 tint = if (canMoveUp) VonageVideoTheme.colors.primary else VonageVideoTheme.colors.border,
             )
@@ -150,7 +152,7 @@ private fun CodecRow(
             modifier = Modifier.size(36.dp),
         ) {
             Icon(
-                imageVector = VividIcons.Solid.Call,
+                imageVector = VividIcons.Line.ChevronDown,
                 contentDescription = "Move down",
                 tint = if (canMoveDown) VonageVideoTheme.colors.primary else VonageVideoTheme.colors.border,
             )

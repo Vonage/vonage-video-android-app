@@ -35,6 +35,7 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Apps
 import com.vonage.android.compose.vivid.icons.solid.AudioMid
+import com.vonage.android.compose.vivid.icons.solid.Chart
 import com.vonage.android.compose.vivid.icons.solid.Video
 import com.vonage.android.settings.R
 import com.vonage.android.settings.SettingsScreenActions
@@ -62,7 +63,7 @@ private val SettingsSection.icon: ImageVector
     get() = when (this) {
         SettingsSection.VIDEO -> VividIcons.Solid.Video
         SettingsSection.AUDIO -> VividIcons.Solid.AudioMid
-        SettingsSection.STATS -> VividIcons.Solid.Apps
+        SettingsSection.STATS -> VividIcons.Solid.Chart
     }
 
 @Composable
