@@ -127,7 +127,7 @@ private fun SettingsTabLayout(
     Row(modifier = modifier) {
         SettingsTabRail(
             selectedSection = selectedSection,
-            onSectionSelected = { selectedSection = it },
+            onSelectSection = { selectedSection = it },
         )
 
         VerticalDivider(color = VonageVideoTheme.colors.border)
@@ -149,7 +149,7 @@ private fun SettingsTabLayout(
 @Composable
 private fun SettingsTabRail(
     selectedSection: SettingsSection,
-    onSectionSelected: (SettingsSection) -> Unit,
+    onSelectSection: (SettingsSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -164,7 +164,7 @@ private fun SettingsTabRail(
                 icon = section.icon,
                 label = stringResource(section.titleRes),
                 selected = section == selectedSection,
-                onClick = { onSectionSelected(section) },
+                onClick = { onSelectSection(section) },
             )
         }
     }

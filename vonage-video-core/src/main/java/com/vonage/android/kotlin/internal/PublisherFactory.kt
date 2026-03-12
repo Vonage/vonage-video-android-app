@@ -137,6 +137,7 @@ class PublisherFactory {
      * Builds a human-readable label with the resolved capture resolution and frame rate.
      * E.g. "720p / 15 FPS".
      */
+    @Suppress("MagicNumber")
     private fun buildCaptureInfoLabel(context: Context): String {
         val resolutionLabel = when (context.resolveResolution()) {
             Publisher.CameraCaptureResolution.LOW -> "288p"
