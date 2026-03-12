@@ -31,7 +31,7 @@ internal fun PublisherStats(
             modifier = modifier,
         ) {
             SectionDivider()
-            SectionHeader(text = stringResource(R.string.settings_stats_publisher_stats_header))
+            SectionHeader(text = stringResource(R.string.settings_stats_publisher_stats_header),)
             videoStats?.let {
                 StatsRow(
                     label = stringResource(R.string.settings_stats_publisher_est_bandwidth),

@@ -51,14 +51,6 @@ internal fun AudioBitrateSelector(
 
         Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
 
-        Text(
-            text = stringResource(R.string.settings_audio_bitrate_note),
-            style = VonageVideoTheme.typography.caption,
-            color = VonageVideoTheme.colors.tertiary,
-        )
-
-        Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -66,7 +58,7 @@ internal fun AudioBitrateSelector(
         ) {
             Text(
                 text = stringResource(R.string.settings_audio_bitrate_default),
-                style = VonageVideoTheme.typography.bodyBaseSemibold,
+                style = VonageVideoTheme.typography.bodyBase,
                 color = VonageVideoTheme.colors.secondary,
             )
             Switch(

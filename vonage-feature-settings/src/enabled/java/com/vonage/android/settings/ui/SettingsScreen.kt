@@ -1,6 +1,5 @@
 package com.vonage.android.settings.ui
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,13 +32,15 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
-import com.vonage.android.compose.vivid.icons.solid.Apps
 import com.vonage.android.compose.vivid.icons.solid.AudioMid
 import com.vonage.android.compose.vivid.icons.solid.Chart
 import com.vonage.android.compose.vivid.icons.solid.Video
 import com.vonage.android.settings.R
+import com.vonage.android.settings.Setting
 import com.vonage.android.settings.SettingsScreenActions
+import com.vonage.android.settings.SettingsSection
 import com.vonage.android.settings.SettingsUiState
+import com.vonage.android.settings.settings
 import com.vonage.android.settings.ui.components.AudioBitrateSelector
 import com.vonage.android.settings.ui.components.DegradationPreferenceSelector
 import com.vonage.android.settings.ui.components.FrameRateSelector
@@ -52,19 +53,6 @@ import com.vonage.android.settings.ui.components.VideoBitrateSelector
 import com.vonage.android.settings.ui.components.footer
 import com.vonage.android.settings.ui.components.stats.PublisherStats
 import com.vonage.android.settings.ui.components.stats.SubscribersStats
-
-private enum class SettingsSection(@StringRes val titleRes: Int) {
-    VIDEO(R.string.settings_section_video),
-    AUDIO(R.string.settings_section_audio),
-    STATS(R.string.settings_section_stats),
-}
-
-private val SettingsSection.icon: ImageVector
-    get() = when (this) {
-        SettingsSection.VIDEO -> VividIcons.Solid.Video
-        SettingsSection.AUDIO -> VividIcons.Solid.AudioMid
-        SettingsSection.STATS -> VividIcons.Solid.Chart
-    }
 
 @Composable
 fun SettingsScreen(
@@ -113,15 +101,13 @@ private fun SettingsListLayout(
             .padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
         verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceXSmall),
     ) {
-        item { SectionHeader(text = stringResource(R.string.settings_section_video)) }
-        videoSectionItems(uiState, actions)
-
-        item { SectionHeader(text = stringResource(R.string.settings_section_audio)) }
-        audioSectionItems(uiState, actions)
-
-        item { SectionHeader(text = stringResource(R.string.settings_section_stats)) }
-        statsSectionItems(uiState, actions)
-
+        SettingsSection.entries.forEach { section ->
+            item { SectionHeader(
+                text = stringResource(section.titleRes),
+                icon = section.icon,
+            ) }
+            settingItems(section, uiState, actions)
+        }
         footer(uiState)
     }
 }
@@ -153,14 +139,8 @@ private fun SettingsTabLayout(
                 .padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
             verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceXSmall),
         ) {
-            item { SectionHeader(text = stringResource(selectedSection.titleRes)) }
-
-            when (selectedSection) {
-                SettingsSection.VIDEO -> videoSectionItems(uiState, actions)
-                SettingsSection.AUDIO -> audioSectionItems(uiState, actions)
-                SettingsSection.STATS -> statsSectionItems(uiState, actions)
-            }
-
+            item { SectionHeader(text = stringResource(selectedSection.titleRes),) }
+            settingItems(selectedSection, uiState, actions)
             footer(uiState)
         }
     }
@@ -238,97 +218,116 @@ private fun SettingsTabItem(
 
 // region Section content
 
-private fun LazyListScope.videoSectionItems(
+private fun LazyListScope.settingItems(
+    section: SettingsSection,
     uiState: SettingsUiState,
     actions: SettingsScreenActions,
 ) {
-    item {
-        FrameRateSelector(
-            selected = uiState.captureFrameRate,
-            onSelectionChange = actions.onFrameRateChange,
-        )
+    section.settings.forEach { setting ->
+        settingItem(setting, uiState, actions)
     }
-    item {
-        ResolutionSelector(
-            selected = uiState.captureResolution,
-            onSelectionChange = actions.onResolutionChange,
-        )
-    }
-    item {
-        VideoBitrateSelector(
-            config = uiState.videoBitrateConfig,
-            onConfigChange = actions.onVideoBitrateConfigChange,
-        )
-    }
-    item {
-        DegradationPreferenceSelector(
-            selected = uiState.degradationPreference,
-            onSelectionChange = actions.onDegradationPreferenceChange,
-        )
-    }
-    item {
-        PreferredCodecOrderSelector(
-            selectedOrder = uiState.preferredVideoCodecOrder,
-            onOrderChange = actions.onPreferredVideoCodecOrderChange,
-        )
+    if (section == SettingsSection.STATS) {
+        uiState.call?.let { call ->
+            item { PublisherStats(call) }
+            item { SubscribersStats(call) }
+        }
     }
 }
 
-private fun LazyListScope.audioSectionItems(
+private fun LazyListScope.settingItem(
+    setting: Setting,
     uiState: SettingsUiState,
     actions: SettingsScreenActions,
 ) {
-    item {
-        SettingsToggleRow(
-            title = stringResource(R.string.settings_opus_dtx),
-            description = stringResource(R.string.settings_opus_dtx_description),
-            isChecked = uiState.opusDtxEnabled,
-            onCheckedChange = actions.onOpusDtxToggle,
-        )
-    }
-    item {
-        AudioBitrateSelector(
-            audioBitrate = uiState.audioBitrate,
-            onAudioBitrateChange = actions.onAudioBitrateChange,
-        )
-    }
-    item {
-        SettingsToggleRow(
-            title = stringResource(R.string.settings_publisher_audio_fallback),
-            description = stringResource(R.string.settings_publisher_audio_fallback_description),
-            isChecked = uiState.publisherAudioFallbackEnabled,
-            onCheckedChange = actions.onPublisherAudioFallbackToggle,
-        )
-    }
-    item {
-        SettingsToggleRow(
-            title = stringResource(R.string.settings_subscriber_audio_fallback),
-            description = stringResource(R.string.settings_subscriber_audio_fallback_description),
-            isChecked = uiState.subscriberAudioFallbackEnabled,
-            onCheckedChange = actions.onSubscriberAudioFallbackToggle,
-        )
-    }
-}
+    when (setting) {
+        Setting.FRAME_RATE -> item {
+            FrameRateSelector(
+                selected = uiState.captureFrameRate,
+                onSelectionChange = actions.onFrameRateChange,
+            )
+        }
 
-private fun LazyListScope.statsSectionItems(
-    uiState: SettingsUiState,
-    actions: SettingsScreenActions,
-) {
-    item {
-        SettingsToggleRow(
-            title = stringResource(R.string.settings_sender_stats_title),
-            description = stringResource(R.string.settings_sender_stats_description),
-            isChecked = uiState.senderStatsEnabled,
-            onCheckedChange = actions.onSenderStatsTrackToggle,
-        )
-    }
-    uiState.call?.let { call ->
-        item { PublisherStats(call) }
-        item { SubscribersStats(call) }
+        Setting.RESOLUTION -> item {
+            ResolutionSelector(
+                selected = uiState.captureResolution,
+                onSelectionChange = actions.onResolutionChange,
+            )
+        }
+
+        Setting.VIDEO_BITRATE -> item {
+            VideoBitrateSelector(
+                config = uiState.videoBitrateConfig,
+                onConfigChange = actions.onVideoBitrateConfigChange,
+            )
+        }
+
+        Setting.DEGRADATION_PREFERENCE -> item {
+            DegradationPreferenceSelector(
+                selected = uiState.degradationPreference,
+                onSelectionChange = actions.onDegradationPreferenceChange,
+            )
+        }
+
+        Setting.PREFERRED_CODEC_ORDER -> item {
+            PreferredCodecOrderSelector(
+                selectedOrder = uiState.preferredVideoCodecOrder,
+                onOrderChange = actions.onPreferredVideoCodecOrderChange,
+            )
+        }
+
+        Setting.OPUS_DTX -> item {
+            SettingsToggleRow(
+                title = stringResource(R.string.settings_opus_dtx),
+                description = stringResource(R.string.settings_opus_dtx_description),
+                isChecked = uiState.opusDtxEnabled,
+                onCheckedChange = actions.onOpusDtxToggle,
+            )
+        }
+
+        Setting.AUDIO_BITRATE -> item {
+            AudioBitrateSelector(
+                audioBitrate = uiState.audioBitrate,
+                onAudioBitrateChange = actions.onAudioBitrateChange,
+            )
+        }
+
+        Setting.PUBLISHER_AUDIO_FALLBACK -> item {
+            SettingsToggleRow(
+                title = stringResource(R.string.settings_publisher_audio_fallback),
+                description = stringResource(R.string.settings_publisher_audio_fallback_description),
+                isChecked = uiState.publisherAudioFallbackEnabled,
+                onCheckedChange = actions.onPublisherAudioFallbackToggle,
+            )
+        }
+
+        Setting.SUBSCRIBER_AUDIO_FALLBACK -> item {
+            SettingsToggleRow(
+                title = stringResource(R.string.settings_subscriber_audio_fallback),
+                description = stringResource(R.string.settings_subscriber_audio_fallback_description),
+                isChecked = uiState.subscriberAudioFallbackEnabled,
+                onCheckedChange = actions.onSubscriberAudioFallbackToggle,
+            )
+        }
+
+        Setting.SENDER_STATS -> item {
+            SettingsToggleRow(
+                title = stringResource(R.string.settings_sender_stats_title),
+                description = stringResource(R.string.settings_sender_stats_description),
+                isChecked = uiState.senderStatsEnabled,
+                onCheckedChange = actions.onSenderStatsTrackToggle,
+            )
+        }
     }
 }
 
 // endregion
+
+private val SettingsSection.icon: ImageVector
+    get() = when (this) {
+        SettingsSection.VIDEO -> VividIcons.Solid.Video
+        SettingsSection.AUDIO -> VividIcons.Solid.AudioMid
+        SettingsSection.STATS -> VividIcons.Solid.Chart
+    }
 
 @PreviewLightDark
 @Composable

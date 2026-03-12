@@ -37,7 +37,7 @@ fun SubscribersStats(
                     text = stringResource(
                         R.string.settings_stats_subscriber_stats_header,
                         sub.name,
-                    )
+                    ),
                 )
                 videoStats?.estimatedBandwidthInBps?.let {
                     StatsRow(

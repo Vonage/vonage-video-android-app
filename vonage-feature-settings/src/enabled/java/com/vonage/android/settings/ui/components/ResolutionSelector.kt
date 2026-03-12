@@ -47,6 +47,5 @@ internal fun ResolutionSelector(
         items = items.toImmutableList(),
         onSelectItem = onSelectionChange,
         modifier = modifier,
-        note = stringResource(R.string.settings_resolution_note),
     )
 }

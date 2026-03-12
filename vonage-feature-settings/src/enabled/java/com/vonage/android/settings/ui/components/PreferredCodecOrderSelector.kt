@@ -49,14 +49,6 @@ internal fun PreferredCodecOrderSelector(
 
         Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
 
-        Text(
-            text = stringResource(R.string.settings_codec_order_note),
-            style = VonageVideoTheme.typography.caption,
-            color = VonageVideoTheme.colors.tertiary,
-        )
-
-        Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -64,7 +56,7 @@ internal fun PreferredCodecOrderSelector(
         ) {
             Text(
                 text = stringResource(R.string.settings_codec_order_auto),
-                style = VonageVideoTheme.typography.bodyBaseSemibold,
+                style = VonageVideoTheme.typography.bodyBase,
                 color = VonageVideoTheme.colors.secondary,
             )
             Switch(
