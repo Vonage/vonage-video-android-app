@@ -176,7 +176,12 @@ fun BottomBar(
             onDismissRequest = { showParticipants = false },
             sheetState = participantsSheetState,
         ) {
-            ParticipantsList(participants = state.participants)
+            val pinnedIds by call.pinnedParticipantIds.collectAsStateWithLifecycle()
+            ParticipantsList(
+                participants = state.participants,
+                pinnedParticipantIds = pinnedIds,
+                actions = roomActions,
+            )
         }
     }
 

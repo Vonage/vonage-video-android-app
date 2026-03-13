@@ -29,6 +29,8 @@
     <string name="meeting_room_participants_list_search_not_found">Participant not found</string>
     <string name="meeting_screen_session_creation_error">Error while creating room, please try again</string>
     <string name="meeting_room_share_room_link">Share room link</string>
+    <string name="meeting_room_pin_participant">Pin</string>
+    <string name="meeting_room_unpin_participant">Unpin</string>
 
     <!-- Goodbye Screen -->
     <string name="goodbye_title">You have left the meeting</string>

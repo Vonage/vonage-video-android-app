@@ -27,6 +27,8 @@ val noOpCall = object : CallFacade {
     override val participantsStateFlow: StateFlow<ImmutableList<ParticipantState>> = MutableStateFlow(persistentListOf())
     override val participantsCount: StateFlow<Int> = MutableStateFlow(1)
     override val activeSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
+    override val pinnedParticipantIds: StateFlow<Set<String>> = MutableStateFlow(emptySet())
+    override fun togglePinParticipant(participantId: String) { /* empty on purpose */ }
     override val signalStateFlow: StateFlow<SignalState?> = MutableStateFlow(null)
     override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
     override val archivingStateFlow: StateFlow<ArchivingState> = MutableStateFlow(ArchivingState.Idle)

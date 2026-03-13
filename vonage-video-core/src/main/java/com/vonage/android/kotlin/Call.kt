@@ -13,8 +13,8 @@ import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
 import com.vonage.android.kotlin.ext.extractSenderName
 import com.vonage.android.kotlin.ext.firstScreenSharing
-import com.vonage.android.kotlin.ext.mapSorted
 import com.vonage.android.kotlin.ext.name
+import com.vonage.android.kotlin.ext.sorted
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
 import com.vonage.android.kotlin.internal.ScreenSharingCapturer
 import com.vonage.android.kotlin.internal.VeraPublisherHolder
@@ -53,6 +53,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
@@ -104,20 +105,38 @@ class Call internal constructor(
 
     /** Internal flow that emits on every participant change, throttled before exposing */
     private val _participantsInternalFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
-    
+
+    private val _pinnedParticipantIds = MutableStateFlow<Set<String>>(emptySet())
+    override val pinnedParticipantIds: StateFlow<Set<String>> = _pinnedParticipantIds
+
+    override fun togglePinParticipant(participantId: String) {
+        _pinnedParticipantIds.update { current ->
+            if (participantId in current) current - participantId else current + participantId
+        }
+    }
+
+    override fun forceMuteParticipant(participantId: String) {
+        (participants[participantId] as? ParticipantState)?.let {
+            session.forceMuteStream(it.stream)
+        }
+    }
+
     /**
-     * StateFlow of all participants sorted with screen sharing first, then by creation time (newest first).
+     * StateFlow of all participants sorted with screen sharing first, then pinned, then by creation time (newest first).
      * Throttled to reduce UI updates and improve performance.
      */
-    override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsInternalFlow
-        .sample(PARTICIPANTS_DEBOUNCE_MILLIS)
-        .distinctUntilChanged()
-        .mapSorted()
-        .stateIn(
-            scope = coroutineScope,
-            started = WhileSubscribed(SUBSCRIBE_TIMEOUT_MILLIS),
-            initialValue = persistentListOf(),
-        )
+    override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = combine(
+        _participantsInternalFlow
+            .sample(PARTICIPANTS_DEBOUNCE_MILLIS)
+            .distinctUntilChanged(),
+        _pinnedParticipantIds,
+    ) { participants, pinnedIds ->
+        participants.sorted(pinnedIds)
+    }.stateIn(
+        scope = coroutineScope,
+        started = WhileSubscribed(SUBSCRIBE_TIMEOUT_MILLIS),
+        initialValue = persistentListOf(),
+    )
 
     /**
      * StateFlow of the local publisher (the current user's camera/screen).

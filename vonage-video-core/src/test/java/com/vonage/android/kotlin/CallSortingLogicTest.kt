@@ -3,6 +3,7 @@ package com.vonage.android.kotlin
 import android.view.View
 import app.cash.turbine.test
 import com.vonage.android.kotlin.ext.mapSorted
+import com.vonage.android.kotlin.ext.sorted
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VideoSource
 import io.mockk.mockk
@@ -129,6 +130,90 @@ class CallSortingLogicTest {
             }
             awaitComplete()
         }
+    }
+
+    @Test
+    fun `should sort pinned participants before unpinned`() = runTest {
+        val participant1 = createMockParticipant(
+            id = "camera1",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 1000L,
+        )
+        val participant2 = createMockParticipant(
+            id = "camera2",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 2000L,
+        )
+        val participant3 = createMockParticipant(
+            id = "camera3",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 3000L,
+        )
+
+        val participants = listOf(participant1, participant2, participant3)
+        val pinnedIds = setOf("camera1")
+
+        val sorted = participants.sorted(pinnedIds)
+
+        assertEquals("camera1", sorted[0].id) // Pinned, oldest
+        assertEquals("camera3", sorted[1].id) // Unpinned, newest
+        assertEquals("camera2", sorted[2].id) // Unpinned
+    }
+
+    @Test
+    fun `should sort screen sharing before pinned`() = runTest {
+        val screenParticipant = createMockParticipant(
+            id = "screen1",
+            videoSource = VideoSource.SCREEN,
+            creationTime = 1000L,
+        )
+        val pinnedParticipant = createMockParticipant(
+            id = "camera1",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 2000L,
+        )
+        val regularParticipant = createMockParticipant(
+            id = "camera2",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 3000L,
+        )
+
+        val participants = listOf(regularParticipant, pinnedParticipant, screenParticipant)
+        val pinnedIds = setOf("camera1")
+
+        val sorted = participants.sorted(pinnedIds)
+
+        assertEquals("screen1", sorted[0].id) // Screen share first
+        assertEquals("camera1", sorted[1].id) // Pinned second
+        assertEquals("camera2", sorted[2].id) // Regular last
+    }
+
+    @Test
+    fun `should sort multiple pinned participants by creation time`() = runTest {
+        val participant1 = createMockParticipant(
+            id = "camera1",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 1000L,
+        )
+        val participant2 = createMockParticipant(
+            id = "camera2",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 2000L,
+        )
+        val participant3 = createMockParticipant(
+            id = "camera3",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 3000L,
+        )
+
+        val participants = listOf(participant1, participant2, participant3)
+        val pinnedIds = setOf("camera1", "camera2")
+
+        val sorted = participants.sorted(pinnedIds)
+
+        assertEquals("camera2", sorted[0].id) // Pinned, newer
+        assertEquals("camera1", sorted[1].id) // Pinned, older
+        assertEquals("camera3", sorted[2].id) // Unpinned
     }
 
     private fun createMockParticipant(

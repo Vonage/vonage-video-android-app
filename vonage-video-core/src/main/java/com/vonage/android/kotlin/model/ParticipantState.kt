@@ -2,7 +2,9 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
+import com.opentok.android.Connection
 import com.opentok.android.Session
+import com.opentok.android.Stream
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
 import com.vonage.android.kotlin.ext.mapTalking
@@ -80,6 +82,8 @@ data class ParticipantState(
             false -> subscriber.subscribeToVideo = false
         }
     }
+
+    val stream: Stream = subscriber.stream
 
     /**
      * Initializes audio level monitoring and talking detection.

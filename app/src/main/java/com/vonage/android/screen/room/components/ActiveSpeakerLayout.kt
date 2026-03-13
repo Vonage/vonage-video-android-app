@@ -55,6 +55,7 @@ fun ActiveSpeakerLayout(
         derivedStateOf { participants.filterNot { it.id == mainParticipant?.id } }
     }
     val listState = lazyStateVisibilityTracker(call = call, lazyState = rememberLazyListState())
+    val pinnedIds by call.pinnedParticipantIds.collectAsStateWithLifecycle()
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -70,6 +71,7 @@ fun ActiveSpeakerLayout(
                     otherParticipantsWeight = otherParticipantsWeight,
                     nonMainParticipant = nonMainParticipant.toImmutableList(),
                     otherParticipantsSize = otherParticipantsSize,
+                    pinnedIds = pinnedIds,
                 )
             }
 
@@ -82,6 +84,7 @@ fun ActiveSpeakerLayout(
                     otherParticipantsWeight = otherParticipantsWeight,
                     nonMainParticipant = nonMainParticipant.toImmutableList(),
                     otherParticipantsSize = otherParticipantsSize,
+                    pinnedIds = pinnedIds,
                 )
             }
         }
@@ -96,7 +99,8 @@ private fun ActiveSpeakerVerticalLayout(
     listState: LazyListState,
     otherParticipantsWeight: Float,
     nonMainParticipant: ImmutableList<Participant>,
-    otherParticipantsSize: Dp
+    otherParticipantsSize: Dp,
+    pinnedIds: Set<String> = emptySet(),
 ) {
     Column(
         verticalArrangement = Arrangement.Bottom,
@@ -106,6 +110,7 @@ private fun ActiveSpeakerVerticalLayout(
                 modifier = Modifier.weight(spotlightWeight),
                 participant = it,
                 actions = actions,
+                isPinned = it.id in pinnedIds,
             )
         } ?: Spacer(modifier = Modifier.weight(spotlightWeight))
         LazyRow(
@@ -125,6 +130,7 @@ private fun ActiveSpeakerVerticalLayout(
                         .height(otherParticipantsSize),
                     participant = participant,
                     actions = actions,
+                    isPinned = participant.id in pinnedIds,
                 )
             }
         }
@@ -140,7 +146,8 @@ private fun ActiveSpeakerHorizontalLayout(
     listState: LazyListState,
     otherParticipantsWeight: Float,
     nonMainParticipant: ImmutableList<Participant>,
-    otherParticipantsSize: Dp
+    otherParticipantsSize: Dp,
+    pinnedIds: Set<String> = emptySet(),
 ) {
     Row(
         horizontalArrangement = Arrangement.End,
@@ -150,6 +157,7 @@ private fun ActiveSpeakerHorizontalLayout(
                 modifier = Modifier.weight(spotlightWeight),
                 participant = it,
                 actions = actions,
+                isPinned = it.id in pinnedIds,
             )
         } ?: Spacer(modifier = Modifier.weight(spotlightWeight))
         LazyColumn(
@@ -169,6 +177,7 @@ private fun ActiveSpeakerHorizontalLayout(
                         .aspectRatio(ASPECT_RATIO_16_9),
                     participant = participant,
                     actions = actions,
+                    isPinned = participant.id in pinnedIds,
                 )
             }
         }
@@ -182,12 +191,14 @@ private fun SpotlightSpeaker(
     participant: Participant,
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
+    isPinned: Boolean = false,
 ) {
     ParticipantVideoCard(
         modifier = modifier
             .padding(VonageVideoTheme.dimens.paddingSmall),
         participant = participant,
         actions = actions,
+        isPinned = isPinned,
     )
 }
 

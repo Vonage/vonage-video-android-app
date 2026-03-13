@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -19,10 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.compose.components.AvatarInitials
@@ -32,8 +35,13 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.MicMute
 import com.vonage.android.compose.vivid.icons.solid.Microphone2
+import com.vonage.android.compose.vivid.icons.solid.Pin2
+import com.vonage.android.compose.vivid.icons.solid.Pin2Off
 import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.screen.room.MeetingRoomActions
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 import java.text.Normalizer
 
@@ -49,16 +57,23 @@ fun String.normalize() =
 fun ParticipantsList(
     participants: ImmutableList<Participant>,
     modifier: Modifier = Modifier,
+    pinnedParticipantIds: Set<String> = persistentSetOf(),
+    actions: MeetingRoomActions = MeetingRoomActions(),
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    val sortedParticipants by remember(participants) {
+    val sortedParticipants by remember(participants, pinnedParticipantIds) {
         derivedStateOf {
-            if (searchQuery.isBlank()) {
-                participants.sortedBy { participant -> participant.name }
+            val filtered = if (searchQuery.isBlank()) {
+                participants.toList()
+            } else {
+                participants.filter {
+                    it.name.normalize().contains(searchQuery.normalize(), ignoreCase = true)
+                }
             }
-            participants.filter {
-                it.name.normalize().contains(searchQuery.normalize(),ignoreCase = true)
-            }.sortedBy { it.name }
+            filtered.sortedWith(
+                compareByDescending<Participant> { it.id in pinnedParticipantIds }
+                    .thenBy { it.name }
+            )
         }
     }
 
@@ -90,8 +105,12 @@ fun ParticipantsList(
             items(
                 items = sortedParticipants,
                 key = { participant -> participant.id },
-            ) {
-                    participantState -> ParticipantRow(participantState)
+            ) { participantState ->
+                ParticipantRow(
+                    participant = participantState,
+                    isPinned = participantState.id in pinnedParticipantIds,
+                    onTogglePin = { actions.onTogglePinParticipant(participantState.id) },
+                )
             }
         }
 
@@ -113,7 +132,11 @@ private fun ParticipantListTitle(participantsCount: Int) {
 }
 
 @Composable
-private fun ParticipantRow(participant: Participant) {
+private fun ParticipantRow(
+    participant: Participant,
+    isPinned: Boolean = false,
+    onTogglePin: () -> Unit = {},
+) {
     val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
 
     Row(
@@ -147,6 +170,25 @@ private fun ParticipantRow(participant: Participant) {
             color = VonageVideoTheme.colors.onSurface,
             style = VonageVideoTheme.typography.bodyExtended,
         )
+        if (!participant.isPublisher) {
+            IconButton(onClick = onTogglePin) {
+                if (isPinned) {
+                    Icon(
+                        imageVector = VividIcons.Solid.Pin2Off,
+                        contentDescription = null,
+                        tint = VonageVideoTheme.colors.onSurface,
+                        modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeSmall),
+                    )
+                } else {
+                    Icon(
+                        imageVector = VividIcons.Solid.Pin2,
+                        contentDescription = null,
+                        tint = VonageVideoTheme.colors.onSurface,
+                        modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeSmall),
+                    )
+                }
+            }
+        }
         if (!isMicEnabled) {
             Icon(
                 modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeSmall),
