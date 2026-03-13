@@ -216,10 +216,10 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                         videoClient.configurePublisher(
                             PublisherConfig(
                                 name = activeCall.publisher.value?.name.orEmpty(),
-                                publishVideo = true,
-                                publishAudio = true,
+                                publishVideo = activeCall.publisher.value?.isCameraEnabled?.value ?: true,
+                                publishAudio = activeCall.publisher.value?.isMicEnabled?.value ?: true,
                                 blurLevel = com.vonage.android.kotlin.model.BlurLevel.NONE,
-                                cameraIndex = 1,
+                                cameraIndex = activeCall.publisher.value?.camera?.value?.index ?: 1,
                                 captureFrameRate = callSettingsHolder.captureFrameRate.value,
                                 captureResolution = callSettingsHolder.captureResolution.value,
                                 preferredVideoCodecOrder = callSettingsHolder.preferredVideoCodecOrder.value,
