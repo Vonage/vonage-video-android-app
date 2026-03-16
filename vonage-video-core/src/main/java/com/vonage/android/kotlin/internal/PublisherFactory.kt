@@ -83,6 +83,8 @@ class PublisherFactory {
         val screenPublisher = Publisher.Builder(context)
             .name(name)
             .capturer(ScreenSharingCapturer(context, mediaProjection))
+            .videoTrack(true)
+            .audioTrack(false)
             .build()
             .apply {
                 renderer?.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FIT)
@@ -90,6 +92,7 @@ class PublisherFactory {
                 publishAudio = false
                 publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeScreen
             }
+        publisherHolder?.screenPublisher = screenPublisher
         val participant = PublisherState(
             publisherId = PUBLISHER_SCREEN_ID,
             publisher = screenPublisher,

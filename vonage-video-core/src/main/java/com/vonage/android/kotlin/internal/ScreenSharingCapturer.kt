@@ -27,6 +27,7 @@ import com.opentok.android.BaseVideoCapturer
 class ScreenSharingCapturer(
     context: Context,
     private val mediaProjection: MediaProjection,
+    private val screenShareContentHint: VideoContentHint = VideoContentHint.TEXT,
 ) : BaseVideoCapturer() {
 
     private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -122,7 +123,7 @@ class ScreenSharingCapturer(
     private fun createVirtualDisplay() {
         // Register empty callback (required for creating virtual displays)
         mediaProjection.registerCallback(object : MediaProjection.Callback() {}, null)
-        
+
         // Create virtual display with default values
         virtualDisplay = mediaProjection.createVirtualDisplay(
             VIRTUAL_SCREEN_NAME,
@@ -134,7 +135,7 @@ class ScreenSharingCapturer(
             null,
             backgroundHandler
         )
-        
+
         // Send each frame to the SDK
         imageReader.setOnImageAvailableListener({ reader: ImageReader ->
             reader.acquireLatestImage()?.let { frame ->
@@ -152,8 +153,7 @@ class ScreenSharingCapturer(
             }
         }, backgroundHandler)
 
-        // Set video content hint to TEXT, should be configurable
-        videoContentHint = VideoContentHint.TEXT
+        videoContentHint = screenShareContentHint
     }
 
     private fun startBackgroundThread() {
