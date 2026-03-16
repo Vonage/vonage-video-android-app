@@ -1,19 +1,19 @@
 package com.vonage.android.data.network
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class GetSessionResponse(
-    @field:Json(name = "apiKey")
+    @SerialName("apiKey")
     val apiKey: String,
 
-    @field:Json(name = "sessionId")
+    @SerialName("sessionId")
     val sessionId: String,
 
-    @field:Json(name = "token")
+    @SerialName("token")
     val token: String,
 
-    @field:Json(name = "captionsId")
-    val captionsId: String?,
+    @SerialName("captionsId")
+    val captionsId: String? = null,
 )
