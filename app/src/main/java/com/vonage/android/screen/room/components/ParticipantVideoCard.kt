@@ -2,7 +2,7 @@ package com.vonage.android.screen.room.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -62,13 +63,14 @@ fun ParticipantVideoCard(
     ParticipantContainer(
         modifier = if (!participant.isPublisher) {
             modifier
-                .combinedClickable(
-                    onClick = {},
-                    onLongClick = {
-                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                        showBottomSheet = true
-                    },
-                )
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                            showBottomSheet = true
+                        },
+                    )
+                }
         } else {
             modifier
         },
