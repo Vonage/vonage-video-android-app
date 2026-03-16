@@ -38,6 +38,7 @@ fun buildCallWithParticipants(
     override val activeSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
     override val pinnedParticipantIds: StateFlow<Set<String>> = MutableStateFlow(emptySet())
     override fun togglePinParticipant(participantId: String) { /* empty on purpose */ }
+    override fun forceMuteParticipant(participantId: String) { /* empty on purpose */ }
 
     // Session related methods
     override fun connect(context: Context): Flow<SessionEvent> = flowOf()
