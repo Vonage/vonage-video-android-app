@@ -102,7 +102,7 @@ class Call internal constructor(
 
     /** Tracks active speaker based on audio levels across all participants */
     private val activeSpeakerTracker = ActiveSpeakerTracker(coroutineScope = coroutineScope)
-    
+
     /** Thread-safe map of all participants (publishers and subscribers) keyed by stream ID */
     private val participants = ConcurrentHashMap<String, Participant>()
 
@@ -111,6 +111,12 @@ class Call internal constructor(
 
     private val _pinnedParticipantIds = MutableStateFlow<Set<String>>(emptySet())
     override val pinnedParticipantIds: StateFlow<Set<String>> = _pinnedParticipantIds
+        .map { ids -> ids.filter { participants.containsKey(it) }.toSet() }
+        .stateIn(
+            scope = coroutineScope,
+            started = SharingStarted.Eagerly,
+            initialValue = emptySet(),
+        )
 
     override fun togglePinParticipant(participantId: String) {
         _pinnedParticipantIds.update { current ->
@@ -154,7 +160,7 @@ class Call internal constructor(
         )
 
     private val _activeSpeaker = MutableStateFlow<Participant?>(null)
-    
+
     /**
      * StateFlow of the currently active speaker based on audio level analysis.
      * Debounced to prevent rapid changes when multiple people speak.
@@ -198,7 +204,7 @@ class Call internal constructor(
             .stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)
 
     //region Session lifecycle
-    
+
     /**
      * Connects to the video session and returns a flow of session events.
      *
@@ -295,7 +301,7 @@ class Call internal constructor(
     //endregion
 
     //region Signals
-    
+
     /**
      * Sends an emoji reaction that will be displayed to all participants.
      *
@@ -357,7 +363,7 @@ class Call internal constructor(
     //endregion
 
     //region Publisher
-    
+
     /**
      * Helper to get the current publisher from participants map.
      */
@@ -465,7 +471,7 @@ class Call internal constructor(
     //endregion
 
     //region Screen sharing
-    
+
     /**
      * Starts screen sharing using the provided MediaProjection.
      *
@@ -511,7 +517,7 @@ class Call internal constructor(
     //endregion
 
     //region Captions
-    
+
     /**
      * Listener for receiving captions from remote participants.
      * Updates the captions state flow with speaker name and text.
@@ -548,7 +554,7 @@ class Call internal constructor(
     //endregion
 
     //region Subscribers
-    
+
     /**
      * Creates and subscribes to a remote participant's stream.
      * Adds the subscriber to the participants map and starts audio level monitoring.

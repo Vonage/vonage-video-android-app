@@ -62,19 +62,15 @@ fun ParticipantContextualActions(
             stringResource(R.string.meeting_room_pin_participant)
         }
         ActionRow(
-            onClick = {
-                actions.onTogglePinParticipant(participant.id)
-            },
+            onClick = { actions.onTogglePinParticipant(participant.id) },
             icon = pinnedIcon,
             label = pinnedLabel,
         )
         if (isMicEnabled) {
             ActionRow(
-                onClick = {
-                    actions.onForceMuteParticipant(participant.id)
-                },
+                onClick = { actions.onForceMuteParticipant(participant.id) },
                 icon = VividIcons.Solid.MicMute,
-                label = "Mute",
+                label = stringResource(R.string.meeting_room_mute_participant),
             )
         }
     }

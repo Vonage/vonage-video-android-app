@@ -82,7 +82,7 @@ data class ParticipantState(
         }
     }
 
-    val stream: Stream = subscriber.stream
+    internal val stream: Stream = subscriber.stream
 
     /**
      * Initializes audio level monitoring and talking detection.
