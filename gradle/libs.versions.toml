@@ -38,7 +38,7 @@ retrofit = "3.0.0"
 testRules = "1.7.0"
 testRunner = "1.7.0"
 turbine = "1.2.1"
-runtime = "1.10.3"
+runtime = "1.10.5"
 material3 = "1.4.0"
 adaptive = "1.2.0"
 

@@ -2,7 +2,6 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
-import com.opentok.android.Connection
 import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber

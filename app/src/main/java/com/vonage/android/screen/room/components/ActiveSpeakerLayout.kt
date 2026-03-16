@@ -91,6 +91,7 @@ fun ActiveSpeakerLayout(
     }
 }
 
+@Suppress("LongParameterList")
 @Composable
 private fun ActiveSpeakerVerticalLayout(
     mainParticipant: Participant?,
@@ -137,7 +138,7 @@ private fun ActiveSpeakerVerticalLayout(
     }
 }
 
-
+@Suppress("LongParameterList")
 @Composable
 private fun ActiveSpeakerHorizontalLayout(
     mainParticipant: Participant?,

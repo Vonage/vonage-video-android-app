@@ -3,7 +3,6 @@ package com.vonage.android.kotlin.model
 import android.view.View
 import androidx.compose.runtime.Stable
 import com.opentok.android.Session
-import com.opentok.android.Stream
 import kotlinx.coroutines.flow.StateFlow
 
 /**
