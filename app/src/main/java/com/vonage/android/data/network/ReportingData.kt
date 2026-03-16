@@ -1,5 +1,8 @@
 package com.vonage.android.data.network
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ReportDataRequest(
     val title: String,
     val name: String,
@@ -7,12 +10,14 @@ data class ReportDataRequest(
     val attachment: String,
 )
 
+@Serializable
 data class ReportResponse(
     val feedbackData: ReportResponseData
 )
 
+@Serializable
 data class ReportResponseData(
     val message: String,
     val ticketUrl: String,
-    val screenshotIncluded: Boolean?,
+    val screenshotIncluded: Boolean? = null,
 )

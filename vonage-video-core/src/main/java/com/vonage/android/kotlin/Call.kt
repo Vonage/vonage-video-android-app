@@ -44,6 +44,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -272,6 +273,11 @@ class Call internal constructor(
         session.setSessionListener(null)
         session.setSignalListener(null)
         session.disconnect()
+
+        coroutineScope.cancel()
+        participantsOnScreenJob?.cancel()
+        activeSpeakerTrackerJob?.cancel()
+        signalsJob?.cancel()
     }
     //endregion
 
