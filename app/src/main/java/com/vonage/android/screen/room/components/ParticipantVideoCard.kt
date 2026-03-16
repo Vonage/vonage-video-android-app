@@ -38,7 +38,6 @@ import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.MicMute
 import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.compose.vivid.icons.solid.MoreVertical
-import com.vonage.android.compose.vivid.icons.solid.Pin2
 import com.vonage.android.fx.ui.BlurIndicator
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.PublisherParticipant
@@ -267,26 +266,6 @@ private fun MicrophoneIcon(
                 modifier = iconSize,
             )
         }
-    }
-}
-
-@Composable
-private fun PinIndicator(
-    modifier: Modifier = Modifier,
-) {
-    val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
-
-    Box(
-        modifier = modifier
-            .background(backgroundColor, CircleShape)
-            .padding(6.dp)
-    ) {
-        Icon(
-            imageVector = VividIcons.Solid.Pin2,
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeSmall),
-        )
     }
 }
 
