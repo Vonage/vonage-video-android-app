@@ -89,6 +89,9 @@ interface PublisherFacade {
     fun toggleLocalCamera()
     fun toggleLocalAudio()
     fun cycleLocalCameraBlur()
+    fun setVideoBitrate(config: VideoBitrateConfig)
+    fun setDegradationPreference(preference: DegradationPreference)
+    fun refreshPublisher(context: Context)
 }
 
 interface SessionFacade {

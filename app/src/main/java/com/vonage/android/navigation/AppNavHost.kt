@@ -98,6 +98,7 @@ fun AppNavHost(
             dialogProperties = DialogProperties(
                 dismissOnBackPress = true,
                 dismissOnClickOutside = true,
+                usePlatformDefaultWidth = false,
             )
         ){
             SettingsScreenRoute(

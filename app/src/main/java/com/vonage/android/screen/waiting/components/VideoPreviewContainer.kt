@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.components.AudioVolumeIndicator
 import com.vonage.android.compose.components.AvatarInitials
+import com.vonage.android.compose.components.CircularControlButton
 import com.vonage.android.compose.components.ParticipantVideoRenderer
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -36,7 +37,7 @@ import com.vonage.android.compose.vivid.icons.solid.Video
 import com.vonage.android.compose.vivid.icons.solid.VideoOff
 import com.vonage.android.fx.ui.BlurIndicator
 import com.vonage.android.kotlin.model.PublisherParticipant
-import com.vonage.android.compose.components.CircularControlButton
+import com.vonage.android.screen.components.VideoLabel
 import com.vonage.android.screen.waiting.WaitingRoomActions
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BLUR_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BUTTON_TAG
@@ -77,6 +78,14 @@ fun VideoPreviewContainer(
                     userName = name,
                 )
             }
+
+            if (publisher.captureInfoLabel.isNotBlank()) {
+                VideoLabel(
+                    modifier = Modifier.align(Alignment.TopStart),
+                    text = publisher.captureInfoLabel,
+                )
+            }
+
             content()
         }
     }

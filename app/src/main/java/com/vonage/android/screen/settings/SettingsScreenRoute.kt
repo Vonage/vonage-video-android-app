@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.BuildConfig
+import com.vonage.android.settings.SettingsScreenActions
 import com.vonage.android.settings.ui.SettingsScreen
 
 @Composable
@@ -17,11 +18,22 @@ fun SettingsScreenRoute(
     },
     onDismiss: () -> Unit = {},
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     SettingsScreen(
         uiState = uiState,
-        onSenderStatsTrackToggle = viewModel::toggleSenderStatsTrack,
-        onDismiss = onDismiss,
+        actions = SettingsScreenActions(
+            onSenderStatsTrackToggle = viewModel::toggleSenderStatsTrack,
+            onOpusDtxToggle = viewModel::toggleOpusDtx,
+            onPublisherAudioFallbackToggle = viewModel::togglePublisherAudioFallback,
+            onSubscriberAudioFallbackToggle = viewModel::toggleSubscriberAudioFallback,
+            onVideoBitrateConfigChange = viewModel::updateVideoBitrateConfig,
+            onDegradationPreferenceChange = viewModel::updateDegradationPreference,
+            onFrameRateChange = viewModel::updateCaptureFrameRate,
+            onResolutionChange = viewModel::updateCaptureResolution,
+            onPreferredVideoCodecOrderChange = viewModel::updatePreferredVideoCodecOrder,
+            onAudioBitrateChange = viewModel::updateAudioBitrate,
+            onDismiss = onDismiss,
+        ),
     )
 }

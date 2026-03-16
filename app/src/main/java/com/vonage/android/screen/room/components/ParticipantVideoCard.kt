@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.components.AudioVolumeIndicator
 import com.vonage.android.compose.components.AvatarInitials
@@ -46,6 +45,7 @@ import com.vonage.android.fx.ui.BlurIndicator
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.kotlin.model.VideoSource
+import com.vonage.android.screen.components.VideoLabel
 import com.vonage.android.screen.room.MeetingRoomActions
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,9 +83,10 @@ fun ParticipantVideoCard(
         )
 
         if (participant.name.isNotBlank()) {
-            ParticipantLabel(participant.name)
-        } else {
-            ParticipantLabel(participant.id)
+            VideoLabel(
+                modifier = Modifier.align(Alignment.BottomStart),
+                text = participant.name
+            )
         }
 
         if (participant.videoSource == VideoSource.CAMERA) {
@@ -121,7 +122,14 @@ fun ParticipantVideoCard(
         }
 
         if (participant.isPublisher && participant.isScreenShare.not()) {
-            val blurLevel by (participant as PublisherParticipant).blurLevel.collectAsStateWithLifecycle()
+            val publisherParticipant = participant as PublisherParticipant
+
+            VideoLabel(
+                text = publisherParticipant.captureInfoLabel,
+                modifier = Modifier.align(Alignment.TopStart),
+            )
+
+            val blurLevel by publisherParticipant.blurLevel.collectAsStateWithLifecycle()
 
             BlurIndicator(
                 modifier = Modifier
@@ -199,38 +207,6 @@ private fun BoxScope.ParticipantVideoContainer(
             modifier = Modifier
                 .align(Alignment.Center),
             userName = participant.name,
-        )
-    }
-}
-
-@Composable
-private fun BoxScope.ParticipantLabel(
-    name: String,
-    modifier: Modifier = Modifier,
-) {
-    val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
-
-    Box(
-        modifier = modifier
-            .align(Alignment.BottomStart)
-            .padding(
-                top = VonageVideoTheme.dimens.paddingXSmall,
-                bottom = VonageVideoTheme.dimens.paddingXSmall,
-                start = VonageVideoTheme.dimens.paddingXSmall,
-                end = 48.dp,
-            )
-            .background(backgroundColor, VonageVideoTheme.shapes.medium)
-            .padding(
-                horizontal = VonageVideoTheme.dimens.paddingSmall,
-                vertical = VonageVideoTheme.dimens.paddingXSmall,
-            )
-    ) {
-        Text(
-            text = name,
-            color = Color.White,
-            fontSize = 12.sp,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
         )
     }
 }
