@@ -151,6 +151,9 @@ class ScreenSharingCapturer(
                 }
             }
         }, backgroundHandler)
+
+        // Set video content hint to TEXT, should be configurable
+        videoContentHint = VideoContentHint.TEXT
     }
 
     private fun startBackgroundThread() {
