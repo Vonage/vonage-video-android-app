@@ -32,7 +32,7 @@ class ThemeGeneratorPlugin : Plugin<Project> {
 
         // Don't auto-run on preBuild, let it be manually triggered
         project.tasks.register("updateTheme") {
-            group = "vonage"
+            group = VONAGE_PREFIX
             description = "Updates theme files from theme.json"
             dependsOn(generateTask)
         }
