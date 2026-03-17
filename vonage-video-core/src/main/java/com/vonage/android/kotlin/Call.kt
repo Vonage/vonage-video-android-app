@@ -3,10 +3,7 @@ package com.vonage.android.kotlin
 import android.content.Context
 import android.media.projection.MediaProjection
 import androidx.compose.runtime.Stable
-import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.OpentokError
-import com.opentok.android.Publisher
-import com.opentok.android.PublisherKit.PublisherKitVideoType
 import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
@@ -17,7 +14,6 @@ import com.vonage.android.kotlin.ext.mapSorted
 import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
 import com.vonage.android.kotlin.internal.PublisherFactory
-import com.vonage.android.kotlin.internal.ScreenSharingCapturer
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.ChatState
@@ -146,7 +142,7 @@ class Call internal constructor(
         .distinctUntilChanged()
         .stateIn(
             scope = coroutineScope,
-            started = WhileSubscribed(SUBSCRIBE_TIMEOUT_MILLIS),
+            started = SharingStarted.Eagerly,
             initialValue = null,
         )
 
@@ -464,21 +460,13 @@ class Call internal constructor(
         coroutineScope.launch(Dispatchers.Default) {
             val name = "${publisher()?.publisher?.name}'s Screen" // translate this!
             val publisher = withContext(Dispatchers.Main) {
-                val screenPublisher = Publisher.Builder(context)
-                    .name(name)
-                    .capturer(ScreenSharingCapturer(context, mediaProjection))
-                    .build()
-                    .apply {
-                        renderer?.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FIT)
-                        publishVideo = true
-                        publishAudio = false
-                        publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeScreen
-                    }
-                session.publish(screenPublisher)
-                PublisherState(
-                    publisherId = PUBLISHER_SCREEN_ID,
-                    publisher = screenPublisher,
+                val screenPublisherState = publisherFactory.createScreenSharePublisherState(
+                    context = context,
+                    mediaProjection = mediaProjection,
+                    name = name,
                 )
+                session.publish(screenPublisherState.publisher)
+                screenPublisherState
             }
             participants[PUBLISHER_SCREEN_ID] = publisher
             updateParticipants()
@@ -614,7 +602,7 @@ class Call internal constructor(
 
     /**
      * Starts monitoring active speaker changes and updates visibility accordingly.
-     * Ensures the active speaker is always visible even if scrolled off screen.
+     * Ensures the active speaker is always visible even if scrolled off-screen.
      * Screen sharing participants are automatically set as the active speaker.
      */
     private fun startActiveSpeakerTracker() {
@@ -659,7 +647,7 @@ class Call internal constructor(
         const val PUBLISHER_SCREEN_ID: String = "publisher-screen"
 
         private const val PARTICIPANTS_DEBOUNCE_MILLIS = 100L
-        private const val ACTIVE_SPEAKER_DEBOUNCE_MILLIS = 100L
+        private const val ACTIVE_SPEAKER_DEBOUNCE_MILLIS = 250L
         private const val VISIBILITY_MONITOR_ENABLED = true
     }
 }

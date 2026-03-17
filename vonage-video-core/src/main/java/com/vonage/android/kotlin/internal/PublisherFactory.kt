@@ -2,11 +2,14 @@ package com.vonage.android.kotlin.internal
 
 import android.app.ActivityManager
 import android.content.Context
+import android.media.projection.MediaProjection
 import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit
+import com.opentok.android.PublisherKit.PublisherKitVideoType
 import com.opentok.android.VeraCameraCapturer
 import com.vonage.android.kotlin.Call.Companion.PUBLISHER_ID
+import com.vonage.android.kotlin.Call.Companion.PUBLISHER_SCREEN_ID
 import com.vonage.android.kotlin.ext.applyDegradationPreference
 import com.vonage.android.kotlin.ext.applyVideoBitrate
 import com.vonage.android.kotlin.ext.applyVideoBlur
@@ -68,6 +71,31 @@ class PublisherFactory {
         )
         publisherHolder = VeraPublisherHolder(
             publisher = publisher,
+        )
+        return participant
+    }
+
+    fun createScreenSharePublisherState(
+        context: Context,
+        mediaProjection: MediaProjection,
+        name: String
+    ): PublisherState {
+        val screenPublisher = Publisher.Builder(context)
+            .name(name)
+            .capturer(ScreenSharingCapturer(context, mediaProjection))
+            .videoTrack(true)
+            .audioTrack(false)
+            .build()
+            .apply {
+                renderer?.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FIT)
+                publishVideo = true
+                publishAudio = false
+                publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeScreen
+            }
+        publisherHolder?.screenPublisher = screenPublisher
+        val participant = PublisherState(
+            publisherId = PUBLISHER_SCREEN_ID,
+            publisher = screenPublisher,
         )
         return participant
     }
@@ -193,7 +221,7 @@ class PublisherFactory {
                     publishAudio = config.publishAudio
                     applyVideoBlur(config.blurLevel)
                 }
-                publisherVideoType = PublisherKit.PublisherKitVideoType.PublisherKitVideoTypeCamera
+                publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeCamera
                 applyVideoBitrate(currentConfig?.videoBitrateConfig)
                 applyDegradationPreference(currentConfig?.degradationPreference)
             }
