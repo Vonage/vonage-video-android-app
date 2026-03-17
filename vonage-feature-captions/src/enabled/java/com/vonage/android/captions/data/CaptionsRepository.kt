@@ -1,7 +1,7 @@
 package com.vonage.android.captions.data
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import javax.inject.Inject
 
 class CaptionsRepository @Inject constructor(
@@ -21,8 +21,8 @@ class CaptionsRepository @Inject constructor(
         }
 }
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class EnableCaptionsResponse(
-    @field:Json(name = "captionsId")
+    @SerialName("captionsId")
     val captionsId: String,
 )

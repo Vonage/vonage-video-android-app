@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.kover)
-    kotlin("plugin.serialization") version "2.0.21"
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.play.publisher)
     alias(libs.plugins.stability.analyzer)
     id("com.vonage.json-config")
@@ -213,8 +213,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.retrofit)
     implementation(libs.okhttp)
-    implementation(libs.converter.moshi)
-    implementation(libs.moshi.kotlin)
+    implementation(libs.converter.kotlinx.serialization)
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.adaptive)
     implementation(libs.androidx.adaptive.layout)

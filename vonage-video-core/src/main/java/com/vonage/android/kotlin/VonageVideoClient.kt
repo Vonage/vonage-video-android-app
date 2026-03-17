@@ -107,9 +107,9 @@ class VonageVideoClient(
      * @return CallFacade interface for managing the video call
      */
     fun initializeSession(apiKey: String, sessionId: String, token: String): CallFacade {
-        vonageLogger.i(TAG, "apiKey: $apiKey")
-        vonageLogger.i(TAG, "sessionId: $sessionId")
-        vonageLogger.i(TAG, "token: $token")
+        vonageLogger.d(TAG, "apiKey: $apiKey")
+        vonageLogger.d(TAG, "sessionId: $sessionId")
+        vonageLogger.d(TAG, "token: $token")
 
         session = Session.Builder(context, apiKey, sessionId)
             .setSinglePeerConnection(true)

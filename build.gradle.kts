@@ -19,12 +19,18 @@ dependencies {
     detektPlugins(libs.detekt.compose.rules)
 }
 
-afterEvaluate {
-    println("Running Add Pre Push Git Hook")
-    exec {
-        commandLine("cp", "./scripts/git-hooks/pre-push", "./.git/hooks")
+tasks.register("installGitHooks") {
+    description = "Installs the pre-push Git hook from scripts/git-hooks"
+    group = "setup"
+    val hookSource = file("scripts/git-hooks/pre-push")
+    val hookDest = file(".git/hooks/pre-push")
+    inputs.file(hookSource)
+    outputs.file(hookDest)
+    doLast {
+        hookSource.copyTo(hookDest, overwrite = true)
+        hookDest.setExecutable(true)
+        logger.lifecycle("Installed pre-push Git hook.")
     }
-    println("Added pre-push Git Hook Script.")
 }
 
 kover {
