@@ -45,11 +45,6 @@ import java.text.Normalizer
 const val PARTICIPANT_ITEM_TAG = "ParticipantItemTestTag"
 const val SEARCH_TAG = "SearchTestTag"
 
-//enable normalization for diacritics
-fun String.normalize() =
-    Normalizer.normalize(this, Normalizer.Form.NFD)
-        .replace("\\p{Mn}+".toRegex(), "")
-
 @Composable
 fun ParticipantsList(
     participants: ImmutableList<Participant>,
@@ -60,17 +55,13 @@ fun ParticipantsList(
     var searchQuery by remember { mutableStateOf("") }
     val sortedParticipants by remember(participants, pinnedParticipantIds) {
         derivedStateOf {
-            val filtered = if (searchQuery.isBlank()) {
+            if (searchQuery.isBlank()) {
                 participants.toList()
             } else {
                 participants.filter {
                     it.name.normalize().contains(searchQuery.normalize(), ignoreCase = true)
                 }
             }
-            filtered.sortedWith(
-                compareByDescending<Participant> { it.id in pinnedParticipantIds }
-                    .thenBy { it.name }
-            )
         }
     }
 
@@ -111,7 +102,6 @@ fun ParticipantsList(
                 )
             }
         }
-
     }
 }
 
@@ -204,6 +194,11 @@ private fun ParticipantRow(
         }
     }
 }
+
+//enable normalization for diacritics
+private fun String.normalize() =
+    Normalizer.normalize(this, Normalizer.Form.NFD)
+        .replace("\\p{Mn}+".toRegex(), "")
 
 @PreviewLightDark
 @Composable
