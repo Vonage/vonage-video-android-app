@@ -30,6 +30,27 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
     /** StateFlow of all participants in the call */
     val participantsStateFlow: StateFlow<ImmutableList<Participant>>
 
+    /** StateFlow of pinned participant IDs */
+    val pinnedParticipantIds: StateFlow<Set<String>>
+
+    /**
+     * Toggles the pin state of a participant.
+     *
+     * @param participantId The ID of the participant to pin/unpin
+     */
+    fun togglePinParticipant(participantId: String)
+
+    /**
+     * Forcibly mutes another participant's audio in the call.
+     *
+     * This is typically used by privileged roles (for example, host or moderator)
+     * to mute a remote participant regardless of that participant's local mute state.
+     * Actual permission enforcement is handled by the underlying call implementation.
+     *
+     * @param participantId The ID of the participant to mute
+     */
+    fun forceMuteParticipant(participantId: String)
+
     /** StateFlow of the current participant count */
     val participantsCount: StateFlow<Int>
 

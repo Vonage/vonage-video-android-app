@@ -253,6 +253,14 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         _uiState.update { uiState -> uiState.copy(layoutType = layoutType) }
     }
 
+    fun onTogglePinParticipant(participantId: String) {
+        call?.togglePinParticipant(participantId)
+    }
+
+    fun forceMuteParticipant(participantId: String) {
+        call?.forceMuteParticipant(participantId)
+    }
+
     //region Archiving
     fun archiveCall(enable: Boolean) {
         if (enable) {

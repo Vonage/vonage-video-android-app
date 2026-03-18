@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +18,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
@@ -58,6 +60,7 @@ fun AdaptiveGrid(
         }
 
         val listState = lazyStateVisibilityTracker(call = call, lazyState = rememberLazyGridState())
+        val pinnedIds by call.pinnedParticipantIds.collectAsStateWithLifecycle()
 
         LazyVerticalGrid(
             modifier = Modifier.fillMaxSize(),
@@ -79,6 +82,7 @@ fun AdaptiveGrid(
                         .height(itemHeight),
                     participant = participant,
                     actions = actions,
+                    isPinned = participant.id in pinnedIds,
                 )
             }
             if (participants.size > takeCount) {
