@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: API check
@@ -44,7 +44,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Java
         uses: ./.github/actions/setup-java
@@ -66,7 +66,7 @@ jobs:
           ./gradlew sonar
 
       - name: Upload test reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-reports
@@ -90,7 +90,7 @@ jobs:
           df -h
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Enable KVM group perms
         run: |
@@ -109,7 +109,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: AVD cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: avd-cache
         with:
           path: |
@@ -122,7 +122,7 @@ jobs:
           ./gradlew pixelDebugAndroidTest --info --stacktrace --no-build-cache
 
       - name: Upload UI test reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: ui-test-reports
