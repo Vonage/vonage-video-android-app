@@ -4,12 +4,13 @@ import android.content.Context
 import android.media.MediaPlayer
 import androidx.compose.runtime.Stable
 import com.vonage.android.R
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 class AudioPlayer @Inject constructor(
-    context: Context
+    @ApplicationContext context: Context
 ) {
 
     private val _audioPlayerState = MutableStateFlow<AudioPlayerState>(AudioPlayerState.Idle)
@@ -31,8 +32,10 @@ class AudioPlayer @Inject constructor(
     }
 
     fun stop() {
-        mediaPlayer.stop()
-        mediaPlayer.prepare()
+        if (mediaPlayer.isPlaying) {
+            mediaPlayer.pause()
+        }
+        mediaPlayer.seekTo(0)
         _audioPlayerState.value = AudioPlayerState.Idle
     }
 
@@ -41,6 +44,10 @@ class AudioPlayer @Inject constructor(
             true -> stop()
             false -> play()
         }
+    }
+
+    fun release() {
+        mediaPlayer.release()
     }
 }
 

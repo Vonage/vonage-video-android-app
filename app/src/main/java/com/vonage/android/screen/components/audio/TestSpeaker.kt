@@ -3,16 +3,17 @@ package com.vonage.android.screen.components.audio
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
@@ -22,12 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.addOutline
-import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -38,38 +33,16 @@ import com.vonage.android.R
 import com.vonage.android.audio.AudioPlayerState
 import com.vonage.android.audio.AudioPlayerViewModel
 import com.vonage.android.compose.modifier.conditional
+import com.vonage.android.compose.modifier.progressBackground
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.AudioMid
 
 @Composable
 fun TestSpeaker(
-    modifier: Modifier = Modifier,
     viewModel: AudioPlayerViewModel = hiltViewModel(),
 ) {
     val audioPlayerState by viewModel.state.collectAsStateWithLifecycle()
-
-    var animatedWithFraction = remember { Animatable(0f) }
-    val defaultButtonClipShape = VonageVideoTheme.shapes.medium
-    val color = MaterialTheme.colorScheme.primary
-    val density = LocalDensity.current
-
-    when (audioPlayerState) {
-        is AudioPlayerState.Playing -> {
-            LaunchedEffect(Unit) {
-                animatedWithFraction = Animatable(0f)
-                animatedWithFraction.animateTo(
-                    targetValue = 1f, // Animate to 1f (100% of width)
-                    animationSpec = tween(
-                        durationMillis = (audioPlayerState as AudioPlayerState.Playing).durationMs,
-                        easing = LinearEasing,
-                    )
-                )
-            }
-        }
-
-        else -> {}
-    }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -77,17 +50,50 @@ fun TestSpeaker(
         }
     }
 
+    TestSpeakerContent(
+        audioPlayerState = audioPlayerState,
+        onSpeakerTestToggle = { viewModel.onSpeakerTestToggle() },
+    )
+}
+
+@Composable
+private fun TestSpeakerContent(
+    audioPlayerState: AudioPlayerState,
+    onSpeakerTestToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val animatedWithFraction = remember { Animatable(0f) }
+
+    LaunchedEffect(audioPlayerState) {
+        when (audioPlayerState) {
+            is AudioPlayerState.Idle -> {
+                animatedWithFraction.snapTo(0F)
+            }
+
+            is AudioPlayerState.Playing -> {
+                animatedWithFraction.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(
+                        durationMillis = audioPlayerState.durationMs,
+                        easing = LinearEasing,
+                    )
+                )
+            }
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(
+                horizontal = VonageVideoTheme.dimens.paddingDefault,
+                vertical = VonageVideoTheme.dimens.paddingSmall,
+            )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .combinedClickable(onClick = {
-                    viewModel.onSpeakerTestToggle()
-                })
+                .combinedClickable(onClick = onSpeakerTestToggle)
                 .border(
                     width = 1.dp,
                     color = VonageVideoTheme.colors.surface,
@@ -96,32 +102,18 @@ fun TestSpeaker(
                 .conditional(
                     condition = audioPlayerState is AudioPlayerState.Playing,
                     ifTrue = {
-                        drawBehind {
-                            val currentSize = this.size
-                            val outline = defaultButtonClipShape
-                                .createOutline(currentSize, layoutDirection, density)
-                            val buttonShapePath = Path().apply { addOutline(outline) }
-
-                            val progressRectWidth = currentSize.width * animatedWithFraction.value
-                            clipPath(buttonShapePath) {
-                                drawRect(
-                                    color = color,
-                                    size = Size(
-                                        width = progressRectWidth,
-                                        height = currentSize.height,
-                                    ),
-                                )
-                            }
-                        }
+                        progressBackground(
+                            progress = animatedWithFraction.value,
+                        )
                     },
                 ),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.paddingSmall)
         ) {
             Icon(
                 modifier = Modifier
                     .minimumInteractiveComponentSize()
-                    .size(24.dp),
+                    .size(VonageVideoTheme.dimens.iconSizeDefault),
                 imageVector = VividIcons.Solid.AudioMid,
                 tint = VonageVideoTheme.colors.secondary,
                 contentDescription = null,
@@ -155,6 +147,20 @@ fun TestSpeaker(
 @Composable
 internal fun TestSpeakerPreview() {
     VonageVideoTheme {
-        TestSpeaker()
+        Column(
+            modifier = Modifier
+                .background(VonageVideoTheme.colors.background)
+        ) {
+            TestSpeakerContent(
+                audioPlayerState = AudioPlayerState.Idle,
+                onSpeakerTestToggle = {},
+            )
+            TestSpeakerContent(
+                audioPlayerState = AudioPlayerState.Playing(
+                    durationMs = 100
+                ),
+                onSpeakerTestToggle = {},
+            )
+        }
     }
 }

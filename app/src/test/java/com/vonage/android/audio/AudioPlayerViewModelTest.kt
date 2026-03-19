@@ -1,5 +1,6 @@
 package com.vonage.android.audio
 
+import androidx.lifecycle.ViewModelStore
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
 import io.mockk.every
@@ -72,5 +73,14 @@ class AudioPlayerViewModelTest {
             audioPlayerState.value = AudioPlayerState.Idle
             assertEquals(AudioPlayerState.Idle, awaitItem())
         }
+    }
+
+    @Test
+    fun `given viewmodel when cleared then releases audio player`() {
+        val store = ViewModelStore()
+        store.put("AudioPlayerViewModel", sut)
+        store.clear()
+
+        verify { audioPlayer.release() }
     }
 }

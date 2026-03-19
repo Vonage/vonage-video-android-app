@@ -60,6 +60,8 @@ class AudioPlayerTest {
 
     @Test
     fun `given audio player when stop then state is idle`() = runTest {
+        every { mediaPlayer.isPlaying } returns true
+
         sut.play()
         sut.stop()
 
@@ -67,8 +69,8 @@ class AudioPlayerTest {
             assertEquals(AudioPlayerState.Idle, awaitItem())
         }
 
-        verify { mediaPlayer.stop() }
-        verify { mediaPlayer.prepare() }
+        verify { mediaPlayer.pause() }
+        verify { mediaPlayer.seekTo(0) }
     }
 
     @Test
@@ -81,7 +83,8 @@ class AudioPlayerTest {
             assertEquals(AudioPlayerState.Idle, awaitItem())
         }
 
-        verify { mediaPlayer.stop() }
+        verify { mediaPlayer.pause() }
+        verify { mediaPlayer.seekTo(0) }
     }
 
     @Test
@@ -110,5 +113,26 @@ class AudioPlayerTest {
         sut.audioPlayerState.test {
             assertEquals(AudioPlayerState.Idle, awaitItem())
         }
+    }
+
+    @Test
+    fun `given audio player when stop while not playing then does not pause`() = runTest {
+        every { mediaPlayer.isPlaying } returns false
+
+        sut.stop()
+
+        verify(exactly = 0) { mediaPlayer.pause() }
+        verify { mediaPlayer.seekTo(0) }
+
+        sut.audioPlayerState.test {
+            assertEquals(AudioPlayerState.Idle, awaitItem())
+        }
+    }
+
+    @Test
+    fun `given audio player when release then media player is released`() {
+        sut.release()
+
+        verify { mediaPlayer.release() }
     }
 }

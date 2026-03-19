@@ -18,4 +18,9 @@ class AudioPlayerViewModel @Inject constructor(
     fun stop() {
         audioPlayer.stop()
     }
+
+    override fun onCleared() {
+        audioPlayer.release()
+        super.onCleared()
+    }
 }
