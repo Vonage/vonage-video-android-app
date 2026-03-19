@@ -1,6 +1,7 @@
 package com.vonage.android.di
 
 import android.content.Context
+import com.vonage.android.audio.AudioPlayer
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.audioselector.VeraAudioDevice
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
@@ -34,6 +35,11 @@ object SdkModule {
     fun provideVeraAudioDevice(
         @ApplicationContext context: Context,
     ): VeraAudioDevice = VeraAudioDevice(context)
+
+    @Provides
+    fun provideAudioPlayer(
+        @ApplicationContext context: Context
+    ): AudioPlayer = AudioPlayer(context)
 
     @Singleton
     @Provides
