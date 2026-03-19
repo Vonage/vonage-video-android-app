@@ -7,6 +7,7 @@ import com.vonage.android.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 class AudioPlayer @Inject constructor(
@@ -14,40 +15,48 @@ class AudioPlayer @Inject constructor(
 ) {
 
     private val _audioPlayerState = MutableStateFlow<AudioPlayerState>(AudioPlayerState.Idle)
-    val audioPlayerState: StateFlow<AudioPlayerState> = _audioPlayerState
+    val audioPlayerState: StateFlow<AudioPlayerState> = _audioPlayerState.asStateFlow()
 
-    private var mediaPlayer: MediaPlayer = MediaPlayer.create(context, R.raw.sample)
+    private var mediaPlayer: MediaPlayer? = MediaPlayer.create(context, R.raw.sample)
 
     init {
-        mediaPlayer.setOnCompletionListener { _ ->
+        mediaPlayer?.setOnCompletionListener { _ ->
             stop()
         }
     }
 
     fun play() {
-        mediaPlayer.start()
-        _audioPlayerState.value = AudioPlayerState.Playing(
-            durationMs = mediaPlayer.duration
-        )
+        mediaPlayer?.let { player ->
+            player.start()
+            _audioPlayerState.value = AudioPlayerState.Playing(
+                durationMs = player.duration
+            )
+        }
     }
 
     fun stop() {
-        if (mediaPlayer.isPlaying) {
-            mediaPlayer.pause()
+        mediaPlayer?.let { player ->
+            if (player.isPlaying) {
+                player.pause()
+            }
+            player.seekTo(0)
         }
-        mediaPlayer.seekTo(0)
         _audioPlayerState.value = AudioPlayerState.Idle
     }
 
     fun toggle() {
-        when (mediaPlayer.isPlaying) {
-            true -> stop()
-            false -> play()
+        mediaPlayer?.let { player ->
+            when (player.isPlaying) {
+                true -> stop()
+                false -> play()
+            }
         }
     }
 
     fun release() {
-        mediaPlayer.release()
+        mediaPlayer?.release()
+        mediaPlayer = null
+        _audioPlayerState.value = AudioPlayerState.Idle
     }
 }
 

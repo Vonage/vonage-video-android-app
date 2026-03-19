@@ -62,19 +62,19 @@ private fun TestSpeakerContent(
     onSpeakerTestToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val animatedWithFraction = remember { Animatable(0f) }
+    val animatedProgress = remember { Animatable(0f) }
 
     LaunchedEffect(audioPlayerState) {
         when (audioPlayerState) {
             is AudioPlayerState.Idle -> {
-                animatedWithFraction.snapTo(0F)
+                animatedProgress.snapTo(0F)
             }
 
             is AudioPlayerState.Playing -> {
-                animatedWithFraction.animateTo(
+                animatedProgress.animateTo(
                     targetValue = 1f,
                     animationSpec = tween(
-                        durationMillis = audioPlayerState.durationMs,
+                        durationMillis = audioPlayerState.durationMs.coerceAtLeast(0),
                         easing = LinearEasing,
                     )
                 )
@@ -103,7 +103,7 @@ private fun TestSpeakerContent(
                     condition = audioPlayerState is AudioPlayerState.Playing,
                     ifTrue = {
                         progressBackground(
-                            progress = animatedWithFraction.value,
+                            progress = animatedProgress.value,
                         )
                     },
                 ),
@@ -157,7 +157,7 @@ internal fun TestSpeakerPreview() {
             )
             TestSpeakerContent(
                 audioPlayerState = AudioPlayerState.Playing(
-                    durationMs = 100
+                    durationMs = 100,
                 ),
                 onSpeakerTestToggle = {},
             )

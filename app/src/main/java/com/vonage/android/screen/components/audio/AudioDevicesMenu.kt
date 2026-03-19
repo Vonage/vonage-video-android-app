@@ -17,6 +17,7 @@ fun AudioDevicesMenu(
     audioDevicesState: AudioDevicesState,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    testSpeakerContent: @Composable () -> Unit = { TestSpeaker() },
 ) {
     val availableDevices by audioDevicesState.availableDevices.collectAsStateWithLifecycle()
     val activeDevice by audioDevicesState.activeDevice.collectAsStateWithLifecycle()
@@ -24,7 +25,7 @@ fun AudioDevicesMenu(
     Column(
         modifier = modifier,
     ) {
-        TestSpeaker()
+        testSpeakerContent()
         AudioDeviceList(
             availableDevices = availableDevices,
             activeDevice = activeDevice,
@@ -59,8 +60,8 @@ internal fun AudioDevicesMenuPreview() {
                 activeDevice = MutableStateFlow(null),
                 selectDevice = { _ -> },
             ),
+            testSpeakerContent = {},
             onDismissRequest = {},
-
-            )
+        )
     }
 }

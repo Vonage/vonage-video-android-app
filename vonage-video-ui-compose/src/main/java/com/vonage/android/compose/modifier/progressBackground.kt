@@ -2,7 +2,7 @@ package com.vonage.android.compose.modifier
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -19,20 +19,23 @@ fun Modifier.progressBackground(
     density: Density = LocalDensity.current,
     clipShape: Shape = VonageVideoTheme.shapes.medium,
     color: Color = VonageVideoTheme.colors.primary,
-): Modifier = drawBehind {
+): Modifier = drawWithCache {
     val currentSize = this.size
     val outline = clipShape
         .createOutline(currentSize, layoutDirection, density)
     val buttonShapePath = Path().apply { addOutline(outline) }
 
-    val progressRectWidth = currentSize.width * progress
-    clipPath(buttonShapePath) {
-        drawRect(
-            color = color,
-            size = Size(
-                width = progressRectWidth,
-                height = currentSize.height,
-            ),
-        )
+    onDrawBehind {
+        val clampedProgress = progress.coerceIn(0F, 1F)
+        val progressRectWidth = currentSize.width * clampedProgress
+        clipPath(buttonShapePath) {
+            drawRect(
+                color = color,
+                size = Size(
+                    width = progressRectWidth,
+                    height = currentSize.height,
+                ),
+            )
+        }
     }
 }
