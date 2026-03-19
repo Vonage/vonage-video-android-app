@@ -3,7 +3,24 @@
 package com.vonage.gradle.tasks
 
 import com.google.gson.Gson
+import com.squareup.kotlinpoet.AnnotationSpec
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.LambdaTypeName
+import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.UNIT
+import com.vonage.gradle.model.ColorScheme
+import com.vonage.gradle.model.Theme
 import com.vonage.gradle.model.ThemeConfig
+import com.vonage.gradle.VONAGE
+import com.vonage.gradle.VONAGE_PREFIX
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -13,8 +30,33 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
+import com.vonage.gradle.model.TextStyle as ThemeTextStyle
 
 private const val COLOR_LENGTH = 6
+
+private val COLOR = ClassName("androidx.compose.ui.graphics", "Color")
+private val COLOR_SCHEME = ClassName("androidx.compose.material3", "ColorScheme")
+private val LIGHT_COLOR_SCHEME_FN = MemberName("androidx.compose.material3", "lightColorScheme")
+private val DARK_COLOR_SCHEME_FN = MemberName("androidx.compose.material3", "darkColorScheme")
+private val IMMUTABLE = ClassName("androidx.compose.runtime", "Immutable")
+private val STATIC_COMPOSITION_LOCAL_OF =
+    MemberName("androidx.compose.runtime", "staticCompositionLocalOf")
+private val PROVIDABLE_COMPOSITION_LOCAL =
+    ClassName("androidx.compose.runtime", "ProvidableCompositionLocal")
+private val ROUNDED_CORNER_SHAPE =
+    ClassName("androidx.compose.foundation.shape", "RoundedCornerShape")
+private val SHAPE = ClassName("androidx.compose.ui.graphics", "Shape")
+private val DP = MemberName("androidx.compose.ui.unit", "dp")
+private val TEXT_STYLE = ClassName("androidx.compose.ui.text", "TextStyle")
+private val FONT_FAMILY = ClassName("androidx.compose.ui.text.font", "FontFamily")
+private val FONT_WEIGHT = ClassName("androidx.compose.ui.text.font", "FontWeight")
+private val SP = MemberName("androidx.compose.ui.unit", "sp")
+private val IS_SYSTEM_IN_DARK_THEME =
+    MemberName("androidx.compose.foundation", "isSystemInDarkTheme")
+private val MATERIAL_THEME = ClassName("androidx.compose.material3", "MaterialTheme")
+private val COMPOSABLE = ClassName("androidx.compose.runtime", "Composable")
+private val COMPOSITION_LOCAL_PROVIDER =
+    MemberName("androidx.compose.runtime", "CompositionLocalProvider")
 
 abstract class GenerateThemeTask : DefaultTask() {
 
@@ -42,7 +84,8 @@ abstract class GenerateThemeTask : DefaultTask() {
         require(themeFile.exists())
 
         val themeConfig = Gson().fromJson(themeFile.readText(), ThemeConfig::class.java)
-        val theme = themeConfig.themes["vonage"] ?: throw IllegalArgumentException("Vonage theme not found")
+        val theme =
+            themeConfig.themes[VONAGE_PREFIX] ?: throw IllegalArgumentException("Vonage theme not found")
 
         val outputDirectory = themeDirectory.get().asFile
         require(outputDirectory.exists())
@@ -64,497 +107,510 @@ abstract class GenerateThemeTask : DefaultTask() {
         generateThemeFile(outputDirectory, packageName)
     }
 
-    private fun generateColorFile(theme: com.vonage.gradle.model.Theme, outputDir: File, packageName: String) {
-        // Helper function to convert hex color to ARGB format with alpha channel
-        fun hexToArgb(hex: String): String {
-            val cleanHex = hex.removePrefix("#")
-            return if (cleanHex.length == COLOR_LENGTH) {
-                "FF$cleanHex" // Add full alpha channel
-            } else {
-                cleanHex // Already has alpha channel
-            }
+    private fun generateColorFile(theme: Theme, outputDir: File, packageName: String) {
+        val lightColors = theme.colors.light
+        val darkColors = theme.colors.dark
+        val vonageColors = ClassName(packageName, "${VONAGE}Colors")
+
+        val fileSpec = FileSpec.builder(packageName, "Color")
+            .indent("    ")
+            .addFileComment("Auto-generated from theme.json")
+            .addAnnotation(
+                AnnotationSpec.builder(ClassName("kotlin", "Suppress"))
+                    .addMember("%S", "MagicNumber")
+                    .build()
+            )
+
+        colorEntries(lightColors).forEach { (name, hex) ->
+            fileSpec.addProperty(
+                PropertySpec.builder("Light$name", COLOR)
+                    .initializer("%T(0x${hex.hexToArgb()})", COLOR)
+                    .build()
+            )
         }
 
-        val content = buildString {
-            appendLine("@file:Suppress(\"MagicNumber\")")
-            appendLine()
-            appendLine("package $packageName")
-            appendLine()
-            appendLine("import androidx.compose.material3.darkColorScheme")
-            appendLine("import androidx.compose.material3.lightColorScheme")
-            appendLine("import androidx.compose.runtime.Immutable")
-            appendLine("import androidx.compose.runtime.staticCompositionLocalOf")
-            appendLine("import androidx.compose.ui.graphics.Color")
-            appendLine()
-            appendLine("// Auto-generated from theme.json")
-            appendLine()
-
-            // Generate color constants for light theme
-            appendLine("// Light theme colors")
-            val lightColors = theme.colors.light
-            appendLine("val LightPrimary = Color(0x${hexToArgb(lightColors.primary)})")
-            appendLine("val LightPrimaryHover = Color(0x${hexToArgb(lightColors.primaryHover)})")
-            appendLine("val LightOnPrimary = Color(0x${hexToArgb(lightColors.onPrimary)})")
-            appendLine("val LightSecondary = Color(0x${hexToArgb(lightColors.secondary)})")
-            appendLine("val LightOnSecondary = Color(0x${hexToArgb(lightColors.onSecondary)})")
-            appendLine("val LightTertiary = Color(0x${hexToArgb(lightColors.tertiary)})")
-            appendLine("val LightOnTertiary = Color(0x${hexToArgb(lightColors.onTertiary)})")
-            appendLine("val LightBackground = Color(0x${hexToArgb(lightColors.background)})")
-            appendLine("val LightOnBackground = Color(0x${hexToArgb(lightColors.onBackground)})")
-            appendLine("val LightSurface = Color(0x${hexToArgb(lightColors.surface)})")
-            appendLine("val LightOnSurface = Color(0x${hexToArgb(lightColors.onSurface)})")
-            appendLine("val LightError = Color(0x${hexToArgb(lightColors.error)})")
-            appendLine("val LightOnError = Color(0x${hexToArgb(lightColors.onError)})")
-            appendLine("val LightErrorHover = Color(0x${hexToArgb(lightColors.errorHover)})")
-            appendLine("val LightWarning = Color(0x${hexToArgb(lightColors.warning)})")
-            appendLine("val LightOnWarning = Color(0x${hexToArgb(lightColors.onWarning)})")
-            appendLine("val LightWarningHover = Color(0x${hexToArgb(lightColors.warningHover)})")
-            appendLine("val LightSuccess = Color(0x${hexToArgb(lightColors.success)})")
-            appendLine("val LightOnSuccess = Color(0x${hexToArgb(lightColors.onSuccess)})")
-            appendLine("val LightSuccessHover = Color(0x${hexToArgb(lightColors.successHover)})")
-            appendLine("val LightBorder = Color(0x${hexToArgb(lightColors.border)})")
-            appendLine("val LightDisabled = Color(0x${hexToArgb(lightColors.disabled)})")
-            appendLine("val LightTextDisabled = Color(0x${hexToArgb(lightColors.textDisabled)})")
-            appendLine()
-
-            // Generate color constants for dark theme
-            appendLine("// Dark theme colors")
-            val darkColors = theme.colors.dark
-            appendLine("val DarkPrimary = Color(0x${hexToArgb(darkColors.primary)})")
-            appendLine("val DarkPrimaryHover = Color(0x${hexToArgb(darkColors.primaryHover)})")
-            appendLine("val DarkOnPrimary = Color(0x${hexToArgb(darkColors.onPrimary)})")
-            appendLine("val DarkSecondary = Color(0x${hexToArgb(darkColors.secondary)})")
-            appendLine("val DarkOnSecondary = Color(0x${hexToArgb(darkColors.onSecondary)})")
-            appendLine("val DarkTertiary = Color(0x${hexToArgb(darkColors.tertiary)})")
-            appendLine("val DarkOnTertiary = Color(0x${hexToArgb(darkColors.onTertiary)})")
-            appendLine("val DarkBackground = Color(0x${hexToArgb(darkColors.background)})")
-            appendLine("val DarkOnBackground = Color(0x${hexToArgb(darkColors.onBackground)})")
-            appendLine("val DarkSurface = Color(0x${hexToArgb(darkColors.surface)})")
-            appendLine("val DarkOnSurface = Color(0x${hexToArgb(darkColors.onSurface)})")
-            appendLine("val DarkError = Color(0x${hexToArgb(darkColors.error)})")
-            appendLine("val DarkOnError = Color(0x${hexToArgb(darkColors.onError)})")
-            appendLine("val DarkErrorHover = Color(0x${hexToArgb(darkColors.errorHover)})")
-            appendLine("val DarkWarning = Color(0x${hexToArgb(darkColors.warning)})")
-            appendLine("val DarkOnWarning = Color(0x${hexToArgb(darkColors.onWarning)})")
-            appendLine("val DarkWarningHover = Color(0x${hexToArgb(darkColors.warningHover)})")
-            appendLine("val DarkSuccess = Color(0x${hexToArgb(darkColors.success)})")
-            appendLine("val DarkOnSuccess = Color(0x${hexToArgb(darkColors.onSuccess)})")
-            appendLine("val DarkSuccessHover = Color(0x${hexToArgb(darkColors.successHover)})")
-            appendLine("val DarkBorder = Color(0x${hexToArgb(darkColors.border)})")
-            appendLine("val DarkDisabled = Color(0x${hexToArgb(darkColors.disabled)})")
-            appendLine("val DarkTextDisabled = Color(0x${hexToArgb(darkColors.textDisabled)})")
-            appendLine()
-
-            // Generate Material3 ColorSchemes
-            appendLine("internal val LightColorScheme = lightColorScheme(")
-            appendLine("    primary = LightPrimary,")
-            appendLine("    onPrimary = LightOnPrimary,")
-            appendLine("    secondary = LightSecondary,")
-            appendLine("    onSecondary = LightOnSecondary,")
-            appendLine("    tertiary = LightTertiary,")
-            appendLine("    onTertiary = LightOnTertiary,")
-            appendLine("    background = LightBackground,")
-            appendLine("    onBackground = LightOnBackground,")
-            appendLine("    surface = LightSurface,")
-            appendLine("    onSurface = LightOnSurface,")
-            appendLine("    error = LightError,")
-            appendLine("    onError = LightOnError,")
-            appendLine("    outline = LightBorder,")
-            appendLine(")")
-            appendLine()
-
-            appendLine("internal val DarkColorScheme = darkColorScheme(")
-            appendLine("    primary = DarkPrimary,")
-            appendLine("    onPrimary = DarkOnPrimary,")
-            appendLine("    secondary = DarkSecondary,")
-            appendLine("    onSecondary = DarkOnSecondary,")
-            appendLine("    tertiary = DarkTertiary,")
-            appendLine("    onTertiary = DarkOnTertiary,")
-            appendLine("    background = DarkBackground,")
-            appendLine("    onBackground = DarkOnBackground,")
-            appendLine("    surface = DarkSurface,")
-            appendLine("    onSurface = DarkOnSurface,")
-            appendLine("    error = DarkError,")
-            appendLine("    onError = DarkOnError,")
-            appendLine("    outline = DarkBorder,")
-            appendLine(")")
-            appendLine()
-
-            // Generate VonageColors data class
-            appendLine("internal val LocalVonageColors = staticCompositionLocalOf {")
-            appendLine("    VonageColors(")
-            appendLine("        primary = Color.Unspecified,")
-            appendLine("        onPrimary = Color.Unspecified,")
-            appendLine("        primaryHover = Color.Unspecified,")
-            appendLine("        secondary = Color.Unspecified,")
-            appendLine("        onSecondary = Color.Unspecified,")
-            appendLine("        tertiary = Color.Unspecified,")
-            appendLine("        onTertiary = Color.Unspecified,")
-            appendLine("        accent = Color.Unspecified,")
-            appendLine("        onAccent = Color.Unspecified,")
-            appendLine("        background = Color.Unspecified,")
-            appendLine("        onBackground = Color.Unspecified,")
-            appendLine("        surface = Color.Unspecified,")
-            appendLine("        onSurface = Color.Unspecified,")
-            appendLine("        error = Color.Unspecified,")
-            appendLine("        onError = Color.Unspecified,")
-            appendLine("        errorHover = Color.Unspecified,")
-            appendLine("        warning = Color.Unspecified,")
-            appendLine("        onWarning = Color.Unspecified,")
-            appendLine("        warningHover = Color.Unspecified,")
-            appendLine("        success = Color.Unspecified,")
-            appendLine("        onSuccess = Color.Unspecified,")
-            appendLine("        successHover = Color.Unspecified,")
-            appendLine("        border = Color.Unspecified,")
-            appendLine("        disabled = Color.Unspecified,")
-            appendLine("        textDisabled = Color.Unspecified,")
-            appendLine("        textPrimary = Color.Unspecified,")
-            appendLine("        textSecondary = Color.Unspecified,")
-            appendLine("        textTertiary = Color.Unspecified,")
-            appendLine("    )")
-            appendLine("}")
-            appendLine()
-
-            appendLine("@Immutable")
-            appendLine("data class VonageColors(")
-            appendLine("    val primary: Color,")
-            appendLine("    val onPrimary: Color,")
-            appendLine("    val primaryHover: Color,")
-            appendLine("    val secondary: Color,")
-            appendLine("    val onSecondary: Color,")
-            appendLine("    val tertiary: Color,")
-            appendLine("    val onTertiary: Color,")
-            appendLine("    val accent: Color,")
-            appendLine("    val onAccent: Color,")
-            appendLine("    val background: Color,")
-            appendLine("    val onBackground: Color,")
-            appendLine("    val surface: Color,")
-            appendLine("    val onSurface: Color,")
-            appendLine("    val error: Color,")
-            appendLine("    val onError: Color,")
-            appendLine("    val errorHover: Color,")
-            appendLine("    val warning: Color,")
-            appendLine("    val onWarning: Color,")
-            appendLine("    val warningHover: Color,")
-            appendLine("    val success: Color,")
-            appendLine("    val onSuccess: Color,")
-            appendLine("    val successHover: Color,")
-            appendLine("    val border: Color,")
-            appendLine("    val disabled: Color,")
-            appendLine("    val textDisabled: Color,")
-            appendLine("    val textPrimary: Color,")
-            appendLine("    val textSecondary: Color,")
-            appendLine("    val textTertiary: Color,")
-            appendLine(")")
+        colorEntries(darkColors).forEach { (name, hex) ->
+            fileSpec.addProperty(
+                PropertySpec.builder("Dark$name", COLOR)
+                    .initializer("%T(0x${hex.hexToArgb()})", COLOR)
+                    .build()
+            )
         }
 
-        File(outputDir, "Color.kt").writeText(content)
-        println("Updated Color.kt")
+        fileSpec.addProperty(
+            PropertySpec.builder("LightColorScheme", COLOR_SCHEME)
+                .addModifiers(KModifier.INTERNAL)
+                .initializer(buildMaterialColorSchemeBlock(LIGHT_COLOR_SCHEME_FN, "Light"))
+                .build()
+        )
+
+        fileSpec.addProperty(
+            PropertySpec.builder("DarkColorScheme", COLOR_SCHEME)
+                .addModifiers(KModifier.INTERNAL)
+                .initializer(buildMaterialColorSchemeBlock(DARK_COLOR_SCHEME_FN, "Dark"))
+                .build()
+        )
+
+        val localInit = CodeBlock.builder()
+            .beginControlFlow("%M", STATIC_COMPOSITION_LOCAL_OF)
+            .add("%T(\n", vonageColors)
+            .indent()
+        VONAGE_COLOR_FIELDS.forEach { field ->
+            localInit.add("$field = %T.Unspecified,\n", COLOR)
+        }
+        localInit.unindent()
+            .add(")\n")
+            .endControlFlow()
+
+        fileSpec.addProperty(
+            PropertySpec.builder(
+                "Local${VONAGE}Colors",
+                PROVIDABLE_COMPOSITION_LOCAL.parameterizedBy(vonageColors),
+            )
+                .addModifiers(KModifier.INTERNAL)
+                .initializer(localInit.build())
+                .build()
+        )
+
+        val constructor = FunSpec.constructorBuilder()
+        VONAGE_COLOR_FIELDS.forEach { field ->
+            constructor.addParameter(field, COLOR)
+        }
+
+        val classBuilder = TypeSpec.classBuilder("${VONAGE}Colors")
+            .addModifiers(KModifier.DATA)
+            .addAnnotation(IMMUTABLE)
+            .primaryConstructor(constructor.build())
+
+        VONAGE_COLOR_FIELDS.forEach { field ->
+            classBuilder.addProperty(
+                PropertySpec.builder(field, COLOR)
+                    .initializer(field)
+                    .build()
+            )
+        }
+
+        fileSpec.addType(classBuilder.build())
+
+        File(outputDir, "Color.kt").writeText(fileSpec.build().toString())
+        logger.debug("Updated Color.kt")
     }
 
-    private fun generateShapeFile(theme: com.vonage.gradle.model.Theme, outputDir: File, packageName: String) {
-        val content = buildString {
-            appendLine("package $packageName")
-            appendLine()
-            appendLine("import androidx.compose.foundation.shape.RoundedCornerShape")
-            appendLine("import androidx.compose.runtime.Immutable")
-            appendLine("import androidx.compose.runtime.staticCompositionLocalOf")
-            appendLine("import androidx.compose.ui.graphics.Shape")
-            appendLine("import androidx.compose.ui.unit.dp")
-            appendLine()
-            appendLine("// Auto-generated from theme.json")
-            appendLine()
+    private fun generateShapeFile(theme: Theme, outputDir: File, packageName: String) {
+        val borderRadius = theme.borderRadius
+        val vonageShapes = ClassName(packageName, "${VONAGE}Shapes")
 
-            val borderRadius = theme.borderRadius
-            appendLine("internal val shapeNone = RoundedCornerShape(${borderRadius.none}.dp)")
-            appendLine("internal val shapeExtraSmall = RoundedCornerShape(${borderRadius.extraSmall}.dp)")
-            appendLine("internal val shapeSmall = RoundedCornerShape(${borderRadius.small}.dp)")
-            appendLine("internal val shapeMedium = RoundedCornerShape(${borderRadius.medium}.dp)")
-            appendLine("internal val shapeLarge = RoundedCornerShape(${borderRadius.large}.dp)")
-            appendLine("internal val shapeExtraLarge = RoundedCornerShape(${borderRadius.extraLarge}.dp)")
-            appendLine()
+        val shapeEntries = listOf(
+            "shapeNone" to borderRadius.none,
+            "shapeExtraSmall" to borderRadius.extraSmall,
+            "shapeSmall" to borderRadius.small,
+            "shapeMedium" to borderRadius.medium,
+            "shapeLarge" to borderRadius.large,
+            "shapeExtraLarge" to borderRadius.extraLarge,
+        )
 
-            appendLine("internal val LocalVonageShapes = staticCompositionLocalOf {")
-            appendLine("    VonageShapes()")
-            appendLine("}")
-            appendLine()
+        val shapeFields = listOf(
+            "none" to "shapeNone",
+            "extraSmall" to "shapeExtraSmall",
+            "small" to "shapeSmall",
+            "medium" to "shapeMedium",
+            "large" to "shapeLarge",
+            "extraLarge" to "shapeExtraLarge",
+        )
 
-            appendLine("@Immutable")
-            appendLine("data class VonageShapes(")
-            appendLine("    val none: Shape = shapeNone,")
-            appendLine("    val extraSmall: Shape = shapeExtraSmall,")
-            appendLine("    val small: Shape = shapeSmall,")
-            appendLine("    val medium: Shape = shapeMedium,")
-            appendLine("    val large: Shape = shapeLarge,")
-            appendLine("    val extraLarge: Shape = shapeExtraLarge,")
-            appendLine(")")
+        val fileSpec = FileSpec.builder(packageName, "Shape")
+            .indent("    ")
+            .addFileComment("Auto-generated from theme.json")
+
+        shapeEntries.forEach { (name, value) ->
+            fileSpec.addProperty(
+                PropertySpec.builder(name, ROUNDED_CORNER_SHAPE)
+                    .addModifiers(KModifier.INTERNAL)
+                    .initializer("%T(%L.%M)", ROUNDED_CORNER_SHAPE, value, DP)
+                    .build()
+            )
         }
 
-        File(outputDir, "Shape.kt").writeText(content)
-        println("Updated Shape.kt")
+        val localInit = CodeBlock.builder()
+            .beginControlFlow("%M", STATIC_COMPOSITION_LOCAL_OF)
+            .addStatement("%T()", vonageShapes)
+            .endControlFlow()
+            .build()
+
+        fileSpec.addProperty(
+            PropertySpec.builder(
+                "Local${VONAGE}Shapes",
+                PROVIDABLE_COMPOSITION_LOCAL.parameterizedBy(vonageShapes),
+            )
+                .addModifiers(KModifier.INTERNAL)
+                .initializer(localInit)
+                .build()
+        )
+
+        val constructor = FunSpec.constructorBuilder()
+        shapeFields.forEach { (fieldName, defaultValue) ->
+            constructor.addParameter(
+                ParameterSpec.builder(fieldName, SHAPE)
+                    .defaultValue(defaultValue)
+                    .build()
+            )
+        }
+
+        val classBuilder = TypeSpec.classBuilder("${VONAGE}Shapes")
+            .addModifiers(KModifier.DATA)
+            .addAnnotation(IMMUTABLE)
+            .primaryConstructor(constructor.build())
+
+        shapeFields.forEach { (fieldName, _) ->
+            classBuilder.addProperty(
+                PropertySpec.builder(fieldName, SHAPE)
+                    .initializer(fieldName)
+                    .build()
+            )
+        }
+
+        fileSpec.addType(classBuilder.build())
+
+        File(outputDir, "Shape.kt").writeText(fileSpec.build().toString())
+        logger.debug("Updated Shape.kt")
     }
 
-    private fun generateTypographyFile(theme: com.vonage.gradle.model.Theme, outputDir: File, packageName: String) {
+    private fun generateTypographyFile(theme: Theme, outputDir: File, packageName: String) {
         val mobile = theme.typography.mobile
+        val vonageTypography = ClassName(packageName, "${VONAGE}Typography")
 
-        val content = buildString {
-            appendLine("package $packageName")
-            appendLine()
-            appendLine("import androidx.compose.runtime.Immutable")
-            appendLine("import androidx.compose.runtime.staticCompositionLocalOf")
-            appendLine("import androidx.compose.ui.text.TextStyle")
-            appendLine("import androidx.compose.ui.text.font.FontFamily")
-            appendLine("import androidx.compose.ui.text.font.FontWeight")
-            appendLine("import androidx.compose.ui.unit.sp")
-            appendLine()
-            appendLine("// Auto-generated from theme.json")
-            appendLine()
+        val textStyleEntries = listOf(
+            "headlineTextStyle" to mobile.headline,
+            "subtitleTextStyle" to mobile.subtitle,
+            "heading1TextStyle" to mobile.heading1,
+            "heading2TextStyle" to mobile.heading2,
+            "heading3TextStyle" to mobile.heading3,
+            "heading4TextStyle" to mobile.heading4,
+            "bodyExtendedTextStyle" to mobile.bodyExtended,
+            "bodyExtendedSemiboldTextStyle" to mobile.bodyExtendedSemibold,
+            "bodyBaseTextStyle" to mobile.bodyBase,
+            "bodyBaseSemiboldTextStyle" to mobile.bodyBaseSemibold,
+            "captionTextStyle" to mobile.caption,
+            "captionSemiboldTextStyle" to mobile.captionSemibold,
+        )
 
-            fun parseSize(size: String) = size.replace("px", "")
+        val typographyFields = listOf(
+            "headline" to "headlineTextStyle",
+            "subtitle" to "subtitleTextStyle",
+            "heading1" to "heading1TextStyle",
+            "heading2" to "heading2TextStyle",
+            "heading3" to "heading3TextStyle",
+            "heading4" to "heading4TextStyle",
+            "bodyExtended" to "bodyExtendedTextStyle",
+            "bodyExtendedSemibold" to "bodyExtendedSemiboldTextStyle",
+            "bodyBase" to "bodyBaseTextStyle",
+            "bodyBaseSemibold" to "bodyBaseSemiboldTextStyle",
+            "caption" to "captionTextStyle",
+            "captionSemibold" to "captionSemiboldTextStyle",
+        )
 
-            appendLine("internal val headlineTextStyle = TextStyle(")
-            appendLine("    fontSize = ${parseSize(mobile.headline.fontSize)}.sp,")
-            appendLine("    fontWeight = FontWeight(${mobile.headline.fontWeight}),")
-            appendLine("    lineHeight = ${parseSize(mobile.headline.lineHeight)}.sp,")
-            appendLine("    fontFamily = FontFamily.Default,")
-            appendLine(")")
-            appendLine()
+        val fileSpec = FileSpec.builder(packageName, "Typography")
+            .indent("    ")
+            .addFileComment("Auto-generated from theme.json")
 
-            appendLine("internal val subtitleTextStyle = TextStyle(")
-            appendLine("    fontSize = ${parseSize(mobile.subtitle.fontSize)}.sp,")
-            appendLine("    fontWeight = FontWeight(${mobile.subtitle.fontWeight}),")
-            appendLine("    lineHeight = ${parseSize(mobile.subtitle.lineHeight)}.sp,")
-            appendLine("    fontFamily = FontFamily.Default,")
-            appendLine(")")
-            appendLine()
-
-            appendLine("internal val heading1TextStyle = TextStyle(")
-            appendLine("    fontSize = ${parseSize(mobile.heading1.fontSize)}.sp,")
-            appendLine("    fontWeight = FontWeight(${mobile.heading1.fontWeight}),")
-            appendLine("    lineHeight = ${parseSize(mobile.heading1.lineHeight)}.sp,")
-            appendLine("    fontFamily = FontFamily.Default,")
-            appendLine(")")
-            appendLine()
-
-            appendLine("internal val heading2TextStyle = TextStyle(")
-            appendLine("    fontSize = ${parseSize(mobile.heading2.fontSize)}.sp,")
-            appendLine("    fontWeight = FontWeight(${mobile.heading2.fontWeight}),")
-            appendLine("    lineHeight = ${parseSize(mobile.heading2.lineHeight)}.sp,")
-            appendLine("    fontFamily = FontFamily.Default,")
-            appendLine(")")
-            appendLine()
-
-            appendLine("internal val heading3TextStyle = TextStyle(")
-            appendLine("    fontSize = ${parseSize(mobile.heading3.fontSize)}.sp,")
-            appendLine("    fontWeight = FontWeight(${mobile.heading3.fontWeight}),")
-            appendLine("    lineHeight = ${parseSize(mobile.heading3.lineHeight)}.sp,")
-            appendLine("    fontFamily = FontFamily.Default,")
-            appendLine(")")
-            appendLine()
-
-            appendLine("internal val heading4TextStyle = TextStyle(")
-            appendLine("    fontSize = ${parseSize(mobile.heading4.fontSize)}.sp,")
-            appendLine("    fontWeight = FontWeight(${mobile.heading4.fontWeight}),")
-            appendLine("    lineHeight = ${parseSize(mobile.heading4.lineHeight)}.sp,")
-            appendLine("    fontFamily = FontFamily.Default,")
-            appendLine(")")
-            appendLine()
-
-            appendLine("internal val bodyExtendedTextStyle = TextStyle(")
-            appendLine("    fontSize = ${parseSize(mobile.bodyExtended.fontSize)}.sp,")
-            appendLine("    fontWeight = FontWeight(${mobile.bodyExtended.fontWeight}),")
-            appendLine("    lineHeight = ${parseSize(mobile.bodyExtended.lineHeight)}.sp,")
-            appendLine("    fontFamily = FontFamily.Default,")
-            appendLine(")")
-            appendLine()
-
-            appendLine("internal val bodyExtendedSemiboldTextStyle = TextStyle(")
-            appendLine("    fontSize = ${parseSize(mobile.bodyExtendedSemibold.fontSize)}.sp,")
-            appendLine("    fontWeight = FontWeight(${mobile.bodyExtendedSemibold.fontWeight}),")
-            appendLine("    lineHeight = ${parseSize(mobile.bodyExtendedSemibold.lineHeight)}.sp,")
-            appendLine("    fontFamily = FontFamily.Default,")
-            appendLine(")")
-            appendLine()
-
-            appendLine("internal val bodyBaseTextStyle = TextStyle(")
-            appendLine("    fontSize = ${parseSize(mobile.bodyBase.fontSize)}.sp,")
-            appendLine("    fontWeight = FontWeight(${mobile.bodyBase.fontWeight}),")
-            appendLine("    lineHeight = ${parseSize(mobile.bodyBase.lineHeight)}.sp,")
-            appendLine("    fontFamily = FontFamily.Default,")
-            appendLine(")")
-            appendLine()
-
-            appendLine("internal val bodyBaseSemiboldTextStyle = TextStyle(")
-            appendLine("    fontSize = ${parseSize(mobile.bodyBaseSemibold.fontSize)}.sp,")
-            appendLine("    fontWeight = FontWeight(${mobile.bodyBaseSemibold.fontWeight}),")
-            appendLine("    lineHeight = ${parseSize(mobile.bodyBaseSemibold.lineHeight)}.sp,")
-            appendLine("    fontFamily = FontFamily.Default,")
-            appendLine(")")
-            appendLine()
-
-            appendLine("internal val captionTextStyle = TextStyle(")
-            appendLine("    fontSize = ${parseSize(mobile.caption.fontSize)}.sp,")
-            appendLine("    fontWeight = FontWeight(${mobile.caption.fontWeight}),")
-            appendLine("    lineHeight = ${parseSize(mobile.caption.lineHeight)}.sp,")
-            appendLine("    fontFamily = FontFamily.Default,")
-            appendLine(")")
-            appendLine()
-
-            appendLine("internal val captionSemiboldTextStyle = TextStyle(")
-            appendLine("    fontSize = ${parseSize(mobile.captionSemibold.fontSize)}.sp,")
-            appendLine("    fontWeight = FontWeight(${mobile.captionSemibold.fontWeight}),")
-            appendLine("    lineHeight = ${parseSize(mobile.captionSemibold.lineHeight)}.sp,")
-            appendLine("    fontFamily = FontFamily.Default,")
-            appendLine(")")
-            appendLine()
-
-            appendLine("internal val LocalVonageTypography = staticCompositionLocalOf {")
-            appendLine("    VonageTypography()")
-            appendLine("}")
-            appendLine()
-
-            appendLine("@Immutable")
-            appendLine("data class VonageTypography(")
-            appendLine("    val headline: TextStyle = headlineTextStyle,")
-            appendLine("    val subtitle: TextStyle = subtitleTextStyle,")
-            appendLine("    val heading1: TextStyle = heading1TextStyle,")
-            appendLine("    val heading2: TextStyle = heading2TextStyle,")
-            appendLine("    val heading3: TextStyle = heading3TextStyle,")
-            appendLine("    val heading4: TextStyle = heading4TextStyle,")
-            appendLine("    val bodyExtended: TextStyle = bodyExtendedTextStyle,")
-            appendLine("    val bodyExtendedSemibold: TextStyle = bodyExtendedSemiboldTextStyle,")
-            appendLine("    val bodyBase: TextStyle = bodyBaseTextStyle,")
-            appendLine("    val bodyBaseSemibold: TextStyle = bodyBaseSemiboldTextStyle,")
-            appendLine("    val caption: TextStyle = captionTextStyle,")
-            appendLine("    val captionSemibold: TextStyle = captionSemiboldTextStyle,")
-            appendLine(")")
+        textStyleEntries.forEach { (name, style) ->
+            fileSpec.addProperty(
+                PropertySpec.builder(name, TEXT_STYLE)
+                    .addModifiers(KModifier.INTERNAL)
+                    .initializer(buildTextStyleBlock(style))
+                    .build()
+            )
         }
 
-        File(outputDir, "Typography.kt").writeText(content)
-        println("Updated Typography.kt")
+        val localInit = CodeBlock.builder()
+            .beginControlFlow("%M", STATIC_COMPOSITION_LOCAL_OF)
+            .addStatement("%T()", vonageTypography)
+            .endControlFlow()
+            .build()
+
+        fileSpec.addProperty(
+            PropertySpec.builder(
+                "Local${VONAGE}Typography",
+                PROVIDABLE_COMPOSITION_LOCAL.parameterizedBy(vonageTypography),
+            )
+                .addModifiers(KModifier.INTERNAL)
+                .initializer(localInit)
+                .build()
+        )
+
+        val constructor = FunSpec.constructorBuilder()
+        typographyFields.forEach { (fieldName, defaultValue) ->
+            constructor.addParameter(
+                ParameterSpec.builder(fieldName, TEXT_STYLE)
+                    .defaultValue(defaultValue)
+                    .build()
+            )
+        }
+
+        val classBuilder = TypeSpec.classBuilder("${VONAGE}Typography")
+            .addModifiers(KModifier.DATA)
+            .addAnnotation(IMMUTABLE)
+            .primaryConstructor(constructor.build())
+
+        typographyFields.forEach { (fieldName, _) ->
+            classBuilder.addProperty(
+                PropertySpec.builder(fieldName, TEXT_STYLE)
+                    .initializer(fieldName)
+                    .build()
+            )
+        }
+
+        fileSpec.addType(classBuilder.build())
+
+        File(outputDir, "Typography.kt").writeText(fileSpec.build().toString())
+        logger.debug("Updated Typography.kt")
+    }
+
+    private fun buildTextStyleBlock(style: ThemeTextStyle): CodeBlock {
+        val fontSize = style.fontSize.replace("px", "")
+        val lineHeight = style.lineHeight.replace("px", "")
+        return CodeBlock.builder()
+            .add("%T(\n", TEXT_STYLE)
+            .indent()
+            .add("fontSize = %L.%M,\n", fontSize, SP)
+            .add("fontWeight = %T(%L),\n", FONT_WEIGHT, style.fontWeight)
+            .add("lineHeight = %L.%M,\n", lineHeight, SP)
+            .add("fontFamily = %T.Default,\n", FONT_FAMILY)
+            .unindent()
+            .add(")")
+            .build()
     }
 
     private fun generateThemeFile(outputDir: File, packageName: String) {
-        val content = buildString {
-            appendLine("package $packageName")
-            appendLine()
-            appendLine("import androidx.compose.foundation.isSystemInDarkTheme")
-            appendLine("import androidx.compose.material3.MaterialTheme")
-            appendLine("import androidx.compose.runtime.Composable")
-            appendLine("import androidx.compose.runtime.CompositionLocalProvider")
-            appendLine()
-            appendLine("// Auto-generated from theme.json")
-            appendLine()
+        val vonageColors = ClassName(packageName, "${VONAGE}Colors")
+        val vonageTypography = ClassName(packageName, "${VONAGE}Typography")
+        val vonageShapes = ClassName(packageName, "${VONAGE}Shapes")
+        val vonageDimens = ClassName(packageName, "${VONAGE}Dimens")
 
-            appendLine("@Composable")
-            appendLine("fun VonageVideoTheme(")
-            appendLine("    darkTheme: Boolean = isSystemInDarkTheme(),")
-            appendLine("    content: @Composable () -> Unit")
-            appendLine(") {")
-            appendLine("    val colorScheme = when {")
-            appendLine("        darkTheme -> DarkColorScheme")
-            appendLine("        else -> LightColorScheme")
-            appendLine("    }")
-            appendLine()
-            appendLine("    val extendedColors = if (darkTheme) {")
-            appendLine("        VonageColors(")
-            appendLine("            primary = DarkPrimary,")
-            appendLine("            onPrimary = DarkOnPrimary,")
-            appendLine("            primaryHover = DarkPrimaryHover,")
-            appendLine("            secondary = DarkSecondary,")
-            appendLine("            onSecondary = DarkOnSecondary,")
-            appendLine("            tertiary = DarkTertiary,")
-            appendLine("            onTertiary = DarkOnTertiary,")
-            appendLine("            accent = DarkPrimary,")
-            appendLine("            onAccent = DarkOnPrimary,")
-            appendLine("            background = DarkBackground,")
-            appendLine("            onBackground = DarkOnBackground,")
-            appendLine("            surface = DarkSurface,")
-            appendLine("            onSurface = DarkOnSurface,")
-            appendLine("            error = DarkError,")
-            appendLine("            onError = DarkOnError,")
-            appendLine("            errorHover = DarkErrorHover,")
-            appendLine("            warning = DarkWarning,")
-            appendLine("            onWarning = DarkOnWarning,")
-            appendLine("            warningHover = DarkWarningHover,")
-            appendLine("            success = DarkSuccess,")
-            appendLine("            onSuccess = DarkOnSuccess,")
-            appendLine("            successHover = DarkSuccessHover,")
-            appendLine("            border = DarkBorder,")
-            appendLine("            disabled = DarkDisabled,")
-            appendLine("            textDisabled = DarkTextDisabled,")
-            appendLine("            textPrimary = DarkPrimary,")
-            appendLine("            textSecondary = DarkSecondary,")
-            appendLine("            textTertiary = DarkTertiary,")
-            appendLine("        )")
-            appendLine("    } else {")
-            appendLine("        VonageColors(")
-            appendLine("            primary = LightPrimary,")
-            appendLine("            onPrimary = LightOnPrimary,")
-            appendLine("            primaryHover = LightPrimaryHover,")
-            appendLine("            secondary = LightSecondary,")
-            appendLine("            onSecondary = LightOnSecondary,")
-            appendLine("            tertiary = LightTertiary,")
-            appendLine("            onTertiary = LightOnTertiary,")
-            appendLine("            accent = LightSecondary,")
-            appendLine("            onAccent = LightOnSecondary,")
-            appendLine("            background = LightBackground,")
-            appendLine("            onBackground = LightOnBackground,")
-            appendLine("            surface = LightSurface,")
-            appendLine("            onSurface = LightOnSurface,")
-            appendLine("            error = LightError,")
-            appendLine("            onError = LightOnError,")
-            appendLine("            errorHover = LightErrorHover,")
-            appendLine("            warning = LightWarning,")
-            appendLine("            onWarning = LightOnWarning,")
-            appendLine("            warningHover = LightWarningHover,")
-            appendLine("            success = LightSuccess,")
-            appendLine("            onSuccess = LightOnSuccess,")
-            appendLine("            successHover = LightSuccessHover,")
-            appendLine("            border = LightBorder,")
-            appendLine("            disabled = LightDisabled,")
-            appendLine("            textDisabled = LightTextDisabled,")
-            appendLine("            textPrimary = LightPrimary,")
-            appendLine("            textSecondary = LightSecondary,")
-            appendLine("            textTertiary = LightTertiary,")
-            appendLine("        )")
-            appendLine("    }")
-            appendLine()
-            appendLine("    val extendedTypography = VonageTypography()")
-            appendLine("    val extendedShapes = VonageShapes()")
-            appendLine("    val extendedDimens = VonageDimens()")
-            appendLine()
-            appendLine("    CompositionLocalProvider(")
-            appendLine("        LocalVonageColors provides extendedColors,")
-            appendLine("        LocalVonageTypography provides extendedTypography,")
-            appendLine("        LocalVonageShapes provides extendedShapes,")
-            appendLine("        LocalVonageDimens provides extendedDimens,")
-            appendLine("    ) {")
-            appendLine("        MaterialTheme(")
-            appendLine("            colorScheme = colorScheme,")
-            appendLine("            content = content,")
-            appendLine("        )")
-            appendLine("    }")
-            appendLine("}")
-            appendLine()
+        val composableLambda = LambdaTypeName.get(returnType = UNIT)
+            .copy(annotations = listOf(AnnotationSpec.builder(COMPOSABLE).build()))
 
-            appendLine("object VonageVideoTheme {")
-            appendLine("    val colors: VonageColors")
-            appendLine("        @Composable")
-            appendLine("        get() = LocalVonageColors.current")
-            appendLine("    val typography: VonageTypography")
-            appendLine("        @Composable")
-            appendLine("        get() = LocalVonageTypography.current")
-            appendLine("    val shapes: VonageShapes")
-            appendLine("        @Composable")
-            appendLine("        get() = LocalVonageShapes.current")
-            appendLine("    val dimens: VonageDimens")
-            appendLine("        @Composable")
-            appendLine("        get() = LocalVonageDimens.current")
-            appendLine("}")
+        val body = CodeBlock.builder()
+        body.beginControlFlow("val colorScheme = when")
+        body.addStatement("darkTheme -> DarkColorScheme")
+        body.addStatement("else -> LightColorScheme")
+        body.endControlFlow()
+        body.add("\n")
+
+        body.beginControlFlow("val extendedColors = if (darkTheme)")
+        body.add("%T(\n", vonageColors)
+        body.indent()
+        DARK_COLOR_MAPPING.forEach { (field, colorRef) ->
+            body.add("$field = $colorRef,\n")
+        }
+        body.unindent()
+        body.add(")\n")
+        body.nextControlFlow("else")
+        body.add("%T(\n", vonageColors)
+        body.indent()
+        LIGHT_COLOR_MAPPING.forEach { (field, colorRef) ->
+            body.add("$field = $colorRef,\n")
+        }
+        body.unindent()
+        body.add(")\n")
+        body.endControlFlow()
+        body.add("\n")
+
+        body.addStatement("val extendedTypography = %T()", vonageTypography)
+        body.addStatement("val extendedShapes = %T()", vonageShapes)
+        body.addStatement("val extendedDimens = %T()", vonageDimens)
+        body.add("\n")
+
+        body.add("%M(\n", COMPOSITION_LOCAL_PROVIDER)
+        body.indent()
+        body.add("Local${VONAGE}Colors provides extendedColors,\n")
+        body.add("Local${VONAGE}Typography provides extendedTypography,\n")
+        body.add("Local${VONAGE}Shapes provides extendedShapes,\n")
+        body.add("Local${VONAGE}Dimens provides extendedDimens,\n")
+        body.unindent()
+        body.beginControlFlow(")")
+        body.add("%T(\n", MATERIAL_THEME)
+        body.indent()
+        body.add("colorScheme = colorScheme,\n")
+        body.add("content = content,\n")
+        body.unindent()
+        body.add(")\n")
+        body.endControlFlow()
+
+        val themeFunction = FunSpec.builder("${VONAGE}VideoTheme")
+            .addAnnotation(COMPOSABLE)
+            .addParameter(
+                ParameterSpec.builder("darkTheme", Boolean::class)
+                    .defaultValue("%M()", IS_SYSTEM_IN_DARK_THEME)
+                    .build()
+            )
+            .addParameter("content", composableLambda)
+            .addCode(body.build())
+            .build()
+
+        val themeObject = TypeSpec.objectBuilder("${VONAGE}VideoTheme")
+        listOf(
+            Triple("colors", vonageColors, "Local${VONAGE}Colors"),
+            Triple("typography", vonageTypography, "Local${VONAGE}Typography"),
+            Triple("shapes", vonageShapes, "Local${VONAGE}Shapes"),
+            Triple("dimens", vonageDimens, "Local${VONAGE}Dimens"),
+        ).forEach { (name, type, localName) ->
+            themeObject.addProperty(
+                PropertySpec.builder(name, type)
+                    .getter(
+                        FunSpec.getterBuilder()
+                            .addAnnotation(COMPOSABLE)
+                            .addStatement("return $localName.current")
+                            .build()
+                    )
+                    .build()
+            )
         }
 
-        File(outputDir, "Theme.kt").writeText(content)
-        println("Updated Theme.kt")
+        val fileSpec = FileSpec.builder(packageName, "Theme")
+            .indent("    ")
+            .addFileComment("Auto-generated from theme.json")
+            .addFunction(themeFunction)
+            .addType(themeObject.build())
+            .build()
+
+        File(outputDir, "Theme.kt").writeText(fileSpec.toString())
+        logger.debug("Updated Theme.kt")
+    }
+
+    private fun String.hexToArgb(): String {
+        val cleanHex = removePrefix("#")
+        return if (cleanHex.length == COLOR_LENGTH) {
+            "FF$cleanHex"
+        } else {
+            cleanHex
+        }
+    }
+
+    private fun colorEntries(colors: ColorScheme): List<Pair<String, String>> = listOf(
+        "Primary" to colors.primary,
+        "PrimaryHover" to colors.primaryHover,
+        "OnPrimary" to colors.onPrimary,
+        "Secondary" to colors.secondary,
+        "OnSecondary" to colors.onSecondary,
+        "Tertiary" to colors.tertiary,
+        "OnTertiary" to colors.onTertiary,
+        "Background" to colors.background,
+        "OnBackground" to colors.onBackground,
+        "Surface" to colors.surface,
+        "OnSurface" to colors.onSurface,
+        "Error" to colors.error,
+        "OnError" to colors.onError,
+        "ErrorHover" to colors.errorHover,
+        "Warning" to colors.warning,
+        "OnWarning" to colors.onWarning,
+        "WarningHover" to colors.warningHover,
+        "Success" to colors.success,
+        "OnSuccess" to colors.onSuccess,
+        "SuccessHover" to colors.successHover,
+        "Border" to colors.border,
+        "Disabled" to colors.disabled,
+        "TextDisabled" to colors.textDisabled,
+    )
+
+    private fun buildMaterialColorSchemeBlock(schemeFn: MemberName, prefix: String): CodeBlock =
+        CodeBlock.builder()
+            .add("%M(\n", schemeFn)
+            .indent()
+            .add("primary = ${prefix}Primary,\n")
+            .add("onPrimary = ${prefix}OnPrimary,\n")
+            .add("secondary = ${prefix}Secondary,\n")
+            .add("onSecondary = ${prefix}OnSecondary,\n")
+            .add("tertiary = ${prefix}Tertiary,\n")
+            .add("onTertiary = ${prefix}OnTertiary,\n")
+            .add("background = ${prefix}Background,\n")
+            .add("onBackground = ${prefix}OnBackground,\n")
+            .add("surface = ${prefix}Surface,\n")
+            .add("onSurface = ${prefix}OnSurface,\n")
+            .add("error = ${prefix}Error,\n")
+            .add("onError = ${prefix}OnError,\n")
+            .add("outline = ${prefix}Border,\n")
+            .unindent()
+            .add(")")
+            .build()
+
+    companion object {
+        private val VONAGE_COLOR_FIELDS = listOf(
+            "primary",
+            "onPrimary",
+            "primaryHover",
+            "secondary",
+            "onSecondary",
+            "tertiary",
+            "onTertiary",
+            "accent",
+            "onAccent",
+            "background",
+            "onBackground",
+            "surface",
+            "onSurface",
+            "error",
+            "onError",
+            "errorHover",
+            "warning",
+            "onWarning",
+            "warningHover",
+            "success",
+            "onSuccess",
+            "successHover",
+            "border",
+            "disabled",
+            "textDisabled",
+            "textPrimary",
+            "textSecondary",
+            "textTertiary",
+        )
+
+        private fun colorMapping(
+            prefix: String,
+            accentColor: String,
+            onAccentColor: String,
+        ): List<Pair<String, String>> = listOf(
+            "primary" to "${prefix}Primary",
+            "onPrimary" to "${prefix}OnPrimary",
+            "primaryHover" to "${prefix}PrimaryHover",
+            "secondary" to "${prefix}Secondary",
+            "onSecondary" to "${prefix}OnSecondary",
+            "tertiary" to "${prefix}Tertiary",
+            "onTertiary" to "${prefix}OnTertiary",
+            "accent" to "$prefix$accentColor",
+            "onAccent" to "$prefix$onAccentColor",
+            "background" to "${prefix}Background",
+            "onBackground" to "${prefix}OnBackground",
+            "surface" to "${prefix}Surface",
+            "onSurface" to "${prefix}OnSurface",
+            "error" to "${prefix}Error",
+            "onError" to "${prefix}OnError",
+            "errorHover" to "${prefix}ErrorHover",
+            "warning" to "${prefix}Warning",
+            "onWarning" to "${prefix}OnWarning",
+            "warningHover" to "${prefix}WarningHover",
+            "success" to "${prefix}Success",
+            "onSuccess" to "${prefix}OnSuccess",
+            "successHover" to "${prefix}SuccessHover",
+            "border" to "${prefix}Border",
+            "disabled" to "${prefix}Disabled",
+            "textDisabled" to "${prefix}TextDisabled",
+            "textPrimary" to "${prefix}Primary",
+            "textSecondary" to "${prefix}Secondary",
+            "textTertiary" to "${prefix}Tertiary",
+        )
+
+        private val DARK_COLOR_MAPPING = colorMapping(
+            prefix = "Dark",
+            accentColor = "Primary",
+            onAccentColor = "OnPrimary",
+        )
+
+        private val LIGHT_COLOR_MAPPING = colorMapping(
+            prefix = "Light",
+            accentColor = "Secondary",
+            onAccentColor = "OnSecondary",
+        )
     }
 }
