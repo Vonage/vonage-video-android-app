@@ -16,6 +16,7 @@ import com.vonage.android.kotlin.ext.observeAudioStats
 import com.vonage.android.kotlin.ext.observeVideoStats
 import com.vonage.android.kotlin.ext.toParticipantType
 import com.vonage.android.kotlin.ext.toggle
+import com.vonage.android.kotlin.internal.SpeakingWhileMutedDetector
 import com.vonage.logger.vonageLogger
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.coroutineScope
@@ -49,7 +50,8 @@ data class PublisherState(
     override val connectionId: String = publisher.stream?.connection?.connectionId ?: ""
     private val logTag = "Publisher[$id]"
     override val creationTime: Long = publisher.stream?.creationTime?.time ?: 0
-    override val videoSource: VideoSource = publisher.stream?.toParticipantType() ?: VideoSource.CAMERA
+    override val videoSource: VideoSource =
+        publisher.stream?.toParticipantType() ?: VideoSource.CAMERA
     override val isScreenShare: Boolean
         get() = videoSource == VideoSource.SCREEN
     override val name: String = publisher.name
@@ -58,7 +60,8 @@ data class PublisherState(
     private val _isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(publisher.publishAudio)
     override val isMicEnabled: StateFlow<Boolean> = _isMicEnabled
 
-    private val _isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(publisher.publishVideo)
+    private val _isCameraEnabled: MutableStateFlow<Boolean> =
+        MutableStateFlow(publisher.publishVideo)
     override val isCameraEnabled: StateFlow<Boolean> = _isCameraEnabled
 
     private val _audioLevel: MutableStateFlow<Float> = MutableStateFlow(0F)
@@ -78,6 +81,14 @@ data class PublisherState(
 
     private val _audioStats: MutableStateFlow<AudioStats?> = MutableStateFlow(null)
     val audioStats: StateFlow<AudioStats?> = _audioStats
+
+    private val speakingWhileMutedDetector = SpeakingWhileMutedDetector(
+        isMicEnabled = _isMicEnabled,
+        audioLevel = _audioLevel,
+    )
+
+    private val _isSpeakingWhileMuted: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isSpeakingWhileMuted: StateFlow<Boolean> = _isSpeakingWhileMuted
 
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
@@ -113,7 +124,10 @@ data class PublisherState(
      */
     fun applyVideoBitrate(config: VideoBitrateConfig) {
         publisher.applyVideoBitrate(config)
-        vonageLogger.d(logTag, "Applied bitrate: preset=${config.preset.label}, max=${config.maxBitrate}")
+        vonageLogger.d(
+            logTag,
+            "Applied bitrate: preset=${config.preset.label}, max=${config.maxBitrate}"
+        )
     }
 
     /**
@@ -176,6 +190,10 @@ data class PublisherState(
             launch {
                 publisher.observeAudioStats()
                     .collect { _audioStats.value = it }
+            }
+            launch {
+                speakingWhileMutedDetector.isSpeakingWhileMuted
+                    .collect { _isSpeakingWhileMuted.value = it }
             }
             publisher.observeAudioLevel()
                 .movingAverage(windowSize = 2)

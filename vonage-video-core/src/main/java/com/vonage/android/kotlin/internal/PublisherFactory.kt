@@ -210,6 +210,7 @@ class PublisherFactory {
                         ?: Default.PUBLISHER_CAMERA_INDEX,
                 )
             )
+            .allowAudioCaptureWhileMuted(true)
             .build()
             .apply {
                 renderer?.setStyle(

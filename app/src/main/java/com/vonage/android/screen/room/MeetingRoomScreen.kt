@@ -47,6 +47,7 @@ import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.MeetingTopBar
 import com.vonage.android.captions.ui.CaptionsOverlay
 import com.vonage.android.reactions.ui.EmojiReactionOverlay
+import com.vonage.android.screen.room.components.SpeakingWhileMutedOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
 import com.vonage.android.screen.components.audio.AudioDevicesMenu
@@ -135,6 +136,7 @@ fun MeetingRoomScreen(
                         ) {
                             EmojiReactionOverlay(call = uiState.call)
                             CaptionsOverlay(call = uiState.call)
+                            SpeakingWhileMutedOverlay(publisher = publisher)
                             MeetingRoomContent(
                                 modifier = Modifier
                                     .testTag(MEETING_ROOM_CONTENT),
