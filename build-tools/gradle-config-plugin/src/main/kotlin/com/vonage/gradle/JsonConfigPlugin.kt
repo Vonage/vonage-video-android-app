@@ -1,5 +1,6 @@
 package com.vonage.gradle
 
+import com.android.build.api.variant.AndroidComponentsExtension
 import com.vonage.gradle.tasks.GenerateConfigTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -19,17 +20,21 @@ class JsonConfigPlugin : Plugin<Project> {
     }
 
     private fun configureAndroidProject(project: Project, extension: JsonConfigExtension) {
-        val taskName = "generateVonageConfig"
-
-        project.tasks.register(taskName, GenerateConfigTask::class.java, {
+        val taskProvider = project.tasks.register(
+            "generateVonageConfig",
+            GenerateConfigTask::class.java,
+        ) {
             configFile.set(extension.configFile)
             outputPackage.set(extension.outputPackage)
             className.set(extension.className)
             outputDir.set(project.layout.buildDirectory.dir("generated/source/jsonConfig"))
-        })
+        }
 
-        project.afterEvaluate {
-            tasks.getByName("preBuild").finalizedBy(project.tasks.getByName(taskName))
+        project.extensions.getByType(AndroidComponentsExtension::class.java).onVariants { variant ->
+            variant.sources.kotlin?.addGeneratedSourceDirectory(
+                taskProvider,
+                GenerateConfigTask::outputDir,
+            )
         }
     }
 }

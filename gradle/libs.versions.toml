@@ -1,7 +1,7 @@
 [versions]
 accompanistPermissions = "0.37.3"
 activityCompose = "1.13.0"
-agp = "8.13.2"
+agp = "9.1.0"
 appcompat = "1.7.1"
 composeBom = "2026.03.00"
 appUpdate = "2.1.0"
@@ -11,15 +11,15 @@ datastoreCore = "1.2.1"
 detekt = "1.23.8"
 detektCompose = "0.4.28"
 espressoCore = "3.7.0"
-firebaseBom = "34.10.0"
+firebaseBom = "34.11.0"
 gson = "2.13.2"
-hiltAndroid = "2.57.2"
+hiltAndroid = "2.59.2"
 hiltNavigationCompose = "1.3.0"
 junit = "5.13.4"
 junitJunit = "4.13.2"
 junitVersion = "1.3.0"
-kotlin = "2.2.21"
-kotlinPoet = "2.0.0"
+kotlin = "2.3.20"
+kotlinPoet = "2.2.0"
 kotlinxCollectionsImmutable = "0.4.0"
 kotlinxCoroutinesTest = "1.10.2"
 kotlinxSerializationJson = "1.10.0"
@@ -107,9 +107,9 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-kotlin-ksp = { id = "com.google.devtools.ksp", version = "2.2.21-2.0.4" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version = "2.3.2" }
 kover = { id = "org.jetbrains.kotlinx.kover", version = "0.9.7" }
-play-publisher = { id = "com.github.triplet.play", version = "3.12.2" }
+play-publisher = { id = "com.github.triplet.play", version = "4.0.0" }
 sonarqube = { id = "org.sonarqube", version = "6.3.1.5724" }
 stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version = "0.7.0" }
 google-services = { id = "com.google.gms.google-services", version = "4.4.4" }

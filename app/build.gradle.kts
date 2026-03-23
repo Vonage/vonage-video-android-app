@@ -3,7 +3,6 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.dagger.hilt)
@@ -11,7 +10,6 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.play.publisher)
-    alias(libs.plugins.stability.analyzer)
     id("com.vonage.json-config")
 }
 
@@ -91,9 +89,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
     buildFeatures {
         compose = true
         buildConfig = true
@@ -172,9 +167,12 @@ android {
         reportsDestination = layout.buildDirectory.dir("compose_compiler")
         metricsDestination = layout.buildDirectory.dir("compose_compiler")
     }
+}
 
-    sourceSets.configureEach {
-        kotlin.srcDir(layout.buildDirectory.dir("generated/source/jsonConfig"))
+kotlin {
+    compilerOptions {
+        languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 
@@ -260,14 +258,6 @@ dependencies {
 }
 
 fun String.toEnabledString(): String = if (toBoolean()) "enabled" else "disabled"
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    dependsOn("generateVonageConfig")
-}
-
-tasks.matching { it.name.startsWith("ksp") }.configureEach {
-    dependsOn("generateVonageConfig")
-}
 
 jsonConfig {
     configFile.set("config/app-config.json")
