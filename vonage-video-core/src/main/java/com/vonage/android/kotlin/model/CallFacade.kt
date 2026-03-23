@@ -82,8 +82,8 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
      */
     val emojiSignalState: StateFlow<EmojiState?>
 
-    /** StateFlow of captions text from remote participants */
-    val captionsStateFlow: StateFlow<String?>
+    /** StateFlow of caption lines from remote participants */
+    val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>>
 
     /** StateFlow of archiving of the session */
     val archivingStateFlow: StateFlow<ArchivingState>
@@ -168,3 +168,9 @@ sealed interface ArchivingState {
     data class Started(val id: String) : ArchivingState
     data class Stopped(val id: String) : ArchivingState
 }
+
+@Immutable
+data class CaptionLine(
+    val subscriberName: String,
+    val text: String,
+)

@@ -83,6 +83,7 @@ fun MeetingRoomScreen(
         (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
             val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
             val publisher by uiState.call.publisher.collectAsStateWithLifecycle()
+            val captionLines by uiState.call.captionsStateFlow.collectAsStateWithLifecycle()
             Scaffold(
                 modifier = modifier
                     .systemBarsPadding(),
@@ -134,7 +135,7 @@ fun MeetingRoomScreen(
                                 .fillMaxSize(),
                         ) {
                             EmojiReactionOverlay(call = uiState.call)
-                            CaptionsOverlay(call = uiState.call)
+                            CaptionsOverlay(captionLines = captionLines)
                             MeetingRoomContent(
                                 modifier = Modifier
                                     .testTag(MEETING_ROOM_CONTENT),

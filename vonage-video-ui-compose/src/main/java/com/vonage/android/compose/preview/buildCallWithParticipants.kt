@@ -5,6 +5,7 @@ import android.media.projection.MediaProjection
 import androidx.compose.runtime.Composable
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.CaptionLine
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.EmojiState
@@ -16,6 +17,7 @@ import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,7 +72,7 @@ fun buildCallWithParticipants(
             )
         )
     )
-    override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
+    override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = MutableStateFlow(persistentListOf())
     override val archivingStateFlow: StateFlow<ArchivingState> = MutableStateFlow(ArchivingState.Idle)
 
     override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> {

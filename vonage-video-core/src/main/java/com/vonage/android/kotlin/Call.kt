@@ -16,6 +16,7 @@ import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
 import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.CaptionLine
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.EmojiState
@@ -177,8 +178,8 @@ class Call internal constructor(
     private val _signalStateFlow = MutableStateFlow<SignalState?>(null)
     override val signalStateFlow: StateFlow<SignalState?> = _signalStateFlow
 
-    private val _captionsStateFlow = MutableStateFlow<String?>(null)
-    override val captionsStateFlow: StateFlow<String?> = _captionsStateFlow
+    private val _captionsStateFlow = MutableStateFlow<ImmutableList<CaptionLine>>(persistentListOf())
+    override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = _captionsStateFlow
 
     private val _archivingStateFlow = MutableStateFlow<ArchivingState>(ArchivingState.Idle)
     override val archivingStateFlow: StateFlow<ArchivingState> = _archivingStateFlow
@@ -518,9 +519,14 @@ class Call internal constructor(
      */
     private val captionsDelegate: SubscriberKit.CaptionsListener =
         SubscriberKit.CaptionsListener { subscriber, text, isFinal ->
-            _captionsStateFlow.update { _ -> "${subscriber.name()}: $text" }
-            if (isFinal) {
-                _captionsStateFlow.update { _ -> null }
+            val name = subscriber.name()
+            _captionsStateFlow.update { lines ->
+                if (isFinal) {
+                    lines.filter { it.subscriberName != name }.toImmutableList()
+                } else {
+                    val line = CaptionLine(subscriberName = name, text = text)
+                    lines.filter { it.subscriberName != name }.plus(line).toImmutableList()
+                }
             }
         }
 
