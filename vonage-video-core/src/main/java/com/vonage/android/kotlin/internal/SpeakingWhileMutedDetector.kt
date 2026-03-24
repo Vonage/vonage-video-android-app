@@ -49,16 +49,7 @@ internal class SpeakingWhileMutedDetector(
                     copy(consecutiveCount = newCount)
                 }
             } else {
-                if (isSpeakingWhileMuted) {
-                    val newCount = consecutiveCount - 1
-                    if (newCount <= RESET_THRESHOLD) {
-                        copy(isSpeakingWhileMuted = false, consecutiveCount = 0)
-                    } else {
-                        copy(consecutiveCount = newCount)
-                    }
-                } else {
-                    copy(consecutiveCount = 0)
-                }
+                copy(isSpeakingWhileMuted = false, consecutiveCount = 0)
             }
     }
 
@@ -68,8 +59,5 @@ internal class SpeakingWhileMutedDetector(
 
         /** Number of consecutive "loud while muted" samples to trigger the indicator */
         const val TRIGGER_THRESHOLD = 3
-
-        /** Consecutive count at or below which the indicator resets */
-        const val RESET_THRESHOLD = 0
     }
 }

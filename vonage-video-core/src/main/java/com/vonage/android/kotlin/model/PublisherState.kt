@@ -124,10 +124,7 @@ data class PublisherState(
      */
     fun applyVideoBitrate(config: VideoBitrateConfig) {
         publisher.applyVideoBitrate(config)
-        vonageLogger.d(
-            logTag,
-            "Applied bitrate: preset=${config.preset.label}, max=${config.maxBitrate}"
-        )
+        vonageLogger.d(logTag, "Applied bitrate: preset=${config.preset.label}, max=${config.maxBitrate}")
     }
 
     /**
