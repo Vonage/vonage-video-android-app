@@ -75,8 +75,8 @@ internal fun CaptionsOverlayPreview() {
         ) {
             CaptionsOverlay(
                 captionLines = persistentListOf(
-                    CaptionLine(subscriberName = "Alice", text = "Hello, how are you?"),
-                    CaptionLine(subscriberName = "Bob", text = "I'm doing great, thanks!"),
+                    CaptionLine(streamId = "1", subscriberName = "Alice", text = "Hello, how are you?"),
+                    CaptionLine(streamId = "2", subscriberName = "Bob", text = "I'm doing great, thanks!"),
                 ),
             )
         }

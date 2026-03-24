@@ -171,6 +171,7 @@ sealed interface ArchivingState {
 
 @Immutable
 data class CaptionLine(
+    val streamId: String,
     val subscriberName: String,
     val text: String,
 )

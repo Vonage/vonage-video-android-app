@@ -10,6 +10,7 @@ import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
 import com.vonage.android.kotlin.ext.extractSenderName
 import com.vonage.android.kotlin.ext.firstScreenSharing
+import com.vonage.android.kotlin.ext.id
 import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.sorted
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
@@ -50,10 +51,10 @@ import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
@@ -62,7 +63,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.set
 
 /**
  * Main implementation of CallFacade managing a Vonage video call session.
@@ -105,7 +105,8 @@ class Call internal constructor(
     private val participants = ConcurrentHashMap<String, Participant>()
 
     /** Internal flow that emits on every participant change, throttled before exposing */
-    private val _participantsInternalFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
+    private val _participantsInternalFlow =
+        MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
 
     private val _pinnedParticipantIds = MutableStateFlow<Set<String>>(emptySet())
     override val pinnedParticipantIds: StateFlow<Set<String>> = _pinnedParticipantIds
@@ -150,7 +151,9 @@ class Call internal constructor(
      * Extracted from the participants list for convenient access.
      */
     override val publisher: StateFlow<PublisherState?> = _participantsInternalFlow
-        .map { participants -> participants.firstOrNull { it.id == PUBLISHER_ID }?.let { it as PublisherState } }
+        .map { participants ->
+            participants.firstOrNull { it.id == PUBLISHER_ID }?.let { it as PublisherState }
+        }
         .stateIn(
             scope = coroutineScope,
             started = WhileSubscribed(SUBSCRIBE_TIMEOUT_MILLIS),
@@ -178,7 +181,8 @@ class Call internal constructor(
     private val _signalStateFlow = MutableStateFlow<SignalState?>(null)
     override val signalStateFlow: StateFlow<SignalState?> = _signalStateFlow
 
-    private val _captionsStateFlow = MutableStateFlow<ImmutableList<CaptionLine>>(persistentListOf())
+    private val _captionsStateFlow =
+        MutableStateFlow<ImmutableList<CaptionLine>>(persistentListOf())
     override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = _captionsStateFlow
 
     private val _archivingStateFlow = MutableStateFlow<ArchivingState>(ArchivingState.Idle)
@@ -330,7 +334,10 @@ class Call internal constructor(
         signalPlugins
             .filter { it.canHandle(signalType.signal) }
             .forEach { plugin ->
-                plugin.sendSignal(senderName = publisher()?.publisher?.name.orEmpty(), message = data).let {
+                plugin.sendSignal(
+                    senderName = publisher()?.publisher?.name.orEmpty(),
+                    message = data
+                ).let {
                     session.sendSignal(it.type, it.data)
                 }
             }
@@ -520,12 +527,13 @@ class Call internal constructor(
     private val captionsDelegate: SubscriberKit.CaptionsListener =
         SubscriberKit.CaptionsListener { subscriber, text, isFinal ->
             val name = subscriber.name()
+            val streamId = subscriber.id()
             _captionsStateFlow.update { lines ->
                 if (isFinal) {
-                    lines.filter { it.subscriberName != name }.toImmutableList()
+                    lines.filter { it.streamId != streamId }.toImmutableList()
                 } else {
-                    val line = CaptionLine(subscriberName = name, text = text)
-                    lines.filter { it.subscriberName != name }.plus(line).toImmutableList()
+                    val line = CaptionLine(streamId = streamId, subscriberName = name, text = text)
+                    lines.filter { it.streamId != streamId }.plus(line).toImmutableList()
                 }
             }
         }
@@ -547,8 +555,8 @@ class Call internal constructor(
     private fun setCaptions(enable: Boolean) {
         coroutineScope.launch {
             publisher()?.publisher?.publishCaptions = enable
-                participants.values.filterIsInstance<ParticipantState>()
-                    .forEach { participant -> participant.subscriber.subscribeToCaptions = enable }
+            participants.values.filterIsInstance<ParticipantState>()
+                .forEach { participant -> participant.subscriber.subscribeToCaptions = enable }
         }
     }
     //endregion
@@ -586,7 +594,10 @@ class Call internal constructor(
     private fun observeSubscriberAudioLevel(participant: Participant) {
         coroutineScope.launch {
             participant.audioLevel.collect { movingAvg ->
-                activeSpeakerTracker.onSubscriberAudioLevelUpdated(streamId = participant.id, movingAvg = movingAvg)
+                activeSpeakerTracker.onSubscriberAudioLevelUpdated(
+                    streamId = participant.id,
+                    movingAvg = movingAvg
+                )
             }
         }
     }
@@ -624,7 +635,8 @@ class Call internal constructor(
                     if (visibleParticipants.isEmpty()) return@collectLatest
                     val activeSpeakerId = activeSpeaker.value?.id
                     participants.forEach { (key, participantState) ->
-                        val isVisible = visibleParticipants.contains(key) || (key == activeSpeakerId)
+                        val isVisible =
+                            visibleParticipants.contains(key) || (key == activeSpeakerId)
                         participantState.changeVisibility(isVisible)
                     }
                 }
