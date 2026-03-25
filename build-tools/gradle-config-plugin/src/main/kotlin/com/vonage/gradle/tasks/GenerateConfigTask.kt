@@ -3,6 +3,10 @@ package com.vonage.gradle.tasks
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
@@ -43,17 +47,9 @@ abstract class GenerateConfigTask : DefaultTask() {
         val packageName = outputPackage.get()
         val className = className.get()
 
-        // Generate the BuildConfig class
-        val buildConfigContent = generateBuildConfigClass(
-            packageName,
-            className,
-            jsonObject,
-        )
-
-        // Write Kotlin config class to output directory
-        val outputFile = outputDir.get().asFile.resolve("${packageName.replace(".", "/")}/${className}.kt")
-        outputFile.parentFile.mkdirs()
-        outputFile.writeText(buildConfigContent)
+        // Generate the BuildConfig class using KotlinPoet
+        val fileSpec = generateBuildConfigClass(packageName, className, jsonObject)
+        fileSpec.writeTo(outputDir.get().asFile)
 
         // Generate Gradle properties file for build configuration
         val gradlePropsContent = generateGradleProperties(jsonObject)
@@ -61,7 +57,7 @@ abstract class GenerateConfigTask : DefaultTask() {
         gradlePropsFile.parentFile.mkdirs()
         gradlePropsFile.writeText(gradlePropsContent)
 
-        logger.info("Generated config class: ${outputFile.absolutePath}")
+        logger.info("Generated config class: ${outputDir.get().asFile.absolutePath}")
         logger.info("Generated gradle properties: ${gradlePropsFile.absolutePath}")
     }
 
@@ -120,7 +116,7 @@ abstract class GenerateConfigTask : DefaultTask() {
 
         // Check if it's a system property or command line argument
         val systemProperty = System.getProperty("config.file")
-        if (systemProperty != null) {
+        systemProperty?.let {
             return systemProperty
         }
 
@@ -137,114 +133,81 @@ abstract class GenerateConfigTask : DefaultTask() {
         packageName: String,
         className: String,
         jsonObject: JsonObject,
-    ): String {
-        val sb = StringBuilder()
+    ): FileSpec {
+        val configObject = TypeSpec.objectBuilder(className)
+            .addKdoc("Generated configuration for Vonage Video SDK\nDo not modify this file manually")
 
-        sb.appendLine("package $packageName")
-        sb.appendLine()
-        sb.appendLine("/**")
-        sb.appendLine(" * Generated configuration for Vonage Video SDK")
-        sb.appendLine(" * Do not modify this file manually.")
-        sb.appendLine(" */")
-        sb.appendLine("object $className {")
-        sb.appendLine()
-
-        // Generate video settings
-        generateVideoSettings(sb, jsonObject)
-
-        // Generate audio settings
-        generateAudioSettings(sb, jsonObject)
-
-        // Generate waiting room settings
-        generateWaitingRoomSettings(sb, jsonObject)
-
-        // Generate meeting room settings
-        generateMeetingRoomSettings(sb, jsonObject)
-
-        sb.appendLine("}")
-
-        return sb.toString()
-    }
-
-    private fun generateVideoSettings(sb: StringBuilder, jsonObject: JsonObject) {
-        val videoSettings = jsonObject.getAsJsonObject("videoSettings")
-        if (videoSettings != null) {
-            sb.appendLine("    /**")
-            sb.appendLine("     * Video Settings Configuration")
-            sb.appendLine("     */")
-            sb.appendLine("    object VideoSettings {")
-            appendObject(videoSettings, sb)
-            sb.appendLine("    }")
-            sb.appendLine()
+        listOf(
+            Triple("videoSettings", "VideoSettings", "Video Settings Configuration"),
+            Triple("audioSettings", "AudioSettings", "Audio Settings Configuration"),
+            Triple(
+                "waitingRoomSettings",
+                "WaitingRoomSettings",
+                "Waiting Room Settings Configuration"
+            ),
+            Triple(
+                "meetingRoomSettings",
+                "MeetingRoomSettings",
+                "Meeting Room Settings Configuration"
+            ),
+        ).forEach { (jsonKey, objectName, kdoc) ->
+            jsonObject.getAsJsonObject(jsonKey)?.let { settings ->
+                configObject.addType(buildSettingsObject(objectName, kdoc, settings))
+            }
         }
+
+        return FileSpec.builder(packageName, className)
+            .addType(configObject.build())
+            .build()
     }
 
-    private fun generateAudioSettings(sb: StringBuilder, jsonObject: JsonObject) {
-        val audioSettings = jsonObject.getAsJsonObject("audioSettings")
-        if (audioSettings != null) {
-            sb.appendLine("    /**")
-            sb.appendLine("     * Audio Settings Configuration")
-            sb.appendLine("     */")
-            sb.appendLine("    object AudioSettings {")
-            appendObject(audioSettings, sb)
-            sb.appendLine("    }")
-            sb.appendLine()
-        }
-    }
+    private fun buildSettingsObject(
+        name: String,
+        kdoc: String,
+        jsonObject: JsonObject,
+    ): TypeSpec {
+        val builder = TypeSpec.objectBuilder(name)
+            .addKdoc(kdoc)
 
-    private fun generateWaitingRoomSettings(sb: StringBuilder, jsonObject: JsonObject) {
-        val waitingRoomSettings = jsonObject.getAsJsonObject("waitingRoomSettings")
-        if (waitingRoomSettings != null) {
-            sb.appendLine("    /**")
-            sb.appendLine("     * Waiting Room Settings Configuration")
-            sb.appendLine("     */")
-            sb.appendLine("    object WaitingRoomSettings {")
-            appendObject(waitingRoomSettings, sb)
-            sb.appendLine("    }")
-            sb.appendLine()
-        }
-    }
-
-    private fun generateMeetingRoomSettings(sb: StringBuilder, jsonObject: JsonObject) {
-        val meetingRoomSettings = jsonObject.getAsJsonObject("meetingRoomSettings")
-        if (meetingRoomSettings != null) {
-            sb.appendLine("    /**")
-            sb.appendLine("     * Meeting Room Settings Configuration")
-            sb.appendLine("     */")
-            sb.appendLine("    object MeetingRoomSettings {")
-            appendObject(meetingRoomSettings, sb)
-            sb.appendLine("    }")
-            sb.appendLine()
-        }
-    }
-
-    private fun appendObject(jsonObject: JsonObject, sb: StringBuilder) {
         jsonObject.entrySet().forEach { (key, value) ->
             val constantName = key.toCamelCase().uppercase()
-            when {
-                value.isJsonPrimitive -> {
-                    val primitive = value.asJsonPrimitive
-                    when {
-                        primitive.isString -> {
-                            sb.appendLine("        const val $constantName: String = \"${primitive.asString}\"")
-                        }
+            if (value.isJsonPrimitive) {
+                val primitive = value.asJsonPrimitive
+                val property = when {
+                    primitive.isString -> PropertySpec.builder(constantName, String::class)
+                        .addModifiers(KModifier.CONST)
+                        .initializer("%S", primitive.asString)
+                        .build()
 
-                        primitive.isNumber -> {
-                            val number = primitive.asNumber
-                            if (number.toString().contains('.')) {
-                                sb.appendLine("        const val $constantName: Double = ${number.toDouble()}")
-                            } else {
-                                sb.appendLine("        const val $constantName: Int = ${number.toInt()}")
-                            }
-                        }
-
-                        primitive.isBoolean -> {
-                            sb.appendLine("        const val $constantName: Boolean = ${primitive.asBoolean}")
+                    primitive.isNumber -> {
+                        val number = primitive.asNumber
+                        if (number.toString().contains('.')) {
+                            PropertySpec.builder(constantName, Double::class)
+                                .addModifiers(KModifier.CONST)
+                                .initializer("%L", number.toDouble())
+                                .build()
+                        } else {
+                            PropertySpec.builder(constantName, Int::class)
+                                .addModifiers(KModifier.CONST)
+                                .initializer("%L", number.toInt())
+                                .build()
                         }
                     }
+
+                    primitive.isBoolean -> PropertySpec.builder(constantName, Boolean::class)
+                        .addModifiers(KModifier.CONST)
+                        .initializer("%L", primitive.asBoolean)
+                        .build()
+
+                    else -> null
+                }
+                property?.let {
+                    builder.addProperty(property)
                 }
             }
         }
+
+        return builder.build()
     }
 
     /**
