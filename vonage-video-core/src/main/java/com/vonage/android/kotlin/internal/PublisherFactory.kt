@@ -87,7 +87,10 @@ class PublisherFactory {
             .audioTrack(false)
             .build()
             .apply {
-                renderer?.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FIT)
+                renderer?.setStyle(
+                    BaseVideoRenderer.STYLE_VIDEO_SCALE,
+                    BaseVideoRenderer.STYLE_VIDEO_FIT
+                )
                 publishVideo = true
                 publishAudio = false
                 publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeScreen
@@ -210,6 +213,11 @@ class PublisherFactory {
                         ?: Default.PUBLISHER_CAMERA_INDEX,
                 )
             )
+            /**
+             * Activating this flag is used to have the functionality `SpeakingWhileMutedDetector`
+             * This flag is safe because the audio is not transmitted while muted.
+             */
+            .allowAudioCaptureWhileMuted(true)
             .build()
             .apply {
                 renderer?.setStyle(
