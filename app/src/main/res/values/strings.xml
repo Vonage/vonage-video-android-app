@@ -52,6 +52,10 @@
     <string name="audio_device_selector_speaker_audio_device">Speaker</string>
     <string name="audio_device_selector_headset_audio_device">Headset</string>
 
+    <!-- Test speakers -->
+    <string name="test_speakers_start">Start test speakers</string>
+    <string name="test_speakers_stop">Stop testing</string>
+
     <!-- Chat -->
     <string name="chat_panel_title">Chat</string>
     <string name="chat_panel_input_text_placeholder">Send a message</string>
