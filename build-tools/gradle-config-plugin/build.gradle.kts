@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.gradle)
     implementation(libs.kotlin.stdlib)
     implementation(libs.gson)
+    implementation(libs.kotlinpoet)
 }
 
 gradlePlugin {
