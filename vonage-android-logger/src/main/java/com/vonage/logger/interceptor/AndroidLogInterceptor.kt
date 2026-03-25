@@ -21,6 +21,6 @@ class AndroidLogInterceptor : LogInterceptor {
         logFn: (String, String, Throwable?) -> Int,
         event: LogEvent,
     ) {
-        logFn(event.tag, event.message, event.throwable)
+        logFn(event.tag+"tada", event.message, event.throwable)
     }
 }
