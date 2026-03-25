@@ -59,11 +59,12 @@ jobs:
         run: |
           ./gradlew clean koverXmlReportDebug detekt --info
 
-      - name: Send report to sonar
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          ./gradlew sonar
+# Disabled temporally because some enterprise issues
+#      - name: Send report to sonar
+#        env:
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#        run: |
+#          ./gradlew sonar
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
