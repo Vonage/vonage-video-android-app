@@ -1,8 +1,12 @@
 package com.vonage.logger.interceptor
 
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
 import com.vonage.logger.LogEvent
 import java.io.File
 import java.io.IOException
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -17,6 +21,7 @@ class FileLogInterceptor(
 ) : LogInterceptor {
 
     private val lock = Any()
+    private val gson = GsonBuilder().disableHtmlEscaping().create()
 
     internal val fileDateFormat = SimpleDateFormat(FILE_DATE_FORMAT, Locale.US)
 
@@ -26,23 +31,29 @@ class FileLogInterceptor(
     }
 
     /**
-     * Formats a [LogEvent] into a human-readable log line.
+     * Formats a [LogEvent] into a single-line JSON object.
      *
      * Visible for testing.
      */
     internal fun formatEvent(event: LogEvent): String {
-        val time = SimpleDateFormat(dateFormat, Locale.US).format(Date(event.timestamp))
-        val base = "$time [${event.thread}] [${event.level}] ${event.tag}: ${event.message}"
-        return if (event.throwable != null) {
-            "$base\n${event.throwable}"
-        } else {
-            base
+        //use Epoch millis for easier parsing and sorting in log management tools
+        val obj = JsonObject()
+        obj.addProperty("clientSystemTime", event.timestamp.toString())
+        obj.addProperty("level", event.level.name)
+        obj.addProperty("userAgent", event.thread)
+        obj.addProperty("source", event.tag)
+        obj.addProperty("action", event.message)
+        if (event.throwable != null) {
+            val sw = StringWriter()
+            event.throwable.printStackTrace(PrintWriter(sw))
+            obj.addProperty("throwable", sw.toString().trimEnd())
         }
+        return gson.toJson(obj)
     }
 
     internal fun logFileForDate(timestamp: Long = System.currentTimeMillis()): File {
         val dateStr = fileDateFormat.format(Date(timestamp))
-        return File(logDir, "$baseName-$dateStr.log")
+        return File(logDir, "$baseName-$dateStr.json.log")
     }
 
     private fun writeToFile(event: LogEvent) {
@@ -125,11 +136,11 @@ class FileLogInterceptor(
     private fun purgeOldLogs(now: Long) {
         val cutoff = now - TimeUnit.DAYS.toMillis(retentionDays.toLong())
         logDir.listFiles { file ->
-            file.isFile && file.name.startsWith(baseName) && file.name.endsWith(".log")
+            file.isFile && file.name.startsWith(baseName) && file.name.endsWith(".json.log")
         }?.forEach { file ->
             val dateStr = file.name
                 .removePrefix("$baseName-")
-                .removeSuffix(".log")
+                .removeSuffix(".json.log")
             runCatching {
                 val fileDate = fileDateFormat.parse(dateStr)?.time ?: return@forEach
                 if (fileDate < cutoff) file.delete()
@@ -144,8 +155,8 @@ class FileLogInterceptor(
 
         const val DEFAULT_MAX_FILE_SIZE_BYTES = 50L * 1024 * 1024
 
-        /** Default timestamp format. */
-        const val DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"
+        /** Default timestamp format (ISO-8601). */
+        const val DEFAULT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
 
         internal const val FILE_DATE_FORMAT = "yyyy-MM-dd"
     }

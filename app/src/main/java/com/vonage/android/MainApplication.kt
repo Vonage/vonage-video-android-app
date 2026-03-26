@@ -4,6 +4,7 @@ import android.app.Application
 import com.opentok.android.OpenTokConfig
 import com.vonage.android.notifications.VeraNotificationChannelRegistry
 import com.vonage.logger.DefaultVonageLogger
+import com.vonage.logger.LogLevel
 import com.vonage.logger.interceptor.FileLogInterceptor
 import com.vonage.logger.interceptor.OpenTokLogcatInterceptor
 import com.vonage.logger.vonageLogger
@@ -26,7 +27,7 @@ open class MainApplication : Application() {
             retentionDays = FileLogInterceptor.DEFAULT_RETENTION_DAYS,
         )
 
-        OpenTokLogcatInterceptor(vonageLogger).start()
+        OpenTokLogcatInterceptor(logger = vonageLogger, minLogLevel = LogLevel.INFO).start()
 
         notificationChannelRegistry.createNotificationChannels()
     }

@@ -26,10 +26,12 @@ import java.io.InputStreamReader
  *
  * @param logger   The [VonageLogger] instance that receives the forwarded events.
  * @param tags     The set of Logcat tags to capture. Defaults to [OPENTOK_TAGS].
+ * @param minLogLevel Minimum OpenTok log level to capture. Defaults to [LogLevel.VERBOSE].
  */
 class OpenTokLogcatInterceptor(
     private val logger: VonageLogger,
     private val tags: Set<String> = OPENTOK_TAGS,
+    private val minLogLevel: LogLevel = LogLevel.VERBOSE,
 ) {
 
     @Volatile
@@ -45,8 +47,9 @@ class OpenTokLogcatInterceptor(
     fun start() {
         if (readerThread?.isAlive == true) return
 
-        val tagFilter = tags.joinToString(separator = " ") { "$it:V" }
-        // Suppress all other tags, then add our targets at VERBOSE level.
+        val minPriority = logLevelToPriorityChar(minLogLevel)
+        val tagFilter = tags.joinToString(separator = " ") { "$it:$minPriority" }
+        // Suppress all other tags, then add our targets at the selected minimum level.
         val command = arrayOf("logcat", "-v", "brief", "-s", tagFilter)
 
         readerThread = Thread({
@@ -83,8 +86,11 @@ class OpenTokLogcatInterceptor(
         val match = BRIEF_PATTERN.matchEntire(line.trim()) ?: return null
         val (levelChar, tag, message) = match.destructured
         val level = levelCharToLogLevel(levelChar.firstOrNull()) ?: return null
+        if (!shouldLog(level)) return null
         return LogEvent(level = level, tag = tag.trim(), message = message)
     }
+
+    private fun shouldLog(level: LogLevel): Boolean = level.ordinal >= minLogLevel.ordinal
 
     private fun levelCharToLogLevel(char: Char?): LogLevel? = when (char) {
         'V' -> LogLevel.VERBOSE
@@ -92,7 +98,16 @@ class OpenTokLogcatInterceptor(
         'I' -> LogLevel.INFO
         'W' -> LogLevel.WARN
         'E' -> LogLevel.ERROR
+        'F' -> LogLevel.ERROR
         else -> null
+    }
+
+    private fun logLevelToPriorityChar(level: LogLevel): Char = when (level) {
+        LogLevel.VERBOSE -> 'V'
+        LogLevel.DEBUG -> 'D'
+        LogLevel.INFO -> 'I'
+        LogLevel.WARN -> 'W'
+        LogLevel.ERROR -> 'E'
     }
 
     companion object {
