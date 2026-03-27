@@ -85,9 +85,10 @@ class OpenTokLogcatInterceptor(
     internal fun parseLine(line: String): LogEvent? {
         val match = BRIEF_PATTERN.matchEntire(line.trim()) ?: return null
         val (levelChar, tag, message) = match.destructured
-        val level = levelCharToLogLevel(levelChar.firstOrNull()) ?: return null
-        if (!shouldLog(level)) return null
-        return LogEvent(level = level, tag = tag.trim(), message = message)
+        val level = levelCharToLogLevel(levelChar.firstOrNull())
+        return level?.takeIf { shouldLog(it) }?.let {
+            LogEvent(level = it, tag = tag.trim(), message = message)
+        }
     }
 
     private fun shouldLog(level: LogLevel): Boolean = level.ordinal >= minLogLevel.ordinal

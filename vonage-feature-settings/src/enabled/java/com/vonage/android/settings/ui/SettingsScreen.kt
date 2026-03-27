@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
+import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.AudioMid
@@ -229,8 +231,43 @@ private fun LazyListScope.settingItems(
     if (section == SettingsSection.STATS) {
         uiState.call?.let { call ->
             item { PublisherStats(call) }
+        }
+        loggingItems(uiState, actions)
+        uiState.call?.let { call ->
             item { SubscribersStats(call) }
         }
+    }
+}
+
+private fun LazyListScope.loggingItems(
+    uiState: SettingsUiState,
+    actions: SettingsScreenActions,
+) {
+    item {
+        SectionHeader(text = stringResource(R.string.settings_logging_section_title))
+    }
+    item {
+        SettingsToggleRow(
+            title = stringResource(R.string.settings_enable_logs_title),
+            description = stringResource(R.string.settings_enable_logs_description),
+            isChecked = uiState.logsEnabled,
+            onCheckedChange = actions.onLogsToggle,
+        )
+    }
+    item {
+        LoggingActionRow(
+            title = stringResource(R.string.settings_send_logs_title),
+            description = stringResource(R.string.settings_send_logs_description),
+            buttonText = stringResource(
+                if (uiState.isSendingLogs) {
+                    R.string.settings_send_logs_in_progress
+                } else {
+                    R.string.settings_send_logs_button
+                },
+            ),
+            enabled = !uiState.isSendingLogs,
+            onClick = actions.onSendLogsClick,
+        )
     }
 }
 
@@ -328,6 +365,40 @@ private val SettingsSection.icon: ImageVector
         SettingsSection.AUDIO -> VividIcons.Solid.AudioMid
         SettingsSection.STATS -> VividIcons.Solid.Chart
     }
+
+@Composable
+private fun LoggingActionRow(
+    title: String,
+    description: String,
+    buttonText: String,
+    enabled: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = VonageVideoTheme.dimens.paddingSmall),
+        verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
+    ) {
+        Text(
+            text = title,
+            style = VonageVideoTheme.typography.bodyBaseSemibold,
+            color = VonageVideoTheme.colors.secondary,
+        )
+        Text(
+            text = description,
+            style = VonageVideoTheme.typography.caption,
+            color = VonageVideoTheme.colors.tertiary,
+        )
+        VonageButton(
+            modifier = Modifier.fillMaxWidth(),
+            text = buttonText,
+            enabled = enabled,
+            onClick = onClick,
+        )
+    }
+}
 
 @PreviewLightDark
 @Composable

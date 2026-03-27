@@ -163,7 +163,7 @@ class CallSettingsHolderTest {
 
         assertNull(sut.call.value)
         assertTrue(sut.senderStatsEnabled.value)
-        assertEquals(VideoBitratePreset.BW_SAVER, sut.videoBitrateConfig.value.preset)
+        assertEquals(VideoBitratePreset.DEFAULT, sut.videoBitrateConfig.value.preset)
         assertEquals(DegradationPreference.NOT_SET, sut.degradationPreference.value)
         assertEquals(CaptureFrameRate.FPS_15, sut.captureFrameRate.value)
         assertNull(sut.captureResolution.value)

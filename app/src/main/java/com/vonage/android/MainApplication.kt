@@ -22,12 +22,15 @@ open class MainApplication : Application() {
 
         enableOpenTokLogs()
 
+        val minLogLevel = LogLevel.INFO
+
         DefaultVonageLogger.init(
             context = this,
             retentionDays = FileLogInterceptor.DEFAULT_RETENTION_DAYS,
+            minLogLevel = minLogLevel,
         )
 
-        OpenTokLogcatInterceptor(logger = vonageLogger, minLogLevel = LogLevel.INFO).start()
+        OpenTokLogcatInterceptor(logger = vonageLogger, minLogLevel = minLogLevel).start()
 
         notificationChannelRegistry.createNotificationChannels()
     }

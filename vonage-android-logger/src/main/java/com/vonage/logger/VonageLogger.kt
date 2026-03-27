@@ -64,11 +64,31 @@ class VonageLogger private constructor(
 }
 
 object DefaultVonageLogger {
+    const val LOGS_DIRECTORY_NAME = "logs"
+
     @Volatile
-    var log: VonageLogger = VonageLogger.Builder()
-        .addInterceptor(AndroidLogInterceptor())
-        .build()
+    private var loggingEnabled = true
+
+    @Volatile
+    private var minLogLevel = LogLevel.VERBOSE
+
+    val isEnabled: Boolean
+        get() = loggingEnabled
+
+    val currentMinLogLevel: LogLevel
+        get() = minLogLevel
+
+    @Volatile
+    var log: VonageLogger = buildLogger()
         private set
+
+    fun setEnabled(enabled: Boolean) {
+        loggingEnabled = enabled
+    }
+
+    fun setMinLogLevel(level: LogLevel) {
+        minLogLevel = level
+    }
 
     /**
      * Initializes the default logger with both Logcat and file outputs.
@@ -79,17 +99,44 @@ object DefaultVonageLogger {
         context: Context,
         retentionDays: Int = FileLogInterceptor.DEFAULT_RETENTION_DAYS,
         baseName: String = FileLogInterceptor.DEFAULT_BASE_NAME,
+        minLogLevel: LogLevel = LogLevel.VERBOSE,
     ) {
-        val logDir = File(context.filesDir, "logs")
-        log = VonageLogger.Builder()
-            .addInterceptor(AndroidLogInterceptor())
+        setMinLogLevel(minLogLevel)
+        val logDir = File(context.filesDir, LOGS_DIRECTORY_NAME)
+        log = buildLogger(
+            logDir = logDir,
+            baseName = baseName,
+            retentionDays = retentionDays,
+        )
+    }
+
+    private fun buildLogger(
+        logDir: File? = null,
+        baseName: String = FileLogInterceptor.DEFAULT_BASE_NAME,
+        retentionDays: Int = FileLogInterceptor.DEFAULT_RETENTION_DAYS,
+    ): VonageLogger {
+        val enabledProvider = { loggingEnabled }
+        val minLogLevelProvider = { minLogLevel }
+        return VonageLogger.Builder()
             .addInterceptor(
-                FileLogInterceptor(
-                    logDir = logDir,
-                    baseName = baseName,
-                    retentionDays = retentionDays,
+                AndroidLogInterceptor(
+                    enabledProvider = enabledProvider,
+                    minLogLevelProvider = minLogLevelProvider,
                 ),
             )
+            .apply {
+                if (logDir != null) {
+                    addInterceptor(
+                        FileLogInterceptor(
+                            logDir = logDir,
+                            baseName = baseName,
+                            retentionDays = retentionDays,
+                            enabledProvider = enabledProvider,
+                            minLogLevelProvider = minLogLevelProvider,
+                        ),
+                    )
+                }
+            }
             .build()
     }
 }

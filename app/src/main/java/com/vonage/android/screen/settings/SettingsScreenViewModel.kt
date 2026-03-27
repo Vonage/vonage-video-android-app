@@ -2,6 +2,7 @@ package com.vonage.android.screen.settings
 
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.core.BaseViewModel
+import com.vonage.android.data.ClientLogsRepository
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
@@ -19,6 +20,7 @@ class SettingsScreenViewModel @AssistedInject constructor(
     @Assisted("appVersion") appVersion: String,
     @Assisted("sdkVersion") sdkVersion: String,
     private val callSettingsHolder: CallSettingsHolder,
+    private val clientLogsRepository: ClientLogsRepository,
 ) : BaseViewModel<SettingsUiState, SettingsViewEvent>(
     SettingsUiState(appVersion = appVersion, sdkVersion = sdkVersion),
 ) {
@@ -26,6 +28,7 @@ class SettingsScreenViewModel @AssistedInject constructor(
     override val dependencies = SettingsActionDependencies(
         coroutineScope = viewModelScope,
         callSettingsHolder = callSettingsHolder,
+        clientLogsRepository = clientLogsRepository,
     )
 
     init {
@@ -51,6 +54,10 @@ class SettingsScreenViewModel @AssistedInject constructor(
     fun updatePreferredVideoCodecOrder(order: List<VideoCodec>?) = dispatch(UpdatePreferredVideoCodecOrderAction(order))
 
     fun updateAudioBitrate(bitrate: Int?) = dispatch(UpdateAudioBitrateAction(bitrate))
+
+    fun toggleLogs(enabled: Boolean) = dispatch(ToggleLogsAction(enabled))
+
+    fun sendLogs() = dispatch(SendClientLogsAction())
 }
 
 @AssistedFactory

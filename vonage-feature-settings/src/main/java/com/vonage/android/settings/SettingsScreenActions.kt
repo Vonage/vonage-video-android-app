@@ -15,6 +15,8 @@ data class SettingsScreenActions(
     val onDegradationPreferenceChange: (DegradationPreference) -> Unit = {},
     val onPreferredVideoCodecOrderChange: (List<VideoCodec>?) -> Unit = {},
     val onOpusDtxToggle: (Boolean) -> Unit = {},
+    val onLogsToggle: (Boolean) -> Unit = {},
+    val onSendLogsClick: () -> Unit = {},
     val onAudioBitrateChange: (Int?) -> Unit = {},
     val onPublisherAudioFallbackToggle: (Boolean) -> Unit = {},
     val onSubscriberAudioFallbackToggle: (Boolean) -> Unit = {},

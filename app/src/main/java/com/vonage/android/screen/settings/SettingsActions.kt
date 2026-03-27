@@ -2,6 +2,7 @@ package com.vonage.android.screen.settings
 
 import com.vonage.android.core.ActionScope
 import com.vonage.android.core.ViewAction
+import com.vonage.android.data.SendClientLogsResult
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
@@ -67,6 +68,11 @@ class ObserveSettingsAction :
         scope.launch {
             holder.audioBitrate.collect { bitrate ->
                 actionScope.setState { copy(audioBitrate = bitrate) }
+            }
+        }
+        scope.launch {
+            dependencies.clientLogsRepository.logsEnabled.collect { enabled ->
+                actionScope.setState { copy(logsEnabled = enabled) }
             }
         }
     }
@@ -181,3 +187,32 @@ class UpdateAudioBitrateAction(
         dependencies.callSettingsHolder.updateAudioBitrate(bitrate)
     }
 }
+
+class ToggleLogsAction(
+    private val enabled: Boolean,
+) : ViewAction<SettingsActionDependencies, SettingsUiState, SettingsViewEvent> {
+    override suspend fun execute(
+        dependencies: SettingsActionDependencies,
+        actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
+    ) {
+        dependencies.clientLogsRepository.setLogsEnabled(enabled)
+    }
+}
+
+class SendClientLogsAction : ViewAction<SettingsActionDependencies, SettingsUiState, SettingsViewEvent> {
+    override suspend fun execute(
+        dependencies: SettingsActionDependencies,
+        actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
+    ) {
+        actionScope.setState { copy(isSendingLogs = true) }
+
+        when (dependencies.clientLogsRepository.sendLogs()) {
+            SendClientLogsResult.Success -> actionScope.sendEvent(SettingsViewEvent.LogsSent)
+            SendClientLogsResult.NoLogsAvailable -> actionScope.sendEvent(SettingsViewEvent.NoLogsAvailable)
+            SendClientLogsResult.Failure -> actionScope.sendEvent(SettingsViewEvent.LogsSendFailed)
+        }
+
+        actionScope.setState { copy(isSendingLogs = false) }
+    }
+}
+

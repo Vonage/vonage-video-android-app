@@ -16,6 +16,8 @@ data class SettingsUiState(
     val sdkVersion: String = "",
     val call: CallFacade? = null,
     val senderStatsEnabled: Boolean = true,
+    val logsEnabled: Boolean = true,
+    val isSendingLogs: Boolean = false,
     val opusDtxEnabled: Boolean = true,
     val publisherAudioFallbackEnabled: Boolean = true,
     val subscriberAudioFallbackEnabled: Boolean = true,

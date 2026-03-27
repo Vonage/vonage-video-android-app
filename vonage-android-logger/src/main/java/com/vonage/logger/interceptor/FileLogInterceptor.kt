@@ -3,6 +3,7 @@ package com.vonage.logger.interceptor
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.vonage.logger.LogEvent
+import com.vonage.logger.LogLevel
 import java.io.File
 import java.io.IOException
 import java.io.PrintWriter
@@ -10,6 +11,7 @@ import java.io.StringWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 class FileLogInterceptor(
@@ -17,7 +19,8 @@ class FileLogInterceptor(
     private val baseName: String = DEFAULT_BASE_NAME,
     private val retentionDays: Int = DEFAULT_RETENTION_DAYS,
     private val maxFileSizeBytes: Long = DEFAULT_MAX_FILE_SIZE_BYTES,
-    private val dateFormat: String = DEFAULT_DATE_FORMAT,
+    private val enabledProvider: () -> Boolean = { true },
+    private val minLogLevelProvider: () -> LogLevel = { LogLevel.VERBOSE },
 ) : LogInterceptor {
 
     private val lock = Any()
@@ -26,6 +29,7 @@ class FileLogInterceptor(
     internal val fileDateFormat = SimpleDateFormat(FILE_DATE_FORMAT, Locale.US)
 
     override fun intercept(event: LogEvent): LogEvent {
+        if (!enabledProvider() || event.level.ordinal < minLogLevelProvider().ordinal) return event
         writeToFile(event)
         return event
     }
@@ -38,6 +42,7 @@ class FileLogInterceptor(
     internal fun formatEvent(event: LogEvent): String {
         //use Epoch millis for easier parsing and sorting in log management tools
         val obj = JsonObject()
+        obj.addProperty("guid", UUID.randomUUID().toString())
         obj.addProperty("clientSystemTime", event.timestamp.toString())
         obj.addProperty("level", event.level.name)
         obj.addProperty("userAgent", event.thread)

@@ -1,16 +1,26 @@
 package com.vonage.android.screen.settings
 
+import android.content.Context
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
+import com.vonage.android.data.ClientLogsRepository
+import com.vonage.android.data.network.APIService
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.settings.CallSettingsHolder
+import com.vonage.logger.DefaultVonageLogger
+import io.mockk.every
+import io.mockk.mockk
+import org.junit.After
+import org.junit.Before
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import java.io.File
+import java.nio.file.Files
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -21,11 +31,30 @@ class SettingsScreenViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val callSettingsHolder = CallSettingsHolder()
+    private val apiService: APIService = mockk()
+    private val context: Context = mockk()
+    private lateinit var filesDir: File
+    private lateinit var clientLogsRepository: ClientLogsRepository
+
+    @Before
+    fun setUp() {
+        filesDir = Files.createTempDirectory("settings-view-model").toFile()
+        every { context.filesDir } returns filesDir
+        DefaultVonageLogger.setEnabled(true)
+        clientLogsRepository = ClientLogsRepository(context, apiService)
+    }
+
+    @After
+    fun tearDown() {
+        DefaultVonageLogger.setEnabled(true)
+        filesDir.deleteRecursively()
+    }
 
     private fun sut() = SettingsScreenViewModel(
         appVersion = APP_VERSION,
         sdkVersion = SDK_VERSION,
         callSettingsHolder = callSettingsHolder,
+        clientLogsRepository = clientLogsRepository,
     )
 
     // region initial state
@@ -46,6 +75,7 @@ class SettingsScreenViewModelTest {
         sut.state.test {
             val state = awaitItem()
             assertTrue(state.senderStatsEnabled)
+            assertTrue(state.logsEnabled)
             assertTrue(state.opusDtxEnabled)
             assertTrue(state.publisherAudioFallbackEnabled)
             assertTrue(state.subscriberAudioFallbackEnabled)
@@ -79,6 +109,17 @@ class SettingsScreenViewModelTest {
 
         sut.state.test {
             assertEquals(false, awaitItem().opusDtxEnabled)
+        }
+    }
+
+    @Test
+    fun `when toggleLogs then state is updated`() = runTest {
+        val sut = sut()
+        sut.toggleLogs(false)
+        mainDispatcherRule.testScheduler.advanceUntilIdle()
+
+        sut.state.test {
+            assertEquals(false, awaitItem().logsEnabled)
         }
     }
 
@@ -182,6 +223,7 @@ class SettingsScreenViewModelTest {
         callSettingsHolder.updateOpusDtx(false)
         callSettingsHolder.updatePublisherAudioFallback(false)
         callSettingsHolder.updateSubscriberAudioFallback(false)
+        clientLogsRepository.setLogsEnabled(false)
         callSettingsHolder.updateCaptureFrameRate(CaptureFrameRate.FPS_30)
         callSettingsHolder.updateCaptureResolution(CaptureResolution.HIGH_1080P)
         callSettingsHolder.updateDegradationPreference(DegradationPreference.MAINTAIN_RESOLUTION)
@@ -190,6 +232,7 @@ class SettingsScreenViewModelTest {
         sut.state.test {
             val state = awaitItem()
             assertEquals(false, state.senderStatsEnabled)
+            assertEquals(false, state.logsEnabled)
             assertEquals(false, state.opusDtxEnabled)
             assertEquals(false, state.publisherAudioFallbackEnabled)
             assertEquals(false, state.subscriberAudioFallbackEnabled)

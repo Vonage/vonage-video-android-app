@@ -1,4 +1,6 @@
 ﻿package com.vonage.logger.interceptor
+
+import com.google.gson.JsonParser
 import com.vonage.logger.LogEvent
 import com.vonage.logger.LogLevel
 import org.junit.After
@@ -11,7 +13,9 @@ import java.io.File
 import java.nio.file.Files
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.UUID
 import java.util.concurrent.TimeUnit
+
 class FileLogInterceptorTest {
     private lateinit var logDir: File
     @Before
@@ -32,9 +36,12 @@ class FileLogInterceptorTest {
         )
 
         val line = interceptor.formatEvent(event)
+        val json = JsonParser.parseString(line).asJsonObject
 
         assertTrue(line.startsWith("{"))
         assertTrue(line.endsWith("}"))
+        assertTrue(json.has("guid"))
+        UUID.fromString(json.get("guid").asString)
         assertTrue(line.contains("\"clientSystemTime\":\"1000000000000\""))
         assertTrue(line.contains("\"level\":\"DEBUG\""))
         assertTrue(line.contains("\"userAgent\":\"test-thread\""))
@@ -61,6 +68,20 @@ class FileLogInterceptorTest {
         assertTrue(line.contains("\"throwable\""))
         assertTrue(line.contains("RuntimeException"))
         assertTrue(line.contains("boom"))
+    }
+
+    @Test
+    fun `formatEvent generates a different guid for each event`() {
+        val interceptor = FileLogInterceptor(logDir)
+
+        val firstGuid = JsonParser.parseString(
+            interceptor.formatEvent(LogEvent(LogLevel.INFO, "Tag", "first")),
+        ).asJsonObject.get("guid").asString
+        val secondGuid = JsonParser.parseString(
+            interceptor.formatEvent(LogEvent(LogLevel.INFO, "Tag", "second")),
+        ).asJsonObject.get("guid").asString
+
+        assertFalse(firstGuid == secondGuid)
     }
 
     // ---- File writing ----
@@ -164,6 +185,21 @@ class FileLogInterceptorTest {
         assertTrue(nestedDir.exists())
         assertTrue(nestedDir.isDirectory)
     }
+
+    @Test
+    fun `events below min log level are not written to file`() {
+        val interceptor = FileLogInterceptor(
+            logDir = logDir,
+            minLogLevelProvider = { LogLevel.WARN },
+        )
+        val event = LogEvent(LogLevel.INFO, "Tag", "filtered")
+
+        interceptor.intercept(event)
+
+        val logFile = interceptor.logFileForDate(event.timestamp)
+        assertFalse(logFile.exists())
+    }
+
     @Test
     fun `when file exceeds max size oldest lines are trimmed and newest line is kept`() {
         val sizingInterceptor = FileLogInterceptor(logDir)
