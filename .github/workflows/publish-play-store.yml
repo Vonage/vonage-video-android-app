@@ -63,8 +63,8 @@ jobs:
 
       - name: Set version from GitHub run number
         run: |
-          VERSION_CODE=$((1000000 + $GITHUB_RUN_NUMBER))
-          VERSION_NAME="1.0.0-build${GITHUB_RUN_NUMBER}"
+          VERSION_CODE=$((1000100 + $GITHUB_RUN_NUMBER))
+          VERSION_NAME="1.1.0-build${GITHUB_RUN_NUMBER}"
           sed -i "s/versionCode = [0-9]\+/versionCode = $VERSION_CODE/" app/build.gradle.kts
           sed -i "s/versionName = \".*\"/versionName = \"$VERSION_NAME\"/" app/build.gradle.kts
 
