@@ -156,7 +156,7 @@ class FileLogInterceptor(
     companion object {
         const val DEFAULT_BASE_NAME = "app"
 
-        const val DEFAULT_RETENTION_DAYS = 7
+        const val DEFAULT_RETENTION_DAYS = 3
 
         const val DEFAULT_MAX_FILE_SIZE_BYTES = 50L * 1024 * 1024
 

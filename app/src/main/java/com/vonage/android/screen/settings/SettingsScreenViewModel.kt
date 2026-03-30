@@ -10,6 +10,7 @@ import com.vonage.android.kotlin.model.VideoCodec
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.settings.SettingsUiState
 import com.vonage.android.kotlin.model.VideoBitrateConfig
+import com.vonage.logger.LogLevel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -57,7 +58,11 @@ class SettingsScreenViewModel @AssistedInject constructor(
 
     fun toggleLogs(enabled: Boolean) = dispatch(ToggleLogsAction(enabled))
 
+    fun updateLogLevel(level: LogLevel) = dispatch(UpdateLogLevelAction(level))
+
     fun sendLogs() = dispatch(SendClientLogsAction())
+
+    fun shareLogs() = dispatch(ShareClientLogsAction())
 }
 
 @AssistedFactory

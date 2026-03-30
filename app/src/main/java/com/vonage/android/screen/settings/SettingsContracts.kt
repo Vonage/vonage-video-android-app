@@ -1,5 +1,6 @@
 package com.vonage.android.screen.settings
 
+import android.net.Uri
 import com.vonage.android.core.ActionDependencies
 import com.vonage.android.core.ViewEvent
 import com.vonage.android.data.ClientLogsRepository
@@ -10,6 +11,8 @@ sealed interface SettingsViewEvent : ViewEvent {
     data object LogsSent : SettingsViewEvent
     data object NoLogsAvailable : SettingsViewEvent
     data object LogsSendFailed : SettingsViewEvent
+    data class ShareLogs(val uri: Uri) : SettingsViewEvent
+    data object NoLogsToShare : SettingsViewEvent
 }
 
 class SettingsActionDependencies(

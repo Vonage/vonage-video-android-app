@@ -46,6 +46,7 @@ import com.vonage.android.settings.settings
 import com.vonage.android.settings.ui.components.AudioBitrateSelector
 import com.vonage.android.settings.ui.components.DegradationPreferenceSelector
 import com.vonage.android.settings.ui.components.FrameRateSelector
+import com.vonage.android.settings.ui.components.LogLevelSelector
 import com.vonage.android.settings.ui.components.PreferredCodecOrderSelector
 import com.vonage.android.settings.ui.components.ResolutionSelector
 import com.vonage.android.settings.ui.components.SectionHeader
@@ -255,6 +256,12 @@ private fun LazyListScope.loggingItems(
         )
     }
     item {
+        LogLevelSelector(
+            selected = uiState.logLevel,
+            onSelectionChange = actions.onLogLevelChange,
+        )
+    }
+    item {
         LoggingActionRow(
             title = stringResource(R.string.settings_send_logs_title),
             description = stringResource(R.string.settings_send_logs_description),
@@ -267,6 +274,15 @@ private fun LazyListScope.loggingItems(
             ),
             enabled = !uiState.isSendingLogs,
             onClick = actions.onSendLogsClick,
+        )
+    }
+    item {
+        LoggingActionRow(
+            title = stringResource(R.string.settings_share_logs_title),
+            description = stringResource(R.string.settings_share_logs_description),
+            buttonText = stringResource(R.string.settings_share_logs_button),
+            enabled = true,
+            onClick = actions.onShareLogsClick,
         )
     }
 }

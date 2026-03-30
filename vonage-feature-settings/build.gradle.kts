@@ -43,6 +43,7 @@ dependencies {
     implementation(project(":vonage-video-ui-compose"))
     implementation(project(":vonage-video-core"))
     implementation(project(":vonage-video-shared"))
+    implementation(project(":vonage-android-logger"))
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.collections.immutable)

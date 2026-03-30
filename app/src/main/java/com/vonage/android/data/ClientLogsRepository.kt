@@ -1,8 +1,11 @@
 package com.vonage.android.data
 
 import android.content.Context
+import android.net.Uri
+import androidx.core.content.FileProvider
 import com.vonage.android.data.network.APIService
 import com.vonage.logger.DefaultVonageLogger
+import com.vonage.logger.LogLevel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,13 +25,37 @@ class ClientLogsRepository @Inject constructor(
     private val _logsEnabled = MutableStateFlow(DefaultVonageLogger.isEnabled)
     val logsEnabled: StateFlow<Boolean> = _logsEnabled.asStateFlow()
 
+    private val _logLevel = MutableStateFlow(DefaultVonageLogger.currentMinLogLevel)
+    val logLevel: StateFlow<LogLevel> = _logLevel.asStateFlow()
+
     fun setLogsEnabled(enabled: Boolean) {
         DefaultVonageLogger.setEnabled(enabled)
         _logsEnabled.value = enabled
     }
 
-    suspend fun sendLogs(): SendClientLogsResult {
-        val payload = buildPayload() ?: return SendClientLogsResult.NoLogsAvailable
+    fun setLogLevel(level: LogLevel) {
+        DefaultVonageLogger.setMinLogLevel(level)
+        _logLevel.value = level
+    }
+
+    fun getLatestLogFile(): File? {
+        val logDir = File(context.filesDir, DefaultVonageLogger.LOGS_DIRECTORY_NAME)
+        if (!logDir.exists() || !logDir.isDirectory) return null
+        return logDir.listFiles { file ->
+            file.isFile && file.name.endsWith(LOG_FILE_SUFFIX)
+        }?.maxByOrNull { it.name }
+    }
+
+    fun getLatestLogUri(): Uri? {
+        val file = getLatestLogFile() ?: return null
+        return FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            file,
+        )
+    }
+
+    suspend fun sendLogs(): SendClientLogsResult {        val payload = buildPayload() ?: return SendClientLogsResult.NoLogsAvailable
         return runCatching {
             apiService.sendClientLogs(payload.toRequestBody(JSON_MEDIA_TYPE))
         }.fold(

@@ -9,6 +9,7 @@ import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoCodec
 import com.vonage.android.settings.SettingsUiState
+import com.vonage.logger.LogLevel
 import kotlinx.coroutines.launch
 
 class ObserveSettingsAction :
@@ -73,6 +74,11 @@ class ObserveSettingsAction :
         scope.launch {
             dependencies.clientLogsRepository.logsEnabled.collect { enabled ->
                 actionScope.setState { copy(logsEnabled = enabled) }
+            }
+        }
+        scope.launch {
+            dependencies.clientLogsRepository.logLevel.collect { level ->
+                actionScope.setState { copy(logLevel = level) }
             }
         }
     }
@@ -199,6 +205,17 @@ class ToggleLogsAction(
     }
 }
 
+class UpdateLogLevelAction(
+    private val level: LogLevel,
+) : ViewAction<SettingsActionDependencies, SettingsUiState, SettingsViewEvent> {
+    override suspend fun execute(
+        dependencies: SettingsActionDependencies,
+        actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
+    ) {
+        dependencies.clientLogsRepository.setLogLevel(level)
+    }
+}
+
 class SendClientLogsAction : ViewAction<SettingsActionDependencies, SettingsUiState, SettingsViewEvent> {
     override suspend fun execute(
         dependencies: SettingsActionDependencies,
@@ -216,3 +233,16 @@ class SendClientLogsAction : ViewAction<SettingsActionDependencies, SettingsUiSt
     }
 }
 
+class ShareClientLogsAction : ViewAction<SettingsActionDependencies, SettingsUiState, SettingsViewEvent> {
+    override suspend fun execute(
+        dependencies: SettingsActionDependencies,
+        actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
+    ) {
+        val uri = dependencies.clientLogsRepository.getLatestLogUri()
+        if (uri == null) {
+            actionScope.sendEvent(SettingsViewEvent.NoLogsToShare)
+        } else {
+            actionScope.sendEvent(SettingsViewEvent.ShareLogs(uri))
+        }
+    }
+}

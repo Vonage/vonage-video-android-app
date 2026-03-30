@@ -1,5 +1,6 @@
 package com.vonage.android.screen.settings
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,15 +30,30 @@ fun SettingsScreenRoute(
     val logsSentMessage = stringResource(SettingsR.string.settings_logs_send_success)
     val noLogsMessage = stringResource(SettingsR.string.settings_logs_send_empty)
     val logsFailedMessage = stringResource(SettingsR.string.settings_logs_send_failed)
+    val noLogsToShareMessage = stringResource(SettingsR.string.settings_logs_share_empty)
 
     LaunchedEffect(viewModel) {
         viewModel.events.collectLatest { event ->
-            val message = when (event) {
-                SettingsViewEvent.LogsSent -> logsSentMessage
-                SettingsViewEvent.NoLogsAvailable -> noLogsMessage
-                SettingsViewEvent.LogsSendFailed -> logsFailedMessage
+            when (event) {
+                SettingsViewEvent.LogsSent ->
+                    Toast.makeText(context, logsSentMessage, Toast.LENGTH_SHORT).show()
+                SettingsViewEvent.NoLogsAvailable ->
+                    Toast.makeText(context, noLogsMessage, Toast.LENGTH_SHORT).show()
+                SettingsViewEvent.LogsSendFailed ->
+                    Toast.makeText(context, logsFailedMessage, Toast.LENGTH_SHORT).show()
+                SettingsViewEvent.NoLogsToShare ->
+                    Toast.makeText(context, noLogsToShareMessage, Toast.LENGTH_SHORT).show()
+                is SettingsViewEvent.ShareLogs -> {
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "application/json"
+                        putExtra(Intent.EXTRA_STREAM, event.uri)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    context.startActivity(
+                        Intent.createChooser(shareIntent, context.getString(SettingsR.string.settings_share_logs_chooser_title)),
+                    )
+                }
             }
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -55,7 +71,9 @@ fun SettingsScreenRoute(
             onPreferredVideoCodecOrderChange = viewModel::updatePreferredVideoCodecOrder,
             onAudioBitrateChange = viewModel::updateAudioBitrate,
             onLogsToggle = viewModel::toggleLogs,
+            onLogLevelChange = viewModel::updateLogLevel,
             onSendLogsClick = viewModel::sendLogs,
+            onShareLogsClick = viewModel::shareLogs,
             onDismiss = onDismiss,
         ),
     )

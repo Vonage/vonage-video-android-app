@@ -48,6 +48,8 @@
     <string name="settings_logging_section_title">Logging</string>
     <string name="settings_enable_logs_title">Enable Logs</string>
     <string name="settings_enable_logs_description">Turn Vonage client log capture on or off for both Logcat and file logging</string>
+    <string name="settings_log_level_title">Log Level</string>
+    <string name="settings_log_level_label">Level</string>
     <string name="settings_send_logs_title">Send Logs</string>
     <string name="settings_send_logs_description">Upload the collected client logs to the backend as a batch JSON payload</string>
     <string name="settings_send_logs_button">Send Logs</string>
@@ -55,6 +57,11 @@
     <string name="settings_logs_send_success">Logs sent successfully</string>
     <string name="settings_logs_send_empty">No logs available to send</string>
     <string name="settings_logs_send_failed">Failed to send logs</string>
+    <string name="settings_share_logs_title">Share Logs</string>
+    <string name="settings_share_logs_description">Share the latest log file via another app</string>
+    <string name="settings_share_logs_button">Share Logs</string>
+    <string name="settings_logs_share_empty">No logs available to share</string>
+    <string name="settings_share_logs_chooser_title">Share logs via…</string>
     <string name="settings_stats_publisher_stats_header">Publisher Stats</string>
     <string name="settings_stats_publisher_est_bandwidth">Est. bandwidth</string>
     <string name="settings_stats_publisher_video_header">Video</string>
