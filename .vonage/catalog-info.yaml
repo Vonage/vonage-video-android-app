@@ -24,3 +24,6 @@ spec:
   owner: group:orgdata/vdk
   system: video-android-ref-app
   lifecycle: production
+  dependsOn:
+    - component:default/video-react-ref-app
+    - component:default/video-native-sdks

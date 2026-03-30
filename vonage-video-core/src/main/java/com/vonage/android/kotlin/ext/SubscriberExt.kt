@@ -2,6 +2,8 @@ package com.vonage.android.kotlin.ext
 
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
+import com.vonage.android.kotlin.model.ParticipantState.SubscriberAudioStats
+import com.vonage.android.kotlin.model.ParticipantState.SubscriberVideoStats
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -57,3 +59,38 @@ internal fun SubscriberKit.name(): String = stream.name
  * @return The stream ID
  */
 internal fun SubscriberKit.id() = stream.streamId
+
+internal fun Subscriber.observeVideoStats(): Flow<SubscriberVideoStats> = callbackFlow {
+    setVideoStatsListener { _, stats ->
+        trySend(
+            SubscriberVideoStats(
+                videoPacketsReceived = stats.videoPacketsReceived,
+                videoPacketsLost = stats.videoPacketsLost,
+                videoBytesReceived = stats.videoBytesReceived,
+                width = stats.width,
+                height = stats.height,
+                codec = stats.codec.orEmpty(),
+                decodedFrameRate = stats.decodedFrameRate,
+                bitrate = stats.bitrate,
+                freezeCount = stats.freezeCount,
+                totalFreezesDuration = stats.totalFreezesDuration,
+                estimatedBandwidthInBps = stats.senderStats?.connectionEstimatedBandwidth,
+            ),
+        )
+    }
+    awaitClose { setVideoStatsListener(null) }
+}
+
+internal fun Subscriber.observeAudioStats(): Flow<SubscriberAudioStats> = callbackFlow {
+    setAudioStatsListener { _, stats ->
+        trySend(
+            SubscriberAudioStats(
+                audioPacketsReceived = stats.audioPacketsReceived,
+                audioPacketsLost = stats.audioPacketsLost,
+                audioBytesReceived = stats.audioBytesReceived,
+                estimatedBandwidthInBps = stats.senderStats?.connectionEstimatedBandwidth,
+            ),
+        )
+    }
+    awaitClose { setAudioStatsListener(null) }
+}

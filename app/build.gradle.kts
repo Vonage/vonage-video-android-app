@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.kover)
-    kotlin("plugin.serialization") version "2.0.21"
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.play.publisher)
     alias(libs.plugins.stability.analyzer)
     id("com.vonage.json-config")
@@ -37,11 +37,14 @@ android {
         targetSdk = 36
         // NOTE: The following versionCode and versionName are placeholders.
         // Actual values are set dynamically by the GitHub Actions workflow during CI/CD.
-        versionCode = 100
-        versionName = "1.0.0"
+        versionCode = 110
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
+
+        // OpenTok SDK version
+        buildConfigField("String", "OPENTOK_SDK_VERSION", "\"${libs.versions.opentokAndroidSdk.get()}\"")
 
         // Set up base API URL
         val baseApiUrl = configProps.getProperty("vonage.baseApiUrl", "")
@@ -77,6 +80,11 @@ android {
         val videoFxProperty = configProps.getProperty("vonage.video.allow_background_effects", "true")
         buildConfigField("boolean", "FEATURE_VIDEO_EFFECTS_ENABLED", "$videoFxProperty")
         missingDimensionStrategy("videofx", videoFxProperty.toEnabledString())
+
+        // Settings feature
+        val settingsProperty = configProps.getProperty("vonage.meetingRoom.allow_settings", "true")
+        buildConfigField("boolean", "FEATURE_SETTINGS_ENABLED", "$settingsProperty")
+        missingDimensionStrategy("settings", settingsProperty.toEnabledString())
     }
 
     compileOptions {
@@ -188,6 +196,7 @@ dependencies {
     implementation(project(":vonage-feature-reactions"))
     implementation(project(":vonage-feature-video-effects"))
     implementation(project(":vonage-feature-captions"))
+    implementation(project(":vonage-feature-settings"))
     implementation(project(":vonage-audio-selector"))
     implementation(project(":vonage-android-logger"))
     implementation(libs.androidx.core.ktx)
@@ -202,11 +211,9 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.android)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.hilt.navigation.fragment)
     implementation(libs.retrofit)
     implementation(libs.okhttp)
-    implementation(libs.converter.moshi)
-    implementation(libs.moshi.kotlin)
+    implementation(libs.converter.kotlinx.serialization)
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.adaptive)
     implementation(libs.androidx.adaptive.layout)

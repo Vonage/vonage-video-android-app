@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,20 +19,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
-import com.vonage.android.R
 import com.vonage.android.compose.layout.TwoPaneScaffold
 import com.vonage.android.compose.preview.buildPublisher
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.components.TopBanner
 import com.vonage.android.screen.components.audio.AudioDevicesMenu
 import com.vonage.android.screen.waiting.components.DeviceSelectionPanel
 import com.vonage.android.screen.waiting.components.JoinRoomSection
 import com.vonage.android.screen.waiting.components.VideoControlPanel
 import com.vonage.android.screen.waiting.components.VideoPreviewContainer
+import com.vonage.android.screen.waiting.components.WaitingRoomTopBar
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,6 +40,7 @@ fun WaitingRoomScreen(
     actions: WaitingRoomActions,
     modifier: Modifier = Modifier,
     navigateToRoom: (String) -> Unit = {},
+    navigateToSettings: () -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
@@ -76,15 +74,9 @@ fun WaitingRoomScreen(
     TwoPaneScaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopBanner(
-                onBack = actions.onBack,
-                content = {
-                    Text(
-                        text = stringResource(R.string.waiting_room_prepare_to_join),
-                        style = VonageVideoTheme.typography.heading4,
-                        color = VonageVideoTheme.colors.textSecondary,
-                    )
-                }
+            WaitingRoomTopBar(
+                actions = actions,
+                navigateToSettings = navigateToSettings,
             )
         },
         firstPane = {

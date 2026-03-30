@@ -15,6 +15,7 @@ import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
@@ -22,16 +23,21 @@ import com.vonage.android.screen.components.audio.AudioDevicesState
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.service.VeraForegroundServiceHandler
+import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.util.ActivityContextProvider
 import com.vonage.android.util.noOpCall
+import com.vonage.logger.vonageLogger
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -51,6 +57,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
     private val activityContextProvider: ActivityContextProvider,
     private val getConfig: GetConfig,
     private val audioDevicesHandler: AudioDevicesHandler,
+    private val callSettingsHolder: CallSettingsHolder,
 ) : ViewModel() {
 
     private val context: Context
@@ -113,11 +120,11 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             .launchIn(viewModelScope)
 
         audioDevicesHandler.start()
+        observePublisherSettings()
     }
 
     private fun connect(sessionInfo: SessionInfo, roomName: String) {
         viewModelScope.launch {
-            videoClient.buildPublisher(context)
             call = videoClient.initializeSession(
                 apiKey = sessionInfo.apiKey,
                 sessionId = sessionInfo.sessionId,
@@ -126,6 +133,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             listenRemoteArchiving()
             call?.let { call ->
                 vonageCaptions.init(call, roomName, sessionInfo.captionsId)
+                callSettingsHolder.bind(call)
                 // Update UI state after call is properly initialized
                 _uiState.update { uiState ->
                     uiState.copy(
@@ -145,9 +153,7 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
                 call.connect(context)
                     .onEach { sessionEvent ->
                         when (sessionEvent) {
-                            is SessionEvent.Disconnected -> {
-                                endCall()
-                            }
+                            is SessionEvent.Disconnected -> endCall()
 
                             is SessionEvent.Error -> {
                                 _uiState.update { uiState ->
@@ -186,7 +192,49 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         foregroundServiceHandler.stopForegroundService()
         vonageScreenSharing.stopSharingScreen()
         audioDevicesHandler.stop()
+        callSettingsHolder.clear()
         call?.endSession()
+    }
+
+    private fun observePublisherSettings() {
+        viewModelScope.launch {
+            combine(
+                listOf<Flow<Any?>>(
+                    callSettingsHolder.captureFrameRate,
+                    callSettingsHolder.captureResolution,
+                    callSettingsHolder.preferredVideoCodecOrder,
+                    callSettingsHolder.audioBitrate,
+                    callSettingsHolder.opusDtxEnabled,
+                    callSettingsHolder.publisherAudioFallbackEnabled,
+                    callSettingsHolder.subscriberAudioFallbackEnabled,
+                    callSettingsHolder.senderStatsEnabled,
+                ),
+            ) { it }
+                .drop(1)
+                .collect {
+                    call?.let { activeCall ->
+                        videoClient.configurePublisher(
+                            PublisherConfig(
+                                name = activeCall.publisher.value?.name.orEmpty(),
+                                publishVideo = activeCall.publisher.value?.isCameraEnabled?.value ?: true,
+                                publishAudio = activeCall.publisher.value?.isMicEnabled?.value ?: true,
+                                blurLevel = com.vonage.android.kotlin.model.BlurLevel.NONE,
+                                cameraIndex = activeCall.publisher.value?.camera?.value?.index ?: 1,
+                                captureFrameRate = callSettingsHolder.captureFrameRate.value,
+                                captureResolution = callSettingsHolder.captureResolution.value,
+                                preferredVideoCodecOrder = callSettingsHolder.preferredVideoCodecOrder.value,
+                                audioBitrate = callSettingsHolder.audioBitrate.value,
+                                senderStatsTrack = callSettingsHolder.senderStatsEnabled.value,
+                                opusDtxEnabled = callSettingsHolder.opusDtxEnabled.value,
+                                publisherAudioFallback = callSettingsHolder.publisherAudioFallbackEnabled.value,
+                                subscriberAudioFallback = callSettingsHolder.subscriberAudioFallbackEnabled.value,
+                            ),
+                        )
+                        vonageLogger.w("PublisherFactory", "Refresh publisher from view model (${activeCall.publisher.value?.name})")
+                        activeCall.refreshPublisher(context)
+                    }
+                }
+        }
     }
 
     fun sendMessage(message: String) {
@@ -203,6 +251,14 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
 
     fun changeLayout(layoutType: CallLayoutType) {
         _uiState.update { uiState -> uiState.copy(layoutType = layoutType) }
+    }
+
+    fun onTogglePinParticipant(participantId: String) {
+        call?.togglePinParticipant(participantId)
+    }
+
+    fun forceMuteParticipant(participantId: String) {
+        call?.forceMuteParticipant(participantId)
     }
 
     //region Archiving

@@ -24,6 +24,7 @@ fun MeetingRoomScreenRoute(
     roomName: String,
     navigateToGoodBye: () -> Unit,
     navigateToShare: (String) -> Unit,
+    navigateToSettings: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MeetingRoomScreenViewModel =
@@ -98,7 +99,10 @@ fun MeetingRoomScreenRoute(
             },
             onChangeLayout = { layoutType ->
                 viewModel.changeLayout(layoutType)
-            }
+            },
+            onSettings = navigateToSettings,
+            onTogglePinParticipant = viewModel::onTogglePinParticipant,
+            onForceMuteParticipant = viewModel::forceMuteParticipant,
         )
     }
 
@@ -147,4 +151,7 @@ data class MeetingRoomActions(
     val onToggleScreenSharing: (Boolean) -> Unit = {},
     val onShowFeedbackScreen: () -> Unit = {},
     val onChangeLayout: (CallLayoutType) -> Unit = {},
+    val onSettings: () -> Unit = {},
+    val onTogglePinParticipant: (String) -> Unit = {},
+    val onForceMuteParticipant: (String) -> Unit = {},
 )

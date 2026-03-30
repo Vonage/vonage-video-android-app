@@ -15,4 +15,17 @@ data class PublisherConfig(
     val publishAudio: Boolean,
     val blurLevel: BlurLevel,
     val cameraIndex: Int,
+    val senderStatsTrack: Boolean = false,
+    val opusDtxEnabled: Boolean = true,
+    val publisherAudioFallback: Boolean = true,
+    val subscriberAudioFallback: Boolean = true,
+    val videoBitrateConfig: VideoBitrateConfig = VideoBitrateConfig(
+        preset = VideoBitratePreset.DEFAULT,
+        maxBitrate = VideoBitratePreset.DEFAULT.defaultMaxBitrate,
+    ),
+    val degradationPreference: DegradationPreference = DegradationPreference.NOT_SET,
+    val captureFrameRate: CaptureFrameRate = CaptureFrameRate.FPS_15,
+    val captureResolution: CaptureResolution? = null,
+    val preferredVideoCodecOrder: List<VideoCodec>? = null,
+    val audioBitrate: Int? = null,
 )

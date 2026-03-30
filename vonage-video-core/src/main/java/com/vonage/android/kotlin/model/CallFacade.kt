@@ -30,6 +30,27 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
     /** StateFlow of all participants in the call */
     val participantsStateFlow: StateFlow<ImmutableList<Participant>>
 
+    /** StateFlow of pinned participant IDs */
+    val pinnedParticipantIds: StateFlow<Set<String>>
+
+    /**
+     * Toggles the pin state of a participant.
+     *
+     * @param participantId The ID of the participant to pin/unpin
+     */
+    fun togglePinParticipant(participantId: String)
+
+    /**
+     * Forcibly mutes another participant's audio in the call.
+     *
+     * This is typically used by privileged roles (for example, host or moderator)
+     * to mute a remote participant regardless of that participant's local mute state.
+     * Actual permission enforcement is handled by the underlying call implementation.
+     *
+     * @param participantId The ID of the participant to mute
+     */
+    fun forceMuteParticipant(participantId: String)
+
     /** StateFlow of the current participant count */
     val participantsCount: StateFlow<Int>
 
@@ -61,8 +82,8 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
      */
     val emojiSignalState: StateFlow<EmojiState?>
 
-    /** StateFlow of captions text from remote participants */
-    val captionsStateFlow: StateFlow<String?>
+    /** StateFlow of caption lines from remote participants */
+    val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>>
 
     /** StateFlow of archiving of the session */
     val archivingStateFlow: StateFlow<ArchivingState>
@@ -77,6 +98,9 @@ interface PublisherFacade {
     fun toggleLocalCamera()
     fun toggleLocalAudio()
     fun cycleLocalCameraBlur()
+    fun setVideoBitrate(config: VideoBitrateConfig)
+    fun setDegradationPreference(preference: DegradationPreference)
+    fun refreshPublisher(context: Context)
 }
 
 interface SessionFacade {
@@ -144,3 +168,10 @@ sealed interface ArchivingState {
     data class Started(val id: String) : ArchivingState
     data class Stopped(val id: String) : ArchivingState
 }
+
+@Immutable
+data class CaptionLine(
+    val streamId: String,
+    val subscriberName: String,
+    val text: String,
+)

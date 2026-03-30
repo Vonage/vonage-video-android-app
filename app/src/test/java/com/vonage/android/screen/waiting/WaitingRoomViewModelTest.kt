@@ -9,8 +9,11 @@ import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CameraType
+import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.PreviewPublisherState
+import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
+import com.vonage.android.settings.CallSettingsHolder
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -34,6 +37,17 @@ class WaitingRoomViewModelTest {
     private val userRepository: UserRepository = mockk()
     private val getConfig: GetConfig = mockk()
     private val audioDevicesHandler: AudioDevicesHandler = mockk(relaxed = true)
+    private val callSettingsHolder: CallSettingsHolder = mockk(relaxed = true) {
+        every { senderStatsEnabled } returns MutableStateFlow(true)
+        every { captureFrameRate } returns MutableStateFlow(CaptureFrameRate.FPS_15)
+        every { captureResolution } returns MutableStateFlow(null)
+        every { preferredVideoCodecOrder } returns MutableStateFlow(null)
+        every { audioBitrate } returns MutableStateFlow(null)
+        every { opusDtxEnabled } returns MutableStateFlow(true)
+        every { publisherAudioFallbackEnabled } returns MutableStateFlow(true)
+        every { subscriberAudioFallbackEnabled } returns MutableStateFlow(true)
+        every { videoBitrateConfig } returns MutableStateFlow(VideoBitrateConfig())
+    }
 
     private lateinit var sut: WaitingRoomViewModel
 
@@ -45,6 +59,7 @@ class WaitingRoomViewModelTest {
             videoClient = videoClient,
             getConfig = getConfig,
             audioDevicesHandler = audioDevicesHandler,
+            callSettingsHolder = callSettingsHolder,
         )
 
         every { getConfig.invoke() } returns Config(
@@ -52,12 +67,12 @@ class WaitingRoomViewModelTest {
             allowMicrophoneControl = true,
             allowShowParticipantList = true,
         )
+        every { videoClient.configurePublisher(any()) } returns Unit
     }
 
     @Test
     fun `given viewmodel when initialize then returns correct state`() = runTest {
-        val publisher = buildMockPublisher()
-        every { videoClient.createPreviewPublisher(context, any()) } returns publisher
+        val publisher = givenPreviewPublisher()
         coEvery { userRepository.getUserName() } returns ""
 
         sut.init(context)
@@ -71,13 +86,12 @@ class WaitingRoomViewModelTest {
             assertEquals(publisher.name, updatedState.userName)
         }
 
-        verify { videoClient.createPreviewPublisher(context, "") }
+        verify { videoClient.createPreviewPublisher(context) }
     }
 
     @Test
     fun `given viewmodel when update user name then returns correct state`() = runTest {
-        val publisher = buildMockPublisher()
-        every { videoClient.createPreviewPublisher(context, any()) } returns publisher
+        givenPreviewPublisher()
         coEvery { userRepository.getUserName() } returns ""
 
         sut.uiState.test {
@@ -97,8 +111,7 @@ class WaitingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when mic toggle then returns correct state`() = runTest {
-        val publisher = buildMockPublisher()
-        every { videoClient.createPreviewPublisher(context, any()) } returns publisher
+        val publisher = givenPreviewPublisher()
         coEvery { userRepository.getUserName() } returns ""
 
         sut.init(context)
@@ -116,8 +129,7 @@ class WaitingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when camera toggle then returns correct state`() = runTest {
-        val publisher = buildMockPublisher()
-        every { videoClient.createPreviewPublisher(context, any()) } returns publisher
+        givenPreviewPublisher()
         coEvery { userRepository.getUserName() } returns ""
 
         sut.init(context)
@@ -132,7 +144,7 @@ class WaitingRoomViewModelTest {
     fun `given viewmodel with cached user name then returns correct state`() = runTest {
         val publisher = buildMockPublisher()
         coEvery { userRepository.getUserName() } returns "Cached user name"
-        every { videoClient.createPreviewPublisher(context, "Cached user name") } returns publisher
+        every { videoClient.createPreviewPublisher(context) } returns publisher
 
         sut.uiState.test {
             awaitItem()
@@ -145,8 +157,7 @@ class WaitingRoomViewModelTest {
     fun `given viewmodel when join room then user name is cached`() = runTest {
         coEvery { userRepository.getUserName() } returns "initial"
         coEvery { userRepository.saveUserName(any()) } returns Unit
-        val mockPublisher = buildMockPublisher()
-        every { videoClient.createPreviewPublisher(context, "initial") } returns mockPublisher
+        givenPreviewPublisher()
         every { videoClient.configurePublisher(any()) } returns Unit
         every { videoClient.destroyPublisher() } returns Unit
 
@@ -163,8 +174,7 @@ class WaitingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when onCameraSwitch then publisher cycle camera`() = runTest {
-        val publisher = buildMockPublisher()
-        every { videoClient.createPreviewPublisher(context, any()) } returns publisher
+        val publisher = givenPreviewPublisher()
         coEvery { userRepository.getUserName() } returns "not relevant"
 
         sut.init(context)
@@ -182,8 +192,7 @@ class WaitingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when onCycleCameraBlur then publisher set camera blur`() = runTest {
-        val publisher = buildMockPublisher()
-        every { videoClient.createPreviewPublisher(context, any()) } returns publisher
+        val publisher = givenPreviewPublisher()
         coEvery { userRepository.getUserName() } returns "not relevant"
 
         sut.init(context)
@@ -205,6 +214,12 @@ class WaitingRoomViewModelTest {
         sut.onStop()
 
         verify { videoClient.destroyPublisher() }
+    }
+
+    private fun givenPreviewPublisher(): PreviewPublisherState {
+        val publisher = buildMockPublisher()
+        every { videoClient.createPreviewPublisher(context) } returns publisher
+        return publisher
     }
 
     @Suppress("LongParameterList")

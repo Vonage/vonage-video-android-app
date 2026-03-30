@@ -7,16 +7,24 @@ import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit
 import com.opentok.android.Session
 import com.opentok.android.Stream
+import com.vonage.android.kotlin.ext.applyDegradationPreference
+import com.vonage.android.kotlin.ext.applyVideoBitrate
 import com.vonage.android.kotlin.ext.cycleBlur
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.observeAudioLevel
+import com.vonage.android.kotlin.ext.observeAudioStats
+import com.vonage.android.kotlin.ext.observeVideoStats
 import com.vonage.android.kotlin.ext.toParticipantType
 import com.vonage.android.kotlin.ext.toggle
+import com.vonage.android.kotlin.internal.SpeakingWhileMutedDetector
 import com.vonage.logger.vonageLogger
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 /**
  * Represents the local publisher (current user's camera/screen) in the video call.
@@ -31,6 +39,7 @@ import kotlinx.coroutines.flow.update
 data class PublisherState(
     private val publisherId: String,
     val publisher: Publisher,
+    override val captureInfoLabel: String = "",
 ) : PublisherParticipant,
     Publisher.CameraListener,
     PublisherKit.VideoListener,
@@ -41,16 +50,18 @@ data class PublisherState(
     override val connectionId: String = publisher.stream?.connection?.connectionId ?: ""
     private val logTag = "Publisher[$id]"
     override val creationTime: Long = publisher.stream?.creationTime?.time ?: 0
-    override val videoSource: VideoSource = publisher.stream?.toParticipantType() ?: VideoSource.CAMERA
+    override val videoSource: VideoSource =
+        publisher.stream?.toParticipantType() ?: VideoSource.CAMERA
     override val isScreenShare: Boolean
         get() = videoSource == VideoSource.SCREEN
-    override val name: String = publisher.stream?.name ?: ""
+    override val name: String = publisher.name
     override val view: View = publisher.view
 
     private val _isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(publisher.publishAudio)
     override val isMicEnabled: StateFlow<Boolean> = _isMicEnabled
 
-    private val _isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(publisher.publishVideo)
+    private val _isCameraEnabled: MutableStateFlow<Boolean> =
+        MutableStateFlow(publisher.publishVideo)
     override val isCameraEnabled: StateFlow<Boolean> = _isCameraEnabled
 
     private val _audioLevel: MutableStateFlow<Float> = MutableStateFlow(0F)
@@ -64,6 +75,20 @@ data class PublisherState(
 
     private val _camera: MutableStateFlow<CameraType> = MutableStateFlow(CameraType.FRONT)
     override val camera: StateFlow<CameraType> = _camera
+
+    private val _videoStats: MutableStateFlow<VideoStats?> = MutableStateFlow(null)
+    val videoStats: StateFlow<VideoStats?> = _videoStats
+
+    private val _audioStats: MutableStateFlow<AudioStats?> = MutableStateFlow(null)
+    val audioStats: StateFlow<AudioStats?> = _audioStats
+
+    private val speakingWhileMutedDetector = SpeakingWhileMutedDetector(
+        isMicEnabled = _isMicEnabled,
+        audioLevel = _audioLevel,
+    )
+
+    private val _isSpeakingWhileMuted: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isSpeakingWhileMuted: StateFlow<Boolean> = _isSpeakingWhileMuted
 
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
@@ -93,6 +118,57 @@ data class PublisherState(
     }
 
     /**
+     * Applies a video bitrate configuration to the publisher at runtime.
+     *
+     * @param config The bitrate configuration to apply
+     */
+    fun applyVideoBitrate(config: VideoBitrateConfig) {
+        publisher.applyVideoBitrate(config)
+        vonageLogger.d(logTag, "Applied bitrate: preset=${config.preset.label}, max=${config.maxBitrate}")
+    }
+
+    /**
+     * Applies a degradation preference to the publisher at runtime.
+     *
+     * @param preference The degradation preference to apply
+     */
+    fun applyDegradationPreference(preference: DegradationPreference) {
+        publisher.applyDegradationPreference(preference)
+        vonageLogger.d(logTag, "Applied degradation preference: ${preference.label}")
+    }
+
+    @Stable
+    data class VideoStats(
+        val duration: Double,
+        val videoPacketsSent: Long,
+        val videoPacketsLost: Long,
+        val videoBytesSent: Long,
+        val estimatedBandwidthInBps: Long,
+        val videoLayerStats: ImmutableList<VideoLayerStats>,
+    )
+
+    @Stable
+    data class VideoLayerStats(
+        val height: Int,
+        val width: Int,
+        val codec: String,
+        val encodedFrameRate: Double,
+        val qualityLimitationReason: String,
+        val scalabilityMode: String?,
+        val bitrate: Long,
+        val totalBitrate: Long,
+    )
+
+    @Stable
+    data class AudioStats(
+        val duration: Double,
+        val audioPacketsSent: Long,
+        val audioPacketsLost: Long,
+        val audioBytesSent: Long,
+        val estimatedBandwidthInBps: Long,
+    )
+
+    /**
      * Initializes publisher listeners and audio level monitoring.
      *
      * Sets up all necessary listeners and starts collecting audio level data.
@@ -103,12 +179,26 @@ data class PublisherState(
         publisher.setMuteListener(this)
         publisher.setCameraListener(this)
 
-        publisher.observeAudioLevel()
-            .movingAverage(windowSize = 2)
-            .distinctUntilChanged()
-            .collect { audioLevel ->
-                _audioLevel.value = audioLevel
+        coroutineScope {
+            launch {
+                publisher.observeVideoStats()
+                    .collect { _videoStats.value = it }
             }
+            launch {
+                publisher.observeAudioStats()
+                    .collect { _audioStats.value = it }
+            }
+            launch {
+                speakingWhileMutedDetector.isSpeakingWhileMuted
+                    .collect { _isSpeakingWhileMuted.value = it }
+            }
+            publisher.observeAudioLevel()
+                .movingAverage(windowSize = 2)
+                .distinctUntilChanged()
+                .collect { audioLevel ->
+                    _audioLevel.value = audioLevel
+                }
+        }
     }
 
     override fun clean(session: Session) {

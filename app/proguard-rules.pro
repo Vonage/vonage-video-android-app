@@ -22,28 +22,29 @@
 -keep class com.vonage.webrtc.** { *; }
 
 # ================================================================================================
-# Moshi (JSON Serialization)
+# kotlinx.serialization
 # ================================================================================================
 
-# Keep data classes used with Moshi
--keep class com.vonage.android.data.network.** { *; }
+-keepattributes RuntimeVisibleAnnotations,AnnotationDefault
 
-# Keep classes annotated with @JsonClass
--keep @com.squareup.moshi.JsonClass class * { *; }
--keepclassmembers @com.squareup.moshi.JsonClass class * {
-    <init>(...);
-    <fields>;
+# Keep @Serializable classes and their generated serializers
+-if @kotlinx.serialization.Serializable class **
+-keepclassmembers class <1> {
+    static <1>$Companion Companion;
 }
-
-# Keep generated JsonAdapter classes
--if @com.squareup.moshi.JsonClass class *
--keep class <1>JsonAdapter {
-    <init>(...);
-    <fields>;
+-if @kotlinx.serialization.Serializable class ** {
+    static **$* *;
 }
-
-# Keep Moshi core classes
--keep class com.squareup.moshi.** { *; }
+-keepclassmembers class <2>$<3> {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+-if @kotlinx.serialization.Serializable class ** {
+    public static ** INSTANCE;
+}
+-keepclassmembers class <1> {
+    public static ** INSTANCE;
+    kotlinx.serialization.KSerializer serializer(...);
+}
 
 # ================================================================================================
 # Retrofit (HTTP Client)
