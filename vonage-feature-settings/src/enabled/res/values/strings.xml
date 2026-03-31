@@ -51,7 +51,7 @@
     <string name="settings_log_level_title">Log Level</string>
     <string name="settings_log_level_label">Level</string>
     <string name="settings_send_logs_title">Send Logs</string>
-    <string name="settings_send_logs_description">Upload the collected client logs to the backend as a batch JSON payload</string>
+    <string name="settings_send_logs_description">Upload the client logs to the backend as a batch JSON payload (only Info and Error Level)</string>
     <string name="settings_send_logs_button">Send Logs</string>
     <string name="settings_send_logs_in_progress">Sending Logs…</string>
     <string name="settings_logs_send_success">Logs sent successfully</string>
