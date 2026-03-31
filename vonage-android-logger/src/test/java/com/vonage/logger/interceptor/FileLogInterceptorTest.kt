@@ -42,8 +42,8 @@ class FileLogInterceptorTest {
         assertTrue(line.endsWith("}"))
         assertTrue(json.has("guid"))
         UUID.fromString(json.get("guid").asString)
-        assertTrue(line.contains("\"clientSystemTime\":\"1000000000000\""))
-        assertTrue(line.contains("\"level\":\"DEBUG\""))
+        assertTrue(line.contains("\"clientSystemTime\":1000000000000"))
+        assertTrue(line.contains("\"level\":\"debug\""))
         assertTrue(line.contains("\"userAgent\":\"test-thread\""))
         assertTrue(line.contains("\"source\":\"MyTag\""))
         assertTrue(line.contains("\"action\":\"hello world\""))
@@ -61,7 +61,7 @@ class FileLogInterceptorTest {
 
         val line = interceptor.formatEvent(event)
 
-        assertTrue(line.contains("\"level\":\"ERROR\""))
+        assertTrue(line.contains("\"level\":\"error\""))
         assertTrue(line.contains("\"userAgent\":\"err-thread\""))
         assertTrue(line.contains("\"source\":\"Err\""))
         assertTrue(line.contains("\"action\":\"failed\""))
@@ -96,7 +96,7 @@ class FileLogInterceptorTest {
         val logFile = interceptor.logFileForDate(event.timestamp)
         assertTrue(logFile.exists())
         val content = logFile.readText()
-        assertTrue(content.contains("\"level\":\"INFO\""))
+        assertTrue(content.contains("\"level\":\"info\""))
         assertTrue(content.contains("\"source\":\"Tag\""))
         assertTrue(content.contains("\"action\":\"test message\""))
     }

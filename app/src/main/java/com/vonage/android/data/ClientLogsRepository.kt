@@ -10,6 +10,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
@@ -55,7 +57,8 @@ class ClientLogsRepository @Inject constructor(
         )
     }
 
-    suspend fun sendLogs(): SendClientLogsResult {        val payload = buildPayload() ?: return SendClientLogsResult.NoLogsAvailable
+    suspend fun sendLogs(): SendClientLogsResult {
+        val payload = buildPayload() ?: return SendClientLogsResult.NoLogsAvailable
         return runCatching {
             apiService.sendClientLogs(payload.toRequestBody(JSON_MEDIA_TYPE))
         }.fold(
@@ -84,6 +87,7 @@ class ClientLogsRepository @Inject constructor(
         val entries = latestLogFile
             ?.readLines(Charsets.UTF_8)
             ?.filter(String::isNotBlank)
+            ?.filter(::isUploadableLevel)
             .orEmpty()
 
         if (entries.isEmpty()) return null
@@ -98,6 +102,19 @@ class ClientLogsRepository @Inject constructor(
     companion object {
         private const val LOG_FILE_SUFFIX = ".json.log"
         private val JSON_MEDIA_TYPE = "application/json".toMediaType()
+        private val LOG_LEVELS_TO_UPLOAD = setOf("error", "info")
+
+        private fun isUploadableLevel(logLine: String): Boolean {
+            val level = runCatching {
+                Json.parseToJsonElement(logLine)
+                    .jsonObject["level"]
+                    ?.toString()
+                    ?.trim('"')
+                    ?.lowercase()
+            }.getOrNull()
+
+            return level in LOG_LEVELS_TO_UPLOAD
+        }
     }
 }
 

@@ -63,8 +63,9 @@ class ClientLogsRepositoryTest {
     fun `sendLogs posts only the latest log file lines as a single JSON array payload`() = runTest {
         val repository = ClientLogsRepository(context, apiService)
         val logsDir = File(filesDir, DefaultVonageLogger.LOGS_DIRECTORY_NAME).apply { mkdirs() }
-        File(logsDir, "app-2026-03-26.json.log").writeText("{" + "\"message\":\"one\"}" + "\n{" + "\"message\":\"two\"}\n")
-        File(logsDir, "app-2026-03-27.json.log").writeText("{" + "\"message\":\"three\"}\n")
+        File(logsDir, "app-2026-03-26.json.log").writeText("{" + "\"level\":\"info\",\"message\":\"one\"}" + "\n{" +
+                "\"level\":\"error\",\"message\":\"two\"}\n")
+        File(logsDir, "app-2026-03-27.json.log").writeText("{" + "\"level\":\"info\",\"message\":\"three\"}\n")
         val requestBody = slot<RequestBody>()
         coEvery { apiService.sendClientLogs(capture(requestBody)) } returns Response.success(Unit)
 
@@ -72,7 +73,29 @@ class ClientLogsRepositoryTest {
 
         assertEquals(SendClientLogsResult.Success, result)
         assertEquals(
-            "[{\"message\":\"three\"}]",
+            "[{\"level\":\"info\",\"message\":\"three\"}]",
+            requestBody.captured.readUtf8(),
+        )
+    }
+
+    @Test
+    fun `sendLogs uploads only info and error log lines from latest file`() = runTest {
+        val repository = ClientLogsRepository(context, apiService)
+        val logsDir = File(filesDir, DefaultVonageLogger.LOGS_DIRECTORY_NAME).apply { mkdirs() }
+        File(logsDir, "app-2026-03-27.json.log").writeText(
+            "{" + "\"level\":\"debug\",\"message\":\"skip-debug\"}\n" +
+                "{" + "\"level\":\"info\",\"message\":\"keep-info\"}\n" +
+                "{" + "\"level\":\"warn\",\"message\":\"skip-warn\"}\n" +
+                "{" + "\"level\":\"error\",\"message\":\"keep-error\"}\n",
+        )
+        val requestBody = slot<RequestBody>()
+        coEvery { apiService.sendClientLogs(capture(requestBody)) } returns Response.success(Unit)
+
+        val result = repository.sendLogs()
+
+        assertEquals(SendClientLogsResult.Success, result)
+        assertEquals(
+            "[{\"level\":\"info\",\"message\":\"keep-info\"},{\"level\":\"error\",\"message\":\"keep-error\"}]",
             requestBody.captured.readUtf8(),
         )
     }
@@ -81,7 +104,7 @@ class ClientLogsRepositoryTest {
     fun `sendLogs returns Failure when backend responds with error`() = runTest {
         val repository = ClientLogsRepository(context, apiService)
         val logsDir = File(filesDir, DefaultVonageLogger.LOGS_DIRECTORY_NAME).apply { mkdirs() }
-        File(logsDir, "app-2026-03-27.json.log").writeText("{" + "\"message\":\"one\"}\n")
+        File(logsDir, "app-2026-03-27.json.log").writeText("{" + "\"level\":\"error\",\"message\":\"one\"}\n")
         coEvery {
             apiService.sendClientLogs(any())
         } returns Response.error(500, "error".toResponseBody("text/plain".toMediaType()))

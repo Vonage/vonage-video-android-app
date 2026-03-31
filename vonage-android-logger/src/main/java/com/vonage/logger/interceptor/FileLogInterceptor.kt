@@ -43,8 +43,8 @@ class FileLogInterceptor(
         //use Epoch millis for easier parsing and sorting in log management tools
         val obj = JsonObject()
         obj.addProperty("guid", UUID.randomUUID().toString())
-        obj.addProperty("clientSystemTime", event.timestamp.toString())
-        obj.addProperty("level", event.level.name)
+        obj.addProperty("clientSystemTime", event.timestamp)
+        obj.addProperty("level", event.level.name.lowercase())
         obj.addProperty("userAgent", event.thread)
         obj.addProperty("source", event.tag)
         obj.addProperty("action", event.message)
