@@ -1,7 +1,5 @@
 package com.vonage.android.di
 
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.vonage.android.BuildConfig
 import com.vonage.android.data.network.APIService
 import com.vonage.android.data.network.interceptor.VeraHeaderRequestDecorator
@@ -9,10 +7,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -37,20 +37,19 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    fun provideMoshi(): Moshi =
-        Moshi.Builder()
-            .addLast(KotlinJsonAdapterFactory())
-            .build()
+    fun provideJson(): Json = Json {
+        ignoreUnknownKeys = true
+    }
 
     @Provides
     @Singleton
     fun provideRetrofit(
         client: OkHttpClient,
-        moshi: Moshi,
+        json: Json,
     ): Retrofit = Retrofit.Builder()
         .baseUrl(BuildConfig.BASE_API_URL)
         .client(client)
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
         .build()
 
     @Provides

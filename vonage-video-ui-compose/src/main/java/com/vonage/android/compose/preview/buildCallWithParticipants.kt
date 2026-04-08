@@ -5,7 +5,9 @@ import android.media.projection.MediaProjection
 import androidx.compose.runtime.Composable
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.CaptionLine
 import com.vonage.android.kotlin.model.ChatState
+import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.PublisherState
@@ -13,7 +15,9 @@ import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
+import com.vonage.android.kotlin.model.VideoBitrateConfig
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +38,9 @@ fun buildCallWithParticipants(
         MutableStateFlow(buildParticipants(participantCount).toImmutableList())
     override val participantsCount: StateFlow<Int> = MutableStateFlow(participantCount)
     override val activeSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
+    override val pinnedParticipantIds: StateFlow<Set<String>> = MutableStateFlow(emptySet())
+    override fun togglePinParticipant(participantId: String) { /* empty on purpose */ }
+    override fun forceMuteParticipant(participantId: String) { /* empty on purpose */ }
 
     // Session related methods
     override fun connect(context: Context): Flow<SessionEvent> = flowOf()
@@ -50,6 +57,9 @@ fun buildCallWithParticipants(
     override fun toggleLocalCamera() { /* empty on purpose */ }
     override fun toggleLocalAudio() { /* empty on purpose */ }
     override fun cycleLocalCameraBlur() { /* empty on purpose */ }
+    override fun setVideoBitrate(config: VideoBitrateConfig) { /* empty on purpose */ }
+    override fun setDegradationPreference(preference: DegradationPreference) { /* empty on purpose */ }
+    override fun refreshPublisher(context: Context) { /* empty on purpose */ }
 
     // Chat related methods
     override val signalStateFlow: StateFlow<SignalState> = MutableStateFlow(
@@ -62,7 +72,7 @@ fun buildCallWithParticipants(
             )
         )
     )
-    override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
+    override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = MutableStateFlow(persistentListOf())
     override val archivingStateFlow: StateFlow<ArchivingState> = MutableStateFlow(ArchivingState.Idle)
 
     override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> {

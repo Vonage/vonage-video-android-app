@@ -3,24 +3,23 @@ package com.vonage.android.kotlin
 import android.content.Context
 import android.media.projection.MediaProjection
 import androidx.compose.runtime.Stable
-import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.OpentokError
-import com.opentok.android.Publisher
-import com.opentok.android.PublisherKit.PublisherKitVideoType
 import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
 import com.vonage.android.kotlin.ext.extractSenderName
 import com.vonage.android.kotlin.ext.firstScreenSharing
-import com.vonage.android.kotlin.ext.mapSorted
+import com.vonage.android.kotlin.ext.id
 import com.vonage.android.kotlin.ext.name
+import com.vonage.android.kotlin.ext.sorted
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
-import com.vonage.android.kotlin.internal.ScreenSharingCapturer
-import com.vonage.android.kotlin.internal.VeraPublisherHolder
+import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.CaptionLine
 import com.vonage.android.kotlin.model.ChatState
+import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.ParticipantState
@@ -30,6 +29,7 @@ import com.vonage.android.kotlin.model.SignalFlows
 import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
+import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.kotlin.signal.SignalPlugin
 import com.vonage.logger.vonageLogger
@@ -42,6 +42,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,6 +51,7 @@ import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -75,7 +77,7 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * @param token Authentication token for the session
  * @param session Vonage session instance
- * @param publisherHolder Container for publisher instances
+ * @param publisherFactory Publisher factory
  * @param signalPlugins List of plugins for handling custom signals
  * @param coroutineDispatcher Dispatcher for coroutine operations (defaults to IO)
  */
@@ -84,7 +86,7 @@ import java.util.concurrent.ConcurrentHashMap
 class Call internal constructor(
     private val token: String,
     private val session: Session,
-    private val publisherHolder: VeraPublisherHolder,
+    private val publisherFactory: PublisherFactory,
     private val signalPlugins: List<SignalPlugin>,
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : CallFacade {
@@ -98,33 +100,60 @@ class Call internal constructor(
 
     /** Tracks active speaker based on audio levels across all participants */
     private val activeSpeakerTracker = ActiveSpeakerTracker(coroutineScope = coroutineScope)
-    
+
     /** Thread-safe map of all participants (publishers and subscribers) keyed by stream ID */
     private val participants = ConcurrentHashMap<String, Participant>()
 
     /** Internal flow that emits on every participant change, throttled before exposing */
-    private val _participantsInternalFlow = MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
-    
-    /**
-     * StateFlow of all participants sorted with screen sharing first, then by creation time (newest first).
-     * Throttled to reduce UI updates and improve performance.
-     */
-    override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = _participantsInternalFlow
-        .sample(PARTICIPANTS_DEBOUNCE_MILLIS)
-        .distinctUntilChanged()
-        .mapSorted()
+    private val _participantsInternalFlow =
+        MutableStateFlow<ImmutableList<Participant>>(persistentListOf())
+
+    private val _pinnedParticipantIds = MutableStateFlow<Set<String>>(emptySet())
+    override val pinnedParticipantIds: StateFlow<Set<String>> = _pinnedParticipantIds
+        .map { ids -> ids.filter { participants.containsKey(it) }.toSet() }
         .stateIn(
             scope = coroutineScope,
-            started = WhileSubscribed(SUBSCRIBE_TIMEOUT_MILLIS),
-            initialValue = persistentListOf(),
+            started = SharingStarted.Eagerly,
+            initialValue = emptySet(),
         )
+
+    override fun togglePinParticipant(participantId: String) {
+        _pinnedParticipantIds.update { current ->
+            if (participantId in current) current - participantId else current + participantId
+        }
+    }
+
+    override fun forceMuteParticipant(participantId: String) {
+        (participants[participantId] as? ParticipantState)?.let {
+            session.forceMuteStream(it.stream)
+        }
+    }
+
+    /**
+     * StateFlow of all participants sorted with screen sharing first, then pinned, then by creation time (newest first).
+     * Throttled to reduce UI updates and improve performance.
+     */
+    override val participantsStateFlow: StateFlow<ImmutableList<Participant>> = combine(
+        _participantsInternalFlow
+            .sample(PARTICIPANTS_DEBOUNCE_MILLIS)
+            .distinctUntilChanged(),
+        _pinnedParticipantIds,
+    ) { participants, pinnedIds ->
+        participants.sorted(pinnedIds)
+    }.stateIn(
+        scope = coroutineScope,
+        started = WhileSubscribed(SUBSCRIBE_TIMEOUT_MILLIS),
+        initialValue = persistentListOf(),
+    )
 
     /**
      * StateFlow of the local publisher (the current user's camera/screen).
      * Extracted from the participants list for convenient access.
      */
     override val publisher: StateFlow<PublisherState?> = _participantsInternalFlow
-        .map { participants -> participants.firstOrNull { it.id == PUBLISHER_ID }?.let { it as PublisherState } }
+        .map { participants ->
+            participants.firstOrNull { it.id == PUBLISHER_ID }?.let { it as PublisherState }
+        }
         .stateIn(
             scope = coroutineScope,
             started = WhileSubscribed(SUBSCRIBE_TIMEOUT_MILLIS),
@@ -132,7 +161,7 @@ class Call internal constructor(
         )
 
     private val _activeSpeaker = MutableStateFlow<Participant?>(null)
-    
+
     /**
      * StateFlow of the currently active speaker based on audio level analysis.
      * Debounced to prevent rapid changes when multiple people speak.
@@ -142,7 +171,7 @@ class Call internal constructor(
         .distinctUntilChanged()
         .stateIn(
             scope = coroutineScope,
-            started = WhileSubscribed(SUBSCRIBE_TIMEOUT_MILLIS),
+            started = SharingStarted.Eagerly,
             initialValue = null,
         )
 
@@ -152,8 +181,9 @@ class Call internal constructor(
     private val _signalStateFlow = MutableStateFlow<SignalState?>(null)
     override val signalStateFlow: StateFlow<SignalState?> = _signalStateFlow
 
-    private val _captionsStateFlow = MutableStateFlow<String?>(null)
-    override val captionsStateFlow: StateFlow<String?> = _captionsStateFlow
+    private val _captionsStateFlow =
+        MutableStateFlow<ImmutableList<CaptionLine>>(persistentListOf())
+    override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = _captionsStateFlow
 
     private val _archivingStateFlow = MutableStateFlow<ArchivingState>(ArchivingState.Idle)
     override val archivingStateFlow: StateFlow<ArchivingState> = _archivingStateFlow
@@ -176,7 +206,7 @@ class Call internal constructor(
             .stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)
 
     //region Session lifecycle
-    
+
     /**
      * Connects to the video session and returns a flow of session events.
      *
@@ -269,11 +299,16 @@ class Call internal constructor(
         session.setSessionListener(null)
         session.setSignalListener(null)
         session.disconnect()
+
+        coroutineScope.cancel()
+        participantsOnScreenJob?.cancel()
+        activeSpeakerTrackerJob?.cancel()
+        signalsJob?.cancel()
     }
     //endregion
 
     //region Signals
-    
+
     /**
      * Sends an emoji reaction that will be displayed to all participants.
      *
@@ -299,7 +334,10 @@ class Call internal constructor(
         signalPlugins
             .filter { it.canHandle(signalType.signal) }
             .forEach { plugin ->
-                plugin.sendSignal(senderName = publisher()?.publisher?.name.orEmpty(), message = data).let {
+                plugin.sendSignal(
+                    senderName = publisher()?.publisher?.name.orEmpty(),
+                    message = data
+                ).let {
                     session.sendSignal(it.type, it.data)
                 }
             }
@@ -335,7 +373,7 @@ class Call internal constructor(
     //endregion
 
     //region Publisher
-    
+
     /**
      * Helper to get the current publisher from participants map.
      */
@@ -370,26 +408,80 @@ class Call internal constructor(
     }
 
     /**
+     * Applies a video bitrate configuration to the publisher at runtime.
+     */
+    override fun setVideoBitrate(config: VideoBitrateConfig) {
+        publisher()?.applyVideoBitrate(config)
+    }
+
+    /**
+     * Applies a degradation preference to the publisher at runtime.
+     */
+    override fun setDegradationPreference(preference: DegradationPreference) {
+        publisher()?.applyDegradationPreference(preference)
+    }
+
+    /**
+     * Refreshes the publisher by unpublishing, destroying, recreating, and republishing.
+     * The publisher factory must be reconfigured with the new settings before calling.
+     */
+    override fun refreshPublisher(context: Context) {
+        vonageLogger.i("PublisherFactory", "Refresh publisher")
+        coroutineScope.launch(Dispatchers.Default) {
+            val old = publisher() ?: return@launch
+            val wasVideoOn = old.isCameraEnabled.value
+            val wasAudioOn = old.isMicEnabled.value
+            val blurLevel = old.blurLevel.value
+            val cameraIndex = old.camera.value.index
+            val name = old.name
+
+            old.clean()
+
+            publisherFactory.destroyPublisher()
+            participants.remove(PUBLISHER_ID)
+
+            vonageLogger.i("PublisherFactory", "Publisher name = $name")
+
+            publisherFactory.init(
+                publisherFactory.currentConfig!!.copy(
+                    name = name,
+                    publishVideo = wasVideoOn,
+                    publishAudio = wasAudioOn,
+                    blurLevel = blurLevel,
+                    cameraIndex = cameraIndex,
+                ),
+            )
+            val newPublisher = withContext(Dispatchers.Main) {
+                val publisherState = publisherFactory.createPublisherState(context)
+                session.publish(publisherState.publisher)
+                publisherState
+            }
+            participants[PUBLISHER_ID] = newPublisher
+            coroutineScope.launch { newPublisher.setup() }
+            updateParticipants()
+        }
+    }
+
+    /**
      * Publishes the local camera stream to the session.
      * Called automatically when connecting to the session.
      */
     private fun publishToSession() {
         coroutineScope.launch(Dispatchers.Default) {
-            publisherHolder.let { holder ->
-                val publisher = withContext(Dispatchers.Main) {
-                    session.publish(holder.publisher)
-                    PublisherState(publisherId = PUBLISHER_ID, publisher = holder.publisher)
-                }
-                participants[PUBLISHER_ID] = publisher
-                coroutineScope.launch { publisher.setup() }
-                updateParticipants()
+            val newPublisher = withContext(Dispatchers.Main) {
+                val publisherState = publisherFactory.createPublisherState(context)
+                session.publish(publisherState.publisher)
+                publisherState
             }
+            participants[PUBLISHER_ID] = newPublisher
+            coroutineScope.launch { newPublisher.setup() }
+            updateParticipants()
         }
     }
     //endregion
 
     //region Screen sharing
-    
+
     /**
      * Starts screen sharing using the provided MediaProjection.
      *
@@ -399,24 +491,15 @@ class Call internal constructor(
      */
     override fun startCapturingScreen(mediaProjection: MediaProjection) {
         coroutineScope.launch(Dispatchers.Default) {
-            val name = "${publisherHolder.publisher.name}'s Screen" // translate this!
+            val name = "${publisher()?.publisher?.name}'s Screen" // translate this!
             val publisher = withContext(Dispatchers.Main) {
-                val screenPublisher = Publisher.Builder(context)
-                    .name(name)
-                    .capturer(ScreenSharingCapturer(context, mediaProjection))
-                    .build()
-                    .apply {
-                        renderer?.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FIT)
-                        publishVideo = true
-                        publishAudio = false
-                        publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeScreen
-                    }
-                session.publish(screenPublisher)
-                publisherHolder.screenPublisher = screenPublisher
-                PublisherState(
-                    publisherId = PUBLISHER_SCREEN_ID,
-                    publisher = screenPublisher,
+                val screenPublisherState = publisherFactory.createScreenSharePublisherState(
+                    context = context,
+                    mediaProjection = mediaProjection,
+                    name = name,
                 )
+                session.publish(screenPublisherState.publisher)
+                screenPublisherState
             }
             participants[PUBLISHER_SCREEN_ID] = publisher
             updateParticipants()
@@ -427,7 +510,7 @@ class Call internal constructor(
      * Stops screen sharing and removes the screen publisher.
      */
     override fun stopCapturingScreen() {
-        publisherHolder.screenPublisher?.let {
+        (participants[PUBLISHER_SCREEN_ID] as PublisherState).publisher.let {
             session.unpublish(it)
         }
         participants.remove(PUBLISHER_SCREEN_ID)
@@ -436,16 +519,22 @@ class Call internal constructor(
     //endregion
 
     //region Captions
-    
+
     /**
      * Listener for receiving captions from remote participants.
      * Updates the captions state flow with speaker name and text.
      */
     private val captionsDelegate: SubscriberKit.CaptionsListener =
         SubscriberKit.CaptionsListener { subscriber, text, isFinal ->
-            _captionsStateFlow.update { _ -> "${subscriber.name()}: $text" }
-            if (isFinal) {
-                _captionsStateFlow.update { _ -> null }
+            val name = subscriber.name()
+            val streamId = subscriber.id()
+            _captionsStateFlow.update { lines ->
+                if (isFinal) {
+                    lines.filter { it.streamId != streamId }.toImmutableList()
+                } else {
+                    val line = CaptionLine(streamId = streamId, subscriberName = name, text = text)
+                    lines.filter { it.streamId != streamId }.plus(line).toImmutableList()
+                }
             }
         }
 
@@ -466,20 +555,21 @@ class Call internal constructor(
     private fun setCaptions(enable: Boolean) {
         coroutineScope.launch {
             publisher()?.publisher?.publishCaptions = enable
-                participants.values.filterIsInstance<ParticipantState>()
-                    .forEach { participant -> participant.subscriber.subscribeToCaptions = enable }
+            participants.values.filterIsInstance<ParticipantState>()
+                .forEach { participant -> participant.subscriber.subscribeToCaptions = enable }
         }
     }
     //endregion
 
     //region Subscribers
-    
+
     /**
      * Creates and subscribes to a remote participant's stream.
      * Adds the subscriber to the participants map and starts audio level monitoring.
      */
     @Suppress("TooGenericExceptionCaught")
     private fun addSubscriber(stream: Stream) {
+        vonageLogger.d(TAG, "Add subscriber ${stream.name} [${stream.streamId}]")
         coroutineScope.launch {
             try {
                 val participant = withContext(Dispatchers.Main) {
@@ -504,7 +594,10 @@ class Call internal constructor(
     private fun observeSubscriberAudioLevel(participant: Participant) {
         coroutineScope.launch {
             participant.audioLevel.collect { movingAvg ->
-                activeSpeakerTracker.onSubscriberAudioLevelUpdated(streamId = participant.id, movingAvg = movingAvg)
+                activeSpeakerTracker.onSubscriberAudioLevelUpdated(
+                    streamId = participant.id,
+                    movingAvg = movingAvg
+                )
             }
         }
     }
@@ -542,7 +635,8 @@ class Call internal constructor(
                     if (visibleParticipants.isEmpty()) return@collectLatest
                     val activeSpeakerId = activeSpeaker.value?.id
                     participants.forEach { (key, participantState) ->
-                        val isVisible = visibleParticipants.contains(key) || (key == activeSpeakerId)
+                        val isVisible =
+                            visibleParticipants.contains(key) || (key == activeSpeakerId)
                         participantState.changeVisibility(isVisible)
                     }
                 }
@@ -551,7 +645,7 @@ class Call internal constructor(
 
     /**
      * Starts monitoring active speaker changes and updates visibility accordingly.
-     * Ensures the active speaker is always visible even if scrolled off screen.
+     * Ensures the active speaker is always visible even if scrolled off-screen.
      * Screen sharing participants are automatically set as the active speaker.
      */
     private fun startActiveSpeakerTracker() {
@@ -590,13 +684,13 @@ class Call internal constructor(
     }
 
     companion object {
-        private const val TAG: String = "Call"
+        private const val TAG: String = "CallFacade"
         private const val SUBSCRIBE_TIMEOUT_MILLIS = 10000L
         const val PUBLISHER_ID: String = "publisher"
         const val PUBLISHER_SCREEN_ID: String = "publisher-screen"
 
         private const val PARTICIPANTS_DEBOUNCE_MILLIS = 100L
-        private const val ACTIVE_SPEAKER_DEBOUNCE_MILLIS = 100L
+        private const val ACTIVE_SPEAKER_DEBOUNCE_MILLIS = 250L
         private const val VISIBILITY_MONITOR_ENABLED = true
     }
 }

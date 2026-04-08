@@ -1,40 +1,40 @@
 package com.vonage.android.archiving.data
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class StartArchivingResponse(
-    @field:Json(name = "archiveId")
+    @SerialName("archiveId")
     val archiveId: String,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class StopArchivingResponse(
-    @field:Json(name = "archiveId")
+    @SerialName("archiveId")
     val archiveId: String,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class GetArchivesResponse(
-    @field:Json(name = "archives")
+    @SerialName("archives")
     val archives: List<ServerArchive>
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class ServerArchive(
-    @field:Json(name = "id")
+    @SerialName("id")
     val id: String,
-    @field:Json(name = "duration")
+    @SerialName("duration")
     val duration: Int,
-    @field:Json(name = "name")
+    @SerialName("name")
     val name: String,
-    @field:Json(name = "url")
-    val url: String?,
-    @field:Json(name = "size")
+    @SerialName("url")
+    val url: String? = null,
+    @SerialName("size")
     val size: Int,
-    @field:Json(name = "status")
+    @SerialName("status")
     val status: String,
-    @field:Json(name = "createdAt")
+    @SerialName("createdAt")
     val createdAt: Long,
 )

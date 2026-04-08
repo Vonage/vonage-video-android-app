@@ -72,6 +72,10 @@ interface PublisherParticipant : Participant {
     override val isPublisher: Boolean
         get() = true
 
+    /** Human-readable label for the capture resolution and frame rate (e.g. "720p / 15 FPS") */
+    val captureInfoLabel: String
+        get() = ""
+
     /** StateFlow of current camera type (front/back) */
     val camera: StateFlow<CameraType>
 

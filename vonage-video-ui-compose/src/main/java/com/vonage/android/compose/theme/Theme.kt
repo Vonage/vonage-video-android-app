@@ -1,17 +1,15 @@
+// Auto-generated from theme.json
 package com.vonage.android.compose.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-
-// Auto-generated from theme.json
+import kotlin.Boolean
+import kotlin.Unit
 
 @Composable
-fun VonageVideoTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
-) {
+public fun VonageVideoTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val colorScheme = when {
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
@@ -98,17 +96,20 @@ fun VonageVideoTheme(
     }
 }
 
-object VonageVideoTheme {
-    val colors: VonageColors
+public object VonageVideoTheme {
+    public val colors: VonageColors
         @Composable
         get() = LocalVonageColors.current
-    val typography: VonageTypography
+
+    public val typography: VonageTypography
         @Composable
         get() = LocalVonageTypography.current
-    val shapes: VonageShapes
+
+    public val shapes: VonageShapes
         @Composable
         get() = LocalVonageShapes.current
-    val dimens: VonageDimens
+
+    public val dimens: VonageDimens
         @Composable
         get() = LocalVonageDimens.current
 }

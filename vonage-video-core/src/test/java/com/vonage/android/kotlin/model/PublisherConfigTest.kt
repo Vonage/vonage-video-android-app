@@ -105,4 +105,40 @@ class PublisherConfigTest {
         assertEquals(config1, config2)
         assertEquals(config1.hashCode(), config2.hashCode())
     }
+
+    @Test
+    fun `should create PublisherConfig with custom videoBitrateConfig`() {
+        val bitrateConfig = VideoBitrateConfig(
+            preset = VideoBitratePreset.CUSTOM,
+            maxBitrate = 500_000,
+        )
+        val config = PublisherConfig(
+            name = "User",
+            publishVideo = true,
+            publishAudio = true,
+            blurLevel = BlurLevel.NONE,
+            cameraIndex = 1,
+            videoBitrateConfig = bitrateConfig,
+        )
+
+        assertEquals(VideoBitratePreset.CUSTOM, config.videoBitrateConfig.preset)
+        assertEquals(500_000, config.videoBitrateConfig.maxBitrate)
+    }
+
+    @Test
+    fun `should have default BW_SAVER videoBitrateConfig`() {
+        val config = PublisherConfig(
+            name = "User",
+            publishVideo = true,
+            publishAudio = true,
+            blurLevel = BlurLevel.NONE,
+            cameraIndex = 1,
+        )
+
+        assertEquals(VideoBitratePreset.DEFAULT, config.videoBitrateConfig.preset)
+        assertEquals(
+            VideoBitratePreset.DEFAULT.defaultMaxBitrate,
+            config.videoBitrateConfig.maxBitrate,
+        )
+    }
 }

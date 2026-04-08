@@ -2,6 +2,7 @@ package com.vonage.android.screen.room.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,18 +11,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.components.AudioVolumeIndicator
 import com.vonage.android.compose.components.AvatarInitials
@@ -31,24 +38,42 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.MicMute
 import com.vonage.android.compose.vivid.icons.solid.Microphone2
+import com.vonage.android.compose.vivid.icons.solid.MoreVertical
 import com.vonage.android.fx.ui.BlurIndicator
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.kotlin.model.VideoSource
+import com.vonage.android.screen.components.VideoLabel
 import com.vonage.android.screen.room.MeetingRoomActions
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ParticipantVideoCard(
     participant: Participant,
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
+    isPinned: Boolean = false,
 ) {
     val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
     val isCameraEnabled by participant.isCameraEnabled.collectAsStateWithLifecycle()
     val isSpeaking by participant.isTalking.collectAsStateWithLifecycle()
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val hapticFeedback = LocalHapticFeedback.current
 
     ParticipantContainer(
-        modifier = modifier,
+        modifier = if (!participant.isPublisher) {
+            modifier
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                            showBottomSheet = true
+                        },
+                    )
+                }
+        } else {
+            modifier
+        },
         isSpeaking = isSpeaking,
         isMicEnabled = isMicEnabled,
     ) {
@@ -57,9 +82,10 @@ fun ParticipantVideoCard(
         )
 
         if (participant.name.isNotBlank()) {
-            ParticipantLabel(participant.name)
-        } else {
-            ParticipantLabel(participant.id)
+            VideoLabel(
+                modifier = Modifier.align(Alignment.BottomStart),
+                text = participant.name
+            )
         }
 
         if (participant.videoSource == VideoSource.CAMERA) {
@@ -72,8 +98,37 @@ fun ParticipantVideoCard(
             )
         }
 
+        if (isPinned) {
+            PinIndicator(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(8.dp),
+            )
+        }
+
+        if (participant.isPublisher.not()) {
+            IconButton(
+                modifier = Modifier.align(Alignment.BottomEnd),
+                onClick = { showBottomSheet = true }
+            ) {
+                Icon(
+                    imageVector = VividIcons.Solid.MoreVertical,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeSmall),
+                )
+            }
+        }
+
         if (participant.isPublisher && participant.isScreenShare.not()) {
-            val blurLevel by (participant as PublisherParticipant).blurLevel.collectAsStateWithLifecycle()
+            val publisherParticipant = participant as PublisherParticipant
+
+            VideoLabel(
+                text = publisherParticipant.captureInfoLabel,
+                modifier = Modifier.align(Alignment.TopStart),
+            )
+
+            val blurLevel by publisherParticipant.blurLevel.collectAsStateWithLifecycle()
 
             BlurIndicator(
                 modifier = Modifier
@@ -87,6 +142,20 @@ fun ParticipantVideoCard(
             )
         }
     }
+
+    if (showBottomSheet && !participant.isPublisher) {
+        val sheetState = rememberModalBottomSheetState()
+        ModalBottomSheet(
+            onDismissRequest = { showBottomSheet = false },
+            sheetState = sheetState,
+        ) {
+            ParticipantContextualActions(
+                participant = participant,
+                actions = actions,
+                isPinned = isPinned
+            )
+        }
+    }
 }
 
 @Composable
@@ -97,12 +166,12 @@ private fun ParticipantContainer(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val borderWidth = remember { 1.dp }
+    val isSpeakingColor = VonageVideoTheme.colors.primary
 
     val border = remember(isSpeaking, isMicEnabled) {
-        if (isSpeaking && isMicEnabled) {
-            BorderStroke(borderWidth, Color.Cyan)
-        } else {
-            null
+        when {
+            isSpeaking && isMicEnabled -> BorderStroke(borderWidth, isSpeakingColor)
+            else -> null
         }
     }
 
@@ -137,38 +206,6 @@ private fun BoxScope.ParticipantVideoContainer(
             modifier = Modifier
                 .align(Alignment.Center),
             userName = participant.name,
-        )
-    }
-}
-
-@Composable
-private fun BoxScope.ParticipantLabel(
-    name: String,
-    modifier: Modifier = Modifier,
-) {
-    val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
-
-    Box(
-        modifier = modifier
-            .align(Alignment.BottomStart)
-            .padding(
-                top = VonageVideoTheme.dimens.paddingXSmall,
-                bottom = VonageVideoTheme.dimens.paddingXSmall,
-                start = VonageVideoTheme.dimens.paddingXSmall,
-                end = 48.dp,
-            )
-            .background(backgroundColor, VonageVideoTheme.shapes.medium)
-            .padding(
-                horizontal = VonageVideoTheme.dimens.paddingSmall,
-                vertical = VonageVideoTheme.dimens.paddingXSmall,
-            )
-    ) {
-        Text(
-            text = name,
-            color = Color.White,
-            fontSize = 12.sp,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
         )
     }
 }

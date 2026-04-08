@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.kotlin.compose)
-    kotlin("plugin.serialization") version "2.0.21"
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.adaptive)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.opentok.android.sdk)
 

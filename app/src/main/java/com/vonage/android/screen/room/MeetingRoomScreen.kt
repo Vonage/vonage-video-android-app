@@ -48,6 +48,9 @@ import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.MeetingTopBar
 import com.vonage.android.screen.room.components.bottombar.BottomBar
 import com.vonage.android.screen.room.components.bottombar.BottomBarState
+import com.vonage.android.captions.ui.CaptionsOverlay
+import com.vonage.android.reactions.ui.EmojiReactionOverlay
+import com.vonage.android.screen.room.components.SpeakingWhileMutedOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat
 import com.vonage.android.util.rememberNoiseSuppression
@@ -84,6 +87,7 @@ fun MeetingRoomScreen(
         (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not()) -> {
             val participants by uiState.call.participantsStateFlow.collectAsStateWithLifecycle()
             val publisher by uiState.call.publisher.collectAsStateWithLifecycle()
+            val captionLines by uiState.call.captionsStateFlow.collectAsStateWithLifecycle()
             Scaffold(
                 modifier = modifier
                     .systemBarsPadding(),
@@ -135,7 +139,8 @@ fun MeetingRoomScreen(
                                 .fillMaxSize(),
                         ) {
                             EmojiReactionOverlay(call = uiState.call)
-                            CaptionsOverlay(call = uiState.call)
+                            CaptionsOverlay(captionLines = captionLines)
+                            SpeakingWhileMutedOverlay(publisher = publisher)
                             MeetingRoomContent(
                                 modifier = Modifier
                                     .testTag(MEETING_ROOM_CONTENT),

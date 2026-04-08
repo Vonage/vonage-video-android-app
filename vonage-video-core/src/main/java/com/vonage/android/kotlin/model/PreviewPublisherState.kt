@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.update
 @Stable
 data class PreviewPublisherState(
     private val publisher: Publisher,
+    override val captureInfoLabel: String = "",
 ) : PublisherParticipant,
     Publisher.CameraListener {
 

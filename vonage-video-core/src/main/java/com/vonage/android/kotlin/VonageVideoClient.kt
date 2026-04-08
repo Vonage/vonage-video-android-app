@@ -76,17 +76,16 @@ class VonageVideoClient(
      * @return PublisherState wrapping the created publisher with reactive state flows
      */
     fun buildPublisher(context: Context): PublisherState =
-        publisherFactory.createPublisher(context)
+        publisherFactory.createPublisherState(context)
 
     /**
      * Creates a preview-only publisher for showing camera preview before joining a call.
      *
      * @param context Android context for publisher creation
-     * @param name Display name for the preview publisher
      * @return PreviewPublisherState for camera preview
      */
-    fun createPreviewPublisher(context: Context, name: String): PreviewPublisherState =
-        publisherFactory.createPreviewPublisher(context, name)
+    fun createPreviewPublisher(context: Context): PreviewPublisherState =
+        publisherFactory.createPreviewPublisher(context)
 
     /**
      * Destroys the current publisher and releases associated resources.
@@ -108,9 +107,9 @@ class VonageVideoClient(
      * @return CallFacade interface for managing the video call
      */
     fun initializeSession(apiKey: String, sessionId: String, token: String): CallFacade {
-        vonageLogger.i(TAG, "apiKey: $apiKey")
-        vonageLogger.i(TAG, "sessionId: $sessionId")
-        vonageLogger.i(TAG, "token: $token")
+        vonageLogger.d(TAG, "apiKey: $apiKey")
+        vonageLogger.d(TAG, "sessionId: $sessionId")
+        vonageLogger.d(TAG, "token: $token")
 
         session = Session.Builder(context, apiKey, sessionId)
             .setSinglePeerConnection(true)
@@ -125,7 +124,7 @@ class VonageVideoClient(
         return Call(
             token = token,
             session = session!!,
-            publisherHolder = publisherFactory.publisherHolder!!,
+            publisherFactory = publisherFactory,
             signalPlugins = signalPlugins,
         )
     }

@@ -101,6 +101,8 @@ fun MeetingRoomScreenRoute(
                 viewModel.changeLayout(layoutType)
             },
             onSettings = navigateToSettings,
+            onTogglePinParticipant = viewModel::onTogglePinParticipant,
+            onForceMuteParticipant = viewModel::forceMuteParticipant,
         )
     }
 
@@ -150,4 +152,6 @@ data class MeetingRoomActions(
     val onShowFeedbackScreen: () -> Unit = {},
     val onChangeLayout: (CallLayoutType) -> Unit = {},
     val onSettings: () -> Unit = {},
+    val onTogglePinParticipant: (String) -> Unit = {},
+    val onForceMuteParticipant: (String) -> Unit = {},
 )

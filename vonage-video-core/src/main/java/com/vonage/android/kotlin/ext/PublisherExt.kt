@@ -5,10 +5,13 @@ import com.opentok.android.PublisherKit
 import com.vonage.android.kotlin.model.BackgroundBlur.KEY
 import com.vonage.android.kotlin.model.BackgroundBlur.params
 import com.vonage.android.kotlin.model.BlurLevel
+import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.NoiseSuppression
 import com.vonage.android.kotlin.model.PublisherState.AudioStats
 import com.vonage.android.kotlin.model.PublisherState.VideoLayerStats
 import com.vonage.android.kotlin.model.PublisherState.VideoStats
+import com.vonage.android.kotlin.model.VideoBitrateConfig
+import com.vonage.android.kotlin.model.VideoBitratePreset
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.awaitClose
@@ -88,6 +91,42 @@ internal fun Publisher.observeAudioLevel(): Flow<Float> = callbackFlow {
     awaitClose {
         setAudioLevelListener(null)
     }
+}
+
+internal fun Publisher.applyVideoBitrate(config: VideoBitrateConfig?) {
+    val sdkPreset = config.toSdkValue()
+    videoBitratePreset = sdkPreset
+    if (config?.preset == VideoBitratePreset.CUSTOM) {
+        config.maxBitrate?.let { safeMaxBitrate ->
+            maxVideoBitrate = safeMaxBitrate
+        }
+    }
+}
+
+internal fun VideoBitrateConfig?.toSdkValue(): PublisherKit.VideoBitratePreset =
+    when (this?.preset) {
+        VideoBitratePreset.DEFAULT -> PublisherKit.VideoBitratePreset.VideoBitratePresetDefault
+        VideoBitratePreset.BW_SAVER -> PublisherKit.VideoBitratePreset.VideoBitratePresetBwSaver
+        VideoBitratePreset.EXTRA_BW_SAVER -> PublisherKit.VideoBitratePreset.VideoBitratePresetExtraBwSaver
+        VideoBitratePreset.CUSTOM -> PublisherKit.VideoBitratePreset.VideoBitratePresetCustom
+        null -> PublisherKit.VideoBitratePreset.VideoBitratePresetDefault
+    }
+
+internal fun Publisher.applyDegradationPreference(preference: DegradationPreference?) {
+    val sdkPref = when (preference) {
+        DegradationPreference.NOT_SET ->
+            PublisherKit.DegradationPreference.DegradationPreferenceNotSet
+        DegradationPreference.MAINTAIN_FRAME_RATE_AND_RESOLUTION ->
+            PublisherKit.DegradationPreference.DegradationPreferenceMaintainFrameRateAndResolution
+        DegradationPreference.MAINTAIN_FRAME_RATE ->
+            PublisherKit.DegradationPreference.DegradationPreferenceMaintainFrameRate
+        DegradationPreference.MAINTAIN_RESOLUTION ->
+            PublisherKit.DegradationPreference.DegradationPreferenceMaintainResolution
+        DegradationPreference.BALANCED ->
+            PublisherKit.DegradationPreference.DegradationPreferenceBalanced
+        null -> PublisherKit.DegradationPreference.DegradationPreferenceNotSet
+    }
+    degradationPreference = sdkPref
 }
 
 internal fun Publisher.observeVideoStats(): Flow<VideoStats> = callbackFlow {

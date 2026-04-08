@@ -607,6 +607,60 @@ class MeetingRoomScreenViewModelTest {
         }
     }
 
+    @Test
+    fun `given viewmodel when onCycleLocalCameraBlur then delegate to call`() = runTest {
+        val mockCall = givenMockCall()
+
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        sut.uiState.test {
+            assertEquals(
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
+            )
+            awaitItem()
+            sut.onCycleLocalCameraBlur()
+            verify { mockCall.cycleLocalCameraBlur() }
+        }
+    }
+
+    @Test
+    fun `given viewmodel when onTogglePinParticipant then delegate to call`() = runTest {
+        val mockCall = givenMockCall()
+
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        sut.uiState.test {
+            assertEquals(
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
+            )
+            awaitItem()
+            sut.onTogglePinParticipant("participant-id")
+            verify { mockCall.togglePinParticipant("participant-id") }
+        }
+    }
+
+    @Test
+    fun `given viewmodel when forceMuteParticipant then delegate to call`() = runTest {
+        val mockCall = givenMockCall()
+
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        sut.uiState.test {
+            assertEquals(
+                MeetingRoomUiState(roomName = ANY_ROOM_NAME, isLoading = true),
+                awaitItem()
+            )
+            awaitItem()
+            sut.forceMuteParticipant("participant-id")
+            verify { mockCall.forceMuteParticipant("participant-id") }
+        }
+    }
+
     private fun givenMockCall(): CallFacade {
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         every { videoClient.buildPublisher(any()) } returns buildMockPublisher()

@@ -17,5 +17,8 @@ internal fun Long.formatBitrate(): String = when {
     else -> "$this bps"
 }
 
+@SuppressLint("DefaultLocale", "MagicNumber")
+internal fun Float.formatBitrate(): String = toLong().formatBitrate()
+
 private const val ONE_MILLION = 1_000_000
 private const val ONE_THOUSAND = 1_000
