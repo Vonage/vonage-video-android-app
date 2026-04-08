@@ -338,7 +338,7 @@ class SettingsActionsTest {
     fun `SendClientLogsAction sends success event and resets loading state`() = runTest {
         File(filesDir, DefaultVonageLogger.LOGS_DIRECTORY_NAME).apply { mkdirs() }
             .resolve("app-2026-03-27.json.log")
-            .writeText("{\"message\":\"hello\"}\n")
+            .writeText("{\"level\":\"info\",\"message\":\"hello\"}\n")
         coEvery { apiService.sendClientLogs(any()) } returns Response.success(Unit)
         val dependencies = SettingsActionDependencies(this, callSettingsHolder, clientLogsRepository)
         val (scope, stateFlow, eventChannel) = actionScope()
