@@ -2,11 +2,15 @@ package com.vonage.android.data
 
 import android.content.Context
 import com.vonage.android.data.network.APIService
+import com.vonage.android.data.storage.ClientLogsSettingsStorage
 import com.vonage.logger.DefaultVonageLogger
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
@@ -21,28 +25,32 @@ import retrofit2.Response
 import java.io.File
 import java.nio.file.Files
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ClientLogsRepositoryTest {
 
     private lateinit var filesDir: File
     private val apiService: APIService = mockk()
     private val context: Context = mockk()
+    private val clientLogsSettingsStorage: ClientLogsSettingsStorage = mockk(relaxed = true)
 
     @Before
     fun setUp() {
         filesDir = Files.createTempDirectory("client-logs-repository").toFile()
         every { context.filesDir } returns filesDir
-        DefaultVonageLogger.setEnabled(true)
+        DefaultVonageLogger.setEnabled(false)
+        coEvery { clientLogsSettingsStorage.getLogsEnabled() } returns null
+        coEvery { clientLogsSettingsStorage.getLogLevel() } returns null
     }
 
     @After
     fun tearDown() {
-        DefaultVonageLogger.setEnabled(true)
+        DefaultVonageLogger.setEnabled(false)
         filesDir.deleteRecursively()
     }
 
     @Test
     fun `setLogsEnabled updates repository flow and default logger state`() {
-        val repository = ClientLogsRepository(context, apiService)
+        val repository = ClientLogsRepository(context, apiService, clientLogsSettingsStorage)
 
         repository.setLogsEnabled(false)
 
@@ -52,7 +60,7 @@ class ClientLogsRepositoryTest {
 
     @Test
     fun `sendLogs returns NoLogsAvailable when no logs exist`() = runTest {
-        val repository = ClientLogsRepository(context, apiService)
+        val repository = ClientLogsRepository(context, apiService, clientLogsSettingsStorage)
 
         val result = repository.sendLogs()
 
@@ -61,7 +69,7 @@ class ClientLogsRepositoryTest {
 
     @Test
     fun `sendLogs posts only the latest log file lines as a single JSON array payload`() = runTest {
-        val repository = ClientLogsRepository(context, apiService)
+        val repository = ClientLogsRepository(context, apiService, clientLogsSettingsStorage)
         val logsDir = File(filesDir, DefaultVonageLogger.LOGS_DIRECTORY_NAME).apply { mkdirs() }
         File(logsDir, "app-2026-03-26.json.log").writeText("{" + "\"level\":\"info\",\"message\":\"one\"}" + "\n{" +
                 "\"level\":\"error\",\"message\":\"two\"}\n")
@@ -80,7 +88,7 @@ class ClientLogsRepositoryTest {
 
     @Test
     fun `sendLogs uploads only info and error log lines from latest file`() = runTest {
-        val repository = ClientLogsRepository(context, apiService)
+        val repository = ClientLogsRepository(context, apiService, clientLogsSettingsStorage)
         val logsDir = File(filesDir, DefaultVonageLogger.LOGS_DIRECTORY_NAME).apply { mkdirs() }
         File(logsDir, "app-2026-03-27.json.log").writeText(
             "{" + "\"level\":\"debug\",\"message\":\"skip-debug\"}\n" +
@@ -102,7 +110,7 @@ class ClientLogsRepositoryTest {
 
     @Test
     fun `sendLogs returns Failure when backend responds with error`() = runTest {
-        val repository = ClientLogsRepository(context, apiService)
+        val repository = ClientLogsRepository(context, apiService, clientLogsSettingsStorage)
         val logsDir = File(filesDir, DefaultVonageLogger.LOGS_DIRECTORY_NAME).apply { mkdirs() }
         File(logsDir, "app-2026-03-27.json.log").writeText("{" + "\"level\":\"error\",\"message\":\"one\"}\n")
         coEvery {
@@ -112,6 +120,26 @@ class ClientLogsRepositoryTest {
         val result = repository.sendLogs()
 
         assertTrue(result is SendClientLogsResult.Failure)
+    }
+
+    @Test
+    fun `setLogsEnabled persists value`() = runTest {
+        val repository = ClientLogsRepository(context, apiService, clientLogsSettingsStorage)
+
+        repository.setLogsEnabled(true)
+        advanceUntilIdle()
+
+        coVerify { clientLogsSettingsStorage.saveLogsEnabled(true) }
+    }
+
+    @Test
+    fun `setLogLevel persists value`() = runTest {
+        val repository = ClientLogsRepository(context, apiService, clientLogsSettingsStorage)
+
+        repository.setLogLevel(com.vonage.logger.LogLevel.ERROR)
+        advanceUntilIdle()
+
+        coVerify { clientLogsSettingsStorage.saveLogLevel(com.vonage.logger.LogLevel.ERROR) }
     }
 
     private fun RequestBody.readUtf8(): String {

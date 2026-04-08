@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
 import com.vonage.android.data.ClientLogsRepository
 import com.vonage.android.data.network.APIService
+import com.vonage.android.data.storage.ClientLogsSettingsStorage
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
@@ -12,6 +13,7 @@ import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.logger.DefaultVonageLogger
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.After
@@ -33,6 +35,7 @@ class SettingsScreenViewModelTest {
     private val callSettingsHolder = CallSettingsHolder()
     private val apiService: APIService = mockk()
     private val context: Context = mockk()
+    private val clientLogsSettingsStorage: ClientLogsSettingsStorage = mockk(relaxed = true)
     private lateinit var filesDir: File
     private lateinit var clientLogsRepository: ClientLogsRepository
 
@@ -40,13 +43,15 @@ class SettingsScreenViewModelTest {
     fun setUp() {
         filesDir = Files.createTempDirectory("settings-view-model").toFile()
         every { context.filesDir } returns filesDir
-        DefaultVonageLogger.setEnabled(true)
-        clientLogsRepository = ClientLogsRepository(context, apiService)
+        DefaultVonageLogger.setEnabled(false)
+        coEvery { clientLogsSettingsStorage.getLogsEnabled() } returns null
+        coEvery { clientLogsSettingsStorage.getLogLevel() } returns null
+        clientLogsRepository = ClientLogsRepository(context, apiService, clientLogsSettingsStorage)
     }
 
     @After
     fun tearDown() {
-        DefaultVonageLogger.setEnabled(true)
+        DefaultVonageLogger.setEnabled(false)
         filesDir.deleteRecursively()
     }
 
@@ -75,7 +80,7 @@ class SettingsScreenViewModelTest {
         sut.state.test {
             val state = awaitItem()
             assertTrue(state.senderStatsEnabled)
-            assertTrue(state.logsEnabled)
+            assertEquals(false, state.logsEnabled)
             assertTrue(state.opusDtxEnabled)
             assertTrue(state.publisherAudioFallbackEnabled)
             assertTrue(state.subscriberAudioFallbackEnabled)

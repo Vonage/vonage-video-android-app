@@ -17,7 +17,7 @@ data class SettingsUiState(
     val sdkVersion: String = "",
     val call: CallFacade? = null,
     val senderStatsEnabled: Boolean = true,
-    val logsEnabled: Boolean = true,
+    val logsEnabled: Boolean = false,
     val logLevel: LogLevel = LogLevel.INFO,
     val isSendingLogs: Boolean = false,
     val opusDtxEnabled: Boolean = true,

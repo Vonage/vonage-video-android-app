@@ -4,6 +4,7 @@ import android.content.Context
 import com.vonage.android.core.ActionScope
 import com.vonage.android.data.ClientLogsRepository
 import com.vonage.android.data.network.APIService
+import com.vonage.android.data.storage.ClientLogsSettingsStorage
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
@@ -38,6 +39,7 @@ class SettingsActionsTest {
     private val callSettingsHolder = CallSettingsHolder()
     private val apiService: APIService = mockk()
     private val context: Context = mockk()
+    private val clientLogsSettingsStorage: ClientLogsSettingsStorage = mockk(relaxed = true)
     private lateinit var filesDir: File
     private lateinit var clientLogsRepository: ClientLogsRepository
 
@@ -45,13 +47,15 @@ class SettingsActionsTest {
     fun setUp() {
         filesDir = Files.createTempDirectory("settings-actions").toFile()
         every { context.filesDir } returns filesDir
-        DefaultVonageLogger.setEnabled(true)
-        clientLogsRepository = ClientLogsRepository(context, apiService)
+        DefaultVonageLogger.setEnabled(false)
+        coEvery { clientLogsSettingsStorage.getLogsEnabled() } returns null
+        coEvery { clientLogsSettingsStorage.getLogLevel() } returns null
+        clientLogsRepository = ClientLogsRepository(context, apiService, clientLogsSettingsStorage)
     }
 
     @After
     fun tearDown() {
-        DefaultVonageLogger.setEnabled(true)
+        DefaultVonageLogger.setEnabled(false)
         filesDir.deleteRecursively()
     }
 
@@ -338,7 +342,7 @@ class SettingsActionsTest {
     fun `SendClientLogsAction sends success event and resets loading state`() = runTest {
         File(filesDir, DefaultVonageLogger.LOGS_DIRECTORY_NAME).apply { mkdirs() }
             .resolve("app-2026-03-27.json.log")
-            .writeText("{\"message\":\"hello\"}\n")
+            .writeText("{\"level\":\"info\",\"message\":\"hello\"}\n")
         coEvery { apiService.sendClientLogs(any()) } returns Response.success(Unit)
         val dependencies = SettingsActionDependencies(this, callSettingsHolder, clientLogsRepository)
         val (scope, stateFlow, eventChannel) = actionScope()

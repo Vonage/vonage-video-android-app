@@ -4,9 +4,15 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.vonage.android.data.network.APIService
+import com.vonage.android.data.storage.ClientLogsSettingsStorage
+import com.vonage.android.logging.OpenTokLoggingController
 import com.vonage.logger.DefaultVonageLogger
 import com.vonage.logger.LogLevel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +28,10 @@ import javax.inject.Singleton
 class ClientLogsRepository @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val apiService: APIService,
+    private val clientLogsSettingsStorage: ClientLogsSettingsStorage,
 ) {
+
+    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val _logsEnabled = MutableStateFlow(DefaultVonageLogger.isEnabled)
     val logsEnabled: StateFlow<Boolean> = _logsEnabled.asStateFlow()
@@ -30,14 +39,26 @@ class ClientLogsRepository @Inject constructor(
     private val _logLevel = MutableStateFlow(DefaultVonageLogger.currentMinLogLevel)
     val logLevel: StateFlow<LogLevel> = _logLevel.asStateFlow()
 
+    init {
+        repositoryScope.launch { restorePersistedSettings() }
+    }
+
+    fun warmUp() {
+        // No-op. Exists to force repository instantiation at app startup.
+    }
+
     fun setLogsEnabled(enabled: Boolean) {
-        DefaultVonageLogger.setEnabled(enabled)
-        _logsEnabled.value = enabled
+        applyRuntimeSettings(enabled = enabled, level = _logLevel.value)
+        repositoryScope.launch {
+            clientLogsSettingsStorage.saveLogsEnabled(enabled)
+        }
     }
 
     fun setLogLevel(level: LogLevel) {
-        DefaultVonageLogger.setMinLogLevel(level)
-        _logLevel.value = level
+        applyRuntimeSettings(enabled = _logsEnabled.value, level = level)
+        repositoryScope.launch {
+            clientLogsSettingsStorage.saveLogLevel(level)
+        }
     }
 
     fun getLatestLogFile(): File? {
@@ -97,6 +118,20 @@ class ClientLogsRepository @Inject constructor(
             prefix = "[",
             postfix = "]",
         )
+    }
+
+    private suspend fun restorePersistedSettings() {
+        val persistedEnabled = clientLogsSettingsStorage.getLogsEnabled() ?: false
+        val persistedLevel = clientLogsSettingsStorage.getLogLevel() ?: _logLevel.value
+        applyRuntimeSettings(enabled = persistedEnabled, level = persistedLevel)
+    }
+
+    private fun applyRuntimeSettings(enabled: Boolean, level: LogLevel) {
+        DefaultVonageLogger.setEnabled(enabled)
+        DefaultVonageLogger.setMinLogLevel(level)
+        _logsEnabled.value = enabled
+        _logLevel.value = level
+        OpenTokLoggingController.apply(enabled = enabled, minLogLevel = level)
     }
 
     companion object {

@@ -67,7 +67,7 @@ object DefaultVonageLogger {
     const val LOGS_DIRECTORY_NAME = "logs"
 
     @Volatile
-    private var loggingEnabled = true
+    private var loggingEnabled = false
 
     @Volatile
     private var minLogLevel = LogLevel.VERBOSE

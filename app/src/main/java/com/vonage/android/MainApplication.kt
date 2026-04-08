@@ -1,13 +1,12 @@
 package com.vonage.android
 
 import android.app.Application
-import com.opentok.android.OpenTokConfig
+import com.vonage.android.data.ClientLogsRepository
+import com.vonage.android.logging.OpenTokLoggingController
 import com.vonage.android.notifications.VeraNotificationChannelRegistry
 import com.vonage.logger.DefaultVonageLogger
 import com.vonage.logger.LogLevel
 import com.vonage.logger.interceptor.FileLogInterceptor
-import com.vonage.logger.interceptor.OpenTokLogcatInterceptor
-import com.vonage.logger.vonageLogger
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -17,10 +16,11 @@ open class MainApplication : Application() {
     @Inject
     lateinit var notificationChannelRegistry: VeraNotificationChannelRegistry
 
+    @Inject
+    lateinit var clientLogsRepository: ClientLogsRepository
+
     override fun onCreate() {
         super.onCreate()
-
-        enableOpenTokLogs()
 
         val minLogLevel = LogLevel.INFO
 
@@ -30,14 +30,12 @@ open class MainApplication : Application() {
             minLogLevel = minLogLevel,
         )
 
-        OpenTokLogcatInterceptor(logger = vonageLogger, minLogLevel = minLogLevel).start()
+        OpenTokLoggingController.apply(
+            enabled = DefaultVonageLogger.isEnabled,
+            minLogLevel = DefaultVonageLogger.currentMinLogLevel,
+        )
+        clientLogsRepository.warmUp()
 
         notificationChannelRegistry.createNotificationChannels()
-    }
-
-    private fun enableOpenTokLogs() {
-        OpenTokConfig.setWebRTCLogs(true)
-        OpenTokConfig.setOTKitLogs(true)
-        OpenTokConfig.setJNILogs(true)
     }
 }
