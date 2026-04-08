@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.binary.compatibility.validator)
+    alias(libs.plugins.metalava)
 }
 
 android {
@@ -19,11 +19,8 @@ android {
     }
 }
 
-kotlin {
-    compilerOptions {
-        languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
-    }
+metalava {
+    filename = "api/$name.api"
 }
 
 dependencies {

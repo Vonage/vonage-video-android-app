@@ -39,13 +39,6 @@ android {
     }
 }
 
-kotlin {
-    compilerOptions {
-        languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
-    }
-}
-
 dependencies {
     implementation(project(":vonage-video-ui-compose"))
     implementation(project(":vonage-video-core"))

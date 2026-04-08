@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.play.publisher)
+    alias(libs.plugins.stability.analyzer)
     id("com.vonage.json-config")
 }
 
@@ -166,13 +167,6 @@ android {
     composeCompiler {
         reportsDestination = layout.buildDirectory.dir("compose_compiler")
         metricsDestination = layout.buildDirectory.dir("compose_compiler")
-    }
-}
-
-kotlin {
-    compilerOptions {
-        languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 

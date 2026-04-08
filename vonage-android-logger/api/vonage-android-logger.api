@@ -1,85 +1,88 @@
-public final class com/vonage/logger/DefaultVonageLogger {
-	public static final field INSTANCE Lcom/vonage/logger/DefaultVonageLogger;
-	public final fun getLog ()Lcom/vonage/logger/VonageLogger;
+// Signature format: 4.0
+package com.vonage.logger {
+
+  public final class DefaultVonageLogger {
+    method @InaccessibleFromKotlin public com.vonage.logger.VonageLogger getLog();
+    property public com.vonage.logger.VonageLogger log;
+    field public static final com.vonage.logger.DefaultVonageLogger INSTANCE;
+  }
+
+  public final class LogEvent {
+    ctor public LogEvent(com.vonage.logger.LogLevel level, String tag, String message, optional Throwable? throwable, optional long timestamp, optional String thread);
+    method public com.vonage.logger.LogLevel component1();
+    method public String component2();
+    method public String component3();
+    method public Throwable? component4();
+    method public long component5();
+    method public String component6();
+    method public com.vonage.logger.LogEvent copy(optional com.vonage.logger.LogLevel level, optional String tag, optional String message, optional Throwable? throwable, optional long timestamp, optional String thread);
+    method @InaccessibleFromKotlin public com.vonage.logger.LogLevel getLevel();
+    method @InaccessibleFromKotlin public String getMessage();
+    method @InaccessibleFromKotlin public String getTag();
+    method @InaccessibleFromKotlin public String getThread();
+    method @InaccessibleFromKotlin public Throwable? getThrowable();
+    method @InaccessibleFromKotlin public long getTimestamp();
+    property public com.vonage.logger.LogLevel level;
+    property public String message;
+    property public String tag;
+    property public String thread;
+    property public Throwable? throwable;
+    property public long timestamp;
+  }
+
+  public enum LogLevel {
+    enum_constant public static final com.vonage.logger.LogLevel DEBUG;
+    enum_constant public static final com.vonage.logger.LogLevel ERROR;
+    enum_constant public static final com.vonage.logger.LogLevel INFO;
+    enum_constant public static final com.vonage.logger.LogLevel VERBOSE;
+    enum_constant public static final com.vonage.logger.LogLevel WARN;
+  }
+
+  public final class VonageLogger {
+    method public void d(String tag, String message, optional Throwable? throwable);
+    method public void e(String tag, String message, optional Throwable? throwable);
+    method public void i(String tag, String message, optional Throwable? throwable);
+    method public void log(com.vonage.logger.LogLevel level, String tag, String message, optional Throwable? throwable);
+    method public void v(String tag, String message, optional Throwable? throwable);
+    method public void w(String tag, String message, optional Throwable? throwable);
+  }
+
+  public static final class VonageLogger.Builder {
+    ctor public VonageLogger.Builder();
+    method public com.vonage.logger.VonageLogger.Builder addInterceptor(com.vonage.logger.interceptor.LogInterceptor interceptor);
+    method public com.vonage.logger.VonageLogger build();
+  }
+
+  public final class VonageLoggerKt {
+    method @InaccessibleFromKotlin public static com.vonage.logger.VonageLogger getVonageLogger();
+    property public static com.vonage.logger.VonageLogger vonageLogger;
+  }
+
 }
 
-public final class com/vonage/logger/LogEvent {
-	public fun <init> (Lcom/vonage/logger/LogLevel;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;JLjava/lang/String;)V
-	public synthetic fun <init> (Lcom/vonage/logger/LogLevel;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;JLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1 ()Lcom/vonage/logger/LogLevel;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun component3 ()Ljava/lang/String;
-	public final fun component4 ()Ljava/lang/Throwable;
-	public final fun component5 ()J
-	public final fun component6 ()Ljava/lang/String;
-	public final fun copy (Lcom/vonage/logger/LogLevel;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;JLjava/lang/String;)Lcom/vonage/logger/LogEvent;
-	public static synthetic fun copy$default (Lcom/vonage/logger/LogEvent;Lcom/vonage/logger/LogLevel;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;JLjava/lang/String;ILjava/lang/Object;)Lcom/vonage/logger/LogEvent;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getLevel ()Lcom/vonage/logger/LogLevel;
-	public final fun getMessage ()Ljava/lang/String;
-	public final fun getTag ()Ljava/lang/String;
-	public final fun getThread ()Ljava/lang/String;
-	public final fun getThrowable ()Ljava/lang/Throwable;
-	public final fun getTimestamp ()J
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
+package com.vonage.logger.interceptor {
 
-public final class com/vonage/logger/LogLevel : java/lang/Enum {
-	public static final field DEBUG Lcom/vonage/logger/LogLevel;
-	public static final field ERROR Lcom/vonage/logger/LogLevel;
-	public static final field INFO Lcom/vonage/logger/LogLevel;
-	public static final field VERBOSE Lcom/vonage/logger/LogLevel;
-	public static final field WARN Lcom/vonage/logger/LogLevel;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Lcom/vonage/logger/LogLevel;
-	public static fun values ()[Lcom/vonage/logger/LogLevel;
-}
+  public final class AndroidLogInterceptor implements com.vonage.logger.interceptor.LogInterceptor {
+    ctor public AndroidLogInterceptor();
+    method public com.vonage.logger.LogEvent intercept(com.vonage.logger.LogEvent event);
+  }
 
-public final class com/vonage/logger/VonageLogger {
-	public synthetic fun <init> (Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun d (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
-	public static synthetic fun d$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
-	public final fun e (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
-	public static synthetic fun e$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
-	public final fun i (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
-	public static synthetic fun i$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
-	public final fun log (Lcom/vonage/logger/LogLevel;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
-	public static synthetic fun log$default (Lcom/vonage/logger/VonageLogger;Lcom/vonage/logger/LogLevel;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
-	public final fun v (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
-	public static synthetic fun v$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
-	public final fun w (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
-	public static synthetic fun w$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
-}
+  public final class FileLogInterceptor implements com.vonage.logger.interceptor.LogInterceptor {
+    ctor public FileLogInterceptor(java.io.File file, optional long maxFileSize, optional String dateFormat);
+    method public com.vonage.logger.LogEvent intercept(com.vonage.logger.LogEvent event);
+    field public static final com.vonage.logger.interceptor.FileLogInterceptor.Companion Companion;
+    field public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+    field public static final long DEFAULT_MAX_FILE_SIZE = 5242880L; // 0x500000L
+  }
 
-public final class com/vonage/logger/VonageLogger$Builder {
-	public fun <init> ()V
-	public final fun addInterceptor (Lcom/vonage/logger/interceptor/LogInterceptor;)Lcom/vonage/logger/VonageLogger$Builder;
-	public final fun build ()Lcom/vonage/logger/VonageLogger;
-}
+  public static final class FileLogInterceptor.Companion {
+    property public static String DEFAULT_DATE_FORMAT;
+    property public static long DEFAULT_MAX_FILE_SIZE;
+  }
 
-public final class com/vonage/logger/VonageLoggerKt {
-	public static final fun getVonageLogger ()Lcom/vonage/logger/VonageLogger;
-}
+  public fun interface LogInterceptor {
+    method public com.vonage.logger.LogEvent? intercept(com.vonage.logger.LogEvent event);
+  }
 
-public final class com/vonage/logger/interceptor/AndroidLogInterceptor : com/vonage/logger/interceptor/LogInterceptor {
-	public fun <init> ()V
-	public fun intercept (Lcom/vonage/logger/LogEvent;)Lcom/vonage/logger/LogEvent;
-}
-
-public final class com/vonage/logger/interceptor/FileLogInterceptor : com/vonage/logger/interceptor/LogInterceptor {
-	public static final field Companion Lcom/vonage/logger/interceptor/FileLogInterceptor$Companion;
-	public static final field DEFAULT_DATE_FORMAT Ljava/lang/String;
-	public static final field DEFAULT_MAX_FILE_SIZE J
-	public fun <init> (Ljava/io/File;JLjava/lang/String;)V
-	public synthetic fun <init> (Ljava/io/File;JLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun intercept (Lcom/vonage/logger/LogEvent;)Lcom/vonage/logger/LogEvent;
-}
-
-public final class com/vonage/logger/interceptor/FileLogInterceptor$Companion {
-}
-
-public abstract interface class com/vonage/logger/interceptor/LogInterceptor {
-	public abstract fun intercept (Lcom/vonage/logger/LogEvent;)Lcom/vonage/logger/LogEvent;
 }
 
