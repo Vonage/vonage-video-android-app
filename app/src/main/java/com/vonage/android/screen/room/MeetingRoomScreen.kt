@@ -48,8 +48,6 @@ import com.vonage.android.screen.room.components.MeetingRoomContent
 import com.vonage.android.screen.room.components.MeetingTopBar
 import com.vonage.android.screen.room.components.bottombar.BottomBar
 import com.vonage.android.screen.room.components.bottombar.BottomBarState
-import com.vonage.android.captions.ui.CaptionsOverlay
-import com.vonage.android.reactions.ui.EmojiReactionOverlay
 import com.vonage.android.screen.room.components.SpeakingWhileMutedOverlay
 import com.vonage.android.util.ext.isExtraPaneShow
 import com.vonage.android.util.ext.toggleChat

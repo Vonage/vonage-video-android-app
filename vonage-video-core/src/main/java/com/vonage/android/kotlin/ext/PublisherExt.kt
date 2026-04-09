@@ -40,8 +40,8 @@ internal fun Publisher.applyVideoBlur(blurLevel: BlurLevel) {
 
 internal fun Publisher.toggleNoiseSuppression(current: NoiseSuppression): Result<NoiseSuppression> =
     when (current) {
-        NoiseSuppression.ENABLED -> applyNoiseSuppression()
-        NoiseSuppression.DISABLED -> removeNoiseSuppression()
+        NoiseSuppression.ENABLED -> removeNoiseSuppression()
+        NoiseSuppression.DISABLED -> applyNoiseSuppression()
     }
 
 internal fun Publisher.applyNoiseSuppression(): Result<NoiseSuppression> =
@@ -52,10 +52,11 @@ internal fun Publisher.applyNoiseSuppression(): Result<NoiseSuppression> =
         NoiseSuppression.ENABLED
     }
 
-internal fun Publisher.removeNoiseSuppression(): Result<NoiseSuppression> {
-    setAudioTransformers(arrayListOf())
-    return Result.success(NoiseSuppression.DISABLED)
-}
+internal fun Publisher.removeNoiseSuppression(): Result<NoiseSuppression> =
+    runCatching {
+        setAudioTransformers(arrayListOf())
+        NoiseSuppression.DISABLED
+    }
 
 /**
  * Cycles through blur levels: NONE -> LOW -> HIGH -> NONE.
