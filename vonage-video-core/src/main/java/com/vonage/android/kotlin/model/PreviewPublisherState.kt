@@ -4,6 +4,7 @@ import android.view.View
 import androidx.compose.runtime.Stable
 import com.opentok.android.OpentokError
 import com.opentok.android.Publisher
+import com.vonage.android.kotlin.ext.toggleNoiseSuppression
 import com.vonage.android.kotlin.ext.cycleBlur
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.MicVolumeListener
@@ -56,6 +57,9 @@ data class PreviewPublisherState(
     private val _camera: MutableStateFlow<CameraType> = MutableStateFlow(CameraType.FRONT)
     override val camera: StateFlow<CameraType> = _camera
 
+    private val _noiseSuppression: MutableStateFlow<NoiseSuppression> = MutableStateFlow(NoiseSuppression.DISABLED)
+    override val noiseSuppression: StateFlow<NoiseSuppression> = _noiseSuppression
+
     override fun toggleVideo() {
         publisher.publishVideo = publisher.publishVideo.toggle()
         _isCameraEnabled.update { publisher.publishVideo }
@@ -74,6 +78,11 @@ data class PreviewPublisherState(
 
     override fun cycleCamera() {
         publisher.cycleCamera()
+    }
+
+    override fun toggleNoiseSuppression() {
+        publisher.toggleNoiseSuppression(_noiseSuppression.value)
+            .onSuccess { _noiseSuppression.value = it }
     }
 
     /**

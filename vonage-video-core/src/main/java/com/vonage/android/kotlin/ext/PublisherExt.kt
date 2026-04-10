@@ -6,6 +6,7 @@ import com.vonage.android.kotlin.model.BackgroundBlur.KEY
 import com.vonage.android.kotlin.model.BackgroundBlur.params
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.DegradationPreference
+import com.vonage.android.kotlin.model.NoiseSuppression
 import com.vonage.android.kotlin.model.PublisherState.AudioStats
 import com.vonage.android.kotlin.model.PublisherState.VideoLayerStats
 import com.vonage.android.kotlin.model.PublisherState.VideoStats
@@ -36,6 +37,26 @@ internal fun Publisher.applyVideoBlur(blurLevel: BlurLevel) {
         setVideoTransformers(it)
     }
 }
+
+internal fun Publisher.toggleNoiseSuppression(current: NoiseSuppression): Result<NoiseSuppression> =
+    when (current) {
+        NoiseSuppression.ENABLED -> removeNoiseSuppression()
+        NoiseSuppression.DISABLED -> applyNoiseSuppression()
+    }
+
+internal fun Publisher.applyNoiseSuppression(): Result<NoiseSuppression> =
+    runCatching {
+        setAudioTransformers(
+            arrayListOf(AudioTransformer("NoiseSuppression", ""))
+        )
+        NoiseSuppression.ENABLED
+    }
+
+internal fun Publisher.removeNoiseSuppression(): Result<NoiseSuppression> =
+    runCatching {
+        setAudioTransformers(arrayListOf())
+        NoiseSuppression.DISABLED
+    }
 
 /**
  * Cycles through blur levels: NONE -> LOW -> HIGH -> NONE.

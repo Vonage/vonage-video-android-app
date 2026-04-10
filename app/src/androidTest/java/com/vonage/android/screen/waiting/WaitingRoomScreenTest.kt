@@ -18,6 +18,7 @@ import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CameraType
+import com.vonage.android.kotlin.model.NoiseSuppression
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.kotlin.model.VideoSource
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -345,6 +346,7 @@ class WaitingRoomScreenTest {
 
             override fun toggleVideo() {}
             override fun toggleAudio() {}
+
             override fun cycleCamera() {}
             override fun cycleCameraBlur() {}
             override fun clean() {}
@@ -360,6 +362,9 @@ class WaitingRoomScreenTest {
             override val isTalking: StateFlow<Boolean> = MutableStateFlow(isMicEnabled)
             override val audioLevel: StateFlow<Float> = MutableStateFlow(0F)
             override val view: View = previewCamera()
+
+            override val noiseSuppression: StateFlow<NoiseSuppression> = MutableStateFlow(NoiseSuppression.DISABLED)
+            override fun toggleNoiseSuppression() {}
         }
     }
 }
