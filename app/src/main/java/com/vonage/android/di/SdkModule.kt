@@ -1,6 +1,7 @@
 package com.vonage.android.di
 
 import android.content.Context
+import com.vonage.android.kotlin.VonageSdkFactory
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.reactions.ReactionSignalPlugin
@@ -41,11 +42,10 @@ object SdkModule {
         @ApplicationContext context: Context,
         chatSignalPlugin: ChatSignalPlugin,
         reactionSignalPlugin: ReactionSignalPlugin,
-        baseAudioDevice: VeraAudioDevice,
     ): VonageVideoClient =
         VonageVideoClient(
             context = context,
-            baseAudioDevice = baseAudioDevice,
+            sdkFactory = VonageSdkFactory.create(),
             signalPlugins = listOfNotNull(
                 chatSignalPlugin,
                 reactionSignalPlugin,

@@ -1,7 +1,6 @@
 package com.vonage.android.kotlin.model
 
-import com.opentok.android.OpentokError
-import io.mockk.mockk
+import com.vonage.android.kotlin.VonageError
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -43,8 +42,8 @@ class SessionEventTest {
     }
 
     @Test
-    fun `Error should contain OpentokError`() {
-        val error = mockk<OpentokError>()
+    fun `Error should contain VonageError`() {
+        val error = VonageError(code = 1, message = "test error")
         val event = SessionEvent.Error(error)
         
         assertEquals(error, event.error)
@@ -82,7 +81,7 @@ class SessionEventTest {
             SessionEvent.Disconnected,
             SessionEvent.StreamReceived("stream-1"),
             SessionEvent.StreamDropped("stream-2"),
-            SessionEvent.Error(mockk())
+            SessionEvent.Error(VonageError(code = 1, message = "test"))
         )
 
         val results = events.map { event ->

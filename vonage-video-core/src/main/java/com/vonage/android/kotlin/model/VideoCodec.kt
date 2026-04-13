@@ -1,11 +1,10 @@
 package com.vonage.android.kotlin.model
 
-import com.opentok.android.PublisherKit
+import com.vonage.android.kotlin.VonageVideoCodec
 
 /**
- * App-level representation of the OpenTok preferred video codec.
+ * App-level representation of the preferred video codec.
  *
- * Maps to [PublisherKit.PreferredVideoCodecs.Codec].
  * This is a **build-time** setting — changes take effect on the next publisher creation.
  *
  * @property label Human-readable label shown in the UI
@@ -21,8 +20,8 @@ enum class VideoCodec(val label: String) {
  */
 val DEFAULT_VIDEO_CODEC_ORDER: List<VideoCodec> = listOf(VideoCodec.VP8, VideoCodec.H264, VideoCodec.VP9)
 
-fun VideoCodec.toSdkValue(): PublisherKit.PreferredVideoCodecs.Codec = when (this) {
-    VideoCodec.VP8 -> PublisherKit.PreferredVideoCodecs.Codec.VP8
-    VideoCodec.H264 -> PublisherKit.PreferredVideoCodecs.Codec.H264
-    VideoCodec.VP9 -> PublisherKit.PreferredVideoCodecs.Codec.VP9
+fun VideoCodec.toVonageVideoCodec(): VonageVideoCodec = when (this) {
+    VideoCodec.VP8 -> VonageVideoCodec.VP8
+    VideoCodec.H264 -> VonageVideoCodec.H264
+    VideoCodec.VP9 -> VonageVideoCodec.VP9
 }

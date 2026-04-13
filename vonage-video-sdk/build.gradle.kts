@@ -25,7 +25,6 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
-            isReturnDefaultValues = true
         }
     }
     
@@ -41,11 +40,10 @@ android {
 
 dependencies {
     implementation(project(":vonage-video-shared"))
-    api(project(":vonage-video-sdk"))
     implementation(project(":vonage-android-logger"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.opentok.android.sdk) // TODO: Remove once dead extension files (PublisherExt, SubscriberExt, StreamExt) are deleted
+    implementation(libs.opentok.android.sdk)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)

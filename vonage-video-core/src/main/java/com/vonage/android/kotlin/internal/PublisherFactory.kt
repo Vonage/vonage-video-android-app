@@ -1,33 +1,37 @@
 package com.vonage.android.kotlin.internal
 
-import android.app.ActivityManager
 import android.content.Context
 import android.media.projection.MediaProjection
-import com.opentok.android.BaseVideoRenderer
-import com.opentok.android.Publisher
-import com.opentok.android.PublisherKit
-import com.opentok.android.PublisherKit.PublisherKitVideoType
-import com.opentok.android.VeraCameraCapturer
 import com.vonage.android.kotlin.Call.Companion.PUBLISHER_ID
 import com.vonage.android.kotlin.Call.Companion.PUBLISHER_SCREEN_ID
-import com.vonage.android.kotlin.ext.applyDegradationPreference
-import com.vonage.android.kotlin.ext.applyVideoBitrate
-import com.vonage.android.kotlin.ext.applyVideoBlur
+import com.vonage.android.kotlin.VonageCaptureFrameRate
+import com.vonage.android.kotlin.VonageCaptureResolution
+import com.vonage.android.kotlin.VonagePublisherConfig
+import com.vonage.android.kotlin.VonageScreenShareConfig
+import com.vonage.android.kotlin.VonageSdkFactory
+import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
+import com.vonage.android.kotlin.model.DegradationPreference.NOT_SET
 import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherState
-import com.vonage.android.kotlin.model.toSdkValue
+import com.vonage.android.kotlin.model.VideoBitratePreset.DEFAULT
+import com.vonage.android.kotlin.model.toVonageBitratePreset
+import com.vonage.android.kotlin.model.toVonageBlurLevel
+import com.vonage.android.kotlin.model.toVonageDegradationPref
+import com.vonage.android.kotlin.model.toVonageVideoCodec
 import com.vonage.logger.vonageLogger
 
 /**
  * Factory for creating and managing Publisher instances.
  *
- * Handles publisher lifecycle including creation, configuration, and cleanup.
- * Automatically selects optimal video resolution based on device memory.
+ * Uses [VonageSdkFactory] to create wrapped publishers,
+ * keeping all OpenTok SDK details behind the abstraction.
  */
-class PublisherFactory {
+class PublisherFactory(
+    private val sdkFactory: VonageSdkFactory = VonageSdkFactory.create(),
+) {
 
     var publisherHolder: VeraPublisherHolder? = null
     private var publisherConfig: PublisherConfig? = null
@@ -35,220 +39,122 @@ class PublisherFactory {
     val currentConfig: PublisherConfig?
         get() = publisherConfig
 
-    /**
-     * Initializes the factory with publisher configuration.
-     *
-     * @param config Configuration for publisher creation
-     */
     fun init(config: PublisherConfig) {
         publisherConfig = config
     }
 
-    /**
-     * Creates a preview-only publisher for camera preview.
-     *
-     * @param context Android context
-     * @return PreviewPublisherState wrapping the publisher
-     */
     fun createPreviewPublisher(context: Context): PreviewPublisherState {
-        val publisher = createPublisher(context)
-        publisherHolder = VeraPublisherHolder(publisher = publisher)
-        return PreviewPublisherState(publisher, captureInfoLabel = buildCaptureInfoLabel(context))
+        val vonagePublisher = sdkFactory.createPublisher(context, buildVonageConfig(context))
+        publisherHolder = VeraPublisherHolder(publisher = vonagePublisher)
+        return PreviewPublisherState(
+            vonagePublisher,
+            captureInfoLabel = buildCaptureInfoLabel(context)
+        )
     }
 
-    /**
-     * Creates a full publisher for the video call.
-     *
-     * @param context Android context
-     * @return PublisherState ready to be published to the session
-     */
     fun createPublisherState(context: Context): PublisherState {
-        val publisher = createPublisher(context)
+        val vonagePublisher = sdkFactory.createPublisher(context, buildVonageConfig(context))
         val participant = PublisherState(
             publisherId = PUBLISHER_ID,
-            publisher = publisher,
+            vonagePublisher = vonagePublisher,
             captureInfoLabel = buildCaptureInfoLabel(context),
         )
-        publisherHolder = VeraPublisherHolder(
-            publisher = publisher,
-        )
+        publisherHolder = VeraPublisherHolder(publisher = vonagePublisher)
         return participant
     }
 
     fun createScreenSharePublisherState(
         context: Context,
         mediaProjection: MediaProjection,
-        name: String
+        name: String,
     ): PublisherState {
-        val screenPublisher = Publisher.Builder(context)
-            .name(name)
-            .capturer(ScreenSharingCapturer(context, mediaProjection))
-            .videoTrack(true)
-            .audioTrack(false)
-            .build()
-            .apply {
-                renderer?.setStyle(
-                    BaseVideoRenderer.STYLE_VIDEO_SCALE,
-                    BaseVideoRenderer.STYLE_VIDEO_FIT
-                )
-                publishVideo = true
-                publishAudio = false
-                publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeScreen
-            }
-        publisherHolder?.screenPublisher = screenPublisher
-        val participant = PublisherState(
-            publisherId = PUBLISHER_SCREEN_ID,
-            publisher = screenPublisher,
+        val vonagePublisher = sdkFactory.createScreenSharePublisher(
+            context,
+            VonageScreenShareConfig(name = name, mediaProjection = mediaProjection),
         )
-        return participant
+        publisherHolder?.screenPublisher = vonagePublisher
+        return PublisherState(
+            publisherId = PUBLISHER_SCREEN_ID,
+            vonagePublisher = vonagePublisher,
+        )
     }
 
-    /**
-     * Destroys the current publisher and releases resources.
-     */
     fun destroyPublisher() {
         publisherHolder?.publisher?.let {
             it.destroy()
-            it.onStop()
+            it.stop()
         }
         publisherHolder = null
         vonageLogger.i(TAG, "Destroy publisher")
     }
 
-    /**
-     * Determines optimal video resolution based on device memory.
-     *
-     * @return HIGH for 512MB+, MEDIUM for 256MB+, LOW otherwise
-     */
-    @Suppress("MagicNumber")
-    private fun Context.getOptimalResolution(): Publisher.CameraCaptureResolution {
-        val memoryClass =
-            (getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).memoryClass
-        return when {
-            memoryClass >= 512 -> Publisher.CameraCaptureResolution.HIGH
-            memoryClass >= 256 -> Publisher.CameraCaptureResolution.MEDIUM
-            else -> Publisher.CameraCaptureResolution.LOW
-        }
+    private fun buildVonageConfig(context: Context): VonagePublisherConfig {
+        val config = currentConfig
+        return VonagePublisherConfig(
+            name = config?.name.orEmpty(),
+            hasVideoTrack = true,
+            hasAudioTrack = true,
+            publishVideo = config?.publishVideo ?: true,
+            publishAudio = config?.publishAudio ?: true,
+            blurLevel = (config?.blurLevel ?: BlurLevel.NONE).toVonageBlurLevel(),
+            cameraIndex = config?.cameraIndex ?: DEFAULT_CAMERA_INDEX,
+            captureResolution = config?.captureResolution?.toVonageCaptureResolution(),
+            captureFrameRate = (config?.captureFrameRate ?: CaptureFrameRate.FPS_15).toVonageCaptureFrameRate(),
+            preferredVideoCodecOrder = config?.preferredVideoCodecOrder?.map { it.toVonageVideoCodec() },
+            senderStatsTrack = config?.senderStatsTrack ?: false,
+            opusDtxEnabled = config?.opusDtxEnabled ?: true,
+            publisherAudioFallback = config?.publisherAudioFallback ?: true,
+            subscriberAudioFallback = config?.subscriberAudioFallback ?: true,
+            videoBitratePreset = (config?.videoBitrateConfig?.preset ?: DEFAULT).toVonageBitratePreset(),
+            maxVideoBitrate = config?.videoBitrateConfig?.maxBitrate,
+            degradationPreference = (config?.degradationPreference ?: NOT_SET).toVonageDegradationPref(),
+            audioBitrate = config?.audioBitrate,
+            allowAudioCaptureWhileMuted = true,
+        )
     }
 
-    /**
-     * Maps the app-level [CaptureFrameRate] to the SDK enum.
-     */
-    private fun resolveFrameRate(): Publisher.CameraCaptureFrameRate =
-        when (publisherConfig?.captureFrameRate) {
-            CaptureFrameRate.FPS_1 -> Publisher.CameraCaptureFrameRate.FPS_1
-            CaptureFrameRate.FPS_7 -> Publisher.CameraCaptureFrameRate.FPS_7
-            CaptureFrameRate.FPS_15 -> Publisher.CameraCaptureFrameRate.FPS_15
-            CaptureFrameRate.FPS_30 -> Publisher.CameraCaptureFrameRate.FPS_30
-            null -> Default.PUBLISHER_FRAME_RATE
-        }
-
-    /**
-     * Resolves the capture resolution from config, falling back to device-optimal.
-     */
-    private fun Context.resolveResolution(): Publisher.CameraCaptureResolution =
-        when (publisherConfig?.captureResolution) {
-            CaptureResolution.LOW -> Publisher.CameraCaptureResolution.LOW
-            CaptureResolution.MEDIUM -> Publisher.CameraCaptureResolution.MEDIUM
-            CaptureResolution.HIGH -> Publisher.CameraCaptureResolution.HIGH
-            CaptureResolution.HIGH_1080P -> Publisher.CameraCaptureResolution.HIGH_1080P
-            null -> getOptimalResolution()
-        }
-
-    /**
-     * Resolves the preferred video codecs from config.
-     */
-    private fun resolvePreferredVideoCodecs(): PublisherKit.PreferredVideoCodecs {
-        val order = publisherConfig?.preferredVideoCodecOrder
-            ?: return PublisherKit.PreferredVideoCodecs.automatic()
-        val sdkCodecs = ArrayList(order.map { it.toSdkValue() })
-        return PublisherKit.PreferredVideoCodecs.manual(sdkCodecs)
-    }
-
-    /**
-     * Builds a human-readable label with the resolved capture resolution and frame rate.
-     * E.g. "720p / 15 FPS".
-     */
     @Suppress("MagicNumber")
     private fun buildCaptureInfoLabel(context: Context): String {
-        val resolutionLabel = when (context.resolveResolution()) {
-            Publisher.CameraCaptureResolution.LOW -> "288p"
-            Publisher.CameraCaptureResolution.MEDIUM -> "480p"
-            Publisher.CameraCaptureResolution.HIGH -> "720p"
-            Publisher.CameraCaptureResolution.HIGH_1080P -> "1080p"
+        val config = currentConfig
+        val resolution = config?.captureResolution ?: resolveOptimalResolution(context)
+        val frameRate = config?.captureFrameRate ?: CaptureFrameRate.FPS_15
+        val resolutionLabel = when (resolution) {
+            CaptureResolution.LOW -> "288p"
+            CaptureResolution.MEDIUM -> "480p"
+            CaptureResolution.HIGH -> "720p"
+            CaptureResolution.HIGH_1080P -> "1080p"
         }
-        val fpsValue = when (resolveFrameRate()) {
-            Publisher.CameraCaptureFrameRate.FPS_1 -> 1
-            Publisher.CameraCaptureFrameRate.FPS_7 -> 7
-            Publisher.CameraCaptureFrameRate.FPS_15 -> 15
-            Publisher.CameraCaptureFrameRate.FPS_30 -> 30
-        }
-        return "$resolutionLabel / ${fpsValue}fps"
+        return "$resolutionLabel / ${frameRate.fps}fps"
     }
 
-    /**
-     * Internal helper to create a configured Publisher instance.
-     */
-    private fun createPublisher(context: Context): Publisher =
-        Publisher.Builder(context)
-            .name(currentConfig?.name.orEmpty())
-            .videoTrack(true)
-            .audioTrack(true)
-            .senderStatsTrack(currentConfig?.senderStatsTrack ?: false)
-            .enableOpusDtx(currentConfig?.opusDtxEnabled ?: true)
-            .publisherAudioFallbackEnabled(currentConfig?.publisherAudioFallback ?: true)
-            .subscriberAudioFallbackEnabled(currentConfig?.subscriberAudioFallback ?: true)
-            .preferredVideoCodecs(resolvePreferredVideoCodecs())
-            .frameRate(resolveFrameRate())
-            .resolution(context.resolveResolution())
-            .let { builder ->
-                currentConfig?.audioBitrate?.let { builder.audioBitrate(it) } ?: builder
-            }
-            .capturer(
-                VeraCameraCapturer(
-                    context = context,
-                    resolution = context.resolveResolution(),
-                    frameRate = resolveFrameRate(),
-                    initialCameraIndex = currentConfig?.cameraIndex
-                        ?: Default.PUBLISHER_CAMERA_INDEX,
-                )
-            )
-            /**
-             * Activating this flag is used to have the functionality `SpeakingWhileMutedDetector`
-             * This flag is safe because the audio is not transmitted while muted.
-             */
-            .allowAudioCaptureWhileMuted(true)
-            .build()
-            .apply {
-                renderer?.setStyle(
-                    BaseVideoRenderer.STYLE_VIDEO_SCALE,
-                    BaseVideoRenderer.STYLE_VIDEO_FIT,
-                )
-                currentConfig?.let { config ->
-                    publishVideo = config.publishVideo
-                    publishAudio = config.publishAudio
-                    applyVideoBlur(config.blurLevel)
-                }
-                publisherVideoType = PublisherKitVideoType.PublisherKitVideoTypeCamera
-                applyVideoBitrate(currentConfig?.videoBitrateConfig)
-                applyDegradationPreference(currentConfig?.degradationPreference)
-            }
-            .also {
-                vonageLogger.d("PublisherFactory", "publisher created with config $currentConfig")
-            }
+    private fun resolveOptimalResolution(context: Context): CaptureResolution =
+        when (sdkFactory.getOptimalResolution(context)) {
+            VonageCaptureResolution.LOW -> CaptureResolution.LOW
+            VonageCaptureResolution.MEDIUM -> CaptureResolution.MEDIUM
+            VonageCaptureResolution.HIGH -> CaptureResolution.HIGH
+            VonageCaptureResolution.HIGH_1080P -> CaptureResolution.HIGH_1080P
+        }
 
-    /**
-     * Default configuration values for publisher creation.
-     */
-    object Default {
-        /** Default frame rate for video capture (15 FPS for better performance) - TODO: Implement adaptive frame rate */
-        val PUBLISHER_FRAME_RATE = Publisher.CameraCaptureFrameRate.FPS_15
-
-        /** Default camera index (1 = front camera) */
-        const val PUBLISHER_CAMERA_INDEX = 1
-    }
-
-    private companion object {
-        const val TAG: String = "PublisherFactory"
+    companion object {
+        private const val TAG = "PublisherFactory"
+        private const val DEFAULT_CAMERA_INDEX = 1
     }
 }
+
+// region Domain → SDK config mapping
+
+private fun CaptureResolution.toVonageCaptureResolution(): VonageCaptureResolution = when (this) {
+    CaptureResolution.LOW -> VonageCaptureResolution.LOW
+    CaptureResolution.MEDIUM -> VonageCaptureResolution.MEDIUM
+    CaptureResolution.HIGH -> VonageCaptureResolution.HIGH
+    CaptureResolution.HIGH_1080P -> VonageCaptureResolution.HIGH_1080P
+}
+
+private fun CaptureFrameRate.toVonageCaptureFrameRate(): VonageCaptureFrameRate = when (this) {
+    CaptureFrameRate.FPS_1 -> VonageCaptureFrameRate.FPS_1
+    CaptureFrameRate.FPS_7 -> VonageCaptureFrameRate.FPS_7
+    CaptureFrameRate.FPS_15 -> VonageCaptureFrameRate.FPS_15
+    CaptureFrameRate.FPS_30 -> VonageCaptureFrameRate.FPS_30
+}
+
+// endregion
