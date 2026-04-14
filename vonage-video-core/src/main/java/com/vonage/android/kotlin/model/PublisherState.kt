@@ -14,6 +14,7 @@ import com.vonage.android.kotlin.VonageStream
 import com.vonage.android.kotlin.VonageVideoType
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.toggle
+import com.vonage.android.kotlin.ext.toggleNoiseSuppression
 import com.vonage.android.kotlin.internal.SpeakingWhileMutedDetector
 import com.vonage.logger.vonageLogger
 import kotlinx.collections.immutable.ImmutableList
@@ -80,6 +81,9 @@ data class PublisherState(
     private val _audioStats: MutableStateFlow<AudioStats?> = MutableStateFlow(null)
     val audioStats: StateFlow<AudioStats?> = _audioStats
 
+    private val _noiseSuppression: MutableStateFlow<NoiseSuppression> = MutableStateFlow(NoiseSuppression.DISABLED)
+    override val noiseSuppression: StateFlow<NoiseSuppression> = _noiseSuppression
+
     private val speakingWhileMutedDetector = SpeakingWhileMutedDetector(
         isMicEnabled = _isMicEnabled,
         audioLevel = _audioLevel,
@@ -118,6 +122,16 @@ data class PublisherState(
         _blurLevel.value = newLevel
     }
 
+    override fun toggleNoiseSuppression() {
+        publisher.toggleNoiseSuppression(_noiseSuppression.value)
+            .onSuccess { _noiseSuppression.value = it }
+    }
+
+    /**
+     * Applies a video bitrate configuration to the publisher at runtime.
+     *
+     * @param config The bitrate configuration to apply
+     */
     fun applyVideoBitrate(config: VideoBitrateConfig) {
         vonagePublisher.applyVideoBitrate(config.preset.toVonageBitratePreset(), config.maxBitrate)
         vonageLogger.d(

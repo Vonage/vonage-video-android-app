@@ -81,6 +81,11 @@ android {
         buildConfigField("boolean", "FEATURE_VIDEO_EFFECTS_ENABLED", "$videoFxProperty")
         missingDimensionStrategy("videofx", videoFxProperty.toEnabledString())
 
+        // Audio effects feature
+        val audioFxProperty = configProps.getProperty("vonage.audio.allow_advanced_noise_suppression", "true")
+        buildConfigField("boolean", "FEATURE_AUDIO_EFFECTS_ENABLED", "$audioFxProperty")
+        missingDimensionStrategy("audiofx", audioFxProperty.toEnabledString())
+
         // Settings feature
         val settingsProperty = configProps.getProperty("vonage.meetingRoom.allow_settings", "true")
         buildConfigField("boolean", "FEATURE_SETTINGS_ENABLED", "$settingsProperty")
@@ -195,6 +200,7 @@ dependencies {
     implementation(project(":vonage-feature-screensharing"))
     implementation(project(":vonage-feature-reactions"))
     implementation(project(":vonage-feature-video-effects"))
+    implementation(project(":vonage-feature-audio-effects"))
     implementation(project(":vonage-feature-captions"))
     implementation(project(":vonage-feature-settings"))
     implementation(project(":vonage-audio-selector"))

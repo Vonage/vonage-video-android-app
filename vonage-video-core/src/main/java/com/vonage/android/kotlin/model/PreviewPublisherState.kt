@@ -55,6 +55,9 @@ data class PreviewPublisherState(
     private val _camera: MutableStateFlow<CameraType> = MutableStateFlow(CameraType.FRONT)
     override val camera: StateFlow<CameraType> = _camera
 
+    private val _noiseSuppression: MutableStateFlow<NoiseSuppression> = MutableStateFlow(NoiseSuppression.DISABLED)
+    override val noiseSuppression: StateFlow<NoiseSuppression> = _noiseSuppression
+
     override fun toggleVideo() {
         vonagePublisher.publishVideo = vonagePublisher.publishVideo.toggle()
         _isCameraEnabled.update { vonagePublisher.publishVideo }
@@ -76,6 +79,16 @@ data class PreviewPublisherState(
         vonagePublisher.cycleCamera()
     }
 
+    override fun toggleNoiseSuppression() {
+        vonagePublisher.toggleNoiseSuppression(_noiseSuppression.value)
+            .onSuccess { _noiseSuppression.value = it }
+    }
+
+    /**
+     * Initializes preview monitoring including camera listener and microphone volume.
+     *
+     * Must be called before using the preview to start audio level monitoring.
+     */
     suspend fun setup() {
         vonagePublisher.setCameraListener(object : VonageCameraListener {
             override fun onCameraChanged(cameraIndex: Int) {

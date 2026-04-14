@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.layout.TwoPaneScaffold
 import com.vonage.android.compose.preview.buildPublisher
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -31,6 +32,7 @@ import com.vonage.android.screen.waiting.components.JoinRoomSection
 import com.vonage.android.screen.waiting.components.VideoControlPanel
 import com.vonage.android.screen.waiting.components.VideoPreviewContainer
 import com.vonage.android.screen.waiting.components.WaitingRoomTopBar
+import com.vonage.android.util.rememberNoiseSuppression
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,6 +60,9 @@ fun WaitingRoomScreen(
             sheetState = sheetState,
         ) {
             uiState.audioDevicesState?.let { audioDevicesState ->
+                val noiseSuppression by rememberNoiseSuppression(uiState.publisher)
+                    .collectAsStateWithLifecycle()
+
                 AudioDevicesMenu(
                     audioDevicesState = audioDevicesState,
                     onDismissRequest = {
@@ -65,6 +70,10 @@ fun WaitingRoomScreen(
                             sheetState.hide()
                             showAudioDeviceSelector = false
                         }
+                    },
+                    noiseSuppressionEnabled = noiseSuppression.isEnabled(),
+                    onNoiseSuppressorToggle = { _ ->
+                        uiState.publisher?.toggleNoiseSuppression()
                     },
                 )
             }
