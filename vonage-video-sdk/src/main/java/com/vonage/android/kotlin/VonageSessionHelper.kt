@@ -14,9 +14,6 @@ class VonageSessionHelper(
 
     private lateinit var session: VonageSession
 
-    val capabilities: String
-        get() = session.capabilities.orEmpty()
-
     fun build(context: Context, apiKey: String, sessionId: String) {
         session = sdkFactory.createSession(context, apiKey, sessionId)
     }

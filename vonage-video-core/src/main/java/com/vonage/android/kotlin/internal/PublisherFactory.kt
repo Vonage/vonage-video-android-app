@@ -44,7 +44,7 @@ class PublisherFactory(
     }
 
     fun createPreviewPublisher(context: Context): PreviewPublisherState {
-        val vonagePublisher = sdkFactory.createPublisher(context, buildVonageConfig(context))
+        val vonagePublisher = sdkFactory.createPublisher(context, buildVonageConfig())
         publisherHolder = VeraPublisherHolder(publisher = vonagePublisher)
         return PreviewPublisherState(
             vonagePublisher,
@@ -53,7 +53,7 @@ class PublisherFactory(
     }
 
     fun createPublisherState(context: Context): PublisherState {
-        val vonagePublisher = sdkFactory.createPublisher(context, buildVonageConfig(context))
+        val vonagePublisher = sdkFactory.createPublisher(context, buildVonageConfig())
         val participant = PublisherState(
             publisherId = PUBLISHER_ID,
             vonagePublisher = vonagePublisher,
@@ -88,7 +88,7 @@ class PublisherFactory(
         vonageLogger.i(TAG, "Destroy publisher")
     }
 
-    private fun buildVonageConfig(context: Context): VonagePublisherConfig {
+    private fun buildVonageConfig(): VonagePublisherConfig {
         val config = currentConfig
         return VonagePublisherConfig(
             name = config?.name.orEmpty(),

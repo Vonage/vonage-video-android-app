@@ -2,16 +2,11 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
-import com.vonage.android.kotlin.VonageAudioLevelListener
 import com.vonage.android.kotlin.VonageSession
 import com.vonage.android.kotlin.VonageStream
 import com.vonage.android.kotlin.VonageSubscriber
-import com.vonage.android.kotlin.VonageSubscriberAudioStatsEntry
-import com.vonage.android.kotlin.VonageSubscriberAudioStatsListener
 import com.vonage.android.kotlin.VonageSubscriberStreamListener
 import com.vonage.android.kotlin.VonageSubscriberVideoListener
-import com.vonage.android.kotlin.VonageSubscriberVideoStatsEntry
-import com.vonage.android.kotlin.VonageSubscriberVideoStatsListener
 import com.vonage.android.kotlin.VonageVideoType
 import com.vonage.android.kotlin.ext.mapTalking
 import com.vonage.android.kotlin.ext.movingAverage
@@ -94,6 +89,7 @@ data class ParticipantState(
             override fun onReconnected() {
                 vonageLogger.d(logTag, "Subscriber reconnected")
             }
+
             override fun onDisconnected() {
                 vonageLogger.d(logTag, "Subscriber disconnected")
             }
@@ -103,16 +99,20 @@ data class ParticipantState(
                 vonageLogger.d(logTag, "Subscriber video enabled")
                 _isCameraEnabled.value = true
             }
+
             override fun onVideoDisabled(reason: String) {
                 vonageLogger.d(logTag, "Subscriber video disabled")
                 _isCameraEnabled.value = false
             }
+
             override fun onVideoDataReceived() {
                 vonageLogger.d(logTag, "Subscriber video data received")
             }
+
             override fun onVideoDisableWarning() {
                 vonageLogger.d(logTag, "Subscriber video disable warning")
             }
+
             override fun onVideoDisableWarningLifted() {
                 vonageLogger.d(logTag, "Subscriber video disable warning lifted")
             }

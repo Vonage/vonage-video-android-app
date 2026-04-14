@@ -6,11 +6,10 @@ import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit
 import com.opentok.android.Stream
 import com.vonage.android.kotlin.VonageAudioLevelListener
-import com.vonage.android.kotlin.VonageBlurLevel
 import com.vonage.android.kotlin.VonageBitratePreset
+import com.vonage.android.kotlin.VonageBlurLevel
 import com.vonage.android.kotlin.VonageCameraListener
 import com.vonage.android.kotlin.VonageDegradationPref
-import com.vonage.android.kotlin.VonageError
 import com.vonage.android.kotlin.VonageMuteListener
 import com.vonage.android.kotlin.VonagePublisher
 import com.vonage.android.kotlin.VonagePublisherAudioStatsEntry
@@ -21,7 +20,6 @@ import com.vonage.android.kotlin.VonagePublisherVideoStatsEntry
 import com.vonage.android.kotlin.VonagePublisherVideoStatsListener
 import com.vonage.android.kotlin.VonageStream
 import com.vonage.android.kotlin.VonageVideoLayer
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -41,15 +39,21 @@ internal class OpenTokPublisher(
 
     override var publishVideo: Boolean
         get() = raw.publishVideo
-        set(value) { raw.publishVideo = value }
+        set(value) {
+            raw.publishVideo = value
+        }
 
     override var publishAudio: Boolean
         get() = raw.publishAudio
-        set(value) { raw.publishAudio = value }
+        set(value) {
+            raw.publishAudio = value
+        }
 
     override var publishCaptions: Boolean
         get() = raw.publishCaptions
-        set(value) { raw.publishCaptions = value }
+        set(value) {
+            raw.publishCaptions = value
+        }
 
     override fun cycleCamera() = raw.cycleCamera()
 
@@ -91,7 +95,9 @@ internal class OpenTokPublisher(
     // region Listeners
 
     override fun setVideoListener(listener: VonagePublisherVideoListener?) {
-        if (listener == null) { raw.setVideoListener(null); return }
+        if (listener == null) {
+            raw.setVideoListener(null); return
+        }
         raw.setVideoListener(object : PublisherKit.VideoListener {
             override fun onVideoEnabled(p: PublisherKit, reason: String) =
                 listener.onVideoEnabled(reason)
@@ -108,7 +114,9 @@ internal class OpenTokPublisher(
     }
 
     override fun setPublisherListener(listener: VonagePublisherKitListener?) {
-        if (listener == null) { raw.setPublisherListener(null); return }
+        if (listener == null) {
+            raw.setPublisherListener(null); return
+        }
         raw.setPublisherListener(object : PublisherKit.PublisherListener {
             override fun onStreamCreated(p: PublisherKit, stream: Stream) =
                 listener.onStreamCreated(stream.toVonage())
@@ -122,12 +130,16 @@ internal class OpenTokPublisher(
     }
 
     override fun setMuteListener(listener: VonageMuteListener?) {
-        if (listener == null) { raw.setMuteListener(null); return }
+        if (listener == null) {
+            raw.setMuteListener(null); return
+        }
         raw.setMuteListener { _ -> listener.onMuteForced() }
     }
 
     override fun setCameraListener(listener: VonageCameraListener?) {
-        if (listener == null) { raw.setCameraListener(null); return }
+        if (listener == null) {
+            raw.setCameraListener(null); return
+        }
         raw.setCameraListener(object : Publisher.CameraListener {
             override fun onCameraChanged(p: Publisher, cameraIndex: Int) =
                 listener.onCameraChanged(cameraIndex)
@@ -138,12 +150,16 @@ internal class OpenTokPublisher(
     }
 
     override fun setAudioLevelListener(listener: VonageAudioLevelListener?) {
-        if (listener == null) { raw.setAudioLevelListener(null); return }
+        if (listener == null) {
+            raw.setAudioLevelListener(null); return
+        }
         raw.setAudioLevelListener { _, level -> listener.onAudioLevelUpdated(level) }
     }
 
     override fun setVideoStatsListener(listener: VonagePublisherVideoStatsListener?) {
-        if (listener == null) { raw.setVideoStatsListener(null); return }
+        if (listener == null) {
+            raw.setVideoStatsListener(null); return
+        }
         raw.setVideoStatsListener { _, stats ->
             val entries = stats.map { s ->
                 VonagePublisherVideoStatsEntry(
@@ -172,7 +188,9 @@ internal class OpenTokPublisher(
     }
 
     override fun setAudioStatsListener(listener: VonagePublisherAudioStatsListener?) {
-        if (listener == null) { raw.setAudioStatsListener(null); return }
+        if (listener == null) {
+            raw.setAudioStatsListener(null); return
+        }
         raw.setAudioStatsListener { _, stats ->
             val entries = stats.map { s ->
                 VonagePublisherAudioStatsEntry(
@@ -207,12 +225,16 @@ private fun VonageBitratePreset.toSdk(): PublisherKit.VideoBitratePreset = when 
 private fun VonageDegradationPref.toSdk(): PublisherKit.DegradationPreference = when (this) {
     VonageDegradationPref.NOT_SET ->
         PublisherKit.DegradationPreference.DegradationPreferenceNotSet
+
     VonageDegradationPref.MAINTAIN_FRAME_RATE_AND_RESOLUTION ->
         PublisherKit.DegradationPreference.DegradationPreferenceMaintainFrameRateAndResolution
+
     VonageDegradationPref.MAINTAIN_FRAME_RATE ->
         PublisherKit.DegradationPreference.DegradationPreferenceMaintainFrameRate
+
     VonageDegradationPref.MAINTAIN_RESOLUTION ->
         PublisherKit.DegradationPreference.DegradationPreferenceMaintainResolution
+
     VonageDegradationPref.BALANCED ->
         PublisherKit.DegradationPreference.DegradationPreferenceBalanced
 }

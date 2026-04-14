@@ -8,10 +8,8 @@ import com.opentok.android.PublisherKit
 import com.opentok.android.PublisherKit.PublisherKitVideoType
 import com.opentok.android.Session
 import com.opentok.android.VeraCameraCapturer
-import com.vonage.android.kotlin.VonageBitratePreset
 import com.vonage.android.kotlin.VonageCaptureFrameRate
 import com.vonage.android.kotlin.VonageCaptureResolution
-import com.vonage.android.kotlin.VonageDegradationPref
 import com.vonage.android.kotlin.VonagePublisher
 import com.vonage.android.kotlin.VonagePublisherConfig
 import com.vonage.android.kotlin.VonageScreenShareConfig

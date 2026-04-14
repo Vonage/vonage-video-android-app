@@ -52,6 +52,7 @@ enum class VonageCaptureResolution {
 /**
  * Capture frame rate options for publisher creation.
  */
+@Suppress("MagicNumber")
 enum class VonageCaptureFrameRate(val fps: Int) {
     FPS_1(1),
     FPS_7(7),

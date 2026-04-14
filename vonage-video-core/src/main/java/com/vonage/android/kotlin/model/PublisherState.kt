@@ -2,18 +2,13 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
-import com.vonage.android.kotlin.VonageAudioLevelListener
 import com.vonage.android.kotlin.VonageBlurLevel
 import com.vonage.android.kotlin.VonageCameraListener
 import com.vonage.android.kotlin.VonageError
 import com.vonage.android.kotlin.VonageMuteListener
 import com.vonage.android.kotlin.VonagePublisher
-import com.vonage.android.kotlin.VonagePublisherAudioStatsEntry
-import com.vonage.android.kotlin.VonagePublisherAudioStatsListener
 import com.vonage.android.kotlin.VonagePublisherKitListener
 import com.vonage.android.kotlin.VonagePublisherVideoListener
-import com.vonage.android.kotlin.VonagePublisherVideoStatsEntry
-import com.vonage.android.kotlin.VonagePublisherVideoStatsListener
 import com.vonage.android.kotlin.VonageSession
 import com.vonage.android.kotlin.VonageStream
 import com.vonage.android.kotlin.VonageVideoType
@@ -97,6 +92,7 @@ data class PublisherState(
         when (visible) {
             true -> vonagePublisher.publishVideo =
                 vonagePublisher.stream?.hasVideo == true
+
             false -> vonagePublisher.publishVideo = false
         }
     }
@@ -124,7 +120,10 @@ data class PublisherState(
 
     fun applyVideoBitrate(config: VideoBitrateConfig) {
         vonagePublisher.applyVideoBitrate(config.preset.toVonageBitratePreset(), config.maxBitrate)
-        vonageLogger.d(logTag, "Applied bitrate: preset=${config.preset.label}, max=${config.maxBitrate}")
+        vonageLogger.d(
+            logTag,
+            "Applied bitrate: preset=${config.preset.label}, max=${config.maxBitrate}"
+        )
     }
 
     fun applyDegradationPreference(preference: DegradationPreference) {
@@ -169,13 +168,16 @@ data class PublisherState(
                 vonageLogger.d(logTag, "Publisher video enabled - $reason")
                 _isCameraEnabled.value = true
             }
+
             override fun onVideoDisabled(reason: String) {
                 vonageLogger.d(logTag, "Publisher video disabled - $reason")
                 _isCameraEnabled.value = false
             }
+
             override fun onVideoDisableWarning() {
                 vonageLogger.d(logTag, "Publisher video disable warning")
             }
+
             override fun onVideoDisableWarningLifted() {
                 vonageLogger.d(logTag, "Publisher video disable warning lifted")
             }
@@ -184,9 +186,11 @@ data class PublisherState(
             override fun onStreamCreated(stream: VonageStream) {
                 vonageLogger.d(logTag, "Publisher stream created")
             }
+
             override fun onStreamDestroyed(stream: VonageStream) {
                 vonageLogger.d(logTag, "Publisher stream destroyed")
             }
+
             override fun onError(error: VonageError) {
                 vonageLogger.e(logTag, "Publisher error ${error.message}")
             }
@@ -201,6 +205,7 @@ data class PublisherState(
                     _camera.update { cameraType }
                 }
             }
+
             override fun onCameraError(error: VonageError) {
                 // No-op for now
             }
@@ -250,15 +255,15 @@ private fun VonageStream.toVideoSource(): VideoSource = when (videoType) {
 }
 
 internal fun VonagePublisher.observeAudioLevel(): Flow<Float> = callbackFlow {
-    setAudioLevelListener(VonageAudioLevelListener { level ->
+    setAudioLevelListener { level ->
         trySend(level)
-    })
+    }
     awaitClose { setAudioLevelListener(null) }
 }
 
 internal fun VonagePublisher.observeVideoStats(): Flow<PublisherState.VideoStats> =
     callbackFlow {
-        setVideoStatsListener(VonagePublisherVideoStatsListener { entries ->
+        setVideoStatsListener { entries ->
             if (entries.isNotEmpty()) {
                 val s = entries[0]
                 trySend(
@@ -283,13 +288,13 @@ internal fun VonagePublisher.observeVideoStats(): Flow<PublisherState.VideoStats
                     ),
                 )
             }
-        })
+        }
         awaitClose { setVideoStatsListener(null) }
     }
 
 internal fun VonagePublisher.observeAudioStats(): Flow<PublisherState.AudioStats> =
     callbackFlow {
-        setAudioStatsListener(VonagePublisherAudioStatsListener { entries ->
+        setAudioStatsListener { entries ->
             if (entries.isNotEmpty()) {
                 val s = entries[0]
                 trySend(
@@ -302,7 +307,7 @@ internal fun VonagePublisher.observeAudioStats(): Flow<PublisherState.AudioStats
                     ),
                 )
             }
-        })
+        }
         awaitClose { setAudioStatsListener(null) }
     }
 
@@ -323,7 +328,8 @@ internal fun VideoBitratePreset.toVonageBitratePreset(): com.vonage.android.kotl
 internal fun DegradationPreference.toVonageDegradationPref(): com.vonage.android.kotlin.VonageDegradationPref =
     when (this) {
         DegradationPreference.NOT_SET -> com.vonage.android.kotlin.VonageDegradationPref.NOT_SET
-        DegradationPreference.MAINTAIN_FRAME_RATE_AND_RESOLUTION -> com.vonage.android.kotlin.VonageDegradationPref.MAINTAIN_FRAME_RATE_AND_RESOLUTION
+        DegradationPreference.MAINTAIN_FRAME_RATE_AND_RESOLUTION ->
+            com.vonage.android.kotlin.VonageDegradationPref.MAINTAIN_FRAME_RATE_AND_RESOLUTION
         DegradationPreference.MAINTAIN_FRAME_RATE -> com.vonage.android.kotlin.VonageDegradationPref.MAINTAIN_FRAME_RATE
         DegradationPreference.MAINTAIN_RESOLUTION -> com.vonage.android.kotlin.VonageDegradationPref.MAINTAIN_RESOLUTION
         DegradationPreference.BALANCED -> com.vonage.android.kotlin.VonageDegradationPref.BALANCED
