@@ -183,11 +183,11 @@ private fun VonageStream.toVideoSource(): VideoSource = when (videoType) {
 }
 
 internal fun VonageSubscriber.observeAudioLevel(): Flow<Float> = callbackFlow {
-    setAudioLevelListener(VonageAudioLevelListener { level ->
+    setAudioLevelListener { level ->
         if (isActive) {
             trySend(level)
         }
-    })
+    }
     awaitClose { setAudioLevelListener(null) }
 }
     .conflate()
@@ -195,7 +195,7 @@ internal fun VonageSubscriber.observeAudioLevel(): Flow<Float> = callbackFlow {
 
 internal fun VonageSubscriber.observeVideoStats(): Flow<ParticipantState.SubscriberVideoStats> =
     callbackFlow {
-        setVideoStatsListener(VonageSubscriberVideoStatsListener { stats ->
+        setVideoStatsListener { stats ->
             trySend(
                 ParticipantState.SubscriberVideoStats(
                     videoPacketsReceived = stats.videoPacketsReceived,
@@ -211,13 +211,13 @@ internal fun VonageSubscriber.observeVideoStats(): Flow<ParticipantState.Subscri
                     estimatedBandwidthInBps = stats.estimatedBandwidthInBps,
                 ),
             )
-        })
+        }
         awaitClose { setVideoStatsListener(null) }
     }
 
 internal fun VonageSubscriber.observeAudioStats(): Flow<ParticipantState.SubscriberAudioStats> =
     callbackFlow {
-        setAudioStatsListener(VonageSubscriberAudioStatsListener { stats ->
+        setAudioStatsListener { stats ->
             trySend(
                 ParticipantState.SubscriberAudioStats(
                     audioPacketsReceived = stats.audioPacketsReceived,
@@ -226,7 +226,7 @@ internal fun VonageSubscriber.observeAudioStats(): Flow<ParticipantState.Subscri
                     estimatedBandwidthInBps = stats.estimatedBandwidthInBps,
                 ),
             )
-        })
+        }
         awaitClose { setAudioStatsListener(null) }
     }
 
