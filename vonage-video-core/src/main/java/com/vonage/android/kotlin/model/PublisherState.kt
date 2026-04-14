@@ -2,10 +2,13 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
+import com.vonage.android.kotlin.VonageBitratePreset
 import com.vonage.android.kotlin.VonageBlurLevel
 import com.vonage.android.kotlin.VonageCameraListener
+import com.vonage.android.kotlin.VonageDegradationPref
 import com.vonage.android.kotlin.VonageError
 import com.vonage.android.kotlin.VonageMuteListener
+import com.vonage.android.kotlin.VonageNoiseSuppression
 import com.vonage.android.kotlin.VonagePublisher
 import com.vonage.android.kotlin.VonagePublisherKitListener
 import com.vonage.android.kotlin.VonagePublisherVideoListener
@@ -14,7 +17,6 @@ import com.vonage.android.kotlin.VonageStream
 import com.vonage.android.kotlin.VonageVideoType
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.toggle
-import com.vonage.android.kotlin.ext.toggleNoiseSuppression
 import com.vonage.android.kotlin.internal.SpeakingWhileMutedDetector
 import com.vonage.logger.vonageLogger
 import kotlinx.collections.immutable.ImmutableList
@@ -81,7 +83,8 @@ data class PublisherState(
     private val _audioStats: MutableStateFlow<AudioStats?> = MutableStateFlow(null)
     val audioStats: StateFlow<AudioStats?> = _audioStats
 
-    private val _noiseSuppression: MutableStateFlow<NoiseSuppression> = MutableStateFlow(NoiseSuppression.DISABLED)
+    private val _noiseSuppression: MutableStateFlow<NoiseSuppression> =
+        MutableStateFlow(NoiseSuppression.DISABLED)
     override val noiseSuppression: StateFlow<NoiseSuppression> = _noiseSuppression
 
     private val speakingWhileMutedDetector = SpeakingWhileMutedDetector(
@@ -123,8 +126,9 @@ data class PublisherState(
     }
 
     override fun toggleNoiseSuppression() {
-        publisher.toggleNoiseSuppression(_noiseSuppression.value)
-            .onSuccess { _noiseSuppression.value = it }
+        val newValue = _noiseSuppression.value
+        vonagePublisher.toggleNoiseSuppression(newValue.toVonageNoiseSuppression())
+            .onSuccess { _noiseSuppression.value = newValue }
     }
 
     /**
@@ -331,22 +335,26 @@ internal fun BlurLevel.toVonageBlurLevel(): VonageBlurLevel = when (this) {
     BlurLevel.HIGH -> VonageBlurLevel.HIGH
 }
 
-internal fun VideoBitratePreset.toVonageBitratePreset(): com.vonage.android.kotlin.VonageBitratePreset =
+internal fun NoiseSuppression.toVonageNoiseSuppression(): VonageNoiseSuppression = when (this) {
+    NoiseSuppression.ENABLED -> VonageNoiseSuppression.ENABLED
+    NoiseSuppression.DISABLED -> VonageNoiseSuppression.DISABLED
+}
+
+internal fun VideoBitratePreset.toVonageBitratePreset(): VonageBitratePreset =
     when (this) {
-        VideoBitratePreset.DEFAULT -> com.vonage.android.kotlin.VonageBitratePreset.DEFAULT
-        VideoBitratePreset.BW_SAVER -> com.vonage.android.kotlin.VonageBitratePreset.BW_SAVER
-        VideoBitratePreset.EXTRA_BW_SAVER -> com.vonage.android.kotlin.VonageBitratePreset.EXTRA_BW_SAVER
-        VideoBitratePreset.CUSTOM -> com.vonage.android.kotlin.VonageBitratePreset.CUSTOM
+        VideoBitratePreset.DEFAULT -> VonageBitratePreset.DEFAULT
+        VideoBitratePreset.BW_SAVER -> VonageBitratePreset.BW_SAVER
+        VideoBitratePreset.EXTRA_BW_SAVER -> VonageBitratePreset.EXTRA_BW_SAVER
+        VideoBitratePreset.CUSTOM -> VonageBitratePreset.CUSTOM
     }
 
-internal fun DegradationPreference.toVonageDegradationPref(): com.vonage.android.kotlin.VonageDegradationPref =
+internal fun DegradationPreference.toVonageDegradationPref(): VonageDegradationPref =
     when (this) {
-        DegradationPreference.NOT_SET -> com.vonage.android.kotlin.VonageDegradationPref.NOT_SET
-        DegradationPreference.MAINTAIN_FRAME_RATE_AND_RESOLUTION ->
-            com.vonage.android.kotlin.VonageDegradationPref.MAINTAIN_FRAME_RATE_AND_RESOLUTION
-        DegradationPreference.MAINTAIN_FRAME_RATE -> com.vonage.android.kotlin.VonageDegradationPref.MAINTAIN_FRAME_RATE
-        DegradationPreference.MAINTAIN_RESOLUTION -> com.vonage.android.kotlin.VonageDegradationPref.MAINTAIN_RESOLUTION
-        DegradationPreference.BALANCED -> com.vonage.android.kotlin.VonageDegradationPref.BALANCED
+        DegradationPreference.NOT_SET -> VonageDegradationPref.NOT_SET
+        DegradationPreference.MAINTAIN_FRAME_RATE_AND_RESOLUTION -> VonageDegradationPref.MAINTAIN_FRAME_RATE_AND_RESOLUTION
+        DegradationPreference.MAINTAIN_FRAME_RATE -> VonageDegradationPref.MAINTAIN_FRAME_RATE
+        DegradationPreference.MAINTAIN_RESOLUTION -> VonageDegradationPref.MAINTAIN_RESOLUTION
+        DegradationPreference.BALANCED -> VonageDegradationPref.BALANCED
     }
 
 // endregion

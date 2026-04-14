@@ -80,8 +80,9 @@ data class PreviewPublisherState(
     }
 
     override fun toggleNoiseSuppression() {
-        vonagePublisher.toggleNoiseSuppression(_noiseSuppression.value)
-            .onSuccess { _noiseSuppression.value = it }
+        val newValue = _noiseSuppression.value
+        vonagePublisher.toggleNoiseSuppression(newValue.toVonageNoiseSuppression())
+            .onSuccess { _noiseSuppression.value = newValue }
     }
 
     /**

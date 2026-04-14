@@ -4,7 +4,7 @@ package com.vonage.android.kotlin.model
  * App-level representation of the OpenTok degradation preference.
  *
  * Controls what the publisher prioritizes when network conditions degrade.
- * Maps to [VonageDegradationPref].
+ * Maps to [com.vonage.android.kotlin.VonageDegradationPref].
  *
  * @property label Human-readable name shown in the UI
  * @property description Short explanation of the behavior

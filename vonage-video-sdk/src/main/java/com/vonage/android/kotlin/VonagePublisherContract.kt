@@ -25,6 +25,7 @@ interface VonagePublisher {
     fun applyBlur(level: VonageBlurLevel)
     fun applyVideoBitrate(preset: VonageBitratePreset, maxBitrate: Int? = null)
     fun applyDegradationPreference(preference: VonageDegradationPref)
+    fun toggleNoiseSuppression(noiseSuppression: VonageNoiseSuppression): Result<VonageNoiseSuppression>
 
     fun setVideoListener(listener: VonagePublisherVideoListener?)
     fun setPublisherListener(listener: VonagePublisherKitListener?)
@@ -118,6 +119,11 @@ enum class VonageBlurLevel {
         private val map = entries.toTypedArray()
         infix fun by(index: Int): VonageBlurLevel = map[index % entries.size]
     }
+}
+
+enum class VonageNoiseSuppression {
+    ENABLED,
+    DISABLED,
 }
 
 enum class VonageBitratePreset {

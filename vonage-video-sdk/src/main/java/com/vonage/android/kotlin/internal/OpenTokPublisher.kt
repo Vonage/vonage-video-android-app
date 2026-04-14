@@ -11,6 +11,7 @@ import com.vonage.android.kotlin.VonageBlurLevel
 import com.vonage.android.kotlin.VonageCameraListener
 import com.vonage.android.kotlin.VonageDegradationPref
 import com.vonage.android.kotlin.VonageMuteListener
+import com.vonage.android.kotlin.VonageNoiseSuppression
 import com.vonage.android.kotlin.VonagePublisher
 import com.vonage.android.kotlin.VonagePublisherAudioStatsEntry
 import com.vonage.android.kotlin.VonagePublisherAudioStatsListener
@@ -60,6 +61,30 @@ internal class OpenTokPublisher(
     override fun destroy() = raw.destroy()
 
     override fun stop() = raw.onStop()
+
+    // region Noise suppression
+
+    override fun toggleNoiseSuppression(noiseSuppression: VonageNoiseSuppression): Result<VonageNoiseSuppression> =
+        when (noiseSuppression) {
+            VonageNoiseSuppression.ENABLED -> removeNoiseSuppression()
+            VonageNoiseSuppression.DISABLED -> applyNoiseSuppression()
+        }
+
+    internal fun applyNoiseSuppression(): Result<VonageNoiseSuppression> =
+        runCatching {
+            raw.setAudioTransformers(
+                arrayListOf(raw.AudioTransformer("NoiseSuppression", ""))
+            )
+            VonageNoiseSuppression.ENABLED
+        }
+
+    internal fun removeNoiseSuppression(): Result<VonageNoiseSuppression> =
+        runCatching {
+            raw.setAudioTransformers(arrayListOf())
+            VonageNoiseSuppression.DISABLED
+        }
+
+    // endregion
 
     // region Blur
 
