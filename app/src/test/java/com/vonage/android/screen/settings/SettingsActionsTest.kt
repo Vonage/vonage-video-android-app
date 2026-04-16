@@ -9,6 +9,7 @@ import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.settings.SettingsUiState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +20,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SettingsActionsTest {
 
     private val callSettingsHolder = CallSettingsHolder()

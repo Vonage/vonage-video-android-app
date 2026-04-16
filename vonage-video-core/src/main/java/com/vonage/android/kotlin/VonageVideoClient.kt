@@ -8,6 +8,8 @@ import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherState
+import com.vonage.android.kotlin.sdk.VonageSdkFactory
+import com.vonage.android.kotlin.sdk.VonageSession
 import com.vonage.android.kotlin.signal.SignalPlugin
 import com.vonage.logger.vonageLogger
 
@@ -27,7 +29,7 @@ class VonageVideoClient(
     private val context: Context,
     private val sdkFactory: VonageSdkFactory,
     private val signalPlugins: List<SignalPlugin>,
-    private val publisherFactory: PublisherFactory = PublisherFactory(sdkFactory),
+    private val publisherFactory: PublisherFactory,
 ) {
 
     private var session: VonageSession? = null

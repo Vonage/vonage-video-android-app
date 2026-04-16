@@ -1,6 +1,6 @@
 package com.vonage.android.kotlin.model
 
-import com.vonage.android.kotlin.VonageError
+import com.vonage.android.kotlin.sdk.VonageError
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

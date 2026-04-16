@@ -1,6 +1,6 @@
 package com.vonage.android.kotlin.internal
 
-import com.vonage.android.kotlin.VonagePublisher
+import com.vonage.android.kotlin.sdk.VonagePublisher
 
 /**
  * Container holding publisher instances for camera and screen sharing.

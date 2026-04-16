@@ -1,6 +1,6 @@
 package com.vonage.android.kotlin.model
 
-import com.vonage.android.kotlin.VonageError
+import com.vonage.android.kotlin.sdk.VonageError
 
 /**
  * Sealed interface representing all possible session events during a video call.

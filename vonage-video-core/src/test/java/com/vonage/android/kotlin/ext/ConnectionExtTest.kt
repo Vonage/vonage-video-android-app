@@ -1,7 +1,7 @@
 package com.vonage.android.kotlin.ext
 
 import android.view.View
-import com.vonage.android.kotlin.VonageConnection
+import com.vonage.android.kotlin.sdk.VonageConnection
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VideoSource
 import io.mockk.mockk

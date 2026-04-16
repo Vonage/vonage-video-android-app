@@ -2,7 +2,7 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
-import com.vonage.android.kotlin.VonageSession
+import com.vonage.android.kotlin.sdk.VonageSession
 import kotlinx.coroutines.flow.StateFlow
 
 /**

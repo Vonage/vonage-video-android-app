@@ -1,8 +1,9 @@
-package com.vonage.android.kotlin
+package com.vonage.android.kotlin.sdk
 
 import android.content.Context
 import android.media.projection.MediaProjection
-import com.vonage.android.kotlin.internal.OpenTokSdkFactory
+import com.opentok.android.BaseAudioDevice
+import com.vonage.android.kotlin.sdk.internal.OpenTokSdkFactory
 
 /**
  * Configuration for creating a [VonagePublisher].
@@ -97,6 +98,8 @@ interface VonageSdkFactory {
         /**
          * Creates the default OpenTok-backed factory.
          */
-        fun create(): VonageSdkFactory = OpenTokSdkFactory()
+        fun create(baseAudioDevice: BaseAudioDevice): VonageSdkFactory = OpenTokSdkFactory(
+            baseAudioDevice = baseAudioDevice,
+        )
     }
 }

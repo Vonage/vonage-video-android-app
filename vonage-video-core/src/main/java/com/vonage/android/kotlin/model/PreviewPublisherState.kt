@@ -2,9 +2,9 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
-import com.vonage.android.kotlin.VonageCameraListener
-import com.vonage.android.kotlin.VonageError
-import com.vonage.android.kotlin.VonagePublisher
+import com.vonage.android.kotlin.sdk.VonageCameraListener
+import com.vonage.android.kotlin.sdk.VonageError
+import com.vonage.android.kotlin.sdk.VonagePublisher
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.MicVolumeListener
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,7 +80,11 @@ data class PreviewPublisherState(
     }
 
     override fun toggleNoiseSuppression() {
-        val newValue = _noiseSuppression.value
+        val currentValue = _noiseSuppression.value
+        val newValue = when (currentValue) {
+            NoiseSuppression.DISABLED -> NoiseSuppression.ENABLED
+            NoiseSuppression.ENABLED -> NoiseSuppression.DISABLED
+        }
         vonagePublisher.toggleNoiseSuppression(newValue.toVonageNoiseSuppression())
             .onSuccess { _noiseSuppression.value = newValue }
     }

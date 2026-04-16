@@ -1,21 +1,23 @@
-package com.vonage.android.kotlin.internal
+package com.vonage.android.kotlin.sdk.internal
 
 import android.app.ActivityManager
 import android.content.Context
+import com.opentok.android.AudioDeviceManager
+import com.opentok.android.BaseAudioDevice
 import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit
 import com.opentok.android.PublisherKit.PublisherKitVideoType
 import com.opentok.android.Session
 import com.opentok.android.VeraCameraCapturer
-import com.vonage.android.kotlin.VonageCaptureFrameRate
-import com.vonage.android.kotlin.VonageCaptureResolution
-import com.vonage.android.kotlin.VonagePublisher
-import com.vonage.android.kotlin.VonagePublisherConfig
-import com.vonage.android.kotlin.VonageScreenShareConfig
-import com.vonage.android.kotlin.VonageSdkFactory
-import com.vonage.android.kotlin.VonageSession
-import com.vonage.android.kotlin.VonageVideoCodec
+import com.vonage.android.kotlin.sdk.VonageCaptureFrameRate
+import com.vonage.android.kotlin.sdk.VonageCaptureResolution
+import com.vonage.android.kotlin.sdk.VonagePublisher
+import com.vonage.android.kotlin.sdk.VonagePublisherConfig
+import com.vonage.android.kotlin.sdk.VonageScreenShareConfig
+import com.vonage.android.kotlin.sdk.VonageSdkFactory
+import com.vonage.android.kotlin.sdk.VonageSession
+import com.vonage.android.kotlin.sdk.VonageVideoCodec
 
 /**
  * Default [VonageSdkFactory] implementation backed by the OpenTok Android SDK.
@@ -23,7 +25,13 @@ import com.vonage.android.kotlin.VonageVideoCodec
  * All raw OpenTok builder calls and SDK enum mappings are encapsulated here
  * so that the rest of the codebase only works with the Vonage wrapper types.
  */
-internal class OpenTokSdkFactory : VonageSdkFactory {
+internal class OpenTokSdkFactory(
+    baseAudioDevice: BaseAudioDevice,
+) : VonageSdkFactory {
+
+    init {
+        AudioDeviceManager.setAudioDevice(baseAudioDevice)
+    }
 
     override fun createSession(
         context: Context,

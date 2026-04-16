@@ -1,20 +1,20 @@
-package com.vonage.android.kotlin.internal
+package com.vonage.android.kotlin.sdk.internal
 
 import android.content.Context
 import com.opentok.android.OpentokError
 import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
-import com.vonage.android.kotlin.VonageArchiveListener
-import com.vonage.android.kotlin.VonageConnection
-import com.vonage.android.kotlin.VonageError
-import com.vonage.android.kotlin.VonagePublisher
-import com.vonage.android.kotlin.VonageSession
-import com.vonage.android.kotlin.VonageSessionListener
-import com.vonage.android.kotlin.VonageSignalListener
-import com.vonage.android.kotlin.VonageStream
-import com.vonage.android.kotlin.VonageSubscriber
-import com.vonage.android.kotlin.VonageVideoType
+import com.vonage.android.kotlin.sdk.VonageArchiveListener
+import com.vonage.android.kotlin.sdk.VonageConnection
+import com.vonage.android.kotlin.sdk.VonageError
+import com.vonage.android.kotlin.sdk.VonagePublisher
+import com.vonage.android.kotlin.sdk.VonageSession
+import com.vonage.android.kotlin.sdk.VonageSessionListener
+import com.vonage.android.kotlin.sdk.VonageSignalListener
+import com.vonage.android.kotlin.sdk.VonageStream
+import com.vonage.android.kotlin.sdk.VonageSubscriber
+import com.vonage.android.kotlin.sdk.VonageVideoType
 import java.util.concurrent.ConcurrentHashMap
 
 /**

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.vonage.android.kotlin"
+    namespace = "com.vonage.android.kotlin.sdk"
     compileSdk = 36
 
     defaultConfig {

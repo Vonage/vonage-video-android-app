@@ -1,4 +1,4 @@
-package com.vonage.android.kotlin
+package com.vonage.android.kotlin.sdk
 
 /**
  * Represents a connection to a Vonage Video session.

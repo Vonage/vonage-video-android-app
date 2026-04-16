@@ -6,6 +6,16 @@ import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
+import com.vonage.android.kotlin.sdk.VonageArchiveListener
+import com.vonage.android.kotlin.sdk.VonageConnection
+import com.vonage.android.kotlin.sdk.VonageError
+import com.vonage.android.kotlin.sdk.VonagePublisher
+import com.vonage.android.kotlin.sdk.VonageSession
+import com.vonage.android.kotlin.sdk.VonageSessionListener
+import com.vonage.android.kotlin.sdk.VonageSignalListener
+import com.vonage.android.kotlin.sdk.VonageStream
+import com.vonage.android.kotlin.sdk.VonageSubscriber
+import com.vonage.android.kotlin.sdk.VonageVideoType
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.kotlin.signal.RawSignal
 import com.vonage.android.kotlin.signal.SignalPlugin

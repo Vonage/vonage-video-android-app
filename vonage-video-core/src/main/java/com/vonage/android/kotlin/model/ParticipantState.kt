@@ -2,15 +2,16 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
-import com.vonage.android.kotlin.VonageSession
-import com.vonage.android.kotlin.VonageStream
-import com.vonage.android.kotlin.VonageSubscriber
-import com.vonage.android.kotlin.VonageSubscriberStreamListener
-import com.vonage.android.kotlin.VonageSubscriberVideoListener
-import com.vonage.android.kotlin.VonageVideoType
+import com.vonage.android.kotlin.sdk.VonageSession
+import com.vonage.android.kotlin.sdk.VonageStream
+import com.vonage.android.kotlin.sdk.VonageSubscriber
+import com.vonage.android.kotlin.sdk.VonageSubscriberStreamListener
+import com.vonage.android.kotlin.sdk.VonageSubscriberVideoListener
+import com.vonage.android.kotlin.sdk.VonageVideoType
 import com.vonage.android.kotlin.ext.mapTalking
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.logger.vonageLogger
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -182,6 +183,7 @@ private fun VonageStream.toVideoSource(): VideoSource = when (videoType) {
     VonageVideoType.SCREEN, VonageVideoType.CUSTOM -> VideoSource.SCREEN
 }
 
+@OptIn(FlowPreview::class)
 internal fun VonageSubscriber.observeAudioLevel(): Flow<Float> = callbackFlow {
     setAudioLevelListener { level ->
         if (isActive) {

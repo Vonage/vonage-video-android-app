@@ -9,12 +9,12 @@ import com.vonage.android.shared.ForegroundChecker
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import junit.framework.TestCase.assertFalse
-import junit.framework.TestCase.assertTrue
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.Date
-import kotlin.test.assertEquals
 
 class EnabledChatSignalPluginTest {
 

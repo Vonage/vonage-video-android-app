@@ -1,4 +1,4 @@
-package com.vonage.android.kotlin
+package com.vonage.android.kotlin.sdk
 
 import android.view.View
 

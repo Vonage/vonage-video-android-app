@@ -1,6 +1,6 @@
 package com.vonage.android.kotlin.ext
 
-import com.vonage.android.kotlin.VonageConnection
+import com.vonage.android.kotlin.sdk.VonageConnection
 import com.vonage.android.kotlin.model.Participant
 
 /**

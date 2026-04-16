@@ -23,6 +23,12 @@ import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VideoBitrateConfig
+import com.vonage.android.kotlin.sdk.VonageArchiveListener
+import com.vonage.android.kotlin.sdk.VonageCaptionsListener
+import com.vonage.android.kotlin.sdk.VonageError
+import com.vonage.android.kotlin.sdk.VonageSession
+import com.vonage.android.kotlin.sdk.VonageSessionListener
+import com.vonage.android.kotlin.sdk.VonageStream
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.kotlin.signal.SignalPlugin
 import com.vonage.logger.vonageLogger

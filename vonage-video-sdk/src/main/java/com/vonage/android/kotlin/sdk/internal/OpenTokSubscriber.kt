@@ -1,18 +1,18 @@
-package com.vonage.android.kotlin.internal
+package com.vonage.android.kotlin.sdk.internal
 
 import android.view.View
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
-import com.vonage.android.kotlin.VonageAudioLevelListener
-import com.vonage.android.kotlin.VonageCaptionsListener
-import com.vonage.android.kotlin.VonageStream
-import com.vonage.android.kotlin.VonageSubscriber
-import com.vonage.android.kotlin.VonageSubscriberAudioStatsEntry
-import com.vonage.android.kotlin.VonageSubscriberAudioStatsListener
-import com.vonage.android.kotlin.VonageSubscriberStreamListener
-import com.vonage.android.kotlin.VonageSubscriberVideoListener
-import com.vonage.android.kotlin.VonageSubscriberVideoStatsEntry
-import com.vonage.android.kotlin.VonageSubscriberVideoStatsListener
+import com.vonage.android.kotlin.sdk.VonageAudioLevelListener
+import com.vonage.android.kotlin.sdk.VonageCaptionsListener
+import com.vonage.android.kotlin.sdk.VonageStream
+import com.vonage.android.kotlin.sdk.VonageSubscriber
+import com.vonage.android.kotlin.sdk.VonageSubscriberAudioStatsEntry
+import com.vonage.android.kotlin.sdk.VonageSubscriberAudioStatsListener
+import com.vonage.android.kotlin.sdk.VonageSubscriberStreamListener
+import com.vonage.android.kotlin.sdk.VonageSubscriberVideoListener
+import com.vonage.android.kotlin.sdk.VonageSubscriberVideoStatsEntry
+import com.vonage.android.kotlin.sdk.VonageSubscriberVideoStatsListener
 
 /**
  * OpenTok-backed implementation of [VonageSubscriber].

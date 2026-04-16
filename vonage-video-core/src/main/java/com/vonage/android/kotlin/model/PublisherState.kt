@@ -2,19 +2,19 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
-import com.vonage.android.kotlin.VonageBitratePreset
-import com.vonage.android.kotlin.VonageBlurLevel
-import com.vonage.android.kotlin.VonageCameraListener
-import com.vonage.android.kotlin.VonageDegradationPref
-import com.vonage.android.kotlin.VonageError
-import com.vonage.android.kotlin.VonageMuteListener
-import com.vonage.android.kotlin.VonageNoiseSuppression
-import com.vonage.android.kotlin.VonagePublisher
-import com.vonage.android.kotlin.VonagePublisherKitListener
-import com.vonage.android.kotlin.VonagePublisherVideoListener
-import com.vonage.android.kotlin.VonageSession
-import com.vonage.android.kotlin.VonageStream
-import com.vonage.android.kotlin.VonageVideoType
+import com.vonage.android.kotlin.sdk.VonageBitratePreset
+import com.vonage.android.kotlin.sdk.VonageBlurLevel
+import com.vonage.android.kotlin.sdk.VonageCameraListener
+import com.vonage.android.kotlin.sdk.VonageDegradationPref
+import com.vonage.android.kotlin.sdk.VonageError
+import com.vonage.android.kotlin.sdk.VonageMuteListener
+import com.vonage.android.kotlin.sdk.VonageNoiseSuppression
+import com.vonage.android.kotlin.sdk.VonagePublisher
+import com.vonage.android.kotlin.sdk.VonagePublisherKitListener
+import com.vonage.android.kotlin.sdk.VonagePublisherVideoListener
+import com.vonage.android.kotlin.sdk.VonageSession
+import com.vonage.android.kotlin.sdk.VonageStream
+import com.vonage.android.kotlin.sdk.VonageVideoType
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.SpeakingWhileMutedDetector
@@ -126,9 +126,11 @@ data class PublisherState(
     }
 
     override fun toggleNoiseSuppression() {
-        val newValue = _noiseSuppression.value
-        vonagePublisher.toggleNoiseSuppression(newValue.toVonageNoiseSuppression())
-            .onSuccess { _noiseSuppression.value = newValue }
+        val currentValue = _noiseSuppression.value
+        vonagePublisher.toggleNoiseSuppression(currentValue.toVonageNoiseSuppression())
+            .onSuccess { toggledValue ->
+                _noiseSuppression.value = toggledValue.toNoiseSuppression()
+            }
     }
 
     /**
@@ -338,6 +340,11 @@ internal fun BlurLevel.toVonageBlurLevel(): VonageBlurLevel = when (this) {
 internal fun NoiseSuppression.toVonageNoiseSuppression(): VonageNoiseSuppression = when (this) {
     NoiseSuppression.ENABLED -> VonageNoiseSuppression.ENABLED
     NoiseSuppression.DISABLED -> VonageNoiseSuppression.DISABLED
+}
+
+internal fun VonageNoiseSuppression.toNoiseSuppression(): NoiseSuppression = when (this) {
+    VonageNoiseSuppression.ENABLED -> NoiseSuppression.ENABLED
+    VonageNoiseSuppression.DISABLED -> NoiseSuppression.DISABLED
 }
 
 internal fun VideoBitratePreset.toVonageBitratePreset(): VonageBitratePreset =

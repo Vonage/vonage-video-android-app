@@ -1,4 +1,4 @@
-package com.vonage.android.kotlin
+package com.vonage.android.kotlin.sdk
 
 /**
  * Domain-level error from the Vonage Video SDK.

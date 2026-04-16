@@ -4,11 +4,11 @@ import android.content.Context
 import android.media.projection.MediaProjection
 import com.vonage.android.kotlin.Call.Companion.PUBLISHER_ID
 import com.vonage.android.kotlin.Call.Companion.PUBLISHER_SCREEN_ID
-import com.vonage.android.kotlin.VonageCaptureFrameRate
-import com.vonage.android.kotlin.VonageCaptureResolution
-import com.vonage.android.kotlin.VonagePublisherConfig
-import com.vonage.android.kotlin.VonageScreenShareConfig
-import com.vonage.android.kotlin.VonageSdkFactory
+import com.vonage.android.kotlin.sdk.VonageCaptureFrameRate
+import com.vonage.android.kotlin.sdk.VonageCaptureResolution
+import com.vonage.android.kotlin.sdk.VonagePublisherConfig
+import com.vonage.android.kotlin.sdk.VonageScreenShareConfig
+import com.vonage.android.kotlin.sdk.VonageSdkFactory
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
@@ -30,7 +30,7 @@ import com.vonage.logger.vonageLogger
  * keeping all OpenTok SDK details behind the abstraction.
  */
 class PublisherFactory(
-    private val sdkFactory: VonageSdkFactory = VonageSdkFactory.create(),
+    private val sdkFactory: VonageSdkFactory,
 ) {
 
     var publisherHolder: VeraPublisherHolder? = null

@@ -1,4 +1,4 @@
-package com.vonage.android.kotlin.internal
+package com.vonage.android.kotlin.sdk.internal
 
 import android.content.Context
 import android.graphics.PixelFormat

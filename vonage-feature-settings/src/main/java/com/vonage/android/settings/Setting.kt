@@ -7,7 +7,7 @@ import androidx.annotation.StringRes
  *
  * The declaration order defines the display order of sections.
  */
-enum class SettingsSection(@StringRes val titleRes: Int) {
+enum class SettingsSection(@param:StringRes val titleRes: Int) {
     VIDEO(R.string.settings_section_video),
     AUDIO(R.string.settings_section_audio),
     STATS(R.string.settings_section_stats),

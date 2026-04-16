@@ -1,6 +1,6 @@
 package com.vonage.android.kotlin.model
 
-import com.vonage.android.kotlin.VonageVideoCodec
+import com.vonage.android.kotlin.sdk.VonageVideoCodec
 
 /**
  * App-level representation of the preferred video codec.
