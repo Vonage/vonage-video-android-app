@@ -3,15 +3,8 @@ package com.vonage.android.kotlin
 import android.content.Context
 import android.media.projection.MediaProjection
 import androidx.compose.runtime.Stable
-import com.opentok.android.OpentokError
-import com.opentok.android.Session
-import com.opentok.android.Stream
-import com.opentok.android.Subscriber
-import com.opentok.android.SubscriberKit
 import com.vonage.android.kotlin.ext.extractSenderName
 import com.vonage.android.kotlin.ext.firstScreenSharing
-import com.vonage.android.kotlin.ext.id
-import com.vonage.android.kotlin.ext.name
 import com.vonage.android.kotlin.ext.sorted
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
 import com.vonage.android.kotlin.internal.PublisherFactory
@@ -30,6 +23,12 @@ import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VideoBitrateConfig
+import com.vonage.android.kotlin.sdk.VonageArchiveListener
+import com.vonage.android.kotlin.sdk.VonageCaptionsListener
+import com.vonage.android.kotlin.sdk.VonageError
+import com.vonage.android.kotlin.sdk.VonageSession
+import com.vonage.android.kotlin.sdk.VonageSessionListener
+import com.vonage.android.kotlin.sdk.VonageStream
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.kotlin.signal.SignalPlugin
 import com.vonage.logger.vonageLogger
@@ -76,7 +75,7 @@ import java.util.concurrent.ConcurrentHashMap
  * - Video visibility optimization based on UI state
  *
  * @param token Authentication token for the session
- * @param session Vonage session instance
+ * @param session Vonage session wrapper
  * @param publisherFactory Publisher factory
  * @param signalPlugins List of plugins for handling custom signals
  * @param coroutineDispatcher Dispatcher for coroutine operations (defaults to IO)
@@ -85,7 +84,7 @@ import java.util.concurrent.ConcurrentHashMap
 @Stable
 class Call internal constructor(
     private val token: String,
-    private val session: Session,
+    private val session: VonageSession,
     private val publisherFactory: PublisherFactory,
     private val signalPlugins: List<SignalPlugin>,
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -219,50 +218,49 @@ class Call internal constructor(
      */
     override fun connect(context: Context): Flow<SessionEvent> = callbackFlow {
         this@Call.context = context
-        val sessionListener = object : Session.SessionListener {
-            override fun onConnected(session: Session) {
+        session.setSessionListener(object : VonageSessionListener {
+            override fun onConnected() {
                 publishToSession()
                 startActiveSpeakerTracker()
                 startListeningSignals()
                 trySend(SessionEvent.Connected)
             }
 
-            override fun onDisconnected(session: Session) {
+            override fun onDisconnected() {
                 trySend(SessionEvent.Disconnected)
             }
 
-            override fun onStreamReceived(session: Session, stream: Stream) {
+            override fun onStreamReceived(stream: VonageStream) {
                 addSubscriber(stream)
                 trySend(SessionEvent.StreamReceived(stream.streamId))
             }
 
-            override fun onStreamDropped(session: Session, stream: Stream) {
+            override fun onStreamDropped(stream: VonageStream) {
                 removeSubscriber(stream)
                 trySend(SessionEvent.StreamDropped(stream.streamId))
             }
 
-            override fun onError(session: Session, error: OpentokError) {
+            override fun onError(error: VonageError) {
                 trySend(SessionEvent.Error(error))
             }
-        }
-        session.setSessionListener(sessionListener)
-        session.setSignalListener { _, type, data, conn ->
+        })
+        session.setSignalListener { type, data, conn ->
             signalPlugins.forEach { plugin ->
-                val isYou = publisher()?.connectionId == conn.connectionId
-                val senderName = if (!isYou) {
+                val isYou = publisher()?.connectionId == conn?.connectionId
+                val senderName = if (!isYou && conn != null) {
                     conn.extractSenderName(participants.values)
                 } else {
                     ""
                 }
-                plugin.handleSignal(type, data, senderName, isYou)
+                plugin.handleSignal(type.orEmpty(), data.orEmpty(), senderName, isYou)
             }
         }
-        session.setArchiveListener(object : Session.ArchiveListener {
-            override fun onArchiveStarted(session: Session, id: String, name: String?) {
+        session.setArchiveListener(object : VonageArchiveListener {
+            override fun onArchiveStarted(id: String, name: String?) {
                 _archivingStateFlow.update { ArchivingState.Started(id) }
             }
 
-            override fun onArchiveStopped(session: Session, id: String) {
+            override fun onArchiveStopped(id: String) {
                 _archivingStateFlow.update { ArchivingState.Stopped(id) }
             }
         })
@@ -276,7 +274,7 @@ class Call internal constructor(
      */
     override fun pauseSession() {
         vonageLogger.d(TAG, "Session paused")
-        session.onPause()
+        session.pause()
     }
 
     /**
@@ -285,7 +283,7 @@ class Call internal constructor(
      */
     override fun resumeSession() {
         vonageLogger.d(TAG, "Session resumed")
-        session.onResume()
+        session.resume()
     }
 
     /**
@@ -293,8 +291,7 @@ class Call internal constructor(
      * Unpublishes the local stream and disconnects from the session.
      */
     override fun endSession() {
-        // Wait for PublisherListener#streamDestroyed before returning (VIDSOL-104)
-        session.unpublish(publisher()?.publisher)
+        publisher()?.vonagePublisher?.let { session.unpublish(it) }
 
         session.setSessionListener(null)
         session.setSignalListener(null)
@@ -335,7 +332,7 @@ class Call internal constructor(
             .filter { it.canHandle(signalType.signal) }
             .forEach { plugin ->
                 plugin.sendSignal(
-                    senderName = publisher()?.publisher?.name.orEmpty(),
+                    senderName = publisher()?.vonagePublisher?.name.orEmpty(),
                     message = data
                 ).let {
                     session.sendSignal(it.type, it.data)
@@ -453,7 +450,7 @@ class Call internal constructor(
             )
             val newPublisher = withContext(Dispatchers.Main) {
                 val publisherState = publisherFactory.createPublisherState(context)
-                session.publish(publisherState.publisher)
+                session.publish(publisherState.vonagePublisher)
                 publisherState
             }
             participants[PUBLISHER_ID] = newPublisher
@@ -470,7 +467,7 @@ class Call internal constructor(
         coroutineScope.launch(Dispatchers.Default) {
             val newPublisher = withContext(Dispatchers.Main) {
                 val publisherState = publisherFactory.createPublisherState(context)
-                session.publish(publisherState.publisher)
+                session.publish(publisherState.vonagePublisher)
                 publisherState
             }
             participants[PUBLISHER_ID] = newPublisher
@@ -491,14 +488,14 @@ class Call internal constructor(
      */
     override fun startCapturingScreen(mediaProjection: MediaProjection) {
         coroutineScope.launch(Dispatchers.Default) {
-            val name = "${publisher()?.publisher?.name}'s Screen" // translate this!
+            val name = "${publisher()?.vonagePublisher?.name}'s Screen"
             val publisher = withContext(Dispatchers.Main) {
                 val screenPublisherState = publisherFactory.createScreenSharePublisherState(
                     context = context,
                     mediaProjection = mediaProjection,
                     name = name,
                 )
-                session.publish(screenPublisherState.publisher)
+                session.publish(screenPublisherState.vonagePublisher)
                 screenPublisherState
             }
             participants[PUBLISHER_SCREEN_ID] = publisher
@@ -510,7 +507,7 @@ class Call internal constructor(
      * Stops screen sharing and removes the screen publisher.
      */
     override fun stopCapturingScreen() {
-        (participants[PUBLISHER_SCREEN_ID] as PublisherState).publisher.let {
+        (participants[PUBLISHER_SCREEN_ID] as PublisherState).vonagePublisher.let {
             session.unpublish(it)
         }
         participants.remove(PUBLISHER_SCREEN_ID)
@@ -524,10 +521,8 @@ class Call internal constructor(
      * Listener for receiving captions from remote participants.
      * Updates the captions state flow with speaker name and text.
      */
-    private val captionsDelegate: SubscriberKit.CaptionsListener =
-        SubscriberKit.CaptionsListener { subscriber, text, isFinal ->
-            val name = subscriber.name()
-            val streamId = subscriber.id()
+    private val captionsDelegate: VonageCaptionsListener =
+        VonageCaptionsListener { name, streamId, text, isFinal ->
             _captionsStateFlow.update { lines ->
                 if (isFinal) {
                     lines.filter { it.streamId != streamId }.toImmutableList()
@@ -554,9 +549,9 @@ class Call internal constructor(
 
     private fun setCaptions(enable: Boolean) {
         coroutineScope.launch {
-            publisher()?.publisher?.publishCaptions = enable
+            publisher()?.vonagePublisher?.publishCaptions = enable
             participants.values.filterIsInstance<ParticipantState>()
-                .forEach { participant -> participant.subscriber.subscribeToCaptions = enable }
+                .forEach { participant -> participant.vonageSubscriber.subscribeToCaptions = enable }
         }
     }
     //endregion
@@ -568,15 +563,14 @@ class Call internal constructor(
      * Adds the subscriber to the participants map and starts audio level monitoring.
      */
     @Suppress("TooGenericExceptionCaught")
-    private fun addSubscriber(stream: Stream) {
+    private fun addSubscriber(stream: VonageStream) {
         vonageLogger.d(TAG, "Add subscriber ${stream.name} [${stream.streamId}]")
         coroutineScope.launch {
             try {
                 val participant = withContext(Dispatchers.Main) {
-                    val subscriber = Subscriber.Builder(context, stream).build()
+                    val subscriber = session.subscribe(context, stream)
                     subscriber.setCaptionsListener(captionsDelegate)
-                    session.subscribe(subscriber)
-                    ParticipantState(subscriber = subscriber)
+                    ParticipantState(vonageSubscriber = subscriber)
                 }
                 launch { participant.setup() }
                 participants[stream.streamId] = participant
@@ -606,7 +600,7 @@ class Call internal constructor(
      * Removes a subscriber when their stream is dropped.
      * Cleans up resources and updates the active speaker if needed.
      */
-    private fun removeSubscriber(stream: Stream) {
+    private fun removeSubscriber(stream: VonageStream) {
         val subscriber = participants[stream.streamId] ?: return
         coroutineScope.launch {
             activeSpeakerTracker.onSubscriberDestroyed(stream.streamId)

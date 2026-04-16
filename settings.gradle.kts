@@ -25,6 +25,7 @@ rootProject.name = "Vonage Video Android"
 include(":app")
 include(":vonage-video-ui-compose")
 include(":vonage-video-core")
+include(":vonage-video-sdk")
 include(":vonage-video-shared")
 include(":vonage-feature-chat")
 include(":vonage-feature-archiving")

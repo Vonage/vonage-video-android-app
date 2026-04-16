@@ -38,7 +38,7 @@ kover {
         allProjects {
             it.name !in listOf(
                 "vonage-video-ui-compose",
-                "vonage-video-core",
+                "vonage-video-sdk",
                 "vonage-config-idea-plugin"
             )
         }

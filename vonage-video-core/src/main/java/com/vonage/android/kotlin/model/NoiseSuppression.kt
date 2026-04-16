@@ -4,5 +4,5 @@ enum class NoiseSuppression {
     ENABLED,
     DISABLED;
 
-    fun isEnabled(): Boolean = this == NoiseSuppression.ENABLED
+    fun isEnabled(): Boolean = this == ENABLED
 }

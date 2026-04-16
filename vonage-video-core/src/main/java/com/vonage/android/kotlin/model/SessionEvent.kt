@@ -1,6 +1,6 @@
 package com.vonage.android.kotlin.model
 
-import com.opentok.android.OpentokError
+import com.vonage.android.kotlin.sdk.VonageError
 
 /**
  * Sealed interface representing all possible session events during a video call.
@@ -29,7 +29,7 @@ sealed interface SessionEvent {
     /**
      * An error occurred during the session.
      *
-     * @property error The OpenTok error details
+     * @property error The Vonage error details
      */
-    data class Error(val error: OpentokError) : SessionEvent
+    data class Error(val error: VonageError) : SessionEvent
 }

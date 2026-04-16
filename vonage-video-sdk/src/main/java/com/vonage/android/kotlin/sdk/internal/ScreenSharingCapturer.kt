@@ -1,4 +1,4 @@
-package com.vonage.android.kotlin.internal
+package com.vonage.android.kotlin.sdk.internal
 
 import android.content.Context
 import android.graphics.PixelFormat
@@ -19,12 +19,9 @@ import com.opentok.android.BaseVideoCapturer
  * captures frames using ImageReader.
  *
  * Captures at 1280x720 resolution at 15 FPS for optimal bandwidth usage.
- *
- * @param context Android context for accessing WindowManager
- * @param mediaProjection MediaProjection instance obtained from user permission
  */
 @Suppress("EmptyFunctionBlock")
-class ScreenSharingCapturer(
+internal class ScreenSharingCapturer(
     context: Context,
     private val mediaProjection: MediaProjection,
     private val screenShareContentHint: VideoContentHint = VideoContentHint.TEXT,
@@ -42,35 +39,16 @@ class ScreenSharingCapturer(
         displayMetrics.densityDpi
     }
 
-    /**
-     * Initializes the capturer (no-op for screen sharing).
-     */
-    override fun init() {
-        // No-op
-    }
+    override fun init() {}
 
-    /**
-     * Starts screen capture.
-     *
-     * Creates ImageReader, virtual display, and background thread for processing frames.
-     *
-     * @return 0 on success
-     */
     override fun startCapture(): Int {
         capturing = true
-
         imageReader = ImageReader.newInstance(WIDTH, HEIGHT, IMAGE_READER_PIXEL_FORMAT, 1)
         createVirtualDisplay()
         startBackgroundThread()
-
         return 0
     }
 
-    /**
-     * Stops screen capture and releases resources.
-     *
-     * @return 0 on success
-     */
     override fun stopCapture(): Int {
         capturing = false
         virtualDisplay?.release()
@@ -79,25 +57,10 @@ class ScreenSharingCapturer(
         return 0
     }
 
-    /**
-     * Destroys the capturer (no-op for screen sharing).
-     */
-    override fun destroy() {
-        // No-op
-    }
+    override fun destroy() {}
 
-    /**
-     * Checks if screen capture is currently active.
-     *
-     * @return True if capturing, false otherwise
-     */
     override fun isCaptureStarted(): Boolean = capturing
 
-    /**
-     * Gets the capture settings for screen sharing.
-     *
-     * @return CaptureSettings with 1280x720 resolution at 15 FPS
-     */
     override fun getCaptureSettings(): CaptureSettings =
         CaptureSettings().apply {
             fps = FPS
@@ -106,25 +69,12 @@ class ScreenSharingCapturer(
             format = SDK_PIXEL_FORMAT
         }
 
-    /**
-     * Called when the app is paused (no-op for screen sharing).
-     */
-    override fun onPause() {
-        // No-op
-    }
+    override fun onPause() {}
 
-    /**
-     * Called when the app is resumed (no-op for screen sharing).
-     */
-    override fun onResume() {
-        // No-op
-    }
+    override fun onResume() {}
 
     private fun createVirtualDisplay() {
-        // Register empty callback (required for creating virtual displays)
         mediaProjection.registerCallback(object : MediaProjection.Callback() {}, null)
-
-        // Create virtual display with default values
         virtualDisplay = mediaProjection.createVirtualDisplay(
             VIRTUAL_SCREEN_NAME,
             WIDTH,
@@ -133,10 +83,8 @@ class ScreenSharingCapturer(
             0,
             imageReader.surface,
             null,
-            backgroundHandler
+            backgroundHandler,
         )
-
-        // Send each frame to the SDK
         imageReader.setOnImageAvailableListener({ reader: ImageReader ->
             reader.acquireLatestImage()?.let { frame ->
                 if (frame.planes.isNotEmpty()) {
@@ -145,14 +93,13 @@ class ScreenSharingCapturer(
                         SDK_PIXEL_FORMAT,
                         WIDTH,
                         HEIGHT,
-                        0, // rotation
-                        false // mirror image
+                        0,
+                        false,
                     )
                     frame.close()
                 }
             }
         }, backgroundHandler)
-
         videoContentHint = screenShareContentHint
     }
 

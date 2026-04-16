@@ -2,6 +2,10 @@ package com.opentok.android
 
 import android.content.Context
 
+/**
+ * Camera capturer wrapping [Camera2VideoCapturer] that applies an initial camera index
+ * after the camera session is configured (needed because the SDK selects a default camera).
+ */
 internal class VeraCameraCapturer(
     context: Context,
     resolution: Publisher.CameraCaptureResolution,

@@ -2,61 +2,62 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
-import com.opentok.android.Session
-import com.opentok.android.Stream
-import com.opentok.android.Subscriber
-import com.opentok.android.SubscriberKit
+import com.vonage.android.kotlin.sdk.VonageSession
+import com.vonage.android.kotlin.sdk.VonageStream
+import com.vonage.android.kotlin.sdk.VonageSubscriber
+import com.vonage.android.kotlin.sdk.VonageSubscriberStreamListener
+import com.vonage.android.kotlin.sdk.VonageSubscriberVideoListener
+import com.vonage.android.kotlin.sdk.VonageVideoType
 import com.vonage.android.kotlin.ext.mapTalking
 import com.vonage.android.kotlin.ext.movingAverage
-import com.vonage.android.kotlin.ext.name
-import com.vonage.android.kotlin.ext.observeAudioLevel
-import com.vonage.android.kotlin.ext.observeAudioStats
-import com.vonage.android.kotlin.ext.observeVideoStats
-import com.vonage.android.kotlin.ext.toParticipantType
 import com.vonage.logger.vonageLogger
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.sample
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /**
  * Represents a remote participant (subscriber) in the video call.
  *
  * Manages the subscriber's stream state, audio level tracking, and video visibility.
- * Implements listener interfaces to react to stream and video state changes.
  *
- * @param subscriber The OpenTok Subscriber instance for this remote participant
+ * @param vonageSubscriber The wrapped Vonage Subscriber instance
  */
 @Stable
 data class ParticipantState(
-    val subscriber: Subscriber,
-) : Participant,
-    SubscriberKit.StreamListener,
-    SubscriberKit.VideoListener {
+    val vonageSubscriber: VonageSubscriber,
+) : Participant {
 
-    override val id: String = subscriber.stream.streamId
+    override val id: String = vonageSubscriber.stream.streamId
 
-    override val connectionId: String = subscriber.stream.connection.connectionId
+    override val connectionId: String = vonageSubscriber.stream.connection.connectionId
 
     override val isPublisher: Boolean = false
 
-    override val creationTime: Long = subscriber.stream.creationTime.time
+    override val creationTime: Long = vonageSubscriber.stream.creationTime
 
-    override val videoSource: VideoSource = subscriber.stream.toParticipantType()
+    override val videoSource: VideoSource = vonageSubscriber.stream.toVideoSource()
 
     override val isScreenShare: Boolean
         get() = videoSource == VideoSource.SCREEN
 
-    override val name: String = subscriber.name()
+    override val name: String = vonageSubscriber.stream.name
 
     private val _isMicEnabled: MutableStateFlow<Boolean> =
-        MutableStateFlow(subscriber.stream.hasAudio())
+        MutableStateFlow(vonageSubscriber.stream.hasAudio)
     override val isMicEnabled: StateFlow<Boolean> = _isMicEnabled
 
     private val _isCameraEnabled: MutableStateFlow<Boolean> =
-        MutableStateFlow(subscriber.stream.hasVideo())
+        MutableStateFlow(vonageSubscriber.stream.hasVideo)
     override val isCameraEnabled: StateFlow<Boolean> = _isCameraEnabled
 
     private val _audioLevel: MutableStateFlow<Float> = MutableStateFlow(0F)
@@ -65,7 +66,7 @@ data class ParticipantState(
     private val _isTalking: MutableStateFlow<Boolean> = MutableStateFlow(false)
     override val isTalking: StateFlow<Boolean> = _isTalking
 
-    override val view: View = subscriber.view
+    override val view: View = vonageSubscriber.view
 
     private val logTag = "Subscriber[$id]"
 
@@ -75,35 +76,59 @@ data class ParticipantState(
     private val _audioStats: MutableStateFlow<SubscriberAudioStats?> = MutableStateFlow(null)
     val audioStats: StateFlow<SubscriberAudioStats?> = _audioStats
 
+    internal val stream: VonageStream = vonageSubscriber.stream
+
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
-            true -> subscriber.subscribeToVideo = subscriber.stream.hasVideo()
-            false -> subscriber.subscribeToVideo = false
+            true -> vonageSubscriber.subscribeToVideo = vonageSubscriber.stream.hasVideo
+            false -> vonageSubscriber.subscribeToVideo = false
         }
     }
 
-    internal val stream: Stream = subscriber.stream
-
-    /**
-     * Initializes audio level monitoring and talking detection.
-     *
-     * Sets up listeners and starts collecting audio level data with moving average
-     * to determine when the participant is speaking.
-     */
     suspend fun setup() {
-        subscriber.setStreamListener(this)
-        subscriber.setVideoListener(this)
+        vonageSubscriber.setStreamListener(object : VonageSubscriberStreamListener {
+            override fun onReconnected() {
+                vonageLogger.d(logTag, "Subscriber reconnected")
+            }
+
+            override fun onDisconnected() {
+                vonageLogger.d(logTag, "Subscriber disconnected")
+            }
+        })
+        vonageSubscriber.setVideoListener(object : VonageSubscriberVideoListener {
+            override fun onVideoEnabled(reason: String) {
+                vonageLogger.d(logTag, "Subscriber video enabled")
+                _isCameraEnabled.value = true
+            }
+
+            override fun onVideoDisabled(reason: String) {
+                vonageLogger.d(logTag, "Subscriber video disabled")
+                _isCameraEnabled.value = false
+            }
+
+            override fun onVideoDataReceived() {
+                vonageLogger.d(logTag, "Subscriber video data received")
+            }
+
+            override fun onVideoDisableWarning() {
+                vonageLogger.d(logTag, "Subscriber video disable warning")
+            }
+
+            override fun onVideoDisableWarningLifted() {
+                vonageLogger.d(logTag, "Subscriber video disable warning lifted")
+            }
+        })
 
         coroutineScope {
             launch {
-                subscriber.observeVideoStats()
+                vonageSubscriber.observeVideoStats()
                     .collect { _videoStats.value = it }
             }
             launch {
-                subscriber.observeAudioStats()
+                vonageSubscriber.observeAudioStats()
                     .collect { _audioStats.value = it }
             }
-            subscriber.observeAudioLevel()
+            vonageSubscriber.observeAudioLevel()
                 .movingAverage(windowSize = 5)
                 .distinctUntilChanged()
                 .onEach { audioLevel ->
@@ -116,53 +141,13 @@ data class ParticipantState(
         }
     }
 
-    override fun clean(session: Session) {
-        subscriber.setVideoListener(null)
-        subscriber.setStreamListener(null)
-        subscriber.setVideoStatsListener(null)
-        subscriber.setAudioStatsListener(null)
-        subscriber.setAudioLevelListener(null)
-        session.unsubscribe(subscriber)
-    }
-
-    override fun onReconnected(subscriber: SubscriberKit) {
-        vonageLogger.d(logTag, "Subscriber reconnected")
-    }
-
-    override fun onDisconnected(subscriber: SubscriberKit) {
-        vonageLogger.d(logTag, "Subscriber disconnected")
-    }
-
-    override fun onAudioDisabled(subscriber: SubscriberKit) {
-        vonageLogger.d(logTag, "Subscriber audio disabled")
-        _isMicEnabled.value = false
-    }
-
-    override fun onAudioEnabled(subscriber: SubscriberKit) {
-        vonageLogger.d(logTag, "Subscriber audio enabled")
-        _isMicEnabled.value = true
-    }
-
-    override fun onVideoDataReceived(subscriber: SubscriberKit) {
-        vonageLogger.d(logTag, "Subscriber video data received")
-    }
-
-    override fun onVideoDisabled(subscriber: SubscriberKit, reason: String) {
-        vonageLogger.d(logTag, "Subscriber video disabled")
-        _isCameraEnabled.value = false
-    }
-
-    override fun onVideoEnabled(subscriber: SubscriberKit, reason: String) {
-        vonageLogger.d(logTag, "Subscriber video enabled")
-        _isCameraEnabled.value = true
-    }
-
-    override fun onVideoDisableWarning(subscriber: SubscriberKit) {
-        vonageLogger.d(logTag, "Subscriber video disable warning")
-    }
-
-    override fun onVideoDisableWarningLifted(subscriber: SubscriberKit) {
-        vonageLogger.d(logTag, "Subscriber video disable warning lifted")
+    override fun clean(session: VonageSession) {
+        vonageSubscriber.setVideoListener(null)
+        vonageSubscriber.setStreamListener(null)
+        vonageSubscriber.setVideoStatsListener(null)
+        vonageSubscriber.setAudioStatsListener(null)
+        vonageSubscriber.setAudioLevelListener(null)
+        session.unsubscribe(vonageSubscriber)
     }
 
     @Stable
@@ -188,3 +173,63 @@ data class ParticipantState(
         val estimatedBandwidthInBps: Long?,
     )
 }
+
+// region Extension helpers
+
+private const val DEBOUNCE_SUBSCRIBER_AUDIO_LEVEL_MILLIS = 100L
+
+private fun VonageStream.toVideoSource(): VideoSource = when (videoType) {
+    VonageVideoType.CAMERA -> VideoSource.CAMERA
+    VonageVideoType.SCREEN, VonageVideoType.CUSTOM -> VideoSource.SCREEN
+}
+
+@OptIn(FlowPreview::class)
+internal fun VonageSubscriber.observeAudioLevel(): Flow<Float> = callbackFlow {
+    setAudioLevelListener { level ->
+        if (isActive) {
+            trySend(level)
+        }
+    }
+    awaitClose { setAudioLevelListener(null) }
+}
+    .conflate()
+    .sample(DEBOUNCE_SUBSCRIBER_AUDIO_LEVEL_MILLIS)
+
+internal fun VonageSubscriber.observeVideoStats(): Flow<ParticipantState.SubscriberVideoStats> =
+    callbackFlow {
+        setVideoStatsListener { stats ->
+            trySend(
+                ParticipantState.SubscriberVideoStats(
+                    videoPacketsReceived = stats.videoPacketsReceived,
+                    videoPacketsLost = stats.videoPacketsLost,
+                    videoBytesReceived = stats.videoBytesReceived,
+                    width = stats.width,
+                    height = stats.height,
+                    codec = stats.codec,
+                    decodedFrameRate = stats.decodedFrameRate,
+                    bitrate = stats.bitrate,
+                    freezeCount = stats.freezeCount,
+                    totalFreezesDuration = stats.totalFreezesDuration,
+                    estimatedBandwidthInBps = stats.estimatedBandwidthInBps,
+                ),
+            )
+        }
+        awaitClose { setVideoStatsListener(null) }
+    }
+
+internal fun VonageSubscriber.observeAudioStats(): Flow<ParticipantState.SubscriberAudioStats> =
+    callbackFlow {
+        setAudioStatsListener { stats ->
+            trySend(
+                ParticipantState.SubscriberAudioStats(
+                    audioPacketsReceived = stats.audioPacketsReceived,
+                    audioPacketsLost = stats.audioPacketsLost,
+                    audioBytesReceived = stats.audioBytesReceived,
+                    estimatedBandwidthInBps = stats.estimatedBandwidthInBps,
+                ),
+            )
+        }
+        awaitClose { setAudioStatsListener(null) }
+    }
+
+// endregion
