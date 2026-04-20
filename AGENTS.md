@@ -27,9 +27,11 @@
 
 ## Developer Workflows That Matter
 - Initial setup after config edits: `./gradlew generateVonageConfig` (documented in `README.md` and `docs/CONFIG-SYSTEM.md`).
+- Install local git hooks (pre-push runs detekt): `./gradlew installGitHooks` (`build.gradle.kts`, `scripts/git-hooks/pre-push`).
 - Build/install app: `./gradlew installDebug`.
 - Unit tests all modules: `./gradlew test`; module-only test example: `./gradlew :vonage-video-core:test`.
 - Instrumented tests: `./gradlew connectedAndroidTest` or managed device: `./gradlew pixelDebugAndroidTest`.
+- Public API compatibility check used in CI: `./gradlew apiCheck` (`.github/workflows/android.yml`).
 - Coverage/reporting: `./gradlew koverHtmlReport` (Kover is centralized in root `build.gradle.kts` + `build-tools/kover.gradle`).
 - Static analysis gate: `./gradlew detekt`; pre-push hook runs detekt (`scripts/git-hooks/pre-push`).
 
@@ -37,5 +39,6 @@
 - Kotlin + Java 17 across modules (`app/build.gradle.kts`, feature module build files).
 - Compose linting is strict through detekt compose rules (`build.gradle.kts` detekt plugin + `build-tools/detekt/detekt.yml` `Compose` section).
 - Branching model in docs: contribute from `develop`, not `main` (`docs/CONTRIBUTING.md`).
+- PR base-branch guard in CI: non-`release-*` branches must target `develop`; `release-*` branches target `main` (`.github/workflows/check-base-branch.yml`).
 - Keep generated/theme outputs plugin-driven (`com.vonage.json-config`, `com.vonage.theme-generator`) instead of manual code edits.
 
