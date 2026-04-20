@@ -12,19 +12,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vonage.android.meetingroom.pip.pipEffect
 import com.vonage.android.meetingroom.pip.rememberIsInPipMode
 import kotlinx.coroutines.launch
 
+@Suppress("LongParameterList")
 @Composable
 fun MeetingRoomScreenRoute(
-    viewModel: MeetingRoomScreenViewModel,
+    roomName: String,
+    viewModelFactory: ViewModelProvider.Factory,
     navigateToGoodBye: () -> Unit,
     navigateToShare: (String) -> Unit,
     navigateToSettings: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: MeetingRoomScreenViewModel = viewModel(key = roomName, factory = viewModelFactory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val inPipMode = rememberIsInPipMode()

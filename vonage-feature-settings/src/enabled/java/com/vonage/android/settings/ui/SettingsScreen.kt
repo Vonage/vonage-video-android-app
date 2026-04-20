@@ -57,8 +57,8 @@ import com.vonage.android.settings.ui.components.stats.SubscribersStats
 @Composable
 fun SettingsScreen(
     uiState: SettingsUiState,
-    modifier: Modifier = Modifier,
     actions: SettingsScreenActions,
+    modifier: Modifier = Modifier,
 ) {
     val isWideLayout = currentWindowAdaptiveInfo()
         .windowSizeClass

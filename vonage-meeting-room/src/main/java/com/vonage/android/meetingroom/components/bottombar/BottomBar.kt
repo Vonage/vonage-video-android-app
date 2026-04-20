@@ -202,6 +202,7 @@ internal fun BottomBar(
     }
 }
 
+@Suppress("LongParameterList")
 @Composable
 private fun actionsFactory(
     actions: ImmutableList<BottomBarActionType>,
