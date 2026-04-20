@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings">Settings</string>
+
+    <string name="settings_close">Close settings</string>
+
+    <!-- Sender stats -->
+    <string name="settings_sender_stats_title">Sender stats</string>
+    <string name="settings_sender_stats_description">Enable extra stats for subscribers</string>
+    <!-- Opus Dtx -->
+    <string name="settings_opus_dtx">Enable Opus Dtx</string>
+    <string name="settings_opus_dtx_description">Enabling Opus DTX can reduce bandwidth usage in streams that have long periods of silence</string>
+    <!-- Publisher audio fallback -->
+    <string name="settings_publisher_audio_fallback">Publisher audio fallback</string>
+    <string name="settings_publisher_audio_fallback_description">With the publisher audio-fallback feature enabled, when publisher determines that a stream\'s quality has degraded significantly, it disables the video in order to preserve audio quality</string>
+    <!-- Subscriber audio fallback -->
+    <string name="settings_subscriber_audio_fallback">Subscriber audio fallback</string>
+    <string name="settings_subscriber_audio_fallback_description">With the subscriber audio-fallback feature enabled, when the SFU determines that a stream\'s quality has degraded significantly for a specific subscriber, it disables the video in that subscriber in order to preserve audio quality</string>
+    <!-- Audio Bitrate -->
+    <string name="settings_audio_bitrate_title">Audio Bitrate</string>
+    <string name="settings_audio_bitrate_default">Default (SDK decides)</string>
+    <string name="settings_audio_bitrate_label">Bitrate (bps)</string>
+    <!-- Video Bitrate -->
+    <string name="settings_bitrate_title">Video Bitrate</string>
+    <string name="settings_bitrate_preset_label">Preset</string>
+    <string name="settings_bitrate_max_label">Max bitrate (bps)</string>
+    <!-- Degradation Preference -->
+    <string name="settings_degradation_title">Degradation Preference</string>
+    <string name="settings_degradation_preset_label">Preference</string>
+    <!-- Frame Rate -->
+    <string name="settings_frame_rate_title">Capture Frame Rate</string>
+    <string name="settings_frame_rate_label">Frame rate</string>
+    <!-- Resolution -->
+    <string name="settings_resolution_title">Capture Resolution</string>
+    <string name="settings_resolution_label">Resolution</string>
+    <!-- Preferred Video Codec Order -->
+    <string name="settings_codec_order_title">Preferred Video Codec</string>
+    <string name="settings_codec_order_auto">Automatic (SDK decides)</string>
+    <!-- Footer -->
+    <string name="settings_app_version">App version: %1$s</string>
+    <string name="settings_vonage_sdk">Vonage SDK: %1$s</string>
+
+    <!-- Stats -->
+    <string name="settings_stats_publisher_stats_header">Publisher Stats</string>
+    <string name="settings_stats_publisher_est_bandwidth">Est. bandwidth</string>
+    <string name="settings_stats_publisher_video_header">Video</string>
+    <string name="settings_stats_publisher_video_packets_sent">Packets sent/Packets lost</string>
+    <string name="settings_stats_publisher_video_bytes_sent">Bytes sent</string>
+    <string name="settings_stats_publisher_video_layer">Layer %1$d</string>
+    <string name="settings_stats_publisher_video_layer_fps">%1$dx%2$d · %3$s · %4$s fps</string>
+    <string name="settings_stats_publisher_audio_header">Audio</string>
+    <string name="settings_stats_publisher_audio_packets_sent">Packets sent/Packets lost</string>
+    <string name="settings_stats_publisher_audio_bytes_sent">Bytes sent</string>
+    <string name="settings_stats_subscriber_stats_header">Subscriber: %1$s</string>
+    <string name="settings_stats_subscriber_est_bandwidth">Est. bandwidth</string>
+    <string name="settings_stats_subscriber_video_header">Video</string>
+    <string name="settings_stats_subscriber_video_resolution">Resolution</string>
+    <string name="settings_stats_subscriber_video_packets_received">Packets received/Packets lost</string>
+    <string name="settings_stats_subscriber_video_bytes_received">Bytes received</string>
+    <string name="settings_stats_subscriber_video_bitrate">Bitrate</string>
+    <string name="settings_stats_subscriber_video_freezes">Freezes</string>
+    <string name="settings_stats_subscriber_audio_header">Audio</string>
+    <string name="settings_stats_subscriber_audio_packets_received">Packets received/Packets lost</string>
+    <string name="settings_stats_subscriber_audio_bytes_received">Bytes received</string>
+</resources>
