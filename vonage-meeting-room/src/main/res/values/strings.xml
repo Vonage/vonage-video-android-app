@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="meeting_screen_session_creation_error">Error while creating room, please try again</string>
+    <string name="generic_retry">Retry</string>
+    <string name="chat_panel_title">Chat</string>
+    <string name="chat_panel_input_text_placeholder">Send a message</string>
+    <string name="chat_panel_jump_to_bottom">Jump to bottom</string>
+    <string name="meeting_room_share_room_link">Share room link</string>
+    <string name="meeting_room_participants_list_title">Participants (%d)</string>
+    <string name="meeting_room_participants_list_search_placeholder">Search</string>
+    <string name="meeting_room_participants_list_search_not_found">Participant not found</string>
+    <string name="meeting_room_pin_participant">Pin</string>
+    <string name="meeting_room_unpin_participant">Unpin</string>
+    <string name="meeting_room_mute_participant">Mute</string>
+    <string name="recording_stop_recording">Stop Recording</string>
+    <string name="recording_start_recording">Start Recording</string>
+    <string name="screen_share_start">Share screen</string>
+    <string name="screen_share_stop">Stop sharing screen</string>
+    <string name="captions_start">Enable captions</string>
+    <string name="captions_stop">Disable captions</string>
+    <string name="change_layout">Change layout</string>
+    <string name="chat">Chat</string>
+    <string name="speaking_while_muted_message">You are muted. Unmute to speak.</string>
+    <string name="advanced_noise_suppression">Advanced noise suppression</string>
+    <string name="waiting_room_available_audio_outputs">Available Audio Outputs</string>
+    <string name="audio_device_selector_earpiece_audio_device">Earpiece</string>
+    <string name="audio_device_selector_bluetooth_audio_device">Bluetooth</string>
+    <string name="audio_device_selector_speaker_audio_device">Speaker</string>
+    <string name="audio_device_selector_headset_audio_device">Headset</string>
+</resources>
+

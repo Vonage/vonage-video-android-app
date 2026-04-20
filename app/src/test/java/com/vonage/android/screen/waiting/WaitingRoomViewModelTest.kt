@@ -12,7 +12,7 @@ import com.vonage.android.kotlin.model.CameraType
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.VideoBitrateConfig
-import com.vonage.android.screen.components.audio.AudioDevicesHandler
+import com.vonage.android.meetingroom.audio.AudioDevicesHandler
 import com.vonage.android.settings.CallSettingsHolder
 import io.mockk.coEvery
 import io.mockk.coVerify

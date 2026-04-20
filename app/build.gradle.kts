@@ -192,6 +192,7 @@ play {
 }
 
 dependencies {
+    implementation(project(":vonage-meeting-room"))
     implementation(project(":vonage-video-ui-compose"))
     implementation(project(":vonage-video-core"))
     implementation(project(":vonage-video-shared"))

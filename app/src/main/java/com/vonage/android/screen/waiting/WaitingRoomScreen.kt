@@ -26,13 +26,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.layout.TwoPaneScaffold
 import com.vonage.android.compose.preview.buildPublisher
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.components.audio.AudioDevicesMenu
+import com.vonage.android.meetingroom.audio.AudioDevicesMenu
 import com.vonage.android.screen.waiting.components.DeviceSelectionPanel
 import com.vonage.android.screen.waiting.components.JoinRoomSection
 import com.vonage.android.screen.waiting.components.VideoControlPanel
 import com.vonage.android.screen.waiting.components.VideoPreviewContainer
 import com.vonage.android.screen.waiting.components.WaitingRoomTopBar
-import com.vonage.android.util.rememberNoiseSuppression
+import com.vonage.android.meetingroom.util.rememberNoiseSuppression
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

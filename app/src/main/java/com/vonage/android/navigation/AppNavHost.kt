@@ -19,7 +19,7 @@ import com.vonage.android.navigation.AppRoute.Settings
 import com.vonage.android.navigation.AppRoute.Waiting
 import com.vonage.android.screen.goodbye.GoodbyeScreenRoute
 import com.vonage.android.screen.landing.LandingScreenRoute
-import com.vonage.android.screen.room.MeetingRoomScreenRoute
+import com.vonage.android.screen.room.MeetingRoomScreenBinder
 import com.vonage.android.screen.settings.SettingsScreenRoute
 import com.vonage.android.screen.waiting.WaitingRoomRoute
 import com.vonage.android.util.navigateToShare
@@ -70,7 +70,7 @@ fun AppNavHost(
             )
         ) { backStackEntry ->
             val roomName = backStackEntry.toRoute<Meeting>().roomName
-            MeetingRoomScreenRoute(
+            MeetingRoomScreenBinder(
                 roomName = roomName,
                 navigateToGoodBye = { navController.navigate(Goodbye(roomName = roomName)) },
                 navigateToShare = { roomName -> context.navigateToShare(roomName) },

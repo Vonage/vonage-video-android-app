@@ -3,7 +3,7 @@ package com.vonage.android.screen.room.elements
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.assertIsDisplayed
-import com.vonage.android.screen.room.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
+import com.vonage.android.meetingroom.components.MeetingRoomContentTestTags.MEETING_ROOM_PARTICIPANTS_GRID
 import com.vonage.android.util.ComposeTestElement
 
 fun SemanticsNodeInteractionsProvider.meetingRoomContent(

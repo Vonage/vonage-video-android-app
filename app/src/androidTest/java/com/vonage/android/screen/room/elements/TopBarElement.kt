@@ -4,8 +4,8 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_SHARE_ACTION
-import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_TITLE
+import com.vonage.android.meetingroom.components.TopBarTestTags.TOP_BAR_SHARE_ACTION
+import com.vonage.android.meetingroom.components.TopBarTestTags.TOP_BAR_TITLE
 import com.vonage.android.util.ComposeTestElement
 
 fun SemanticsNodeInteractionsProvider.topBar(

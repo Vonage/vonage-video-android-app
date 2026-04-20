@@ -8,6 +8,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.vonage.android.compose.preview.buildParticipants
+import com.vonage.android.meetingroom.components.bottombar.PARTICIPANT_ITEM_TAG
+import com.vonage.android.meetingroom.components.bottombar.ParticipantsList
+import com.vonage.android.meetingroom.components.bottombar.SEARCH_TAG
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.collections.immutable.toImmutableList
