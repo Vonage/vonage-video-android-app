@@ -13,8 +13,8 @@ import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.meetingroom.MeetingRoomActions
 import com.vonage.android.meetingroom.MeetingRoomUiPlugin
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.orEmpty
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -40,7 +40,7 @@ class ChatUiPlugin(
             title = stringResource(R.string.chat_panel_title),
             sendLabel = stringResource(R.string.chat_panel_input_text_placeholder),
             jumpToBottomLabel = stringResource(R.string.chat_panel_jump_to_bottom),
-            messages = chatState?.messages.orEmpty().toImmutableList(),
+            messages = chatState?.messages?.toImmutableList() ?: persistentListOf(),
             onSendMessage = { message -> call.sendChatMessage(message) },
             onCloseChat = onClose,
         )

@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.androidx.adaptive.navigation)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.activity.compose)
 
     ksp(libs.hilt.android.compiler)
 }

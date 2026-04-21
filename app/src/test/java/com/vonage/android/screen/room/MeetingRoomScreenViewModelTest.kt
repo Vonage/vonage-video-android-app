@@ -19,7 +19,7 @@ import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
-import com.vonage.android.screen.components.audio.AudioDevicesState
+import com.vonage.audioselector.AudioDevicesState
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.service.VeraForegroundServiceHandler

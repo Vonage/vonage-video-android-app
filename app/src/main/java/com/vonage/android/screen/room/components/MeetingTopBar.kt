@@ -26,9 +26,9 @@ import com.vonage.android.compose.icons.AudioSelectorIcon
 import com.vonage.android.compose.icons.CameraSwitchIcon
 import com.vonage.android.compose.icons.ShareIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.screen.components.audio.AudioDevicesState
 import com.vonage.android.screen.components.audio.toImageVector
 import com.vonage.android.screen.room.MeetingRoomActions
+import com.vonage.audioselector.AudioDevicesState
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_AUDIO_SELECTOR_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_CAMERA_SWITCH_ACTION
 import com.vonage.android.screen.room.components.TopBarTestTags.TOP_BAR_SHARE_ACTION

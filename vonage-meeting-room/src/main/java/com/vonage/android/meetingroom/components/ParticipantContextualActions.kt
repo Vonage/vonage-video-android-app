@@ -83,7 +83,7 @@ private fun ActionRow(onClick: () -> Unit, icon: ImageVector, label: String) {
         Text(
             text = label,
             color = VonageVideoTheme.colors.onSurface,
-            style = VonageVideoTheme.typography.body,
+            style = VonageVideoTheme.typography.bodyBase,
         )
     }
 }

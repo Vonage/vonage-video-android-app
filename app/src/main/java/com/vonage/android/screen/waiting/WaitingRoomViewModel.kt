@@ -12,7 +12,7 @@ import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
-import com.vonage.android.screen.components.audio.AudioDevicesState
+import com.vonage.audioselector.AudioDevicesState
 import com.vonage.android.util.isValidUserName
 import com.vonage.android.util.sanitizeUserName
 import dagger.assisted.Assisted

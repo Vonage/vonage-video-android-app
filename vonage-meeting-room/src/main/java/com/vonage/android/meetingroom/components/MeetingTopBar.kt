@@ -29,6 +29,12 @@ import com.vonage.android.meetingroom.components.TopBarTestTags.TOP_BAR_AUDIO_SE
 import com.vonage.android.meetingroom.components.TopBarTestTags.TOP_BAR_CAMERA_SWITCH_ACTION
 import com.vonage.android.meetingroom.components.TopBarTestTags.TOP_BAR_SHARE_ACTION
 import com.vonage.android.meetingroom.components.TopBarTestTags.TOP_BAR_TITLE
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bluetooth
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.AudioMid
+import com.vonage.android.compose.vivid.icons.solid.Call
+import com.vonage.android.compose.vivid.icons.solid.Headset2
 import com.vonage.audioselector.AudioDeviceSelector.AudioDevice
 import com.vonage.audioselector.AudioDeviceSelector.AudioDeviceType
 import com.vonage.audioselector.AudioDevicesState
@@ -138,12 +144,10 @@ internal fun MeetingTopBarPreview() {
     }
 }
 
-internal fun AudioDeviceType.toImageVector(): androidx.compose.ui.graphics.vector.ImageVector {
-    return when (this) {
-        AudioDeviceType.EARPIECE -> com.vonage.android.compose.vivid.icons.VividIcons.Solid.Call
-        AudioDeviceType.SPEAKER -> com.vonage.android.compose.vivid.icons.VividIcons.Solid.AudioMid
-        AudioDeviceType.BLUETOOTH -> androidx.compose.material.icons.Icons.Filled.Bluetooth
-        AudioDeviceType.WIRED_HEADSET -> com.vonage.android.compose.vivid.icons.VividIcons.Solid.Headset2
-        else -> com.vonage.android.compose.vivid.icons.VividIcons.Solid.AudioMid
+internal fun AudioDeviceType.toImageVector(): androidx.compose.ui.graphics.vector.ImageVector =
+    when (this) {
+        AudioDeviceType.EARPIECE -> VividIcons.Solid.Call
+        AudioDeviceType.SPEAKER -> VividIcons.Solid.AudioMid
+        AudioDeviceType.BLUETOOTH -> Icons.Filled.Bluetooth
+        AudioDeviceType.WIRED_HEADSET -> VividIcons.Solid.Headset2
     }
-}

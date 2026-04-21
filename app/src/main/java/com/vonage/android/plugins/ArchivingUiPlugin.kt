@@ -4,6 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
@@ -37,19 +41,16 @@ class ArchivingUiPlugin(
         when (state) {
             ArchivingUiState.IDLE -> Unit
             ArchivingUiState.STARTING,
-            ArchivingUiState.STOPPING -> androidx.compose.material3.CircularProgressIndicator(
-                color = androidx.compose.ui.graphics.Color.Red,
-                modifier = Modifier.then(Modifier.run {
-                    androidx.compose.foundation.layout.size(24.dp)
-                        .padding(androidx.compose.foundation.layout.PaddingValues(end = 4.dp))
-                }),
+            ArchivingUiState.STOPPING -> CircularProgressIndicator(
+                color = Color.Red,
+                modifier = Modifier
+                    .size(24.dp)
+                    .padding(end = 4.dp),
             )
             ArchivingUiState.RECORDING -> RecordingIndicator(
                 modifier = Modifier
-                    .then(Modifier.run {
-                        androidx.compose.foundation.layout.size(24.dp)
-                            .padding(androidx.compose.foundation.layout.PaddingValues(end = 4.dp))
-                    }),
+                    .size(24.dp)
+                    .padding(end = 4.dp),
             )
         }
     }

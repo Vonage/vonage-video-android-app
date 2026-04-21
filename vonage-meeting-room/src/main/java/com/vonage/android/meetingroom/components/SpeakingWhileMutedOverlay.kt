@@ -70,7 +70,7 @@ fun SpeakingWhileMutedOverlay(publisher: PublisherState?, modifier: Modifier = M
                 Text(
                     text = stringResource(R.string.speaking_while_muted_message),
                     color = VonageVideoTheme.colors.onSurface,
-                    style = VonageVideoTheme.typography.body,
+                    style = VonageVideoTheme.typography.bodyBase,
                 )
             }
         }

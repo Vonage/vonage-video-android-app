@@ -10,6 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.fx.ui.NoiseSuppressorToggle
+import com.vonage.audioselector.AudioDevicesState
 import com.vonage.audioselector.AudioDeviceSelector.AudioDevice
 import com.vonage.audioselector.AudioDeviceSelector.AudioDeviceType
 import kotlinx.collections.immutable.persistentListOf
