@@ -33,6 +33,22 @@ public final class com/vonage/audioselector/AudioDeviceSelector$AudioDeviceType 
 	public static fun values ()[Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;
 }
 
+public final class com/vonage/audioselector/AudioDevicesState {
+	public static final field $stable I
+	public fun <init> (Lkotlinx/coroutines/flow/StateFlow;Lkotlinx/coroutines/flow/StateFlow;Lkotlin/jvm/functions/Function1;)V
+	public final fun component1 ()Lkotlinx/coroutines/flow/StateFlow;
+	public final fun component2 ()Lkotlinx/coroutines/flow/StateFlow;
+	public final fun component3 ()Lkotlin/jvm/functions/Function1;
+	public final fun copy (Lkotlinx/coroutines/flow/StateFlow;Lkotlinx/coroutines/flow/StateFlow;Lkotlin/jvm/functions/Function1;)Lcom/vonage/audioselector/AudioDevicesState;
+	public static synthetic fun copy$default (Lcom/vonage/audioselector/AudioDevicesState;Lkotlinx/coroutines/flow/StateFlow;Lkotlinx/coroutines/flow/StateFlow;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lcom/vonage/audioselector/AudioDevicesState;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getActiveDevice ()Lkotlinx/coroutines/flow/StateFlow;
+	public final fun getAvailableDevices ()Lkotlinx/coroutines/flow/StateFlow;
+	public final fun getSelectDevice ()Lkotlin/jvm/functions/Function1;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class com/vonage/audioselector/VeraAudioDevice : com/opentok/android/BaseAudioDevice {
 	public static final field $stable I
 	public static final field DEFAULT_BUFFER_SIZE I
