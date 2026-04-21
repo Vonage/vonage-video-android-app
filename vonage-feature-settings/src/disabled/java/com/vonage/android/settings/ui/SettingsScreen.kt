@@ -9,8 +9,7 @@ import com.vonage.android.settings.SettingsUiState
 fun SettingsScreen(
     uiState: SettingsUiState,
     modifier: Modifier = Modifier,
-    onSenderStatsTrackToggle: (Boolean) -> Unit = {},
-    onDismiss: () -> Unit = {},
+    actions: SettingsScreenActions = SettingsScreenActions(),
 ) {
 
 }

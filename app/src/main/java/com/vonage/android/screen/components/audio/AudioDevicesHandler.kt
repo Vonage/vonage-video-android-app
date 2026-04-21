@@ -1,10 +1,7 @@
 package com.vonage.android.screen.components.audio
 
-import androidx.compose.runtime.Stable
 import com.vonage.audioselector.AudioDeviceSelector
-import com.vonage.audioselector.AudioDeviceSelector.AudioDevice
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.coroutines.flow.StateFlow
+import com.vonage.audioselector.AudioDevicesState
 import javax.inject.Inject
 
 class AudioDevicesHandler @Inject constructor(
@@ -27,10 +24,3 @@ class AudioDevicesHandler @Inject constructor(
         audioDeviceSelector.stop()
     }
 }
-
-@Stable
-data class AudioDevicesState(
-    val availableDevices: StateFlow<ImmutableList<AudioDevice>>,
-    val activeDevice: StateFlow<AudioDevice?>,
-    val selectDevice: (AudioDevice) -> Unit,
-)

@@ -15,11 +15,12 @@ import com.vonage.android.data.SessionRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.notifications.VeraNotificationChannelRegistry.CallAction
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
-import com.vonage.android.screen.components.audio.AudioDevicesState
+import com.vonage.audioselector.AudioDevicesState
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.service.VeraForegroundServiceHandler
@@ -38,7 +39,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -74,6 +77,27 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         started = SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
         initialValue = initialUiState,
     )
+
+    /** Derived flow consumed by [ArchivingUiPlugin]. */
+    val archivingUiState: StateFlow<ArchivingUiState> = _uiState
+        .map { it.archivingUiState }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS), ArchivingUiState.IDLE)
+
+    /** Derived flow consumed by [CaptionsUiPlugin]. */
+    val captionsUiState: StateFlow<CaptionsUiState> = _uiState
+        .map { it.captionsUiState }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS), CaptionsUiState.IDLE)
+
+    /** Derived flow consumed by [ScreenSharingUiPlugin]. */
+    val screenSharingState: StateFlow<ScreenSharingState> = _uiState
+        .map { it.screenSharingState }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS), ScreenSharingState.IDLE)
+
+    /** Derived flow consumed by [ChatUiPlugin]. Switches to the real call once connected. */
+    val chatSignalState: StateFlow<ChatState?> = _uiState
+        .map { it.call.chatSignalState }
+        .flatMapLatest { it }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(SUBSCRIBED_TIMEOUT_MS), null)
 
     private var call: CallFacade? = null
 

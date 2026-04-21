@@ -15,8 +15,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.meetingroom.CallLayoutType as MeetingCallLayoutType
+import com.vonage.android.meetingroom.MeetingRoomActions as NewMeetingRoomActions
+import com.vonage.android.meetingroom.MeetingRoomScreen
+import com.vonage.android.meetingroom.MeetingRoomUiPlugin
+import com.vonage.android.meetingroom.MeetingRoomUiState as NewMeetingRoomUiState
+import com.vonage.android.meetingroom.PipMeetingRoomScreen
+import com.vonage.android.plugins.ArchivingUiPlugin
+import com.vonage.android.plugins.CaptionsUiPlugin
+import com.vonage.android.plugins.ChatUiPlugin
+import com.vonage.android.plugins.ReactionsUiPlugin
+import com.vonage.android.plugins.ReportingUiPlugin
+import com.vonage.android.plugins.ScreenSharingUiPlugin
+import com.vonage.android.plugins.SettingsUiPlugin
+import com.vonage.android.screen.components.audio.AudioDevicesMenu
 import com.vonage.android.util.pip.pipEffect
 import com.vonage.android.util.pip.rememberIsInPipMode
+import com.vonage.android.util.rememberNoiseSuppression
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,7 +69,7 @@ fun MeetingRoomScreenRoute(
     }
 
     val actions = remember {
-        MeetingRoomActions(
+        NewMeetingRoomActions(
             onToggleMic = viewModel::onToggleMic,
             onToggleCamera = viewModel::onToggleCamera,
             onCameraSwitch = viewModel::onSwitchCamera,
@@ -98,11 +114,49 @@ fun MeetingRoomScreenRoute(
                 }
             },
             onChangeLayout = { layoutType ->
-                viewModel.changeLayout(layoutType)
+                viewModel.changeLayout(
+                    when (layoutType) {
+                        MeetingCallLayoutType.GRID -> CallLayoutType.GRID
+                        MeetingCallLayoutType.SPEAKER_LAYOUT -> CallLayoutType.SPEAKER_LAYOUT
+                        MeetingCallLayoutType.ADAPTIVE_GRID -> CallLayoutType.ADAPTIVE_GRID
+                    }
+                )
             },
             onSettings = navigateToSettings,
             onTogglePinParticipant = viewModel::onTogglePinParticipant,
             onForceMuteParticipant = viewModel::forceMuteParticipant,
+        )
+    }
+
+    val newUiState = remember(uiState) {
+        NewMeetingRoomUiState(
+            roomName = uiState.roomName,
+            call = uiState.call,
+            audioDevicesState = uiState.audioDevicesState,
+            isLoading = uiState.isLoading,
+            isError = uiState.isError,
+            errorMessage = uiState.errorMessage,
+            isEndCall = uiState.isEndCall,
+            layoutType = when (uiState.layoutType) {
+                CallLayoutType.GRID -> MeetingCallLayoutType.GRID
+                CallLayoutType.SPEAKER_LAYOUT -> MeetingCallLayoutType.SPEAKER_LAYOUT
+                CallLayoutType.ADAPTIVE_GRID -> MeetingCallLayoutType.ADAPTIVE_GRID
+            },
+            allowMicrophoneControl = uiState.allowMicrophoneControl,
+            allowCameraControl = uiState.allowCameraControl,
+            allowShowParticipantList = uiState.allowShowParticipantList,
+        )
+    }
+
+    val plugins = remember {
+        persistentListOf<MeetingRoomUiPlugin>(
+            ArchivingUiPlugin(viewModel.archivingUiState),
+            CaptionsUiPlugin(viewModel.captionsUiState),
+            ChatUiPlugin(viewModel.chatSignalState),
+            ReactionsUiPlugin(),
+            ScreenSharingUiPlugin(viewModel.screenSharingState),
+            SettingsUiPlugin(),
+            ReportingUiPlugin(),
         )
     }
 
@@ -115,13 +169,27 @@ fun MeetingRoomScreenRoute(
         PipMeetingRoomScreen(
             modifier = modifier.then(pipModifier),
             actions = actions,
-            uiState = uiState,
+            uiState = newUiState,
         )
     } else {
         MeetingRoomScreen(
             modifier = modifier.then(pipModifier),
             actions = actions,
-            uiState = uiState,
+            uiState = newUiState,
+            plugins = plugins,
+            audioDeviceSheetContent = uiState.audioDevicesState?.let { audioDevicesState ->
+                { onDismiss ->
+                    val publisher by uiState.call.publisher.collectAsStateWithLifecycle()
+                    val noiseSuppression by rememberNoiseSuppression(publisher)
+                        .collectAsStateWithLifecycle()
+                    AudioDevicesMenu(
+                        audioDevicesState = audioDevicesState,
+                        onDismissRequest = onDismiss,
+                        noiseSuppressionEnabled = noiseSuppression.isEnabled(),
+                        onNoiseSuppressorToggle = { publisher?.toggleNoiseSuppression() },
+                    )
+                }
+            },
         )
     }
 }
