@@ -1,6 +1,5 @@
 package com.vonage.android.meetingroom.components.bottombar
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -37,7 +36,6 @@ import com.vonage.android.meetingroom.MeetingRoomActions
 import com.vonage.android.meetingroom.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentSetOf
-import kotlinx.collections.immutable.toImmutableList
 import java.text.Normalizer
 
 const val PARTICIPANT_ITEM_TAG = "ParticipantItemTestTag"

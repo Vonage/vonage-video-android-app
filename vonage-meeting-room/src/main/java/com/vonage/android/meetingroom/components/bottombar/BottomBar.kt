@@ -63,9 +63,9 @@ fun BottomBar(
     allowShowParticipantList: Boolean,
     allowMicrophoneControl: Boolean,
     allowCameraControl: Boolean,
+    modifier: Modifier = Modifier,
     pluginActions: ImmutableList<BottomBarAction> = persistentListOf(),
     moreActionsContent: @Composable () -> Unit = {},
-    modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -93,7 +93,6 @@ fun BottomBar(
     val coreActions = buildCoreActions(
         layoutType = layoutType,
         roomActions = roomActions,
-        participants = participants,
         call = call,
         allowShowParticipantList = allowShowParticipantList,
         onShowParticipants = {
@@ -163,7 +162,6 @@ fun BottomBar(
 private fun buildCoreActions(
     layoutType: CallLayoutType,
     roomActions: MeetingRoomActions,
-    participants: ImmutableList<Participant>,
     call: CallFacade,
     allowShowParticipantList: Boolean,
     onShowParticipants: () -> Unit,

@@ -18,7 +18,6 @@ import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.meetingroom.MeetingRoomActions
 import com.vonage.android.meetingroom.MeetingRoomUiPlugin
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.StateFlow
 

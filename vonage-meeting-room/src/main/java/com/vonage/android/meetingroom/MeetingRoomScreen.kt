@@ -36,7 +36,6 @@ import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.meetingroom.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.meetingroom.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.meetingroom.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
@@ -51,12 +50,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
-object MeetingRoomScreenTestTags {
-    const val MEETING_ROOM_TOP_BAR = "meeting_room_top_bar"
-    const val MEETING_ROOM_CONTENT = "meeting_room_content"
-    const val MEETING_ROOM_BOTTOM_BAR = "meeting_room_bottom_bar"
-}
-
 /**
  * The main meeting room screen composable.
  *
@@ -68,15 +61,15 @@ object MeetingRoomScreenTestTags {
  * @param audioDeviceSheetContent  Optional content for the audio device selection bottom sheet.
  *                      When null the audio device selector icon is hidden from the top bar.
  */
-@Suppress("LongMethod")
+@Suppress("LongMethod", "CyclomaticComplexMethod")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun MeetingRoomScreen(
     uiState: MeetingRoomUiState,
     actions: MeetingRoomActions,
+    modifier: Modifier = Modifier,
     plugins: ImmutableList<MeetingRoomUiPlugin> = persistentListOf(),
     audioDeviceSheetContent: (@Composable (onDismiss: () -> Unit) -> Unit)? = null,
-    modifier: Modifier = Modifier,
 ) {
     var showAudioOutputs by remember { mutableStateOf(false) }
     val audioOutputsSheetState = rememberModalBottomSheetState()

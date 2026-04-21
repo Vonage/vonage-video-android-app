@@ -13,7 +13,6 @@ import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.meetingroom.MeetingRoomActions
 import com.vonage.android.meetingroom.MeetingRoomUiPlugin
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.StateFlow
 

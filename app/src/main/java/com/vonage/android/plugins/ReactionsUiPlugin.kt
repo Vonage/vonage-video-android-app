@@ -6,9 +6,6 @@ import com.vonage.android.meetingroom.MeetingRoomActions
 import com.vonage.android.meetingroom.MeetingRoomUiPlugin
 import com.vonage.android.reactions.ui.EmojiReactionOverlay
 import com.vonage.android.reactions.ui.EmojiSelector
-import com.vonage.android.compose.components.bottombar.BottomBarAction
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 
 /**
  * [MeetingRoomUiPlugin] for the reactions/emoji feature.

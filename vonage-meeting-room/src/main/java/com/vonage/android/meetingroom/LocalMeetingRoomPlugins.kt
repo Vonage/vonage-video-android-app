@@ -8,6 +8,7 @@ import kotlinx.collections.immutable.persistentListOf
  * CompositionLocal that provides the list of active [MeetingRoomUiPlugin]s to any
  * composable in the meeting room hierarchy without requiring parameter threading.
  */
+@Suppress("CompositionLocalAllowlist")
 val LocalMeetingRoomPlugins = compositionLocalOf<ImmutableList<MeetingRoomUiPlugin>> {
     persistentListOf()
 }

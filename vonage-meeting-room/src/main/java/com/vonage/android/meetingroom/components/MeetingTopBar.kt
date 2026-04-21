@@ -2,7 +2,6 @@ package com.vonage.android.meetingroom.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,7 +34,6 @@ import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.AudioMid
 import com.vonage.android.compose.vivid.icons.solid.Call
 import com.vonage.android.compose.vivid.icons.solid.Headset2
-import com.vonage.audioselector.AudioDeviceSelector.AudioDevice
 import com.vonage.audioselector.AudioDeviceSelector.AudioDeviceType
 import com.vonage.audioselector.AudioDevicesState
 import kotlinx.coroutines.flow.MutableStateFlow

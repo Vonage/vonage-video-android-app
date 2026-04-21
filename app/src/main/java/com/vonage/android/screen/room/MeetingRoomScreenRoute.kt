@@ -35,6 +35,7 @@ import com.vonage.android.util.rememberNoiseSuppression
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 
+@Suppress("LongMethod")
 @Composable
 fun MeetingRoomScreenRoute(
     roomName: String,
