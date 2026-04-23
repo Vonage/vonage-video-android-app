@@ -12,9 +12,10 @@ object ChatModule {
         EnabledChatFeature()
 
     fun provideChatSignalPlugin(context: Context): ChatSignalPlugin {
+        val applicationContext = context.applicationContext
         val notifications = EnabledChatNotifications(
-            context = context,
-            notificationManager = NotificationManagerCompat.from(context),
+            context = applicationContext,
+            notificationManager = NotificationManagerCompat.from(applicationContext),
         )
         return EnabledChatSignalPlugin(
             foregroundChecker = ForegroundChecker(),

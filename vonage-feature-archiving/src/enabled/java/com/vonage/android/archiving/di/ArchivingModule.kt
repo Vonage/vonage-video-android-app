@@ -8,11 +8,11 @@ import retrofit2.Retrofit
 
 object ArchivingModule {
 
-    fun provideApiService(retrofit: Retrofit): ArchivingApi = retrofit
-        .create(ArchivingApi::class.java)
-
     fun provideVonageArchiving(retrofit: Retrofit): VonageArchiving =
         EnabledVonageArchiving(
             archiveRepository = ArchiveRepository(provideApiService(retrofit))
         )
+
+    private fun provideApiService(retrofit: Retrofit): ArchivingApi = retrofit
+        .create(ArchivingApi::class.java)
 }

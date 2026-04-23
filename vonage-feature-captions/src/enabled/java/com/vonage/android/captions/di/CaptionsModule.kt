@@ -8,11 +8,11 @@ import retrofit2.Retrofit
 
 object CaptionsModule {
 
-    fun provideApiService(retrofit: Retrofit): CaptionsApi = retrofit
-        .create(CaptionsApi::class.java)
-
     fun provideVonageCaptions(retrofit: Retrofit): VonageCaptions =
         EnabledVonageCaptions(
             captionsRepository = CaptionsRepository(provideApiService(retrofit)),
         )
+
+    private fun provideApiService(retrofit: Retrofit): CaptionsApi = retrofit
+        .create(CaptionsApi::class.java)
 }

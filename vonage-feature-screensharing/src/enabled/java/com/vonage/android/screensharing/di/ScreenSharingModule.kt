@@ -10,7 +10,7 @@ object ScreenSharingModule {
         context: Context
     ): VonageScreenSharing =
         EnabledScreenSharing(
-            context = context,
+            context = context.applicationContext,
         )
 
 }
