@@ -23,6 +23,8 @@ import com.vonage.android.meetingroom.internal.viewmodel.MeetingRoomViewModel
 import com.vonage.android.meetingroom.internal.viewmodel.MeetingRoomViewModelFactory
 import kotlinx.coroutines.launch
 
+private typealias ReportingContent = @Composable (() -> Unit) -> Unit
+
 /**
  * Public Composable entry point for the meeting room.
  *
@@ -35,7 +37,9 @@ import kotlinx.coroutines.launch
  * @param onNavigateToSettings  Optional callback for navigating to a settings screen.
  * @param onShare               Optional callback for sharing the room link; receives the roomName.
  * @param isDebug               Enables verbose HTTP logging when true. Defaults to false.
- * @param viewModel             Optional ViewModel override; defaults to a factory-created instance.
+ * @param reportingContent      Optional composable shown inside the report-issue bottom sheet.
+ *                              Receives an `onDismiss` callback; defaults to the built-in
+ *                              placeholder (or nothing when the reporting feature is disabled).
  */
 @Composable
 @Suppress("LongParameterList")
@@ -46,6 +50,7 @@ fun MeetingRoomComponent(
     onNavigateToSettings: () -> Unit = {},
     onShare: (String) -> Unit = {},
     isDebug: Boolean = false,
+    reportingContent: ReportingContent? = null,
 ) {
     val context = LocalContext.current
     @Suppress("ViewModelInjection")
@@ -132,6 +137,7 @@ fun MeetingRoomComponent(
             modifier = modifier.then(pipModifier),
             actions = actions,
             uiState = uiState,
+            reportingContent = reportingContent,
         )
     }
 }

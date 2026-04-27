@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.vonage.android.meetingroom.api.MeetingRoomComponent
 import com.vonage.android.meetingroom.api.MeetingRoomConfig
+import com.vonage.android.screen.reporting.ReportIssueScreen
 
 /**
  * App-level navigation wrapper for the meeting room.
@@ -34,6 +35,7 @@ fun MeetingRoomScreenRoute(
         onShare = navigateToShare,
         modifier = modifier,
         isDebug = com.vonage.android.BuildConfig.DEBUG,
+        reportingContent = { onDismiss -> ReportIssueScreen(onClose = onDismiss) },
     )
 }
 

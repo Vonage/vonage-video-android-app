@@ -29,7 +29,7 @@ android {
     // Mirror the same flavor dimensions as the individual feature modules so
     // the build system automatically selects the matching variant of each
     // feature module dependency.
-    flavorDimensions += listOf("chat", "reactions", "archiving", "captions", "screensharing", "videofx", "audiofx", "settings")
+    flavorDimensions += listOf("chat", "reactions", "archiving", "captions", "screensharing", "videofx", "audiofx", "settings", "reporting")
 
     productFlavors {
         // Each flavor declares matchingFallbacks so Gradle can resolve the feature
@@ -50,6 +50,8 @@ android {
         create("audiofxDisabled") { dimension = "audiofx"; matchingFallbacks += listOf("disabled") }
         create("settingsEnabled") { dimension = "settings"; matchingFallbacks += listOf("enabled") }
         create("settingsDisabled") { dimension = "settings"; matchingFallbacks += listOf("disabled") }
+        create("reportingEnabled") { dimension = "reporting" }
+        create("reportingDisabled") { dimension = "reporting" }
     }
 }
 

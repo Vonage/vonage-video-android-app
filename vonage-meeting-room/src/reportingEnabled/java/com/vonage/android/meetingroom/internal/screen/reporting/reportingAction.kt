@@ -11,7 +11,7 @@ import com.vonage.android.meetingroom.R
 @Composable
 internal fun reportingAction(
     onClick: () -> Unit,
-): BottomBarAction =
+): BottomBarAction? =
     BottomBarAction(
         type = BottomBarActionType.REPORT,
         icon = VividIcons.Solid.Warning,
