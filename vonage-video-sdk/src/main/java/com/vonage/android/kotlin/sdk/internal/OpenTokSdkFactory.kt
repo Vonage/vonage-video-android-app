@@ -18,6 +18,7 @@ import com.vonage.android.kotlin.sdk.VonageScreenShareConfig
 import com.vonage.android.kotlin.sdk.VonageSdkFactory
 import com.vonage.android.kotlin.sdk.VonageSession
 import com.vonage.android.kotlin.sdk.VonageVideoCodec
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Default [VonageSdkFactory] implementation backed by the OpenTok Android SDK.
@@ -30,7 +31,17 @@ internal class OpenTokSdkFactory(
 ) : VonageSdkFactory {
 
     init {
-        AudioDeviceManager.setAudioDevice(baseAudioDevice)
+        // AudioDeviceManager.setAudioDevice must be called before any session or publisher
+        // is created and cannot be called again once the SDK is initialized. Guard with an
+        // AtomicBoolean so that creating multiple factory instances (e.g. from MeetingRoomContainer
+        // and from the Hilt graph) does not trigger a second call and throw IllegalStateException.
+        if (audioDeviceRegistered.compareAndSet(false, true)) {
+            AudioDeviceManager.setAudioDevice(baseAudioDevice)
+        }
+    }
+
+    companion object {
+        private val audioDeviceRegistered = AtomicBoolean(false)
     }
 
     override fun createSession(
