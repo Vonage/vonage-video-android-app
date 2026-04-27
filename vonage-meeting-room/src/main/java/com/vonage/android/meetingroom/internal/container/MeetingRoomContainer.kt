@@ -1,0 +1,119 @@
+package com.vonage.android.meetingroom.internal.container
+
+import android.content.Context
+import com.vonage.android.archiving.VonageArchiving
+import com.vonage.android.captions.VonageCaptions
+import com.vonage.android.chat.ChatModule
+import com.vonage.android.kotlin.VonageVideoClient
+import com.vonage.android.kotlin.internal.PublisherFactory
+import com.vonage.android.kotlin.sdk.VonageSdkFactory
+import com.vonage.android.kotlin.signal.ChatSignalPlugin
+import com.vonage.android.meetingroom.api.MeetingRoomConfig
+import com.vonage.android.meetingroom.internal.data.MeetingRoomApiService
+import com.vonage.android.meetingroom.internal.data.MeetingRoomNetworkFactory
+import com.vonage.android.meetingroom.internal.data.MeetingRoomSessionRepository
+import com.vonage.android.meetingroom.internal.factory.createVonageArchiving
+import com.vonage.android.meetingroom.internal.factory.createVonageCaptions
+import com.vonage.android.meetingroom.internal.factory.createVonageScreenSharing
+import com.vonage.android.meetingroom.internal.screen.audio.MeetingRoomAudioDevicesHandler
+import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler
+import com.vonage.android.meetingroom.internal.util.ActivityContextHolder
+import com.vonage.android.reactions.ReactionSignalPlugin
+import com.vonage.android.reactions.di.ReactionsModule
+import com.vonage.android.screensharing.VonageScreenSharing
+import com.vonage.android.settings.CallSettingsHolder
+import com.vonage.audioselector.AudioDeviceSelector
+import com.vonage.audioselector.VeraAudioDevice
+import kotlinx.coroutines.Dispatchers
+import retrofit2.Retrofit
+
+/**
+ * Manual DI container for the meeting room session.
+ *
+ * All dependencies are created lazily and scoped to the lifetime of this container, which
+ * is tied to the [MeetingRoomViewModel]. No Hilt or any other DI framework is used.
+ */
+internal class MeetingRoomContainer(
+    private val applicationContext: Context,
+    private val config: MeetingRoomConfig,
+    private val isDebug: Boolean = false,
+) {
+
+    private val retrofit: Retrofit by lazy {
+        MeetingRoomNetworkFactory.createRetrofit(
+            baseUrl = config.baseUrl,
+            isDebug = isDebug,
+        )
+    }
+
+    private val apiService: MeetingRoomApiService by lazy {
+        retrofit.create(MeetingRoomApiService::class.java)
+    }
+
+    val sessionRepository: MeetingRoomSessionRepository by lazy {
+        MeetingRoomSessionRepository(apiService)
+    }
+
+    private val chatSignalPlugin: ChatSignalPlugin by lazy {
+        ChatModule.provideChatSignalPlugin(applicationContext)
+    }
+
+    private val reactionSignalPlugin: ReactionSignalPlugin by lazy {
+        ReactionsModule.provideReactionSignalPlugin()
+    }
+
+    private val veraAudioDevice: VeraAudioDevice by lazy {
+        VeraAudioDevice(applicationContext)
+    }
+
+    private val sdkFactory: VonageSdkFactory by lazy {
+        VonageSdkFactory.create(baseAudioDevice = veraAudioDevice)
+    }
+
+    private val publisherFactory: PublisherFactory by lazy {
+        PublisherFactory(sdkFactory = sdkFactory)
+    }
+
+    val videoClient: VonageVideoClient by lazy {
+        VonageVideoClient(
+            context = applicationContext,
+            sdkFactory = sdkFactory,
+            publisherFactory = publisherFactory,
+            signalPlugins = listOfNotNull(chatSignalPlugin, reactionSignalPlugin),
+        )
+    }
+
+    val vonageArchiving: VonageArchiving by lazy {
+        createVonageArchiving(retrofit)
+    }
+
+    val vonageCaptions: VonageCaptions by lazy {
+        createVonageCaptions(retrofit)
+    }
+
+    val vonageScreenSharing: VonageScreenSharing by lazy {
+        createVonageScreenSharing(applicationContext)
+    }
+
+    val callSettingsHolder: CallSettingsHolder by lazy {
+        CallSettingsHolder()
+    }
+
+    val foregroundServiceHandler: MeetingRoomForegroundServiceHandler by lazy {
+        val handler = MeetingRoomForegroundServiceHandler(applicationContext)
+        handler.createNotificationChannel()
+        handler
+    }
+
+    val audioDevicesHandler: MeetingRoomAudioDevicesHandler by lazy {
+        val audioDeviceSelector = AudioDeviceSelector(
+            context = applicationContext,
+            dispatcher = Dispatchers.Default,
+        )
+        MeetingRoomAudioDevicesHandler(audioDeviceSelector)
+    }
+
+    val activityContextHolder: ActivityContextHolder by lazy {
+        ActivityContextHolder()
+    }
+}

@@ -75,11 +75,6 @@ fun AppNavHost(
                 navigateToGoodBye = { navController.navigate(Goodbye(roomName = roomName)) },
                 navigateToShare = { roomName -> context.navigateToShare(roomName) },
                 navigateToSettings = { navController.navigate(Settings) },
-                onBack = {
-                    navController.navigate(Waiting(roomName = roomName)) {
-                        popUpTo(Waiting(roomName = roomName)) { inclusive = true }
-                    }
-                }
             )
         }
         composable<Goodbye> { backStackEntry ->
