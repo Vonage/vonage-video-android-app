@@ -23,7 +23,7 @@ internal object MeetingRoomNetworkFactory {
                     .newBuilder()
                     .header(
                         "User-Agent",
-                        "VonageMeetingRoomSDK android/${Build.VERSION.RELEASE}"
+                        "VeraNativeAndroid/${Build.VERSION.RELEASE}"
                     )
                     .build()
                 chain.proceed(request)
