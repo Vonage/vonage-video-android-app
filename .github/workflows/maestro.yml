@@ -1,0 +1,166 @@
+name: Maestro UI Tests
+
+permissions:
+  contents: read
+  actions: read
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_PR_NUM: ${{ github.event.pull_request.number }}
+  BASE_API_URL: ${{ secrets.BASE_API_URL }}
+
+jobs:
+  maestro-tests:
+    name: Maestro Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          df -h
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls -al /dev/kvm
+
+      - name: Setup Java
+        uses: ./.github/actions/setup-java
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Build debug APK
+        run: |
+          ./gradlew :app:assembleDebug --info --stacktrace --no-build-cache
+
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-pixel-34-aosp-atd-x86_64-v2
+
+      - name: Run Maestro flows on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: aosp_atd
+          arch: x86_64
+          profile: pixel
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            adb wait-for-device
+            adb install -r app/build/outputs/apk/debug/app-debug.apk
+            maestro --version
+            mkdir -p test-reports
+            maestro test maestro/flows --format junit --output test-reports/maestro-junit.xml
+
+      - name: List Maestro test artifacts
+        if: always()
+        run: |
+          echo "📁 Maestro test directory contents:"
+          ls -la ~/.maestro/tests/ 2>/dev/null || echo "No tests directory"
+
+          echo ""
+          echo "📸 Screenshots found:"
+          find ~/.maestro/tests -type f \( -name "*.png" -o -name "*.jpg" \) 2>/dev/null | head -20
+
+      - name: Generate Test Report
+        if: always()
+        run: |
+          mkdir -p test-reports
+          cat > test-reports/maestro-summary.txt << EOF
+          🎭 Maestro Test Execution Summary
+          ==================================
+          Run Number: ${{ github.run_number }}
+          Timestamp: $(date)
+          Branch: ${{ github.ref }}
+          Commit: ${{ github.sha }}
+
+          Test Results Location:
+          ~/.maestro/tests/
+
+          Screenshots and test artifacts have been uploaded below.
+          EOF
+
+          if [ -d ~/.maestro/tests ]; then
+            cp -r ~/.maestro/tests/* test-reports/ 2>/dev/null || true
+          fi
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-test-results-${{ github.run_number }}
+          path: ~/.maestro/tests/
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Upload Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-report-${{ github.run_number }}
+          path: test-reports/
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Comment PR with Results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let comment = '## 🎭 Maestro UI Test Results\n\n';
+            if ('${{ job.status }}' === 'success') {
+              comment += '✅ **All tests passed!**\n\n';
+            } else {
+              comment += '❌ **Some tests failed**\n\n';
+            }
+            comment += `- **Run**: [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n`;
+            comment += `- **Commit**: \`${{ github.sha }}\`\n\n`;
+            comment += '📊 **Artifacts:**\n';
+            comment += `  - maestro-test-results-${{ github.run_number }}\n`;
+            comment += `  - maestro-report-${{ github.run_number }}\n\n`;
+            comment += '📸 View the complete test results and screenshots in the artifacts section above.';
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

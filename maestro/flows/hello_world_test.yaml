@@ -1,0 +1,4 @@
+appId: com.vonage.video.app
+---
+# Test básico: tomar screenshot de la pantalla actual
+- takeScreenshot: initial_screen
