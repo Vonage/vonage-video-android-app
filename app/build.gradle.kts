@@ -54,12 +54,12 @@ android {
         // Chat feature
         val chatProperty = configProps.getProperty("vonage.meetingRoom.allow_chat", "true")
         buildConfigField("boolean", "FEATURE_CHAT_ENABLED", "$chatProperty")
-        missingDimensionStrategy("chat", chatProperty.toEnabledString(), chatProperty.toModuleFlavorString("chat"))
+        missingDimensionStrategy("chat", chatProperty.toEnabledString())
 
         // Reactions feature
         val reactionsProperty = configProps.getProperty("vonage.meetingRoom.allow_emojis", "true")
         buildConfigField("boolean", "FEATURE_REACTIONS_ENABLED", "$reactionsProperty")
-        missingDimensionStrategy("reactions", reactionsProperty.toEnabledString(), reactionsProperty.toModuleFlavorString("reactions"))
+        missingDimensionStrategy("reactions", reactionsProperty.toEnabledString())
 
         // Archiving/recording feature
         val archivingProperty = configProps.getProperty("vonage.meetingRoom.allow_archiving", "true")
@@ -83,17 +83,17 @@ android {
         // Background (video) effects feature
         val videoFxProperty = configProps.getProperty("vonage.video.allow_background_effects", "true")
         buildConfigField("boolean", "FEATURE_VIDEO_EFFECTS_ENABLED", "$videoFxProperty")
-        missingDimensionStrategy("videofx", videoFxProperty.toEnabledString(), videoFxProperty.toModuleFlavorString("videofx"))
+        missingDimensionStrategy("videofx", videoFxProperty.toEnabledString())
 
         // Audio effects feature
         val audioFxProperty = configProps.getProperty("vonage.audio.allow_advanced_noise_suppression", "true")
         buildConfigField("boolean", "FEATURE_AUDIO_EFFECTS_ENABLED", "$audioFxProperty")
-        missingDimensionStrategy("audiofx", audioFxProperty.toEnabledString(), audioFxProperty.toModuleFlavorString("audiofx"))
+        missingDimensionStrategy("audiofx", audioFxProperty.toEnabledString())
 
         // Settings feature
         val settingsProperty = configProps.getProperty("vonage.meetingRoom.allow_settings", "true")
         buildConfigField("boolean", "FEATURE_SETTINGS_ENABLED", "$settingsProperty")
-        missingDimensionStrategy("settings", settingsProperty.toEnabledString(), settingsProperty.toModuleFlavorString("settings"))
+        missingDimensionStrategy("settings", settingsProperty.toEnabledString())
 
         // Reporting feature
         val reportingProperty = configProps.getProperty("vonage.meetingRoom.allow_reporting", "true")

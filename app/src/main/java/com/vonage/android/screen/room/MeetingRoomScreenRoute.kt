@@ -2,6 +2,7 @@ package com.vonage.android.screen.room
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.vonage.android.config.AppConfig
 import com.vonage.android.meetingroom.api.MeetingRoomComponent
 import com.vonage.android.meetingroom.api.MeetingRoomConfig
 import com.vonage.android.screen.reporting.ReportIssueScreen
@@ -23,9 +24,9 @@ fun MeetingRoomScreenRoute(
     val config = MeetingRoomConfig(
         baseUrl = com.vonage.android.BuildConfig.BASE_API_URL,
         roomName = roomName,
-        allowCameraControl = com.vonage.android.config.AppConfig.VideoSettings.ALLOW_CAMERA_CONTROL,
-        allowMicrophoneControl = com.vonage.android.config.AppConfig.AudioSettings.ALLOW_MICROPHONE_CONTROL,
-        allowShowParticipantList = com.vonage.android.config.AppConfig.MeetingRoomSettings.SHOW_PARTICIPANT_LIST,
+        allowCameraControl = AppConfig.VideoSettings.ALLOW_CAMERA_CONTROL,
+        allowMicrophoneControl = AppConfig.AudioSettings.ALLOW_MICROPHONE_CONTROL,
+        allowShowParticipantList = AppConfig.MeetingRoomSettings.SHOW_PARTICIPANT_LIST,
     )
 
     MeetingRoomComponent(

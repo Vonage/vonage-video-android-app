@@ -11,6 +11,14 @@ android {
 
     defaultConfig {
         minSdk = 24
+        // These feature modules are always included in their enabled variant from meeting-room's
+        // perspective; the app layer controls which variant is used via its own
+        // missingDimensionStrategy for direct feature-module dependencies.
+        missingDimensionStrategy("chat", "enabled")
+        missingDimensionStrategy("reactions", "enabled")
+        missingDimensionStrategy("videofx", "enabled")
+        missingDimensionStrategy("audiofx", "enabled")
+        missingDimensionStrategy("settings", "enabled")
     }
 
     compileOptions {
@@ -26,32 +34,20 @@ android {
         buildConfig = true
     }
 
-    // Mirror the same flavor dimensions as the individual feature modules so
-    // the build system automatically selects the matching variant of each
-    // feature module dependency.
-    flavorDimensions += listOf("chat", "reactions", "archiving", "captions", "screensharing", "videofx", "audiofx", "settings", "reporting")
+    // Only dimensions with actual source-set differences in this module need explicit flavors.
+    // Dimensions without custom source sets (chat, reactions, videofx, audiofx, settings) are
+    // handled via missingDimensionStrategy in defaultConfig, reducing variants from 512 to 16.
+    flavorDimensions += listOf("archiving", "captions", "screensharing", "reporting")
 
     productFlavors {
-        // Each flavor declares matchingFallbacks so Gradle can resolve the feature
-        // modules whose flavors are named "enabled"/"disabled" (not the longer names).
-        create("chatEnabled") { dimension = "chat"; matchingFallbacks += listOf("enabled") }
-        create("chatDisabled") { dimension = "chat"; matchingFallbacks += listOf("disabled") }
-        create("reactionsEnabled") { dimension = "reactions"; matchingFallbacks += listOf("enabled") }
-        create("reactionsDisabled") { dimension = "reactions"; matchingFallbacks += listOf("disabled") }
         create("archivingEnabled") { dimension = "archiving"; matchingFallbacks += listOf("enabled") }
         create("archivingDisabled") { dimension = "archiving"; matchingFallbacks += listOf("disabled") }
         create("captionsEnabled") { dimension = "captions"; matchingFallbacks += listOf("enabled") }
         create("captionsDisabled") { dimension = "captions"; matchingFallbacks += listOf("disabled") }
         create("screensharingEnabled") { dimension = "screensharing"; matchingFallbacks += listOf("enabled") }
         create("screensharingDisabled") { dimension = "screensharing"; matchingFallbacks += listOf("disabled") }
-        create("videofxEnabled") { dimension = "videofx"; matchingFallbacks += listOf("enabled") }
-        create("videofxDisabled") { dimension = "videofx"; matchingFallbacks += listOf("disabled") }
-        create("audiofxEnabled") { dimension = "audiofx"; matchingFallbacks += listOf("enabled") }
-        create("audiofxDisabled") { dimension = "audiofx"; matchingFallbacks += listOf("disabled") }
-        create("settingsEnabled") { dimension = "settings"; matchingFallbacks += listOf("enabled") }
-        create("settingsDisabled") { dimension = "settings"; matchingFallbacks += listOf("disabled") }
-        create("reportingEnabled") { dimension = "reporting" }
-        create("reportingDisabled") { dimension = "reporting" }
+        create("reportingEnabled") { dimension = "reporting"; matchingFallbacks += listOf("enabled") }
+        create("reportingDisabled") { dimension = "reporting"; matchingFallbacks += listOf("disabled") }
     }
 }
 

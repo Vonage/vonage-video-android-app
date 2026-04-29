@@ -33,7 +33,6 @@ Launches the meeting room in a new, standalone `Activity`. No Compose setup requ
 MeetingRoom.launch(
     context = context,
     config  = MeetingRoomConfig(baseUrl = "https://...", roomName = "my-room"),
-    isDebug = BuildConfig.DEBUG,
 )
 ```
 
@@ -49,7 +48,6 @@ MeetingRoomComponent(
     onCallEnd           = { navController.popBackStack() },
     onNavigateToSettings = { navController.navigate("settings") }, // optional
     onShare             = { roomName -> shareLink(roomName) },      // optional
-    isDebug             = BuildConfig.DEBUG,
 )
 ```
 
