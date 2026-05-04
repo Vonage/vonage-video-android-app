@@ -45,6 +45,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Setup Java
         uses: ./.github/actions/setup-java
@@ -57,7 +59,7 @@ jobs:
 
       - name: Run unit tests and code quality checks
         run: |
-          ./gradlew clean koverXmlReportDebug detekt --info
+          ./gradlew clean koverXmlReportDebug detekt verifyRoborazziDebug --info
 
 # Disabled temporally because some enterprise issues
 #      - name: Send report to sonar

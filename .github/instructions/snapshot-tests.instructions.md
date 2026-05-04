@@ -139,9 +139,11 @@ For multiple preview variants, prefix with the variant name:
 
 | Command | Description |
 |---|---|
-| `./gradlew :vonage-video-ui-compose:test` | Verify snapshots match golden images |
+| `./gradlew :vonage-video-ui-compose:verifyRoborazziDebug` | Verify snapshots match golden images (used in CI) |
 | `./gradlew :vonage-video-ui-compose:recordRoborazziDebug` | Record new / update golden images |
-| `./gradlew :vonage-video-ui-compose:verifyRoborazziDebug` | Explicitly verify against goldens |
+| `./gradlew :vonage-video-ui-compose:test` | Run tests without strict golden comparison |
+
+> **CI**: The `build-and-test` job runs `verifyRoborazziDebug` explicitly and uses `lfs: true` on checkout to ensure golden images are available.
 
 **Workflow when changing component visuals:**
 1. Make the UI change.
