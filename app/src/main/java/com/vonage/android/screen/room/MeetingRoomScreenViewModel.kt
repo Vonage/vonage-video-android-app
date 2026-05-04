@@ -82,6 +82,25 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
             .startForegroundService(roomName)
     }
 
+    /**
+     * Entry point for the call lifecycle — call this once from the composable screen on first
+     * composition (or when the Activity context becomes available).
+     *
+     * Execution sequence:
+     * 1. Stores the Activity context in [activityContextProvider] (needed for publisher/subscriber).
+     * 2. Loads runtime feature flags via [getConfig] and updates [_uiState].
+     * 3. Fetches session credentials from the backend via [sessionRepository] and delegates to the
+     *    private [connect] on success, or marks [_uiState] as error on failure.
+     * 4. Subscribes to foreground-service [CallAction] events (e.g. hang-up from notification).
+     * 5. Starts the [audioDevicesHandler] for Bluetooth/wired headset switching.
+     * 6. Starts [observePublisherSettings] to reactively reconfigure the publisher when any
+     *    codec / quality setting changes.
+     *
+     * The foreground service is started earlier, in the ViewModel `init` block, so it is running
+     * before this method is called.
+     *
+     * @param context The Activity [Context] required by the Vonage SDK publisher/subscriber.
+     */
     fun setup(context: Context) {
         // Set the activity context in the provider for future use
         activityContextProvider.setActivityContext(context)
@@ -123,6 +142,23 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         observePublisherSettings()
     }
 
+    /**
+     * Initialises the Vonage SDK session and begins collecting [SessionEvent]s.
+     *
+     * Execution sequence:
+     * 1. Calls [VonageVideoClient.initializeSession] to create the [CallFacade] (no network yet).
+     * 2. Wires archiving listener ([listenRemoteArchiving]), captions module, and call-settings
+     *    holder to the new call.
+     * 3. Pushes the call reference and initial UI state into [_uiState].
+     * 4. Collects the event flow from [CallFacade.connect]:
+     *    - [SessionEvent.Disconnected] → triggers [endCall] for full teardown.
+     *    - [SessionEvent.Error] → sets `isError = true` and the error message in [_uiState].
+     *    - Other events (stream added/dropped) are handled inside [Call] and exposed via
+     *      participant/signal state flows consumed directly by the UI.
+     *
+     * @param sessionInfo Credentials returned by the backend session endpoint.
+     * @param roomName    Human-readable room name displayed in the UI and passed to captions.
+     */
     private fun connect(sessionInfo: SessionInfo, roomName: String) {
         viewModelScope.launch {
             call = videoClient.initializeSession(
@@ -188,6 +224,21 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         call?.cycleLocalCameraBlur()
     }
 
+    /**
+     * Tears down the active call and releases all associated resources.
+     *
+     * Called automatically when a [SessionEvent.Disconnected] event is received, and may also
+     * be invoked directly by the user pressing the hang-up button.
+     *
+     * Teardown sequence:
+     * 1. Stops the foreground service notification (call must remain active in background while
+     *    the foreground service is running).
+     * 2. Stops any active screen-share broadcast.
+     * 3. Stops the audio-devices handler (Bluetooth/wired headset tracking).
+     * 4. Clears persisted call settings in [callSettingsHolder].
+     * 5. Calls [CallFacade.endSession] which unpublishes the local stream, removes all listeners,
+     *    disconnects from the Vonage session, and cancels the call coroutine scope.
+     */
     fun endCall() {
         foregroundServiceHandler.stopForegroundService()
         vonageScreenSharing.stopSharingScreen()
@@ -196,6 +247,20 @@ class MeetingRoomScreenViewModel @AssistedInject constructor(
         call?.endSession()
     }
 
+    /**
+     * Reactively reconfigures and refreshes the local publisher whenever any codec or quality
+     * setting changes at runtime.
+     *
+     * Combines eight settings flows from [callSettingsHolder] into a single stream:
+     * - capture frame rate, capture resolution, preferred video codec order, audio bitrate
+     * - sender-stats tracking, Opus DTX, publisher audio fallback, subscriber audio fallback
+     *
+     * The **first emission is intentionally dropped** (`.drop(1)`) because the initial publisher
+     * is already configured during [connect]; reacting to it would cause an unnecessary refresh.
+     * Every subsequent emission triggers [CallFacade.configurePublisher] followed by
+     * [CallFacade.refreshPublisher], which tears down and recreates the publisher with the new
+     * settings while preserving the session connection.
+     */
     private fun observePublisherSettings() {
         viewModelScope.launch {
             combine(
