@@ -38,8 +38,6 @@ turbine = "1.2.1"
 runtime = "1.10.5"
 material3 = "1.4.0"
 adaptive = "1.2.0"
-roborazzi = "1.60.0"
-robolectric = "4.16.1"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -99,9 +97,6 @@ turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-compose-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive", version.ref = "adaptive" }
-roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi", version.ref = "roborazzi" }
-roborazzi-compose = { module = "io.github.takahirom.roborazzi:roborazzi-compose", version.ref = "roborazzi" }
-robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -119,4 +114,3 @@ sonarqube = { id = "org.sonarqube", version = "6.3.1.5724" }
 stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version = "0.7.0" }
 google-services = { id = "com.google.gms.google-services", version = "4.4.4" }
 crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.6" }
-roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }

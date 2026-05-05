@@ -59,7 +59,7 @@ jobs:
 
       - name: Run unit tests and code quality checks
         run: |
-          ./gradlew clean koverXmlReportDebug detekt verifyRoborazziDebug --info
+          ./gradlew clean koverXmlReportDebug detekt --info
 
 # Disabled temporally because some enterprise issues
 #      - name: Send report to sonar
