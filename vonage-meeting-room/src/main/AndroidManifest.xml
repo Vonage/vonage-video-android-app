@@ -11,7 +11,7 @@
 
     <application>
         <activity
-            android:name=".api.MeetingRoomActivity"
+            android:name=".internal.MeetingRoomActivity"
             android:exported="false"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:supportsPictureInPicture="true"

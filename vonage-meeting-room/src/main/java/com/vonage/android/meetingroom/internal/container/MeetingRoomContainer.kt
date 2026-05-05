@@ -8,7 +8,7 @@ import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.sdk.VonageSdkFactory
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
-import com.vonage.android.meetingroom.api.MeetingRoomConfig
+import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.internal.data.MeetingRoomApiService
 import com.vonage.android.meetingroom.internal.data.MeetingRoomNetworkFactory
 import com.vonage.android.meetingroom.internal.data.MeetingRoomSessionRepository
@@ -35,14 +35,13 @@ import retrofit2.Retrofit
  */
 internal class MeetingRoomContainer(
     private val applicationContext: Context,
-    private val config: MeetingRoomConfig,
-    private val isDebug: Boolean = false,
+    val prebuilt: MeetingRoomPrebuilt,
 ) {
 
     private val retrofit: Retrofit by lazy {
         MeetingRoomNetworkFactory.createRetrofit(
-            baseUrl = config.baseUrl,
-            isDebug = isDebug,
+            baseUrl = prebuilt.baseUrl,
+            isDebug = prebuilt.isDebug,
         )
     }
 

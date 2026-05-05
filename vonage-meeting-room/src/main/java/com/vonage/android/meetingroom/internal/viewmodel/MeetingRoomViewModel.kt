@@ -10,6 +10,8 @@ import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.SessionEvent
+import com.vonage.android.meetingroom.api.MeetingRoomCallState
+import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
 import com.vonage.android.meetingroom.internal.data.SessionInfo
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
@@ -32,9 +34,11 @@ import kotlinx.coroutines.launch
 
 @Suppress("LongParameterList")
 internal class MeetingRoomViewModel(
-    private val roomName: String,
     private val container: MeetingRoomContainer,
 ) : ViewModel() {
+
+    private val prebuilt: MeetingRoomPrebuilt get() = container.prebuilt
+    private val roomName: String get() = prebuilt.roomName
 
     private val context: Context
         get() = container.activityContextHolder.requireActivityContext()
@@ -43,6 +47,10 @@ internal class MeetingRoomViewModel(
         roomName = roomName,
         isLoading = true,
         isEndCall = false,
+        allowCameraControl = prebuilt.configuration.allowCameraControl,
+        allowMicrophoneControl = prebuilt.configuration.allowMicrophoneControl,
+        allowShowParticipantList = prebuilt.configuration.allowShowParticipantList,
+        enabledFeatures = prebuilt.enabledFeatures,
     )
     private val _uiState = MutableStateFlow(initialUiState)
     val uiState: StateFlow<MeetingRoomUiState> = _uiState.stateIn(
@@ -55,16 +63,27 @@ internal class MeetingRoomViewModel(
 
     init {
         container.foregroundServiceHandler.startForegroundService(roomName)
+        observeUiStateForPublicBridge()
     }
 
     fun setup(context: Context) {
         container.activityContextHolder.setActivityContext(context)
 
+        // Apply initial publisher settings from PublisherSettings
+        container.videoClient.configurePublisher(
+            PublisherConfig(
+                name = prebuilt.publisherSettings.username,
+                publishAudio = prebuilt.publisherSettings.publishAudio,
+                publishVideo = prebuilt.publisherSettings.publishVideo,
+                blurLevel = com.vonage.android.kotlin.model.BlurLevel.NONE,
+                cameraIndex = 1, // default to front camera
+            ),
+        )
+
         viewModelScope.launch {
             _uiState.update { state ->
                 state.copy(
                     isLoading = true,
-                    allowCameraControl = container.callSettingsHolder.call.value?.publisher?.value != null || true,
                     audioDevicesState = container.audioDevicesHandler.audioDevicesState,
                 )
             }
@@ -89,6 +108,25 @@ internal class MeetingRoomViewModel(
 
         container.audioDevicesHandler.start()
         observePublisherSettings()
+    }
+
+    /** Bridges the internal [MeetingRoomUiState] to the public [MeetingRoomCallState]. */
+    private fun observeUiStateForPublicBridge() {
+        uiState
+            .onEach { state ->
+                val activeCall = state.call
+                val publisher = activeCall?.publisher?.value
+                prebuilt.updateCallState(
+                    MeetingRoomCallState(
+                        isConnected = activeCall != null && !state.isLoading,
+                        participantCount = activeCall?.participantsCount?.value ?: 0,
+                        isLocalMicEnabled = publisher?.isMicEnabled?.value ?: prebuilt.publisherSettings.publishAudio,
+                        isLocalCameraEnabled = publisher?.isCameraEnabled?.value ?: prebuilt.publisherSettings.publishVideo,
+                        roomName = state.roomName,
+                    ),
+                )
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun connect(
@@ -176,7 +214,10 @@ internal class MeetingRoomViewModel(
                     call?.let { activeCall ->
                         container.videoClient.configurePublisher(
                             PublisherConfig(
-                                name = activeCall.publisher.value?.name.orEmpty(),
+                                // Prefer the name set by PublisherSettings; fall back to the active publisher name
+                                name = prebuilt.publisherSettings.username.ifEmpty {
+                                    activeCall.publisher.value?.name.orEmpty()
+                                },
                                 publishVideo = activeCall.publisher.value?.isCameraEnabled?.value ?: true,
                                 publishAudio = activeCall.publisher.value?.isMicEnabled?.value ?: true,
                                 blurLevel = com.vonage.android.kotlin.model.BlurLevel.NONE,

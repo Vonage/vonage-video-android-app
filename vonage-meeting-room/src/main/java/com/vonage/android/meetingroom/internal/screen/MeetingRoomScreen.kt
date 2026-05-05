@@ -32,9 +32,11 @@ import com.vonage.android.captions.ui.CaptionsOverlay
 import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.components.GenericLoading
+import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.meetingroom.R
+import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
@@ -49,8 +51,27 @@ import com.vonage.android.meetingroom.internal.util.ext.isExtraPaneShow
 import com.vonage.android.meetingroom.internal.util.ext.toggleChat
 import com.vonage.android.meetingroom.internal.util.rememberNoiseSuppression
 import com.vonage.android.reactions.ui.EmojiReactionOverlay
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
+
+/**
+ * Maps the runtime [MeetingRoomFeature] set to the [BottomBarActionType] list that should be
+ * shown. Features absent from [enabledFeatures] are filtered out; the compile-time flavor system
+ * already handles the disabled case for flavor-gated features, so this is purely additive.
+ */
+private fun enabledBottomBarActions(
+    enabledFeatures: Set<MeetingRoomFeature>,
+): ImmutableList<BottomBarActionType> = BottomBarActionType.entries.filter { actionType ->
+    when (actionType) {
+        BottomBarActionType.CHAT -> MeetingRoomFeature.CHAT in enabledFeatures
+        BottomBarActionType.RECORD_SESSION -> MeetingRoomFeature.ARCHIVING in enabledFeatures
+        BottomBarActionType.CAPTIONS -> MeetingRoomFeature.CAPTIONS in enabledFeatures
+        BottomBarActionType.SCREEN_SHARING -> MeetingRoomFeature.SCREEN_SHARE in enabledFeatures
+        // CHANGE_LAYOUT, PARTICIPANTS, REPORT are always allowed (not feature-gated)
+        else -> true
+    }
+}.toImmutableList()
 
 @Suppress("LongMethod")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
@@ -103,6 +124,9 @@ internal fun MeetingRoomScreen(
                         modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
                         call = call,
                         roomActions = actions,
+                        actions = remember(uiState.enabledFeatures) {
+                            enabledBottomBarActions(uiState.enabledFeatures)
+                        },
                         state = BottomBarState(
                             onShowChat = { scope.launch { navigator.toggleChat() } },
                             isChatShow = isChatShow,

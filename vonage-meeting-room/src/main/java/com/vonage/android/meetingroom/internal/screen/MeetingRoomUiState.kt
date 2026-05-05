@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.captions.CaptionsUiState
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.internal.screen.audio.AudioDevicesState
 import com.vonage.android.screensharing.ScreenSharingState
 
@@ -23,6 +24,8 @@ internal data class MeetingRoomUiState(
     val allowMicrophoneControl: Boolean = true,
     val allowCameraControl: Boolean = true,
     val allowShowParticipantList: Boolean = true,
+    /** Runtime feature set — applied on top of compile-time flavor toggles. */
+    val enabledFeatures: Set<MeetingRoomFeature> = MeetingRoomFeature.all,
 )
 
 internal enum class CallLayoutType {
