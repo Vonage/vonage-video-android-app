@@ -3,7 +3,7 @@ package com.vonage.android.meetingroom.internal.screen.reporting
 import androidx.compose.runtime.Composable
 import com.vonage.android.compose.components.bottombar.BottomBarAction
 
-@Suppress("UnusedParameter")
+@Suppress("UnusedParameter", "FunctionOnlyReturningConstant")
 @Composable
 internal fun reportingAction(
     onClick: () -> Unit,

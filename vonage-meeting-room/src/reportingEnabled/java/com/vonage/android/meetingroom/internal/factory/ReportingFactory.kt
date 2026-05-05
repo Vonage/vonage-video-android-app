@@ -11,8 +11,9 @@ import androidx.compose.ui.res.stringResource
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.meetingroom.R
 
+@Suppress("UnusedParameter")
 @Composable
-internal fun reportingContent(onDismiss: () -> Unit) {
+internal fun ReportingContent(onDismiss: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()

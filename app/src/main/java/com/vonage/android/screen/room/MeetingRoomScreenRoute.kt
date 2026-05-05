@@ -2,7 +2,6 @@ package com.vonage.android.screen.room
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import com.vonage.android.config.AppConfig
 import com.vonage.android.meetingroom.api.MeetingRoomBuilder
 import com.vonage.android.meetingroom.api.MeetingRoomConfiguration
@@ -21,7 +20,6 @@ fun MeetingRoomScreenRoute(
     navigateToGoodBye: () -> Unit,
     navigateToShare: (String) -> Unit,
     navigateToSettings: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val prebuilt = remember(roomName) {
         MeetingRoomBuilder(

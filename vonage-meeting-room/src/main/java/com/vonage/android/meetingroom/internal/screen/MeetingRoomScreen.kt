@@ -46,7 +46,7 @@ import com.vonage.android.meetingroom.internal.screen.components.MeetingTopBar
 import com.vonage.android.meetingroom.internal.screen.components.SpeakingWhileMutedOverlay
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBar
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarState
-import com.vonage.android.meetingroom.internal.factory.reportingContent as defaultReportingContent
+import com.vonage.android.meetingroom.internal.factory.ReportingContent as DefaultReportingContent
 import com.vonage.android.meetingroom.internal.util.ext.isExtraPaneShow
 import com.vonage.android.meetingroom.internal.util.ext.toggleChat
 import com.vonage.android.meetingroom.internal.util.rememberNoiseSuppression
@@ -140,7 +140,7 @@ internal fun MeetingRoomScreen(
                             allowMicrophoneControl = uiState.allowMicrophoneControl,
                             allowCameraControl = uiState.allowCameraControl,
                         ),
-                        reportingContent = reportingContent ?: { onDismiss -> defaultReportingContent(onDismiss) },
+                        reportingContent = reportingContent ?: { onDismiss -> DefaultReportingContent(onDismiss) },
                     )
                 }
             ) { paddingValues ->
