@@ -23,7 +23,6 @@
     "allowEmojis": true,
     "allowScreenShare": true,
     "defaultLayoutMode": "activespeaker",
-    "showParticipantList": true,
-    "allowReporting": true
+    "showParticipantList": true
   }
 }

@@ -95,10 +95,8 @@ android {
         buildConfigField("boolean", "FEATURE_SETTINGS_ENABLED", "$settingsProperty")
         missingDimensionStrategy("settings", settingsProperty.toEnabledString())
 
-        // Reporting feature
-        val reportingProperty = configProps.getProperty("vonage.meetingRoom.allow_reporting", "true")
-        buildConfigField("boolean", "FEATURE_REPORTING_ENABLED", "$reportingProperty")
-        missingDimensionStrategy("reporting", reportingProperty.toModuleFlavorString("reporting"))
+        // Reporting feature — always enabled
+        missingDimensionStrategy("reporting", "reportingEnabled")
     }
 
     compileOptions {
