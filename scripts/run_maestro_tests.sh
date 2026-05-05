@@ -74,7 +74,7 @@ export PATH="$ANDROID_HOME/platform-tools:$HOME/.maestro/bin:$PATH"
 
 # ========== VERIFY ADB ==========
 echo -e "${BLUE}📱 Verifying adb...${NC}"
-ADB_PATH="/Users/jsanmartin/Library/Android/sdk/platform-tools/adb"
+ADB_PATH="$ANDROID_HOME/platform-tools/adb"
 if [ ! -f "$ADB_PATH" ]; then
     echo -e "${RED}❌ Error: adb not found at $ADB_PATH${NC}"
     exit 1
@@ -83,7 +83,7 @@ echo -e "${GREEN}✓ adb found: $ADB_PATH${NC}"
 
 # ========== VERIFY MAESTRO ==========
 echo -e "${BLUE}🧪 Verifying Maestro CLI...${NC}"
-MAESTRO_PATH="/Users/jsanmartin/.maestro/bin/maestro"
+MAESTRO_PATH="$HOME/.maestro/bin/maestro"
 if [ ! -f "$MAESTRO_PATH" ]; then
     echo -e "${YELLOW}📦 Maestro is not installed. Installing...${NC}"
     curl -fsSL "https://get.maestro.mobile.dev" | bash
@@ -101,7 +101,7 @@ fi
 echo -e "${BLUE}📲 Checking for connected device/emulator...${NC}"
 
 # Get device list properly
-DEVICE_LIST=$(/Users/jsanmartin/Library/Android/sdk/platform-tools/adb devices -l 2>&1)
+DEVICE_LIST=$("$ADB_PATH" devices -l 2>&1)
 DEVICE_COUNT=$(echo "$DEVICE_LIST" | grep -c "device" | grep -v "List of attached devices")
 
 # Check if there are devices (not offline)
@@ -112,7 +112,7 @@ if [ "$HAS_DEVICES" -eq 0 ]; then
     echo -e ""
     
     # Try to list available emulators
-    AVAILABLE_AVDS=$(/Users/jsanmartin/Library/Android/sdk/emulator/emulator -list-avds 2>/dev/null || echo "")
+    AVAILABLE_AVDS=$("$ANDROID_HOME/emulator/emulator" -list-avds 2>/dev/null || echo "")
     
     if [ ! -z "$AVAILABLE_AVDS" ]; then
         echo -e "${YELLOW}📱 Available emulators:${NC}"
@@ -132,28 +132,16 @@ if [ "$HAS_DEVICES" -eq 0 ]; then
             fi
             echo -e "${BLUE}Auto-launching emulator: $SELECTED_AVD${NC}"
         else
-            # Ask if want to launch an emulator
-            read -p "Do you want to launch an emulator? (y/n): " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                LAUNCH_EMU=true
-                # Use first available emulator as default
-                DEFAULT_AVD=$(echo "$AVAILABLE_AVDS" | head -n 1)
-                read -p "Enter emulator name (default: $DEFAULT_AVD): " AVD_NAME
-                
-                # If empty, use default
-                if [ -z "$AVD_NAME" ]; then
-                    SELECTED_AVD="$DEFAULT_AVD"
-                else
-                    SELECTED_AVD="$AVD_NAME"
-                fi
-            fi
+            # Auto-launch first available emulator without asking
+            LAUNCH_EMU=true
+            SELECTED_AVD=$(echo "$AVAILABLE_AVDS" | head -n 1)
+            echo -e "${BLUE}Launching emulator: $SELECTED_AVD${NC}"
         fi
         
         if [ "$LAUNCH_EMU" = true ]; then
             if [ ! -z "$SELECTED_AVD" ]; then
                 echo -e "${BLUE}🚀 Launching emulator: $SELECTED_AVD${NC}"
-                /Users/jsanmartin/Library/Android/sdk/emulator/emulator -avd "$SELECTED_AVD" -no-snapshot-load > /tmp/emulator.log 2>&1 &
+                "$ANDROID_HOME/emulator/emulator" -avd "$SELECTED_AVD" -no-snapshot-load > /tmp/emulator.log 2>&1 &
                 EMULATOR_PID=$!
                 
                 echo -e "${YELLOW}⏳ Waiting for emulator to boot (this may take 2-3 minutes)...${NC}"
@@ -165,7 +153,7 @@ if [ "$HAS_DEVICES" -eq 0 ]; then
                 DEVICE_DETECTED=false
                 
                 while [ $attempt -lt $max_attempts ]; do
-                    DEVICE_COUNT=$(/Users/jsanmartin/Library/Android/sdk/platform-tools/adb devices 2>/dev/null | grep "emulator" | grep "device" | wc -l)
+                    DEVICE_COUNT=$("$ADB_PATH" devices 2>/dev/null | grep "emulator" | grep "device" | wc -l)
                     if [ "$DEVICE_COUNT" -gt 0 ]; then
                         DEVICE_DETECTED=true
                         echo -e "${GREEN}✓ Emulator detected by adb${NC}"
@@ -190,7 +178,7 @@ if [ "$HAS_DEVICES" -eq 0 ]; then
         echo -e "${YELLOW}⚠ No emulators available${NC}"
         echo -e ""
         echo -e "${YELLOW}To create an emulator:${NC}"
-        echo -e "  /Users/jsanmartin/Library/Android/sdk/tools/bin/avdmanager create avd -n \"Pixel_4\" -k \"system-images;android-31;google_apis;arm64-v8a\""
+        echo -e "  $ANDROID_HOME/tools/bin/avdmanager create avd -n \"Pixel_4\" -k \"system-images;android-31;google_apis;arm64-v8a\""
         echo -e ""
         echo -e "${YELLOW}Or connect a physical device with USB debugging enabled${NC}"
         exit 1
@@ -199,12 +187,12 @@ fi
 
 # Wait for device/emulator to be fully ready
 echo -e "${BLUE}⏳ Waiting for device to be fully ready...${NC}"
-/Users/jsanmartin/Library/Android/sdk/platform-tools/adb wait-for-device
+"$ADB_PATH" wait-for-device
 sleep 3
 
 # Show connected device(s)
 echo -e "${GREEN}✓ Connected device(s):${NC}"
-/Users/jsanmartin/Library/Android/sdk/platform-tools/adb devices -l | grep -E "device|emulator" | grep -v "List of attached"
+"$ADB_PATH" devices -l | grep -E "device|emulator" | grep -v "List of attached"
 
 # ========== BUILD APK ==========
 echo -e "${BLUE}🔨 Building debug APK...${NC}"
@@ -226,7 +214,7 @@ echo -e "${GREEN}✓ APK found: $APK_PATH${NC}"
 
 # ========== INSTALL APK ==========
 echo -e "${BLUE}📱 Installing APK on device...${NC}"
-/Users/jsanmartin/Library/Android/sdk/platform-tools/adb install -r "$APK_PATH"
+"$ADB_PATH" install -r "$APK_PATH"
 if [ $? -ne 0 ]; then
     echo -e "${RED}❌ Error installing APK${NC}"
     echo -e "${YELLOW}Try uninstalling the app first:${NC}"
@@ -254,7 +242,7 @@ if [ "$FLOW_COUNT" -eq 0 ]; then
 fi
 
 echo -e "${BLUE}Found $FLOW_COUNT test(s)${NC}"
-/Users/jsanmartin/.maestro/bin/maestro test maestro/flows/
+"$MAESTRO_PATH" test maestro/flows/
 
 if [ $? -eq 0 ]; then
     echo -e ""
