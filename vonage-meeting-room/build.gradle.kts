@@ -11,6 +11,7 @@ android {
 
     defaultConfig {
         minSdk = 24
+        consumerProguardFiles("consumer-rules.pro")
         // These feature modules are always included in their enabled variant from meeting-room's
         // perspective; the app layer controls which variant is used via its own
         // missingDimensionStrategy for direct feature-module dependencies.

@@ -60,6 +60,7 @@ internal class MeetingRoomViewModel(
     )
 
     private var call: CallFacade? = null
+    private var callEnded = false
 
     init {
         container.foregroundServiceHandler.startForegroundService(roomName)
@@ -187,6 +188,8 @@ internal class MeetingRoomViewModel(
     fun onCycleLocalCameraBlur() { call?.cycleLocalCameraBlur() }
 
     fun endCall() {
+        if (callEnded) return
+        callEnded = true
         container.foregroundServiceHandler.stopForegroundService()
         container.vonageScreenSharing.stopSharingScreen()
         container.audioDevicesHandler.stop()
@@ -336,6 +339,7 @@ internal class MeetingRoomViewModel(
 
     override fun onCleared() {
         super.onCleared()
+        endCall()
         container.activityContextHolder.clearActivityContext()
     }
 

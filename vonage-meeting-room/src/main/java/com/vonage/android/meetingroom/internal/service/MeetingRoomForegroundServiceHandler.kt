@@ -51,8 +51,8 @@ internal class MeetingRoomForegroundServiceHandler(
             } else {
                 context.startService(serviceIntent)
             }
+            listenCallActions()
         }
-        listenCallActions()
     }
 
     fun stopForegroundService() {
