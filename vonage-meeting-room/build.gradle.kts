@@ -38,7 +38,7 @@ android {
     // Only dimensions with actual source-set differences in this module need explicit flavors.
     // Dimensions without custom source sets (chat, reactions, videofx, audiofx, settings) are
     // handled via missingDimensionStrategy in defaultConfig, reducing variants from 512 to 16.
-    flavorDimensions += listOf("archiving", "captions", "screensharing", "reporting")
+    flavorDimensions += listOf("archiving", "captions", "screensharing")
 
     productFlavors {
         create("archivingEnabled") { dimension = "archiving"; matchingFallbacks += listOf("enabled") }
@@ -47,8 +47,6 @@ android {
         create("captionsDisabled") { dimension = "captions"; matchingFallbacks += listOf("disabled") }
         create("screensharingEnabled") { dimension = "screensharing"; matchingFallbacks += listOf("enabled") }
         create("screensharingDisabled") { dimension = "screensharing"; matchingFallbacks += listOf("disabled") }
-        create("reportingEnabled") { dimension = "reporting"; matchingFallbacks += listOf("enabled") }
-        create("reportingDisabled") { dimension = "reporting"; matchingFallbacks += listOf("disabled") }
     }
 }
 
