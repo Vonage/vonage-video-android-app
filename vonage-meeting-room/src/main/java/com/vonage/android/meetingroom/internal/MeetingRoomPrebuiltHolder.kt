@@ -1,6 +1,7 @@
 package com.vonage.android.meetingroom.internal
 
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
+import com.vonage.logger.vonageLogger
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -21,6 +22,12 @@ internal object MeetingRoomPrebuiltHolder {
     private val held: AtomicReference<MeetingRoomPrebuilt?> = AtomicReference(null)
 
     fun set(prebuilt: MeetingRoomPrebuilt) {
+        if (held.get() != null) {
+            vonageLogger.w(
+                "MeetingRoomPrebuiltHolder",
+                "Overwriting previously held MeetingRoomPrebuilt — was the previous launch consumed?",
+            )
+        }
         held.set(prebuilt)
     }
 

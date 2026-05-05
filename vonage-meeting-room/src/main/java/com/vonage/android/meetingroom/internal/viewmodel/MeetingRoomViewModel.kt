@@ -19,6 +19,7 @@ import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler.CallAction
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.logger.vonageLogger
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -60,7 +61,7 @@ internal class MeetingRoomViewModel(
     )
 
     private var call: CallFacade? = null
-    private var callEnded = false
+    private val callEnded = AtomicBoolean(false)
 
     init {
         container.foregroundServiceHandler.startForegroundService(roomName)
@@ -188,8 +189,7 @@ internal class MeetingRoomViewModel(
     fun onCycleLocalCameraBlur() { call?.cycleLocalCameraBlur() }
 
     fun endCall() {
-        if (callEnded) return
-        callEnded = true
+        if (!callEnded.compareAndSet(false, true)) return
         container.foregroundServiceHandler.stopForegroundService()
         container.vonageScreenSharing.stopSharingScreen()
         container.audioDevicesHandler.stop()
@@ -235,7 +235,7 @@ internal class MeetingRoomViewModel(
                                 subscriberAudioFallback = holder.subscriberAudioFallbackEnabled.value,
                             ),
                         )
-                        vonageLogger.w("MeetingRoomViewModel", "Refresh publisher (${activeCall.publisher.value?.name})")
+                        vonageLogger.d("MeetingRoomViewModel", "Refresh publisher (${activeCall.publisher.value?.name})")
                         activeCall.refreshPublisher(context)
                     }
                 }

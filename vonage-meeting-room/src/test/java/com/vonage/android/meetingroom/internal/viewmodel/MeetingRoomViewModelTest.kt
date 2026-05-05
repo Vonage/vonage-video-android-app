@@ -11,6 +11,8 @@ import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherState
+import com.vonage.android.kotlin.model.SessionEvent
+import com.vonage.android.kotlin.sdk.VonageError
 import com.vonage.android.meetingroom.MainDispatcherRule
 import com.vonage.android.meetingroom.api.MeetingRoomConfiguration
 import com.vonage.android.meetingroom.api.MeetingRoomFeature
@@ -575,6 +577,59 @@ class MeetingRoomViewModelTest {
             assertEquals(CaptionsUiState.ENABLED, awaitItem().captionsUiState) // remains ENABLED on failure
             coVerify { vonageCaptions.disable() }
         }
+    }
+
+    // endregion
+
+    // region Session events
+
+    @Test
+    fun `given viewmodel when connection fails then sets error state`() = runTest {
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns Result.failure(Exception("Network error"))
+
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        val state = sut.uiState.value
+        assertEquals(false, state.isLoading)
+        assertEquals(true, state.isError)
+    }
+
+    @Test
+    fun `given viewmodel when SessionEvent Disconnected then endCall is invoked`() = runTest {
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        val mockCall: CallFacade = mockk(relaxed = true) {
+            every { publisher } returns MutableStateFlow<PublisherState?>(null)
+            every { participantsCount } returns MutableStateFlow(0)
+            every { connect(any()) } returns flowOf(SessionEvent.Disconnected)
+        }
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        verify { foregroundServiceHandler.stopForegroundService() }
+        verify { vonageScreenSharing.stopSharingScreen() }
+        verify { mockCall.endSession() }
+    }
+
+    @Test
+    fun `given viewmodel when SessionEvent Error then sets error state with message`() = runTest {
+        val vonageError = VonageError(code = 1, message = "Session error")
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        val mockCall: CallFacade = mockk(relaxed = true) {
+            every { publisher } returns MutableStateFlow<PublisherState?>(null)
+            every { participantsCount } returns MutableStateFlow(0)
+            every { connect(any()) } returns flowOf(SessionEvent.Error(vonageError))
+        }
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        val state = sut.uiState.value
+        assertEquals(true, state.isError)
+        assertEquals("Session error", state.errorMessage)
     }
 
     // endregion
