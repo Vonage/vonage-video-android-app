@@ -76,6 +76,7 @@ jobs:
           path: |
             app/build/reports/
             build/reports/
+            vonage-video-ui-compose/build/reports
 
   ui-tests:
     name: UI Tests

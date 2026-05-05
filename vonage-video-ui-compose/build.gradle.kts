@@ -38,10 +38,6 @@ roborazzi {
     outputDir.set(file("src/test/snapshots/images"))
 }
 
-tasks.withType<Test>().configureEach {
-    systemProperty("roborazzi.output.dir", file("src/test/snapshots/images").absolutePath)
-}
-
 themeGenerator {
     themeJsonFile.set(file("../config/theme.json"))
     outputPackage.set("com.vonage.android.compose.theme")
