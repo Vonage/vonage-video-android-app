@@ -10,9 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.R
+import com.vonage.android.screen.goodbye.GoodbyeScreenTestTags.GOODBYE_GO_HOME_BUTTON_TAG
+import com.vonage.android.screen.goodbye.GoodbyeScreenTestTags.GOODBYE_REJOIN_BUTTON_TAG
 import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.components.VonageOutlinedButton
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -38,6 +41,7 @@ fun RejoiningContainer(
 
         VonageButton(
             modifier = Modifier
+                .testTag(GOODBYE_REJOIN_BUTTON_TAG)
                 .fillMaxWidth(),
             text = stringResource(R.string.goodbye_rejoin_button_label),
             onClick = actions.onReEnter,
@@ -53,6 +57,7 @@ fun RejoiningContainer(
 
         VonageOutlinedButton(
             modifier = Modifier
+                .testTag(GOODBYE_GO_HOME_BUTTON_TAG)
                 .fillMaxWidth(),
             text = stringResource(R.string.goodbye_return_home_button_label),
             onClick = actions.onGoHome,

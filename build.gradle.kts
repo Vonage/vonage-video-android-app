@@ -74,8 +74,12 @@ kover {
 
 apply(from = "${rootDir}/build-tools/sonar.gradle")
 
+val koverExcludedModules = listOf("vonage-video-ui-compose", "vonage-video-sdk", "vonage-config-idea-plugin")
+
 subprojects {
-    apply(from = "${rootDir}/build-tools/kover.gradle")
+    if (name !in koverExcludedModules) {
+        apply(from = "${rootDir}/build-tools/kover.gradle")
+    }
 }
 
 apply(from = "build-tools/detekt.gradle")

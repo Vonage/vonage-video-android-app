@@ -45,6 +45,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Setup Java
         uses: ./.github/actions/setup-java
@@ -74,6 +76,7 @@ jobs:
           path: |
             app/build/reports/
             build/reports/
+            vonage-video-ui-compose/build/reports
 
   ui-tests:
     name: UI Tests
