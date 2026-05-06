@@ -90,7 +90,7 @@ jobs:
             adb install -r app/build/outputs/apk/debug/app-debug.apk
             maestro --version
             mkdir -p test-reports
-            maestro test maestro/flows --format junit --output test-reports/maestro-junit.xml
+            maestro test .maestro/flows --format junit --output test-reports/maestro-junit.xml
 
       - name: List Maestro test artifacts
         if: always()
