@@ -37,6 +37,7 @@ object SdkModule {
         @ApplicationContext context: Context,
     ): VeraAudioDevice = VeraAudioDevice(context)
 
+    @Singleton
     @Provides
     fun provideVonageSdkFactory(
         veraAudioDevice: VeraAudioDevice,
