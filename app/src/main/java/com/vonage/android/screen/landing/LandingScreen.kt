@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
@@ -17,6 +18,7 @@ import com.vonage.android.R
 import com.vonage.android.compose.layout.TwoPaneScaffold
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.TopBanner
+import com.vonage.android.screen.landing.LandingScreenTestTags.LANDING_SCREEN_TAG
 import com.vonage.android.screen.landing.components.LandingScreenContent
 import com.vonage.android.screen.landing.components.LandingScreenHeader
 
@@ -39,7 +41,9 @@ fun LandingScreen(
             }
 
             TwoPaneScaffold(
-                modifier = modifier.fillMaxSize(),
+                modifier = modifier
+                    .fillMaxSize()
+                    .testTag(LANDING_SCREEN_TAG),
                 topBar = { TopBanner() },
                 firstPane = {
                     LandingScreenHeader(

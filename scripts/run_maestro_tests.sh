@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script para ejecutar tests de Maestro en local
 
-# Uso: ./run_maestro_tests.sh [--auto-emulator | --avd <nombre>]
+# Uso: ./scripts/run_maestro_tests.sh [--auto-emulator | --avd <nombre>]
 # Ejemplos:
 #   ./run_maestro_tests.sh                              # Interactivo
 #   ./run_maestro_tests.sh --auto-emulator              # Usa el primer emulador disponible
@@ -12,14 +12,20 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 cd "$PROJECT_DIR" || exit 1
 
-# ========== SETUP JAVA AUTOMÁTICO ==========
-# Intenta usar Java 17, sino usa la versión disponible
-JAVA_17=$(/usr/libexec/java_home -v17 2>/dev/null || echo "")
-if [ -n "$JAVA_17" ]; then
-    export JAVA_HOME="$JAVA_17"
-else
-    export JAVA_HOME=$(/usr/libexec/java_home)
-fi
+# Output colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+# ========== INSTALL MAESTRO & DEPENDENCIES ==========
+echo -e "${BLUE}🚀 Setting up Maestro and dependencies...${NC}"
+source "$SCRIPT_DIR/install_maestro.sh"
+install_all || exit 1
+
+ADB_PATH="$ANDROID_HOME/platform-tools/adb"
+MAESTRO_PATH="$HOME/.maestro/bin/maestro"
 
 AUTO_LAUNCH_EMULATOR=false
 SPECIFIC_AVD=""
@@ -43,68 +49,13 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-echo "🚀 Starting Maestro tests..."
-
-# Output colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# ========== SHOW JAVA CONFIG ==========
-echo -e "${BLUE}☕ Java configured automatically${NC}"
-echo -e "${GREEN}✓ JAVA_HOME: $JAVA_HOME${NC}"
-
-# ========== SETUP ANDROID SDK ==========
-echo -e "${BLUE}🤖 Configuring Android SDK...${NC}"
-if [ -z "$ANDROID_HOME" ]; then
-    if [ -d "$HOME/Library/Android/sdk" ]; then
-        export ANDROID_HOME="$HOME/Library/Android/sdk"
-        echo -e "${GREEN}✓ ANDROID_HOME configured: $ANDROID_HOME${NC}"
-    else
-        echo -e "${RED}❌ Error: Android SDK not found at $HOME/Library/Android/sdk${NC}"
-        echo -e "${YELLOW}Please install Android SDK from https://developer.android.com/studio${NC}"
-        exit 1
-    fi
-fi
-
-# ========== SETUP PATH ==========
-export PATH="$ANDROID_HOME/platform-tools:$HOME/.maestro/bin:$PATH"
-
-# ========== VERIFY ADB ==========
-echo -e "${BLUE}📱 Verifying adb...${NC}"
-ADB_PATH="$ANDROID_HOME/platform-tools/adb"
-if [ ! -f "$ADB_PATH" ]; then
-    echo -e "${RED}❌ Error: adb not found at $ADB_PATH${NC}"
-    exit 1
-fi
-echo -e "${GREEN}✓ adb found: $ADB_PATH${NC}"
-
-# ========== VERIFY MAESTRO ==========
-echo -e "${BLUE}🧪 Verifying Maestro CLI...${NC}"
-MAESTRO_PATH="$HOME/.maestro/bin/maestro"
-if [ ! -f "$MAESTRO_PATH" ]; then
-    echo -e "${YELLOW}📦 Maestro is not installed. Installing...${NC}"
-    curl -fsSL "https://get.maestro.mobile.dev" | bash
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}✓ Maestro installed successfully${NC}"
-    else
-        echo -e "${RED}❌ Error installing Maestro${NC}"
-        exit 1
-    fi
-else
-    echo -e "${GREEN}✓ Maestro found: $MAESTRO_PATH${NC}"
-fi
+echo -e "${BLUE}🚀 Starting Maestro tests...${NC}"
 
 # ========== VERIFY DEVICE/EMULATOR ==========
 echo -e "${BLUE}📲 Checking for connected device/emulator...${NC}"
 
-# Get device list properly
 DEVICE_LIST=$("$ADB_PATH" devices -l 2>&1)
-DEVICE_COUNT=$(echo "$DEVICE_LIST" | grep -c "device" | grep -v "List of attached devices")
 
-# Check if there are devices (not offline)
 HAS_DEVICES=$(echo "$DEVICE_LIST" | grep -E "device|emulator" | grep -v "List of attached" | grep "device$" | wc -l)
 
 if [ "$HAS_DEVICES" -eq 0 ]; then
@@ -218,7 +169,7 @@ echo -e "${BLUE}📱 Installing APK on device...${NC}"
 if [ $? -ne 0 ]; then
     echo -e "${RED}❌ Error installing APK${NC}"
     echo -e "${YELLOW}Try uninstalling the app first:${NC}"
-    echo -e "  adb uninstall com.vonage.video.app"
+    echo -e "  adb uninstall com.vonage.android.debug"
     exit 1
 fi
 echo -e "${GREEN}✓ APK installed successfully${NC}"
@@ -227,14 +178,14 @@ echo -e "${GREEN}✓ APK installed successfully${NC}"
 echo -e "${BLUE}🧪 Running Maestro tests...${NC}"
 
 # Check if flows directory exists
-if [ ! -d "maestro/flows" ]; then
-    echo -e "${RED}❌ Error: maestro/flows directory not found${NC}"
+if [ ! -d ".maestro/flows" ]; then
+    echo -e "${RED}❌ Error: .maestro/flows directory not found${NC}"
     echo -e "${YELLOW}Create the directory and add test flow YAML files${NC}"
     exit 1
 fi
 
 # Count flows
-FLOW_COUNT=$(find maestro/flows -name "*.yaml" | wc -l)
+FLOW_COUNT=$(find .maestro/flows -name "*.yaml" | wc -l)
 if [ "$FLOW_COUNT" -eq 0 ]; then
     echo -e "${YELLOW}⚠ Warning: No test flows found in maestro/flows/${NC}"
     echo -e "${YELLOW}Add .yaml files with your tests${NC}"
@@ -242,7 +193,7 @@ if [ "$FLOW_COUNT" -eq 0 ]; then
 fi
 
 echo -e "${BLUE}Found $FLOW_COUNT test(s)${NC}"
-"$MAESTRO_PATH" test maestro/flows/
+"$MAESTRO_PATH" test .maestro/flows/
 
 if [ $? -eq 0 ]; then
     echo -e ""

@@ -196,6 +196,185 @@ Run tests from the command line:
 
 Or run tests in Android Studio by right-clicking on test files or packages and selecting "Run Tests".
 
+### E2E Testing with Maestro
+
+This project uses [Maestro](https://maestro.mobile.dev) for end-to-end UI testing. Tests are YAML-based and interact with the app through Compose test tags exposed as resource IDs.
+
+#### Installation
+
+Use the provided install script (installs Maestro CLI + verifies Java 17 and Android SDK):
+
+```bash
+./scripts/install_maestro.sh
+```
+
+#### Folder Structure
+
+```
+.maestro/
+├── config.yaml          # Global configuration (appId, platform)
+└── flows/               # Test flows (YAML files)
+    └── launch-app.yaml  # P0: Launch app and validate landing screen
+```
+
+#### Running Tests
+
+```bash
+# Run all tests (builds APK, launches emulator, installs, runs flows)
+./scripts/run_maestro_tests.sh
+
+# Auto-launch first available emulator
+./scripts/run_maestro_tests.sh --auto-emulator
+
+# Use a specific AVD
+./scripts/run_maestro_tests.sh --avd Pixel_4_API_34
+
+# Run a single flow
+maestro test .maestro/flows/launch-app.yaml
+```
+
+#### Writing Tests with Test Tags
+
+Tests target elements using Compose `testTag` modifiers exposed as resource IDs via `testTagsAsResourceId = true` in `MainActivity`. Test tags are defined in `*TestTags` objects (e.g., `LandingScreenTestTags`).
+
+##### Example 1: Validate the landing screen
+
+```yaml
+appId: com.vonage.android.debug
+---
+# E2E Test: Launch App
+# Priority: P0
+
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      id: "landing_screen"
+    timeout: 15000
+
+- assertVisible:
+    id: "landing_screen"
+
+- assertVisible:
+    id: "landing_screen_create_room_button"
+
+- takeScreenshot: landing-screen
+```
+
+##### Example 2: Complete meeting flow
+
+```yaml
+appId: com.vonage.android.debug
+---
+# E2E Test: Create Room → Join → Leave → Goodbye
+# Priority: P0
+
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      id: "landing_screen"
+    timeout: 15000
+
+- tapOn:
+    id: "landing_screen_create_room_button"
+
+- extendedWaitUntil:
+    visible:
+      id: "waiting_room_screen"
+    timeout: 10000
+
+- tapOn:
+    id: "waiting_room_name_input"
+- inputText: "Test User"
+- hideKeyboard
+
+- tapOn:
+    id: "waiting_room_join_button"
+
+- extendedWaitUntil:
+    visible:
+      id: "meeting_room_screen"
+    timeout: 15000
+
+- tapOn:
+    id: "meeting_room_leave_button"
+
+- extendedWaitUntil:
+    visible:
+      id: "goodbye_screen"
+    timeout: 10000
+
+- takeScreenshot: goodbye-screen
+```
+
+#### Adding Test Tags in Jetpack Compose
+
+For Maestro to find elements, `testTagsAsResourceId` must be enabled at the root (already configured in `MainActivity`) and `testTag` modifiers must be applied to composables.
+
+##### Enabling testTagsAsResourceId (already done in MainActivity)
+
+```kotlin
+Box(
+    modifier = Modifier.semantics {
+        testTagsAsResourceId = true
+    }
+) {
+    // App content
+}
+```
+
+##### Defining test tags in a TestTags object
+
+```kotlin
+object LandingScreenTestTags {
+    const val LANDING_SCREEN_TAG = "landing_screen"
+    const val CREATE_ROOM_BUTTON_TAG = "landing_screen_create_room_button"
+    const val JOIN_BUTTON_TAG = "landing_screen_join_button"
+    const val ROOM_INPUT_TAG = "landing_screen_room_input"
+}
+```
+
+##### Applying test tags to composables
+
+```kotlin
+// Screen container
+TwoPaneScaffold(
+    modifier = modifier
+        .fillMaxSize()
+        .testTag(LANDING_SCREEN_TAG),
+    // ...
+)
+
+// Buttons
+VonageButton(
+    text = stringResource(R.string.landing_create_room),
+    modifier = Modifier
+        .fillMaxWidth()
+        .testTag(CREATE_ROOM_BUTTON_TAG),
+    onClick = actions.onCreateRoomClick,
+)
+
+// Text fields
+VonageTextField(
+    modifier = Modifier
+        .fillMaxWidth()
+        .testTag(ROOM_INPUT_TAG),
+    value = roomName,
+    onValueChange = actions.onRoomNameChange,
+)
+```
+
+> **Important:** Always apply `.testTag()` directly to the target composable, not to wrapper containers. The `testTagsAsResourceId` semantic property in the root `Box` ensures all test tags are exposed as `resource-id` values that Maestro can find.
+
+#### Useful Links
+
+- [Maestro Documentation](https://maestro.mobile.dev)
+- [Maestro CLI Commands](https://maestro.mobile.dev/api-reference/commands)
+- [Maestro Studio (interactive recorder)](https://maestro.mobile.dev/getting-started/maestro-studio)
+
 ## Code style
 
 We use Detekt for static analysis and Spotless for code formatting. Check and fix code style by running:
