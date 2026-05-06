@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.vonage.android.R
 import com.vonage.android.archiving.Archive
@@ -22,6 +23,9 @@ import com.vonage.android.archiving.ui.ArchivesContainer
 import com.vonage.android.compose.layout.TwoPaneScaffold
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.screen.components.TopBanner
+import com.vonage.android.screen.goodbye.GoodbyeScreenTestTags.GOODBYE_ARCHIVES_CONTAINER_TAG
+import com.vonage.android.screen.goodbye.GoodbyeScreenTestTags.GOODBYE_HEADER_TAG
+import com.vonage.android.screen.goodbye.GoodbyeScreenTestTags.GOODBYE_REJOIN_CONTAINER_TAG
 import com.vonage.android.screen.goodbye.components.GoodbyeScreenHeader
 import com.vonage.android.screen.goodbye.components.RejoiningContainer
 import kotlinx.collections.immutable.persistentListOf
@@ -41,6 +45,7 @@ fun GoodbyeScreen(
         firstPane = {
             GoodbyeScreenHeader(
                 modifier = Modifier
+                    .testTag(GOODBYE_HEADER_TAG)
                     .padding(VonageVideoTheme.dimens.paddingLarge)
                     .widthIn(0.dp, MAX_PANE_WIDTH.dp),
             )
@@ -53,6 +58,7 @@ fun GoodbyeScreen(
             ) {
                 RejoiningContainer(
                     modifier = Modifier
+                        .testTag(GOODBYE_REJOIN_CONTAINER_TAG)
                         .background(VonageVideoTheme.colors.surface, VonageVideoTheme.shapes.small)
                         .padding(VonageVideoTheme.dimens.paddingLarge),
                     actions = actions,
@@ -61,6 +67,7 @@ fun GoodbyeScreen(
                     is GoodbyeScreenUiState.Content -> {
                         ArchivesContainer(
                             modifier = Modifier
+                                .testTag(GOODBYE_ARCHIVES_CONTAINER_TAG)
                                 .background(VonageVideoTheme.colors.surface, VonageVideoTheme.shapes.small)
                                 .padding(VonageVideoTheme.dimens.paddingLarge),
                             onDownloadArchive = actions.onDownloadArchive,

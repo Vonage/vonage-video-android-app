@@ -61,6 +61,25 @@ class VonageVideoClient(
         publisherFactory.destroyPublisher()
     }
 
+    /**
+     * Creates a new session and returns a [CallFacade] ready for connection.
+     *
+     * Instantiates the underlying [VonageSession] via the SDK factory and wraps it in a [Call]
+     * object together with the publisher factory and any registered signal plugins.
+     *
+     * **Note:** This method does NOT connect to the session. Call [CallFacade.connect] on the
+     * returned facade to actually establish the WebRTC connection and start publishing.
+     *
+     * Typical call chain (orchestrated by `MeetingRoomScreenViewModel`):
+     * ```
+     * SessionRepository.getSession() → VonageVideoClient.initializeSession() → CallFacade.connect()
+     * ```
+     *
+     * @param apiKey   Vonage project API key obtained from the backend session endpoint.
+     * @param sessionId Vonage session ID obtained from the backend session endpoint.
+     * @param token    Short-lived token authorising this participant to join the session.
+     * @return A [CallFacade] combining session, publisher, chat, emoji, and screen-share facades.
+     */
     fun initializeSession(apiKey: String, sessionId: String, token: String): CallFacade {
         vonageLogger.d(TAG, "apiKey: $apiKey")
         vonageLogger.d(TAG, "sessionId: $sessionId")
