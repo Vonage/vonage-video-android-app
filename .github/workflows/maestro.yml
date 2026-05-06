@@ -3,6 +3,7 @@ name: Maestro UI Tests
 permissions:
   contents: read
   actions: read
+  pull-requests: write
 
 on:
   push:
@@ -158,7 +159,7 @@ jobs:
             comment += `  - maestro-test-results-${{ github.run_number }}\n`;
             comment += `  - maestro-report-${{ github.run_number }}\n\n`;
             comment += '📸 View the complete test results and screenshots in the artifacts section above.';
-            github.rest.issues.createComment({
+            await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
