@@ -13,16 +13,37 @@ NC='\033[0m'
 # ========== SETUP JAVA ==========
 setup_java() {
     echo -e "${BLUE}☕ Configuring Java...${NC}"
-    JAVA_17=$(/usr/libexec/java_home -v17 2>/dev/null || echo "")
-    if [ -n "$JAVA_17" ]; then
-        export JAVA_HOME="$JAVA_17"
+
+    # Honor existing JAVA_HOME if already set
+    if [ -n "$JAVA_HOME" ]; then
+        echo -e "${GREEN}✓ JAVA_HOME already set: $JAVA_HOME${NC}"
+        return 0
+    fi
+
+    if [ "$(uname)" = "Darwin" ]; then
+        # macOS: use java_home utility
+        JAVA_17=$(/usr/libexec/java_home -v17 2>/dev/null || echo "")
+        if [ -n "$JAVA_17" ]; then
+            export JAVA_HOME="$JAVA_17"
+        else
+            export JAVA_HOME=$(/usr/libexec/java_home 2>/dev/null || echo "")
+        fi
     else
-        export JAVA_HOME=$(/usr/libexec/java_home 2>/dev/null || echo "")
+        # Linux / CI: resolve from java binary
+        JAVA_BIN=$(which java 2>/dev/null || echo "")
+        if [ -n "$JAVA_BIN" ]; then
+            JAVA_REAL=$(readlink -f "$JAVA_BIN" 2>/dev/null || readlink "$JAVA_BIN" 2>/dev/null || echo "$JAVA_BIN")
+            export JAVA_HOME=$(dirname "$(dirname "$JAVA_REAL")")
+        fi
     fi
 
     if [ -z "$JAVA_HOME" ]; then
         echo -e "${RED}❌ Error: Java not found. Maestro requires Java 17.${NC}"
-        echo -e "${YELLOW}Install with: brew install openjdk@17${NC}"
+        if [ "$(uname)" = "Darwin" ]; then
+            echo -e "${YELLOW}Install with: brew install openjdk@17${NC}"
+        else
+            echo -e "${YELLOW}Install with: sudo apt install openjdk-17-jdk${NC}"
+        fi
         return 1
     fi
     echo -e "${GREEN}✓ JAVA_HOME: $JAVA_HOME${NC}"
@@ -32,11 +53,19 @@ setup_java() {
 setup_android_sdk() {
     echo -e "${BLUE}🤖 Configuring Android SDK...${NC}"
     if [ -z "$ANDROID_HOME" ]; then
-        if [ -d "$HOME/Library/Android/sdk" ]; then
+        # Honor ANDROID_SDK_ROOT if set
+        if [ -n "$ANDROID_SDK_ROOT" ]; then
+            export ANDROID_HOME="$ANDROID_SDK_ROOT"
+        # Try common SDK locations
+        elif [ -d "$HOME/Library/Android/sdk" ]; then
             export ANDROID_HOME="$HOME/Library/Android/sdk"
+        elif [ -d "$HOME/Android/Sdk" ]; then
+            export ANDROID_HOME="$HOME/Android/Sdk"
+        elif [ -d "/usr/local/lib/android/sdk" ]; then
+            export ANDROID_HOME="/usr/local/lib/android/sdk"
         else
-            echo -e "${RED}❌ Error: Android SDK not found at $HOME/Library/Android/sdk${NC}"
-            echo -e "${YELLOW}Please install Android SDK from https://developer.android.com/studio${NC}"
+            echo -e "${RED}❌ Error: Android SDK not found${NC}"
+            echo -e "${YELLOW}Set ANDROID_HOME or ANDROID_SDK_ROOT, or install Android SDK from https://developer.android.com/studio${NC}"
             return 1
         fi
     fi

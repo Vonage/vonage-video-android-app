@@ -3,9 +3,9 @@
 
 # Uso: ./scripts/run_maestro_tests.sh [--auto-emulator | --avd <nombre>]
 # Ejemplos:
-#   ./run_maestro_tests.sh                              # Interactivo
-#   ./run_maestro_tests.sh --auto-emulator              # Usa el primer emulador disponible
-#   ./run_maestro_tests.sh --avd Medium_Phone_API_36.1  # Usa ese emulador específico
+#   ./run_maestro_tests.sh                              # Auto-launches first available emulator
+#   ./run_maestro_tests.sh --auto-emulator              # Same as above (explicit)
+#   ./run_maestro_tests.sh --avd Medium_Phone_API_36.1  # Uses the specified emulator
 
 # Cambiar al directorio del proyecto
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -54,9 +54,8 @@ echo -e "${BLUE}🚀 Starting Maestro tests...${NC}"
 # ========== VERIFY DEVICE/EMULATOR ==========
 echo -e "${BLUE}📲 Checking for connected device/emulator...${NC}"
 
-DEVICE_LIST=$("$ADB_PATH" devices -l 2>&1)
-
-HAS_DEVICES=$(echo "$DEVICE_LIST" | grep -E "device|emulator" | grep -v "List of attached" | grep "device$" | wc -l)
+# Use 'adb devices' (without -l) so the state column is the last field
+HAS_DEVICES=$("$ADB_PATH" devices 2>/dev/null | awk 'NR>1 && $2=="device" {count++} END {print count+0}')
 
 if [ "$HAS_DEVICES" -eq 0 ]; then
     echo -e "${RED}❌ No devices or emulators connected${NC}"
@@ -104,7 +103,7 @@ if [ "$HAS_DEVICES" -eq 0 ]; then
                 DEVICE_DETECTED=false
                 
                 while [ $attempt -lt $max_attempts ]; do
-                    DEVICE_COUNT=$("$ADB_PATH" devices 2>/dev/null | grep "emulator" | grep "device" | wc -l)
+                    DEVICE_COUNT=$("$ADB_PATH" devices 2>/dev/null | awk 'NR>1 && $2=="device" {count++} END {print count+0}')
                     if [ "$DEVICE_COUNT" -gt 0 ]; then
                         DEVICE_DETECTED=true
                         echo -e "${GREEN}✓ Emulator detected by adb${NC}"
@@ -141,9 +140,18 @@ echo -e "${BLUE}⏳ Waiting for device to be fully ready...${NC}"
 "$ADB_PATH" wait-for-device
 sleep 3
 
+# ========== SELECT TARGET DEVICE ==========
+DEVICE_SERIAL=$("$ADB_PATH" devices 2>/dev/null | awk 'NR>1 && $2=="device" {print $1; exit}')
+if [ -z "$DEVICE_SERIAL" ]; then
+    echo -e "${RED}❌ No device available after wait${NC}"
+    exit 1
+fi
+echo -e "${GREEN}✓ Using device: $DEVICE_SERIAL${NC}"
+export ANDROID_SERIAL="$DEVICE_SERIAL"
+
 # Show connected device(s)
 echo -e "${GREEN}✓ Connected device(s):${NC}"
-"$ADB_PATH" devices -l | grep -E "device|emulator" | grep -v "List of attached"
+"$ADB_PATH" devices -l | awk 'NR>1 && $2=="device"'
 
 # ========== BUILD APK ==========
 echo -e "${BLUE}🔨 Building debug APK...${NC}"
@@ -165,11 +173,10 @@ echo -e "${GREEN}✓ APK found: $APK_PATH${NC}"
 
 # ========== INSTALL APK ==========
 echo -e "${BLUE}📱 Installing APK on device...${NC}"
-"$ADB_PATH" install -r "$APK_PATH"
+"$ADB_PATH" -s "$DEVICE_SERIAL" install -r "$APK_PATH"
 if [ $? -ne 0 ]; then
     echo -e "${RED}❌ Error installing APK${NC}"
-    echo -e "${YELLOW}Try uninstalling the app first:${NC}"
-    echo -e "  adb uninstall com.vonage.android.debug"
+    echo -e "${YELLOW}Try: adb -s $DEVICE_SERIAL uninstall com.vonage.android.debug${NC}"
     exit 1
 fi
 echo -e "${GREEN}✓ APK installed successfully${NC}"
