@@ -125,6 +125,21 @@ data class PublisherState(
         _blurLevel.value = newLevel
     }
 
+    override fun applyBlurLevel(level: BlurLevel) {
+        vonagePublisher.applyBlur(level.toVonageBlurLevel())
+        _blurLevel.value = level
+    }
+
+    override fun applyBackgroundImage(imageName: String) {
+        vonagePublisher.applyBackgroundImage(imageName)
+        _blurLevel.value = BlurLevel.NONE
+    }
+
+    override fun clearVideoEffect() {
+        vonagePublisher.applyBlur(VonageBlurLevel.NONE)
+        _blurLevel.value = BlurLevel.NONE
+    }
+
     override fun toggleNoiseSuppression() {
         val currentValue = _noiseSuppression.value
         vonagePublisher.toggleNoiseSuppression(currentValue.toVonageNoiseSuppression())

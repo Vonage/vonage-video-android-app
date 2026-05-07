@@ -157,9 +157,8 @@ internal fun VideoControlPanel(
         BlurIndicator(
             modifier = Modifier
                 .testTag(CAMERA_BLUR_BUTTON_TAG),
-            isCameraEnabled = isCameraEnabled,
             blurLevel = blurLevel,
-            onCameraBlur = actions.onCameraBlur,
+            onCameraBlur = actions.onOpenVideoEffects,
         )
     }
 }

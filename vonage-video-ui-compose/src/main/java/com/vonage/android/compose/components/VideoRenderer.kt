@@ -30,6 +30,9 @@ fun ParticipantVideoRenderer(
                 container.addView(view)
             }
         },
+        onRelease = { container ->
+            container.removeAllViews()
+        },
         modifier = modifier,
     )
 }

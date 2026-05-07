@@ -2,6 +2,7 @@ package com.vonage.android.screen.room
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import com.vonage.android.BuildConfig
 import com.vonage.android.config.AppConfig
 import com.vonage.android.meetingroom.api.MeetingRoomBuilder
 import com.vonage.android.meetingroom.api.MeetingRoomConfiguration
@@ -23,7 +24,7 @@ fun MeetingRoomScreenRoute(
 ) {
     val prebuilt = remember(roomName) {
         MeetingRoomBuilder(
-            baseUrl = com.vonage.android.BuildConfig.BASE_API_URL,
+            baseUrl = BuildConfig.BASE_API_URL,
             roomName = roomName,
         )
             .configuration(
@@ -41,16 +42,10 @@ fun MeetingRoomScreenRoute(
                     is MeetingRoomSDKAction.NavigateToSettings -> navigateToSettings()
                 }
             }
-            .isDebug(com.vonage.android.BuildConfig.DEBUG)
+            .isDebug(BuildConfig.DEBUG)
             .reportingContent { onDismiss -> ReportIssueScreen(onClose = onDismiss) }
             .build()
     }
 
     prebuilt.content()
-}
-
-object MeetingRoomScreenTestTags {
-    const val MEETING_ROOM_TOP_BAR = "meeting_room_top_bar"
-    const val MEETING_ROOM_CONTENT = "meeting_room_content"
-    const val MEETING_ROOM_BOTTOM_BAR = "meeting_room_bottom_bar"
 }

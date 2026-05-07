@@ -2,7 +2,6 @@ package com.vonage.android.fx.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -21,29 +20,24 @@ import com.vonage.android.kotlin.model.BlurLevel
 
 @Composable
 fun BlurIndicator(
-    isCameraEnabled: Boolean,
     blurLevel: BlurLevel,
     onCameraBlur: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 56.dp,
     iconSize: Dp = 24.dp,
 ) {
-    if (isCameraEnabled) {
-        CircularControlButton(
-            modifier = modifier
-                .border(BorderStroke(1.dp, Color.White), CircleShape),
-            onClick = onCameraBlur,
-            icon = rememberBlurIcon(blurLevel),
-            size = size,
-            iconSize = iconSize,
-        )
-    } else {
-        Spacer(modifier = modifier.size(size))
-    }
+    CircularControlButton(
+        modifier = modifier
+            .border(BorderStroke(1.dp, Color.White), CircleShape),
+        onClick = onCameraBlur,
+        icon = rememberEffectIcon(blurLevel),
+        size = size,
+        iconSize = iconSize,
+    )
 }
 
 @Composable
-private fun rememberBlurIcon(level: BlurLevel): ImageVector = remember(level) {
+private fun rememberEffectIcon(level: BlurLevel): ImageVector = remember(level) {
     when (level) {
         BlurLevel.HIGH -> VividIcons.Solid.Blur
         BlurLevel.LOW -> VividIcons.Line.Blur

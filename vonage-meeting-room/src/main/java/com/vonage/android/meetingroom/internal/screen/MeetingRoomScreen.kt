@@ -19,11 +19,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -33,6 +35,10 @@ import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.components.GenericLoading
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
+import com.vonage.android.fx.VideoEffect
+import com.vonage.android.fx.data.BackgroundEffectsRepository
+import com.vonage.android.fx.ui.VideoEffectCategory
+import com.vonage.android.fx.ui.VideoEffectsScreen
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.meetingroom.R
@@ -73,7 +79,7 @@ private fun enabledBottomBarActions(
     }
 }.toImmutableList()
 
-@Suppress("LongMethod")
+@Suppress("LongMethod", "CyclomaticComplexMethod")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 internal fun MeetingRoomScreen(
@@ -84,6 +90,36 @@ internal fun MeetingRoomScreen(
 ) {
     var showAudioOutputs by remember { mutableStateOf(false) }
     val audioOutputsSheetState = rememberModalBottomSheetState()
+
+    var showVideoEffects by remember { mutableStateOf(false) }
+    var selectedEffectCategory by remember { mutableStateOf<VideoEffectCategory>(VideoEffectCategory.None) }
+    var selectedBackgroundId by remember { mutableStateOf<String?>(null) }
+    var selectedBackgroundPath by remember { mutableStateOf<String?>(null) }
+    var previousEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
+    val context = LocalContext.current
+    val backgroundsRepository = remember { BackgroundEffectsRepository(context) }
+    val backgrounds = remember { backgroundsRepository.getBackgrounds() }
+
+    val effectsActions = remember(actions) {
+        actions.copy(
+            onOpenVideoEffects = {
+                previousEffect = when (selectedEffectCategory) {
+                    VideoEffectCategory.None -> VideoEffect.None
+                    VideoEffectCategory.BlurLow -> VideoEffect.BlurLow
+                    VideoEffectCategory.BlurHigh -> VideoEffect.BlurHigh
+                    VideoEffectCategory.VirtualBackground -> {
+                        selectedBackgroundPath?.let { path ->
+                            VideoEffect.BackgroundImage(
+                                id = selectedBackgroundId.orEmpty(),
+                                imagePath = path,
+                            )
+                        } ?: VideoEffect.None
+                    }
+                }
+                showVideoEffects = true
+            },
+        )
+    }
 
     val navigator = rememberSupportingPaneScaffoldNavigator()
     val scope = rememberCoroutineScope()
@@ -156,13 +192,15 @@ internal fun MeetingRoomScreen(
                             EmojiReactionOverlay(call = call)
                             CaptionsOverlay(captionLines = captionLines)
                             SpeakingWhileMutedOverlay(publisher = publisher)
-                            MeetingRoomContent(
-                                modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
-                                call = call,
-                                actions = actions,
-                                participants = participants,
-                                layoutType = uiState.layoutType,
-                            )
+                            key(showVideoEffects) {
+                                MeetingRoomContent(
+                                    modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
+                                    call = call,
+                                    actions = effectsActions,
+                                    participants = participants,
+                                    layoutType = uiState.layoutType,
+                                )
+                            }
                         }
                     },
                     supportingPane = { },
@@ -199,6 +237,53 @@ internal fun MeetingRoomScreen(
                         )
                     }
                 }
+            }
+
+            if (showVideoEffects && MeetingRoomFeature.BACKGROUND_EFFECTS in uiState.enabledFeatures) {
+                VideoEffectsScreen(
+                    publisher = publisher,
+                    isCameraEnabled = publisher?.isCameraEnabled?.value ?: false,
+                    backgrounds = backgrounds,
+                    selectedCategory = selectedEffectCategory,
+                    selectedBackgroundId = selectedBackgroundId,
+                    onDismiss = {
+                        actions.onApplyVideoEffect(previousEffect)
+                        selectedEffectCategory = when (previousEffect) {
+                            is VideoEffect.None -> VideoEffectCategory.None
+                            is VideoEffect.BlurLow -> VideoEffectCategory.BlurLow
+                            is VideoEffect.BlurHigh -> VideoEffectCategory.BlurHigh
+                            is VideoEffect.BackgroundImage -> VideoEffectCategory.VirtualBackground
+                        }
+                        selectedBackgroundId = (previousEffect as? VideoEffect.BackgroundImage)?.id
+                        selectedBackgroundPath = (previousEffect as? VideoEffect.BackgroundImage)?.imagePath
+                        showVideoEffects = false
+                    },
+                    onApply = { showVideoEffects = false },
+                    onCategorySelected = { category ->
+                        selectedEffectCategory = category
+                        val effect = when (category) {
+                            VideoEffectCategory.None -> VideoEffect.None
+                            VideoEffectCategory.BlurLow -> VideoEffect.BlurLow
+                            VideoEffectCategory.BlurHigh -> VideoEffect.BlurHigh
+                            VideoEffectCategory.VirtualBackground -> {
+                                val path = selectedBackgroundPath ?: return@VideoEffectsScreen
+                                VideoEffect.BackgroundImage(
+                                    id = selectedBackgroundId.orEmpty(),
+                                    imagePath = path,
+                                )
+                            }
+                        }
+                        actions.onApplyVideoEffect(effect)
+                    },
+                    onBackgroundSelected = { item ->
+                        selectedBackgroundId = item.id
+                        selectedBackgroundPath = item.imagePath
+                        val path = item.imagePath ?: return@VideoEffectsScreen
+                        actions.onApplyVideoEffect(
+                            VideoEffect.BackgroundImage(id = item.id, imagePath = path),
+                        )
+                    },
+                )
             }
         }
 

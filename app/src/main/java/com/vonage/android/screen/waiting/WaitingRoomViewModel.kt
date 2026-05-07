@@ -5,6 +5,7 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.config.GetConfig
+import com.vonage.android.fx.VideoEffect
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
@@ -94,6 +95,16 @@ class WaitingRoomViewModel @AssistedInject constructor(
 
     fun onCycleCameraBlur() {
         currentPublisher()?.cycleCameraBlur()
+    }
+
+    fun applyVideoEffect(effect: VideoEffect) {
+        val publisher = currentPublisher() ?: return
+        when (effect) {
+            is VideoEffect.None -> publisher.clearVideoEffect()
+            is VideoEffect.BlurLow -> publisher.applyBlurLevel(BlurLevel.LOW)
+            is VideoEffect.BlurHigh -> publisher.applyBlurLevel(BlurLevel.HIGH)
+            is VideoEffect.BackgroundImage -> publisher.applyBackgroundImage(effect.imagePath)
+        }
     }
 
     fun joinRoom(userName: String) {

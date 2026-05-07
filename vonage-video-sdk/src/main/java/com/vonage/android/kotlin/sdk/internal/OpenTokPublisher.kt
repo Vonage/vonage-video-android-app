@@ -100,6 +100,12 @@ internal class OpenTokPublisher(
         raw.setVideoTransformers(transformers)
     }
 
+    override fun applyBackgroundImage(imageName: String) {
+        val params = Json.encodeToString(BackgroundImageParams(imageName))
+        val transformers = arrayListOf(raw.VideoTransformer(BACKGROUND_REPLACEMENT_KEY, params))
+        raw.setVideoTransformers(transformers)
+    }
+
     // endregion
 
     // region Bitrate / Degradation
@@ -235,6 +241,7 @@ internal class OpenTokPublisher(
 
     companion object {
         private const val BLUR_KEY = "BackgroundBlur"
+        private const val BACKGROUND_REPLACEMENT_KEY = "BackgroundReplacement"
     }
 }
 
@@ -275,5 +282,8 @@ private enum class SdkBlurName { Low, High, None }
 
 @Serializable
 private data class BlurRadius(val radius: SdkBlurName)
+
+@Serializable
+private data class BackgroundImageParams(@kotlinx.serialization.SerialName("image_file_path") val imageFilePath: String)
 
 // endregion

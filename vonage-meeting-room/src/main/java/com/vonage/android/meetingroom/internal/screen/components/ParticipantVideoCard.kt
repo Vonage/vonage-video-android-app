@@ -54,7 +54,6 @@ internal fun ParticipantVideoCard(
     isPinned: Boolean = false,
 ) {
     val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
-    val isCameraEnabled by participant.isCameraEnabled.collectAsStateWithLifecycle()
     val isSpeaking by participant.isTalking.collectAsStateWithLifecycle()
     var showBottomSheet by remember { mutableStateOf(false) }
     val hapticFeedback = LocalHapticFeedback.current
@@ -133,9 +132,8 @@ internal fun ParticipantVideoCard(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(VonageVideoTheme.dimens.paddingSmall),
-                isCameraEnabled = isCameraEnabled,
                 blurLevel = blurLevel,
-                onCameraBlur = actions.onCycleCameraBlur,
+                onCameraBlur = actions.onOpenVideoEffects,
                 size = VonageVideoTheme.dimens.minTouchTarget,
                 iconSize = VonageVideoTheme.dimens.iconSizeSmall,
             )

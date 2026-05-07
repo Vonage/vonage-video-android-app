@@ -99,6 +99,15 @@ interface PublisherParticipant : Participant {
     /** Cycles through blur levels (none -> low -> high -> none) */
     fun cycleCameraBlur()
 
+    /** Applies a specific blur level */
+    fun applyBlurLevel(level: BlurLevel)
+
+    /** Applies a background replacement image */
+    fun applyBackgroundImage(imageName: String)
+
+    /** Removes all video effects */
+    fun clearVideoEffect()
+
     /** Cleans up publisher resources */
     fun clean()
 }

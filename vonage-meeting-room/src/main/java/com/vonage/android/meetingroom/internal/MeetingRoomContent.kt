@@ -91,6 +91,7 @@ private fun MeetingRoomContentInner(
             onToggleCamera = viewModel::onToggleCamera,
             onCameraSwitch = viewModel::onSwitchCamera,
             onCycleCameraBlur = viewModel::onCycleLocalCameraBlur,
+            onApplyVideoEffect = viewModel::applyVideoEffect,
             onEndCall = {
                 viewModel.endCall()
                 if (!inPipMode) {

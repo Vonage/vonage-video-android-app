@@ -6,7 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.captions.CaptionsUiState
+import com.vonage.android.fx.VideoEffect
 import com.vonage.android.kotlin.model.ArchivingState
+import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.SessionEvent
@@ -77,7 +79,7 @@ internal class MeetingRoomViewModel(
                 name = prebuilt.publisherSettings.username,
                 publishAudio = prebuilt.publisherSettings.publishAudio,
                 publishVideo = prebuilt.publisherSettings.publishVideo,
-                blurLevel = com.vonage.android.kotlin.model.BlurLevel.NONE,
+                blurLevel = BlurLevel.NONE,
                 cameraIndex = 1, // default to front camera
             ),
         )
@@ -188,6 +190,16 @@ internal class MeetingRoomViewModel(
 
     fun onCycleLocalCameraBlur() { call?.cycleLocalCameraBlur() }
 
+    fun applyVideoEffect(effect: VideoEffect) {
+        val publisher = call?.publisher?.value ?: return
+        when (effect) {
+            is VideoEffect.None -> publisher.clearVideoEffect()
+            is VideoEffect.BlurLow -> publisher.applyBlurLevel(BlurLevel.LOW)
+            is VideoEffect.BlurHigh -> publisher.applyBlurLevel(BlurLevel.HIGH)
+            is VideoEffect.BackgroundImage -> publisher.applyBackgroundImage(effect.imagePath)
+        }
+    }
+
     fun endCall() {
         if (!callEnded.compareAndSet(false, true)) return
         container.foregroundServiceHandler.stopForegroundService()
@@ -223,7 +235,7 @@ internal class MeetingRoomViewModel(
                                 },
                                 publishVideo = activeCall.publisher.value?.isCameraEnabled?.value ?: true,
                                 publishAudio = activeCall.publisher.value?.isMicEnabled?.value ?: true,
-                                blurLevel = com.vonage.android.kotlin.model.BlurLevel.NONE,
+                                blurLevel = BlurLevel.NONE,
                                 cameraIndex = activeCall.publisher.value?.camera?.value?.index ?: 1,
                                 captureFrameRate = holder.captureFrameRate.value,
                                 captureResolution = holder.captureResolution.value,

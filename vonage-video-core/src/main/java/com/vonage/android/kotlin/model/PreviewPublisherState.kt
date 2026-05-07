@@ -75,6 +75,21 @@ data class PreviewPublisherState(
         _blurLevel.value = newLevel
     }
 
+    override fun applyBlurLevel(level: BlurLevel) {
+        vonagePublisher.applyBlur(level.toVonageBlurLevel())
+        _blurLevel.value = level
+    }
+
+    override fun applyBackgroundImage(imageName: String) {
+        vonagePublisher.applyBackgroundImage(imageName)
+        _blurLevel.value = BlurLevel.NONE
+    }
+
+    override fun clearVideoEffect() {
+        vonagePublisher.applyBlur(BlurLevel.NONE.toVonageBlurLevel())
+        _blurLevel.value = BlurLevel.NONE
+    }
+
     override fun cycleCamera() {
         vonagePublisher.cycleCamera()
     }
