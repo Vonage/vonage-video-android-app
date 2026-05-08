@@ -5,11 +5,12 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.config.GetConfig
-import com.vonage.android.fx.VideoEffect
+import com.vonage.android.kotlin.model.VideoEffect
+import com.vonage.android.fx.data.BackgroundEffectsRepository
+import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
-import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
@@ -20,6 +21,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +39,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = WaitingRoomViewModelFactory::class)
 class WaitingRoomViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
+    @ApplicationContext private val appContext: Context,
     private val getConfig: GetConfig,
     private val userRepository: UserRepository,
     private val videoClient: VonageVideoClient,
@@ -48,6 +54,16 @@ class WaitingRoomViewModel @AssistedInject constructor(
         started = WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
         initialValue = WaitingRoomUiState(roomName = roomName),
     )
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val repository = BackgroundEffectsRepository(appContext)
+                repository.getBackgrounds()
+            }.getOrElse { persistentListOf() }
+                .also { backgrounds -> _uiState.update { it.copy(backgrounds = backgrounds) } }
+        }
+    }
 
     fun init(context: Context) {
         viewModelScope.launch {
@@ -93,18 +109,8 @@ class WaitingRoomViewModel @AssistedInject constructor(
         currentPublisher()?.cycleCamera()
     }
 
-    fun onCycleCameraBlur() {
-        currentPublisher()?.cycleCameraBlur()
-    }
-
     fun applyVideoEffect(effect: VideoEffect) {
-        val publisher = currentPublisher() ?: return
-        when (effect) {
-            is VideoEffect.None -> publisher.clearVideoEffect()
-            is VideoEffect.BlurLow -> publisher.applyBlurLevel(BlurLevel.LOW)
-            is VideoEffect.BlurHigh -> publisher.applyBlurLevel(BlurLevel.HIGH)
-            is VideoEffect.BackgroundImage -> publisher.applyBackgroundImage(effect.imagePath)
-        }
+        currentPublisher()?.applyVideoEffect(effect)
     }
 
     fun joinRoom(userName: String) {
@@ -121,7 +127,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
                         name = sanitizedUserName,
                         publishVideo = publisher.isCameraEnabled.value,
                         publishAudio = publisher.isMicEnabled.value,
-                        blurLevel = publisher.blurLevel.value,
+                        initialVideoEffect = publisher.videoEffect.value,
                         cameraIndex = publisher.camera.value.index,
                         senderStatsTrack = callSettingsHolder.senderStatsEnabled.value,
                         preferredVideoCodecOrder = callSettingsHolder.preferredVideoCodecOrder.value,
@@ -168,7 +174,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
         val name = _uiState.value.userName
         val publishVideo = current.isCameraEnabled.value
         val publishAudio = current.isMicEnabled.value
-        val blurLevel = current.blurLevel.value
+        val videoEffect = current.videoEffect.value
         val cameraIndex = current.camera.value.index
 
         publisherSetupJob?.cancel()
@@ -176,7 +182,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
         videoClient.destroyPublisher()
 
         videoClient.configurePublisher(
-            buildPreviewConfig(name, publishVideo, publishAudio, blurLevel, cameraIndex),
+            buildPreviewConfig(name, publishVideo, publishAudio, videoEffect, cameraIndex),
         )
         val newPublisher = videoClient.createPreviewPublisher(context)
         _uiState.update { it.copy(publisher = newPublisher) }
@@ -187,13 +193,13 @@ class WaitingRoomViewModel @AssistedInject constructor(
         name: String,
         publishVideo: Boolean = true,
         publishAudio: Boolean = true,
-        blurLevel: BlurLevel = BlurLevel.NONE,
+        initialVideoEffect: VideoEffect = VideoEffect.None,
         cameraIndex: Int = 1,
     ): PublisherConfig = PublisherConfig(
         name = name,
         publishVideo = publishVideo,
         publishAudio = publishAudio,
-        blurLevel = blurLevel,
+        initialVideoEffect = initialVideoEffect,
         cameraIndex = cameraIndex,
         captureFrameRate = callSettingsHolder.captureFrameRate.value,
         captureResolution = callSettingsHolder.captureResolution.value,
@@ -227,4 +233,6 @@ data class WaitingRoomUiState(
     val allowMicrophoneControl: Boolean = true,
     val allowCameraControl: Boolean = true,
     val audioDevicesState: AudioDevicesState? = null,
+    val backgrounds: ImmutableList<VideoBackgroundItem> = persistentListOf(),
 )
+

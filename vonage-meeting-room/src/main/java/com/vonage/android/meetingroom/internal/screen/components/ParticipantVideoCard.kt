@@ -126,13 +126,13 @@ internal fun ParticipantVideoCard(
                 modifier = Modifier.align(Alignment.TopStart),
             )
 
-            val blurLevel by publisherParticipant.blurLevel.collectAsStateWithLifecycle()
+            val videoEffect by publisherParticipant.videoEffect.collectAsStateWithLifecycle()
 
             BlurIndicator(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(VonageVideoTheme.dimens.paddingSmall),
-                blurLevel = blurLevel,
+                videoEffect = videoEffect,
                 onCameraBlur = actions.onOpenVideoEffects,
                 size = VonageVideoTheme.dimens.minTouchTarget,
                 iconSize = VonageVideoTheme.dimens.iconSizeSmall,

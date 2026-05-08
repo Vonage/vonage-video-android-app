@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,12 +34,11 @@ import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.components.GenericLoading
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
-import com.vonage.android.fx.VideoEffect
 import com.vonage.android.fx.data.BackgroundEffectsRepository
-import com.vonage.android.fx.ui.VideoEffectCategory
 import com.vonage.android.fx.ui.VideoEffectsScreen
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.R
 import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
@@ -59,6 +57,7 @@ import com.vonage.android.meetingroom.internal.util.rememberNoiseSuppression
 import com.vonage.android.reactions.ui.EmojiReactionOverlay
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -92,9 +91,8 @@ internal fun MeetingRoomScreen(
     val audioOutputsSheetState = rememberModalBottomSheetState()
 
     var showVideoEffects by remember { mutableStateOf(false) }
-    var selectedEffectCategory by remember { mutableStateOf<VideoEffectCategory>(VideoEffectCategory.None) }
-    var selectedBackgroundId by remember { mutableStateOf<String?>(null) }
-    var selectedBackgroundPath by remember { mutableStateOf<String?>(null) }
+    val videoEffectsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var selectedEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
     var previousEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
     val context = LocalContext.current
     val backgroundsRepository = remember { BackgroundEffectsRepository(context) }
@@ -103,19 +101,7 @@ internal fun MeetingRoomScreen(
     val effectsActions = remember(actions) {
         actions.copy(
             onOpenVideoEffects = {
-                previousEffect = when (selectedEffectCategory) {
-                    VideoEffectCategory.None -> VideoEffect.None
-                    VideoEffectCategory.BlurLow -> VideoEffect.BlurLow
-                    VideoEffectCategory.BlurHigh -> VideoEffect.BlurHigh
-                    VideoEffectCategory.VirtualBackground -> {
-                        selectedBackgroundPath?.let { path ->
-                            VideoEffect.BackgroundImage(
-                                id = selectedBackgroundId.orEmpty(),
-                                imagePath = path,
-                            )
-                        } ?: VideoEffect.None
-                    }
-                }
+                previousEffect = selectedEffect
                 showVideoEffects = true
             },
         )
@@ -143,6 +129,9 @@ internal fun MeetingRoomScreen(
             val participants by call.participantsStateFlow.collectAsStateWithLifecycle()
             val publisher by call.publisher.collectAsStateWithLifecycle()
             val captionLines by call.captionsStateFlow.collectAsStateWithLifecycle()
+            val isCameraEnabled by remember(publisher) {
+                publisher?.isCameraEnabled ?: MutableStateFlow(false)
+            }.collectAsStateWithLifecycle()
             Scaffold(
                 modifier = modifier.systemBarsPadding(),
                 topBar = {
@@ -192,7 +181,7 @@ internal fun MeetingRoomScreen(
                             EmojiReactionOverlay(call = call)
                             CaptionsOverlay(captionLines = captionLines)
                             SpeakingWhileMutedOverlay(publisher = publisher)
-                            key(showVideoEffects) {
+                            if (!showVideoEffects) {
                                 MeetingRoomContent(
                                     modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
                                     call = call,
@@ -240,50 +229,39 @@ internal fun MeetingRoomScreen(
             }
 
             if (showVideoEffects && MeetingRoomFeature.BACKGROUND_EFFECTS in uiState.enabledFeatures) {
-                VideoEffectsScreen(
-                    publisher = publisher,
-                    isCameraEnabled = publisher?.isCameraEnabled?.value ?: false,
-                    backgrounds = backgrounds,
-                    selectedCategory = selectedEffectCategory,
-                    selectedBackgroundId = selectedBackgroundId,
-                    onDismiss = {
+                ModalBottomSheet(
+                    onDismissRequest = {
+                        selectedEffect = previousEffect
                         actions.onApplyVideoEffect(previousEffect)
-                        selectedEffectCategory = when (previousEffect) {
-                            is VideoEffect.None -> VideoEffectCategory.None
-                            is VideoEffect.BlurLow -> VideoEffectCategory.BlurLow
-                            is VideoEffect.BlurHigh -> VideoEffectCategory.BlurHigh
-                            is VideoEffect.BackgroundImage -> VideoEffectCategory.VirtualBackground
-                        }
-                        selectedBackgroundId = (previousEffect as? VideoEffect.BackgroundImage)?.id
-                        selectedBackgroundPath = (previousEffect as? VideoEffect.BackgroundImage)?.imagePath
                         showVideoEffects = false
                     },
-                    onApply = { showVideoEffects = false },
-                    onCategorySelected = { category ->
-                        selectedEffectCategory = category
-                        val effect = when (category) {
-                            VideoEffectCategory.None -> VideoEffect.None
-                            VideoEffectCategory.BlurLow -> VideoEffect.BlurLow
-                            VideoEffectCategory.BlurHigh -> VideoEffect.BlurHigh
-                            VideoEffectCategory.VirtualBackground -> {
-                                val path = selectedBackgroundPath ?: return@VideoEffectsScreen
-                                VideoEffect.BackgroundImage(
-                                    id = selectedBackgroundId.orEmpty(),
-                                    imagePath = path,
-                                )
+                    sheetState = videoEffectsSheetState,
+                ) {
+                    VideoEffectsScreen(
+                        publisher = publisher,
+                        isCameraEnabled = isCameraEnabled,
+                        backgrounds = backgrounds,
+                        selectedEffect = selectedEffect,
+                        onDismiss = {
+                            scope.launch {
+                                videoEffectsSheetState.hide()
+                                selectedEffect = previousEffect
+                                actions.onApplyVideoEffect(previousEffect)
+                                showVideoEffects = false
                             }
-                        }
-                        actions.onApplyVideoEffect(effect)
-                    },
-                    onBackgroundSelected = { item ->
-                        selectedBackgroundId = item.id
-                        selectedBackgroundPath = item.imagePath
-                        val path = item.imagePath ?: return@VideoEffectsScreen
-                        actions.onApplyVideoEffect(
-                            VideoEffect.BackgroundImage(id = item.id, imagePath = path),
-                        )
-                    },
-                )
+                        },
+                        onApply = {
+                            scope.launch {
+                                videoEffectsSheetState.hide()
+                                showVideoEffects = false
+                            }
+                        },
+                        onEffectSelect = { effect ->
+                            selectedEffect = effect
+                            actions.onApplyVideoEffect(effect)
+                        },
+                    )
+                }
             }
         }
 

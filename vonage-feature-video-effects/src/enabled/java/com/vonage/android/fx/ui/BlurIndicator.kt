@@ -13,14 +13,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.components.CircularControlButton
 import com.vonage.android.compose.vivid.icons.VividIcons
-import com.vonage.android.compose.vivid.icons.line.Blur
 import com.vonage.android.compose.vivid.icons.line.BlurOff
 import com.vonage.android.compose.vivid.icons.solid.Blur
-import com.vonage.android.kotlin.model.BlurLevel
-
+import com.vonage.android.kotlin.model.VideoEffect
 @Composable
 fun BlurIndicator(
-    blurLevel: BlurLevel,
+    videoEffect: VideoEffect,
     onCameraBlur: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 56.dp,
@@ -30,17 +28,16 @@ fun BlurIndicator(
         modifier = modifier
             .border(BorderStroke(1.dp, Color.White), CircleShape),
         onClick = onCameraBlur,
-        icon = rememberEffectIcon(blurLevel),
+        icon = rememberEffectIcon(videoEffect),
         size = size,
         iconSize = iconSize,
     )
 }
 
 @Composable
-private fun rememberEffectIcon(level: BlurLevel): ImageVector = remember(level) {
-    when (level) {
-        BlurLevel.HIGH -> VividIcons.Solid.Blur
-        BlurLevel.LOW -> VividIcons.Line.Blur
-        BlurLevel.NONE -> VividIcons.Line.BlurOff
+private fun rememberEffectIcon(effect: VideoEffect): ImageVector = remember(effect) {
+    when (effect) {
+        VideoEffect.None -> VividIcons.Line.BlurOff
+        else -> VividIcons.Solid.Blur
     }
 }

@@ -17,10 +17,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CameraType
 import com.vonage.android.kotlin.model.NoiseSuppression
 import com.vonage.android.kotlin.model.PublisherParticipant
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.kotlin.model.VideoSource
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -407,13 +407,13 @@ class WaitingRoomScreenTest {
     ): PublisherParticipant {
         return object : PublisherParticipant {
             override val camera: StateFlow<CameraType> = MutableStateFlow(CameraType.FRONT)
-            override val blurLevel: StateFlow<BlurLevel> = MutableStateFlow(BlurLevel.NONE)
+            override val videoEffect: StateFlow<VideoEffect> = MutableStateFlow(VideoEffect.None)
 
             override fun toggleVideo() {}
             override fun toggleAudio() {}
 
             override fun cycleCamera() {}
-            override fun cycleCameraBlur() {}
+            override fun applyVideoEffect(effect: VideoEffect) {}
             override fun clean() {}
 
             override val id: String = "publisher"

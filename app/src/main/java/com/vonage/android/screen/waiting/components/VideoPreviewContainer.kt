@@ -102,7 +102,7 @@ internal fun VideoControlPanel(
     val isCameraEnabled by publisher.isCameraEnabled.collectAsStateWithLifecycle()
     val isMicEnabled by publisher.isMicEnabled.collectAsStateWithLifecycle()
     val audioLevel by publisher.audioLevel.collectAsStateWithLifecycle()
-    val blurLevel by publisher.blurLevel.collectAsStateWithLifecycle()
+    val videoEffect by publisher.videoEffect.collectAsStateWithLifecycle()
 
     Row(
         modifier = modifier
@@ -157,7 +157,7 @@ internal fun VideoControlPanel(
         BlurIndicator(
             modifier = Modifier
                 .testTag(CAMERA_BLUR_BUTTON_TAG),
-            blurLevel = blurLevel,
+            videoEffect = videoEffect,
             onCameraBlur = actions.onOpenVideoEffects,
         )
     }

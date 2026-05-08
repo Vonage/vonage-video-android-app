@@ -6,14 +6,14 @@ package com.vonage.android.kotlin.model
  * @property name Display name for the publisher
  * @property publishVideo Initial video enabled state
  * @property publishAudio Initial audio enabled state
- * @property blurLevel Initial background blur level
+ * @property initialVideoEffect Initial video effect (blur level or background image)
  * @property cameraIndex Initial camera (0 = back, 1 = front)
  */
 data class PublisherConfig(
     val name: String,
     val publishVideo: Boolean,
     val publishAudio: Boolean,
-    val blurLevel: BlurLevel,
+    val initialVideoEffect: VideoEffect = VideoEffect.None,
     val cameraIndex: Int,
     val senderStatsTrack: Boolean = false,
     val opusDtxEnabled: Boolean = true,

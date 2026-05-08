@@ -8,7 +8,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,9 +19,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,43 +45,30 @@ import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.components.ParticipantVideoRenderer
 import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.compose.vivid.icons.VividIcons
-import com.vonage.android.compose.vivid.icons.line.AddImage
-import com.vonage.android.compose.vivid.icons.line.Blur
 import com.vonage.android.compose.vivid.icons.line.BlurOff
+import com.vonage.android.compose.vivid.icons.line.Blur as LineBlur
+import com.vonage.android.compose.vivid.icons.solid.Blur as SolidBlur
 import com.vonage.android.compose.vivid.icons.line.Close
-import com.vonage.android.compose.vivid.icons.solid.Blur
+import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.VideoEffect
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 /**
- * Represents the type of video effect the user can apply.
- */
-sealed interface VideoEffectCategory {
-    data object None : VideoEffectCategory
-    data object BlurLow : VideoEffectCategory
-    data object BlurHigh : VideoEffectCategory
-    data object VirtualBackground : VideoEffectCategory
-}
-
-/**
  * Full-screen sheet for selecting a video effect.
  *
- * Displays a camera preview area, a horizontal toolbar of effect categories,
- * an optional scrollable background thumbnail grid (visible when [selectedCategory]
- * is [VideoEffectCategory.VirtualBackground]), and Cancel / Apply actions.
+ * Displays a camera preview area, a flat scrollable grid with "Effects" and "Backgrounds"
+ * section headers, and Cancel / Apply actions. Effects are applied immediately on selection.
  *
- * @param publisher              Publisher participant for camera preview rendering.
- * @param isCameraEnabled        Whether the camera is currently active.
- * @param backgrounds            List of virtual background thumbnails to display.
- * @param selectedCategory       Currently active effect category.
- * @param selectedBackgroundId   ID of the selected virtual background, if any.
- * @param onDismiss              Invoked when the user taps Close or Cancel.
- * @param onApply                Invoked when the user taps Apply.
- * @param onCategorySelected     Invoked when the user taps an effect category icon.
- * @param onBackgroundSelected   Invoked when the user taps a background thumbnail.
- * @param modifier               Optional [Modifier] for the root layout.
+ * @param publisher            Publisher participant for camera preview rendering.
+ * @param isCameraEnabled      Whether the camera is currently active.
+ * @param backgrounds          List of virtual background thumbnails to display.
+ * @param selectedEffect       Currently active video effect.
+ * @param onDismiss            Invoked when the user taps Close or Cancel (should revert effect).
+ * @param onApply              Invoked when the user taps Apply (just closes the sheet).
+ * @param onEffectSelect     Invoked when the user selects an effect; applied immediately.
+ * @param modifier             Optional [Modifier] for the root layout.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("LongParameterList")
@@ -91,12 +77,10 @@ fun VideoEffectsScreen(
     publisher: Participant?,
     isCameraEnabled: Boolean,
     backgrounds: ImmutableList<VideoBackgroundItem>,
-    selectedCategory: VideoEffectCategory,
-    selectedBackgroundId: String?,
+    selectedEffect: VideoEffect,
     onDismiss: () -> Unit,
     onApply: () -> Unit,
-    onCategorySelected: (VideoEffectCategory) -> Unit,
-    onBackgroundSelected: (VideoBackgroundItem) -> Unit,
+    onEffectSelect: (VideoEffect) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -113,10 +97,8 @@ fun VideoEffectsScreen(
                 publisher = publisher,
                 isCameraEnabled = isCameraEnabled,
                 backgrounds = backgrounds,
-                selectedCategory = selectedCategory,
-                selectedBackgroundId = selectedBackgroundId,
-                onCategorySelected = onCategorySelected,
-                onBackgroundSelected = onBackgroundSelected,
+                selectedEffect = selectedEffect,
+                onEffectSelect = onEffectSelect,
                 modifier = Modifier.weight(1f),
             )
         } else {
@@ -124,10 +106,8 @@ fun VideoEffectsScreen(
                 publisher = publisher,
                 isCameraEnabled = isCameraEnabled,
                 backgrounds = backgrounds,
-                selectedCategory = selectedCategory,
-                selectedBackgroundId = selectedBackgroundId,
-                onCategorySelected = onCategorySelected,
-                onBackgroundSelected = onBackgroundSelected,
+                selectedEffect = selectedEffect,
+                onEffectSelect = onEffectSelect,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -145,10 +125,8 @@ private fun PortraitContent(
     publisher: Participant?,
     isCameraEnabled: Boolean,
     backgrounds: ImmutableList<VideoBackgroundItem>,
-    selectedCategory: VideoEffectCategory,
-    selectedBackgroundId: String?,
-    onCategorySelected: (VideoEffectCategory) -> Unit,
-    onBackgroundSelected: (VideoBackgroundItem) -> Unit,
+    selectedEffect: VideoEffect,
+    onEffectSelect: (VideoEffect) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -160,15 +138,10 @@ private fun PortraitContent(
                 .padding(VonageVideoTheme.dimens.paddingDefault),
         )
 
-        EffectCategoryToolbar(
-            selectedCategory = selectedCategory,
-            onCategorySelected = onCategorySelected,
-        )
-
-        VirtualBackgroundGrid(
+        EffectsAndBackgroundsGrid(
             backgrounds = backgrounds,
-            selectedBackgroundId = selectedBackgroundId,
-            onBackgroundSelected = onBackgroundSelected,
+            selectedEffect = selectedEffect,
+            onEffectSelect = onEffectSelect,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
@@ -182,10 +155,8 @@ private fun LandscapeContent(
     publisher: Participant?,
     isCameraEnabled: Boolean,
     backgrounds: ImmutableList<VideoBackgroundItem>,
-    selectedCategory: VideoEffectCategory,
-    selectedBackgroundId: String?,
-    onCategorySelected: (VideoEffectCategory) -> Unit,
-    onBackgroundSelected: (VideoBackgroundItem) -> Unit,
+    selectedEffect: VideoEffect,
+    onEffectSelect: (VideoEffect) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier.fillMaxWidth()) {
@@ -198,26 +169,92 @@ private fun LandscapeContent(
                 .padding(VonageVideoTheme.dimens.paddingDefault),
         )
 
-        Column(
+        EffectsAndBackgroundsGrid(
+            backgrounds = backgrounds,
+            selectedEffect = selectedEffect,
+            onEffectSelect = onEffectSelect,
             modifier = Modifier
                 .weight(1f)
-                .fillMaxHeight(),
-        ) {
-            EffectCategoryToolbar(
-                selectedCategory = selectedCategory,
-                onCategorySelected = onCategorySelected,
-            )
+                .fillMaxHeight()
+                .padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
+        )
+    }
+}
 
-            VirtualBackgroundGrid(
-                backgrounds = backgrounds,
-                selectedBackgroundId = selectedBackgroundId,
-                onBackgroundSelected = onBackgroundSelected,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
-            )
+@Composable
+private fun EffectsAndBackgroundsGrid(
+    backgrounds: ImmutableList<VideoBackgroundItem>,
+    selectedEffect: VideoEffect,
+    onEffectSelect: (VideoEffect) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val blurEffects = remember {
+        listOf(
+            VideoEffect.None to VividIcons.Line.BlurOff,
+            VideoEffect.BlurLow to VividIcons.Line.LineBlur,
+            VideoEffect.BlurHigh to VividIcons.Solid.SolidBlur,
+        )
+    }
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(GRID_COLUMNS),
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
+        verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
+    ) {
+        // Effects section header
+        item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+            SectionHeader(text = "Effects")
+        }
+        // All blur effects in a single full-width row
+        item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
+            ) {
+                blurEffects.forEach { (effect, icon) ->
+                    EffectItem(
+                        icon = icon,
+                        isSelected = selectedEffect == effect,
+                        onClick = { onEffectSelect(effect) },
+                    )
+                }
+            }
+        }
+
+        if (backgrounds.isNotEmpty()) {
+            // Backgrounds section header
+            item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+                SectionHeader(text = "Backgrounds")
+            }
+            // Background thumbnails
+            items(items = backgrounds, key = { it.id }) { item ->
+                BackgroundThumbnail(
+                    item = item,
+                    isSelected = selectedEffect is VideoEffect.BackgroundImage &&
+                        selectedEffect.id == item.id,
+                    onClick = {
+                        val path = item.imagePath ?: return@BackgroundThumbnail
+                        onEffectSelect(VideoEffect.BackgroundImage(id = item.id, imagePath = path))
+                    },
+                )
+            }
         }
     }
+}
+
+@Composable
+private fun SectionHeader(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = text,
+        style = VonageVideoTheme.typography.bodyBase,
+        color = VonageVideoTheme.colors.secondary,
+        modifier = modifier.padding(
+            top = VonageVideoTheme.dimens.spaceSmall,
+            bottom = VonageVideoTheme.dimens.spaceXSmall,
+        ),
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -235,17 +272,17 @@ private fun VideoEffectsTopBar(
                 color = VonageVideoTheme.colors.secondary,
             )
         },
-        actions = {
+        navigationIcon = {
             IconButton(onClick = onDismiss) {
                 Icon(
                     imageVector = VividIcons.Line.Close,
-                    contentDescription = "Close",
+                    contentDescription = null,
                     tint = VonageVideoTheme.colors.secondary,
                 )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = VonageVideoTheme.colors.surface,
+            containerColor = VonageVideoTheme.colors.background,
         ),
     )
 }
@@ -280,39 +317,7 @@ private fun CameraPreview(
 }
 
 @Composable
-private fun EffectCategoryToolbar(
-    selectedCategory: VideoEffectCategory,
-    onCategorySelected: (VideoEffectCategory) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val categories = remember {
-        listOf(
-            VideoEffectCategory.None to VividIcons.Line.BlurOff,
-            VideoEffectCategory.BlurLow to VividIcons.Line.Blur,
-            VideoEffectCategory.BlurHigh to VividIcons.Solid.Blur,
-            VideoEffectCategory.VirtualBackground to VividIcons.Line.AddImage,
-        )
-    }
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState())
-            .padding(VonageVideoTheme.dimens.paddingDefault),
-        horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
-    ) {
-        categories.forEach { (category, icon) ->
-            EffectCategoryItem(
-                icon = icon,
-                isSelected = selectedCategory == category,
-                onClick = { onCategorySelected(category) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun EffectCategoryItem(
+private fun EffectItem(
     icon: ImageVector,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -344,29 +349,6 @@ private fun EffectCategoryItem(
             tint = iconTint,
             modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeDefault),
         )
-    }
-}
-
-@Composable
-private fun VirtualBackgroundGrid(
-    backgrounds: ImmutableList<VideoBackgroundItem>,
-    selectedBackgroundId: String?,
-    onBackgroundSelected: (VideoBackgroundItem) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(GRID_COLUMNS),
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
-        verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
-    ) {
-        items(items = backgrounds, key = { it.id }) { item ->
-            BackgroundThumbnail(
-                item = item,
-                isSelected = item.id == selectedBackgroundId,
-                onClick = { onBackgroundSelected(item) },
-            )
-        }
     }
 }
 
@@ -455,12 +437,10 @@ internal fun VideoEffectsScreenPortraitPreview() {
                 VideoBackgroundItem(id = "bg5"),
                 VideoBackgroundItem(id = "bg6"),
             ),
-            selectedCategory = VideoEffectCategory.VirtualBackground,
-            selectedBackgroundId = "bg1",
+            selectedEffect = VideoEffect.None,
             onDismiss = {},
             onApply = {},
-            onCategorySelected = {},
-            onBackgroundSelected = {},
+            onEffectSelect = {},
         )
     }
 }
@@ -478,12 +458,10 @@ internal fun VideoEffectsScreenLandscapePreview() {
                 VideoBackgroundItem(id = "bg3"),
                 VideoBackgroundItem(id = "bg4"),
             ),
-            selectedCategory = VideoEffectCategory.VirtualBackground,
-            selectedBackgroundId = "bg1",
+            selectedEffect = VideoEffect.BlurLow,
             onDismiss = {},
             onApply = {},
-            onCategorySelected = {},
-            onBackgroundSelected = {},
+            onEffectSelect = {},
         )
     }
 }

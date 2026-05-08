@@ -166,16 +166,6 @@ class MeetingRoomViewModelTest {
     }
 
     @Test
-    fun `given viewmodel when onCycleLocalCameraBlur then delegate to call`() = runTest {
-        val mockCall = givenMockCall()
-        sut.setup(context)
-        testScheduler.advanceUntilIdle()
-
-        sut.onCycleLocalCameraBlur()
-        verify { mockCall.cycleLocalCameraBlur() }
-    }
-
-    @Test
     fun `given viewmodel when onTogglePinParticipant then delegate to call`() = runTest {
         val mockCall = givenMockCall()
         sut.setup(context)

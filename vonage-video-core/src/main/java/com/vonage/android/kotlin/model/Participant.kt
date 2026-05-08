@@ -79,8 +79,8 @@ interface PublisherParticipant : Participant {
     /** StateFlow of current camera type (front/back) */
     val camera: StateFlow<CameraType>
 
-    /** StateFlow of current background blur level */
-    val blurLevel: StateFlow<BlurLevel>
+    /** StateFlow of the currently applied video effect */
+    val videoEffect: StateFlow<VideoEffect>
 
     /** StateFlow of current noise suppression state */
     val noiseSuppression: StateFlow<NoiseSuppression>
@@ -96,17 +96,8 @@ interface PublisherParticipant : Participant {
     /** Switches between front and back camera */
     fun cycleCamera()
 
-    /** Cycles through blur levels (none -> low -> high -> none) */
-    fun cycleCameraBlur()
-
-    /** Applies a specific blur level */
-    fun applyBlurLevel(level: BlurLevel)
-
-    /** Applies a background replacement image */
-    fun applyBackgroundImage(imageName: String)
-
-    /** Removes all video effects */
-    fun clearVideoEffect()
+    /** Applies a video effect (blur level or background image) */
+    fun applyVideoEffect(effect: VideoEffect)
 
     /** Cleans up publisher resources */
     fun clean()

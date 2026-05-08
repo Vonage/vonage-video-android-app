@@ -2,6 +2,7 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
+import com.vonage.android.kotlin.sdk.VonageBlurLevel
 import com.vonage.android.kotlin.sdk.VonageCameraListener
 import com.vonage.android.kotlin.sdk.VonageError
 import com.vonage.android.kotlin.sdk.VonagePublisher
@@ -21,11 +22,13 @@ import kotlinx.coroutines.flow.update
  * microphone monitoring since it's not connected to a session.
  *
  * @param vonagePublisher The wrapped Vonage Publisher instance for preview
+ * @param initialVideoEffect The video effect to set on the publisher at creation time
  */
 @Stable
 data class PreviewPublisherState(
     private val vonagePublisher: VonagePublisher,
     override val captureInfoLabel: String = "",
+    private val initialVideoEffect: VideoEffect = VideoEffect.None,
 ) : PublisherParticipant {
 
     private val micVolumeListener by lazy { MicVolumeListener() }
@@ -49,8 +52,8 @@ data class PreviewPublisherState(
 
     override val isTalking: StateFlow<Boolean> = MutableStateFlow(false)
 
-    private val _blurLevel: MutableStateFlow<BlurLevel> = MutableStateFlow(BlurLevel.NONE)
-    override val blurLevel: StateFlow<BlurLevel> = _blurLevel
+    private val _videoEffect: MutableStateFlow<VideoEffect> = MutableStateFlow(initialVideoEffect)
+    override val videoEffect: StateFlow<VideoEffect> = _videoEffect
 
     private val _camera: MutableStateFlow<CameraType> = MutableStateFlow(CameraType.FRONT)
     override val camera: StateFlow<CameraType> = _camera
@@ -68,30 +71,18 @@ data class PreviewPublisherState(
         _isMicEnabled.update { vonagePublisher.publishAudio }
     }
 
-    override fun cycleCameraBlur() {
-        var index = BlurLevel.entries.first { it == _blurLevel.value }.ordinal
-        val newLevel = BlurLevel by ++index
-        vonagePublisher.applyBlur(newLevel.toVonageBlurLevel())
-        _blurLevel.value = newLevel
-    }
-
-    override fun applyBlurLevel(level: BlurLevel) {
-        vonagePublisher.applyBlur(level.toVonageBlurLevel())
-        _blurLevel.value = level
-    }
-
-    override fun applyBackgroundImage(imageName: String) {
-        vonagePublisher.applyBackgroundImage(imageName)
-        _blurLevel.value = BlurLevel.NONE
-    }
-
-    override fun clearVideoEffect() {
-        vonagePublisher.applyBlur(BlurLevel.NONE.toVonageBlurLevel())
-        _blurLevel.value = BlurLevel.NONE
-    }
-
     override fun cycleCamera() {
         vonagePublisher.cycleCamera()
+    }
+
+    override fun applyVideoEffect(effect: VideoEffect) {
+        when (effect) {
+            VideoEffect.None -> vonagePublisher.applyBlur(VonageBlurLevel.NONE)
+            VideoEffect.BlurLow -> vonagePublisher.applyBlur(VonageBlurLevel.LOW)
+            VideoEffect.BlurHigh -> vonagePublisher.applyBlur(VonageBlurLevel.HIGH)
+            is VideoEffect.BackgroundImage -> vonagePublisher.applyBackgroundImage(effect.imagePath)
+        }
+        _videoEffect.value = effect
     }
 
     override fun toggleNoiseSuppression() {

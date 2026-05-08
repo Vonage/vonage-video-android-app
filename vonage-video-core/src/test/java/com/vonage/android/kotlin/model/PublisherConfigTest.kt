@@ -13,7 +13,7 @@ class PublisherConfigTest {
             name = "John Doe",
             publishVideo = true,
             publishAudio = false,
-            blurLevel = BlurLevel.HIGH,
+            initialVideoEffect = VideoEffect.BlurHigh,
             cameraIndex = 1,
             senderStatsTrack = true,
         )
@@ -21,25 +21,25 @@ class PublisherConfigTest {
         assertEquals("John Doe", config.name)
         assertTrue(config.publishVideo)
         assertFalse(config.publishAudio)
-        assertEquals(BlurLevel.HIGH, config.blurLevel)
+        assertEquals(VideoEffect.BlurHigh, config.initialVideoEffect)
         assertEquals(1, config.cameraIndex)
         assertTrue(config.senderStatsTrack)
     }
 
     @Test
-    fun `should create PublisherConfig with default camera and blur`() {
+    fun `should create PublisherConfig with default camera and effect`() {
         val config = PublisherConfig(
             name = "Jane Smith",
             publishVideo = false,
             publishAudio = true,
-            blurLevel = BlurLevel.NONE,
+            initialVideoEffect = VideoEffect.None,
             cameraIndex = 0,
         )
 
         assertEquals("Jane Smith", config.name)
         assertFalse(config.publishVideo)
         assertTrue(config.publishAudio)
-        assertEquals(BlurLevel.NONE, config.blurLevel)
+        assertEquals(VideoEffect.None, config.initialVideoEffect)
         assertEquals(0, config.cameraIndex)
         assertFalse(config.senderStatsTrack)
     }
@@ -50,7 +50,7 @@ class PublisherConfigTest {
             name = "Test User",
             publishVideo = true,
             publishAudio = true,
-            blurLevel = BlurLevel.LOW,
+            initialVideoEffect = VideoEffect.BlurLow,
             cameraIndex = 1,
             senderStatsTrack = true,
         )
@@ -60,7 +60,7 @@ class PublisherConfigTest {
         assertEquals("Test User", copy.name)
         assertFalse(copy.publishVideo)
         assertTrue(copy.publishAudio)
-        assertEquals(BlurLevel.LOW, copy.blurLevel)
+        assertEquals(VideoEffect.BlurLow, copy.initialVideoEffect)
         assertEquals(1, copy.cameraIndex)
         assertTrue(copy.senderStatsTrack)
     }
@@ -71,7 +71,7 @@ class PublisherConfigTest {
             name = "Test User",
             publishVideo = true,
             publishAudio = true,
-            blurLevel = BlurLevel.LOW,
+            initialVideoEffect = VideoEffect.BlurLow,
             cameraIndex = 1,
             senderStatsTrack = false,
         )
@@ -88,7 +88,7 @@ class PublisherConfigTest {
             name = "User",
             publishVideo = true,
             publishAudio = false,
-            blurLevel = BlurLevel.HIGH,
+            initialVideoEffect = VideoEffect.BlurHigh,
             cameraIndex = 0,
             senderStatsTrack = true,
         )
@@ -97,7 +97,7 @@ class PublisherConfigTest {
             name = "User",
             publishVideo = true,
             publishAudio = false,
-            blurLevel = BlurLevel.HIGH,
+            initialVideoEffect = VideoEffect.BlurHigh,
             cameraIndex = 0,
             senderStatsTrack = true,
         )
@@ -116,7 +116,7 @@ class PublisherConfigTest {
             name = "User",
             publishVideo = true,
             publishAudio = true,
-            blurLevel = BlurLevel.NONE,
+            initialVideoEffect = VideoEffect.None,
             cameraIndex = 1,
             videoBitrateConfig = bitrateConfig,
         )
@@ -131,7 +131,7 @@ class PublisherConfigTest {
             name = "User",
             publishVideo = true,
             publishAudio = true,
-            blurLevel = BlurLevel.NONE,
+            initialVideoEffect = VideoEffect.None,
             cameraIndex = 1,
         )
 
