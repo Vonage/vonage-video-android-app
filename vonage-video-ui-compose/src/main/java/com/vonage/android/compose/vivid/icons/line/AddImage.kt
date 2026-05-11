@@ -1,4 +1,4 @@
-@file:Suppress("MaxLineLength")
+@file:Suppress("MaxLineLength", "MagicNumber")
 
 package com.vonage.android.compose.vivid.icons.line
 
