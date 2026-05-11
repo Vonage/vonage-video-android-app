@@ -192,6 +192,23 @@ class WaitingRoomViewModelTest {
     }
 
     @Test
+    fun `given viewmodel when applyVideoEffect then delegate to publisher`() = runTest {
+        val publisher = givenPreviewPublisher()
+        coEvery { userRepository.getUserName() } returns ""
+
+        sut.init(context)
+        sut.uiState.test {
+            awaitItem() // initial state
+            awaitItem() // after init
+
+            sut.applyVideoEffect(VideoEffect.BlurLow)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(exactly = 1) { publisher.applyVideoEffect(VideoEffect.BlurLow) }
+    }
+
+    @Test
     fun `given viewmodel when stop then destroy publisher`() = runTest {
         every { videoClient.destroyPublisher() } returns Unit
 
