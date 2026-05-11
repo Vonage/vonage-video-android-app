@@ -29,6 +29,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import com.vonage.android.videofx.R
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -68,7 +70,7 @@ fun VideoEffectsScreen(
     ) {
         // Title only — no close button; the sheet is dismissed via swipe-down.
         Text(
-            text = "Video effects",
+            text = stringResource(R.string.video_effects_title),
             style = VonageVideoTheme.typography.heading3,
             color = VonageVideoTheme.colors.secondary,
             modifier = Modifier.padding(
@@ -108,7 +110,7 @@ private fun EffectsAndBackgroundsGrid(
     ) {
         // Effects section header
         item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-            SectionHeader(text = "Effects")
+            SectionHeader(text = stringResource(R.string.video_effects_section_effects))
         }
         // All blur effects in a single full-width row
         item(span = { GridItemSpan(maxCurrentLineSpan) }) {
@@ -128,7 +130,7 @@ private fun EffectsAndBackgroundsGrid(
         if (backgrounds.isNotEmpty()) {
             // Backgrounds section header
             item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-                SectionHeader(text = "Backgrounds")
+                SectionHeader(text = stringResource(R.string.video_effects_section_backgrounds))
             }
             // Background thumbnails
             items(items = backgrounds, key = { it.id }) { item ->
