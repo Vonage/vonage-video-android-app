@@ -55,7 +55,6 @@ import com.vonage.android.meetingroom.internal.util.rememberNoiseSuppression
 import com.vonage.android.reactions.ui.EmojiReactionOverlay
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -88,9 +87,14 @@ internal fun MeetingRoomScreen(
     var showAudioOutputs by remember { mutableStateOf(false) }
     val audioOutputsSheetState = rememberModalBottomSheetState()
 
-    // Effects sheet visibility is driven entirely by the ViewModel via effectsPreviewPublisher.
-    val showVideoEffects = uiState.effectsPreviewPublisher != null
+    var showVideoEffects by remember { mutableStateOf(false) }
+    var selectedEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
     val videoEffectsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // Wire onOpenVideoEffects to local sheet state so no VM involvement is needed.
+    val effectsActions = remember(actions) {
+        actions.copy(onOpenVideoEffects = { showVideoEffects = true })
+    }
 
     val navigator = rememberSupportingPaneScaffoldNavigator()
     val scope = rememberCoroutineScope()
@@ -114,20 +118,13 @@ internal fun MeetingRoomScreen(
             val participants by call.participantsStateFlow.collectAsStateWithLifecycle()
             val publisher by call.publisher.collectAsStateWithLifecycle()
             val captionLines by call.captionsStateFlow.collectAsStateWithLifecycle()
-            val isCameraEnabled by remember(publisher) {
-                publisher?.isCameraEnabled ?: MutableStateFlow(false)
-            }.collectAsStateWithLifecycle()
-
-            // Derive selected effect and camera state from the isolated preview publisher.
-            // When the sheet opens the preview publisher is seeded with the real publisher's
-            // current effect, so the grid highlights the correct initial selection.
-            val previewVideoEffect by remember(uiState.effectsPreviewPublisher) {
-                uiState.effectsPreviewPublisher?.videoEffect ?: MutableStateFlow(VideoEffect.None)
-            }.collectAsStateWithLifecycle()
-
-            val previewCameraEnabled by remember(uiState.effectsPreviewPublisher) {
-                uiState.effectsPreviewPublisher?.isCameraEnabled ?: MutableStateFlow(false)
-            }.collectAsStateWithLifecycle()
+            // Sync selectedEffect to the real publisher's current effect each time the sheet
+            // opens, so the grid always highlights the correct initial selection.
+            LaunchedEffect(showVideoEffects) {
+                if (showVideoEffects) {
+                    selectedEffect = publisher?.videoEffect?.value ?: VideoEffect.None
+                }
+            }
 
             Scaffold(
                 modifier = modifier.systemBarsPadding(),
@@ -178,12 +175,12 @@ internal fun MeetingRoomScreen(
                             EmojiReactionOverlay(call = call)
                             CaptionsOverlay(captionLines = captionLines)
                             SpeakingWhileMutedOverlay(publisher = publisher)
-                            // Always shown — the effects sheet uses its own isolated preview
-                            // publisher and does not share the real publisher's SurfaceView.
+                            // MeetingRoomContent is always visible — the effects sheet is a
+                            // ModalBottomSheet that overlays it without disturbing the publisher.
                             MeetingRoomContent(
                                 modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
                                 call = call,
-                                actions = actions,
+                                actions = effectsActions,
                                 participants = participants,
                                 layoutType = uiState.layoutType,
                             )
@@ -226,35 +223,16 @@ internal fun MeetingRoomScreen(
             }
 
             if (showVideoEffects && MeetingRoomFeature.BACKGROUND_EFFECTS in uiState.enabledFeatures) {
-                val previewPublisher = uiState.effectsPreviewPublisher
                 ModalBottomSheet(
-                    onDismissRequest = {
-                        // Back gesture dismiss: cancel without applying.
-                        actions.onCancelVideoEffects()
-                    },
+                    onDismissRequest = { showVideoEffects = false },
                     sheetState = videoEffectsSheetState,
                 ) {
                     VideoEffectsScreen(
-                        previewPublisher = previewPublisher,
-                        isCameraEnabled = previewCameraEnabled,
                         backgrounds = uiState.backgrounds,
-                        selectedEffect = previewVideoEffect,
-                        onDismiss = {
-                            scope.launch {
-                                videoEffectsSheetState.hide()
-                                actions.onCancelVideoEffects()
-                            }
-                        },
-                        onApply = { effect ->
-                            scope.launch {
-                                videoEffectsSheetState.hide()
-                                actions.onApplyVideoEffect(effect)
-                            }
-                        },
+                        selectedEffect = selectedEffect,
                         onEffectSelect = { effect ->
-                            // Apply to the isolated preview publisher only.
-                            // The real session publisher is NOT touched here.
-                            previewPublisher?.applyVideoEffect(effect)
+                            selectedEffect = effect
+                            actions.onApplyVideoEffect(effect)
                         },
                     )
                 }

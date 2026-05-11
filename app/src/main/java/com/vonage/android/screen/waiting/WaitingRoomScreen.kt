@@ -49,18 +49,15 @@ fun WaitingRoomScreen(
 ) {
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
+    val videoEffectsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showAudioDeviceSelector by remember { mutableStateOf(false) }
 
     var showVideoEffects by remember { mutableStateOf(false) }
     var selectedEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
-    var previousEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
 
     val effectsActions = remember(actions) {
         actions.copy(
-            onOpenVideoEffects = {
-                previousEffect = selectedEffect
-                showVideoEffects = true
-            },
+            onOpenVideoEffects = { showVideoEffects = true },
         )
     }
 
@@ -113,22 +110,20 @@ fun WaitingRoomScreen(
                 verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
             ) {
                 uiState.publisher?.let {
-                    if (!showVideoEffects) {
-                        VideoPreviewContainer(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .requiredHeight(245.dp),
+                    VideoPreviewContainer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .requiredHeight(245.dp),
+                        publisher = uiState.publisher,
+                        name = uiState.userName,
+                    ) {
+                        VideoControlPanel(
+                            modifier = Modifier.padding(bottom = VonageVideoTheme.dimens.paddingSmall),
                             publisher = uiState.publisher,
-                            name = uiState.userName,
-                        ) {
-                            VideoControlPanel(
-                                modifier = Modifier.padding(bottom = VonageVideoTheme.dimens.paddingSmall),
-                                publisher = uiState.publisher,
-                                allowMicrophoneControl = uiState.allowMicrophoneControl,
-                                allowCameraControl = uiState.allowCameraControl,
-                                actions = effectsActions,
-                            )
-                        }
+                            allowMicrophoneControl = uiState.allowMicrophoneControl,
+                            allowCameraControl = uiState.allowCameraControl,
+                            actions = effectsActions,
+                        )
                     }
                 }
                 DeviceSelectionPanel(
@@ -153,26 +148,19 @@ fun WaitingRoomScreen(
     )
 
     if (showVideoEffects) {
-        VideoEffectsScreen(
-            previewPublisher = uiState.publisher,
-            isCameraEnabled = uiState.publisher?.isCameraEnabled?.value ?: false,
-            backgrounds = uiState.backgrounds,
-            selectedEffect = selectedEffect,
-            onDismiss = {
-                selectedEffect = previousEffect
-                actions.onApplyVideoEffect(previousEffect)
-                showVideoEffects = false
-            },
-            onApply = { _ ->
-                // In the waiting room effects are applied immediately on selection
-                // (publisher is not in a session). Apply just closes the sheet.
-                showVideoEffects = false
-            },
-            onEffectSelect = { effect ->
-                selectedEffect = effect
-                actions.onApplyVideoEffect(effect)
-            },
-        )
+        ModalBottomSheet(
+            onDismissRequest = { showVideoEffects = false },
+            sheetState = videoEffectsSheetState,
+        ) {
+            VideoEffectsScreen(
+                backgrounds = uiState.backgrounds,
+                selectedEffect = selectedEffect,
+                onEffectSelect = { effect ->
+                    selectedEffect = effect
+                    actions.onApplyVideoEffect(effect)
+                },
+            )
+        }
     }
 }
 

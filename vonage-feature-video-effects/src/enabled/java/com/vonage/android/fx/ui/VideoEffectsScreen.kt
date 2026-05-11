@@ -1,8 +1,5 @@
-@file:Suppress("LongMethod", "TooManyFunctions")
-
 package com.vonage.android.fx.ui
 
-import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,13 +18,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -37,152 +28,60 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.vonage.android.compose.components.ParticipantVideoRenderer
-import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.line.BlurOff
 import com.vonage.android.compose.vivid.icons.line.Blur as LineBlur
 import com.vonage.android.compose.vivid.icons.solid.Blur as SolidBlur
-import com.vonage.android.compose.vivid.icons.line.Close
-import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VideoEffect
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 /**
- * Full-screen sheet for selecting a video effect.
+ * Bottom-sheet content for selecting a video effect.
  *
- * Displays a camera preview area, a flat scrollable grid with "Effects" and "Backgrounds"
- * section headers, and Cancel / Apply actions. Effects are applied to [previewPublisher]
- * immediately on selection so the user can preview them locally; the real session publisher
- * is not touched until [onApply] is invoked.
+ * Displays a "Video effects" title and a scrollable grid of blur effects and virtual
+ * background thumbnails. The selected effect is applied to the publisher immediately on
+ * tap ([onEffectSelect] is called with every selection). There is no Cancel/Apply step —
+ * the sheet is dismissed by swiping it down.
  *
- * @param previewPublisher     Isolated preview publisher for the camera preview. Effects
- *                             selected here are applied to this publisher only.
- * @param isCameraEnabled      Whether the preview camera is currently active.
- * @param backgrounds          List of virtual background thumbnails to display.
- * @param selectedEffect       Currently active video effect (reflects preview publisher state).
- * @param onDismiss            Invoked when the user taps Close or Cancel (no effect applied
- *                             to the real publisher).
- * @param onApply              Invoked when the user taps Apply; receives the chosen
- *                             [VideoEffect] so the caller can commit it to the real publisher.
- * @param onEffectSelect       Invoked when the user selects an effect; caller should apply
- *                             it to [previewPublisher] only.
- * @param modifier             Optional [Modifier] for the root layout.
+ * @param backgrounds    List of virtual background thumbnails to display.
+ * @param selectedEffect Currently active video effect (used to highlight the active tile).
+ * @param onEffectSelect Invoked when the user taps an effect tile; caller should apply
+ *                       it to the publisher immediately.
+ * @param modifier       Optional [Modifier] for the root layout.
  */
-@OptIn(ExperimentalMaterial3Api::class)
-@Suppress("LongParameterList")
 @Composable
 fun VideoEffectsScreen(
-    previewPublisher: Participant?,
-    isCameraEnabled: Boolean,
     backgrounds: ImmutableList<VideoBackgroundItem>,
     selectedEffect: VideoEffect,
-    onDismiss: () -> Unit,
-    onApply: (VideoEffect) -> Unit,
     onEffectSelect: (VideoEffect) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-
     Column(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .background(VonageVideoTheme.colors.background),
     ) {
-        VideoEffectsTopBar(onDismiss = onDismiss)
-
-        if (isLandscape) {
-            LandscapeContent(
-                publisher = previewPublisher,
-                isCameraEnabled = isCameraEnabled,
-                backgrounds = backgrounds,
-                selectedEffect = selectedEffect,
-                onEffectSelect = onEffectSelect,
-                modifier = Modifier.weight(1f),
-            )
-        } else {
-            PortraitContent(
-                publisher = previewPublisher,
-                isCameraEnabled = isCameraEnabled,
-                backgrounds = backgrounds,
-                selectedEffect = selectedEffect,
-                onEffectSelect = onEffectSelect,
-                modifier = Modifier.weight(1f),
-            )
-        }
-
-        VideoEffectsBottomBar(
-            onCancel = onDismiss,
-            onApply = { onApply(selectedEffect) },
-        )
-    }
-}
-
-@Suppress("LongParameterList")
-@Composable
-private fun PortraitContent(
-    publisher: Participant?,
-    isCameraEnabled: Boolean,
-    backgrounds: ImmutableList<VideoBackgroundItem>,
-    selectedEffect: VideoEffect,
-    onEffectSelect: (VideoEffect) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier = modifier) {
-        CameraPreview(
-            publisher = publisher,
-            isCameraEnabled = isCameraEnabled,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(VonageVideoTheme.dimens.paddingDefault),
+        // Title only — no close button; the sheet is dismissed via swipe-down.
+        Text(
+            text = "Video effects",
+            style = VonageVideoTheme.typography.heading3,
+            color = VonageVideoTheme.colors.secondary,
+            modifier = Modifier.padding(
+                horizontal = VonageVideoTheme.dimens.paddingDefault,
+                vertical = VonageVideoTheme.dimens.paddingMedium,
+            ),
         )
 
         EffectsAndBackgroundsGrid(
             backgrounds = backgrounds,
             selectedEffect = selectedEffect,
             onEffectSelect = onEffectSelect,
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
-        )
-    }
-}
-
-@Suppress("LongParameterList")
-@Composable
-private fun LandscapeContent(
-    publisher: Participant?,
-    isCameraEnabled: Boolean,
-    backgrounds: ImmutableList<VideoBackgroundItem>,
-    selectedEffect: VideoEffect,
-    onEffectSelect: (VideoEffect) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(modifier = modifier.fillMaxWidth()) {
-        CameraPreview(
-            publisher = publisher,
-            isCameraEnabled = isCameraEnabled,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .padding(VonageVideoTheme.dimens.paddingDefault),
-        )
-
-        EffectsAndBackgroundsGrid(
-            backgrounds = backgrounds,
-            selectedEffect = selectedEffect,
-            onEffectSelect = onEffectSelect,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
+            modifier = Modifier.padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
         )
     }
 }
@@ -263,65 +162,6 @@ private fun SectionHeader(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun VideoEffectsTopBar(
-    onDismiss: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    TopAppBar(
-        modifier = modifier,
-        title = {
-            Text(
-                text = "Video effects",
-                style = VonageVideoTheme.typography.heading3,
-                color = VonageVideoTheme.colors.secondary,
-            )
-        },
-        navigationIcon = {
-            IconButton(onClick = onDismiss) {
-                Icon(
-                    imageVector = VividIcons.Line.Close,
-                    contentDescription = null,
-                    tint = VonageVideoTheme.colors.secondary,
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = VonageVideoTheme.colors.background,
-        ),
-    )
-}
-
-@Composable
-private fun CameraPreview(
-    publisher: Participant?,
-    isCameraEnabled: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier
-            .aspectRatio(CAMERA_PREVIEW_ASPECT_RATIO)
-            .clip(VonageVideoTheme.shapes.large)
-            .background(VonageVideoTheme.colors.disabled),
-        contentAlignment = Alignment.Center,
-    ) {
-        if (isCameraEnabled && publisher != null) {
-            ParticipantVideoRenderer(
-                participant = publisher,
-                modifier = Modifier.fillMaxSize(),
-            )
-        } else {
-            Text(
-                text = "Your camera is turned off.",
-                style = VonageVideoTheme.typography.bodyBase,
-                color = VonageVideoTheme.colors.onBackground,
-                textAlign = TextAlign.Center,
-            )
-        }
-    }
-}
-
 @Composable
 private fun EffectItem(
     icon: ImageVector,
@@ -391,38 +231,6 @@ private fun BackgroundThumbnail(
     }
 }
 
-@Composable
-private fun VideoEffectsBottomBar(
-    onCancel: () -> Unit,
-    onApply: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = VonageVideoTheme.dimens.paddingDefault,
-                vertical = VonageVideoTheme.dimens.paddingMedium,
-            ),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        TextButton(onClick = onCancel) {
-            Text(
-                text = "Cancel",
-                style = VonageVideoTheme.typography.bodyBase,
-                color = VonageVideoTheme.colors.secondary,
-            )
-        }
-
-        VonageButton(
-            text = "Apply",
-            onClick = onApply,
-        )
-    }
-}
-
-private const val CAMERA_PREVIEW_ASPECT_RATIO = 16f / 9f
 private const val THUMBNAIL_ASPECT_RATIO = 16f / 9f
 private const val EFFECT_ICON_SIZE = 56
 private const val GRID_COLUMNS = 2
@@ -433,8 +241,6 @@ private const val SELECTED_ALPHA = 0.12f
 internal fun VideoEffectsScreenPortraitPreview() {
     VonageVideoTheme {
         VideoEffectsScreen(
-            previewPublisher = null,
-            isCameraEnabled = false,
             backgrounds = persistentListOf(
                 VideoBackgroundItem(id = "bg1"),
                 VideoBackgroundItem(id = "bg2"),
@@ -444,8 +250,6 @@ internal fun VideoEffectsScreenPortraitPreview() {
                 VideoBackgroundItem(id = "bg6"),
             ),
             selectedEffect = VideoEffect.None,
-            onDismiss = {},
-            onApply = {},
             onEffectSelect = {},
         )
     }
@@ -456,8 +260,6 @@ internal fun VideoEffectsScreenPortraitPreview() {
 internal fun VideoEffectsScreenLandscapePreview() {
     VonageVideoTheme {
         VideoEffectsScreen(
-            previewPublisher = null,
-            isCameraEnabled = false,
             backgrounds = persistentListOf(
                 VideoBackgroundItem(id = "bg1"),
                 VideoBackgroundItem(id = "bg2"),
@@ -465,8 +267,6 @@ internal fun VideoEffectsScreenLandscapePreview() {
                 VideoBackgroundItem(id = "bg4"),
             ),
             selectedEffect = VideoEffect.BlurLow,
-            onDismiss = {},
-            onApply = {},
             onEffectSelect = {},
         )
     }

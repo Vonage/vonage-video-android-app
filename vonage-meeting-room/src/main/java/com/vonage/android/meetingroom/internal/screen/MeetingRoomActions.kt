@@ -15,8 +15,6 @@ internal data class MeetingRoomActions(
     val onCameraSwitch: () -> Unit = {},
     val onOpenVideoEffects: () -> Unit = {},
     val onApplyVideoEffect: (VideoEffect) -> Unit = {},
-    /** Invoked when the effects sheet is dismissed without applying (Cancel / back gesture). */
-    val onCancelVideoEffects: () -> Unit = {},
     val onAudioSwitch: () -> Unit = {},
     val onMessageSent: (String) -> Unit = {},
     val onListenUnread: (Boolean) -> Unit = {},
