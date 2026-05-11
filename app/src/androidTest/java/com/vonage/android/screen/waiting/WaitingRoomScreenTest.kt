@@ -11,12 +11,14 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.fx.ui.VideoEffectsTestTags
 import com.vonage.android.kotlin.model.CameraType
 import com.vonage.android.kotlin.model.NoiseSuppression
 import com.vonage.android.kotlin.model.PublisherParticipant
@@ -26,6 +28,7 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -397,6 +400,29 @@ class WaitingRoomScreenTest {
         screen.cameraButtonEnabled.performClick()
 
         assertTrue(wasCalled)
+    }
+
+    @Test
+    fun given_videoEffects_indicator_clicked_THEN_sheet_appears_and_callback_invoked() {
+        var appliedEffect: VideoEffect? = null
+
+        compose.setContent {
+            VonageVideoTheme {
+                WaitingRoomScreen(
+                    uiState = WaitingRoomUiState(
+                        roomName = "room-name",
+                        userName = "user",
+                        publisher = buildPublisher(isMicEnabled = true, isCameraEnabled = true),
+                    ),
+                    actions = WaitingRoomActions(onApplyVideoEffect = { appliedEffect = it }),
+                )
+            }
+        }
+
+        screen.cameraBlurButton.performClick()
+        screen.videoEffectsSheet.assertIsDisplayed()
+        compose.onNodeWithTag(VideoEffectsTestTags.VIDEO_EFFECTS_BLUR_LOW_TILE).performClick()
+        assertEquals(VideoEffect.BlurLow, appliedEffect)
     }
 
     @Suppress("EmptyFunctionBlock")

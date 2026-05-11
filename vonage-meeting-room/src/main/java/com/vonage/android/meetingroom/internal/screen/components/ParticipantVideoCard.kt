@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,6 +45,7 @@ import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
+import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,6 +132,7 @@ internal fun ParticipantVideoCard(
 
             VideoEffectIndicator(
                 modifier = Modifier
+                    .testTag(MeetingRoomScreenTestTags.MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON)
                     .align(Alignment.BottomEnd)
                     .padding(VonageVideoTheme.dimens.paddingSmall),
                 videoEffect = videoEffect,

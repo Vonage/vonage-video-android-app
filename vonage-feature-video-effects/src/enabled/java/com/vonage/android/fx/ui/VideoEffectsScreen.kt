@@ -31,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.vonage.android.videofx.R
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -65,6 +66,7 @@ fun VideoEffectsScreen(
 ) {
     Column(
         modifier = modifier
+            .testTag(VideoEffectsTestTags.VIDEO_EFFECTS_SHEET_CONTENT)
             .fillMaxWidth()
             .background(VonageVideoTheme.colors.background),
     ) {
@@ -118,7 +120,13 @@ private fun EffectsAndBackgroundsGrid(
                 horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
             ) {
                 blurEffects.forEach { (effect, icon) ->
+                    val tileTag = when (effect) {
+                        VideoEffect.None -> VideoEffectsTestTags.VIDEO_EFFECTS_NONE_TILE
+                        VideoEffect.BlurLow -> VideoEffectsTestTags.VIDEO_EFFECTS_BLUR_LOW_TILE
+                        else -> VideoEffectsTestTags.VIDEO_EFFECTS_BLUR_HIGH_TILE
+                    }
                     EffectItem(
+                        modifier = Modifier.testTag(tileTag),
                         icon = icon,
                         isSelected = selectedEffect == effect,
                         onClick = { onEffectSelect(effect) },
