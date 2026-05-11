@@ -2,6 +2,7 @@ package com.vonage.android.fx.data
 
 import android.content.Context
 import com.vonage.android.fx.ui.VideoBackgroundItem
+import com.vonage.android.kotlin.model.CaptureResolution
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -10,5 +11,7 @@ import kotlinx.collections.immutable.persistentListOf
  */
 class BackgroundEffectsRepository(@Suppress("UNUSED_PARAMETER") context: Context) {
 
-    fun getBackgrounds(): ImmutableList<VideoBackgroundItem> = persistentListOf()
+    fun getBackgrounds(
+        @Suppress("UNUSED_PARAMETER") captureResolution: CaptureResolution? = null,
+    ): ImmutableList<VideoBackgroundItem> = persistentListOf()
 }

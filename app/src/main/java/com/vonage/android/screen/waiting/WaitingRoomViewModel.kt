@@ -59,7 +59,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val repository = BackgroundEffectsRepository(appContext)
-                repository.getBackgrounds()
+                repository.getBackgrounds(callSettingsHolder.captureResolution.value)
             }.getOrElse { persistentListOf() }
                 .also { backgrounds -> _uiState.update { it.copy(backgrounds = backgrounds) } }
         }
