@@ -7,6 +7,7 @@ import com.vonage.android.kotlin.Call.Companion.PUBLISHER_SCREEN_ID
 import com.vonage.android.kotlin.sdk.VonageBlurLevel
 import com.vonage.android.kotlin.sdk.VonageCaptureFrameRate
 import com.vonage.android.kotlin.sdk.VonageCaptureResolution
+import com.vonage.android.kotlin.sdk.VonagePublisher
 import com.vonage.android.kotlin.sdk.VonagePublisherConfig
 import com.vonage.android.kotlin.sdk.VonageScreenShareConfig
 import com.vonage.android.kotlin.sdk.VonageSdkFactory
@@ -35,12 +36,46 @@ class PublisherFactory(
 
     var publisherHolder: VeraPublisherHolder? = null
     private var publisherConfig: PublisherConfig? = null
+    private var isolatedPreviewPublisher: VonagePublisher? = null
 
     val currentConfig: PublisherConfig?
         get() = publisherConfig
 
     fun init(config: PublisherConfig) {
         publisherConfig = config
+    }
+
+    /**
+     * Creates a standalone preview publisher that is **never published to any session** and
+     * whose lifecycle is managed independently from [publisherHolder].
+     *
+     * Use this for the effects-preview sheet in the meeting room so that the real session
+     * publisher ([publisherHolder]) is not disturbed while the user browses effects.
+     *
+     * Call [destroyIsolatedPreviewPublisher] to release camera resources when done.
+     */
+    fun createIsolatedPreviewPublisher(context: Context): PreviewPublisherState {
+        val vonagePublisher = sdkFactory.createPublisher(context, buildVonageConfig())
+        isolatedPreviewPublisher = vonagePublisher           // separate from publisherHolder
+        val effect = currentConfig?.initialVideoEffect ?: VideoEffect.None
+        val state = PreviewPublisherState(
+            vonagePublisher,
+            captureInfoLabel = buildCaptureInfoLabel(context),
+            initialVideoEffect = effect,
+        )
+        if (effect is VideoEffect.BackgroundImage) {
+            vonagePublisher.applyBackgroundImage(effect.imagePath)
+        }
+        vonageLogger.i(TAG, "Create isolated preview publisher (effect=$effect)")
+        return state
+    }
+
+    /** Releases the isolated preview publisher created by [createIsolatedPreviewPublisher]. */
+    fun destroyIsolatedPreviewPublisher() {
+        isolatedPreviewPublisher?.destroy()
+        isolatedPreviewPublisher?.stop()
+        isolatedPreviewPublisher = null
+        vonageLogger.i(TAG, "Destroy isolated preview publisher")
     }
 
     fun createPreviewPublisher(context: Context): PreviewPublisherState {

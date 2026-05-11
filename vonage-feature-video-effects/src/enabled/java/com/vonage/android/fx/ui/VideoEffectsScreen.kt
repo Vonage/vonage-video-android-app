@@ -59,27 +59,33 @@ import kotlinx.collections.immutable.persistentListOf
  * Full-screen sheet for selecting a video effect.
  *
  * Displays a camera preview area, a flat scrollable grid with "Effects" and "Backgrounds"
- * section headers, and Cancel / Apply actions. Effects are applied immediately on selection.
+ * section headers, and Cancel / Apply actions. Effects are applied to [previewPublisher]
+ * immediately on selection so the user can preview them locally; the real session publisher
+ * is not touched until [onApply] is invoked.
  *
- * @param publisher            Publisher participant for camera preview rendering.
- * @param isCameraEnabled      Whether the camera is currently active.
+ * @param previewPublisher     Isolated preview publisher for the camera preview. Effects
+ *                             selected here are applied to this publisher only.
+ * @param isCameraEnabled      Whether the preview camera is currently active.
  * @param backgrounds          List of virtual background thumbnails to display.
- * @param selectedEffect       Currently active video effect.
- * @param onDismiss            Invoked when the user taps Close or Cancel (should revert effect).
- * @param onApply              Invoked when the user taps Apply (just closes the sheet).
- * @param onEffectSelect     Invoked when the user selects an effect; applied immediately.
+ * @param selectedEffect       Currently active video effect (reflects preview publisher state).
+ * @param onDismiss            Invoked when the user taps Close or Cancel (no effect applied
+ *                             to the real publisher).
+ * @param onApply              Invoked when the user taps Apply; receives the chosen
+ *                             [VideoEffect] so the caller can commit it to the real publisher.
+ * @param onEffectSelect       Invoked when the user selects an effect; caller should apply
+ *                             it to [previewPublisher] only.
  * @param modifier             Optional [Modifier] for the root layout.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("LongParameterList")
 @Composable
 fun VideoEffectsScreen(
-    publisher: Participant?,
+    previewPublisher: Participant?,
     isCameraEnabled: Boolean,
     backgrounds: ImmutableList<VideoBackgroundItem>,
     selectedEffect: VideoEffect,
     onDismiss: () -> Unit,
-    onApply: () -> Unit,
+    onApply: (VideoEffect) -> Unit,
     onEffectSelect: (VideoEffect) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -94,7 +100,7 @@ fun VideoEffectsScreen(
 
         if (isLandscape) {
             LandscapeContent(
-                publisher = publisher,
+                publisher = previewPublisher,
                 isCameraEnabled = isCameraEnabled,
                 backgrounds = backgrounds,
                 selectedEffect = selectedEffect,
@@ -103,7 +109,7 @@ fun VideoEffectsScreen(
             )
         } else {
             PortraitContent(
-                publisher = publisher,
+                publisher = previewPublisher,
                 isCameraEnabled = isCameraEnabled,
                 backgrounds = backgrounds,
                 selectedEffect = selectedEffect,
@@ -114,7 +120,7 @@ fun VideoEffectsScreen(
 
         VideoEffectsBottomBar(
             onCancel = onDismiss,
-            onApply = onApply,
+            onApply = { onApply(selectedEffect) },
         )
     }
 }
@@ -427,7 +433,7 @@ private const val SELECTED_ALPHA = 0.12f
 internal fun VideoEffectsScreenPortraitPreview() {
     VonageVideoTheme {
         VideoEffectsScreen(
-            publisher = null,
+            previewPublisher = null,
             isCameraEnabled = false,
             backgrounds = persistentListOf(
                 VideoBackgroundItem(id = "bg1"),
@@ -450,7 +456,7 @@ internal fun VideoEffectsScreenPortraitPreview() {
 internal fun VideoEffectsScreenLandscapePreview() {
     VonageVideoTheme {
         VideoEffectsScreen(
-            publisher = null,
+            previewPublisher = null,
             isCameraEnabled = false,
             backgrounds = persistentListOf(
                 VideoBackgroundItem(id = "bg1"),

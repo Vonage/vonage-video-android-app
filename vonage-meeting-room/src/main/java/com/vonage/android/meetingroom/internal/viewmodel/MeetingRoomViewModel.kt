@@ -23,6 +23,7 @@ import com.vonage.logger.vonageLogger
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -65,6 +66,7 @@ internal class MeetingRoomViewModel(
 
     private var call: CallFacade? = null
     private val callEnded = AtomicBoolean(false)
+    private var effectsPreviewJob: Job? = null
 
     init {
         container.foregroundServiceHandler.startForegroundService(roomName)
@@ -198,8 +200,47 @@ internal class MeetingRoomViewModel(
 
     fun onSwitchCamera() { call?.toggleLocalCamera() }
 
+    /**
+     * Applies [effect] to the real session publisher **and** tears down the isolated
+     * preview publisher. This is invoked when the user taps Apply in the effects sheet.
+     */
     fun applyVideoEffect(effect: VideoEffect) {
         call?.applyLocalVideoEffect(effect)
+        closeEffectsPreview()
+    }
+
+    /**
+     * Creates an isolated preview publisher seeded with the current session publisher's
+     * effect. The preview publisher is never published to the session, so other participants
+     * are not affected while the user browses effects.
+     */
+    fun openEffectsPreview() {
+        if (_uiState.value.effectsPreviewPublisher != null) return   // guard against double-open
+        val currentEffect = call?.publisher?.value?.videoEffect?.value ?: VideoEffect.None
+        container.videoClient.configurePublisher(
+            PublisherConfig(
+                name = "",
+                publishVideo = true,
+                publishAudio = false,
+                initialVideoEffect = currentEffect,
+                cameraIndex = call?.publisher?.value?.camera?.value?.index ?: 1,
+            ),
+        )
+        val preview = container.videoClient.createIsolatedPreviewPublisher(context)
+        effectsPreviewJob = viewModelScope.launch { preview.setup() }
+        _uiState.update { it.copy(effectsPreviewPublisher = preview) }
+    }
+
+    /**
+     * Closes the effects sheet without applying any effect to the real publisher.
+     * Invoked on Cancel or back-gesture dismiss.
+     */
+    fun closeEffectsPreview() {
+        effectsPreviewJob?.cancel()
+        effectsPreviewJob = null
+        _uiState.value.effectsPreviewPublisher?.clean()
+        container.videoClient.destroyIsolatedPreviewPublisher()
+        _uiState.update { it.copy(effectsPreviewPublisher = null) }
     }
 
     fun endCall() {
@@ -353,6 +394,7 @@ internal class MeetingRoomViewModel(
 
     override fun onCleared() {
         super.onCleared()
+        closeEffectsPreview()
         endCall()
         container.activityContextHolder.clearActivityContext()
     }

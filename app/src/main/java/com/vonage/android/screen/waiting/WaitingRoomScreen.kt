@@ -154,7 +154,7 @@ fun WaitingRoomScreen(
 
     if (showVideoEffects) {
         VideoEffectsScreen(
-            publisher = uiState.publisher,
+            previewPublisher = uiState.publisher,
             isCameraEnabled = uiState.publisher?.isCameraEnabled?.value ?: false,
             backgrounds = uiState.backgrounds,
             selectedEffect = selectedEffect,
@@ -163,7 +163,11 @@ fun WaitingRoomScreen(
                 actions.onApplyVideoEffect(previousEffect)
                 showVideoEffects = false
             },
-            onApply = { showVideoEffects = false },
+            onApply = { _ ->
+                // In the waiting room effects are applied immediately on selection
+                // (publisher is not in a session). Apply just closes the sheet.
+                showVideoEffects = false
+            },
             onEffectSelect = { effect ->
                 selectedEffect = effect
                 actions.onApplyVideoEffect(effect)

@@ -57,9 +57,22 @@ class VonageVideoClient(
     fun createPreviewPublisher(context: Context): PreviewPublisherState =
         publisherFactory.createPreviewPublisher(context)
 
+    /**
+     * Creates a standalone preview publisher for the effects sheet that is never published
+     * to any session. The real session publisher is unaffected.
+     *
+     * Call [destroyIsolatedPreviewPublisher] when the sheet is dismissed.
+     */
+    fun createIsolatedPreviewPublisher(context: Context): PreviewPublisherState =
+        publisherFactory.createIsolatedPreviewPublisher(context)
+
     fun destroyPublisher() {
         publisherFactory.destroyPublisher()
     }
+
+    /** Releases the isolated preview publisher created by [createIsolatedPreviewPublisher]. */
+    fun destroyIsolatedPreviewPublisher() =
+        publisherFactory.destroyIsolatedPreviewPublisher()
 
     /**
      * Creates a new session and returns a [CallFacade] ready for connection.

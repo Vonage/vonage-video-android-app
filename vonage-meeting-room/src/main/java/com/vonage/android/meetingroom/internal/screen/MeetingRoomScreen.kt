@@ -88,19 +88,9 @@ internal fun MeetingRoomScreen(
     var showAudioOutputs by remember { mutableStateOf(false) }
     val audioOutputsSheetState = rememberModalBottomSheetState()
 
-    var showVideoEffects by remember { mutableStateOf(false) }
+    // Effects sheet visibility is driven entirely by the ViewModel via effectsPreviewPublisher.
+    val showVideoEffects = uiState.effectsPreviewPublisher != null
     val videoEffectsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var selectedEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
-    var previousEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
-
-    val effectsActions = remember(actions) {
-        actions.copy(
-            onOpenVideoEffects = {
-                previousEffect = selectedEffect
-                showVideoEffects = true
-            },
-        )
-    }
 
     val navigator = rememberSupportingPaneScaffoldNavigator()
     val scope = rememberCoroutineScope()
@@ -128,15 +118,16 @@ internal fun MeetingRoomScreen(
                 publisher?.isCameraEnabled ?: MutableStateFlow(false)
             }.collectAsStateWithLifecycle()
 
-            // Sync selectedEffect with the publisher's actual videoEffect whenever the sheet is
-            // closed. This ensures that previousEffect is correct when the sheet is opened,
-            // preventing a dismiss/cancel from erroneously reverting to VideoEffect.None when
-            // the publisher started with a non-None effect (e.g. carried over from waiting room).
-            LaunchedEffect(publisher, showVideoEffects) {
-                if (!showVideoEffects) {
-                    selectedEffect = publisher?.videoEffect?.value ?: VideoEffect.None
-                }
-            }
+            // Derive selected effect and camera state from the isolated preview publisher.
+            // When the sheet opens the preview publisher is seeded with the real publisher's
+            // current effect, so the grid highlights the correct initial selection.
+            val previewVideoEffect by remember(uiState.effectsPreviewPublisher) {
+                uiState.effectsPreviewPublisher?.videoEffect ?: MutableStateFlow(VideoEffect.None)
+            }.collectAsStateWithLifecycle()
+
+            val previewCameraEnabled by remember(uiState.effectsPreviewPublisher) {
+                uiState.effectsPreviewPublisher?.isCameraEnabled ?: MutableStateFlow(false)
+            }.collectAsStateWithLifecycle()
 
             Scaffold(
                 modifier = modifier.systemBarsPadding(),
@@ -187,15 +178,15 @@ internal fun MeetingRoomScreen(
                             EmojiReactionOverlay(call = call)
                             CaptionsOverlay(captionLines = captionLines)
                             SpeakingWhileMutedOverlay(publisher = publisher)
-                            if (!showVideoEffects) {
-                                MeetingRoomContent(
-                                    modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
-                                    call = call,
-                                    actions = effectsActions,
-                                    participants = participants,
-                                    layoutType = uiState.layoutType,
-                                )
-                            }
+                            // Always shown — the effects sheet uses its own isolated preview
+                            // publisher and does not share the real publisher's SurfaceView.
+                            MeetingRoomContent(
+                                modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
+                                call = call,
+                                actions = actions,
+                                participants = participants,
+                                layoutType = uiState.layoutType,
+                            )
                         }
                     },
                     supportingPane = { },
@@ -235,36 +226,35 @@ internal fun MeetingRoomScreen(
             }
 
             if (showVideoEffects && MeetingRoomFeature.BACKGROUND_EFFECTS in uiState.enabledFeatures) {
+                val previewPublisher = uiState.effectsPreviewPublisher
                 ModalBottomSheet(
                     onDismissRequest = {
-                        selectedEffect = previousEffect
-                        actions.onApplyVideoEffect(previousEffect)
-                        showVideoEffects = false
+                        // Back gesture dismiss: cancel without applying.
+                        actions.onCancelVideoEffects()
                     },
                     sheetState = videoEffectsSheetState,
                 ) {
                     VideoEffectsScreen(
-                        publisher = publisher,
-                        isCameraEnabled = isCameraEnabled,
+                        previewPublisher = previewPublisher,
+                        isCameraEnabled = previewCameraEnabled,
                         backgrounds = uiState.backgrounds,
-                        selectedEffect = selectedEffect,
+                        selectedEffect = previewVideoEffect,
                         onDismiss = {
                             scope.launch {
                                 videoEffectsSheetState.hide()
-                                selectedEffect = previousEffect
-                                actions.onApplyVideoEffect(previousEffect)
-                                showVideoEffects = false
+                                actions.onCancelVideoEffects()
                             }
                         },
-                        onApply = {
+                        onApply = { effect ->
                             scope.launch {
                                 videoEffectsSheetState.hide()
-                                showVideoEffects = false
+                                actions.onApplyVideoEffect(effect)
                             }
                         },
                         onEffectSelect = { effect ->
-                            selectedEffect = effect
-                            actions.onApplyVideoEffect(effect)
+                            // Apply to the isolated preview publisher only.
+                            // The real session publisher is NOT touched here.
+                            previewPublisher?.applyVideoEffect(effect)
                         },
                     )
                 }
