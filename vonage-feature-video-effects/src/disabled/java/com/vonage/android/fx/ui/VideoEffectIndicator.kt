@@ -10,7 +10,7 @@ import com.vonage.android.kotlin.model.VideoEffect
 
 @Suppress("UnusedParameter")
 @Composable
-fun BlurIndicator(
+fun VideoEffectIndicator(
     videoEffect: VideoEffect,
     onCameraBlur: () -> Unit,
     modifier: Modifier = Modifier,

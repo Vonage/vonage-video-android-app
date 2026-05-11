@@ -39,7 +39,7 @@ import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.MicMute
 import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.compose.vivid.icons.solid.MoreVertical
-import com.vonage.android.fx.ui.BlurIndicator
+import com.vonage.android.fx.ui.VideoEffectIndicator
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.kotlin.model.VideoSource
@@ -128,7 +128,7 @@ internal fun ParticipantVideoCard(
 
             val videoEffect by publisherParticipant.videoEffect.collectAsStateWithLifecycle()
 
-            BlurIndicator(
+            VideoEffectIndicator(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(VonageVideoTheme.dimens.paddingSmall),

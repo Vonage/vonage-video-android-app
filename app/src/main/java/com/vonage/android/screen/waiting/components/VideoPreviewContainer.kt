@@ -35,7 +35,7 @@ import com.vonage.android.compose.vivid.icons.solid.MicMute
 import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.compose.vivid.icons.solid.Video
 import com.vonage.android.compose.vivid.icons.solid.VideoOff
-import com.vonage.android.fx.ui.BlurIndicator
+import com.vonage.android.fx.ui.VideoEffectIndicator
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.screen.components.VideoLabel
 import com.vonage.android.screen.waiting.WaitingRoomActions
@@ -154,7 +154,7 @@ internal fun VideoControlPanel(
             }
         }
 
-        BlurIndicator(
+        VideoEffectIndicator(
             modifier = Modifier
                 .testTag(CAMERA_BLUR_BUTTON_TAG),
             videoEffect = videoEffect,

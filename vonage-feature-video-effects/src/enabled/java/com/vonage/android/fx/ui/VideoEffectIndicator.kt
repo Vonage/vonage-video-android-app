@@ -2,7 +2,6 @@ package com.vonage.android.fx.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -13,11 +12,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.components.CircularControlButton
 import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.line.Blur as LineBlur
 import com.vonage.android.compose.vivid.icons.line.BlurOff
-import com.vonage.android.compose.vivid.icons.solid.Blur
+import com.vonage.android.compose.vivid.icons.line.Image
+import com.vonage.android.compose.vivid.icons.solid.Blur as SolidBlur
 import com.vonage.android.kotlin.model.VideoEffect
+
 @Composable
-fun BlurIndicator(
+fun VideoEffectIndicator(
     videoEffect: VideoEffect,
     onCameraBlur: () -> Unit,
     modifier: Modifier = Modifier,
@@ -38,6 +40,8 @@ fun BlurIndicator(
 private fun rememberEffectIcon(effect: VideoEffect): ImageVector = remember(effect) {
     when (effect) {
         VideoEffect.None -> VividIcons.Line.BlurOff
-        else -> VividIcons.Solid.Blur
+        VideoEffect.BlurLow -> VividIcons.Line.LineBlur
+        VideoEffect.BlurHigh -> VividIcons.Solid.SolidBlur
+        is VideoEffect.BackgroundImage -> VividIcons.Line.Image
     }
 }
