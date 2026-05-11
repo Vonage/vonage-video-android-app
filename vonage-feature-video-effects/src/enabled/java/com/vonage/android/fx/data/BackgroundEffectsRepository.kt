@@ -33,6 +33,7 @@ class BackgroundEffectsRepository(private val context: Context) {
         if (file.exists()) return file.absolutePath
         dir.mkdirs()
         val bitmap = BitmapFactory.decodeResource(context.resources, drawableRes)
+            ?: error("Failed to decode drawable resource $drawableRes for background '$id'")
         FileOutputStream(file).use { out ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, out)
         }

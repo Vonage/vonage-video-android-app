@@ -127,6 +127,17 @@ internal fun MeetingRoomScreen(
             val isCameraEnabled by remember(publisher) {
                 publisher?.isCameraEnabled ?: MutableStateFlow(false)
             }.collectAsStateWithLifecycle()
+
+            // Sync selectedEffect with the publisher's actual videoEffect whenever the sheet is
+            // closed. This ensures that previousEffect is correct when the sheet is opened,
+            // preventing a dismiss/cancel from erroneously reverting to VideoEffect.None when
+            // the publisher started with a non-None effect (e.g. carried over from waiting room).
+            LaunchedEffect(publisher, showVideoEffects) {
+                if (!showVideoEffects) {
+                    selectedEffect = publisher?.videoEffect?.value ?: VideoEffect.None
+                }
+            }
+
             Scaffold(
                 modifier = modifier.systemBarsPadding(),
                 topBar = {

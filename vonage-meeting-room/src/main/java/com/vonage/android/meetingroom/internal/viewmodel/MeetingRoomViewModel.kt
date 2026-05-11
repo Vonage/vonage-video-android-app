@@ -88,6 +88,8 @@ internal class MeetingRoomViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val backgrounds = runCatching {
                 container.backgroundEffectsRepository.getBackgrounds()
+            }.onFailure { throwable ->
+                vonageLogger.e("MeetingRoomViewModel", "Failed to load background effects: $throwable")
             }.getOrElse { persistentListOf() }
             _uiState.update { it.copy(backgrounds = backgrounds) }
         }
