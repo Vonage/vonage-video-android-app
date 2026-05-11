@@ -92,8 +92,12 @@ internal fun MeetingRoomScreen(
     val videoEffectsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     // Wire onOpenVideoEffects to local sheet state so no VM involvement is needed.
-    val effectsActions = remember(actions) {
-        actions.copy(onOpenVideoEffects = { showVideoEffects = true })
+    val effectsActions = remember(actions, uiState.enabledFeatures) {
+        actions.copy(onOpenVideoEffects = {
+            if (MeetingRoomFeature.BACKGROUND_EFFECTS in uiState.enabledFeatures) {
+                showVideoEffects = true
+            }
+        })
     }
 
     val navigator = rememberSupportingPaneScaffoldNavigator()

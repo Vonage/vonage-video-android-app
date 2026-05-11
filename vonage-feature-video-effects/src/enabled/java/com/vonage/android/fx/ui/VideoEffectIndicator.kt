@@ -21,7 +21,7 @@ import com.vonage.android.kotlin.model.VideoEffect
 @Composable
 fun VideoEffectIndicator(
     videoEffect: VideoEffect,
-    onCameraBlur: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 56.dp,
     iconSize: Dp = 24.dp,
@@ -29,7 +29,7 @@ fun VideoEffectIndicator(
     CircularControlButton(
         modifier = modifier
             .border(BorderStroke(1.dp, Color.White), CircleShape),
-        onClick = onCameraBlur,
+        onClick = onClick,
         icon = rememberEffectIcon(videoEffect),
         size = size,
         iconSize = iconSize,

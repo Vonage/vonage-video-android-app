@@ -12,7 +12,7 @@ import com.vonage.android.kotlin.model.VideoEffect
 @Composable
 fun VideoEffectIndicator(
     videoEffect: VideoEffect,
-    onCameraBlur: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 0.dp,
     iconSize: Dp = 0.dp,

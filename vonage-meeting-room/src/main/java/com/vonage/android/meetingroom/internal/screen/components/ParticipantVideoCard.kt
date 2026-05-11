@@ -133,7 +133,7 @@ internal fun ParticipantVideoCard(
                     .align(Alignment.BottomEnd)
                     .padding(VonageVideoTheme.dimens.paddingSmall),
                 videoEffect = videoEffect,
-                onCameraBlur = actions.onOpenVideoEffects,
+                onClick = actions.onOpenVideoEffects,
                 size = VonageVideoTheme.dimens.minTouchTarget,
                 iconSize = VonageVideoTheme.dimens.iconSizeSmall,
             )

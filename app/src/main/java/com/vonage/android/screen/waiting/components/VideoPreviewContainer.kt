@@ -158,7 +158,7 @@ internal fun VideoControlPanel(
             modifier = Modifier
                 .testTag(CAMERA_BLUR_BUTTON_TAG),
             videoEffect = videoEffect,
-            onCameraBlur = actions.onOpenVideoEffects,
+            onClick = actions.onOpenVideoEffects,
         )
     }
 }
