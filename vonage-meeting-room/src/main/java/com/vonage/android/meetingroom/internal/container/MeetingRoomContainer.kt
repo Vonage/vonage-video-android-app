@@ -4,6 +4,7 @@ import android.content.Context
 import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.captions.VonageCaptions
 import com.vonage.android.chat.ChatModule
+import com.vonage.android.fx.data.BackgroundEffectsRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.sdk.VonageSdkFactory
@@ -114,5 +115,9 @@ internal class MeetingRoomContainer(
 
     val activityContextHolder: ActivityContextHolder by lazy {
         ActivityContextHolder()
+    }
+
+    val backgroundEffectsRepository: BackgroundEffectsRepository by lazy {
+        BackgroundEffectsRepository(applicationContext)
     }
 }

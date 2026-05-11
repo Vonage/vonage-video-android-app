@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,7 +33,6 @@ import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.components.GenericLoading
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
-import com.vonage.android.fx.data.BackgroundEffectsRepository
 import com.vonage.android.fx.ui.VideoEffectsScreen
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
@@ -94,9 +92,6 @@ internal fun MeetingRoomScreen(
     val videoEffectsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var selectedEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
     var previousEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
-    val context = LocalContext.current
-    val backgroundsRepository = remember { BackgroundEffectsRepository(context) }
-    val backgrounds = remember { backgroundsRepository.getBackgrounds() }
 
     val effectsActions = remember(actions) {
         actions.copy(
@@ -240,7 +235,7 @@ internal fun MeetingRoomScreen(
                     VideoEffectsScreen(
                         publisher = publisher,
                         isCameraEnabled = isCameraEnabled,
-                        backgrounds = backgrounds,
+                        backgrounds = uiState.backgrounds,
                         selectedEffect = selectedEffect,
                         onDismiss = {
                             scope.launch {

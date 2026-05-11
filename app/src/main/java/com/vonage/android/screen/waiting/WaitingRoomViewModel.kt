@@ -121,13 +121,14 @@ class WaitingRoomViewModel @AssistedInject constructor(
                 return@launch
             }
             userRepository.saveUserName(sanitizedUserName)
-            currentPublisher()?.let { publisher ->
+            val joinEffect = currentPublisher()?.let { publisher ->
+                val effect = publisher.videoEffect.value
                 videoClient.configurePublisher(
                     PublisherConfig(
                         name = sanitizedUserName,
                         publishVideo = publisher.isCameraEnabled.value,
                         publishAudio = publisher.isMicEnabled.value,
-                        initialVideoEffect = publisher.videoEffect.value,
+                        initialVideoEffect = effect,
                         cameraIndex = publisher.camera.value.index,
                         senderStatsTrack = callSettingsHolder.senderStatsEnabled.value,
                         preferredVideoCodecOrder = callSettingsHolder.preferredVideoCodecOrder.value,
@@ -137,9 +138,10 @@ class WaitingRoomViewModel @AssistedInject constructor(
                         captureFrameRate = callSettingsHolder.captureFrameRate.value,
                     )
                 )
-            }
+                effect
+            } ?: VideoEffect.None
             onStop()
-            _uiState.update { uiState -> uiState.copy(isSuccess = true) }
+            _uiState.update { uiState -> uiState.copy(isSuccess = true, joinEffect = joinEffect) }
         }
     }
 
@@ -230,6 +232,7 @@ data class WaitingRoomUiState(
     val isUserNameValid: Boolean = true,
     val publisher: PublisherParticipant? = null,
     val isSuccess: Boolean = false,
+    val joinEffect: VideoEffect = VideoEffect.None,
     val allowMicrophoneControl: Boolean = true,
     val allowCameraControl: Boolean = true,
     val audioDevicesState: AudioDevicesState? = null,

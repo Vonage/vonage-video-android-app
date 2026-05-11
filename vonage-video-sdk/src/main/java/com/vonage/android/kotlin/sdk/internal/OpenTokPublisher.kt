@@ -100,8 +100,8 @@ internal class OpenTokPublisher(
         raw.setVideoTransformers(transformers)
     }
 
-    override fun applyBackgroundImage(imageName: String) {
-        val params = Json.encodeToString(BackgroundImageParams(imageName))
+    override fun applyBackgroundImage(imageFilePath: String) {
+        val params = Json.encodeToString(BackgroundImageParams(imageFilePath))
         val transformers = arrayListOf(raw.VideoTransformer(BACKGROUND_REPLACEMENT_KEY, params))
         raw.setVideoTransformers(transformers)
     }

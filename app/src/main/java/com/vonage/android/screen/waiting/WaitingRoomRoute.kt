@@ -19,7 +19,7 @@ import com.vonage.android.util.pip.pipEffect
 @Composable
 fun WaitingRoomRoute(
     roomName: String,
-    navigateToRoom: (String) -> Unit,
+    navigateToRoom: (String, VideoEffect) -> Unit,
     navigateToPermissions: () -> Unit,
     navigateToSettings: () -> Unit,
     onBack: () -> Unit,

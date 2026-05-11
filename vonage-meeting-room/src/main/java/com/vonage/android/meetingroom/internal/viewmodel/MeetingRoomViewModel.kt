@@ -21,6 +21,8 @@ import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServ
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.logger.vonageLogger
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -78,10 +80,17 @@ internal class MeetingRoomViewModel(
                 name = prebuilt.publisherSettings.username,
                 publishAudio = prebuilt.publisherSettings.publishAudio,
                 publishVideo = prebuilt.publisherSettings.publishVideo,
-                initialVideoEffect = VideoEffect.None,
+                initialVideoEffect = prebuilt.publisherSettings.initialVideoEffect,
                 cameraIndex = 1, // default to front camera
             ),
         )
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val backgrounds = runCatching {
+                container.backgroundEffectsRepository.getBackgrounds()
+            }.getOrElse { persistentListOf() }
+            _uiState.update { it.copy(backgrounds = backgrounds) }
+        }
 
         viewModelScope.launch {
             _uiState.update { state ->
@@ -226,7 +235,7 @@ internal class MeetingRoomViewModel(
                                 },
                                 publishVideo = activeCall.publisher.value?.isCameraEnabled?.value ?: true,
                                 publishAudio = activeCall.publisher.value?.isMicEnabled?.value ?: true,
-                                initialVideoEffect = VideoEffect.None,
+                                initialVideoEffect = activeCall.publisher.value?.videoEffect?.value ?: VideoEffect.None,
                                 cameraIndex = activeCall.publisher.value?.camera?.value?.index ?: 1,
                                 captureFrameRate = holder.captureFrameRate.value,
                                 captureResolution = holder.captureResolution.value,

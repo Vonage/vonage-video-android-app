@@ -13,7 +13,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -45,7 +44,7 @@ fun WaitingRoomScreen(
     uiState: WaitingRoomUiState,
     actions: WaitingRoomActions,
     modifier: Modifier = Modifier,
-    navigateToRoom: (String) -> Unit = {},
+    navigateToRoom: (String, VideoEffect) -> Unit = { _, _ -> },
     navigateToSettings: () -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
@@ -67,7 +66,7 @@ fun WaitingRoomScreen(
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            navigateToRoom(uiState.roomName)
+            navigateToRoom(uiState.roomName, uiState.joinEffect)
         }
     }
 
@@ -114,7 +113,7 @@ fun WaitingRoomScreen(
                 verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
             ) {
                 uiState.publisher?.let {
-                    key(showVideoEffects) {
+                    if (!showVideoEffects) {
                         VideoPreviewContainer(
                             modifier = Modifier
                                 .fillMaxWidth()
