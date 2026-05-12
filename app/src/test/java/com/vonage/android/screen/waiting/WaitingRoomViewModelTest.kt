@@ -7,11 +7,11 @@ import com.vonage.android.config.Config
 import com.vonage.android.config.GetConfig
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
-import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CameraType
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.VideoBitrateConfig
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
 import com.vonage.android.settings.CallSettingsHolder
 import io.mockk.coEvery
@@ -55,6 +55,7 @@ class WaitingRoomViewModelTest {
     fun setUp() {
         sut = WaitingRoomViewModel(
             roomName = ANY_ROOM_NAME,
+            appContext = context,
             userRepository = userRepository,
             videoClient = videoClient,
             getConfig = getConfig,
@@ -191,20 +192,20 @@ class WaitingRoomViewModelTest {
     }
 
     @Test
-    fun `given viewmodel when onCycleCameraBlur then publisher set camera blur`() = runTest {
+    fun `given viewmodel when applyVideoEffect then delegate to publisher`() = runTest {
         val publisher = givenPreviewPublisher()
-        coEvery { userRepository.getUserName() } returns "not relevant"
+        coEvery { userRepository.getUserName() } returns ""
 
         sut.init(context)
-
         sut.uiState.test {
             awaitItem() // initial state
             awaitItem() // after init
 
-            sut.onCycleCameraBlur()
+            sut.applyVideoEffect(VideoEffect.BlurLow)
+            cancelAndIgnoreRemainingEvents()
         }
 
-        verify { publisher.cycleCameraBlur() }
+        verify(exactly = 1) { publisher.applyVideoEffect(VideoEffect.BlurLow) }
     }
 
     @Test
@@ -226,7 +227,7 @@ class WaitingRoomViewModelTest {
     private fun buildMockPublisher() = mockk<PreviewPublisherState>(relaxed = true) {
         every { isCameraEnabled } returns MutableStateFlow(true)
         every { isMicEnabled } returns MutableStateFlow(false)
-        every { blurLevel } returns MutableStateFlow(BlurLevel.NONE)
+        every { videoEffect } returns MutableStateFlow(VideoEffect.None)
         every { camera } returns MutableStateFlow(CameraType.BACK)
     }
 

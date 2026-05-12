@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -39,11 +40,12 @@ import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.MicMute
 import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.compose.vivid.icons.solid.MoreVertical
-import com.vonage.android.fx.ui.BlurIndicator
+import com.vonage.android.fx.ui.VideoEffectIndicator
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.kotlin.model.VideoSource
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
+import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,7 +56,6 @@ internal fun ParticipantVideoCard(
     isPinned: Boolean = false,
 ) {
     val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
-    val isCameraEnabled by participant.isCameraEnabled.collectAsStateWithLifecycle()
     val isSpeaking by participant.isTalking.collectAsStateWithLifecycle()
     var showBottomSheet by remember { mutableStateOf(false) }
     val hapticFeedback = LocalHapticFeedback.current
@@ -127,15 +128,15 @@ internal fun ParticipantVideoCard(
                 modifier = Modifier.align(Alignment.TopStart),
             )
 
-            val blurLevel by publisherParticipant.blurLevel.collectAsStateWithLifecycle()
+            val videoEffect by publisherParticipant.videoEffect.collectAsStateWithLifecycle()
 
-            BlurIndicator(
+            VideoEffectIndicator(
                 modifier = Modifier
+                    .testTag(MeetingRoomScreenTestTags.MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON)
                     .align(Alignment.BottomEnd)
                     .padding(VonageVideoTheme.dimens.paddingSmall),
-                isCameraEnabled = isCameraEnabled,
-                blurLevel = blurLevel,
-                onCameraBlur = actions.onCycleCameraBlur,
+                videoEffect = videoEffect,
+                onClick = actions.onOpenVideoEffects,
                 size = VonageVideoTheme.dimens.minTouchTarget,
                 iconSize = VonageVideoTheme.dimens.iconSizeSmall,
             )

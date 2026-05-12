@@ -1,6 +1,7 @@
 package com.vonage.android.meetingroom.internal.screen
 
 import androidx.compose.runtime.Stable
+import com.vonage.android.kotlin.model.VideoEffect
 
 @Stable
 internal data class MeetingRoomActions(
@@ -12,7 +13,8 @@ internal data class MeetingRoomActions(
     val onEndCall: () -> Unit = {},
     val onBack: () -> Unit = {},
     val onCameraSwitch: () -> Unit = {},
-    val onCycleCameraBlur: () -> Unit = {},
+    val onOpenVideoEffects: () -> Unit = {},
+    val onApplyVideoEffect: (VideoEffect) -> Unit = {},
     val onAudioSwitch: () -> Unit = {},
     val onMessageSent: (String) -> Unit = {},
     val onListenUnread: (Boolean) -> Unit = {},

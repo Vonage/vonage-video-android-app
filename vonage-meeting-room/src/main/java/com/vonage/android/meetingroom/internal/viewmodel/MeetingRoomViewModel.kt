@@ -10,6 +10,7 @@ import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.SessionEvent
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.MeetingRoomCallState
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
@@ -20,6 +21,8 @@ import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServ
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.logger.vonageLogger
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -77,10 +80,21 @@ internal class MeetingRoomViewModel(
                 name = prebuilt.publisherSettings.username,
                 publishAudio = prebuilt.publisherSettings.publishAudio,
                 publishVideo = prebuilt.publisherSettings.publishVideo,
-                blurLevel = com.vonage.android.kotlin.model.BlurLevel.NONE,
+                initialVideoEffect = prebuilt.publisherSettings.initialVideoEffect,
                 cameraIndex = 1, // default to front camera
             ),
         )
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val backgrounds = runCatching {
+                container.backgroundEffectsRepository.getBackgrounds(
+                    container.callSettingsHolder.captureResolution.value,
+                )
+            }.onFailure { throwable ->
+                vonageLogger.e("MeetingRoomViewModel", "Failed to load background effects: $throwable")
+            }.getOrElse { persistentListOf() }
+            _uiState.update { it.copy(backgrounds = backgrounds) }
+        }
 
         viewModelScope.launch {
             _uiState.update { state ->
@@ -186,7 +200,13 @@ internal class MeetingRoomViewModel(
 
     fun onSwitchCamera() { call?.toggleLocalCamera() }
 
-    fun onCycleLocalCameraBlur() { call?.cycleLocalCameraBlur() }
+    /**
+     * Applies [effect] to the real session publisher immediately.
+     * Invoked when the user selects an effect tile in the effects sheet.
+     */
+    fun applyVideoEffect(effect: VideoEffect) {
+        call?.applyLocalVideoEffect(effect)
+    }
 
     fun endCall() {
         if (!callEnded.compareAndSet(false, true)) return
@@ -223,7 +243,7 @@ internal class MeetingRoomViewModel(
                                 },
                                 publishVideo = activeCall.publisher.value?.isCameraEnabled?.value ?: true,
                                 publishAudio = activeCall.publisher.value?.isMicEnabled?.value ?: true,
-                                blurLevel = com.vonage.android.kotlin.model.BlurLevel.NONE,
+                                initialVideoEffect = activeCall.publisher.value?.videoEffect?.value ?: VideoEffect.None,
                                 cameraIndex = activeCall.publisher.value?.camera?.value?.index ?: 1,
                                 captureFrameRate = holder.captureFrameRate.value,
                                 captureResolution = holder.captureResolution.value,

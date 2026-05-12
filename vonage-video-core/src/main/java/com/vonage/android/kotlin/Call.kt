@@ -23,6 +23,7 @@ import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VideoBitrateConfig
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.kotlin.sdk.VonageArchiveListener
 import com.vonage.android.kotlin.sdk.VonageCaptionsListener
 import com.vonage.android.kotlin.sdk.VonageError
@@ -398,10 +399,10 @@ class Call internal constructor(
     }
 
     /**
-     * Cycle local camera blur level
+     * Applies a video effect to the local publisher.
      */
-    override fun cycleLocalCameraBlur() {
-        publisher()?.cycleCameraBlur()
+    override fun applyLocalVideoEffect(effect: VideoEffect) {
+        publisher()?.applyVideoEffect(effect)
     }
 
     /**
@@ -428,7 +429,7 @@ class Call internal constructor(
             val old = publisher() ?: return@launch
             val wasVideoOn = old.isCameraEnabled.value
             val wasAudioOn = old.isMicEnabled.value
-            val blurLevel = old.blurLevel.value
+            val videoEffect = old.videoEffect.value
             val cameraIndex = old.camera.value.index
             val name = old.name
 
@@ -444,7 +445,7 @@ class Call internal constructor(
                     name = name,
                     publishVideo = wasVideoOn,
                     publishAudio = wasAudioOn,
-                    blurLevel = blurLevel,
+                    initialVideoEffect = videoEffect,
                     cameraIndex = cameraIndex,
                 ),
             )

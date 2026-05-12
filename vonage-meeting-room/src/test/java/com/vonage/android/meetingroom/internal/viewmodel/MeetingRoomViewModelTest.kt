@@ -12,6 +12,7 @@ import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.kotlin.sdk.VonageError
 import com.vonage.android.meetingroom.MainDispatcherRule
 import com.vonage.android.meetingroom.api.MeetingRoomConfiguration
@@ -166,16 +167,6 @@ class MeetingRoomViewModelTest {
     }
 
     @Test
-    fun `given viewmodel when onCycleLocalCameraBlur then delegate to call`() = runTest {
-        val mockCall = givenMockCall()
-        sut.setup(context)
-        testScheduler.advanceUntilIdle()
-
-        sut.onCycleLocalCameraBlur()
-        verify { mockCall.cycleLocalCameraBlur() }
-    }
-
-    @Test
     fun `given viewmodel when onTogglePinParticipant then delegate to call`() = runTest {
         val mockCall = givenMockCall()
         sut.setup(context)
@@ -223,6 +214,17 @@ class MeetingRoomViewModelTest {
 
         sut.sendEmoji("emoji :)")
         verify { mockCall.sendEmoji("emoji :)") }
+    }
+
+    @Test
+    fun `given viewmodel when applyVideoEffect then delegate to call`() = runTest {
+        val mockCall = givenMockCall()
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        sut.applyVideoEffect(VideoEffect.BlurLow)
+
+        verify { mockCall.applyLocalVideoEffect(VideoEffect.BlurLow) }
     }
 
     // endregion

@@ -2,10 +2,13 @@ package com.vonage.android.screen.room
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import com.vonage.android.BuildConfig
 import com.vonage.android.config.AppConfig
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.MeetingRoomBuilder
 import com.vonage.android.meetingroom.api.MeetingRoomConfiguration
 import com.vonage.android.meetingroom.api.MeetingRoomSDKAction
+import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.screen.reporting.ReportIssueScreen
 
 /**
@@ -20,12 +23,16 @@ fun MeetingRoomScreenRoute(
     navigateToGoodBye: () -> Unit,
     navigateToShare: (String) -> Unit,
     navigateToSettings: () -> Unit,
+    initialVideoEffect: VideoEffect = VideoEffect.None,
 ) {
-    val prebuilt = remember(roomName) {
+    val prebuilt = remember(roomName, initialVideoEffect) {
         MeetingRoomBuilder(
-            baseUrl = com.vonage.android.BuildConfig.BASE_API_URL,
+            baseUrl = BuildConfig.BASE_API_URL,
             roomName = roomName,
         )
+            .publisherSettings(
+                PublisherSettings(initialVideoEffect = initialVideoEffect)
+            )
             .configuration(
                 MeetingRoomConfiguration(
                     allowCameraControl = AppConfig.VideoSettings.ALLOW_CAMERA_CONTROL,
@@ -41,16 +48,10 @@ fun MeetingRoomScreenRoute(
                     is MeetingRoomSDKAction.NavigateToSettings -> navigateToSettings()
                 }
             }
-            .isDebug(com.vonage.android.BuildConfig.DEBUG)
+            .isDebug(BuildConfig.DEBUG)
             .reportingContent { onDismiss -> ReportIssueScreen(onClose = onDismiss) }
             .build()
     }
 
     prebuilt.content()
-}
-
-object MeetingRoomScreenTestTags {
-    const val MEETING_ROOM_TOP_BAR = "meeting_room_top_bar"
-    const val MEETING_ROOM_CONTENT = "meeting_room_content"
-    const val MEETING_ROOM_BOTTOM_BAR = "meeting_room_bottom_bar"
 }

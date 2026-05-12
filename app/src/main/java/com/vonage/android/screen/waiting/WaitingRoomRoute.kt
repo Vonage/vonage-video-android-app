@@ -12,13 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.screen.components.permissions.CallPermissionHandler
 import com.vonage.android.util.pip.pipEffect
 
 @Composable
 fun WaitingRoomRoute(
     roomName: String,
-    navigateToRoom: (String) -> Unit,
+    navigateToRoom: (String, VideoEffect) -> Unit,
     navigateToPermissions: () -> Unit,
     navigateToSettings: () -> Unit,
     onBack: () -> Unit,
@@ -39,7 +40,7 @@ fun WaitingRoomRoute(
             onCameraToggle = viewModel::onCameraToggle,
             onJoinRoom = { userName -> viewModel.joinRoom(userName) },
             onCameraSwitch = viewModel::onCameraSwitch,
-            onCameraBlur = viewModel::onCycleCameraBlur,
+            onApplyVideoEffect = viewModel::applyVideoEffect,
             onBack = {
                 viewModel.onStop()
                 onBack()
@@ -91,7 +92,8 @@ data class WaitingRoomActions(
     val onJoinRoom: (String) -> Unit = {},
     val onMicToggle: () -> Unit = {},
     val onCameraToggle: () -> Unit = {},
-    val onCameraBlur: () -> Unit = {},
+    val onOpenVideoEffects: () -> Unit = {},
+    val onApplyVideoEffect: (VideoEffect) -> Unit = {},
     val onCameraSwitch: () -> Unit = {},
     val onBack: () -> Unit = {},
 )

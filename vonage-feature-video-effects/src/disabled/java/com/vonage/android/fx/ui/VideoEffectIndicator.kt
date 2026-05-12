@@ -6,14 +6,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.vonage.android.kotlin.model.BlurLevel
+import com.vonage.android.kotlin.model.VideoEffect
 
 @Suppress("UnusedParameter")
 @Composable
-fun BlurIndicator(
-    isCameraEnabled: Boolean,
-    blurLevel: BlurLevel,
-    onCameraBlur: () -> Unit,
+fun VideoEffectIndicator(
+    videoEffect: VideoEffect,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 0.dp,
     iconSize: Dp = 0.dp,

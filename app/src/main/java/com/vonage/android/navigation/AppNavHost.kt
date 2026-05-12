@@ -1,6 +1,10 @@
 package com.vonage.android.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.DialogProperties
@@ -12,6 +16,7 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.vonage.android.BuildConfig
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.navigation.AppRoute.Goodbye
 import com.vonage.android.navigation.AppRoute.Landing
 import com.vonage.android.navigation.AppRoute.Meeting
@@ -31,6 +36,7 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    var pendingVideoEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -49,7 +55,8 @@ fun AppNavHost(
             val roomName = backStackEntry.toRoute<Waiting>().roomName
             WaitingRoomRoute(
                 roomName = roomName,
-                navigateToRoom = { roomName ->
+                navigateToRoom = { roomName, videoEffect ->
+                    pendingVideoEffect = videoEffect
                     navController.navigate(
                         route = Meeting(roomName),
                         navOptions = NavOptions.Builder().setLaunchSingleTop(true).build(),
@@ -72,6 +79,7 @@ fun AppNavHost(
             val roomName = backStackEntry.toRoute<Meeting>().roomName
             MeetingRoomScreenRoute(
                 roomName = roomName,
+                initialVideoEffect = pendingVideoEffect,
                 navigateToGoodBye = { navController.navigate(Goodbye(roomName = roomName)) },
                 navigateToShare = { roomName -> context.navigateToShare(roomName) },
                 navigateToSettings = { navController.navigate(Settings) },

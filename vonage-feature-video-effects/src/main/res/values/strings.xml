@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Video Effects -->
+    <string name="video_effects_title">Video effects</string>
+    <string name="video_effects_section_effects">Effects</string>
+    <string name="video_effects_section_backgrounds">Backgrounds</string>
+</resources>

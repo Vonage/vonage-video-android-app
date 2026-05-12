@@ -2,10 +2,10 @@ package com.vonage.android.compose.preview
 
 import android.view.View
 import androidx.compose.runtime.Composable
-import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CameraType
 import com.vonage.android.kotlin.model.NoiseSuppression
 import com.vonage.android.kotlin.model.PublisherParticipant
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.kotlin.model.VideoSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +20,7 @@ fun buildPublisher() = object : PublisherParticipant {
     override val isScreenShare: Boolean = false
     override val videoSource: VideoSource = VideoSource.CAMERA
     override val camera: StateFlow<CameraType> = MutableStateFlow(CameraType.FRONT)
-    override val blurLevel: StateFlow<BlurLevel> = MutableStateFlow(BlurLevel.NONE)
+    override val videoEffect: StateFlow<VideoEffect> = MutableStateFlow(VideoEffect.None)
     override val noiseSuppression: StateFlow<NoiseSuppression> = MutableStateFlow(NoiseSuppression.DISABLED)
     override val name: String = "Preview publisher"
     override val isMicEnabled: StateFlow<Boolean> = MutableStateFlow(true)
@@ -34,6 +34,6 @@ fun buildPublisher() = object : PublisherParticipant {
     override fun toggleNoiseSuppression() { /* empty on purpose */ }
 
     override fun cycleCamera() { /* empty on purpose */ }
-    override fun cycleCameraBlur() { /* empty on purpose */ }
+    override fun applyVideoEffect(effect: VideoEffect) { /* empty on purpose */ }
     override fun clean() { /* empty on purpose */ }
 }

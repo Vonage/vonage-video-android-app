@@ -33,8 +33,10 @@ import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.components.GenericLoading
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
+import com.vonage.android.fx.ui.VideoEffectsScreen
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.R
 import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
@@ -73,7 +75,7 @@ private fun enabledBottomBarActions(
     }
 }.toImmutableList()
 
-@Suppress("LongMethod")
+@Suppress("LongMethod", "CyclomaticComplexMethod")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 internal fun MeetingRoomScreen(
@@ -84,6 +86,19 @@ internal fun MeetingRoomScreen(
 ) {
     var showAudioOutputs by remember { mutableStateOf(false) }
     val audioOutputsSheetState = rememberModalBottomSheetState()
+
+    var showVideoEffects by remember { mutableStateOf(false) }
+    var selectedEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
+    val videoEffectsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // Wire onOpenVideoEffects to local sheet state so no VM involvement is needed.
+    val effectsActions = remember(actions, uiState.enabledFeatures) {
+        actions.copy(onOpenVideoEffects = {
+            if (MeetingRoomFeature.BACKGROUND_EFFECTS in uiState.enabledFeatures) {
+                showVideoEffects = true
+            }
+        })
+    }
 
     val navigator = rememberSupportingPaneScaffoldNavigator()
     val scope = rememberCoroutineScope()
@@ -107,6 +122,14 @@ internal fun MeetingRoomScreen(
             val participants by call.participantsStateFlow.collectAsStateWithLifecycle()
             val publisher by call.publisher.collectAsStateWithLifecycle()
             val captionLines by call.captionsStateFlow.collectAsStateWithLifecycle()
+            // Sync selectedEffect to the real publisher's current effect each time the sheet
+            // opens, so the grid always highlights the correct initial selection.
+            LaunchedEffect(showVideoEffects) {
+                if (showVideoEffects) {
+                    selectedEffect = publisher?.videoEffect?.value ?: VideoEffect.None
+                }
+            }
+
             Scaffold(
                 modifier = modifier.systemBarsPadding(),
                 topBar = {
@@ -156,10 +179,12 @@ internal fun MeetingRoomScreen(
                             EmojiReactionOverlay(call = call)
                             CaptionsOverlay(captionLines = captionLines)
                             SpeakingWhileMutedOverlay(publisher = publisher)
+                            // MeetingRoomContent is always visible — the effects sheet is a
+                            // ModalBottomSheet that overlays it without disturbing the publisher.
                             MeetingRoomContent(
                                 modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
                                 call = call,
-                                actions = actions,
+                                actions = effectsActions,
                                 participants = participants,
                                 layoutType = uiState.layoutType,
                             )
@@ -198,6 +223,22 @@ internal fun MeetingRoomScreen(
                             }
                         )
                     }
+                }
+            }
+
+            if (showVideoEffects && MeetingRoomFeature.BACKGROUND_EFFECTS in uiState.enabledFeatures) {
+                ModalBottomSheet(
+                    onDismissRequest = { showVideoEffects = false },
+                    sheetState = videoEffectsSheetState,
+                ) {
+                    VideoEffectsScreen(
+                        backgrounds = uiState.backgrounds,
+                        selectedEffect = selectedEffect,
+                        onEffectSelect = { effect ->
+                            selectedEffect = effect
+                            actions.onApplyVideoEffect(effect)
+                        },
+                    )
                 }
             }
         }
@@ -252,4 +293,5 @@ internal object MeetingRoomScreenTestTags {
     const val MEETING_ROOM_TOP_BAR = "meeting_room_top_bar"
     const val MEETING_ROOM_CONTENT = "meeting_room_content"
     const val MEETING_ROOM_BOTTOM_BAR = "meeting_room_bottom_bar"
+    const val MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON = "meeting_room_publisher_effects_button"
 }

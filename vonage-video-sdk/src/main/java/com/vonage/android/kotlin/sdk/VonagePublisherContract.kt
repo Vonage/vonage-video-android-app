@@ -23,6 +23,7 @@ interface VonagePublisher {
     fun stop()
 
     fun applyBlur(level: VonageBlurLevel)
+    fun applyBackgroundImage(imageFilePath: String)
     fun applyVideoBitrate(preset: VonageBitratePreset, maxBitrate: Int? = null)
     fun applyDegradationPreference(preference: VonageDegradationPref)
     fun toggleNoiseSuppression(noiseSuppression: VonageNoiseSuppression): Result<VonageNoiseSuppression>

@@ -6,6 +6,7 @@ import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.kotlin.sdk.VonageArchiveListener
 import com.vonage.android.kotlin.sdk.VonageConnection
 import com.vonage.android.kotlin.sdk.VonageError
@@ -401,16 +402,16 @@ class CallTest {
     }
 
     @Test
-    fun `cycleLocalCameraBlur should delegate to publisher`() = runTest(testDispatcher) {
+    fun `applyLocalVideoEffect should delegate to publisher`() = runTest(testDispatcher) {
         val call = createCall()
 
         call.connect(mockContext).test {
             triggerConnectedAndWaitForPublisher()
             awaitItem()
 
-            call.cycleLocalCameraBlur()
+            call.applyLocalVideoEffect(VideoEffect.BlurLow)
 
-            verify { mockPublisherState.cycleCameraBlur() }
+            verify { mockPublisherState.applyVideoEffect(VideoEffect.BlurLow) }
             cancelAndIgnoreRemainingEvents()
         }
     }
