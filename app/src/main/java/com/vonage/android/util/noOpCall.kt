@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.projection.MediaProjection
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.CaptionLine
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.Participant
@@ -29,8 +30,12 @@ val noOpCall = object : CallFacade {
     override val participantsStateFlow: StateFlow<ImmutableList<ParticipantState>> = MutableStateFlow(persistentListOf())
     override val participantsCount: StateFlow<Int> = MutableStateFlow(1)
     override val activeSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
+    override val pinnedParticipantIds: StateFlow<Set<String>> = MutableStateFlow(emptySet())
+    override fun togglePinParticipant(participantId: String) { /* empty on purpose */ }
+    override fun forceMuteParticipant(participantId: String) { /* empty on purpose */ }
+
     override val signalStateFlow: StateFlow<SignalState?> = MutableStateFlow(null)
-    override val captionsStateFlow: StateFlow<String?> = MutableStateFlow(null)
+    override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = MutableStateFlow(persistentListOf())
     override val archivingStateFlow: StateFlow<ArchivingState> = MutableStateFlow(ArchivingState.Idle)
 
     override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> = MutableStateFlow(null)

@@ -1,8 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.ksp)
-    alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
 }
@@ -55,8 +53,6 @@ dependencies {
     implementation(libs.androidx.compose.adaptive)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.opentok.android.sdk)
-
-    ksp(libs.hilt.android.compiler)
 
     testImplementation(libs.junit.junit)
     testImplementation(libs.mockk)

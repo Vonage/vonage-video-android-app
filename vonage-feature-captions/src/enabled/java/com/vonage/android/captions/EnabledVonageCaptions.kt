@@ -2,9 +2,8 @@ package com.vonage.android.captions
 
 import com.vonage.android.captions.data.CaptionsRepository
 import com.vonage.android.kotlin.model.CallFacade
-import javax.inject.Inject
 
-class EnabledVonageCaptions @Inject constructor(
+class EnabledVonageCaptions(
     private val captionsRepository: CaptionsRepository,
 ) : VonageCaptions {
 

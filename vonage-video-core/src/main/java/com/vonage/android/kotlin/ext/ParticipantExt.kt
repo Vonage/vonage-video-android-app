@@ -8,13 +8,17 @@ import kotlinx.coroutines.flow.map
 
 internal fun Flow<ImmutableList<Participant>>.mapSorted(): Flow<ImmutableList<Participant>> =
     map { participants ->
-        participants
-            .sortedWith(
-                compareByDescending<Participant> { it.isScreenShare }
-                    .thenByDescending { it.creationTime }
-            )
-            .toImmutableList()
+        participants.sorted()
     }
+
+internal fun List<Participant>.sorted(
+    pinnedIds: Set<String> = emptySet(),
+): ImmutableList<Participant> =
+    sortedWith(
+        compareByDescending<Participant> { it.isScreenShare }
+            .thenByDescending { it.id in pinnedIds }
+            .thenByDescending { it.creationTime }
+    ).toImmutableList()
 
 internal fun Iterable<Participant>.firstScreenSharing() =
     firstOrNull { it.isScreenShare }

@@ -1,6 +1,6 @@
 package com.vonage.android.kotlin.internal
 
-import com.opentok.android.Publisher
+import com.vonage.android.kotlin.sdk.VonagePublisher
 
 /**
  * Container holding publisher instances for camera and screen sharing.
@@ -9,6 +9,6 @@ import com.opentok.android.Publisher
  * @property screenPublisher Optional screen sharing publisher
  */
 data class VeraPublisherHolder(
-    val publisher: Publisher,
-    var screenPublisher: Publisher? = null,
+    val publisher: VonagePublisher,
+    var screenPublisher: VonagePublisher? = null,
 )

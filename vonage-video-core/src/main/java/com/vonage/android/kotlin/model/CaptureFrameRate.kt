@@ -3,7 +3,7 @@ package com.vonage.android.kotlin.model
 /**
  * App-level representation of the OpenTok camera capture frame rate.
  *
- * Maps to [com.opentok.android.Publisher.CameraCaptureFrameRate].
+ * Maps to [VonageCaptureFrameRate].
  * This is a **build-time** setting — changes take effect on the next publisher creation.
  *
  * @property label Human-readable label shown in the UI

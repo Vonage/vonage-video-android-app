@@ -2,7 +2,7 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
-import com.opentok.android.Session
+import com.vonage.android.kotlin.sdk.VonageSession
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -61,7 +61,7 @@ interface Participant {
      *
      * @param session The session to unsubscribe from
      */
-    fun clean(session: Session) {}
+    fun clean(session: VonageSession) {}
 }
 
 /**
@@ -82,11 +82,16 @@ interface PublisherParticipant : Participant {
     /** StateFlow of current background blur level */
     val blurLevel: StateFlow<BlurLevel>
 
+    /** StateFlow of current noise suppression state */
+    val noiseSuppression: StateFlow<NoiseSuppression>
+
     /** Toggles video on/off */
     fun toggleVideo()
 
     /** Toggles audio on/off */
     fun toggleAudio()
+
+    fun toggleNoiseSuppression()
 
     /** Switches between front and back camera */
     fun cycleCamera()

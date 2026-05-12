@@ -45,6 +45,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Setup Java
         uses: ./.github/actions/setup-java
@@ -59,11 +61,12 @@ jobs:
         run: |
           ./gradlew clean koverXmlReportDebug detekt --info
 
-      - name: Send report to sonar
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          ./gradlew sonar
+# Disabled temporally because some enterprise issues
+#      - name: Send report to sonar
+#        env:
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#        run: |
+#          ./gradlew sonar
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
@@ -73,6 +76,7 @@ jobs:
           path: |
             app/build/reports/
             build/reports/
+            vonage-video-ui-compose/build/reports
 
   ui-tests:
     name: UI Tests

@@ -1,0 +1,301 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
+package com.vonage.android.meetingroom.internal.screen.components.bottombar
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.archiving.ArchivingUiState
+import com.vonage.android.archiving.ui.recordingAction
+import com.vonage.android.captions.CaptionsUiState
+import com.vonage.android.captions.ui.captionsAction
+import com.vonage.android.chat.ui.chatAction
+import com.vonage.android.compose.components.bottombar.BottomBarAction
+import com.vonage.android.compose.components.bottombar.BottomBarActionType
+import com.vonage.android.compose.components.bottombar.ControlButton
+import com.vonage.android.compose.preview.buildParticipants
+import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.kotlin.ext.toggle
+import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.meetingroom.R
+import com.vonage.android.meetingroom.internal.screen.CallLayoutType
+import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
+import com.vonage.android.meetingroom.internal.screen.reporting.reportingAction
+import com.vonage.android.meetingroom.internal.util.noOpCall
+import com.vonage.android.reactions.ui.EmojiSelector
+import com.vonage.android.screensharing.ScreenSharingState
+import com.vonage.android.screensharing.ui.screenSharingAction
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.launch
+
+@Stable
+internal data class BottomBarState(
+    val publisher: Participant?,
+    val onShowChat: () -> Unit,
+    val isChatShow: Boolean,
+    val layoutType: CallLayoutType,
+    val archivingUiState: ArchivingUiState,
+    val screenSharingState: ScreenSharingState,
+    val captionsUiState: CaptionsUiState,
+    val participants: ImmutableList<Participant>,
+    val allowShowParticipantList: Boolean,
+    val allowMicrophoneControl: Boolean,
+    val allowCameraControl: Boolean,
+)
+
+// 4 because mic + camera + menu + end
+const val DEFAULT_ACTIONS_COUNT = 4
+
+@Suppress("LongMethod")
+@Composable
+internal fun BottomBar(
+    roomActions: MeetingRoomActions,
+    call: CallFacade,
+    state: BottomBarState,
+    modifier: Modifier = Modifier,
+    actions: ImmutableList<BottomBarActionType> = BottomBarActionType.entries.toImmutableList(),
+    reportingContent: @Composable (() -> Unit) -> Unit = {},
+) {
+    val scope = rememberCoroutineScope()
+
+    var showParticipants by remember { mutableStateOf(false) }
+    val participantsSheetState = rememberModalBottomSheetState()
+    var showMoreActions by remember { mutableStateOf(false) }
+    val moreActionsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showReporting by remember { mutableStateOf(false) }
+    val reportSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val density = LocalDensity.current
+    val actionWidth = with(density) { VonageVideoTheme.dimens.minTouchTarget.toPx() }
+    val spacingWidth = with(density) { VonageVideoTheme.dimens.spaceSmall.toPx() }
+    val containerSpacing = with(density) { VonageVideoTheme.dimens.spaceXLarge.toPx() }
+
+    var availableWidth by remember { mutableIntStateOf(0) }
+    val pinnedActionsWidth =
+        DEFAULT_ACTIONS_COUNT * actionWidth + (DEFAULT_ACTIONS_COUNT - 1) * spacingWidth
+    val availableWidthForActions by remember(availableWidth) {
+        derivedStateOf { (availableWidth - pinnedActionsWidth - containerSpacing).coerceAtLeast(0F) }
+    }
+    val actionsVisibleCount by remember(availableWidthForActions) {
+        derivedStateOf { (availableWidthForActions / (actionWidth + spacingWidth)).toInt() }
+    }
+
+    val bottomBarActions = actionsFactory(
+        actions = actions,
+        state = state,
+        roomActions = roomActions,
+        call = call,
+        onShowParticipants = {
+            scope.launch {
+                showParticipants = showParticipants.toggle()
+                moreActionsSheetState.hide()
+                showMoreActions = false
+            }
+        },
+        onShowChat = {
+            scope.launch {
+                state.onShowChat()
+                moreActionsSheetState.hide()
+                showMoreActions = false
+            }
+        },
+        onShowReporting = {
+            scope.launch {
+                showReporting = showReporting.toggle()
+                moreActionsSheetState.hide()
+                showMoreActions = false
+            }
+        }
+    )
+    val visibleActions = bottomBarActions.take(actionsVisibleCount)
+    val overflowActions = bottomBarActions.drop(actionsVisibleCount)
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .safeContentPadding()
+            .onSizeChanged { size -> availableWidth = size.width },
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        CallControlBar(
+            publisher = state.publisher,
+            roomActions = roomActions,
+            allowMicrophoneControl = state.allowMicrophoneControl,
+            allowCameraControl = state.allowCameraControl,
+            onShowMore = { showMoreActions = showMoreActions.toggle() },
+        ) {
+            visibleActions.forEach { action ->
+                ControlButton(
+                    icon = action.icon,
+                    onClick = action.onClick,
+                    badgeCount = action.badgeCount,
+                    isActive = action.isSelected,
+                )
+            }
+        }
+    }
+
+    if (showMoreActions) {
+        ModalBottomSheet(
+            onDismissRequest = { showMoreActions = false },
+            sheetState = moreActionsSheetState,
+        ) {
+            EmojiSelector(
+                onEmojiClick = { emoji -> roomActions.onEmojiSent(emoji) },
+            )
+            MoreActionsGrid(
+                actions = overflowActions.toImmutableList(),
+            )
+        }
+    }
+
+    if (showParticipants && state.allowShowParticipantList) {
+        ModalBottomSheet(
+            onDismissRequest = { showParticipants = false },
+            sheetState = participantsSheetState,
+        ) {
+            val pinnedIds by call.pinnedParticipantIds.collectAsStateWithLifecycle()
+            ParticipantsList(
+                participants = state.participants,
+                pinnedParticipantIds = pinnedIds,
+                actions = roomActions,
+            )
+        }
+    }
+
+    if (showReporting) {
+        ModalBottomSheet(
+            onDismissRequest = { showReporting = false },
+            sheetState = reportSheetState,
+        ) {
+            reportingContent {
+                scope.launch {
+                    reportSheetState.hide()
+                    showReporting = false
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun actionsFactory(
+    actions: ImmutableList<BottomBarActionType>,
+    state: BottomBarState,
+    roomActions: MeetingRoomActions,
+    call: CallFacade,
+    onShowReporting: () -> Unit,
+    onShowParticipants: () -> Unit,
+    onShowChat: () -> Unit,
+): ImmutableList<BottomBarAction> {
+    val participantsCount by call.participantsCount.collectAsStateWithLifecycle()
+    val chatState by call.chatSignalState.collectAsStateWithLifecycle()
+
+    return actions.mapNotNull { type ->
+        when (type) {
+            BottomBarActionType.CHANGE_LAYOUT -> layoutSelectorAction(
+                layoutType = state.layoutType,
+                roomActions = roomActions,
+            )
+
+            BottomBarActionType.PARTICIPANTS -> if (state.allowShowParticipantList) {
+                participantsAction(
+                    participantsCount = participantsCount,
+                    onToggleParticipants = onShowParticipants,
+                )
+            } else null
+
+            BottomBarActionType.CHAT -> chatAction(
+                label = stringResource(R.string.chat),
+                isSelected = state.isChatShow,
+                badgeCount = chatState?.unreadCount ?: 0,
+                onShowChat = onShowChat,
+            )
+
+            BottomBarActionType.SCREEN_SHARING -> screenSharingAction(
+                onStartScreenSharing = { roomActions.onToggleScreenSharing(true) },
+                onStopScreenSharing = { roomActions.onToggleScreenSharing(false) },
+                startScreenSharingLabel = stringResource(R.string.screen_share_start),
+                stopScreenSharingLabel = stringResource(R.string.screen_share_stop),
+                screenSharingState = state.screenSharingState,
+            )
+
+            BottomBarActionType.RECORD_SESSION -> recordingAction(
+                onStartRecording = { roomActions.onToggleRecording(true) },
+                onStopRecording = { roomActions.onToggleRecording(false) },
+                startRecordingLabel = stringResource(R.string.recording_start_recording),
+                stopRecordingLabel = stringResource(R.string.recording_stop_recording),
+                archivingUiState = state.archivingUiState,
+            )
+
+            BottomBarActionType.CAPTIONS -> captionsAction(
+                onEnableCaptions = { roomActions.onToggleCaptions(true) },
+                onDisableCaptions = { roomActions.onToggleCaptions(false) },
+                enableCaptionsLabel = stringResource(R.string.captions_start),
+                disableCaptionsLabel = stringResource(R.string.captions_stop),
+                captionsUiState = state.captionsUiState,
+            )
+
+            BottomBarActionType.REPORT -> reportingAction(
+                onClick = onShowReporting,
+            )
+        }
+    }.toImmutableList()
+}
+
+object BottomBarTestTags {
+    const val BOTTOM_BAR_PARTICIPANTS_BUTTON = "bottom_bar_participants_button"
+    const val BOTTOM_BAR_PARTICIPANTS_BADGE = "bottom_bar_participants_badge"
+    const val BOTTOM_BAR_END_CALL_BUTTON = "bottom_bar_end_call_button"
+    const val BOTTOM_BAR_CAMERA_BUTTON = "bottom_bar_camera_button"
+    const val BOTTOM_BAR_MIC_BUTTON = "bottom_bar_mic_button"
+    const val BOTTOM_BAR_GRID_LAYOUT_BUTTON = "bottom_bar_grid_layout_button"
+    const val BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON = "bottom_bar_active_speaker_layout_button"
+}
+
+@PreviewLightDark
+@PreviewScreenSizes
+@Composable
+internal fun BottomBarPreview() {
+    VonageVideoTheme {
+        BottomBar(
+            roomActions = MeetingRoomActions(),
+            call = noOpCall,
+            state = BottomBarState(
+                publisher = buildParticipants(15).first(),
+                participants = buildParticipants(15).toImmutableList(),
+                onShowChat = {},
+                isChatShow = false,
+                layoutType = CallLayoutType.SPEAKER_LAYOUT,
+                archivingUiState = ArchivingUiState.RECORDING,
+                captionsUiState = CaptionsUiState.IDLE,
+                screenSharingState = ScreenSharingState.IDLE,
+                allowShowParticipantList = true,
+                allowMicrophoneControl = true,
+                allowCameraControl = true,
+            ),
+        )
+    }
+}

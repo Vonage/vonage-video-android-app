@@ -11,6 +11,7 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
@@ -18,12 +19,14 @@ import com.vonage.android.compose.preview.previewCamera
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CameraType
+import com.vonage.android.kotlin.model.NoiseSuppression
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.kotlin.model.VideoSource
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -333,6 +336,69 @@ class WaitingRoomScreenTest {
             .assertIsEnabled()
     }
 
+    @Test
+    fun given_join_button_clicked_THEN_onJoinRoom_callback_invoked() {
+        var wasCalled = false
+        compose.setContent {
+            VonageVideoTheme {
+                WaitingRoomScreen(
+                    uiState = WaitingRoomUiState(
+                        roomName = "room-name",
+                        userName = "user",
+                        publisher = buildPublisher(isMicEnabled = true, isCameraEnabled = true),
+                    ),
+                    actions = WaitingRoomActions(onJoinRoom = { wasCalled = true }),
+                )
+            }
+        }
+
+        screen.joinButton.performScrollTo().performClick()
+
+        assertTrue(wasCalled)
+    }
+
+    @Test
+    fun given_mic_toggle_clicked_THEN_onMicToggle_callback_invoked() {
+        var wasCalled = false
+        compose.setContent {
+            VonageVideoTheme {
+                WaitingRoomScreen(
+                    uiState = WaitingRoomUiState(
+                        roomName = "room-name",
+                        userName = "user",
+                        publisher = buildPublisher(isMicEnabled = true, isCameraEnabled = true),
+                    ),
+                    actions = WaitingRoomActions(onMicToggle = { wasCalled = true }),
+                )
+            }
+        }
+
+        screen.micButtonEnabled.performClick()
+
+        assertTrue(wasCalled)
+    }
+
+    @Test
+    fun given_camera_toggle_clicked_THEN_onCameraToggle_callback_invoked() {
+        var wasCalled = false
+        compose.setContent {
+            VonageVideoTheme {
+                WaitingRoomScreen(
+                    uiState = WaitingRoomUiState(
+                        roomName = "room-name",
+                        userName = "user",
+                        publisher = buildPublisher(isMicEnabled = true, isCameraEnabled = true),
+                    ),
+                    actions = WaitingRoomActions(onCameraToggle = { wasCalled = true }),
+                )
+            }
+        }
+
+        screen.cameraButtonEnabled.performClick()
+
+        assertTrue(wasCalled)
+    }
+
     @Suppress("EmptyFunctionBlock")
     @Composable
     private fun buildPublisher(
@@ -345,6 +411,7 @@ class WaitingRoomScreenTest {
 
             override fun toggleVideo() {}
             override fun toggleAudio() {}
+
             override fun cycleCamera() {}
             override fun cycleCameraBlur() {}
             override fun clean() {}
@@ -360,6 +427,9 @@ class WaitingRoomScreenTest {
             override val isTalking: StateFlow<Boolean> = MutableStateFlow(isMicEnabled)
             override val audioLevel: StateFlow<Float> = MutableStateFlow(0F)
             override val view: View = previewCamera()
+
+            override val noiseSuppression: StateFlow<NoiseSuppression> = MutableStateFlow(NoiseSuppression.DISABLED)
+            override fun toggleNoiseSuppression() {}
         }
     }
 }

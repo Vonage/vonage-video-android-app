@@ -1,11 +1,13 @@
 package com.vonage.android.di
 
 import android.content.Context
+import com.vonage.android.kotlin.sdk.VonageSdkFactory
 import com.vonage.android.kotlin.VonageVideoClient
-import com.vonage.audioselector.VeraAudioDevice
+import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.reactions.ReactionSignalPlugin
 import com.vonage.audioselector.AudioDeviceSelector
+import com.vonage.audioselector.VeraAudioDevice
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,19 +39,30 @@ object SdkModule {
 
     @Singleton
     @Provides
+    fun provideVonageSdkFactory(
+        veraAudioDevice: VeraAudioDevice,
+    ): VonageSdkFactory =
+        VonageSdkFactory.create(
+            baseAudioDevice = veraAudioDevice,
+        )
+
+    @Singleton
+    @Provides
     fun provideVonageVideoClient(
         @ApplicationContext context: Context,
+        vonageSdkFactory: VonageSdkFactory,
         chatSignalPlugin: ChatSignalPlugin,
         reactionSignalPlugin: ReactionSignalPlugin,
-        baseAudioDevice: VeraAudioDevice,
     ): VonageVideoClient =
         VonageVideoClient(
             context = context,
-            baseAudioDevice = baseAudioDevice,
+            sdkFactory = vonageSdkFactory,
+            publisherFactory = PublisherFactory(
+                sdkFactory = vonageSdkFactory,
+            ),
             signalPlugins = listOfNotNull(
                 chatSignalPlugin,
                 reactionSignalPlugin,
             )
         )
-
 }

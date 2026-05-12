@@ -37,8 +37,8 @@ android {
         targetSdk = 36
         // NOTE: The following versionCode and versionName are placeholders.
         // Actual values are set dynamically by the GitHub Actions workflow during CI/CD.
-        versionCode = 100
-        versionName = "1.0.0"
+        versionCode = 110
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
@@ -64,22 +64,31 @@ android {
         // Archiving/recording feature
         val archivingProperty = configProps.getProperty("vonage.meetingRoom.allow_archiving", "true")
         buildConfigField("boolean", "FEATURE_ARCHIVING_ENABLED", "$archivingProperty")
-        missingDimensionStrategy("archiving", archivingProperty.toEnabledString())
+        missingDimensionStrategy("archiving", archivingProperty.toEnabledString(), archivingProperty.toModuleFlavorString("archiving"))
 
         // Captions feature
         val captionsProperty = configProps.getProperty("vonage.meetingRoom.allow_captions", "true")
         buildConfigField("boolean", "FEATURE_CAPTIONS_ENABLED", "$captionsProperty")
-        missingDimensionStrategy("captions", captionsProperty.toEnabledString())
+        missingDimensionStrategy("captions", captionsProperty.toEnabledString(), captionsProperty.toModuleFlavorString("captions"))
 
         // Screensharing feature
         val screenSharingProperty = configProps.getProperty("vonage.meetingRoom.allow_screen_share", "true")
         buildConfigField("boolean", "FEATURE_SCREENSHARING_ENABLED", "$screenSharingProperty")
-        missingDimensionStrategy("screensharing", screenSharingProperty.toEnabledString())
+        missingDimensionStrategy(
+            "screensharing",
+            screenSharingProperty.toEnabledString(),
+            screenSharingProperty.toModuleFlavorString("screensharing"),
+        )
 
         // Background (video) effects feature
         val videoFxProperty = configProps.getProperty("vonage.video.allow_background_effects", "true")
         buildConfigField("boolean", "FEATURE_VIDEO_EFFECTS_ENABLED", "$videoFxProperty")
         missingDimensionStrategy("videofx", videoFxProperty.toEnabledString())
+
+        // Audio effects feature
+        val audioFxProperty = configProps.getProperty("vonage.audio.allow_advanced_noise_suppression", "true")
+        buildConfigField("boolean", "FEATURE_AUDIO_EFFECTS_ENABLED", "$audioFxProperty")
+        missingDimensionStrategy("audiofx", audioFxProperty.toEnabledString())
 
         // Settings feature
         val settingsProperty = configProps.getProperty("vonage.meetingRoom.allow_settings", "true")
@@ -187,6 +196,7 @@ play {
 }
 
 dependencies {
+    implementation(project(":vonage-meeting-room"))
     implementation(project(":vonage-video-ui-compose"))
     implementation(project(":vonage-video-core"))
     implementation(project(":vonage-video-shared"))
@@ -195,6 +205,7 @@ dependencies {
     implementation(project(":vonage-feature-screensharing"))
     implementation(project(":vonage-feature-reactions"))
     implementation(project(":vonage-feature-video-effects"))
+    implementation(project(":vonage-feature-audio-effects"))
     implementation(project(":vonage-feature-captions"))
     implementation(project(":vonage-feature-settings"))
     implementation(project(":vonage-audio-selector"))
@@ -260,6 +271,13 @@ dependencies {
 }
 
 fun String.toEnabledString(): String = if (toBoolean()) "enabled" else "disabled"
+
+/**
+ * Returns the prefixed flavor name used by the vonage-meeting-room module,
+ * e.g. "chat" + true → "chatEnabled".
+ */
+fun String.toModuleFlavorString(dimension: String): String =
+    if (toBoolean()) "${dimension}Enabled" else "${dimension}Disabled"
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     dependsOn("generateVonageConfig")

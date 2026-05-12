@@ -1,6 +1,6 @@
 package com.vonage.android.kotlin.ext
 
-import com.opentok.android.Connection
+import com.vonage.android.kotlin.sdk.VonageConnection
 import com.vonage.android.kotlin.model.Participant
 
 /**
@@ -12,7 +12,7 @@ import com.vonage.android.kotlin.model.Participant
  * @param subs Collection of participants to search through
  * @return The participant's display name, or empty string if not found
  */
-internal fun Connection.extractSenderName(subs: Collection<Participant>): String =
+internal fun VonageConnection.extractSenderName(subs: Collection<Participant>): String =
     subs
         .filter { participant -> participant.connectionId == connectionId }
         .map { participant -> participant.name }

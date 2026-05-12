@@ -7,7 +7,7 @@
     "defaultResolution": "640x480"
   },
   "audioSettings": {
-    "allowAdvancedNoiseSuppression": true,
+    "allowAdvancedNoiseSuppression": false,
     "allowAudioOnJoin": true,
     "allowMicrophoneControl": true
   },
