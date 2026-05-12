@@ -77,47 +77,56 @@ class FileLogInterceptor(
     }
 
     private fun appendWithSizeLimit(target: File, newContent: String) {
-        if (target.length() + newContent.toByteArray(Charsets.UTF_8).size <= maxFileSizeBytes) {
+        val newBytes = newContent.toByteArray(Charsets.UTF_8)
+        if (target.length() + newBytes.size <= maxFileSizeBytes) {
             target.appendText(newContent, Charsets.UTF_8)
             return
         }
 
-        val incomingLines = newContent
-            .removeSuffix("\n")
-            .lineSequence()
-            .toList()
+        // Each line is stored as its raw UTF-8 bytes; size accounting adds 1 byte per trailing newline.
+        val newlineBytes = 1L  // "\n" is always 1 byte in UTF-8
+        val lineQueue = ArrayDeque<ByteArray>()
+        var totalBytes = 0L
 
-        val combinedLines = buildList {
-            if (target.exists()) addAll(target.readLines(Charsets.UTF_8))
-            addAll(incomingLines)
-        }.toMutableList()
-
-        while (combinedLines.isNotEmpty() && textSizeInBytes(combinedLines) > maxFileSizeBytes) {
-            combinedLines.removeAt(0)
-        }
-
-        val trimmedLines = if (combinedLines.isEmpty()) {
-            emptyList()
-        } else {
-            val lastLine = combinedLines.last()
-            if (combinedLines.size == 1 && textSizeInBytes(combinedLines) > maxFileSizeBytes) {
-                listOf(trimToByteLimit(lastLine, maxFileSizeBytes))
-            } else {
-                combinedLines
+        if (target.exists() && target.length() > 0) {
+            target.forEachLine(Charsets.UTF_8) { line ->
+                val lb = line.toByteArray(Charsets.UTF_8)
+                lineQueue.addLast(lb)
+                totalBytes += lb.size + newlineBytes
             }
         }
 
-        val content = if (trimmedLines.isEmpty()) {
-            ""
-        } else {
-            trimmedLines.joinToString(separator = "\n", postfix = "\n")
+        // Enqueue incoming lines and update the counter incrementally — no repeated joins.
+        newContent.removeSuffix("\n").split("\n").forEach { line ->
+            val lb = line.toByteArray(Charsets.UTF_8)
+            lineQueue.addLast(lb)
+            totalBytes += lb.size + newlineBytes
         }
 
-        target.writeText(content, Charsets.UTF_8)
-    }
+        // Drop oldest lines one-by-one; each removal is O(1).
+        while (lineQueue.size > 1 && totalBytes > maxFileSizeBytes) {
+            val removed = lineQueue.removeFirst()
+            totalBytes -= removed.size + newlineBytes
+        }
 
-    private fun textSizeInBytes(lines: List<String>): Long =
-        if (lines.isEmpty()) 0L else lines.joinToString(separator = "\n", postfix = "\n").toByteArray(Charsets.UTF_8).size.toLong()
+        // Edge case: single remaining line still exceeds the cap — keep only its tail bytes.
+        if (lineQueue.size == 1 && totalBytes > maxFileSizeBytes) {
+            val trimmed = trimToByteLimit(
+                String(lineQueue.first(), Charsets.UTF_8),
+                maxFileSizeBytes - newlineBytes
+            )
+            lineQueue[0] = trimmed.toByteArray(Charsets.UTF_8)
+        }
+
+        // Write in one streaming pass — no giant intermediate String allocation.
+        val newline = byteArrayOf('\n'.code.toByte())
+        target.outputStream().buffered().use { out ->
+            for (lb in lineQueue) {
+                out.write(lb)
+                out.write(newline)
+            }
+        }
+    }
 
     private fun trimToByteLimit(text: String, byteLimit: Long): String {
         if (text.toByteArray(Charsets.UTF_8).size <= byteLimit) return text
