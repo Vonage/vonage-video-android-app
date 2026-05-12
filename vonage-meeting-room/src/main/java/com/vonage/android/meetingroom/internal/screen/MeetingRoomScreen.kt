@@ -131,9 +131,12 @@ internal fun MeetingRoomScreen(
             }
             // If the user deletes the active background while the sheet is open, reset the
             // local selection so the grid no longer highlights a non-existent item.
+            // Guard with isNotEmpty() so the effect doesn't fire while the list is still
+            // loading (empty initial state would otherwise clear any active selection).
             LaunchedEffect(uiState.backgrounds) {
                 val current = selectedEffect
                 if (current is VideoEffect.BackgroundImage &&
+                    uiState.backgrounds.isNotEmpty() &&
                     uiState.backgrounds.none { it.id == current.id }
                 ) {
                     selectedEffect = VideoEffect.None

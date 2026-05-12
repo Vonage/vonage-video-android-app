@@ -153,9 +153,12 @@ fun WaitingRoomScreen(
             sheetState = videoEffectsSheetState,
         ) {
             // Reset the local selection if the active background was deleted while the sheet is open.
+            // Guard with isNotEmpty() so the effect doesn't fire while the list is still
+            // loading (empty initial state would otherwise clear any active selection).
             LaunchedEffect(uiState.backgrounds) {
                 val current = selectedEffect
                 if (current is VideoEffect.BackgroundImage &&
+                    uiState.backgrounds.isNotEmpty() &&
                     uiState.backgrounds.none { it.id == current.id }
                 ) {
                     selectedEffect = VideoEffect.None
