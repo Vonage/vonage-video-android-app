@@ -48,9 +48,11 @@ class OpenTokLogcatInterceptor(
         if (readerThread?.isAlive == true) return
 
         val minPriority = logLevelToPriorityChar(minLogLevel)
-        val tagFilter = tags.joinToString(separator = " ") { "$it:$minPriority" }
-        // Suppress all other tags, then add our targets at the selected minimum level.
-        val command = arrayOf("logcat", "-v", "brief", "-s", tagFilter)
+        val tagFilters = tags.map { "$it:$minPriority" }
+// Suppress all other tags, then add our targets at the selected minimum level.
+        val command = mutableListOf("logcat", "-v", "brief", "-s", "*:S").apply {
+            addAll(tagFilters)
+        }.toTypedArray()
 
         readerThread = Thread({
             try {

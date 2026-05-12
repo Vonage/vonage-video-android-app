@@ -141,7 +141,7 @@ class FileLogInterceptor(
     private fun purgeOldLogs(now: Long) {
         val cutoff = now - TimeUnit.DAYS.toMillis(retentionDays.toLong())
         logDir.listFiles { file ->
-            file.isFile && file.name.startsWith(baseName) && file.name.endsWith(".json.log")
+            file.isFile && file.name.startsWith("$baseName-") && file.name.endsWith(".json.log")
         }?.forEach { file ->
             val dateStr = file.name
                 .removePrefix("$baseName-")
