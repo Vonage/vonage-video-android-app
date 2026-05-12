@@ -1,6 +1,8 @@
 package com.vonage.android.meetingroom.internal.screen
 
+import android.net.Uri
 import androidx.compose.runtime.Stable
+import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.VideoEffect
 
 @Stable
@@ -25,4 +27,6 @@ internal data class MeetingRoomActions(
     val onSettings: () -> Unit = {},
     val onTogglePinParticipant: (String) -> Unit = {},
     val onForceMuteParticipant: (String) -> Unit = {},
+    val onAddBackground: (Uri) -> Unit = {},
+    val onDeleteBackground: (VideoBackgroundItem) -> Unit = {},
 )

@@ -1,5 +1,6 @@
 package com.vonage.android.screen.waiting
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.screen.components.permissions.CallPermissionHandler
 import com.vonage.android.util.pip.pipEffect
@@ -41,6 +43,8 @@ fun WaitingRoomRoute(
             onJoinRoom = { userName -> viewModel.joinRoom(userName) },
             onCameraSwitch = viewModel::onCameraSwitch,
             onApplyVideoEffect = viewModel::applyVideoEffect,
+            onAddBackground = viewModel::addBackground,
+            onDeleteBackground = viewModel::deleteBackground,
             onBack = {
                 viewModel.onStop()
                 onBack()
@@ -94,6 +98,8 @@ data class WaitingRoomActions(
     val onCameraToggle: () -> Unit = {},
     val onOpenVideoEffects: () -> Unit = {},
     val onApplyVideoEffect: (VideoEffect) -> Unit = {},
+    val onAddBackground: (Uri) -> Unit = {},
+    val onDeleteBackground: (VideoBackgroundItem) -> Unit = {},
     val onCameraSwitch: () -> Unit = {},
     val onBack: () -> Unit = {},
 )

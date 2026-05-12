@@ -1,5 +1,10 @@
 package com.vonage.android.fx.ui
 
+import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,29 +24,40 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.vonage.android.videofx.R
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
-import com.vonage.android.compose.vivid.icons.line.BlurOff
+import com.vonage.android.compose.vivid.icons.line.AddImage
 import com.vonage.android.compose.vivid.icons.line.Blur as LineBlur
+import com.vonage.android.compose.vivid.icons.line.BlurOff
+import com.vonage.android.compose.vivid.icons.line.Close
 import com.vonage.android.compose.vivid.icons.solid.Blur as SolidBlur
 import com.vonage.android.kotlin.model.VideoEffect
+import com.vonage.android.videofx.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Bottom-sheet content for selecting a video effect.
@@ -51,19 +67,32 @@ import kotlinx.collections.immutable.persistentListOf
  * tap ([onEffectSelect] is called with every selection). There is no Cancel/Apply step —
  * the sheet is dismissed by swiping it down.
  *
- * @param backgrounds    List of virtual background thumbnails to display.
- * @param selectedEffect Currently active video effect (used to highlight the active tile).
- * @param onEffectSelect Invoked when the user taps an effect tile; caller should apply
- *                       it to the publisher immediately.
- * @param modifier       Optional [Modifier] for the root layout.
+ * @param backgrounds       List of virtual background thumbnails to display.
+ * @param selectedEffect    Currently active video effect (used to highlight the active tile).
+ * @param canAddBackground  Whether the "Add image" tile should be shown. Callers hide it once
+ *                          [UserBackgroundRepository.MAX_USER_BACKGROUNDS] is reached.
+ * @param onEffectSelect    Invoked when the user taps an effect tile; caller should apply
+ *                          it to the publisher immediately.
+ * @param onAddBackground   Invoked with the content [Uri] when the user picks an image from
+ *                          the system photo picker. Caller is responsible for IO / file saving.
+ * @param onDeleteBackground Invoked when the user taps the delete button on a user-uploaded
+ *                           background tile.
+ * @param modifier          Optional [Modifier] for the root layout.
  */
 @Composable
 fun VideoEffectsScreen(
     backgrounds: ImmutableList<VideoBackgroundItem>,
     selectedEffect: VideoEffect,
+    canAddBackground: Boolean,
     onEffectSelect: (VideoEffect) -> Unit,
+    onAddBackground: (Uri) -> Unit,
+    onDeleteBackground: (VideoBackgroundItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+    ) { uri -> uri?.let { onAddBackground(it) } }
+
     Column(
         modifier = modifier
             .testTag(VideoEffectsTestTags.VIDEO_EFFECTS_SHEET_CONTENT)
@@ -84,7 +113,14 @@ fun VideoEffectsScreen(
         EffectsAndBackgroundsGrid(
             backgrounds = backgrounds,
             selectedEffect = selectedEffect,
+            canAddBackground = canAddBackground,
             onEffectSelect = onEffectSelect,
+            onAddImageClick = {
+                launcher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
+                )
+            },
+            onDeleteBackground = onDeleteBackground,
             modifier = Modifier.padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
         )
     }
@@ -94,7 +130,10 @@ fun VideoEffectsScreen(
 private fun EffectsAndBackgroundsGrid(
     backgrounds: ImmutableList<VideoBackgroundItem>,
     selectedEffect: VideoEffect,
+    canAddBackground: Boolean,
     onEffectSelect: (VideoEffect) -> Unit,
+    onAddImageClick: () -> Unit,
+    onDeleteBackground: (VideoBackgroundItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val blurEffects = remember {
@@ -104,6 +143,10 @@ private fun EffectsAndBackgroundsGrid(
             VideoEffect.BlurHigh to VividIcons.Solid.SolidBlur,
         )
     }
+
+    // Show the backgrounds section when there are existing backgrounds OR when a new one can be added.
+    val showBackgroundsSection = backgrounds.isNotEmpty() || canAddBackground
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(GRID_COLUMNS),
         modifier = modifier,
@@ -135,12 +178,12 @@ private fun EffectsAndBackgroundsGrid(
             }
         }
 
-        if (backgrounds.isNotEmpty()) {
+        if (showBackgroundsSection) {
             // Backgrounds section header
             item(span = { GridItemSpan(maxCurrentLineSpan) }) {
                 SectionHeader(text = stringResource(R.string.video_effects_section_backgrounds))
             }
-            // Background thumbnails
+            // Background thumbnails (built-in and user-uploaded)
             items(items = backgrounds, key = { it.id }) { item ->
                 BackgroundThumbnail(
                     item = item,
@@ -150,7 +193,21 @@ private fun EffectsAndBackgroundsGrid(
                         val path = item.imagePath ?: return@BackgroundThumbnail
                         onEffectSelect(VideoEffect.BackgroundImage(id = item.id, imagePath = path))
                     },
+                    onDelete = if (item.isUserUploaded) {
+                        { onDeleteBackground(item) }
+                    } else {
+                        null
+                    },
                 )
+            }
+            // "Add image" tile — shown when the user has not yet reached the limit
+            if (canAddBackground) {
+                item {
+                    AddBackgroundTile(
+                        modifier = Modifier.testTag(VideoEffectsTestTags.VIDEO_EFFECTS_ADD_BACKGROUND_TILE),
+                        onClick = onAddImageClick,
+                    )
+                }
             }
         }
     }
@@ -213,10 +270,27 @@ private fun BackgroundThumbnail(
     item: VideoBackgroundItem,
     isSelected: Boolean,
     onClick: () -> Unit,
+    onDelete: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     val primary = VonageVideoTheme.colors.primary
     val borderColor = if (isSelected) primary else Color.Transparent
+
+    // For user-uploaded images (thumbnailRes == null), load the bitmap from disk asynchronously.
+    val painter: Painter = if (item.thumbnailRes != null) {
+        painterResource(item.thumbnailRes)
+    } else {
+        val bitmap by produceState<android.graphics.Bitmap?>(initialValue = null, item.imagePath) {
+            value = withContext(Dispatchers.IO) {
+                item.imagePath?.let { path ->
+                    runCatching { BitmapFactory.decodeFile(path) }.getOrNull()
+                }
+            }
+        }
+        remember(bitmap) {
+            bitmap?.asImageBitmap()?.let { BitmapPainter(it) } ?: ColorPainter(Color.DarkGray)
+        }
+    }
 
     Box(
         modifier = modifier
@@ -230,21 +304,73 @@ private fun BackgroundThumbnail(
             )
             .clickable { onClick() },
     ) {
-        if (item.thumbnailRes != null) {
-            Image(
-                painter = painterResource(item.thumbnailRes),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-            )
+        Image(
+            painter = painter,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
+
+        // Delete affordance — only for user-uploaded backgrounds
+        if (onDelete != null) {
+            IconButton(
+                onClick = onDelete,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .testTag(VideoEffectsTestTags.VIDEO_EFFECTS_DELETE_BACKGROUND_BUTTON)
+                    .padding(DELETE_BUTTON_PADDING.dp)
+                    .size(DELETE_BUTTON_SIZE.dp)
+                    .background(
+                        color = Color.Black.copy(alpha = DELETE_SCRIM_ALPHA),
+                        shape = VonageVideoTheme.shapes.small,
+                    ),
+            ) {
+                Icon(
+                    imageVector = VividIcons.Line.Close,
+                    contentDescription = stringResource(R.string.video_effects_delete_background_description),
+                    tint = Color.White,
+                    modifier = Modifier.size(DELETE_ICON_SIZE.dp),
+                )
+            }
         }
+    }
+}
+
+@Composable
+private fun AddBackgroundTile(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(THUMBNAIL_ASPECT_RATIO)
+            .clip(VonageVideoTheme.shapes.medium)
+            .background(VonageVideoTheme.colors.surface)
+            .border(
+                BorderStroke(VonageVideoTheme.dimens.borderWidthDefault, Color.Transparent),
+                VonageVideoTheme.shapes.medium
+            )
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = VividIcons.Line.AddImage,
+            contentDescription = stringResource(R.string.video_effects_add_background),
+            tint = VonageVideoTheme.colors.secondary,
+            modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeDefault),
+        )
     }
 }
 
 private const val THUMBNAIL_ASPECT_RATIO = 16f / 9f
 private const val EFFECT_ICON_SIZE = 56
-private const val GRID_COLUMNS = 2
+private const val GRID_COLUMNS = 3
 private const val SELECTED_ALPHA = 0.12f
+private const val DELETE_BUTTON_PADDING = 4
+private const val DELETE_BUTTON_SIZE = 24
+private const val DELETE_ICON_SIZE = 16
+private const val DELETE_SCRIM_ALPHA = 0.5f
 
 @Preview(showBackground = true)
 @Composable
@@ -254,13 +380,16 @@ internal fun VideoEffectsScreenPortraitPreview() {
             backgrounds = persistentListOf(
                 VideoBackgroundItem(id = "bg1"),
                 VideoBackgroundItem(id = "bg2"),
-                VideoBackgroundItem(id = "bg3"),
+                VideoBackgroundItem(id = "bg3", isUserUploaded = true),
                 VideoBackgroundItem(id = "bg4"),
                 VideoBackgroundItem(id = "bg5"),
                 VideoBackgroundItem(id = "bg6"),
             ),
             selectedEffect = VideoEffect.None,
+            canAddBackground = true,
             onEffectSelect = {},
+            onAddBackground = {},
+            onDeleteBackground = {},
         )
     }
 }
@@ -277,7 +406,10 @@ internal fun VideoEffectsScreenLandscapePreview() {
                 VideoBackgroundItem(id = "bg4"),
             ),
             selectedEffect = VideoEffect.BlurLow,
+            canAddBackground = false,
             onEffectSelect = {},
+            onAddBackground = {},
+            onDeleteBackground = {},
         )
     }
 }

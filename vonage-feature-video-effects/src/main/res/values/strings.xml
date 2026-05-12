@@ -4,4 +4,6 @@
     <string name="video_effects_title">Video effects</string>
     <string name="video_effects_section_effects">Effects</string>
     <string name="video_effects_section_backgrounds">Backgrounds</string>
+    <string name="video_effects_add_background">Add image</string>
+    <string name="video_effects_delete_background_description">Delete background</string>
 </resources>

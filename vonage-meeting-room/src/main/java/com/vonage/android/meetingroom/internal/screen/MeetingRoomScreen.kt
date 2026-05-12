@@ -129,6 +129,16 @@ internal fun MeetingRoomScreen(
                     selectedEffect = publisher?.videoEffect?.value ?: VideoEffect.None
                 }
             }
+            // If the user deletes the active background while the sheet is open, reset the
+            // local selection so the grid no longer highlights a non-existent item.
+            LaunchedEffect(uiState.backgrounds) {
+                val current = selectedEffect
+                if (current is VideoEffect.BackgroundImage &&
+                    uiState.backgrounds.none { it.id == current.id }
+                ) {
+                    selectedEffect = VideoEffect.None
+                }
+            }
 
             Scaffold(
                 modifier = modifier.systemBarsPadding(),
@@ -234,10 +244,13 @@ internal fun MeetingRoomScreen(
                     VideoEffectsScreen(
                         backgrounds = uiState.backgrounds,
                         selectedEffect = selectedEffect,
+                        canAddBackground = uiState.canAddBackground,
                         onEffectSelect = { effect ->
                             selectedEffect = effect
                             actions.onApplyVideoEffect(effect)
                         },
+                        onAddBackground = actions.onAddBackground,
+                        onDeleteBackground = actions.onDeleteBackground,
                     )
                 }
             }
