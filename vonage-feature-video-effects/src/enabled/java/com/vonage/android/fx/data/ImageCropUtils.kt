@@ -19,18 +19,22 @@ internal fun portraitDimensionsFor(resolution: CaptureResolution?): Pair<Int, In
     }
 
 /**
- * Returns a new [Bitmap] center-cropped to the given [targetWidth]:[targetHeight] aspect ratio.
+ * Returns a new [Bitmap] center-cropped **and scaled** to exactly [targetWidth] × [targetHeight].
  * The source bitmap is NOT recycled here — the caller must recycle it after use.
  *
- * - Source wider than target ratio → keep full height, crop left/right.
- * - Source taller than target ratio → keep full width, crop top/bottom.
- * - Ratios match exactly → return source unchanged (no allocation).
+ * - Step 1 (crop): adjust the aspect ratio by trimming the wider dimension.
+ * - Step 2 (scale): resize the cropped result to the exact target pixel dimensions.
+ *
+ * Any intermediate bitmap created during cropping is recycled internally.
+ * If the source already has the correct ratio and dimensions, it is returned unchanged
+ * (no allocation).
  */
 internal fun Bitmap.centerCropTo(targetWidth: Int, targetHeight: Int): Bitmap {
     val srcRatio = width.toFloat() / height.toFloat()
     val dstRatio = targetWidth.toFloat() / targetHeight.toFloat()
 
-    return when {
+    // Step 1: crop to the correct aspect ratio
+    val cropped: Bitmap = when {
         srcRatio > dstRatio -> {
             // Source is wider → crop left/right
             val cropWidth = (height * dstRatio).toInt().coerceAtMost(width)
@@ -43,6 +47,12 @@ internal fun Bitmap.centerCropTo(targetWidth: Int, targetHeight: Int): Bitmap {
             val top = (height - cropHeight) / 2
             Bitmap.createBitmap(this, 0, top, width, cropHeight)
         }
-        else -> this // ratios already match
+        else -> this // ratios already match — no crop needed
     }
+
+    // Step 2: scale to exact target dimensions (if not already the right size)
+    if (cropped.width == targetWidth && cropped.height == targetHeight) return cropped
+    val scaled = Bitmap.createScaledBitmap(cropped, targetWidth, targetHeight, true)
+    if (cropped !== this) cropped.recycle() // recycle the intermediate crop; caller owns `this`
+    return scaled
 }
