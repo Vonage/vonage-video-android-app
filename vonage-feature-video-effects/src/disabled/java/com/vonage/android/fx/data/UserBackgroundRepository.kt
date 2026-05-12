@@ -22,9 +22,6 @@ class UserBackgroundRepository(@Suppress("UNUSED_PARAMETER") context: Context) {
     @Suppress("FunctionOnlyReturningConstant")
     fun deleteBackground(id: String): Boolean = false
 
-    @Suppress("FunctionOnlyReturningConstant")
-    fun getCount(): Int = 0
-
     companion object {
         const val MAX_USER_BACKGROUNDS = 10
     }

@@ -94,15 +94,6 @@ class UserBackgroundRepository(private val context: Context) {
         return file.delete()
     }
 
-    /**
-     * Returns the number of stored user backgrounds without constructing the full item list.
-     * Used to compute [canAddBackground] efficiently.
-     */
-    fun getCount(): Int {
-        val dir = File(context.filesDir, USER_BACKGROUNDS_DIR)
-        return dir.listFiles()?.count { it.isFile && it.extension == "jpg" } ?: 0
-    }
-
     companion object {
         /** Configurable upper limit. The "Add image" tile is hidden once this is reached. */
         const val MAX_USER_BACKGROUNDS = 10
