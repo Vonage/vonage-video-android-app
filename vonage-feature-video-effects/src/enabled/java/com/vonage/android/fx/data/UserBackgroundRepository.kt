@@ -61,6 +61,10 @@ class UserBackgroundRepository(private val context: Context) {
         val dir = File(context.filesDir, USER_BACKGROUNDS_DIR)
         dir.mkdirs()
 
+        // Belt-and-suspenders: guard against concurrent or stale-UI saves exceeding the cap.
+        val existingCount = dir.listFiles()?.count { it.isFile && it.extension == "jpg" } ?: 0
+        if (existingCount >= MAX_USER_BACKGROUNDS) return null
+
         val bitmap = context.contentResolver.openInputStream(uri)?.use { stream ->
             BitmapFactory.decodeStream(stream)
         } ?: return null
