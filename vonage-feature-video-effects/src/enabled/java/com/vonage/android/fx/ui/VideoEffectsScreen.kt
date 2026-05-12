@@ -277,13 +277,20 @@ private fun BackgroundThumbnail(
     val borderColor = if (isSelected) primary else Color.Transparent
 
     // For user-uploaded images (thumbnailRes == null), load the bitmap from disk asynchronously.
+    // Use inSampleSize to decode a thumbnail-sized bitmap rather than the full saved image.
     val painter: Painter = if (item.thumbnailRes != null) {
         painterResource(item.thumbnailRes)
     } else {
         val bitmap by produceState<android.graphics.Bitmap?>(initialValue = null, item.imagePath) {
             value = withContext(Dispatchers.IO) {
                 item.imagePath?.let { path ->
-                    runCatching { BitmapFactory.decodeFile(path) }.getOrNull()
+                    runCatching {
+                        val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                        BitmapFactory.decodeFile(path, opts)
+                        opts.inSampleSize = calculateInSampleSize(opts, THUMBNAIL_TARGET_PX, THUMBNAIL_TARGET_PX)
+                        opts.inJustDecodeBounds = false
+                        BitmapFactory.decodeFile(path, opts)
+                    }.getOrNull()
                 }
             }
         }
@@ -364,6 +371,8 @@ private fun AddBackgroundTile(
 }
 
 private const val THUMBNAIL_ASPECT_RATIO = 16f / 9f
+/** Target pixel size used for inSampleSize calculation when decoding user-uploaded thumbnails. */
+private const val THUMBNAIL_TARGET_PX = 256
 private const val EFFECT_ICON_SIZE = 56
 private const val GRID_COLUMNS = 3
 private const val SELECTED_ALPHA = 0.12f
@@ -412,4 +421,21 @@ internal fun VideoEffectsScreenLandscapePreview() {
             onDeleteBackground = {},
         )
     }
+}
+
+/**
+ * Calculates the largest power-of-2 [BitmapFactory.Options.inSampleSize] such that the decoded
+ * bitmap is still at least [reqWidth] × [reqHeight] pixels. This avoids loading the full
+ * high-resolution file into memory when only a small thumbnail is needed.
+ */
+private fun calculateInSampleSize(opts: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+    var sampleSize = 1
+    if (opts.outHeight > reqHeight || opts.outWidth > reqWidth) {
+        val halfH = opts.outHeight / 2
+        val halfW = opts.outWidth / 2
+        while (halfH / sampleSize >= reqHeight && halfW / sampleSize >= reqWidth) {
+            sampleSize *= 2
+        }
+    }
+    return sampleSize
 }
