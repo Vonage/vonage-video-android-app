@@ -23,6 +23,7 @@ import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -164,16 +165,36 @@ class WaitingRoomViewModelTest {
         every { videoClient.destroyPublisher() } returns Unit
 
         sut.uiState.test {
-            awaitItem()
+            awaitItem()                // initial state
             sut.init(context)
+            awaitItem()                // post-init: publisher now set in uiState
             sut.joinRoom("save user name")
-            val state = awaitItem()
+            val state = awaitItem()    // post-join: isSuccess = true
             assertTrue(state.isSuccess)
             assertEquals("save user name", state.joinSettings.username)
         }
 
         coVerify { userRepository.saveUserName("save user name") }
         verify { videoClient.destroyPublisher() }
+    }
+
+    @Test
+    fun `given viewmodel when join room with whitespace-only name then state is invalid and room is not joined`() = runTest {
+        coEvery { userRepository.getUserName() } returns "initial"
+        givenPreviewPublisher()
+        every { videoClient.destroyPublisher() } returns Unit
+
+        sut.uiState.test {
+            awaitItem()                // initial state
+            sut.init(context)
+            awaitItem()                // post-init: publisher now set in uiState
+            sut.joinRoom("   ")        // whitespace-only — trimmed to empty, must be rejected
+            val state = awaitItem()
+            assertFalse(state.isSuccess)
+            assertFalse(state.isUserNameValid)
+        }
+
+        coVerify(exactly = 0) { userRepository.saveUserName(any()) }
     }
 
     @Test
