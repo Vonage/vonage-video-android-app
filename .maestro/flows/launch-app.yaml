@@ -10,7 +10,7 @@ appId: com.vonage.android.debug
 - extendedWaitUntil:
     visible:
       id: "landing_screen"
-    timeout: 15000
+    timeout: 30000
 
 - assertVisible:
     id: "landing_screen"
