@@ -1,0 +1,22 @@
+app/src/test/java/com/vonage/android/screen/waiting/WaitingRoomViewModelTest.kt
+  s_1d7ce7f0cd147b::t_7bd1cff123b7f9 26
+  s_1d7ce7f0cd147b::t_71af151c84703a 168,170,172,181-197
+app/src/test/java/com/vonage/android/util/IsValidUserNameTest.kt
+  s_1d7ce7f0cd147b::t_e1dcfd61e34b47 1-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "4518034bcdf90231109d4525790f4faab77a7811",
+  "prompts": {},
+  "sessions": {
+    "s_1d7ce7f0cd147b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1de3eb62affekYs8fptTgPOhB2",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
