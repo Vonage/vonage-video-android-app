@@ -2,10 +2,13 @@ package com.vonage.android.meetingroom.internal.viewmodel
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.captions.CaptionsUiState
+import com.vonage.android.fx.data.UserBackgroundRepository
+import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherConfig
@@ -22,6 +25,7 @@ import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.logger.vonageLogger
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +39,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Suppress("LongParameterList")
 internal class MeetingRoomViewModel(
@@ -85,16 +90,7 @@ internal class MeetingRoomViewModel(
             ),
         )
 
-        viewModelScope.launch(Dispatchers.IO) {
-            val backgrounds = runCatching {
-                container.backgroundEffectsRepository.getBackgrounds(
-                    container.callSettingsHolder.captureResolution.value,
-                )
-            }.onFailure { throwable ->
-                vonageLogger.e("MeetingRoomViewModel", "Failed to load background effects: $throwable")
-            }.getOrElse { persistentListOf() }
-            _uiState.update { it.copy(backgrounds = backgrounds) }
-        }
+        viewModelScope.launch(Dispatchers.IO) { refreshBackgrounds() }
 
         viewModelScope.launch {
             _uiState.update { state ->
@@ -206,6 +202,55 @@ internal class MeetingRoomViewModel(
      */
     fun applyVideoEffect(effect: VideoEffect) {
         call?.applyLocalVideoEffect(effect)
+    }
+
+    /**
+     * Saves the image at [uri] to persistent storage and refreshes the backgrounds list.
+     * Must be called from any thread; IO is performed internally on [Dispatchers.IO].
+     */
+    fun addBackground(uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val resolution = container.callSettingsHolder.captureResolution.value
+            container.userBackgroundRepository.saveBackground(uri, resolution)
+            refreshBackgrounds()
+        }
+    }
+
+    /**
+     * Deletes the user-uploaded background identified by [item]. If the deleted background is
+     * currently active on the publisher, the effect is reset to [VideoEffect.None].
+     */
+    fun deleteBackground(item: VideoBackgroundItem) {
+        viewModelScope.launch(Dispatchers.IO) {
+            container.userBackgroundRepository.deleteBackground(item.id)
+            val currentEffect = call?.publisher?.value?.videoEffect?.value
+            if (currentEffect is VideoEffect.BackgroundImage && currentEffect.id == item.id) {
+                withContext(Dispatchers.Main) { applyVideoEffect(VideoEffect.None) }
+            }
+            refreshBackgrounds()
+        }
+    }
+
+    /**
+     * Merges built-in and user-uploaded backgrounds then updates the UI state.
+     * Must be called from [Dispatchers.IO].
+     */
+    private suspend fun refreshBackgrounds() {
+        val resolution = container.callSettingsHolder.captureResolution.value
+        val builtIn = runCatching {
+            container.backgroundEffectsRepository.getBackgrounds(resolution)
+        }.onFailure { throwable ->
+            vonageLogger.e("MeetingRoomViewModel", "Failed to load built-in backgrounds: $throwable")
+        }.getOrElse { persistentListOf() }
+
+        val user = runCatching {
+            container.userBackgroundRepository.getUserBackgrounds(resolution)
+        }.onFailure { throwable ->
+            vonageLogger.e("MeetingRoomViewModel", "Failed to load user backgrounds: $throwable")
+        }.getOrElse { persistentListOf() }
+
+        val canAdd = user.size < UserBackgroundRepository.MAX_USER_BACKGROUNDS
+        _uiState.update { it.copy(backgrounds = (builtIn + user).toImmutableList(), canAddBackground = canAdd) }
     }
 
     fun endCall() {
