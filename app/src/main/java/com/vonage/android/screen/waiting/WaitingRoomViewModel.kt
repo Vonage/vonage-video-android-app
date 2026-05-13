@@ -143,7 +143,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     fun joinRoom(userName: String) {
         viewModelScope.launch {
             val sanitizedUserName = userName.sanitizeUserName()
-            if (userName.isValidUserName().not()) {
+            if (sanitizedUserName.isValidUserName().not()) {
                 _uiState.update { uiState -> uiState.copy(isUserNameValid = false) }
                 return@launch
             }
