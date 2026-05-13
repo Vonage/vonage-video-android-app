@@ -82,8 +82,8 @@ public final class com/vonage/logger/interceptor/FileLogInterceptor : com/vonage
 	public static final field DEFAULT_DATE_FORMAT Ljava/lang/String;
 	public static final field DEFAULT_MAX_FILE_SIZE_BYTES J
 	public static final field DEFAULT_RETENTION_DAYS I
-	public fun <init> (Ljava/io/File;Ljava/lang/String;IJLjava/lang/String;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;)V
-	public synthetic fun <init> (Ljava/io/File;Ljava/lang/String;IJLjava/lang/String;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/io/File;Ljava/lang/String;IJLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;)V
+	public synthetic fun <init> (Ljava/io/File;Ljava/lang/String;IJLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun intercept (Lcom/vonage/logger/LogEvent;)Lcom/vonage/logger/LogEvent;
 }
 
