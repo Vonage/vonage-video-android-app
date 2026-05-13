@@ -1,0 +1,38 @@
+app/src/main/java/com/vonage/android/navigation/AppNavHost.kt
+  s_3247238252155a::t_6dcd55d125102a 19
+  s_3247238252155a::t_59e063ce3fab4f 39
+  s_3247238252155a::t_478d035741e763 58-59
+  s_3247238252155a::t_58e285acb43676 82
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomViewModel.kt
+  s_3247238252155a::t_13dee9bf84a868 13
+  s_3247238252155a::t_381117c269c271 151,153-154,158-159,170-176,178
+  s_3247238252155a::t_99202a566a9af5 290
+app/src/main/java/com/vonage/android/screen/room/MeetingRoomScreenRoute.kt
+  s_3247238252155a::t_267e62438d64a2 25,27,32
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomScreen.kt
+  s_3247238252155a::t_87fcae0d5bdf32 30
+  s_3247238252155a::t_167656c9c8de39 48
+  s_3247238252155a::t_d23b8c7edaa699 67
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomRoute.kt
+  s_3247238252155a::t_8be3a793cd501c 18
+  s_3247238252155a::t_db9b27e0d46144 25
+app/src/test/java/com/vonage/android/screen/waiting/WaitingRoomViewModelTest.kt
+  s_3247238252155a::t_1938a02c4e816c 15
+  s_3247238252155a::t_a2ba383629fe5b 170-172,179-203
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.6",
+  "base_commit_sha": "04cda7b8297de31b14c144fc41006338fd0dedc4",
+  "prompts": {},
+  "sessions": {
+    "s_3247238252155a": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1de6068b1ffeWyRrDmbeOwvg16",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
