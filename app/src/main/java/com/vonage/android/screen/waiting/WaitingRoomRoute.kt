@@ -15,13 +15,14 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.VideoEffect
+import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.screen.components.permissions.CallPermissionHandler
 import com.vonage.android.util.pip.pipEffect
 
 @Composable
 fun WaitingRoomRoute(
     roomName: String,
-    navigateToRoom: (String, VideoEffect) -> Unit,
+    navigateToRoom: (String, PublisherSettings) -> Unit,
     navigateToPermissions: () -> Unit,
     navigateToSettings: () -> Unit,
     onBack: () -> Unit,

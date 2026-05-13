@@ -16,7 +16,7 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.vonage.android.BuildConfig
-import com.vonage.android.kotlin.model.VideoEffect
+import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.navigation.AppRoute.Goodbye
 import com.vonage.android.navigation.AppRoute.Landing
 import com.vonage.android.navigation.AppRoute.Meeting
@@ -36,7 +36,7 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    var pendingVideoEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
+    var pendingPublisherSettings by remember { mutableStateOf(PublisherSettings()) }
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -55,8 +55,8 @@ fun AppNavHost(
             val roomName = backStackEntry.toRoute<Waiting>().roomName
             WaitingRoomRoute(
                 roomName = roomName,
-                navigateToRoom = { roomName, videoEffect ->
-                    pendingVideoEffect = videoEffect
+                navigateToRoom = { roomName, settings ->
+                    pendingPublisherSettings = settings
                     navController.navigate(
                         route = Meeting(roomName),
                         navOptions = NavOptions.Builder().setLaunchSingleTop(true).build(),
@@ -79,7 +79,7 @@ fun AppNavHost(
             val roomName = backStackEntry.toRoute<Meeting>().roomName
             MeetingRoomScreenRoute(
                 roomName = roomName,
-                initialVideoEffect = pendingVideoEffect,
+                initialPublisherSettings = pendingPublisherSettings,
                 navigateToGoodBye = { navController.navigate(Goodbye(roomName = roomName)) },
                 navigateToShare = { roomName -> context.navigateToShare(roomName) },
                 navigateToSettings = { navController.navigate(Settings) },

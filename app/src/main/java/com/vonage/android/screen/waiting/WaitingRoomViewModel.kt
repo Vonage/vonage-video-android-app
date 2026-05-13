@@ -10,6 +10,7 @@ import com.vonage.android.fx.data.BackgroundEffectsRepository
 import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.VideoEffect
+import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
@@ -147,13 +148,15 @@ class WaitingRoomViewModel @AssistedInject constructor(
                 return@launch
             }
             userRepository.saveUserName(sanitizedUserName)
-            val joinEffect = currentPublisher()?.let { publisher ->
+            val joinSettings = currentPublisher()?.let { publisher ->
                 val effect = publisher.videoEffect.value
+                val publishAudio = publisher.isMicEnabled.value
+                val publishVideo = publisher.isCameraEnabled.value
                 videoClient.configurePublisher(
                     PublisherConfig(
                         name = sanitizedUserName,
-                        publishVideo = publisher.isCameraEnabled.value,
-                        publishAudio = publisher.isMicEnabled.value,
+                        publishVideo = publishVideo,
+                        publishAudio = publishAudio,
                         initialVideoEffect = effect,
                         cameraIndex = publisher.camera.value.index,
                         senderStatsTrack = callSettingsHolder.senderStatsEnabled.value,
@@ -164,10 +167,15 @@ class WaitingRoomViewModel @AssistedInject constructor(
                         captureFrameRate = callSettingsHolder.captureFrameRate.value,
                     )
                 )
-                effect
-            } ?: VideoEffect.None
+                PublisherSettings(
+                    username = sanitizedUserName,
+                    publishAudio = publishAudio,
+                    publishVideo = publishVideo,
+                    initialVideoEffect = effect,
+                )
+            } ?: PublisherSettings(username = sanitizedUserName)
             onStop()
-            _uiState.update { uiState -> uiState.copy(isSuccess = true, joinEffect = joinEffect) }
+            _uiState.update { uiState -> uiState.copy(isSuccess = true, joinSettings = joinSettings) }
         }
     }
 
@@ -279,7 +287,7 @@ data class WaitingRoomUiState(
     val isUserNameValid: Boolean = true,
     val publisher: PublisherParticipant? = null,
     val isSuccess: Boolean = false,
-    val joinEffect: VideoEffect = VideoEffect.None,
+    val joinSettings: PublisherSettings = PublisherSettings(),
     val allowMicrophoneControl: Boolean = true,
     val allowCameraControl: Boolean = true,
     val audioDevicesState: AudioDevicesState? = null,

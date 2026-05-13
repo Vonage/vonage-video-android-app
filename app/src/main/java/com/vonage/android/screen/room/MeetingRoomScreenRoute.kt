@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.vonage.android.BuildConfig
 import com.vonage.android.config.AppConfig
-import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.MeetingRoomBuilder
 import com.vonage.android.meetingroom.api.MeetingRoomConfiguration
 import com.vonage.android.meetingroom.api.MeetingRoomSDKAction
@@ -23,16 +22,14 @@ fun MeetingRoomScreenRoute(
     navigateToGoodBye: () -> Unit,
     navigateToShare: (String) -> Unit,
     navigateToSettings: () -> Unit,
-    initialVideoEffect: VideoEffect = VideoEffect.None,
+    initialPublisherSettings: PublisherSettings = PublisherSettings(),
 ) {
-    val prebuilt = remember(roomName, initialVideoEffect) {
+    val prebuilt = remember(roomName, initialPublisherSettings) {
         MeetingRoomBuilder(
             baseUrl = BuildConfig.BASE_API_URL,
             roomName = roomName,
         )
-            .publisherSettings(
-                PublisherSettings(initialVideoEffect = initialVideoEffect)
-            )
+            .publisherSettings(initialPublisherSettings)
             .configuration(
                 MeetingRoomConfiguration(
                     allowCameraControl = AppConfig.VideoSettings.ALLOW_CAMERA_CONTROL,

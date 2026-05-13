@@ -12,6 +12,7 @@ import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoEffect
+import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
 import com.vonage.android.settings.CallSettingsHolder
 import io.mockk.coEvery
@@ -166,11 +167,40 @@ class WaitingRoomViewModelTest {
             awaitItem()
             sut.init(context)
             sut.joinRoom("save user name")
-            assertTrue(awaitItem().isSuccess)
+            val state = awaitItem()
+            assertTrue(state.isSuccess)
+            assertEquals("save user name", state.joinSettings.username)
         }
 
         coVerify { userRepository.saveUserName("save user name") }
         verify { videoClient.destroyPublisher() }
+    }
+
+    @Test
+    fun `given initialized viewmodel when join room then joinSettings contains publisher state`() = runTest {
+        coEvery { userRepository.getUserName() } returns "initial"
+        coEvery { userRepository.saveUserName(any()) } returns Unit
+        givenPreviewPublisher()
+        every { videoClient.configurePublisher(any()) } returns Unit
+        every { videoClient.destroyPublisher() } returns Unit
+
+        sut.uiState.test {
+            awaitItem() // initial state
+            sut.init(context)
+            awaitItem() // post-init: publisher is now set in _uiState
+            sut.joinRoom("Alice")
+            val state = awaitItem() // post-join state
+            assertTrue(state.isSuccess)
+            assertEquals(
+                PublisherSettings(
+                    username = "Alice",
+                    publishAudio = false,      // isMicEnabled = false per buildMockPublisher()
+                    publishVideo = true,       // isCameraEnabled = true per buildMockPublisher()
+                    initialVideoEffect = VideoEffect.None,
+                ),
+                state.joinSettings,
+            )
+        }
     }
 
     @Test
