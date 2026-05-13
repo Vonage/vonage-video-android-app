@@ -1,6 +1,7 @@
 package com.vonage.android.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +37,7 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    var pendingPublisherSettings by remember { mutableStateOf(PublisherSettings()) }
+    var pendingPublisherSettings by remember { mutableStateOf<PublisherSettings?>(null) }
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -77,9 +78,14 @@ fun AppNavHost(
             )
         ) { backStackEntry ->
             val roomName = backStackEntry.toRoute<Meeting>().roomName
+            // Capture once per navigation event; re-entry that bypasses the waiting room
+            // (e.g. Goodbye → Re-enter) will find null here and receive clean defaults.
+            val settings = remember(roomName) { pendingPublisherSettings ?: PublisherSettings() }
+            // Reset so any future arrival at Meeting without a waiting-room join gets defaults.
+            SideEffect { pendingPublisherSettings = null }
             MeetingRoomScreenRoute(
                 roomName = roomName,
-                initialPublisherSettings = pendingPublisherSettings,
+                initialPublisherSettings = settings,
                 navigateToGoodBye = { navController.navigate(Goodbye(roomName = roomName)) },
                 navigateToShare = { roomName -> context.navigateToShare(roomName) },
                 navigateToSettings = { navController.navigate(Settings) },
