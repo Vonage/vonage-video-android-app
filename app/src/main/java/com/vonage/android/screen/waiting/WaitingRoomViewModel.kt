@@ -50,6 +50,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     private val videoClient: VonageVideoClient,
     private val audioDevicesHandler: AudioDevicesHandler,
     private val callSettingsHolder: CallSettingsHolder,
+    private val userBackgroundRepository: UserBackgroundRepository,
 ) : ViewModel() {
 
     private var publisherSetupJob: Job? = null
@@ -59,8 +60,6 @@ class WaitingRoomViewModel @AssistedInject constructor(
         started = WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
         initialValue = WaitingRoomUiState(roomName = roomName),
     )
-
-    private val userBackgroundRepository = UserBackgroundRepository(appContext)
 
     init {
         viewModelScope.launch(Dispatchers.IO) { refreshBackgrounds() }
@@ -123,8 +122,8 @@ class WaitingRoomViewModel @AssistedInject constructor(
     fun addBackgrounds(uris: List<Uri>) {
         viewModelScope.launch(Dispatchers.IO) {
             val resolution = callSettingsHolder.captureResolution.value
-            uris.forEach { uri ->
-                userBackgroundRepository.saveBackground(uri, resolution) ?: return@forEach
+            for (uri in uris) {
+                userBackgroundRepository.saveBackground(uri, resolution) ?: break
             }
             refreshBackgrounds()
         }
