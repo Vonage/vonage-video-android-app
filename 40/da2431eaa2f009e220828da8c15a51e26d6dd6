@@ -1,0 +1,33 @@
+app/src/main/java/com/vonage/android/di/FeaturesModule.kt
+  s_c3cffd8b69c935::t_de76fe42b37ee9 63-68
+  s_c3cffd8b69c935::t_d8c48426c7e570 10
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomViewModel.kt
+  s_c3cffd8b69c935::t_19bcdb9f92ea60 125-126
+  s_c3cffd8b69c935::t_6f4c86870c380c 53
+app/src/test/java/com/vonage/android/screen/waiting/WaitingRoomViewModelTest.kt
+  s_c3cffd8b69c935::t_b36b798f4b7800 288,295,302,305,311-312,320-324,330
+  s_c3cffd8b69c935::t_1683f688a31e78 61,63,67,77
+  s_c3cffd8b69c935::t_8993c229a9ae3a 319,329
+  s_c3cffd8b69c935::t_d0c08176075034 20,26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "40da2431eaa2f009e220828da8c15a51e26d6dd6",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_c3cffd8b69c935": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1da0414feffelF664Gm4fncXRO",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
