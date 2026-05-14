@@ -27,6 +27,7 @@ import com.vonage.android.compose.layout.TwoPaneScaffold
 import com.vonage.android.compose.preview.buildPublisher
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.VideoEffect
+import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.fx.ui.VideoEffectsScreen
 import com.vonage.android.screen.components.audio.AudioDevicesMenu
 import com.vonage.android.screen.waiting.components.DeviceSelectionPanel
@@ -44,7 +45,7 @@ fun WaitingRoomScreen(
     uiState: WaitingRoomUiState,
     actions: WaitingRoomActions,
     modifier: Modifier = Modifier,
-    navigateToRoom: (String, VideoEffect) -> Unit = { _, _ -> },
+    navigateToRoom: (String, PublisherSettings) -> Unit = { _, _ -> },
     navigateToSettings: () -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
@@ -63,7 +64,7 @@ fun WaitingRoomScreen(
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            navigateToRoom(uiState.roomName, uiState.joinEffect)
+            navigateToRoom(uiState.roomName, uiState.joinSettings)
         }
     }
 
