@@ -168,8 +168,7 @@ fun WaitingRoomScreen(
             VideoEffectsScreen(
                 backgrounds = uiState.backgrounds,
                 selectedEffect = selectedEffect,
-                canAddBackground = uiState.canAddBackground,
-                onEffectSelect = { effect ->
+                remainingBackgroundSlots = uiState.remainingBackgroundSlots,                onEffectSelect = { effect ->
                     selectedEffect = effect
                     actions.onApplyVideoEffect(effect)
                 },

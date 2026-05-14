@@ -1,6 +1,7 @@
 package com.vonage.android.screen.waiting
 
 import android.content.Context
+import android.net.Uri
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
 import com.vonage.android.config.Config
@@ -15,13 +16,19 @@ import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
 import com.vonage.android.settings.CallSettingsHolder
+import com.vonage.android.fx.data.UserBackgroundRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.io.File
+import java.nio.file.Files
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -29,6 +36,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class WaitingRoomViewModelTest {
 
     @get:Rule
@@ -53,8 +61,17 @@ class WaitingRoomViewModelTest {
 
     private lateinit var sut: WaitingRoomViewModel
 
+    private val tempFilesDir: File = Files.createTempDirectory("vonage_test_files").toFile()
+
     @Before
     fun setUp() {
+        // Provide a real directory so that File(context.filesDir, ...) in
+        // UserBackgroundRepository doesn't NPE on a mock File's null path field.
+        // openInputStream returns null so BitmapFactory.decodeStream → null
+        // and saveBackground returns null early without writing any file.
+        every { context.filesDir } returns tempFilesDir
+        every { context.contentResolver.openInputStream(any()) } returns null
+
         sut = WaitingRoomViewModel(
             roomName = ANY_ROOM_NAME,
             appContext = context,
@@ -71,6 +88,11 @@ class WaitingRoomViewModelTest {
             allowShowParticipantList = true,
         )
         every { videoClient.configurePublisher(any()) } returns Unit
+    }
+
+    @After
+    fun tearDown() {
+        tempFilesDir.deleteRecursively()
     }
 
     @Test
@@ -266,6 +288,65 @@ class WaitingRoomViewModelTest {
         sut.onStop()
 
         verify { videoClient.destroyPublisher() }
+    }
+
+    // -------------------------------------------------------------------------
+    // addBackgrounds — batch upload
+    //
+    // Note: UserBackgroundRepository is constructed inline inside WaitingRoomViewModel
+    // and cannot be mocked at the unit-test level without a constructor refactor.
+    // These tests therefore exercise the observable state invariants that are
+    // verifiable even when all saveBackground() calls silently return null
+    // (which always happens here because context.contentResolver is a relaxed mock
+    // and BitmapFactory.decodeStream produces null for a mock InputStream).
+    // -------------------------------------------------------------------------
+
+    @Test
+    fun `given empty uri list WHEN addBackgrounds THEN remainingBackgroundSlots unchanged and backgrounds empty`() =
+        runTest {
+            advanceUntilIdle() // drain the init refreshBackgrounds coroutine
+
+            sut.addBackgrounds(emptyList())
+            advanceUntilIdle()
+
+            val state = sut.uiState.value
+            assertEquals(UserBackgroundRepository.MAX_USER_BACKGROUNDS, state.remainingBackgroundSlots)
+            assertTrue(state.backgrounds.isEmpty())
+        }
+
+    @Test
+    fun `given uri list WHEN addBackgrounds THEN remainingBackgroundSlots unchanged and backgrounds empty`() =
+        runTest {
+            val uris = listOf(mockk<Uri>(), mockk<Uri>(), mockk<Uri>())
+            advanceUntilIdle() // drain the init refreshBackgrounds coroutine
+
+            // All saves fail (mock context → null InputStream → saveBackground returns null)
+            // refreshBackgrounds() is still called once at the end.
+            sut.addBackgrounds(uris)
+            advanceUntilIdle()
+
+            val state = sut.uiState.value
+            assertEquals(UserBackgroundRepository.MAX_USER_BACKGROUNDS, state.remainingBackgroundSlots)
+            assertTrue(state.backgrounds.isEmpty())
+        }
+
+    @Test
+    fun `given uri list WHEN addBackgrounds THEN state updates only once via turbine`() = runTest {
+        val uris = listOf(mockk<Uri>(), mockk<Uri>(), mockk<Uri>())
+        advanceUntilIdle() // drain the init refreshBackgrounds coroutine
+
+        sut.uiState.test {
+            // Consume the current StateFlow value (replayed on subscribe)
+            awaitItem()
+
+            sut.addBackgrounds(uris)
+            advanceUntilIdle()
+
+            // With a relaxed mock context all saves return null, so state doesn't change
+            // → StateFlow emits nothing (deduplication). Verify no spurious extra emissions.
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun givenPreviewPublisher(): PreviewPublisherState {

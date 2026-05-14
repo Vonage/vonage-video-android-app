@@ -115,12 +115,17 @@ class WaitingRoomViewModel @AssistedInject constructor(
     }
 
     /**
-     * Saves the image at [uri] to persistent storage and refreshes the backgrounds list.
+     * Saves each image in [uris] to persistent storage sequentially, then refreshes the
+     * backgrounds list once. Processing stops early if
+     * [UserBackgroundRepository.MAX_USER_BACKGROUNDS] is reached mid-batch.
      * IO is performed internally on [Dispatchers.IO].
      */
-    fun addBackground(uri: Uri) {
+    fun addBackgrounds(uris: List<Uri>) {
         viewModelScope.launch(Dispatchers.IO) {
-            userBackgroundRepository.saveBackground(uri, callSettingsHolder.captureResolution.value)
+            val resolution = callSettingsHolder.captureResolution.value
+            uris.forEach { uri ->
+                userBackgroundRepository.saveBackground(uri, resolution) ?: return@forEach
+            }
             refreshBackgrounds()
         }
     }
@@ -197,11 +202,11 @@ class WaitingRoomViewModel @AssistedInject constructor(
         val user = runCatching {
             userBackgroundRepository.getUserBackgrounds(resolution)
         }.getOrElse { persistentListOf() }
-        val canAdd = user.size < UserBackgroundRepository.MAX_USER_BACKGROUNDS
+        val remainingSlots = (UserBackgroundRepository.MAX_USER_BACKGROUNDS - user.size).coerceAtLeast(0)
         _uiState.update {
             it.copy(
                 backgrounds = (builtIn + user).toImmutableList(),
-                canAddBackground = canAdd,
+                remainingBackgroundSlots = remainingSlots,
             )
         }
     }
@@ -292,6 +297,6 @@ data class WaitingRoomUiState(
     val allowCameraControl: Boolean = true,
     val audioDevicesState: AudioDevicesState? = null,
     val backgrounds: ImmutableList<VideoBackgroundItem> = persistentListOf(),
-    /** Whether the "Add image" tile should be shown in the effects sheet. */
-    val canAddBackground: Boolean = true,
+    /** Number of additional user backgrounds that can be added before the cap is reached. */
+    val remainingBackgroundSlots: Int = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
 )

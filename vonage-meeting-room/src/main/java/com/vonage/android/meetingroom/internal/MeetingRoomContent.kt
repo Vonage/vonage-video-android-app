@@ -125,7 +125,7 @@ private fun MeetingRoomContentInner(
             onSettings = { prebuilt.onAction(MeetingRoomSDKAction.NavigateToSettings) },
             onTogglePinParticipant = viewModel::onTogglePinParticipant,
             onForceMuteParticipant = viewModel::forceMuteParticipant,
-            onAddBackground = viewModel::addBackground,
+            onAddBackground = viewModel::addBackgrounds,
             onDeleteBackground = viewModel::deleteBackground,
         )
     }

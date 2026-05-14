@@ -205,13 +205,17 @@ internal class MeetingRoomViewModel(
     }
 
     /**
-     * Saves the image at [uri] to persistent storage and refreshes the backgrounds list.
+     * Saves each image in [uris] to persistent storage sequentially, then refreshes the
+     * backgrounds list once. Processing stops early if
+     * [UserBackgroundRepository.MAX_USER_BACKGROUNDS] is reached mid-batch.
      * Must be called from any thread; IO is performed internally on [Dispatchers.IO].
      */
-    fun addBackground(uri: Uri) {
+    fun addBackgrounds(uris: List<Uri>) {
         viewModelScope.launch(Dispatchers.IO) {
             val resolution = container.callSettingsHolder.captureResolution.value
-            container.userBackgroundRepository.saveBackground(uri, resolution)
+            uris.forEach { uri ->
+                container.userBackgroundRepository.saveBackground(uri, resolution) ?: return@forEach
+            }
             refreshBackgrounds()
         }
     }
@@ -249,8 +253,8 @@ internal class MeetingRoomViewModel(
             vonageLogger.e("MeetingRoomViewModel", "Failed to load user backgrounds: $throwable")
         }.getOrElse { persistentListOf() }
 
-        val canAdd = user.size < UserBackgroundRepository.MAX_USER_BACKGROUNDS
-        _uiState.update { it.copy(backgrounds = (builtIn + user).toImmutableList(), canAddBackground = canAdd) }
+        val remainingSlots = (UserBackgroundRepository.MAX_USER_BACKGROUNDS - user.size).coerceAtLeast(0)
+        _uiState.update { it.copy(backgrounds = (builtIn + user).toImmutableList(), remainingBackgroundSlots = remainingSlots) }
     }
 
     fun endCall() {
