@@ -27,6 +27,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -600,6 +601,31 @@ class CallTest {
         val call = createCall()
         assertNull(call.signalStateFlow.value)
     }
+
+    // endregion
+
+    // region Visibility
+
+    @Test
+    fun `updateParticipantVisibilityFlow should never call changeVisibility on publisher`() =
+        runTest(testDispatcher) {
+            val call = createCall()
+
+            call.connect(mockContext).test {
+                triggerConnectedAndWaitForPublisher()
+                awaitItem() // Connected
+
+                // Snapshot flow that does NOT include PUBLISHER_ID — simulates the publisher
+                // tile being off-screen (e.g. scrolled off thumbnail strip in SPEAKER_LAYOUT).
+                val visibilityFlow = MutableStateFlow(listOf("some-remote-id"))
+                call.updateParticipantVisibilityFlow(visibilityFlow)
+                runCurrent()
+
+                // Publisher's changeVisibility must never be called by the visibility system.
+                verify(exactly = 0) { mockPublisherState.changeVisibility(any()) }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     // endregion
 
