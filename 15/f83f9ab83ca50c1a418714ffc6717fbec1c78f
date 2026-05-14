@@ -1,0 +1,19 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/ParticipantVideoCard.kt
+  s_2a4285421f1745::t_4d2ffe9f42c0fe 133
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "15f83f9ab83ca50c1a418714ffc6717fbec1c78f",
+  "prompts": {},
+  "sessions": {
+    "s_2a4285421f1745": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1de1844c9ffe1KMKY3C90tuYq7",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
