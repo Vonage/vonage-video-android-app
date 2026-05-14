@@ -1,0 +1,18 @@
+config/app-config.json
+  h_25498f8d57a266 10
+vonage-feature-audio-effects/src/enabled/java/com/vonage/android/fx/ui/NoiseSuppressorToggle.kt
+  h_25498f8d57a266 47
+gradle/libs.versions.toml
+  h_25498f8d57a266 34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "5d9032d9e6d16e7ee0f5988fe999add740ca3d51",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
