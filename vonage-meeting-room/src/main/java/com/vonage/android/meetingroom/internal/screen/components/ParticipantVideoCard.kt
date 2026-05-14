@@ -129,9 +129,8 @@ internal fun ParticipantVideoCard(
                 modifier = Modifier.align(Alignment.TopStart),
             )
 
-            val videoEffect by publisherParticipant.videoEffect.collectAsStateWithLifecycle()
-
             if (showVideoEffectsButton) {
+                val videoEffect by publisherParticipant.videoEffect.collectAsStateWithLifecycle()
                 VideoEffectIndicator(
                     modifier = Modifier
                         .testTag(MeetingRoomScreenTestTags.MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON)
