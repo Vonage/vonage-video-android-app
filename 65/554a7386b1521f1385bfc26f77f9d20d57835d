@@ -1,0 +1,19 @@
+vonage-video-core/src/test/java/com/vonage/android/kotlin/CallTest.kt
+  s_2a4285421f1745::t_6080d69fb9d93c 622
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "65554a7386b1521f1385bfc26f77f9d20d57835d",
+  "prompts": {},
+  "sessions": {
+    "s_2a4285421f1745": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1de1844c9ffe1KMKY3C90tuYq7",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
