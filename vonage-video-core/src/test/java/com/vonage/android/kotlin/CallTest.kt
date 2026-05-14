@@ -619,6 +619,7 @@ class CallTest {
                 // tile being off-screen (e.g. scrolled off thumbnail strip in SPEAKER_LAYOUT).
                 val visibilityFlow = MutableStateFlow(listOf("some-remote-id"))
                 call.updateParticipantVisibilityFlow(visibilityFlow)
+                Thread.sleep(200)
                 runCurrent()
 
                 // Publisher's changeVisibility must never be called by the visibility system.
