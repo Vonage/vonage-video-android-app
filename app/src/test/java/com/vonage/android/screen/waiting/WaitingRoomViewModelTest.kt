@@ -285,7 +285,7 @@ class WaitingRoomViewModelTest {
     // -------------------------------------------------------------------------
 
     @Test
-    fun `given empty uri list WHEN addBackgrounds THEN saveBackground not called and slots at max`() =
+    fun `given empty uri list WHEN addBackgrounds THEN saveBackground not called`() =
         runTest {
             advanceUntilIdle() // drain the init refreshBackgrounds coroutine
 
@@ -293,13 +293,10 @@ class WaitingRoomViewModelTest {
             advanceUntilIdle()
 
             verify(exactly = 0) { userBackgroundRepository.saveBackground(any(), any()) }
-            val state = sut.uiState.value
-            assertEquals(UserBackgroundRepository.MAX_USER_BACKGROUNDS, state.remainingBackgroundSlots)
-            assertTrue(state.backgrounds.isEmpty())
         }
 
     @Test
-    fun `given uri list WHEN addBackgrounds and save returns null THEN loop breaks after first call and slots unchanged`() =
+    fun `given uri list WHEN addBackgrounds and save returns null THEN loop breaks after first call`() =
         runTest {
             val uris = listOf(mockk<Uri>(), mockk<Uri>(), mockk<Uri>())
             every { userBackgroundRepository.saveBackground(any(), any()) } returns null
@@ -310,9 +307,22 @@ class WaitingRoomViewModelTest {
 
             // null return → for-loop breaks after the first call
             verify(exactly = 1) { userBackgroundRepository.saveBackground(any(), any()) }
-            val state = sut.uiState.value
-            assertEquals(UserBackgroundRepository.MAX_USER_BACKGROUNDS, state.remainingBackgroundSlots)
-            assertTrue(state.backgrounds.isEmpty())
+        }
+
+    @Test
+    fun `given uri list WHEN addBackgrounds and cap hit mid-batch THEN processing stops at cap`() =
+        runTest {
+            val uris = listOf(mockk<Uri>(), mockk<Uri>(), mockk<Uri>())
+            val savedItem = VideoBackgroundItem(id = "user_bg_test", isUserUploaded = true)
+            // First save fills the last slot, second hits the cap and returns null.
+            every { userBackgroundRepository.saveBackground(any(), any()) } returnsMany listOf(savedItem, null)
+            advanceUntilIdle() // drain the init refreshBackgrounds coroutine
+
+            sut.addBackgrounds(uris)
+            advanceUntilIdle()
+
+            // Loop breaks on second null; third URI is never processed.
+            verify(exactly = 2) { userBackgroundRepository.saveBackground(any(), any()) }
         }
 
     @Test

@@ -28,6 +28,8 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -70,6 +72,7 @@ internal class MeetingRoomViewModel(
 
     private var call: CallFacade? = null
     private val callEnded = AtomicBoolean(false)
+    private val backgroundsMutex = Mutex()
 
     init {
         container.foregroundServiceHandler.startForegroundService(roomName)
@@ -212,11 +215,13 @@ internal class MeetingRoomViewModel(
      */
     fun addBackgrounds(uris: List<Uri>) {
         viewModelScope.launch(Dispatchers.IO) {
-            val resolution = container.callSettingsHolder.captureResolution.value
-            uris.forEach { uri ->
-                container.userBackgroundRepository.saveBackground(uri, resolution) ?: return@forEach
+            backgroundsMutex.withLock {
+                val resolution = container.callSettingsHolder.captureResolution.value
+                for (uri in uris) {
+                    container.userBackgroundRepository.saveBackground(uri, resolution) ?: break
+                }
+                refreshBackgrounds()
             }
-            refreshBackgrounds()
         }
     }
 

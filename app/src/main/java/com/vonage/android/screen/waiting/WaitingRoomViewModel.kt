@@ -31,6 +31,8 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
@@ -54,6 +56,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     private var publisherSetupJob: Job? = null
+    private val backgroundsMutex = Mutex()
     private val _uiState = MutableStateFlow(WaitingRoomUiState(roomName = roomName))
     val uiState: StateFlow<WaitingRoomUiState> = _uiState.stateIn(
         scope = viewModelScope,
@@ -121,11 +124,13 @@ class WaitingRoomViewModel @AssistedInject constructor(
      */
     fun addBackgrounds(uris: List<Uri>) {
         viewModelScope.launch(Dispatchers.IO) {
-            val resolution = callSettingsHolder.captureResolution.value
-            for (uri in uris) {
-                userBackgroundRepository.saveBackground(uri, resolution) ?: break
+            backgroundsMutex.withLock {
+                val resolution = callSettingsHolder.captureResolution.value
+                for (uri in uris) {
+                    userBackgroundRepository.saveBackground(uri, resolution) ?: break
+                }
+                refreshBackgrounds()
             }
-            refreshBackgrounds()
         }
     }
 
@@ -296,6 +301,6 @@ data class WaitingRoomUiState(
     val allowCameraControl: Boolean = true,
     val audioDevicesState: AudioDevicesState? = null,
     val backgrounds: ImmutableList<VideoBackgroundItem> = persistentListOf(),
-    /** Number of additional user backgrounds that can be added before the cap is reached. */
-    val remainingBackgroundSlots: Int = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
+    /** Number of additional user backgrounds that can be added before the cap is reached. 0 until the first refresh completes. */
+    val remainingBackgroundSlots: Int = 0,
 )
