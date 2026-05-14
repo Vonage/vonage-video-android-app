@@ -54,6 +54,7 @@ internal fun ParticipantVideoCard(
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
     isPinned: Boolean = false,
+    showVideoEffectsButton: Boolean = true,
 ) {
     val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
     val isSpeaking by participant.isTalking.collectAsStateWithLifecycle()
@@ -130,16 +131,18 @@ internal fun ParticipantVideoCard(
 
             val videoEffect by publisherParticipant.videoEffect.collectAsStateWithLifecycle()
 
-            VideoEffectIndicator(
-                modifier = Modifier
-                    .testTag(MeetingRoomScreenTestTags.MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON)
-                    .align(Alignment.BottomEnd)
-                    .padding(VonageVideoTheme.dimens.paddingSmall),
-                videoEffect = videoEffect,
-                onClick = actions.onOpenVideoEffects,
-                size = VonageVideoTheme.dimens.minTouchTarget,
-                iconSize = VonageVideoTheme.dimens.iconSizeSmall,
-            )
+            if (showVideoEffectsButton) {
+                VideoEffectIndicator(
+                    modifier = Modifier
+                        .testTag(MeetingRoomScreenTestTags.MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON)
+                        .align(Alignment.BottomEnd)
+                        .padding(VonageVideoTheme.dimens.paddingSmall),
+                    videoEffect = videoEffect,
+                    onClick = actions.onOpenVideoEffects,
+                    size = VonageVideoTheme.dimens.minTouchTarget,
+                    iconSize = VonageVideoTheme.dimens.iconSizeSmall,
+                )
+            }
         }
     }
 

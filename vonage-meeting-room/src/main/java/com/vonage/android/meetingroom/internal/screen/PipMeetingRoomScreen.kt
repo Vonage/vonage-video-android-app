@@ -45,6 +45,7 @@ internal fun PipMeetingRoomScreen(
                     ParticipantVideoCard(
                         participant = p,
                         actions = actions,
+                        showVideoEffectsButton = false,
                     )
                 }
                 ChatBadgeButton(
