@@ -1,0 +1,44 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/ExperimentalMeetingRoomApi.kt
+  s_d4b1a55efd6b66::t_673abbe6bc4f75 1-25
+vonage-meeting-room-sample-app/build.gradle.kts
+  s_d4b1a55efd6b66::t_7b747f1dc93c86 40
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomFeature.kt
+  s_d4b1a55efd6b66::t_e921452d1a3a43 13
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomPrebuilt.kt
+  s_d4b1a55efd6b66::t_d187d6d946cf01 37
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomSDKAction.kt
+  s_d4b1a55efd6b66::t_b1172007893add 9
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomBuilder.kt
+  s_d4b1a55efd6b66::t_792321bf22a21c 37
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/PublisherSettings.kt
+  s_d4b1a55efd6b66::t_fdeb22e01054f9 19
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomTheme.kt
+  s_d4b1a55efd6b66::t_dbd605bdb9df02 88
+  s_d4b1a55efd6b66::t_b9cb8245c0f715 122
+  s_d4b1a55efd6b66::t_c70074dc2cc32d 72
+vonage-meeting-room/build.gradle.kts
+  s_d4b1a55efd6b66::t_59862ff83d7482 31
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomStateHolder.kt
+  s_d4b1a55efd6b66::t_40d13b182f995c 25
+  s_d4b1a55efd6b66::t_7f1b4d15d282e5 11
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomConfiguration.kt
+  s_d4b1a55efd6b66::t_15385179318492 13
+app/build.gradle.kts
+  s_d4b1a55efd6b66::t_f3d8ffb009006f 105
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "4bb52c593301bc694bbb84c30a2d92b559228ed0",
+  "prompts": {},
+  "sessions": {
+    "s_d4b1a55efd6b66": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1c5bf0fe3ffeL2hgMTBJ1oOkbV",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
