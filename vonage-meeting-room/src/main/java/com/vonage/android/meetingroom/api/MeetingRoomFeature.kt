@@ -10,6 +10,7 @@ package com.vonage.android.meetingroom.api
  * Passing no value to [MeetingRoomBuilder.enabledFeatures] defaults to [MeetingRoomFeature.all],
  * which preserves the same behavior as before the builder API.
  */
+@ExperimentalMeetingRoomApi
 enum class MeetingRoomFeature {
     /** In-call text chat. */
     CHAT,

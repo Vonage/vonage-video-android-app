@@ -16,6 +16,7 @@ import com.vonage.android.kotlin.model.VideoEffect
  *                            Defaults to [VideoEffect.None]. Pass the effect selected in
  *                            the waiting room to preserve continuity.
  */
+@ExperimentalMeetingRoomApi
 data class PublisherSettings(
     val username: String = "",
     val publishAudio: Boolean = true,
