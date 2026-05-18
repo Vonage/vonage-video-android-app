@@ -44,7 +44,7 @@ fun NoiseSuppressorToggle(
         Icon(
             imageVector = VividIcons.Solid.Headset2,
             contentDescription = null,
-            tint = VonageVideoTheme.colors.onSurface,
+            tint = VonageVideoTheme.colors.secondary,
             modifier = Modifier
                 .padding(start = VonageVideoTheme.dimens.paddingSmall)
                 .size(24.dp),
