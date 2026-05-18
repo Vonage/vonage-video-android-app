@@ -10,6 +10,7 @@ package com.vonage.android.meetingroom.api
  * @param allowMicrophoneControl   Show a mic on/off toggle in the bottom bar. Default `true`.
  * @param allowShowParticipantList Show the participant list button. Default `true`.
  */
+@ExperimentalMeetingRoomApi
 data class MeetingRoomConfiguration(
     val allowCameraControl: Boolean = true,
     val allowMicrophoneControl: Boolean = true,

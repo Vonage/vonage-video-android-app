@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
  * @param baseUrl  Base URL of the Vonage Video backend (e.g. `"https://my-backend.example.com"`).
  * @param roomName Name of the meeting room to join.
  */
+@ExperimentalMeetingRoomApi
 class MeetingRoomBuilder(
     private val baseUrl: String,
     private val roomName: String,

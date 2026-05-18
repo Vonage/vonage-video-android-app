@@ -69,6 +69,7 @@ import com.vonage.android.compose.theme.LightWarningHover
  * @param lightColors Color palette used in light mode.
  * @param darkColors  Color palette used in dark mode.
  */
+@ExperimentalMeetingRoomApi
 data class MeetingRoomTheme(
     val lightColors: VonageColors,
     val darkColors: VonageColors,
@@ -84,6 +85,7 @@ data class MeetingRoomTheme(
 }
 
 /** Constructs [VonageColors] from the default Vonage light-mode palette. */
+@ExperimentalMeetingRoomApi
 fun vonageLightColors(): VonageColors = VonageColors(
     primary = LightPrimary,
     onPrimary = LightOnPrimary,
@@ -117,6 +119,7 @@ fun vonageLightColors(): VonageColors = VonageColors(
 )
 
 /** Constructs [VonageColors] from the default Vonage dark-mode palette. */
+@ExperimentalMeetingRoomApi
 fun vonageDarkColors(): VonageColors = VonageColors(
     primary = DarkPrimary,
     onPrimary = DarkOnPrimary,

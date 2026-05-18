@@ -6,6 +6,7 @@ package com.vonage.android.meetingroom.api
  * Register a handler via [MeetingRoomBuilder.onAction]. The host app must handle all cases;
  * alerts (permission prompts, errors) are presented automatically by the SDK.
  */
+@ExperimentalMeetingRoomApi
 sealed class MeetingRoomSDKAction {
 
     /** The call ended — navigate to the goodbye or home screen. */

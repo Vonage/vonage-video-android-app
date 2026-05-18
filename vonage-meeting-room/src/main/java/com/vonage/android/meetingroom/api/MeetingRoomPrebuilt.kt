@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.asStateFlow
  *   first composed and the call setup begins.
  * @property content     Fully composed meeting room UI. Embed in any Compose hierarchy.
  */
+@ExperimentalMeetingRoomApi
 @Suppress("LongParameterList")
 class MeetingRoomPrebuilt internal constructor(
     internal val baseUrl: String,

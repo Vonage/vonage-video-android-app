@@ -37,6 +37,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs += "-opt-in=com.vonage.android.meetingroom.api.ExperimentalMeetingRoomApi"
     }
 }
 
