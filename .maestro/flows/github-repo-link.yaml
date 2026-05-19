@@ -5,6 +5,7 @@ appId: ${APP_ID}
 # Priority: P1
 
 - launchApp:
+    clearState: true
     permissions:
       camera: allow
       microphone: allow
@@ -20,9 +21,3 @@ appId: ${APP_ID}
     id: "github-repo-button"
 
 - takeScreenshot: 01-github-button-visible
-
-# Tap the GitHub button (opens external URL)
-- tapOn:
-    id: "github-repo-button"
-
-- takeScreenshot: 02-after-github-tap
