@@ -1,11 +1,13 @@
 #!/bin/bash
 # Script para ejecutar tests de Maestro en local
 
-# Uso: ./scripts/run_maestro_tests.sh [--auto-emulator | --avd <nombre>]
+# Uso: ./scripts/run_maestro_tests.sh [--auto-emulator | --avd <nombre>] [flow.yaml]
 # Ejemplos:
-#   ./run_maestro_tests.sh                              # Auto-launches first available emulator
+#   ./run_maestro_tests.sh                              # Auto-launches first available emulator, runs all flows
 #   ./run_maestro_tests.sh --auto-emulator              # Same as above (explicit)
 #   ./run_maestro_tests.sh --avd Medium_Phone_API_36.1  # Uses the specified emulator
+#   ./run_maestro_tests.sh launch-app.yaml              # Runs a single flow
+#   ./run_maestro_tests.sh --avd Pixel_4 launch-app.yaml # Specific emulator + single flow
 
 # Cambiar al directorio del proyecto
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -19,6 +21,8 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
+APP_ID="com.vonage.android.debug"
+
 # ========== INSTALL MAESTRO & DEPENDENCIES ==========
 echo -e "${BLUE}🚀 Setting up Maestro and dependencies...${NC}"
 source "$SCRIPT_DIR/install_maestro.sh"
@@ -29,6 +33,7 @@ MAESTRO_PATH="$HOME/.maestro/bin/maestro"
 
 AUTO_LAUNCH_EMULATOR=false
 SPECIFIC_AVD=""
+SINGLE_FLOW=""
 
 # Parsear argumentos
 while [[ $# -gt 0 ]]; do
@@ -42,8 +47,12 @@ while [[ $# -gt 0 ]]; do
             AUTO_LAUNCH_EMULATOR=true
             shift 2
             ;;
+        *.yaml)
+            SINGLE_FLOW="$1"
+            shift
+            ;;
         *)
-            echo "Usage: $0 [--auto-emulator | --avd <name>]"
+            echo "Usage: $0 [--auto-emulator | --avd <name>] [flow.yaml]"
             exit 1
             ;;
     esac
@@ -172,14 +181,26 @@ fi
 echo -e "${GREEN}✓ APK found: $APK_PATH${NC}"
 
 # ========== INSTALL APK ==========
+echo -e "${BLUE}📱 Freeing up device space...${NC}"
+"$ADB_PATH" -s "$DEVICE_SERIAL" shell pm trim-caches 2G 2>/dev/null
+"$ADB_PATH" -s "$DEVICE_SERIAL" uninstall "$APP_ID" 2>/dev/null
+
 echo -e "${BLUE}📱 Installing APK on device...${NC}"
 "$ADB_PATH" -s "$DEVICE_SERIAL" install -r "$APK_PATH"
 if [ $? -ne 0 ]; then
     echo -e "${RED}❌ Error installing APK${NC}"
-    echo -e "${YELLOW}Try: adb -s $DEVICE_SERIAL uninstall com.vonage.android.debug${NC}"
+    echo -e "${YELLOW}Try: adb -s $DEVICE_SERIAL uninstall $APP_ID${NC}"
     exit 1
 fi
 echo -e "${GREEN}✓ APK installed successfully${NC}"
+
+# ========== GRANT PERMISSIONS ==========
+echo -e "${BLUE}🔐 Granting permissions...${NC}"
+"$ADB_PATH" -s "$DEVICE_SERIAL" shell pm grant "$APP_ID" android.permission.CAMERA 2>/dev/null
+"$ADB_PATH" -s "$DEVICE_SERIAL" shell pm grant "$APP_ID" android.permission.RECORD_AUDIO 2>/dev/null
+"$ADB_PATH" -s "$DEVICE_SERIAL" shell pm grant "$APP_ID" android.permission.BLUETOOTH_CONNECT 2>/dev/null
+"$ADB_PATH" -s "$DEVICE_SERIAL" shell pm grant "$APP_ID" android.permission.POST_NOTIFICATIONS 2>/dev/null
+echo -e "${GREEN}✓ Permissions granted${NC}"
 
 # ========== RUN TESTS ==========
 echo -e "${BLUE}🧪 Running Maestro tests...${NC}"
@@ -191,16 +212,26 @@ if [ ! -d ".maestro/flows" ]; then
     exit 1
 fi
 
-# Count flows
-FLOW_COUNT=$(find .maestro/flows -name "*.yaml" | wc -l)
-if [ "$FLOW_COUNT" -eq 0 ]; then
-    echo -e "${YELLOW}⚠ Warning: No test flows found in maestro/flows/${NC}"
-    echo -e "${YELLOW}Add .yaml files with your tests${NC}"
-    exit 0
+if [ -n "$SINGLE_FLOW" ]; then
+    # Run a single flow
+    FLOW_FILE=".maestro/flows/$SINGLE_FLOW"
+    if [ ! -f "$FLOW_FILE" ]; then
+        echo -e "${RED}❌ Error: Flow not found: $FLOW_FILE${NC}"
+        exit 1
+    fi
+    echo -e "${BLUE}Running flow: $SINGLE_FLOW${NC}"
+    "$MAESTRO_PATH" test --env APP_ID="$APP_ID" "$FLOW_FILE"
+else
+    # Run all flows
+    FLOW_COUNT=$(find .maestro/flows -name "*.yaml" | wc -l)
+    if [ "$FLOW_COUNT" -eq 0 ]; then
+        echo -e "${YELLOW}⚠ Warning: No test flows found in maestro/flows/${NC}"
+        echo -e "${YELLOW}Add .yaml files with your tests${NC}"
+        exit 0
+    fi
+    echo -e "${BLUE}Found $FLOW_COUNT test(s)${NC}"
+    "$MAESTRO_PATH" test --env APP_ID="$APP_ID" .maestro/flows/
 fi
-
-echo -e "${BLUE}Found $FLOW_COUNT test(s)${NC}"
-"$MAESTRO_PATH" test .maestro/flows/
 
 if [ $? -eq 0 ]; then
     echo -e ""

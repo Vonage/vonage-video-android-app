@@ -41,6 +41,7 @@ import com.vonage.android.meetingroom.R
 import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
+import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_SCREEN_TAG
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
 import com.vonage.android.meetingroom.internal.screen.audio.AudioDevicesMenu
 import com.vonage.android.meetingroom.internal.screen.components.MeetingRoomContent
@@ -144,7 +145,7 @@ internal fun MeetingRoomScreen(
             }
 
             Scaffold(
-                modifier = modifier.systemBarsPadding(),
+                modifier = modifier.testTag(MEETING_ROOM_SCREEN_TAG).systemBarsPadding(),
                 topBar = {
                     MeetingTopBar(
                         modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
@@ -306,8 +307,9 @@ private fun ThreePaneScaffoldPaneScope.ExtraPane(
 }
 
 internal object MeetingRoomScreenTestTags {
-    const val MEETING_ROOM_TOP_BAR = "meeting_room_top_bar"
-    const val MEETING_ROOM_CONTENT = "meeting_room_content"
-    const val MEETING_ROOM_BOTTOM_BAR = "meeting_room_bottom_bar"
-    const val MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON = "meeting_room_publisher_effects_button"
+    const val MEETING_ROOM_SCREEN_TAG = "meeting-room-screen"
+    const val MEETING_ROOM_TOP_BAR = "meeting-room-top-bar"
+    const val MEETING_ROOM_CONTENT = "meeting-room-content"
+    const val MEETING_ROOM_BOTTOM_BAR = "meeting-room-bottom-bar"
+    const val MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON = "meeting-room-publisher-effects-button"
 }
