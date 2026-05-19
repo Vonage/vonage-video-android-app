@@ -96,5 +96,6 @@
     <string name="change_layout">Change layout</string>
     <string name="chat">Chat</string>
     <string name="speaking_while_muted_message">You are muted. Unmute to speak.</string>
+    <string name="advanced_noise_suppression">Advanced noise suppression</string>
 
 </resources>

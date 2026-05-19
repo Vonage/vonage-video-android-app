@@ -2,9 +2,8 @@ package com.vonage.android.captions.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import javax.inject.Inject
 
-class CaptionsRepository @Inject constructor(
+class CaptionsRepository(
     private val apiService: CaptionsApi,
 ) {
 

@@ -16,6 +16,7 @@ import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
+import com.vonage.android.kotlin.model.VideoEffect
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
@@ -54,7 +55,7 @@ val noOpCall = object : CallFacade {
     override fun toggleLocalVideo() { /* empty on purpose */ }
     override fun toggleLocalCamera() { /* empty on purpose */ }
     override fun toggleLocalAudio() { /* empty on purpose */ }
-    override fun cycleLocalCameraBlur() { /* empty on purpose */ }
+    override fun applyLocalVideoEffect(effect: VideoEffect) { /* empty on purpose */ }
     override fun setVideoBitrate(config: VideoBitrateConfig) { /* empty on purpose */ }
     override fun setDegradationPreference(preference: DegradationPreference) { /* empty on purpose */ }
 

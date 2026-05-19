@@ -8,12 +8,16 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.foundation.layout.Box
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.navigation.AppNavHost
 import com.vonage.android.util.InAppUpdates
@@ -42,7 +46,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             VonageVideoTheme {
-                InterceptorAppNavHost(flow)
+                Box(
+                    modifier = Modifier.semantics {
+                        testTagsAsResourceId = true
+                    }
+                ) {
+                    InterceptorAppNavHost(flow)
+                }
             }
         }
     }

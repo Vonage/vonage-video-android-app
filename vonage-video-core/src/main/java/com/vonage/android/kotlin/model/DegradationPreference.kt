@@ -1,12 +1,10 @@
 package com.vonage.android.kotlin.model
 
-import com.opentok.android.PublisherKit
-
 /**
  * App-level representation of the OpenTok degradation preference.
  *
  * Controls what the publisher prioritizes when network conditions degrade.
- * Maps to [com.opentok.android.PublisherKit.DegradationPreference].
+ * Maps to [com.vonage.android.kotlin.sdk.VonageDegradationPref].
  *
  * @property label Human-readable name shown in the UI
  * @property description Short explanation of the behavior
@@ -37,19 +35,4 @@ enum class DegradationPreference(
     ),
 }
 
-fun DegradationPreference.toSdkValue(): PublisherKit.DegradationPreference = when (this) {
-    DegradationPreference.NOT_SET ->
-        PublisherKit.DegradationPreference.DegradationPreferenceNotSet
 
-    DegradationPreference.MAINTAIN_FRAME_RATE_AND_RESOLUTION ->
-        PublisherKit.DegradationPreference.DegradationPreferenceMaintainFrameRateAndResolution
-
-    DegradationPreference.MAINTAIN_FRAME_RATE ->
-        PublisherKit.DegradationPreference.DegradationPreferenceMaintainFrameRate
-
-    DegradationPreference.MAINTAIN_RESOLUTION ->
-        PublisherKit.DegradationPreference.DegradationPreferenceMaintainResolution
-
-    DegradationPreference.BALANCED ->
-        PublisherKit.DegradationPreference.DegradationPreferenceBalanced
-}

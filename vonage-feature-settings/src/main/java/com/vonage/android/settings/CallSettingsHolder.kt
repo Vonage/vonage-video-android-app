@@ -10,11 +10,8 @@ import com.vonage.android.kotlin.model.VideoCodec
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class CallSettingsHolder @Inject constructor() {
+class CallSettingsHolder {
 
     private val _call = MutableStateFlow<CallFacade?>(null)
     val call: StateFlow<CallFacade?> = _call.asStateFlow()

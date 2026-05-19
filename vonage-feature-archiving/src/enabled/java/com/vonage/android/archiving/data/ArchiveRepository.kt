@@ -3,9 +3,8 @@ package com.vonage.android.archiving.data
 import com.vonage.android.archiving.Archive
 import com.vonage.android.archiving.ArchiveId
 import com.vonage.android.archiving.ArchiveStatus
-import javax.inject.Inject
 
-class ArchiveRepository @Inject constructor(
+class ArchiveRepository(
     private val archivingApi: ArchivingApi,
 ) {
 

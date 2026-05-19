@@ -150,21 +150,23 @@ private fun EmojiItem(
             modifier = Modifier
                 .padding(VonageVideoTheme.dimens.paddingSmall)
         )
-        Box(
-            modifier = Modifier
-                .background(
-                    color = Color.Black.copy(alpha = 0.6f),
-                    shape = VonageVideoTheme.shapes.medium,
+        if (emojiLabel.isNotEmpty()) {
+            Box(
+                modifier = Modifier
+                    .background(
+                        color = Color.Black.copy(alpha = 0.6f),
+                        shape = VonageVideoTheme.shapes.medium,
+                    )
+                    .padding(VonageVideoTheme.dimens.paddingSmall)
+            ) {
+                Text(
+                    text = emojiLabel,
+                    style = VonageVideoTheme.typography.caption,
+                    color = Color.White,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
                 )
-                .padding(VonageVideoTheme.dimens.paddingSmall)
-        ) {
-            Text(
-                text = emojiLabel,
-                style = VonageVideoTheme.typography.caption,
-                color = Color.White,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
-            )
+            }
         }
     }
 }

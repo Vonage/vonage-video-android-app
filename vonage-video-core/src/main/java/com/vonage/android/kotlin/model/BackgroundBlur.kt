@@ -21,7 +21,7 @@ internal data class Radius(
  * Enumeration of background blur levels for video.
  */
 @Serializable
-enum class BlurLevel {
+internal enum class BlurLevel {
     /** Low blur effect */
     @SerialName("Low")
     LOW,

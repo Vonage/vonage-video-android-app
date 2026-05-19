@@ -54,9 +54,9 @@ class SpeakingWhileMutedDetectorTest {
             isMicEnabled.value = false
 
             // Emit enough consecutive loud samples to exceed TRIGGER_THRESHOLD
-            repeat(SpeakingWhileMutedDetector.TRIGGER_THRESHOLD + 1) {
-                audioLevel.value = 0f // reset to trigger re-emission
-                audioLevel.value = 0.2f
+            // Alternate between two loud values to force re-emission from StateFlow
+            repeat(SpeakingWhileMutedDetector.TRIGGER_THRESHOLD + 1) { i ->
+                audioLevel.value = if (i % 2 == 0) 0.2f else 0.3f
             }
 
             assertTrue(awaitItem())
@@ -71,9 +71,8 @@ class SpeakingWhileMutedDetectorTest {
 
             // Trigger speaking while muted
             isMicEnabled.value = false
-            repeat(SpeakingWhileMutedDetector.TRIGGER_THRESHOLD + 1) {
-                audioLevel.value = 0f
-                audioLevel.value = 0.2f
+            repeat(SpeakingWhileMutedDetector.TRIGGER_THRESHOLD + 1) { i ->
+                audioLevel.value = if (i % 2 == 0) 0.2f else 0.3f
             }
             assertTrue(awaitItem())
 

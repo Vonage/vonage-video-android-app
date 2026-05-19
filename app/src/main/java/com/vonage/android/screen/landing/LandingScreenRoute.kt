@@ -35,6 +35,7 @@ internal fun LandingScreenRoute(
 }
 
 object LandingScreenTestTags {
+    const val LANDING_SCREEN_TAG = "landing_screen"
     const val TITLE_TAG = "landing_screen_title"
     const val VONAGE_ICON_TAG = "landing_screen_icon"
     const val SUBTITLE_TAG = "landing_screen_subtitle"

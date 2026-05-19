@@ -2,9 +2,10 @@ package com.vonage.android.kotlin.model
 
 import android.view.View
 import androidx.compose.runtime.Stable
-import com.opentok.android.OpentokError
-import com.opentok.android.Publisher
-import com.vonage.android.kotlin.ext.cycleBlur
+import com.vonage.android.kotlin.sdk.VonageBlurLevel
+import com.vonage.android.kotlin.sdk.VonageCameraListener
+import com.vonage.android.kotlin.sdk.VonageError
+import com.vonage.android.kotlin.sdk.VonagePublisher
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.MicVolumeListener
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,14 +21,15 @@ import kotlinx.coroutines.flow.update
  * settings before entering a video session. Uses MicVolumeListener for direct
  * microphone monitoring since it's not connected to a session.
  *
- * @param publisher The OpenTok Publisher instance for preview
+ * @param vonagePublisher The wrapped Vonage Publisher instance for preview
+ * @param initialVideoEffect The video effect to set on the publisher at creation time
  */
 @Stable
 data class PreviewPublisherState(
-    private val publisher: Publisher,
+    private val vonagePublisher: VonagePublisher,
     override val captureInfoLabel: String = "",
-) : PublisherParticipant,
-    Publisher.CameraListener {
+    private val initialVideoEffect: VideoEffect = VideoEffect.None,
+) : PublisherParticipant {
 
     private val micVolumeListener by lazy { MicVolumeListener() }
 
@@ -36,13 +38,13 @@ data class PreviewPublisherState(
     override val creationTime: Long = 0
     override val isScreenShare: Boolean = false
     override val videoSource: VideoSource = VideoSource.CAMERA
-    override val name: String = publisher.name
-    override val view: View = publisher.view
+    override val name: String = vonagePublisher.name
+    override val view: View = vonagePublisher.view
 
-    private val _isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(publisher.publishAudio)
+    private val _isMicEnabled: MutableStateFlow<Boolean> = MutableStateFlow(vonagePublisher.publishAudio)
     override val isMicEnabled: StateFlow<Boolean> = _isMicEnabled
 
-    private val _isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(publisher.publishVideo)
+    private val _isCameraEnabled: MutableStateFlow<Boolean> = MutableStateFlow(vonagePublisher.publishVideo)
     override val isCameraEnabled: StateFlow<Boolean> = _isCameraEnabled
 
     private val _audioLevel: MutableStateFlow<Float> = MutableStateFlow(0F)
@@ -50,30 +52,47 @@ data class PreviewPublisherState(
 
     override val isTalking: StateFlow<Boolean> = MutableStateFlow(false)
 
-    private val _blurLevel: MutableStateFlow<BlurLevel> = MutableStateFlow(BlurLevel.NONE)
-    override val blurLevel: StateFlow<BlurLevel> = _blurLevel
+    private val _videoEffect: MutableStateFlow<VideoEffect> = MutableStateFlow(initialVideoEffect)
+    override val videoEffect: StateFlow<VideoEffect> = _videoEffect
 
     private val _camera: MutableStateFlow<CameraType> = MutableStateFlow(CameraType.FRONT)
     override val camera: StateFlow<CameraType> = _camera
 
+    private val _noiseSuppression: MutableStateFlow<NoiseSuppression> = MutableStateFlow(NoiseSuppression.DISABLED)
+    override val noiseSuppression: StateFlow<NoiseSuppression> = _noiseSuppression
+
     override fun toggleVideo() {
-        publisher.publishVideo = publisher.publishVideo.toggle()
-        _isCameraEnabled.update { publisher.publishVideo }
+        vonagePublisher.publishVideo = vonagePublisher.publishVideo.toggle()
+        _isCameraEnabled.update { vonagePublisher.publishVideo }
     }
 
     override fun toggleAudio() {
-        publisher.publishAudio = publisher.publishAudio.toggle()
-        _isMicEnabled.update { publisher.publishAudio }
-    }
-
-    override fun cycleCameraBlur() {
-        publisher.cycleBlur(_blurLevel.value) {
-            _blurLevel.value = it
-        }
+        vonagePublisher.publishAudio = vonagePublisher.publishAudio.toggle()
+        _isMicEnabled.update { vonagePublisher.publishAudio }
     }
 
     override fun cycleCamera() {
-        publisher.cycleCamera()
+        vonagePublisher.cycleCamera()
+    }
+
+    override fun applyVideoEffect(effect: VideoEffect) {
+        when (effect) {
+            VideoEffect.None -> vonagePublisher.applyBlur(VonageBlurLevel.NONE)
+            VideoEffect.BlurLow -> vonagePublisher.applyBlur(VonageBlurLevel.LOW)
+            VideoEffect.BlurHigh -> vonagePublisher.applyBlur(VonageBlurLevel.HIGH)
+            is VideoEffect.BackgroundImage -> vonagePublisher.applyBackgroundImage(effect.imagePath)
+        }
+        _videoEffect.value = effect
+    }
+
+    override fun toggleNoiseSuppression() {
+        val currentValue = _noiseSuppression.value
+        val newValue = when (currentValue) {
+            NoiseSuppression.DISABLED -> NoiseSuppression.ENABLED
+            NoiseSuppression.ENABLED -> NoiseSuppression.DISABLED
+        }
+        vonagePublisher.toggleNoiseSuppression(newValue.toVonageNoiseSuppression())
+            .onSuccess { _noiseSuppression.value = newValue }
     }
 
     /**
@@ -82,7 +101,16 @@ data class PreviewPublisherState(
      * Must be called before using the preview to start audio level monitoring.
      */
     suspend fun setup() {
-        publisher.setCameraListener(this)
+        vonagePublisher.setCameraListener(object : VonageCameraListener {
+            override fun onCameraChanged(cameraIndex: Int) {
+                CameraType.fromInt(cameraIndex)?.let { cameraType ->
+                    _camera.update { cameraType }
+                }
+            }
+            override fun onCameraError(error: VonageError) {
+                // No-op for now
+            }
+        })
         micVolumeListener.start()
             .distinctUntilChanged()
             .collectLatest { _audioLevel.value = it }
@@ -90,15 +118,5 @@ data class PreviewPublisherState(
 
     override fun clean() {
         micVolumeListener.stop()
-    }
-
-    override fun onCameraChanged(publisher: Publisher, cameraIndex: Int) {
-        CameraType.fromInt(cameraIndex)?.let { cameraType ->
-            _camera.update { cameraType }
-        }
-    }
-
-    override fun onCameraError(publisher: Publisher, error: OpentokError) {
-        // No-op for now
     }
 }

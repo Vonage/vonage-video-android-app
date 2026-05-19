@@ -3,6 +3,8 @@ package com.vonage.android.screen.waiting
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.onNodeWithTag
 import com.vonage.android.elements.avatarInitials
+import com.vonage.android.fx.ui.VideoEffectsTestTags
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BLUR_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.JOIN_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.MIC_BUTTON_TAG
@@ -29,4 +31,7 @@ class WaitingRoomScreenObject(
     val micButtonDisabled = compose.onNodeWithTag("$MIC_BUTTON_TAG-off")
     val volumeIndicator = compose.onNodeWithTag(VOLUME_INDICATOR_TAG)
     val initials = compose.avatarInitials(USER_INITIALS_TAG)
+    val cameraBlurButton = compose.onNodeWithTag(CAMERA_BLUR_BUTTON_TAG)
+    val videoEffectsSheet = compose.onNodeWithTag(VideoEffectsTestTags.VIDEO_EFFECTS_SHEET_CONTENT)
 }
+

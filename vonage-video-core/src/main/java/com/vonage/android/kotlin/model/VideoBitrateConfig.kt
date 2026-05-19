@@ -5,7 +5,7 @@ import androidx.compose.runtime.Stable
 /**
  * App-level representation of the OpenTok video bitrate presets.
  *
- * Maps to [com.opentok.android.PublisherKit.VideoBitratePreset].
+ * Maps to [com.vonage.android.kotlin.sdk.VonageBitratePreset].
  * https://developer.vonage.com/en/video/guides/publishing-streams/setting-bitrate
  *
  * @property label Human-readable name for the preset

@@ -1,10 +1,9 @@
 package com.vonage.android.kotlin.ext
 
 import android.view.View
-import com.opentok.android.Connection
+import com.vonage.android.kotlin.sdk.VonageConnection
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.VideoSource
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,8 +14,7 @@ class ConnectionExtTest {
 
     @Test
     fun `extractSenderName should return participant name when connection ID matches`() {
-        val connection = mockk<Connection>()
-        every { connection.connectionId } returns "conn-123"
+        val connection = VonageConnection(connectionId = "conn-123")
 
         val participant = createParticipant("conn-123", "John Doe")
         val participants = listOf(participant)
@@ -28,8 +26,7 @@ class ConnectionExtTest {
 
     @Test
     fun `extractSenderName should return empty string when no match found`() {
-        val connection = mockk<Connection>()
-        every { connection.connectionId } returns "conn-999"
+        val connection = VonageConnection(connectionId = "conn-999")
 
         val participant1 = createParticipant("conn-123", "John Doe")
         val participant2 = createParticipant("conn-456", "Jane Smith")
@@ -42,8 +39,7 @@ class ConnectionExtTest {
 
     @Test
     fun `extractSenderName should return empty string for empty participants list`() {
-        val connection = mockk<Connection>()
-        every { connection.connectionId } returns "conn-123"
+        val connection = VonageConnection(connectionId = "conn-123")
 
         val participants = emptyList<Participant>()
 
@@ -54,8 +50,7 @@ class ConnectionExtTest {
 
     @Test
     fun `extractSenderName should return first match when multiple participants with same connection ID`() {
-        val connection = mockk<Connection>()
-        every { connection.connectionId } returns "conn-123"
+        val connection = VonageConnection(connectionId = "conn-123")
 
         val participant1 = createParticipant("conn-123", "John Doe")
         val participant2 = createParticipant("conn-123", "Jane Smith")
@@ -68,8 +63,7 @@ class ConnectionExtTest {
 
     @Test
     fun `extractSenderName should handle participant at end of list`() {
-        val connection = mockk<Connection>()
-        every { connection.connectionId } returns "conn-789"
+        val connection = VonageConnection(connectionId = "conn-789")
 
         val participant1 = createParticipant("conn-123", "John Doe")
         val participant2 = createParticipant("conn-456", "Jane Smith")
@@ -83,8 +77,7 @@ class ConnectionExtTest {
 
     @Test
     fun `extractSenderName should handle single participant match`() {
-        val connection = mockk<Connection>()
-        every { connection.connectionId } returns "conn-only"
+        val connection = VonageConnection(connectionId = "conn-only")
 
         val participant = createParticipant("conn-only", "Solo User")
         val participants = listOf(participant)
