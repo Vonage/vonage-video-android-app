@@ -5,7 +5,6 @@ appId: ${APP_ID}
 # Priority: P1
 
 - launchApp:
-    clearState: true
     permissions:
       camera: allow
       microphone: allow
