@@ -630,6 +630,7 @@ class Call internal constructor(
                     if (visibleParticipants.isEmpty()) return@collectLatest
                     val activeSpeakerId = activeSpeaker.value?.id
                     participants.forEach { (key, participantState) ->
+                        if (participantState.isPublisher) return@forEach
                         val isVisible =
                             visibleParticipants.contains(key) || (key == activeSpeakerId)
                         participantState.changeVisibility(isVisible)
