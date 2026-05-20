@@ -96,8 +96,6 @@ jobs:
           script: |
             adb wait-for-device
             sleep 5
-            adb shell getprop net.dns1 || true
-            adb shell getprop net.dns2 || true
 
             mkdir -p test-reports
             adb logcat -c
@@ -166,7 +164,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            let comment = '## 🎭 Maestro UI Test Results\n\n';
+            let comment = '## 🎭 Maestro E2E Test Results\n\n';
             if ('${{ job.status }}' === 'success') {
               comment += '✅ **All tests passed!**\n\n';
             } else {
