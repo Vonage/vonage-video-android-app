@@ -110,8 +110,6 @@ jobs:
             sleep 5
             adb shell getprop net.dns1 || true
             adb shell getprop net.dns2 || true
-            adb shell ping -c 3 8.8.8.8 || true
-            adb shell ping -c 3 google.com || true
 
             mkdir -p test-reports
             adb logcat -c
