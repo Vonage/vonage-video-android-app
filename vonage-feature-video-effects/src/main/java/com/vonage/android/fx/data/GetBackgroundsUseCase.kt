@@ -10,6 +10,10 @@ import kotlinx.collections.immutable.toImmutableList
  * Each source is fetched independently: a failure in one does not prevent the other from
  * being included in the result. Built-in backgrounds appear before user-uploaded ones.
  *
+ * Individual source failures are intentionally silenced — the use case falls back to an
+ * empty list for the failing source so a partial result is always returned. Repository
+ * implementations are responsible for logging errors before throwing.
+ *
  * The [canAddBackground][BackgroundsResult.canAddBackground] flag is derived here so that
  * ViewModels have no knowledge of [UserBackgroundRepository.MAX_USER_BACKGROUNDS].
  */

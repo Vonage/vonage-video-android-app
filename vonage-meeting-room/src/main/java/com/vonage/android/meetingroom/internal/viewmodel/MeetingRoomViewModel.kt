@@ -203,7 +203,7 @@ internal class MeetingRoomViewModel(
 
     /**
      * Saves the image at [uri] to persistent storage and refreshes the backgrounds list.
-     * Must be called from any thread; IO is performed internally on [Dispatchers.IO].
+     * IO is performed internally by [com.vonage.android.fx.data.AddBackgroundUseCase].
      */
     fun addBackground(uri: Uri) {
         viewModelScope.launch {
