@@ -105,6 +105,11 @@ jobs:
             adb shell ping -c 3 8.8.8.8 || true
             adb shell ping -c 3 google.com || true
 
+            mkdir -p test-reports
+            adb logcat -c
+            adb logcat -v time > test-reports/logcat.txt &
+            LOGCAT_PID=$!
+
             adb install -r app/build/outputs/apk/debug/app-debug.apk
             adb shell pm grant com.vonage.android.debug android.permission.CAMERA 2>/dev/null
             adb shell pm grant com.vonage.android.debug android.permission.RECORD_AUDIO 2>/dev/null
@@ -112,8 +117,14 @@ jobs:
             adb shell pm grant com.vonage.android.debug android.permission.POST_NOTIFICATIONS 2>/dev/null
 
             maestro --version
-            mkdir -p test-reports
+            set +e
             maestro test --env APP_ID=com.vonage.android.debug .maestro/flows --format junit --output test-reports/maestro-junit.xml
+            MAESTRO_EXIT_CODE=$?
+            set -e
+
+            kill "$LOGCAT_PID" || true
+            wait "$LOGCAT_PID" 2>/dev/null || true
+            exit "$MAESTRO_EXIT_CODE"
 
       - name: List Maestro test artifacts
         if: always()
