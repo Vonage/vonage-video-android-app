@@ -1,0 +1,19 @@
+vonage-video-core/src/main/java/com/vonage/android/kotlin/internal/CaptionsHideScheduler.kt
+  s_c474814a229813::t_5d655a9c47fcbe 6,8,16-21,32,39-40,42-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "547a93aba35044f4f0910368899bc252478f29d0",
+  "prompts": {},
+  "sessions": {
+    "s_c474814a229813": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1ba18f0a2ffeakZLA3LC745lnZ",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
