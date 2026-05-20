@@ -7,6 +7,7 @@ import com.vonage.android.kotlin.ext.extractSenderName
 import com.vonage.android.kotlin.ext.firstScreenSharing
 import com.vonage.android.kotlin.ext.sorted
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
+import com.vonage.android.kotlin.internal.CaptionsHideScheduler
 import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
@@ -184,6 +185,14 @@ class Call internal constructor(
     private val _captionsStateFlow =
         MutableStateFlow<ImmutableList<CaptionLine>>(persistentListOf())
     override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = _captionsStateFlow
+
+    private val captionsHideScheduler = CaptionsHideScheduler(
+        coroutineScope = coroutineScope,
+    ) { streamId ->
+        _captionsStateFlow.update { lines ->
+            lines.filter { it.streamId != streamId }.toImmutableList()
+        }
+    }
 
     private val _archivingStateFlow = MutableStateFlow<ArchivingState>(ArchivingState.Idle)
     override val archivingStateFlow: StateFlow<ArchivingState> = _archivingStateFlow
@@ -524,13 +533,15 @@ class Call internal constructor(
      */
     private val captionsDelegate: VonageCaptionsListener =
         VonageCaptionsListener { name, streamId, text, isFinal ->
+            // Cancel any pending hide — the stream is either still active or
+            // about to schedule a fresh cooldown.
+            captionsHideScheduler.cancel(streamId)
             _captionsStateFlow.update { lines ->
-                if (isFinal) {
-                    lines.filter { it.streamId != streamId }.toImmutableList()
-                } else {
-                    val line = CaptionLine(streamId = streamId, subscriberName = name, text = text)
-                    lines.filter { it.streamId != streamId }.plus(line).toImmutableList()
-                }
+                val line = CaptionLine(streamId = streamId, subscriberName = name, text = text)
+                lines.filter { it.streamId != streamId }.plus(line).toImmutableList()
+            }
+            if (isFinal) {
+                captionsHideScheduler.schedule(streamId)
             }
         }
 
@@ -545,6 +556,8 @@ class Call internal constructor(
      * Disables captions.
      */
     override fun disableCaptions() {
+        captionsHideScheduler.cancelAll()
+        _captionsStateFlow.update { persistentListOf() }
         setCaptions(false)
     }
 
