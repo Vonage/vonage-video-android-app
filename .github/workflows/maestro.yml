@@ -75,6 +75,14 @@ jobs:
             exit 1
           }
 
+      - name: Generate config
+        run: |
+          ./gradlew generateVonageConfig --info --stacktrace
+          grep -Eq '^vonage\.baseApiUrl=https?://' gradle/generated-config.properties || {
+            echo "Generated config does not contain a valid http(s) vonage.baseApiUrl."
+            exit 1
+          }
+
       - name: Build debug APK
         run: |
           ./gradlew :app:assembleDebug --info --stacktrace --no-build-cache
