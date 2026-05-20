@@ -36,6 +36,8 @@ appId: ${APP_ID}
 
 - inputText: "Test User"
 
+- hideKeyboard
+
 - tapOn:
     id: "join-meeting-button"
 

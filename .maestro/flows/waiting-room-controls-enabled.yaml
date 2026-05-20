@@ -17,6 +17,8 @@ appId: ${APP_ID}
 
 - inputText: "testroom"
 
+- hideKeyboard
+
 - tapOn:
     id: "join-waiting-room-button"
 
@@ -40,6 +42,8 @@ appId: ${APP_ID}
     id: "username-input"
 
 - inputText: "Test User"
+
+- hideKeyboard
 
 - tapOn:
     id: "join-meeting-button"
