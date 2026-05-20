@@ -82,13 +82,13 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-pixel-34-default-x86_64-v1
+          key: avd-pixel-34-aosp-atdotd-x86_64-v2
 
       - name: Run Maestro flows on emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
-          target: default
+          target: aosp-atdotd
           arch: x86_64
           profile: pixel
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -netdelay none -netspeed full -dns-server 8.8.8.8,8.8.4.4

@@ -84,7 +84,7 @@ fun LandingScreen(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_github),
-                        contentDescription = "GitHub Repository",
+                        contentDescription = null,
                         modifier = Modifier.size(32.dp),
                         tint = VonageVideoTheme.colors.onBackground,
                     )

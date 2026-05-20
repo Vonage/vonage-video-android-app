@@ -273,7 +273,7 @@ object BottomBarTestTags {
     const val BOTTOM_BAR_MIC_BUTTON = "meeting-room-mic"
     const val BOTTOM_BAR_GRID_LAYOUT_BUTTON = "bottom-bar-grid-layout-button"
     const val BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON = "bottom-bar-active-speaker-layout-button"
-    const val BOTTOM_BAR_MORE_BUTTON = "More options"
+    const val BOTTOM_BAR_MORE_BUTTON = "more-options"
 }
 
 @PreviewLightDark

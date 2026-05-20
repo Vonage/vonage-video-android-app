@@ -52,7 +52,7 @@ appId: ${APP_ID}
 
 # Start recording (button may be in overflow menu on smaller screens)
 - tapOn:
-    text: "More options"
+    id: "more-options"
     optional: true
 
 - tapOn: "Start Recording"
@@ -78,7 +78,7 @@ appId: ${APP_ID}
 
 # Stop recording (button may be in overflow menu on smaller screens)
 - tapOn:
-    text: "More options"
+    id: "more-options"
     optional: true
 
 - tapOn: "Stop Recording"

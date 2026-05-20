@@ -13,8 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,6 +32,7 @@ import com.vonage.android.meetingroom.internal.screen.components.bottombar.Botto
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_END_CALL_BUTTON
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_MIC_BUTTON
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_MORE_BUTTON
+import com.vonage.android.shared.buildTestTag
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
@@ -91,10 +90,9 @@ private fun MicButton(
     roomActions: MeetingRoomActions,
     isMicEnabled: Boolean,
 ) {
-    val suffix = if (isMicEnabled) "enabled" else "disabled"
     ControlButton(
         modifier = Modifier
-            .testTag("$BOTTOM_BAR_MIC_BUTTON-$suffix"),
+            .testTag(BOTTOM_BAR_MIC_BUTTON.buildTestTag(isMicEnabled)),
         onClick = roomActions.onToggleMic,
         icon = if (isMicEnabled) VividIcons.Solid.Microphone2 else VividIcons.Solid.MicMute,
         isActive = isMicEnabled,
@@ -103,10 +101,9 @@ private fun MicButton(
 
 @Composable
 private fun CameraButton(roomActions: MeetingRoomActions, isCameraEnabled: Boolean) {
-    val suffix = if (isCameraEnabled) "enabled" else "disabled"
     ControlButton(
         modifier = Modifier
-            .testTag("$BOTTOM_BAR_CAMERA_BUTTON-$suffix"),
+            .testTag(BOTTOM_BAR_CAMERA_BUTTON.buildTestTag(isCameraEnabled)),
         onClick = roomActions.onToggleCamera,
         icon = if (isCameraEnabled) VividIcons.Solid.Video else VividIcons.Solid.VideoOff,
         isActive = isCameraEnabled,
@@ -116,7 +113,7 @@ private fun CameraButton(roomActions: MeetingRoomActions, isCameraEnabled: Boole
 @Composable
 private fun MenuButton(onShowMore: () -> Unit) {
     ControlButton(
-        modifier = Modifier.semantics { contentDescription = BOTTOM_BAR_MORE_BUTTON },
+        modifier = Modifier.testTag(BOTTOM_BAR_MORE_BUTTON),
         onClick = onShowMore,
         icon = VividIcons.Solid.MoreVertical,
     )
