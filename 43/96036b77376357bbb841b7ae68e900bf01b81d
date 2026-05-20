@@ -1,0 +1,30 @@
+vonage-video-core/src/test/java/com/vonage/android/kotlin/internal/CaptionsHideSchedulerTest.kt
+  s_c474814a229813::t_ff5d2fb07500fc 1-120
+vonage-video-core/src/main/java/com/vonage/android/kotlin/Call.kt
+  s_c474814a229813::t_97326644bbf392 536-538,540-544
+  s_c474814a229813::t_96c259eb476170 189-196
+  s_c474814a229813::t_2ba5b88d1e7b63 559-560
+  s_c474814a229813::t_b00db9e7546a84 10
+vonage-video-core/src/test/java/com/vonage/android/kotlin/CallTest.kt
+  s_c474814a229813::t_999190a659bfdb 11
+  s_c474814a229813::t_44285a6a4dcc25 540,543,555,569,572,584,602,605,618,622,640,643,655
+  s_c474814a229813::t_044a8b6da3fedf 535-539,541-542,544-554,556-568,570-571,573-583,585-601,603-604,606-617,619-621,623-639,641-642,644-654,656-673
+vonage-video-core/src/main/java/com/vonage/android/kotlin/internal/CaptionsHideScheduler.kt
+  s_c474814a229813::t_73d360393e8416 1-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "4396036b77376357bbb841b7ae68e900bf01b81d",
+  "prompts": {},
+  "sessions": {
+    "s_c474814a229813": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1ba18f0a2ffeakZLA3LC745lnZ",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
