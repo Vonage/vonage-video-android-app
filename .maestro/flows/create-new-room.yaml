@@ -5,7 +5,6 @@ appId: ${APP_ID}
 # Priority: P0
 
 - launchApp:
-    clearState: true
     permissions:
       camera: allow
       microphone: allow
@@ -34,6 +33,8 @@ appId: ${APP_ID}
 # Enter username and join meeting
 - tapOn:
     id: "username-input"
+
+- eraseText
 
 - inputText: "Test User"
 
