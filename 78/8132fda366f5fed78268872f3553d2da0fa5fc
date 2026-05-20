@@ -1,0 +1,77 @@
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTest.kt
+  s_d5c1c1d69e5c57::t_e1a0b4e99600ec 733-734,760-761
+  s_d5c1c1d69e5c57::t_1c87de8c4524f5 101-103
+  s_d5c1c1d69e5c57::t_a0db27867a8c6e 716
+  s_d5c1c1d69e5c57::t_0a51ec3ebc3ff0 82
+  s_d5c1c1d69e5c57::t_a85de81006520c 676
+  s_d5c1c1d69e5c57::t_3c7e600fc88919 655-660,662-675,677-695,697-715,717-732,735-759,762-782
+  s_d5c1c1d69e5c57::t_d373b9df4f148f 661
+  s_d5c1c1d69e5c57::t_305dce52e9e02f 81,83-85
+  s_d5c1c1d69e5c57::t_b01609a172f12b 49-56
+  s_d5c1c1d69e5c57::t_0ca26963591ca0 696
+vonage-feature-video-effects/src/testEnabled/java/com/vonage/android/fx/data/ImageCropUtilsTest.kt
+  s_d5c1c1d69e5c57::t_99f7eb1952706e 10-18,22-30,34-42,46-54,58-66
+  s_d5c1c1d69e5c57::t_2b96b3e4478f97 1-9,19-21,31-33,43-45,55-57,67-68
+vonage-feature-video-effects/src/main/java/com/vonage/android/fx/data/AddBackgroundUseCase.kt
+  s_d5c1c1d69e5c57::t_8e66045c4995d7 3,8,10-11,13-17,19
+vonage-feature-video-effects/src/main/java/com/vonage/android/fx/data/BackgroundsResult.kt
+  s_d5c1c1d69e5c57::t_6d8b8e0b0f91b4 7-10,12-15
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  s_d5c1c1d69e5c57::t_d619cdace82fee 28
+  s_d5c1c1d69e5c57::t_ec3b06fa5fbe33 209
+  s_d5c1c1d69e5c57::t_de18e110881f03 211,222,232,236-238,240
+  s_d5c1c1d69e5c57::t_9529e8b3de7e7e 10
+  s_d5c1c1d69e5c57::t_95ac7a01bacb2f 221,225
+  s_d5c1c1d69e5c57::t_f1dcb8a170762a 90
+app/src/test/java/com/vonage/android/screen/waiting/WaitingRoomViewModelTest.kt
+  s_d5c1c1d69e5c57::t_9c5620bc41059a 75-77
+  s_d5c1c1d69e5c57::t_f5661f48580019 59
+  s_d5c1c1d69e5c57::t_cd511f587db61c 58,60-62
+  s_d5c1c1d69e5c57::t_b151877490c277 9-12,27
+vonage-feature-video-effects/src/testEnabled/java/com/vonage/android/fx/data/DeleteBackgroundUseCaseTest.kt
+  s_d5c1c1d69e5c57::t_e64b36c0ac4324 1-20,23-24,27,30-33,36,40,43-44
+  s_d5c1c1d69e5c57::t_0db7b7f65f924b 21-22,25-26,28-29,34-35,37-39,41-42
+vonage-feature-video-effects/src/main/java/com/vonage/android/fx/data/BackgroundEffectsRepository.kt
+  s_d5c1c1d69e5c57::t_8c900a0d13a1f1 8-12,14-19
+vonage-feature-video-effects/src/main/java/com/vonage/android/fx/data/DeleteBackgroundUseCase.kt
+  s_d5c1c1d69e5c57::t_3e1f640ef19921 1-17
+vonage-feature-video-effects/src/testEnabled/java/com/vonage/android/fx/data/MainDispatcherRule.kt
+  s_d5c1c1d69e5c57::t_45975d2197dd69 1-26
+vonage-feature-video-effects/src/main/java/com/vonage/android/fx/data/UserBackgroundRepository.kt
+  s_d5c1c1d69e5c57::t_4d34a494f0578c 9,11-13,15,18-20,22,25-26,28-29,31,34-36,38,41
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomViewModel.kt
+  s_d5c1c1d69e5c57::t_006e592c06c2e4 124,135
+  s_d5c1c1d69e5c57::t_c96311d7c557a4 9-12
+  s_d5c1c1d69e5c57::t_253bd6875d6783 45
+  s_d5c1c1d69e5c57::t_50791a84be7e6f 53-55
+  s_d5c1c1d69e5c57::t_b19c446cbb48f2 190,194-196,199-200
+vonage-feature-video-effects/src/main/java/com/vonage/android/fx/data/GetBackgroundsUseCase.kt
+  s_d5c1c1d69e5c57::t_fc51d4093123d4 1-34
+app/src/main/java/com/vonage/android/di/VideoEffectsModule.kt
+  s_d5c1c1d69e5c57::t_90e99f52fade7d 1-52
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/container/MeetingRoomContainer.kt
+  s_d5c1c1d69e5c57::t_da2344c1478892 126-127,130-143
+  s_d5c1c1d69e5c57::t_54e4a1a35c1eeb 7,9-12
+vonage-feature-video-effects/src/testEnabled/java/com/vonage/android/fx/data/GetBackgroundsUseCaseTest.kt
+  s_d5c1c1d69e5c57::t_f0f7831a1d37bb 1-4,8-21,25-28,35-36,38-41,52-54,58-59,68-70,77-78,80-84,91-92,94-98,105-106,108-112,119-120,122-126,133-134,138-140,147-148,152-153
+  s_d5c1c1d69e5c57::t_31498bc4c2f365 5-7,22-24,29-34,37,42-51,55-57,60-67,71-76,79,85-90,93,99-104,107,113-118,121,127-132,135-137,141-146,149-151
+vonage-feature-video-effects/src/testEnabled/java/com/vonage/android/fx/data/AddBackgroundUseCaseTest.kt
+  s_d5c1c1d69e5c57::t_67e5f4f828cd9d 24-25,30,33,39-40,45-46,48,53-54,57-59,61-62
+  s_d5c1c1d69e5c57::t_f0545abee8f439 1-23,26-29,31-32,34-38,41-44,47,49-52,55-56,60,63-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "788132fda366f5fed78268872f3553d2da0fa5fc",
+  "prompts": {},
+  "sessions": {
+    "s_d5c1c1d69e5c57": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1ba8046cdffefwBTeVdq5MKAr7",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
