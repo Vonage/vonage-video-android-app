@@ -63,18 +63,6 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
 
-      - name: Validate backend URL
-        run: |
-          if [ -z "$BASE_API_URL" ]; then
-            echo "BASE_API_URL is not available for this workflow run. Check that the repository secret exists and is allowed for this event."
-            exit 1
-          fi
-
-          curl --silent --show-error --location --max-time 20 --output /dev/null "$BASE_API_URL" || {
-            echo "BASE_API_URL is configured, but the GitHub runner cannot reach it."
-            exit 1
-          }
-
       - name: Generate config
         run: |
           ./gradlew generateVonageConfig --info --stacktrace
