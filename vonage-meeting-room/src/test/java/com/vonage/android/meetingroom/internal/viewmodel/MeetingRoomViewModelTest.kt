@@ -46,6 +46,14 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import android.net.Uri
+import com.vonage.android.fx.data.AddBackgroundUseCase
+import com.vonage.android.fx.data.BackgroundsResult
+import com.vonage.android.fx.data.DeleteBackgroundUseCase
+import com.vonage.android.fx.data.GetBackgroundsUseCase
+import com.vonage.android.fx.ui.VideoBackgroundItem
+import kotlinx.collections.immutable.persistentListOf
+import org.junit.Assert.assertFalse
 import kotlin.Result.Companion.success
 
 class MeetingRoomViewModelTest {
@@ -70,6 +78,11 @@ class MeetingRoomViewModelTest {
         every { actions } returns MutableSharedFlow()
     }
     private val activityContextHolder: ActivityContextHolder = mockk(relaxed = true)
+    private val getBackgroundsUseCase: GetBackgroundsUseCase = mockk {
+        coEvery { invoke(captureResolution = null) } returns BackgroundsResult(persistentListOf(), canAddBackground = true)
+    }
+    private val addBackgroundUseCase: AddBackgroundUseCase = mockk(relaxed = true)
+    private val deleteBackgroundUseCase: DeleteBackgroundUseCase = mockk(relaxed = true)
 
     private lateinit var sut: MeetingRoomViewModel
 
@@ -85,6 +98,9 @@ class MeetingRoomViewModelTest {
         every { container.activityContextHolder } returns activityContextHolder
         every { container.audioDevicesHandler } returns audioDevicesHandler
         every { container.callSettingsHolder } returns callSettingsHolder
+        every { container.getBackgroundsUseCase } returns getBackgroundsUseCase
+        every { container.addBackgroundUseCase } returns addBackgroundUseCase
+        every { container.deleteBackgroundUseCase } returns deleteBackgroundUseCase
 
         every { prebuilt.roomName } returns ANY_ROOM_NAME
         every { prebuilt.configuration } returns MeetingRoomConfiguration()
@@ -632,6 +648,134 @@ class MeetingRoomViewModelTest {
         val state = sut.uiState.value
         assertEquals(true, state.isError)
         assertEquals("Session error", state.errorMessage)
+    }
+
+    // endregion
+
+    // region Background management
+
+    @Test
+    fun `given setup when getBackgroundsUseCase returns result then backgrounds and canAddBackground update in state`() = runTest {
+        // Given
+        val backgrounds = persistentListOf(VideoBackgroundItem(id = "bg-1"))
+        coEvery { getBackgroundsUseCase(captureResolution = null) } returns BackgroundsResult(backgrounds, canAddBackground = false)
+        givenMockCall()
+
+        // When
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        // Then
+        assertEquals(backgrounds, sut.uiState.value.backgrounds)
+        assertFalse(sut.uiState.value.canAddBackground)
+    }
+
+    @Test
+    fun `given setup when getBackgroundsUseCase throws then sets empty backgrounds and canAddBackground true`() = runTest {
+        // Given
+        coEvery { getBackgroundsUseCase(captureResolution = null) } throws RuntimeException("load failure")
+        givenMockCall()
+
+        // When
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        // Then
+        assertTrue(sut.uiState.value.backgrounds.isEmpty())
+        assertTrue(sut.uiState.value.canAddBackground)
+    }
+
+    @Test
+    fun `given addBackground is called then delegates to addBackgroundUseCase and refreshes backgrounds in state`() = runTest {
+        // Given
+        val uri = mockk<Uri>()
+        val updatedBackgrounds = persistentListOf(VideoBackgroundItem(id = "user-bg", isUserUploaded = true))
+        givenMockCall()
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+        coEvery { getBackgroundsUseCase(captureResolution = null) } returns BackgroundsResult(updatedBackgrounds, canAddBackground = false)
+
+        // When
+        sut.addBackground(uri)
+        testScheduler.advanceUntilIdle()
+
+        // Then
+        coVerify(exactly = 1) { addBackgroundUseCase(uri, any()) }
+        assertEquals(updatedBackgrounds, sut.uiState.value.backgrounds)
+        assertFalse(sut.uiState.value.canAddBackground)
+    }
+
+    @Test
+    fun `given deleteBackground is called then delegates to deleteBackgroundUseCase and refreshes backgrounds`() = runTest {
+        // Given
+        val item = VideoBackgroundItem(id = "user-bg", isUserUploaded = true)
+        val updatedBackgrounds = persistentListOf(VideoBackgroundItem(id = "bg-1"))
+        givenMockCall()
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+        coEvery { getBackgroundsUseCase(captureResolution = null) } returns BackgroundsResult(updatedBackgrounds, canAddBackground = true)
+
+        // When
+        sut.deleteBackground(item)
+        testScheduler.advanceUntilIdle()
+
+        // Then
+        coVerify(exactly = 1) { deleteBackgroundUseCase("user-bg") }
+        assertEquals(updatedBackgrounds, sut.uiState.value.backgrounds)
+    }
+
+    @Test
+    fun `given deleteBackground when deleted background is the active video effect then resets effect to None`() = runTest {
+        // Given
+        val item = VideoBackgroundItem(id = "user-bg", isUserUploaded = true)
+        val mockPublisher = mockk<PublisherState>(relaxed = true) {
+            every { videoEffect } returns MutableStateFlow(VideoEffect.BackgroundImage(id = "user-bg", imagePath = "path"))
+            every { isMicEnabled } returns MutableStateFlow(true)
+            every { isCameraEnabled } returns MutableStateFlow(true)
+        }
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        val mockCall = mockk<CallFacade>(relaxed = true) {
+            every { publisher } returns MutableStateFlow<PublisherState?>(mockPublisher)
+            every { participantsCount } returns MutableStateFlow(0)
+            every { connect(any()) } returns flowOf()
+        }
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        // When
+        sut.deleteBackground(item)
+        testScheduler.advanceUntilIdle()
+
+        // Then
+        verify(exactly = 1) { mockCall.applyLocalVideoEffect(VideoEffect.None) }
+    }
+
+    @Test
+    fun `given deleteBackground when a different background is the active effect then does not reset effect`() = runTest {
+        // Given
+        val item = VideoBackgroundItem(id = "user-bg", isUserUploaded = true)
+        val mockPublisher = mockk<PublisherState>(relaxed = true) {
+            every { videoEffect } returns MutableStateFlow(VideoEffect.BackgroundImage(id = "other-bg", imagePath = "path"))
+            every { isMicEnabled } returns MutableStateFlow(true)
+            every { isCameraEnabled } returns MutableStateFlow(true)
+        }
+        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        val mockCall = mockk<CallFacade>(relaxed = true) {
+            every { publisher } returns MutableStateFlow<PublisherState?>(mockPublisher)
+            every { participantsCount } returns MutableStateFlow(0)
+            every { connect(any()) } returns flowOf()
+        }
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        // When
+        sut.deleteBackground(item)
+        testScheduler.advanceUntilIdle()
+
+        // Then
+        verify(exactly = 0) { mockCall.applyLocalVideoEffect(any()) }
     }
 
     // endregion

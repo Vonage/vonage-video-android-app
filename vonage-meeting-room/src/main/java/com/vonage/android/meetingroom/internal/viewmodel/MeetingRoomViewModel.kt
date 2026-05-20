@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.captions.CaptionsUiState
-import com.vonage.android.fx.data.UserBackgroundRepository
+import com.vonage.android.fx.data.BackgroundsResult
 import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
@@ -25,8 +25,7 @@ import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.logger.vonageLogger
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -38,8 +37,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Suppress("LongParameterList")
 internal class MeetingRoomViewModel(
@@ -90,7 +87,7 @@ internal class MeetingRoomViewModel(
             ),
         )
 
-        viewModelScope.launch(Dispatchers.IO) { refreshBackgrounds() }
+        viewModelScope.launch { refreshBackgrounds() }
 
         viewModelScope.launch {
             _uiState.update { state ->
@@ -209,9 +206,9 @@ internal class MeetingRoomViewModel(
      * Must be called from any thread; IO is performed internally on [Dispatchers.IO].
      */
     fun addBackground(uri: Uri) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val resolution = container.callSettingsHolder.captureResolution.value
-            container.userBackgroundRepository.saveBackground(uri, resolution)
+            container.addBackgroundUseCase(uri, resolution)
             refreshBackgrounds()
         }
     }
@@ -221,36 +218,26 @@ internal class MeetingRoomViewModel(
      * currently active on the publisher, the effect is reset to [VideoEffect.None].
      */
     fun deleteBackground(item: VideoBackgroundItem) {
-        viewModelScope.launch(Dispatchers.IO) {
-            container.userBackgroundRepository.deleteBackground(item.id)
+        viewModelScope.launch {
+            container.deleteBackgroundUseCase(item.id)
             val currentEffect = call?.publisher?.value?.videoEffect?.value
             if (currentEffect is VideoEffect.BackgroundImage && currentEffect.id == item.id) {
-                withContext(Dispatchers.Main) { applyVideoEffect(VideoEffect.None) }
+                applyVideoEffect(VideoEffect.None)
             }
             refreshBackgrounds()
         }
     }
 
     /**
-     * Merges built-in and user-uploaded backgrounds then updates the UI state.
-     * Must be called from [Dispatchers.IO].
+     * Fetches the merged backgrounds list via [GetBackgroundsUseCase] and updates the UI state.
      */
     private suspend fun refreshBackgrounds() {
         val resolution = container.callSettingsHolder.captureResolution.value
-        val builtIn = runCatching {
-            container.backgroundEffectsRepository.getBackgrounds(resolution)
-        }.onFailure { throwable ->
-            vonageLogger.e("MeetingRoomViewModel", "Failed to load built-in backgrounds: $throwable")
-        }.getOrElse { persistentListOf() }
+        val result = runCatching {
+            container.getBackgroundsUseCase(resolution)
+        }.getOrElse { BackgroundsResult(persistentListOf(), canAddBackground = true) }
 
-        val user = runCatching {
-            container.userBackgroundRepository.getUserBackgrounds(resolution)
-        }.onFailure { throwable ->
-            vonageLogger.e("MeetingRoomViewModel", "Failed to load user backgrounds: $throwable")
-        }.getOrElse { persistentListOf() }
-
-        val canAdd = user.size < UserBackgroundRepository.MAX_USER_BACKGROUNDS
-        _uiState.update { it.copy(backgrounds = (builtIn + user).toImmutableList(), canAddBackground = canAdd) }
+        _uiState.update { it.copy(backgrounds = result.backgrounds, canAddBackground = result.canAddBackground) }
     }
 
     fun endCall() {

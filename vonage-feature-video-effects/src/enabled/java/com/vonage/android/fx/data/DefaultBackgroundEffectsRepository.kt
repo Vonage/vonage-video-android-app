@@ -8,6 +8,8 @@ import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.videofx.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
@@ -19,7 +21,7 @@ import java.io.FileOutputStream
  * publisher video frame's portrait aspect ratio before being written, preventing the
  * SDK from non-uniformly stretching a landscape image into a portrait frame.
  */
-class BackgroundEffectsRepository(private val context: Context) {
+class DefaultBackgroundEffectsRepository(private val context: Context) : BackgroundEffectsRepository {
 
     /**
      * @param captureResolution The configured publisher capture resolution, used to derive the
@@ -27,11 +29,11 @@ class BackgroundEffectsRepository(private val context: Context) {
      *   caching. Pass `null` to use the default (9:16, matching `CaptureResolution.HIGH`
      *   which is auto-selected on devices with ≥ 512 MB RAM).
      */
-    fun getBackgrounds(
-        captureResolution: CaptureResolution? = null,
-    ): ImmutableList<VideoBackgroundItem> {
+    override suspend fun getBackgrounds(
+        captureResolution: CaptureResolution?,
+    ): ImmutableList<VideoBackgroundItem> = withContext(Dispatchers.IO) {
         val (targetW, targetH) = portraitDimensionsFor(captureResolution)
-        return backgroundEntries.map { entry ->
+        backgroundEntries.map { entry ->
             VideoBackgroundItem(
                 id = entry.id,
                 thumbnailRes = entry.drawableRes,

@@ -9,9 +9,9 @@ import kotlinx.collections.immutable.persistentListOf
 /**
  * No-op stub for the disabled video effects flavor.
  */
-class BackgroundEffectsRepository(@Suppress("UNUSED_PARAMETER") context: Context) {
+class DefaultBackgroundEffectsRepository(@Suppress("UNUSED_PARAMETER") context: Context) : BackgroundEffectsRepository {
 
-    fun getBackgrounds(
-        @Suppress("UNUSED_PARAMETER") captureResolution: CaptureResolution? = null,
+    override suspend fun getBackgrounds(
+        captureResolution: CaptureResolution?,
     ): ImmutableList<VideoBackgroundItem> = persistentListOf()
 }
