@@ -74,13 +74,13 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-pixel-34-aosp-atd-x86_64-v2
+          key: avd-pixel-34-default-x86_64-v1
 
       - name: Run Maestro flows on emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
-          target: aosp_atd
+          target: default
           arch: x86_64
           profile: pixel
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
@@ -89,40 +89,15 @@ jobs:
             adb wait-for-device
             sleep 5
 
-            # Diagnostic: verify emulator networking
-            echo "=== Network Diagnostics ==="
-            adb shell ping -c 2 8.8.8.8 || echo "⚠️ No internet (ping)"
-            adb shell curl -sI https://meet.vonagenetworks.net/ || echo "⚠️ Cannot reach backend"
-
-            # Diagnostic: check camera devices
-            echo "=== Camera Diagnostics ==="
-            adb shell dumpsys media.camera | head -20 || echo "No camera service info"
-
             adb install -r app/build/outputs/apk/debug/app-debug.apk
             adb shell pm grant com.vonage.android.debug android.permission.CAMERA 2>/dev/null
             adb shell pm grant com.vonage.android.debug android.permission.RECORD_AUDIO 2>/dev/null
             adb shell pm grant com.vonage.android.debug android.permission.BLUETOOTH_CONNECT 2>/dev/null
             adb shell pm grant com.vonage.android.debug android.permission.POST_NOTIFICATIONS 2>/dev/null
 
-            # Diagnostic: capture logcat during test run
-            adb logcat -c
-            adb logcat -v time *:E VonageVideo:* OkHttp:* Retrofit:* > /tmp/logcat-maestro.txt 2>&1 &
-            LOGCAT_PID=$!
-
             maestro --version
             mkdir -p test-reports
             maestro test --env APP_ID=com.vonage.android.debug .maestro/flows --format junit --output test-reports/maestro-junit.xml
-            TEST_EXIT=$?
-
-            # Stop logcat and save
-            kill $LOGCAT_PID 2>/dev/null || true
-            cp /tmp/logcat-maestro.txt test-reports/ 2>/dev/null || true
-
-            # Diagnostic: dump logcat errors
-            echo "=== Logcat Errors (last 100 lines) ==="
-            tail -100 /tmp/logcat-maestro.txt 2>/dev/null || true
-
-            exit $TEST_EXIT
 
       - name: List Maestro test artifacts
         if: always()
