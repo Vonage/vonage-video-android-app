@@ -2,11 +2,14 @@ package com.vonage.android.meetingroom.internal.viewmodel
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import app.cash.turbine.test
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.captions.CaptionsUiState
 import com.vonage.android.captions.VonageCaptions
+import com.vonage.android.fx.data.UserBackgroundRepository
+import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
@@ -37,6 +40,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -70,6 +74,7 @@ class MeetingRoomViewModelTest {
         every { actions } returns MutableSharedFlow()
     }
     private val activityContextHolder: ActivityContextHolder = mockk(relaxed = true)
+    private val userBackgroundRepository: UserBackgroundRepository = mockk(relaxed = true)
 
     private lateinit var sut: MeetingRoomViewModel
 
@@ -85,6 +90,8 @@ class MeetingRoomViewModelTest {
         every { container.activityContextHolder } returns activityContextHolder
         every { container.audioDevicesHandler } returns audioDevicesHandler
         every { container.callSettingsHolder } returns callSettingsHolder
+        every { container.userBackgroundRepository } returns userBackgroundRepository
+        every { userBackgroundRepository.getUserBackgrounds(any()) } returns persistentListOf()
 
         every { prebuilt.roomName } returns ANY_ROOM_NAME
         every { prebuilt.configuration } returns MeetingRoomConfiguration()
@@ -633,6 +640,63 @@ class MeetingRoomViewModelTest {
         assertEquals(true, state.isError)
         assertEquals("Session error", state.errorMessage)
     }
+
+    // endregion
+
+    // region addBackgrounds
+
+    @Test
+    fun `given empty uri list WHEN addBackgrounds THEN saveBackground not called`() = runTest {
+        testScheduler.advanceUntilIdle() // drain init
+
+        sut.addBackgrounds(emptyList())
+        testScheduler.advanceUntilIdle()
+
+        verify(exactly = 0) { userBackgroundRepository.saveBackground(any(), any()) }
+    }
+
+    @Test
+    fun `given uri list WHEN addBackgrounds and save returns null THEN loop breaks after first call`() =
+        runTest {
+            val uris = listOf(mockk<Uri>(), mockk<Uri>(), mockk<Uri>())
+            every { userBackgroundRepository.saveBackground(any(), any()) } returns null
+            testScheduler.advanceUntilIdle() // drain init
+
+            sut.addBackgrounds(uris)
+            testScheduler.advanceUntilIdle()
+
+            // null return → for-loop breaks after the first call
+            verify(exactly = 1) { userBackgroundRepository.saveBackground(any(), any()) }
+        }
+
+    @Test
+    fun `given uri list WHEN addBackgrounds and all saves succeed THEN all uris are processed`() =
+        runTest {
+            val uris = listOf(mockk<Uri>(), mockk<Uri>(), mockk<Uri>())
+            val savedItem = VideoBackgroundItem(id = "user_bg_test", isUserUploaded = true)
+            every { userBackgroundRepository.saveBackground(any(), any()) } returns savedItem
+            testScheduler.advanceUntilIdle() // drain init
+
+            sut.addBackgrounds(uris)
+            testScheduler.advanceUntilIdle()
+
+            verify(exactly = 3) { userBackgroundRepository.saveBackground(any(), any()) }
+        }
+
+    @Test
+    fun `given uri list WHEN addBackgrounds and cap hit mid-batch THEN processing stops at cap`() =
+        runTest {
+            val uris = listOf(mockk<Uri>(), mockk<Uri>(), mockk<Uri>())
+            val savedItem = VideoBackgroundItem(id = "user_bg_test", isUserUploaded = true)
+            every { userBackgroundRepository.saveBackground(any(), any()) } returnsMany listOf(savedItem, null)
+            testScheduler.advanceUntilIdle() // drain init
+
+            sut.addBackgrounds(uris)
+            testScheduler.advanceUntilIdle()
+
+            // Loop breaks on second null; third URI is never processed.
+            verify(exactly = 2) { userBackgroundRepository.saveBackground(any(), any()) }
+        }
 
     // endregion
 

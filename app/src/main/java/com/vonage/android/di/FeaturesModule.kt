@@ -7,6 +7,7 @@ import com.vonage.android.captions.VonageCaptions
 import com.vonage.android.captions.di.CaptionsModule
 import com.vonage.android.chat.ChatFeature
 import com.vonage.android.chat.ChatModule
+import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.reactions.ReactionSignalPlugin
 import com.vonage.android.reactions.di.ReactionsModule
@@ -59,4 +60,10 @@ object FeaturesModule {
     @Singleton
     @Provides
     fun provideCallSettingsHolder(): CallSettingsHolder = CallSettingsHolder()
+
+    @Singleton
+    @Provides
+    fun provideUserBackgroundRepository(
+        @ApplicationContext context: Context,
+    ): UserBackgroundRepository = UserBackgroundRepository(context)
 }

@@ -31,6 +31,8 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
@@ -50,17 +52,17 @@ class WaitingRoomViewModel @AssistedInject constructor(
     private val videoClient: VonageVideoClient,
     private val audioDevicesHandler: AudioDevicesHandler,
     private val callSettingsHolder: CallSettingsHolder,
+    private val userBackgroundRepository: UserBackgroundRepository,
 ) : ViewModel() {
 
     private var publisherSetupJob: Job? = null
+    private val backgroundsMutex = Mutex()
     private val _uiState = MutableStateFlow(WaitingRoomUiState(roomName = roomName))
     val uiState: StateFlow<WaitingRoomUiState> = _uiState.stateIn(
         scope = viewModelScope,
         started = WhileSubscribed(SUBSCRIBED_TIMEOUT_MS),
         initialValue = WaitingRoomUiState(roomName = roomName),
     )
-
-    private val userBackgroundRepository = UserBackgroundRepository(appContext)
 
     init {
         viewModelScope.launch(Dispatchers.IO) { refreshBackgrounds() }
@@ -115,13 +117,20 @@ class WaitingRoomViewModel @AssistedInject constructor(
     }
 
     /**
-     * Saves the image at [uri] to persistent storage and refreshes the backgrounds list.
+     * Saves each image in [uris] to persistent storage sequentially, then refreshes the
+     * backgrounds list once. Processing stops early if
+     * [UserBackgroundRepository.MAX_USER_BACKGROUNDS] is reached mid-batch.
      * IO is performed internally on [Dispatchers.IO].
      */
-    fun addBackground(uri: Uri) {
+    fun addBackgrounds(uris: List<Uri>) {
         viewModelScope.launch(Dispatchers.IO) {
-            userBackgroundRepository.saveBackground(uri, callSettingsHolder.captureResolution.value)
-            refreshBackgrounds()
+            backgroundsMutex.withLock {
+                val resolution = callSettingsHolder.captureResolution.value
+                for (uri in uris) {
+                    userBackgroundRepository.saveBackground(uri, resolution) ?: break
+                }
+                refreshBackgrounds()
+            }
         }
     }
 
@@ -197,11 +206,11 @@ class WaitingRoomViewModel @AssistedInject constructor(
         val user = runCatching {
             userBackgroundRepository.getUserBackgrounds(resolution)
         }.getOrElse { persistentListOf() }
-        val canAdd = user.size < UserBackgroundRepository.MAX_USER_BACKGROUNDS
+        val remainingSlots = (UserBackgroundRepository.MAX_USER_BACKGROUNDS - user.size).coerceAtLeast(0)
         _uiState.update {
             it.copy(
                 backgrounds = (builtIn + user).toImmutableList(),
-                canAddBackground = canAdd,
+                remainingBackgroundSlots = remainingSlots,
             )
         }
     }
@@ -292,6 +301,6 @@ data class WaitingRoomUiState(
     val allowCameraControl: Boolean = true,
     val audioDevicesState: AudioDevicesState? = null,
     val backgrounds: ImmutableList<VideoBackgroundItem> = persistentListOf(),
-    /** Whether the "Add image" tile should be shown in the effects sheet. */
-    val canAddBackground: Boolean = true,
+    /** Number of additional user backgrounds that can be added before the cap is reached. 0 until the first refresh completes. */
+    val remainingBackgroundSlots: Int = 0,
 )

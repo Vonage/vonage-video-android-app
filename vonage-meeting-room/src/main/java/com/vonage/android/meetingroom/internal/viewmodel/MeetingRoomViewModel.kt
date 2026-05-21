@@ -28,6 +28,8 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -70,6 +72,7 @@ internal class MeetingRoomViewModel(
 
     private var call: CallFacade? = null
     private val callEnded = AtomicBoolean(false)
+    private val backgroundsMutex = Mutex()
 
     init {
         container.foregroundServiceHandler.startForegroundService(roomName)
@@ -205,14 +208,20 @@ internal class MeetingRoomViewModel(
     }
 
     /**
-     * Saves the image at [uri] to persistent storage and refreshes the backgrounds list.
+     * Saves each image in [uris] to persistent storage sequentially, then refreshes the
+     * backgrounds list once. Processing stops early if
+     * [UserBackgroundRepository.MAX_USER_BACKGROUNDS] is reached mid-batch.
      * Must be called from any thread; IO is performed internally on [Dispatchers.IO].
      */
-    fun addBackground(uri: Uri) {
+    fun addBackgrounds(uris: List<Uri>) {
         viewModelScope.launch(Dispatchers.IO) {
-            val resolution = container.callSettingsHolder.captureResolution.value
-            container.userBackgroundRepository.saveBackground(uri, resolution)
-            refreshBackgrounds()
+            backgroundsMutex.withLock {
+                val resolution = container.callSettingsHolder.captureResolution.value
+                for (uri in uris) {
+                    container.userBackgroundRepository.saveBackground(uri, resolution) ?: break
+                }
+                refreshBackgrounds()
+            }
         }
     }
 
@@ -249,8 +258,8 @@ internal class MeetingRoomViewModel(
             vonageLogger.e("MeetingRoomViewModel", "Failed to load user backgrounds: $throwable")
         }.getOrElse { persistentListOf() }
 
-        val canAdd = user.size < UserBackgroundRepository.MAX_USER_BACKGROUNDS
-        _uiState.update { it.copy(backgrounds = (builtIn + user).toImmutableList(), canAddBackground = canAdd) }
+        val remainingSlots = (UserBackgroundRepository.MAX_USER_BACKGROUNDS - user.size).coerceAtLeast(0)
+        _uiState.update { it.copy(backgrounds = (builtIn + user).toImmutableList(), remainingBackgroundSlots = remainingSlots) }
     }
 
     fun endCall() {

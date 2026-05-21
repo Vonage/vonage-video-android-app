@@ -28,8 +28,8 @@ internal data class MeetingRoomUiState(
     val allowCameraControl: Boolean = true,
     val allowShowParticipantList: Boolean = true,
     val backgrounds: ImmutableList<VideoBackgroundItem> = persistentListOf(),
-    /** Whether the "Add image" tile should be shown in the effects sheet. */
-    val canAddBackground: Boolean = true,
+    /** Number of additional user backgrounds that can be added before the cap is reached. 0 until the first refresh completes. */
+    val remainingBackgroundSlots: Int = 0,
     /** Runtime feature set — applied on top of compile-time flavor toggles. */
     val enabledFeatures: Set<MeetingRoomFeature> = MeetingRoomFeature.all,
 )

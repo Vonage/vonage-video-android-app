@@ -67,31 +67,49 @@ import kotlinx.coroutines.withContext
  * tap ([onEffectSelect] is called with every selection). There is no Cancel/Apply step —
  * the sheet is dismissed by swiping it down.
  *
- * @param backgrounds       List of virtual background thumbnails to display.
- * @param selectedEffect    Currently active video effect (used to highlight the active tile).
- * @param canAddBackground  Whether the "Add image" tile should be shown. Callers hide it once
- *                          [UserBackgroundRepository.MAX_USER_BACKGROUNDS] is reached.
- * @param onEffectSelect    Invoked when the user taps an effect tile; caller should apply
- *                          it to the publisher immediately.
- * @param onAddBackground   Invoked with the content [Uri] when the user picks an image from
- *                          the system photo picker. Caller is responsible for IO / file saving.
- * @param onDeleteBackground Invoked when the user taps the delete button on a user-uploaded
- *                           background tile.
- * @param modifier          Optional [Modifier] for the root layout.
+ * @param backgrounds            List of virtual background thumbnails to display.
+ * @param selectedEffect         Currently active video effect (used to highlight the active tile).
+ * @param remainingBackgroundSlots Number of additional user backgrounds the app can accept before
+ *                               reaching [UserBackgroundRepository.MAX_USER_BACKGROUNDS]. The
+ *                               "Add image" tile is hidden when this is 0. When it is 1, the
+ *                               system single-item photo picker is shown; for 2+ the multi-item
+ *                               picker is used with the count capped to this value.
+ * @param onEffectSelect         Invoked when the user taps an effect tile; caller should apply
+ *                               it to the publisher immediately.
+ * @param onAddBackground        Invoked with the list of content [Uri]s when the user picks one or
+ *                               more images from the system photo picker. Caller is responsible for
+ *                               IO / file saving.
+ * @param onDeleteBackground     Invoked when the user taps the delete button on a user-uploaded
+ *                               background tile.
+ * @param modifier               Optional [Modifier] for the root layout.
  */
 @Composable
 fun VideoEffectsScreen(
     backgrounds: ImmutableList<VideoBackgroundItem>,
     selectedEffect: VideoEffect,
-    canAddBackground: Boolean,
+    remainingBackgroundSlots: Int,
     onEffectSelect: (VideoEffect) -> Unit,
-    onAddBackground: (Uri) -> Unit,
+    onAddBackground: (List<Uri>) -> Unit,
     onDeleteBackground: (VideoBackgroundItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val launcher = rememberLauncherForActivityResult(
+    val canAddBackground = remainingBackgroundSlots > 0
+
+    // Register a multi-item launcher (used when ≥ 2 slots remain) and a single-item launcher
+    // (used when exactly 1 slot remains). Both must always be registered — Compose prohibits
+    // conditional calls to rememberLauncherForActivityResult.
+    val multiLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia(
+            maxItems = remainingBackgroundSlots.coerceAtLeast(2),
+        ),
+    ) { uris -> if (uris.isNotEmpty()) onAddBackground(uris) }
+    val singleLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
-    ) { uri -> uri?.let { onAddBackground(it) } }
+    ) { uri -> uri?.let { onAddBackground(listOf(it)) } }
+
+    val pickerRequest = remember {
+        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+    }
 
     Column(
         modifier = modifier
@@ -116,9 +134,11 @@ fun VideoEffectsScreen(
             canAddBackground = canAddBackground,
             onEffectSelect = onEffectSelect,
             onAddImageClick = {
-                launcher.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
-                )
+                if (remainingBackgroundSlots >= 2) {
+                    multiLauncher.launch(pickerRequest)
+                } else {
+                    singleLauncher.launch(pickerRequest)
+                }
             },
             onDeleteBackground = onDeleteBackground,
             modifier = Modifier.padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
@@ -395,7 +415,7 @@ internal fun VideoEffectsScreenPortraitPreview() {
                 VideoBackgroundItem(id = "bg6"),
             ),
             selectedEffect = VideoEffect.None,
-            canAddBackground = true,
+            remainingBackgroundSlots = 4,
             onEffectSelect = {},
             onAddBackground = {},
             onDeleteBackground = {},
@@ -415,7 +435,7 @@ internal fun VideoEffectsScreenLandscapePreview() {
                 VideoBackgroundItem(id = "bg4"),
             ),
             selectedEffect = VideoEffect.BlurLow,
-            canAddBackground = false,
+            remainingBackgroundSlots = 0,
             onEffectSelect = {},
             onAddBackground = {},
             onDeleteBackground = {},
