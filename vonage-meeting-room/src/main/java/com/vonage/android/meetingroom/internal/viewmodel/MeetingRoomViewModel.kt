@@ -27,6 +27,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -67,6 +69,7 @@ internal class MeetingRoomViewModel(
 
     private var call: CallFacade? = null
     private val callEnded = AtomicBoolean(false)
+    private val backgroundsMutex = Mutex()
 
     init {
         container.foregroundServiceHandler.startForegroundService(roomName)
