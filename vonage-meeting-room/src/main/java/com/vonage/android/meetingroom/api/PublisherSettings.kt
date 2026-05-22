@@ -1,5 +1,6 @@
 package com.vonage.android.meetingroom.api
 
+import androidx.compose.runtime.Stable
 import com.vonage.android.kotlin.model.VideoEffect
 
 /**
@@ -17,6 +18,7 @@ import com.vonage.android.kotlin.model.VideoEffect
  *                            the waiting room to preserve continuity.
  */
 @ExperimentalMeetingRoomApi
+@Stable
 data class PublisherSettings(
     val username: String = "",
     val publishAudio: Boolean = true,

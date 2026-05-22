@@ -70,7 +70,14 @@ internal class MeetingRoomViewModel(
     private val callEnded = AtomicBoolean(false)
 
     init {
-        container.foregroundServiceHandler.startForegroundService(roomName)
+        if (prebuilt.foregroundServiceEnabled) {
+            container.foregroundServiceHandler.startForegroundService(roomName)
+        }
+        viewModelScope.launch {
+            prebuilt.hangUpCommand.collect {
+                _uiState.update { state -> state.copy(isEndCall = true) }
+            }
+        }
         observeUiStateForPublicBridge()
     }
 
@@ -244,7 +251,9 @@ internal class MeetingRoomViewModel(
 
     fun endCall() {
         if (!callEnded.compareAndSet(false, true)) return
-        container.foregroundServiceHandler.stopForegroundService()
+        if (prebuilt.foregroundServiceEnabled) {
+            container.foregroundServiceHandler.stopForegroundService()
+        }
         container.vonageScreenSharing.stopSharingScreen()
         container.audioDevicesHandler.stop()
         container.callSettingsHolder.clear()

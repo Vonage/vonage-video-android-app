@@ -46,6 +46,7 @@ fun MeetingRoomScreenRoute(
                 }
             }
             .isDebug(BuildConfig.DEBUG)
+            .foregroundServiceEnabled(false)
             .reportingContent { onDismiss -> ReportIssueScreen(onClose = onDismiss) }
             .build()
     }
