@@ -61,9 +61,4 @@ object FeaturesModule {
     @Provides
     fun provideCallSettingsHolder(): CallSettingsHolder = CallSettingsHolder()
 
-    @Singleton
-    @Provides
-    fun provideUserBackgroundRepository(
-        @ApplicationContext context: Context,
-    ): UserBackgroundRepository = UserBackgroundRepository(context)
 }

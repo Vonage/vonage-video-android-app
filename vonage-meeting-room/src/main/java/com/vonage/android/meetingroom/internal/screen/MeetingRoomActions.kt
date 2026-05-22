@@ -27,6 +27,6 @@ internal data class MeetingRoomActions(
     val onSettings: () -> Unit = {},
     val onTogglePinParticipant: (String) -> Unit = {},
     val onForceMuteParticipant: (String) -> Unit = {},
-    val onAddBackground: (List<Uri>) -> Unit = {},
+    val onAddBackground: (Uri) -> Unit = {},
     val onDeleteBackground: (VideoBackgroundItem) -> Unit = {},
 )

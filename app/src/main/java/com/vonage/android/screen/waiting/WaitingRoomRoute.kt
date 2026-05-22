@@ -44,7 +44,7 @@ fun WaitingRoomRoute(
             onJoinRoom = { userName -> viewModel.joinRoom(userName) },
             onCameraSwitch = viewModel::onCameraSwitch,
             onApplyVideoEffect = viewModel::applyVideoEffect,
-            onAddBackground = viewModel::addBackgrounds,
+            onAddBackground = viewModel::addBackground,
             onDeleteBackground = viewModel::deleteBackground,
             onBack = {
                 viewModel.onStop()
@@ -99,7 +99,7 @@ data class WaitingRoomActions(
     val onCameraToggle: () -> Unit = {},
     val onOpenVideoEffects: () -> Unit = {},
     val onApplyVideoEffect: (VideoEffect) -> Unit = {},
-    val onAddBackground: (List<Uri>) -> Unit = {},
+    val onAddBackground: (Uri) -> Unit = {},
     val onDeleteBackground: (VideoBackgroundItem) -> Unit = {},
     val onCameraSwitch: () -> Unit = {},
     val onBack: () -> Unit = {},
