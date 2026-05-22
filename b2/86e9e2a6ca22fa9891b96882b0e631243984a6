@@ -1,0 +1,16 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  h_25498f8d57a266 30-31,72
+vonage-feature-video-effects/src/enabled/java/com/vonage/android/fx/ui/VideoEffectsScreen.kt
+  h_25498f8d57a266 72-76,79-81,90,96,98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "b286e9e2a6ca22fa9891b96882b0e631243984a6",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
