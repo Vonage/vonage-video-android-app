@@ -7,9 +7,11 @@ import kotlinx.collections.immutable.ImmutableList
  * The result of a backgrounds load, combining both built-in and user-uploaded entries.
  *
  * @property backgrounds Merged list of all available backgrounds (built-in first, then user-uploaded).
- * @property canAddBackground `true` while the number of user uploads is below [UserBackgroundRepository.MAX_USER_BACKGROUNDS].
+ * @property remainingBackgroundSlots Number of additional user backgrounds the user may still upload
+ *   before reaching [UserBackgroundRepository.MAX_USER_BACKGROUNDS]. Zero means the cap is reached
+ *   and the "Add image" tile should be hidden.
  */
 data class BackgroundsResult(
     val backgrounds: ImmutableList<VideoBackgroundItem>,
-    val canAddBackground: Boolean,
+    val remainingBackgroundSlots: Int,
 )

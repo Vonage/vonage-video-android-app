@@ -10,6 +10,7 @@ import com.vonage.android.fx.data.AddBackgroundUseCase
 import com.vonage.android.fx.data.BackgroundsResult
 import com.vonage.android.fx.data.DeleteBackgroundUseCase
 import com.vonage.android.fx.data.GetBackgroundsUseCase
+import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.PublisherSettings
@@ -116,12 +117,14 @@ class WaitingRoomViewModel @AssistedInject constructor(
     }
 
     /**
-     * Saves the image at [uri] to persistent storage and refreshes the backgrounds list.
-     * IO is performed internally on [Dispatchers.IO].
+     * Saves each image in [uris] to persistent storage and refreshes the backgrounds list.
+     * Images are saved sequentially on [Dispatchers.IO]; saves that hit the cap or encounter an
+     * unreadable URI are silently skipped (the repository returns `null` for those).
      */
-    fun addBackground(uri: Uri) {
+    fun addBackground(uris: List<Uri>) {
         viewModelScope.launch(Dispatchers.IO) {
-            addBackgroundUseCase(uri, callSettingsHolder.captureResolution.value)
+            val resolution = callSettingsHolder.captureResolution.value
+            uris.forEach { uri -> addBackgroundUseCase(uri, resolution) }
             refreshBackgrounds()
         }
     }
@@ -193,11 +196,11 @@ class WaitingRoomViewModel @AssistedInject constructor(
         val resolution = callSettingsHolder.captureResolution.value
         val result = runCatching {
             getBackgroundsUseCase(resolution)
-        }.getOrElse { BackgroundsResult(persistentListOf(), canAddBackground = true) }
+        }.getOrElse { BackgroundsResult(persistentListOf(), remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS) }
         _uiState.update {
             it.copy(
                 backgrounds = result.backgrounds,
-                canAddBackground = result.canAddBackground,
+                remainingBackgroundSlots = result.remainingBackgroundSlots,
             )
         }
     }
@@ -289,5 +292,5 @@ data class WaitingRoomUiState(
     val audioDevicesState: AudioDevicesState? = null,
     val backgrounds: ImmutableList<VideoBackgroundItem> = persistentListOf(),
     /** Whether the "Add image" tile should be shown in the effects sheet. */
-    val canAddBackground: Boolean = true,
+    val remainingBackgroundSlots: Int = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
 )

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.captions.CaptionsUiState
 import com.vonage.android.fx.data.BackgroundsResult
+import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
@@ -27,8 +28,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -69,7 +68,6 @@ internal class MeetingRoomViewModel(
 
     private var call: CallFacade? = null
     private val callEnded = AtomicBoolean(false)
-    private val backgroundsMutex = Mutex()
 
     init {
         container.foregroundServiceHandler.startForegroundService(roomName)
@@ -205,13 +203,14 @@ internal class MeetingRoomViewModel(
     }
 
     /**
-     * Saves the image at [uri] to persistent storage and refreshes the backgrounds list.
-     * IO is performed internally by [com.vonage.android.fx.data.AddBackgroundUseCase].
+     * Saves each image in [uris] to persistent storage and refreshes the backgrounds list.
+     * Images are saved sequentially; saves that hit the cap or encounter an unreadable URI are
+     * silently skipped (the repository returns `null` for those).
      */
-    fun addBackground(uri: Uri) {
+    fun addBackground(uris: List<Uri>) {
         viewModelScope.launch {
             val resolution = container.callSettingsHolder.captureResolution.value
-            container.addBackgroundUseCase(uri, resolution)
+            uris.forEach { uri -> container.addBackgroundUseCase(uri, resolution) }
             refreshBackgrounds()
         }
     }
@@ -238,9 +237,9 @@ internal class MeetingRoomViewModel(
         val resolution = container.callSettingsHolder.captureResolution.value
         val result = runCatching {
             container.getBackgroundsUseCase(resolution)
-        }.getOrElse { BackgroundsResult(persistentListOf(), canAddBackground = true) }
+        }.getOrElse { BackgroundsResult(persistentListOf(), remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS) }
 
-        _uiState.update { it.copy(backgrounds = result.backgrounds, canAddBackground = result.canAddBackground) }
+        _uiState.update { it.copy(backgrounds = result.backgrounds, remainingBackgroundSlots = result.remainingBackgroundSlots) }
     }
 
     fun endCall() {

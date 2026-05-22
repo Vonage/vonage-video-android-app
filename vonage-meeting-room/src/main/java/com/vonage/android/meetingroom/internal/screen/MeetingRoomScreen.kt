@@ -247,7 +247,7 @@ internal fun MeetingRoomScreen(
                     VideoEffectsScreen(
                         backgrounds = uiState.backgrounds,
                         selectedEffect = selectedEffect,
-                        canAddBackground = uiState.canAddBackground,
+                        remainingBackgroundSlots = uiState.remainingBackgroundSlots,
                         onEffectSelect = { effect ->
                             selectedEffect = effect
                             actions.onApplyVideoEffect(effect)

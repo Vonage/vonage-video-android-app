@@ -14,7 +14,7 @@ import kotlinx.collections.immutable.toImmutableList
  * empty list for the failing source so a partial result is always returned. Repository
  * implementations are responsible for logging errors before throwing.
  *
- * The [canAddBackground][BackgroundsResult.canAddBackground] flag is derived here so that
+ * The [remainingBackgroundSlots][BackgroundsResult.remainingBackgroundSlots] count is derived here so that
  * ViewModels have no knowledge of [UserBackgroundRepository.MAX_USER_BACKGROUNDS].
  */
 class GetBackgroundsUseCase(
@@ -32,7 +32,7 @@ class GetBackgroundsUseCase(
 
         return BackgroundsResult(
             backgrounds = (builtIn + user).toImmutableList(),
-            canAddBackground = user.size < UserBackgroundRepository.MAX_USER_BACKGROUNDS,
+            remainingBackgroundSlots = maxOf(0, UserBackgroundRepository.MAX_USER_BACKGROUNDS - user.size),
         )
     }
 }

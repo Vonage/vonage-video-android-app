@@ -51,9 +51,9 @@ import com.vonage.android.fx.data.AddBackgroundUseCase
 import com.vonage.android.fx.data.BackgroundsResult
 import com.vonage.android.fx.data.DeleteBackgroundUseCase
 import com.vonage.android.fx.data.GetBackgroundsUseCase
+import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.fx.ui.VideoBackgroundItem
 import kotlinx.collections.immutable.persistentListOf
-import org.junit.Assert.assertFalse
 import kotlin.Result.Companion.success
 
 class MeetingRoomViewModelTest {
@@ -79,7 +79,10 @@ class MeetingRoomViewModelTest {
     }
     private val activityContextHolder: ActivityContextHolder = mockk(relaxed = true)
     private val getBackgroundsUseCase: GetBackgroundsUseCase = mockk {
-        coEvery { invoke(captureResolution = null) } returns BackgroundsResult(persistentListOf(), canAddBackground = true)
+        coEvery { invoke(captureResolution = null) } returns BackgroundsResult(
+            persistentListOf(),
+            remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
+        )
     }
     private val addBackgroundUseCase: AddBackgroundUseCase = mockk(relaxed = true)
     private val deleteBackgroundUseCase: DeleteBackgroundUseCase = mockk(relaxed = true)
@@ -655,10 +658,10 @@ class MeetingRoomViewModelTest {
     // region Background management
 
     @Test
-    fun `given setup when getBackgroundsUseCase returns result then backgrounds and canAddBackground update in state`() = runTest {
+    fun `given setup when getBackgroundsUseCase returns result then backgrounds and remainingBackgroundSlots update in state`() = runTest {
         // Given
         val backgrounds = persistentListOf(VideoBackgroundItem(id = "bg-1"))
-        coEvery { getBackgroundsUseCase(captureResolution = null) } returns BackgroundsResult(backgrounds, canAddBackground = false)
+        coEvery { getBackgroundsUseCase(captureResolution = null) } returns BackgroundsResult(backgrounds, remainingBackgroundSlots = 0)
         givenMockCall()
 
         // When
@@ -667,11 +670,11 @@ class MeetingRoomViewModelTest {
 
         // Then
         assertEquals(backgrounds, sut.uiState.value.backgrounds)
-        assertFalse(sut.uiState.value.canAddBackground)
+        assertEquals(0, sut.uiState.value.remainingBackgroundSlots)
     }
 
     @Test
-    fun `given setup when getBackgroundsUseCase throws then sets empty backgrounds and canAddBackground true`() = runTest {
+    fun `given setup when getBackgroundsUseCase throws then sets empty backgrounds and remainingBackgroundSlots is MAX`() = runTest {
         // Given
         coEvery { getBackgroundsUseCase(captureResolution = null) } throws RuntimeException("load failure")
         givenMockCall()
@@ -682,7 +685,7 @@ class MeetingRoomViewModelTest {
 
         // Then
         assertTrue(sut.uiState.value.backgrounds.isEmpty())
-        assertTrue(sut.uiState.value.canAddBackground)
+        assertEquals(UserBackgroundRepository.MAX_USER_BACKGROUNDS, sut.uiState.value.remainingBackgroundSlots)
     }
 
     @Test
@@ -693,16 +696,18 @@ class MeetingRoomViewModelTest {
         givenMockCall()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
-        coEvery { getBackgroundsUseCase(captureResolution = null) } returns BackgroundsResult(updatedBackgrounds, canAddBackground = false)
+        coEvery { getBackgroundsUseCase(captureResolution = null) } returns BackgroundsResult(
+            updatedBackgrounds, remainingBackgroundSlots = 0,
+        )
 
         // When
-        sut.addBackground(uri)
+        sut.addBackground(listOf(uri))
         testScheduler.advanceUntilIdle()
 
         // Then
         coVerify(exactly = 1) { addBackgroundUseCase(uri, any()) }
         assertEquals(updatedBackgrounds, sut.uiState.value.backgrounds)
-        assertFalse(sut.uiState.value.canAddBackground)
+        assertEquals(0, sut.uiState.value.remainingBackgroundSlots)
     }
 
     @Test
@@ -713,7 +718,9 @@ class MeetingRoomViewModelTest {
         givenMockCall()
         sut.setup(context)
         testScheduler.advanceUntilIdle()
-        coEvery { getBackgroundsUseCase(captureResolution = null) } returns BackgroundsResult(updatedBackgrounds, canAddBackground = true)
+        coEvery { getBackgroundsUseCase(captureResolution = null) } returns BackgroundsResult(
+            updatedBackgrounds, remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
+        )
 
         // When
         sut.deleteBackground(item)

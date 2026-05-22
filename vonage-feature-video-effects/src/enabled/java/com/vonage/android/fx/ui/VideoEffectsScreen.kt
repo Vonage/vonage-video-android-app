@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.PickMultipleVisualMedia
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -87,15 +88,19 @@ import kotlinx.coroutines.withContext
 fun VideoEffectsScreen(
     backgrounds: ImmutableList<VideoBackgroundItem>,
     selectedEffect: VideoEffect,
-    canAddBackground: Boolean,
+    remainingBackgroundSlots: Int,
     onEffectSelect: (VideoEffect) -> Unit,
-    onAddBackground: (Uri) -> Unit,
+    onAddBackground: (List<Uri>) -> Unit,
     onDeleteBackground: (VideoBackgroundItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val launcher = rememberLauncherForActivityResult(
+    val multiLauncher = rememberLauncherForActivityResult(
+        contract = PickMultipleVisualMedia(maxItems = maxOf(2, remainingBackgroundSlots)),
+    ) { uris -> if (uris.isNotEmpty()) onAddBackground(uris) }
+
+    val singleLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
-    ) { uri -> uri?.let { onAddBackground(it) } }
+    ) { uri -> uri?.let { onAddBackground(listOf(it)) } }
 
     Column(
         modifier = modifier
@@ -117,12 +122,15 @@ fun VideoEffectsScreen(
         EffectsAndBackgroundsGrid(
             backgrounds = backgrounds,
             selectedEffect = selectedEffect,
-            canAddBackground = canAddBackground,
+            canAddBackground = remainingBackgroundSlots > 0,
             onEffectSelect = onEffectSelect,
             onAddImageClick = {
-                launcher.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
-                )
+                val request = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                if (remainingBackgroundSlots >= 2) {
+                    multiLauncher.launch(request)
+                } else {
+                    singleLauncher.launch(request)
+                }
             },
             onDeleteBackground = onDeleteBackground,
             modifier = Modifier.padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
@@ -399,7 +407,7 @@ internal fun VideoEffectsScreenPortraitPreview() {
                 VideoBackgroundItem(id = "bg6"),
             ),
             selectedEffect = VideoEffect.None,
-            canAddBackground = true,
+            remainingBackgroundSlots = 7,
             onEffectSelect = {},
             onAddBackground = {},
             onDeleteBackground = {},
@@ -419,7 +427,7 @@ internal fun VideoEffectsScreenLandscapePreview() {
                 VideoBackgroundItem(id = "bg4"),
             ),
             selectedEffect = VideoEffect.BlurLow,
-            canAddBackground = false,
+            remainingBackgroundSlots = 0,
             onEffectSelect = {},
             onAddBackground = {},
             onDeleteBackground = {},

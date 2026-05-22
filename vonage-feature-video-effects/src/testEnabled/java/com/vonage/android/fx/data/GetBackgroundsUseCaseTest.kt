@@ -9,7 +9,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -39,7 +38,7 @@ class GetBackgroundsUseCaseTest {
     }
 
     @Test
-    fun `given user count is below MAX when invoked then canAddBackground is true`() = runTest {
+    fun `given user count is below MAX when invoked then remainingBackgroundSlots is positive`() = runTest {
         // Given
         coEvery { backgroundEffectsRepository.getBackgrounds(any()) } returns persistentListOf()
         coEvery { userBackgroundRepository.getUserBackgrounds(any()) } returns persistentListOf(makeItem("u1"))
@@ -48,11 +47,11 @@ class GetBackgroundsUseCaseTest {
         val result = sut()
 
         // Then
-        assertTrue(result.canAddBackground)
+        assertTrue(result.remainingBackgroundSlots > 0)
     }
 
     @Test
-    fun `given user count equals MAX when invoked then canAddBackground is false`() = runTest {
+    fun `given user count equals MAX when invoked then remainingBackgroundSlots is 0`() = runTest {
         // Given
         val maxUserItems = (1..UserBackgroundRepository.MAX_USER_BACKGROUNDS)
             .map { makeItem("u$it") }
@@ -64,11 +63,11 @@ class GetBackgroundsUseCaseTest {
         val result = sut()
 
         // Then
-        assertFalse(result.canAddBackground)
+        assertEquals(0, result.remainingBackgroundSlots)
     }
 
     @Test
-    fun `given built-in source throws when invoked then returns only user items and canAddBackground is true`() = runTest {
+    fun `given built-in source throws when invoked then returns only user items and remainingBackgroundSlots is positive`() = runTest {
         // Given
         coEvery { backgroundEffectsRepository.getBackgrounds(any()) } throws RuntimeException("built-in failure")
         coEvery { userBackgroundRepository.getUserBackgrounds(any()) } returns persistentListOf(makeItem("u1"))
@@ -78,11 +77,11 @@ class GetBackgroundsUseCaseTest {
 
         // Then
         assertEquals(listOf("u1"), result.backgrounds.map { it.id })
-        assertTrue(result.canAddBackground)
+        assertTrue(result.remainingBackgroundSlots > 0)
     }
 
     @Test
-    fun `given user source throws when invoked then returns only built-in items and canAddBackground is true`() = runTest {
+    fun `given user source throws when invoked then returns only built-in items and remainingBackgroundSlots is MAX`() = runTest {
         // Given
         coEvery { backgroundEffectsRepository.getBackgrounds(any()) } returns persistentListOf(makeItem("b1"))
         coEvery { userBackgroundRepository.getUserBackgrounds(any()) } throws RuntimeException("user failure")
@@ -92,11 +91,11 @@ class GetBackgroundsUseCaseTest {
 
         // Then
         assertEquals(listOf("b1"), result.backgrounds.map { it.id })
-        assertTrue(result.canAddBackground)
+        assertEquals(UserBackgroundRepository.MAX_USER_BACKGROUNDS, result.remainingBackgroundSlots)
     }
 
     @Test
-    fun `given both sources throw when invoked then returns empty list and canAddBackground is true`() = runTest {
+    fun `given both sources throw when invoked then returns empty list and remainingBackgroundSlots is MAX`() = runTest {
         // Given
         coEvery { backgroundEffectsRepository.getBackgrounds(any()) } throws RuntimeException("built-in failure")
         coEvery { userBackgroundRepository.getUserBackgrounds(any()) } throws RuntimeException("user failure")
@@ -106,11 +105,11 @@ class GetBackgroundsUseCaseTest {
 
         // Then
         assertTrue(result.backgrounds.isEmpty())
-        assertTrue(result.canAddBackground)
+        assertEquals(UserBackgroundRepository.MAX_USER_BACKGROUNDS, result.remainingBackgroundSlots)
     }
 
     @Test
-    fun `given both sources are empty when invoked then returns empty list and canAddBackground is true`() = runTest {
+    fun `given both sources are empty when invoked then returns empty list and remainingBackgroundSlots is MAX`() = runTest {
         // Given
         coEvery { backgroundEffectsRepository.getBackgrounds(any()) } returns persistentListOf()
         coEvery { userBackgroundRepository.getUserBackgrounds(any()) } returns persistentListOf()
@@ -120,7 +119,7 @@ class GetBackgroundsUseCaseTest {
 
         // Then
         assertTrue(result.backgrounds.isEmpty())
-        assertTrue(result.canAddBackground)
+        assertEquals(UserBackgroundRepository.MAX_USER_BACKGROUNDS, result.remainingBackgroundSlots)
     }
 
     @Test

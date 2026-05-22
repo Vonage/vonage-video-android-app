@@ -99,7 +99,7 @@ data class WaitingRoomActions(
     val onCameraToggle: () -> Unit = {},
     val onOpenVideoEffects: () -> Unit = {},
     val onApplyVideoEffect: (VideoEffect) -> Unit = {},
-    val onAddBackground: (Uri) -> Unit = {},
+    val onAddBackground: (List<Uri>) -> Unit = {},
     val onDeleteBackground: (VideoBackgroundItem) -> Unit = {},
     val onCameraSwitch: () -> Unit = {},
     val onBack: () -> Unit = {},
