@@ -3,6 +3,7 @@ package com.vonage.android.meetingroom.internal.screen
 import androidx.compose.runtime.Immutable
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.captions.CaptionsUiState
+import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.meetingroom.api.MeetingRoomFeature
@@ -28,8 +29,12 @@ internal data class MeetingRoomUiState(
     val allowCameraControl: Boolean = true,
     val allowShowParticipantList: Boolean = true,
     val backgrounds: ImmutableList<VideoBackgroundItem> = persistentListOf(),
-    /** Number of additional user backgrounds that can be added before the cap is reached. 0 until the first refresh completes. */
-    val remainingBackgroundSlots: Int = 0,
+    /**
+     * Number of additional user backgrounds the user may still upload before reaching the cap.
+     * Zero means the "Add image" tile should be hidden. Used to select the correct photo picker
+     * (single vs. multi-image) and to cap the number of images the user can pick in one go.
+     */
+    val remainingBackgroundSlots: Int = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
     /** Runtime feature set — applied on top of compile-time flavor toggles. */
     val enabledFeatures: Set<MeetingRoomFeature> = MeetingRoomFeature.all,
 )

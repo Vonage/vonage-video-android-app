@@ -1,12 +1,16 @@
 package com.vonage.android.screen.waiting
 
 import android.content.Context
-import android.net.Uri
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
 import com.vonage.android.config.Config
 import com.vonage.android.config.GetConfig
 import com.vonage.android.data.UserRepository
+import com.vonage.android.fx.data.AddBackgroundUseCase
+import com.vonage.android.fx.data.BackgroundsResult
+import com.vonage.android.fx.data.DeleteBackgroundUseCase
+import com.vonage.android.fx.data.GetBackgroundsUseCase
+import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.CameraType
 import com.vonage.android.kotlin.model.CaptureFrameRate
@@ -16,17 +20,13 @@ import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
 import com.vonage.android.settings.CallSettingsHolder
-import com.vonage.android.fx.data.UserBackgroundRepository
-import com.vonage.android.fx.ui.VideoBackgroundItem
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -35,7 +35,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class WaitingRoomViewModelTest {
 
     @get:Rule
@@ -57,24 +56,29 @@ class WaitingRoomViewModelTest {
         every { subscriberAudioFallbackEnabled } returns MutableStateFlow(true)
         every { videoBitrateConfig } returns MutableStateFlow(VideoBitrateConfig())
     }
-
-    private val userBackgroundRepository: UserBackgroundRepository = mockk(relaxed = true)
+    private val getBackgroundsUseCase: GetBackgroundsUseCase = mockk {
+        coEvery { invoke(captureResolution = null) } returns BackgroundsResult(
+            persistentListOf(),
+            remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
+        )
+    }
+    private val addBackgroundUseCase: AddBackgroundUseCase = mockk(relaxed = true)
+    private val deleteBackgroundUseCase: DeleteBackgroundUseCase = mockk(relaxed = true)
 
     private lateinit var sut: WaitingRoomViewModel
 
     @Before
     fun setUp() {
-        every { userBackgroundRepository.getUserBackgrounds(any()) } returns persistentListOf()
-
         sut = WaitingRoomViewModel(
             roomName = ANY_ROOM_NAME,
-            appContext = context,
             userRepository = userRepository,
             videoClient = videoClient,
             getConfig = getConfig,
             audioDevicesHandler = audioDevicesHandler,
             callSettingsHolder = callSettingsHolder,
-            userBackgroundRepository = userBackgroundRepository,
+            getBackgroundsUseCase = getBackgroundsUseCase,
+            addBackgroundUseCase = addBackgroundUseCase,
+            deleteBackgroundUseCase = deleteBackgroundUseCase,
         )
 
         every { getConfig.invoke() } returns Config(
@@ -279,66 +283,6 @@ class WaitingRoomViewModelTest {
 
         verify { videoClient.destroyPublisher() }
     }
-
-    // -------------------------------------------------------------------------
-    // addBackgrounds — batch upload
-    // -------------------------------------------------------------------------
-
-    @Test
-    fun `given empty uri list WHEN addBackgrounds THEN saveBackground not called`() =
-        runTest {
-            advanceUntilIdle() // drain the init refreshBackgrounds coroutine
-
-            sut.addBackgrounds(emptyList())
-            advanceUntilIdle()
-
-            verify(exactly = 0) { userBackgroundRepository.saveBackground(any(), any()) }
-        }
-
-    @Test
-    fun `given uri list WHEN addBackgrounds and save returns null THEN loop breaks after first call`() =
-        runTest {
-            val uris = listOf(mockk<Uri>(), mockk<Uri>(), mockk<Uri>())
-            every { userBackgroundRepository.saveBackground(any(), any()) } returns null
-            advanceUntilIdle() // drain the init refreshBackgrounds coroutine
-
-            sut.addBackgrounds(uris)
-            advanceUntilIdle()
-
-            // null return → for-loop breaks after the first call
-            verify(exactly = 1) { userBackgroundRepository.saveBackground(any(), any()) }
-        }
-
-    @Test
-    fun `given uri list WHEN addBackgrounds and cap hit mid-batch THEN processing stops at cap`() =
-        runTest {
-            val uris = listOf(mockk<Uri>(), mockk<Uri>(), mockk<Uri>())
-            val savedItem = VideoBackgroundItem(id = "user_bg_test", isUserUploaded = true)
-            // First save fills the last slot, second hits the cap and returns null.
-            every { userBackgroundRepository.saveBackground(any(), any()) } returnsMany listOf(savedItem, null)
-            advanceUntilIdle() // drain the init refreshBackgrounds coroutine
-
-            sut.addBackgrounds(uris)
-            advanceUntilIdle()
-
-            // Loop breaks on second null; third URI is never processed.
-            verify(exactly = 2) { userBackgroundRepository.saveBackground(any(), any()) }
-        }
-
-    @Test
-    fun `given uri list WHEN addBackgrounds and all saves succeed THEN all uris are processed`() =
-        runTest {
-            val uris = listOf(mockk<Uri>(), mockk<Uri>(), mockk<Uri>())
-            val savedItem = VideoBackgroundItem(id = "user_bg_test", isUserUploaded = true)
-            every { userBackgroundRepository.saveBackground(any(), any()) } returns savedItem
-            advanceUntilIdle() // drain the init refreshBackgrounds coroutine
-
-            sut.addBackgrounds(uris)
-            advanceUntilIdle()
-
-            // All saves return a non-null item → no early break → all 3 URIs are processed.
-            verify(exactly = 3) { userBackgroundRepository.saveBackground(any(), any()) }
-        }
 
     private fun givenPreviewPublisher(): PreviewPublisherState {
         val publisher = buildMockPublisher()

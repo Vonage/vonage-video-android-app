@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.captions.CaptionsUiState
+import com.vonage.android.fx.data.BackgroundsResult
 import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.ArchivingState
@@ -25,11 +26,8 @@ import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.logger.vonageLogger
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -40,8 +38,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Suppress("LongParameterList")
 internal class MeetingRoomViewModel(
@@ -72,7 +68,6 @@ internal class MeetingRoomViewModel(
 
     private var call: CallFacade? = null
     private val callEnded = AtomicBoolean(false)
-    private val backgroundsMutex = Mutex()
 
     init {
         container.foregroundServiceHandler.startForegroundService(roomName)
@@ -93,7 +88,7 @@ internal class MeetingRoomViewModel(
             ),
         )
 
-        viewModelScope.launch(Dispatchers.IO) { refreshBackgrounds() }
+        viewModelScope.launch { refreshBackgrounds() }
 
         viewModelScope.launch {
             _uiState.update { state ->
@@ -208,20 +203,15 @@ internal class MeetingRoomViewModel(
     }
 
     /**
-     * Saves each image in [uris] to persistent storage sequentially, then refreshes the
-     * backgrounds list once. Processing stops early if
-     * [UserBackgroundRepository.MAX_USER_BACKGROUNDS] is reached mid-batch.
-     * Must be called from any thread; IO is performed internally on [Dispatchers.IO].
+     * Saves each image in [uris] to persistent storage and refreshes the backgrounds list.
+     * Images are saved sequentially; saves that hit the cap or encounter an unreadable URI are
+     * silently skipped (the repository returns `null` for those).
      */
-    fun addBackgrounds(uris: List<Uri>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            backgroundsMutex.withLock {
-                val resolution = container.callSettingsHolder.captureResolution.value
-                for (uri in uris) {
-                    container.userBackgroundRepository.saveBackground(uri, resolution) ?: break
-                }
-                refreshBackgrounds()
-            }
+    fun addBackground(uris: List<Uri>) {
+        viewModelScope.launch {
+            val resolution = container.callSettingsHolder.captureResolution.value
+            uris.forEach { uri -> container.addBackgroundUseCase(uri, resolution) }
+            refreshBackgrounds()
         }
     }
 
@@ -230,36 +220,26 @@ internal class MeetingRoomViewModel(
      * currently active on the publisher, the effect is reset to [VideoEffect.None].
      */
     fun deleteBackground(item: VideoBackgroundItem) {
-        viewModelScope.launch(Dispatchers.IO) {
-            container.userBackgroundRepository.deleteBackground(item.id)
+        viewModelScope.launch {
+            container.deleteBackgroundUseCase(item.id)
             val currentEffect = call?.publisher?.value?.videoEffect?.value
             if (currentEffect is VideoEffect.BackgroundImage && currentEffect.id == item.id) {
-                withContext(Dispatchers.Main) { applyVideoEffect(VideoEffect.None) }
+                applyVideoEffect(VideoEffect.None)
             }
             refreshBackgrounds()
         }
     }
 
     /**
-     * Merges built-in and user-uploaded backgrounds then updates the UI state.
-     * Must be called from [Dispatchers.IO].
+     * Fetches the merged backgrounds list via [GetBackgroundsUseCase] and updates the UI state.
      */
     private suspend fun refreshBackgrounds() {
         val resolution = container.callSettingsHolder.captureResolution.value
-        val builtIn = runCatching {
-            container.backgroundEffectsRepository.getBackgrounds(resolution)
-        }.onFailure { throwable ->
-            vonageLogger.e("MeetingRoomViewModel", "Failed to load built-in backgrounds: $throwable")
-        }.getOrElse { persistentListOf() }
+        val result = runCatching {
+            container.getBackgroundsUseCase(resolution)
+        }.getOrElse { BackgroundsResult(persistentListOf(), remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS) }
 
-        val user = runCatching {
-            container.userBackgroundRepository.getUserBackgrounds(resolution)
-        }.onFailure { throwable ->
-            vonageLogger.e("MeetingRoomViewModel", "Failed to load user backgrounds: $throwable")
-        }.getOrElse { persistentListOf() }
-
-        val remainingSlots = (UserBackgroundRepository.MAX_USER_BACKGROUNDS - user.size).coerceAtLeast(0)
-        _uiState.update { it.copy(backgrounds = (builtIn + user).toImmutableList(), remainingBackgroundSlots = remainingSlots) }
+        _uiState.update { it.copy(backgrounds = result.backgrounds, remainingBackgroundSlots = result.remainingBackgroundSlots) }
     }
 
     fun endCall() {

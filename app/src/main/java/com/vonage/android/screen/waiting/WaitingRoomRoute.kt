@@ -44,7 +44,7 @@ fun WaitingRoomRoute(
             onJoinRoom = { userName -> viewModel.joinRoom(userName) },
             onCameraSwitch = viewModel::onCameraSwitch,
             onApplyVideoEffect = viewModel::applyVideoEffect,
-            onAddBackground = viewModel::addBackgrounds,
+            onAddBackground = viewModel::addBackground,
             onDeleteBackground = viewModel::deleteBackground,
             onBack = {
                 viewModel.onStop()

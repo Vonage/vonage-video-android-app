@@ -6,7 +6,10 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.config.GetConfig
-import com.vonage.android.fx.data.BackgroundEffectsRepository
+import com.vonage.android.fx.data.AddBackgroundUseCase
+import com.vonage.android.fx.data.BackgroundsResult
+import com.vonage.android.fx.data.DeleteBackgroundUseCase
+import com.vonage.android.fx.data.GetBackgroundsUseCase
 import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.VideoEffect
@@ -24,15 +27,11 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
@@ -44,19 +43,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @HiltViewModel(assistedFactory = WaitingRoomViewModelFactory::class)
+@Suppress("LongParameterList")
 class WaitingRoomViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
-    @ApplicationContext private val appContext: Context,
     private val getConfig: GetConfig,
     private val userRepository: UserRepository,
     private val videoClient: VonageVideoClient,
     private val audioDevicesHandler: AudioDevicesHandler,
     private val callSettingsHolder: CallSettingsHolder,
-    private val userBackgroundRepository: UserBackgroundRepository,
+    private val getBackgroundsUseCase: GetBackgroundsUseCase,
+    private val addBackgroundUseCase: AddBackgroundUseCase,
+    private val deleteBackgroundUseCase: DeleteBackgroundUseCase,
 ) : ViewModel() {
 
     private var publisherSetupJob: Job? = null
-    private val backgroundsMutex = Mutex()
     private val _uiState = MutableStateFlow(WaitingRoomUiState(roomName = roomName))
     val uiState: StateFlow<WaitingRoomUiState> = _uiState.stateIn(
         scope = viewModelScope,
@@ -117,20 +117,15 @@ class WaitingRoomViewModel @AssistedInject constructor(
     }
 
     /**
-     * Saves each image in [uris] to persistent storage sequentially, then refreshes the
-     * backgrounds list once. Processing stops early if
-     * [UserBackgroundRepository.MAX_USER_BACKGROUNDS] is reached mid-batch.
-     * IO is performed internally on [Dispatchers.IO].
+     * Saves each image in [uris] to persistent storage and refreshes the backgrounds list.
+     * Images are saved sequentially on [Dispatchers.IO]; saves that hit the cap or encounter an
+     * unreadable URI are silently skipped (the repository returns `null` for those).
      */
-    fun addBackgrounds(uris: List<Uri>) {
+    fun addBackground(uris: List<Uri>) {
         viewModelScope.launch(Dispatchers.IO) {
-            backgroundsMutex.withLock {
-                val resolution = callSettingsHolder.captureResolution.value
-                for (uri in uris) {
-                    userBackgroundRepository.saveBackground(uri, resolution) ?: break
-                }
-                refreshBackgrounds()
-            }
+            val resolution = callSettingsHolder.captureResolution.value
+            uris.forEach { uri -> addBackgroundUseCase(uri, resolution) }
+            refreshBackgrounds()
         }
     }
 
@@ -140,7 +135,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
      */
     fun deleteBackground(item: VideoBackgroundItem) {
         viewModelScope.launch(Dispatchers.IO) {
-            userBackgroundRepository.deleteBackground(item.id)
+            deleteBackgroundUseCase(item.id)
             val currentEffect = _uiState.value.publisher?.videoEffect?.value
             if (currentEffect is VideoEffect.BackgroundImage && currentEffect.id == item.id) {
                 withContext(Dispatchers.Main) { applyVideoEffect(VideoEffect.None) }
@@ -195,22 +190,17 @@ class WaitingRoomViewModel @AssistedInject constructor(
     }
 
     /**
-     * Merges built-in and user-uploaded backgrounds then updates the UI state.
-     * Must be called from [Dispatchers.IO].
+     * Fetches the merged backgrounds list via [GetBackgroundsUseCase] and updates the UI state.
      */
     private suspend fun refreshBackgrounds() {
         val resolution = callSettingsHolder.captureResolution.value
-        val builtIn = runCatching {
-            BackgroundEffectsRepository(appContext).getBackgrounds(resolution)
-        }.getOrElse { persistentListOf() }
-        val user = runCatching {
-            userBackgroundRepository.getUserBackgrounds(resolution)
-        }.getOrElse { persistentListOf() }
-        val remainingSlots = (UserBackgroundRepository.MAX_USER_BACKGROUNDS - user.size).coerceAtLeast(0)
+        val result = runCatching {
+            getBackgroundsUseCase(resolution)
+        }.getOrElse { BackgroundsResult(persistentListOf(), remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS) }
         _uiState.update {
             it.copy(
-                backgrounds = (builtIn + user).toImmutableList(),
-                remainingBackgroundSlots = remainingSlots,
+                backgrounds = result.backgrounds,
+                remainingBackgroundSlots = result.remainingBackgroundSlots,
             )
         }
     }
@@ -301,6 +291,6 @@ data class WaitingRoomUiState(
     val allowCameraControl: Boolean = true,
     val audioDevicesState: AudioDevicesState? = null,
     val backgrounds: ImmutableList<VideoBackgroundItem> = persistentListOf(),
-    /** Number of additional user backgrounds that can be added before the cap is reached. 0 until the first refresh completes. */
-    val remainingBackgroundSlots: Int = 0,
+    /** Whether the "Add image" tile should be shown in the effects sheet. */
+    val remainingBackgroundSlots: Int = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
 )

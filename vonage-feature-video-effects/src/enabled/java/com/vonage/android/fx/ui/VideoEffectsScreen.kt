@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.PickMultipleVisualMedia
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -93,23 +94,13 @@ fun VideoEffectsScreen(
     onDeleteBackground: (VideoBackgroundItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val canAddBackground = remainingBackgroundSlots > 0
-
-    // Register a multi-item launcher (used when ≥ 2 slots remain) and a single-item launcher
-    // (used when exactly 1 slot remains). Both must always be registered — Compose prohibits
-    // conditional calls to rememberLauncherForActivityResult.
     val multiLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickMultipleVisualMedia(
-            maxItems = remainingBackgroundSlots.coerceAtLeast(2),
-        ),
+        contract = PickMultipleVisualMedia(maxItems = maxOf(2, remainingBackgroundSlots)),
     ) { uris -> if (uris.isNotEmpty()) onAddBackground(uris) }
+
     val singleLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
     ) { uri -> uri?.let { onAddBackground(listOf(it)) } }
-
-    val pickerRequest = remember {
-        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-    }
 
     Column(
         modifier = modifier
@@ -131,13 +122,14 @@ fun VideoEffectsScreen(
         EffectsAndBackgroundsGrid(
             backgrounds = backgrounds,
             selectedEffect = selectedEffect,
-            canAddBackground = canAddBackground,
+            canAddBackground = remainingBackgroundSlots > 0,
             onEffectSelect = onEffectSelect,
             onAddImageClick = {
+                val request = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 if (remainingBackgroundSlots >= 2) {
-                    multiLauncher.launch(pickerRequest)
+                    multiLauncher.launch(request)
                 } else {
-                    singleLauncher.launch(pickerRequest)
+                    singleLauncher.launch(request)
                 }
             },
             onDeleteBackground = onDeleteBackground,
@@ -415,7 +407,7 @@ internal fun VideoEffectsScreenPortraitPreview() {
                 VideoBackgroundItem(id = "bg6"),
             ),
             selectedEffect = VideoEffect.None,
-            remainingBackgroundSlots = 4,
+            remainingBackgroundSlots = 7,
             onEffectSelect = {},
             onAddBackground = {},
             onDeleteBackground = {},
