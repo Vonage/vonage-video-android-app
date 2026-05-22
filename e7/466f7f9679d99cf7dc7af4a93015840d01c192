@@ -1,0 +1,66 @@
+vonage-feature-video-effects/src/main/java/com/vonage/android/fx/data/GetBackgroundsUseCase.kt
+  s_24aaa1479657fe::t_840333cd461e74 17
+  s_24aaa1479657fe::t_d1679da3b51f90 35
+vonage-feature-video-effects/src/testEnabled/java/com/vonage/android/fx/data/GetBackgroundsUseCaseTest.kt
+  s_24aaa1479657fe::t_9371d037a82a3b 80,84,94,98,108,112,122
+  s_24aaa1479657fe::t_b6f4c0394cda8d 70
+  s_24aaa1479657fe::t_e5af3a32462c41 41,50,54,66
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomUiState.kt
+  s_24aaa1479657fe::t_166e7f7f0a3d75 6
+  s_24aaa1479657fe::t_3d834ba109b53f 32-37
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomRoute.kt
+  s_24aaa1479657fe::t_3028655de32e7d 102
+app/src/test/java/com/vonage/android/screen/waiting/WaitingRoomViewModelTest.kt
+  s_24aaa1479657fe::t_237d6b027bae3c 60
+  s_24aaa1479657fe::t_7c50913f26f492 13
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTest.kt
+  s_24aaa1479657fe::t_6b3e8750cf62d4 696,699,705,716
+  s_24aaa1479657fe::t_5bf17f2bfdbca5 54
+  s_24aaa1479657fe::t_b026eec9ea6235 82
+  s_24aaa1479657fe::t_c524025b1ca089 658,661,670,674,685
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  s_24aaa1479657fe::t_b9a778a3a3729b 250
+vonage-feature-video-effects/src/enabled/java/com/vonage/android/fx/ui/VideoEffectsScreen.kt
+  s_24aaa1479657fe::t_066dcbe0a0ab0a 91,93,97-101,103
+  s_24aaa1479657fe::t_9a52a67a08c129 8
+  s_24aaa1479657fe::t_369e3fd4274898 410,430
+  s_24aaa1479657fe::t_c5b1923f5798c2 125,128-133
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  s_24aaa1479657fe::t_5755926d372b02 11
+  s_24aaa1479657fe::t_f70b94e1005c8c 209-211,213,216
+  s_24aaa1479657fe::t_02b8366d2caa5f 245
+  s_24aaa1479657fe::t_6d75ee80294441 243
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomScreen.kt
+  s_24aaa1479657fe::t_37beca5276a9e2 171
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomViewModel.kt
+  s_24aaa1479657fe::t_66c1274042dcf6 199
+  s_24aaa1479657fe::t_d8f93150034182 203
+  s_24aaa1479657fe::t_8496ec1a5cff70 13
+  s_24aaa1479657fe::t_d433ba9f63c3e7 120-122,124,126-127
+  s_24aaa1479657fe::t_531af6b903d382 295
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomActions.kt
+  s_24aaa1479657fe::t_82f5ab019feb74 30
+vonage-feature-video-effects/src/main/java/com/vonage/android/fx/data/BackgroundsResult.kt
+  s_24aaa1479657fe::t_8c62b0c18693df 10-12,16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "e7466f7f9679d99cf7dc7af4a93015840d01c192",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_24aaa1479657fe": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1b0027938ffejESGTGXvGFuBpA",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
