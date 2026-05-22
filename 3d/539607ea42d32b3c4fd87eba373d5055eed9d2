@@ -1,0 +1,18 @@
+vonage-feature-video-effects/src/enabled/java/com/vonage/android/fx/ui/VideoEffectsScreen.kt
+  h_25498f8d57a266 90,123-125,402,422
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomRoute.kt
+  h_25498f8d57a266 47,102
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomScreen.kt
+  h_25498f8d57a266 171
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "3d539607ea42d32b3c4fd87eba373d5055eed9d2",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
