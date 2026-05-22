@@ -1,0 +1,55 @@
+PLAN.md
+  s_2c76b28b8d8f44::t_f44a338b14bcf0 1-305
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomBuilder.kt
+  s_2c76b28b8d8f44::t_09df88dc6c7ac1 115-126
+  s_2c76b28b8d8f44::t_1977b1fdce9666 49
+  s_2c76b28b8d8f44::t_ebeffab78544f7 153
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  s_2c76b28b8d8f44::t_10a4f6a514ce1c 29
+  s_2c76b28b8d8f44::t_53600c64b37f6d 226
+  s_2c76b28b8d8f44::t_6dce3f8c41c4d5 276-278
+  s_2c76b28b8d8f44::t_c6be6c60bf04a7 242
+  s_2c76b28b8d8f44::t_4cd68e880d66a5 80-87
+  s_2c76b28b8d8f44::t_15088da45ae998 105
+  s_2c76b28b8d8f44::t_388fa9e6af3a38 50
+app/src/main/java/com/vonage/android/screen/room/MeetingRoomScreenRoute.kt
+  h_25498f8d57a266 49
+vonage-meeting-room/CONTEXT.md
+  s_2c76b28b8d8f44::t_919ca3ddcef28b 1-27
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/PublisherSettings.kt
+  h_25498f8d57a266 3,21
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomPrebuilt.kt
+  s_2c76b28b8d8f44::t_37c36535250da8 9,11
+  s_2c76b28b8d8f44::t_91b596d0d67450 51,55-77
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTest.kt
+  s_2c76b28b8d8f44::t_0f386a2fe1868f 76
+  s_2c76b28b8d8f44::t_7dc0c28bf7f67e 709,718-722,725-726
+  s_2c76b28b8d8f44::t_70089873e0520f 303
+  s_2c76b28b8d8f44::t_e60fcab4399a8e 710-713,717
+  s_2c76b28b8d8f44::t_b85c308ef4fc9a 101-102
+  s_2c76b28b8d8f44::t_ef6f0e367b7070 104
+  s_2c76b28b8d8f44::t_0f1f54d1b7c99e 706-708,714,727-740
+  s_2c76b28b8d8f44::t_71469c1a7761dd 716,724
+  s_2c76b28b8d8f44::t_10d575940d2d62 715,723
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "9961ae925078770ef8cef8ab310c968132a919c2",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_2c76b28b8d8f44": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1afe7cb9affekIrlPuTQeQXkQK",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
