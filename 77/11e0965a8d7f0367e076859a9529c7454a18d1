@@ -1,0 +1,133 @@
+.github/workflows/android.yml
+  s_9f59bb83d0b0d7::t_9e4bb42adbd6f9 64-67
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/GenericLoadingScreenshotTest.kt
+  s_9f59bb83d0b0d7::t_0ec9a354ea0859 8
+  s_9f59bb83d0b0d7::t_da957156311a8d 22-24
+  s_9f59bb83d0b0d7::t_60f8a9cbb17730 1-7,9-21,25-43
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/VonageButton.kt
+  s_9f59bb83d0b0d7::t_892293648e6b97 70-97
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/bottombar/ControlButtonScreenshotTest.kt
+  s_9f59bb83d0b0d7::t_66fac86e4ae03b 1-7,9-21,25-69
+  s_9f59bb83d0b0d7::t_a8992df3bcced6 8
+  s_9f59bb83d0b0d7::t_32f0ef4b8b022c 22-24
+vonage-video-ui-compose/build.gradle.kts
+  s_9f59bb83d0b0d7::t_d0fe8b008528a0 6
+  s_9f59bb83d0b0d7::t_bf95a9145a57ac 47-53
+  s_9f59bb83d0b0d7::t_a62bbccb3607dd 43-46
+  s_9f59bb83d0b0d7::t_98a9a04a3c5ce6 77-79
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/GenericLoading.kt
+  s_9f59bb83d0b0d7::t_4cf9895c2c9701 10,27-32
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/VonageButtonScreenshotTest.kt
+  s_9f59bb83d0b0d7::t_a1ed83b05dd27b 8
+  s_9f59bb83d0b0d7::t_5b25d6663391ea 22-24
+  s_9f59bb83d0b0d7::t_87a1eafe3b2ed7 1-7,9-21,25-69
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/bottombar/ControlButton.kt
+  s_9f59bb83d0b0d7::t_58e512b35e3ba6 6,22,25-27
+  s_9f59bb83d0b0d7::t_d37a44ab37f244 77-118
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/AudioVolumeIndicatorScreenshotTest.kt
+  s_9f59bb83d0b0d7::t_a6d6e19c912a7b 22-24
+  s_9f59bb83d0b0d7::t_9c5a7df35e69cf 1-7,9-21,25-69
+  s_9f59bb83d0b0d7::t_3af7e3266705a8 8
+gradle/libs.versions.toml
+  s_9f59bb83d0b0d7::t_9f95ad3deb537c 105-107
+  h_25498f8d57a266 6,14-15,24-25,31-32,39,43,119,122,124
+  s_9f59bb83d0b0d7::t_6df9b41fde1c3d 42
+  s_9f59bb83d0b0d7::t_225ea0bf2883f3 125
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/VonageOutlinedButton.kt
+  s_9f59bb83d0b0d7::t_da5341d81756bc 69-96
+  s_9f59bb83d0b0d7::t_3ebcb7e3953c58 16
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/VonageTextField.kt
+  s_9f59bb83d0b0d7::t_a33abea766a0ca 74-114
+  s_9f59bb83d0b0d7::t_bdf2080aab9e17 10
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/bottombar/ActionCellScreenshotTest.kt
+  s_9f59bb83d0b0d7::t_61b9c70700b3eb 8
+  s_9f59bb83d0b0d7::t_346169d5702f1b 22-24
+  s_9f59bb83d0b0d7::t_a16101e2251d04 1-7,9-21,25-69
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/layout/TwoPaneScaffoldScreenshotTest.kt
+  s_9f59bb83d0b0d7::t_f43b89135be9d1 1-7,9-21,25-56
+  s_9f59bb83d0b0d7::t_181dc19e86e087 8
+  s_9f59bb83d0b0d7::t_1ebebdf1e5a9f8 22-24
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/VonageOutlinedButtonScreenshotTest.kt
+  s_9f59bb83d0b0d7::t_ca22354b2485cc 22-24
+  s_9f59bb83d0b0d7::t_3b2599f894fd83 1-7,9-21,25-69
+  s_9f59bb83d0b0d7::t_727ecc79010f38 8
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/layout/TwoPaneScaffold.kt
+  s_9f59bb83d0b0d7::t_065af9f68df78d 21
+  s_9f59bb83d0b0d7::t_9c3c8e9c3fb8b2 24
+  s_9f59bb83d0b0d7::t_334506a95c5bac 169
+  s_9f59bb83d0b0d7::t_96ce1ceb768c54 139-144,146-168,170-186
+  s_9f59bb83d0b0d7::t_f006f1581f9157 145
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/bottombar/ActionCell.kt
+  s_9f59bb83d0b0d7::t_3b0fc570e5364f 128-185
+  s_9f59bb83d0b0d7::t_fcbe5e4292f008 7
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/DropdownSelector.kt
+  s_9f59bb83d0b0d7::t_68aac2296d6b29 23,27
+  s_9f59bb83d0b0d7::t_5808a106b85758 200-216
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/CircularControlButtonScreenshotTest.kt
+  s_9f59bb83d0b0d7::t_31fcbce63d5708 1-7,9-21,25-43
+  s_9f59bb83d0b0d7::t_e4a0bbbf7cc0f7 8
+  s_9f59bb83d0b0d7::t_97c6b902c5aebd 22-24
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/AvatarInitialsScreenshotTest.kt
+  s_9f59bb83d0b0d7::t_1ca017c2772b1d 8
+  s_9f59bb83d0b0d7::t_5347086a08efc0 1-7,9-21,25-56
+  s_9f59bb83d0b0d7::t_f05c833138c53c 22-24
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/VonageTopAppBarScreenshotTest.kt
+  s_9f59bb83d0b0d7::t_f1fb493bea11cc 1-7,9-21,25-69
+  s_9f59bb83d0b0d7::t_399c98f1e02802 8
+  s_9f59bb83d0b0d7::t_55acea394e9434 22-24
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/DropdownSelectorScreenshotTest.kt
+  s_9f59bb83d0b0d7::t_962a567da5fe02 8
+  s_9f59bb83d0b0d7::t_da48627f657972 24-26
+  s_9f59bb83d0b0d7::t_438b35ca790771 1-7,9-23,27-45
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/SnapshotOutputDirRule.kt
+  s_9f59bb83d0b0d7::t_736bdc337c1ede 1-2,5-17,19-31
+  s_9f59bb83d0b0d7::t_6536815d1727ae 3-4
+  s_9f59bb83d0b0d7::t_437be2aa8bec9b 18
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/BasicAlertDialogScreenshotTest.kt
+  s_9f59bb83d0b0d7::t_e5956c694bd1b8 8
+  s_9f59bb83d0b0d7::t_d6a18fc90796d5 1-7,9-23,27-45
+  s_9f59bb83d0b0d7::t_1e956202670e19 24-26
+vonage-video-ui-compose/src/test/resources/robolectric.properties
+  s_9f59bb83d0b0d7::t_3a52eb43ceec64 1
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/AvatarInitials.kt
+  s_9f59bb83d0b0d7::t_4e49a40ffd597d 86-113
+  s_9f59bb83d0b0d7::t_58c111337eee3d 18
+  s_9f59bb83d0b0d7::t_7730facd4489ba 5
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/LinkifyTextScreenshotTest.kt
+  s_9f59bb83d0b0d7::t_fa04a07669cf5f 22-24
+  s_9f59bb83d0b0d7::t_686bc8c3f00b4d 8
+  s_9f59bb83d0b0d7::t_ea495944881c99 1-7,9-21,25-56
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/LinkifyText.kt
+  s_9f59bb83d0b0d7::t_2a3709ab6f47bb 80-87
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/VonageTopAppBar.kt
+  s_9f59bb83d0b0d7::t_e78284cba3be8e 44-75
+  s_9f59bb83d0b0d7::t_a45f7d0a2c2dc7 5,7,13,16-17
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/VonageTextFieldScreenshotTest.kt
+  s_9f59bb83d0b0d7::t_f8e809e4486008 8
+  s_9f59bb83d0b0d7::t_a6f6cfbea2305a 1-7,9-21,25-69
+  s_9f59bb83d0b0d7::t_fd6b3cc13b3378 22-24
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/AudioVolumeIndicator.kt
+  s_9f59bb83d0b0d7::t_db5b6f2ab0b944 21
+  s_9f59bb83d0b0d7::t_0b313219186812 77-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "7711e0965a8d7f0367e076859a9529c7454a18d1",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_9f59bb83d0b0d7": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1a05aed9dffejS8IgCjaSxQBLG",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
