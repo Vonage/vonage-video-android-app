@@ -1,0 +1,19 @@
+app/src/main/java/com/vonage/android/screen/room/MeetingRoomScreenRoute.kt
+  s_e52ba511b066b4::t_82edc309b600a0 60-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "939f8cd1e890732790b3ea5e69c690f7d07739e0",
+  "prompts": {},
+  "sessions": {
+    "s_e52ba511b066b4": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1a18732a1ffeNz7Jg5uFednxPV",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
