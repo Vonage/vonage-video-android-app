@@ -114,14 +114,16 @@ internal class MeetingRoomViewModel(
                 }
         }
 
-        container.foregroundServiceHandler.actions
-            .onEach { callAction ->
-                when (callAction) {
-                    CallAction.HangUp -> _uiState.update { state -> state.copy(isEndCall = true) }
-                    else -> {}
+        if (prebuilt.foregroundServiceEnabled) {
+            container.foregroundServiceHandler.actions
+                .onEach { callAction ->
+                    when (callAction) {
+                        CallAction.HangUp -> _uiState.update { state -> state.copy(isEndCall = true) }
+                        else -> {}
+                    }
                 }
-            }
-            .launchIn(viewModelScope)
+                .launchIn(viewModelScope)
+        }
 
         container.audioDevicesHandler.start()
         observePublisherSettings()
