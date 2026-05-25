@@ -1,0 +1,22 @@
+app/src/main/java/com/vonage/android/screen/components/permissions/CallPermissionHandler.kt
+  s_e52ba511b066b4::t_19ed3612f6ad97 16,22-28,30
+app/src/main/java/com/vonage/android/screen/room/MeetingRoomScreenRoute.kt
+  s_e52ba511b066b4::t_0b119706a8d0f6 60,62
+  s_e52ba511b066b4::t_d8bc20e6a75b14 23-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "e39d3813c618f753bc3d23f5add16e81bcd39e15",
+  "prompts": {},
+  "sessions": {
+    "s_e52ba511b066b4": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1a18732a1ffeNz7Jg5uFednxPV",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
