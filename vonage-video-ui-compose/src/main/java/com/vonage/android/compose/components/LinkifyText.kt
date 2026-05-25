@@ -77,3 +77,11 @@ internal fun LinkifyTextPreview() {
         )
     }
 }
+
+@PreviewLightDark
+@Composable
+internal fun LinkifyTextPlainPreview() {
+    VonageVideoTheme {
+        LinkifyText(text = "Join the meeting now")
+    }
+}

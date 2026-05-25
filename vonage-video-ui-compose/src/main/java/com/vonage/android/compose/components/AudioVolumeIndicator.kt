@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -71,5 +72,29 @@ internal fun ActiveSoundLevelsPreview() {
             AudioVolumeIndicator(audioLevel = 0f)
             AudioVolumeIndicator(audioLevel = 1f)
         }
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun AudioVolumeIndicatorSilentPreview() {
+    VonageVideoTheme {
+        AudioVolumeIndicator(audioLevel = 0f)
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun AudioVolumeIndicatorMediumPreview() {
+    VonageVideoTheme {
+        AudioVolumeIndicator(audioLevel = 0.5f)
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun AudioVolumeIndicatorLoudPreview() {
+    VonageVideoTheme {
+        AudioVolumeIndicator(audioLevel = 1f)
     }
 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -66,6 +67,47 @@ internal fun VonageTextFieldPreview() {
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = { PersonIcon() },
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun VonageTextFieldEmptyPreview() {
+    VonageVideoTheme {
+        Box(
+            modifier = Modifier
+                .background(VonageVideoTheme.colors.background)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
+        ) {
+            VonageTextField(
+                value = "",
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Enter your name") },
+                label = { Text("Name") },
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun VonageTextFieldErrorPreview() {
+    VonageVideoTheme {
+        Box(
+            modifier = Modifier
+                .background(VonageVideoTheme.colors.background)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
+        ) {
+            VonageTextField(
+                value = "bad!",
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                isError = true,
+                label = { Text("Name") },
+                supportingText = { Text("Invalid characters") },
             )
         }
     }

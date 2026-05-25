@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -120,6 +121,64 @@ internal fun MoreActionsGridPreview() {
                 label = "Sample label",
                 isSelected = true,
                 onClickCell = {},
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun ActionCellUnselectedPreview() {
+    VonageVideoTheme {
+        Box(
+            modifier = Modifier
+                .background(VonageVideoTheme.colors.background)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
+        ) {
+            ActionCell(
+                icon = VividIcons.Solid.Blur,
+                label = "Effects",
+                isSelected = false,
+                onClickCell = {},
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun ActionCellSelectedPreview() {
+    VonageVideoTheme {
+        Box(
+            modifier = Modifier
+                .background(VonageVideoTheme.colors.background)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
+        ) {
+            ActionCell(
+                icon = VividIcons.Solid.Blur,
+                label = "Effects",
+                isSelected = true,
+                onClickCell = {},
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun ActionCellWithBadgePreview() {
+    VonageVideoTheme {
+        Box(
+            modifier = Modifier
+                .background(VonageVideoTheme.colors.background)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
+        ) {
+            ActionCell(
+                icon = VividIcons.Solid.Blur,
+                label = "Effects",
+                isSelected = false,
+                onClickCell = {},
+                badgeCount = 5,
             )
         }
     }
