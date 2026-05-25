@@ -14,7 +14,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -62,26 +61,6 @@ fun AvatarInitials(
 object AvatarInitialsTestTags {
     const val USER_INITIALS_ICON_TAG = "user_initials_view_icon"
     const val USER_INITIALS_TEXT_TAG = "user_initials_view_text"
-}
-
-@Preview
-@Composable
-internal fun AvatarInitialsPreview() {
-    VonageVideoTheme {
-        AvatarInitials(
-            userName = "Vonage User",
-        )
-    }
-}
-
-@Preview
-@Composable
-internal fun AvatarInitialsEmptyPreview() {
-    VonageVideoTheme {
-        AvatarInitials(
-            userName = "",
-        )
-    }
 }
 
 @PreviewLightDark
