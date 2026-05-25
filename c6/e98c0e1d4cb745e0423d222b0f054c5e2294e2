@@ -1,0 +1,38 @@
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/VonageTextFieldScreenshotTest.kt
+  h_25498f8d57a266 3
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/DropdownSelectorScreenshotTest.kt
+  h_25498f8d57a266 3
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/BasicAlertDialogScreenshotTest.kt
+  h_25498f8d57a266 4
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/VonageOutlinedButtonScreenshotTest.kt
+  h_25498f8d57a266 3
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/bottombar/ActionCellScreenshotTest.kt
+  h_25498f8d57a266 3
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/bottombar/ControlButtonScreenshotTest.kt
+  h_25498f8d57a266 3
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/LinkifyTextScreenshotTest.kt
+  h_25498f8d57a266 3
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/AvatarInitialsScreenshotTest.kt
+  h_25498f8d57a266 3
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/AudioVolumeIndicatorScreenshotTest.kt
+  h_25498f8d57a266 3
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/CircularControlButtonScreenshotTest.kt
+  h_25498f8d57a266 3
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/VonageButtonScreenshotTest.kt
+  h_25498f8d57a266 3
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/GenericLoadingScreenshotTest.kt
+  h_25498f8d57a266 3
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/VonageTopAppBarScreenshotTest.kt
+  h_25498f8d57a266 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "c6e98c0e1d4cb745e0423d222b0f054c5e2294e2",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
