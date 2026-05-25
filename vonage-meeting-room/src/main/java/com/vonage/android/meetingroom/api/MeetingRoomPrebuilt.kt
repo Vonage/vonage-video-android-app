@@ -70,8 +70,8 @@ class MeetingRoomPrebuilt internal constructor(
      * [MeetingRoomBuilder.foregroundServiceEnabled].
      *
      * Calling this before the meeting room composable is first shown is safe — the command is
-     * buffered and processed once the call is active. Calling it after the call has already
-     * ended is a no-op.
+     * buffered (capacity 1) and will be delivered as soon as the ViewModel initialises.
+     * Calling it after the call has already ended is a no-op.
      */
     fun hangUp() {
         _hangUpCommand.tryEmit(Unit)
