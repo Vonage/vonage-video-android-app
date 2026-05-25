@@ -37,7 +37,7 @@ class DefaultPermissionContentTest {
             VonageVideoTheme {
                 DefaultPermissionContent(
                     permissions = emptyList(),
-                    onGranted = { granted = true },
+                    onGrant = { granted = true },
                 )
             }
         }
@@ -62,7 +62,7 @@ class DefaultPermissionContentTest {
             VonageVideoTheme {
                 DefaultPermissionContent(
                     permissions = listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO),
-                    onGranted = { granted = true },
+                    onGrant = { granted = true },
                 )
             }
         }
@@ -82,7 +82,7 @@ class DefaultPermissionContentTest {
             VonageVideoTheme {
                 DefaultPermissionContent(
                     permissions = listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO),
-                    onGranted = { },
+                    onGrant = { },
                 )
             }
         }
