@@ -20,9 +20,10 @@ import com.vonage.android.util.navigateToSystemPermissions
  * The app is responsible for wiring navigation callbacks (goodbye screen, settings, share).
  *
  * A custom [permissionContent] is provided to the builder so the app's existing Accompanist-
- * based permission UI is used instead of the SDK default. In the normal flow (navigated from
- * [com.vonage.android.screen.waiting.WaitingRoomRoute]), permissions are already granted and
- * [CallPermissionHandler] calls [onGranted] immediately without displaying any dialog.
+ * based permission UI is used instead of the SDK default. The SDK-computed `requiredPermissions`
+ * list is forwarded to [CallPermissionHandler] so both remain in sync. In the normal flow
+ * (navigated from [com.vonage.android.screen.waiting.WaitingRoomRoute]), permissions are already
+ * granted and [CallPermissionHandler] calls `onGranted` immediately without displaying any dialog.
  */
 @Composable
 fun MeetingRoomScreenRoute(
@@ -56,8 +57,9 @@ fun MeetingRoomScreenRoute(
             }
             .isDebug(BuildConfig.DEBUG)
             .reportingContent { onDismiss -> ReportIssueScreen(onClose = onDismiss) }
-            .permissionContent { _, onGranted ->
+            .permissionContent { requiredPermissions, onGranted ->
                 CallPermissionHandler(
+                    permissions = requiredPermissions,
                     onGrantPermissions = onGranted,
                     navigateToPermissions = { context.navigateToSystemPermissions() },
                 )
