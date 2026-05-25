@@ -1,0 +1,19 @@
+vonage-meeting-room/src/androidTest/java/com/vonage/android/meetingroom/internal/permissions/DefaultPermissionContentTest.kt
+  s_e52ba511b066b4::t_1f7921569d5b50 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "5396fd9fe2b47a00aeab801278a4a15aedebd857",
+  "prompts": {},
+  "sessions": {
+    "s_e52ba511b066b4": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1a18732a1ffeNz7Jg5uFednxPV",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
