@@ -10,21 +10,20 @@ import kotlin.test.assertTrue
 class MeetingRoomRequiredPermissionsTest {
 
     @Test
-    fun `given api 32 THEN returns only camera and audio`() {
-        val permissions = computeRequiredPermissions(sdkInt = Build.VERSION_CODES.S_V2)
+    fun `given api 30 THEN returns only camera and audio`() {
+        val permissions = computeRequiredPermissions(sdkInt = Build.VERSION_CODES.R)
 
         assertEquals(listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO), permissions)
     }
 
     @Test
-    fun `given api 33 THEN returns camera audio notifications and bluetooth`() {
-        val permissions = computeRequiredPermissions(sdkInt = Build.VERSION_CODES.TIRAMISU)
+    fun `given api 31 THEN returns camera audio and bluetooth`() {
+        val permissions = computeRequiredPermissions(sdkInt = Build.VERSION_CODES.S)
 
         assertEquals(
             listOf(
                 Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.POST_NOTIFICATIONS,
                 Manifest.permission.BLUETOOTH_CONNECT,
             ),
             permissions,
@@ -32,15 +31,44 @@ class MeetingRoomRequiredPermissionsTest {
     }
 
     @Test
-    fun `given api 34 THEN returns camera audio notifications and bluetooth`() {
+    fun `given api 32 THEN returns camera audio and bluetooth`() {
+        val permissions = computeRequiredPermissions(sdkInt = Build.VERSION_CODES.S_V2)
+
+        assertEquals(
+            listOf(
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.BLUETOOTH_CONNECT,
+            ),
+            permissions,
+        )
+    }
+
+    @Test
+    fun `given api 33 THEN returns camera audio bluetooth and notifications`() {
+        val permissions = computeRequiredPermissions(sdkInt = Build.VERSION_CODES.TIRAMISU)
+
+        assertEquals(
+            listOf(
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.POST_NOTIFICATIONS,
+            ),
+            permissions,
+        )
+    }
+
+    @Test
+    fun `given api 34 THEN returns camera audio bluetooth and notifications`() {
         val permissions = computeRequiredPermissions(sdkInt = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 
         assertEquals(
             listOf(
                 Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.POST_NOTIFICATIONS,
                 Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.POST_NOTIFICATIONS,
             ),
             permissions,
         )
@@ -55,6 +83,13 @@ class MeetingRoomRequiredPermissionsTest {
     }
 
     @Test
+    fun `given api below 31 THEN no bluetooth connect permission`() {
+        val permissions = computeRequiredPermissions(sdkInt = 30)
+
+        assertFalse(permissions.contains(Manifest.permission.BLUETOOTH_CONNECT))
+    }
+
+    @Test
     fun `given api below 33 THEN no post notifications permission`() {
         val permissions = computeRequiredPermissions(sdkInt = 32)
 
@@ -62,10 +97,10 @@ class MeetingRoomRequiredPermissionsTest {
     }
 
     @Test
-    fun `given api below 33 THEN no bluetooth connect permission`() {
-        val permissions = computeRequiredPermissions(sdkInt = 32)
+    fun `given api 31 THEN contains bluetooth connect`() {
+        val permissions = computeRequiredPermissions(sdkInt = 31)
 
-        assertFalse(permissions.contains(Manifest.permission.BLUETOOTH_CONNECT))
+        assertTrue(permissions.contains(Manifest.permission.BLUETOOTH_CONNECT))
     }
 
     @Test
