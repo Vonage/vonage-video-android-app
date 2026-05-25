@@ -814,7 +814,7 @@ class MeetingRoomViewModelTest {
     }
 
     @Test
-    fun `given active call when hangUpCommand emits then isEndCall becomes true`() = runTest {
+    fun `given hangUpCommand emits then isEndCall becomes true`() = runTest {
         sut.uiState.test {
             awaitItem() // initial state
             hangUpCommands.emit(Unit)
