@@ -47,7 +47,7 @@
     <string name="audio_device_selector_headset_audio_device">Headset</string>
 
     <!-- Permissions -->
-    <string name="meeting_room_permission_required_title">Camera and microphone permissions are needed</string>
+    <string name="meeting_room_permission_required_title">Permissions needed to join the room</string>
     <string name="meeting_room_permission_request_button">Request Permissions</string>
     <string name="meeting_room_permission_open_settings_button">Open Settings</string>
 
