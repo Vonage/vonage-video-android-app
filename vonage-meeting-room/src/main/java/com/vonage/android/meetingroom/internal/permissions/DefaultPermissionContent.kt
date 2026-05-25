@@ -14,6 +14,7 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +28,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.meetingroom.R
@@ -84,6 +88,27 @@ internal fun DefaultPermissionContent(
         } else {
             launcher.launch(permissions.toTypedArray())
         }
+    }
+
+    // Re-check permissions when the user returns from system Settings. The LaunchedEffect
+    // above fires only once, so without this observer a user who grants permissions in the
+    // Settings screen would remain stuck on the blocking dialog.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME && showDialog) {
+                val allGranted = permissions.all { permission ->
+                    ContextCompat.checkSelfPermission(context, permission) ==
+                        PackageManager.PERMISSION_GRANTED
+                }
+                if (allGranted) {
+                    showDialog = false
+                    onGrant()
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     if (showDialog) {
