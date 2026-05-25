@@ -44,13 +44,6 @@ roborazzi {
     outputDir.set(layout.projectDirectory.dir("src/test/snapshots/images"))
 }
 
-tasks.withType<Test>().configureEach {
-    systemProperty(
-        "roborazzi.output.dir",
-        layout.projectDirectory.dir("src/test/snapshots/images").asFile.absolutePath,
-    )
-}
-
 dependencies {
     implementation(project(":vonage-video-core"))
     implementation(project(":vonage-video-shared"))
