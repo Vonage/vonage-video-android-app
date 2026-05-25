@@ -33,7 +33,6 @@ fun MeetingRoomScreenRoute(
     navigateToSettings: () -> Unit,
     initialPublisherSettings: PublisherSettings = PublisherSettings(),
 ) {
-    val context = LocalContext.current
     val prebuilt = remember(roomName, initialPublisherSettings) {
         MeetingRoomBuilder(
             baseUrl = BuildConfig.BASE_API_URL,
@@ -58,6 +57,10 @@ fun MeetingRoomScreenRoute(
             .isDebug(BuildConfig.DEBUG)
             .reportingContent { onDismiss -> ReportIssueScreen(onClose = onDismiss) }
             .permissionContent { requiredPermissions, onGranted ->
+                // Read context inside the @Composable slot lambda so it always reflects the
+                // current Activity after configuration changes, rather than closing over the
+                // context captured at remember {} time.
+                val context = LocalContext.current
                 CallPermissionHandler(
                     permissions = requiredPermissions,
                     onGrantPermissions = onGranted,
