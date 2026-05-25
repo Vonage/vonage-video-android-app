@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
@@ -58,7 +59,7 @@ class MeetingRoomPrebuilt internal constructor(
      * Internal command flow observed by [com.vonage.android.meetingroom.internal.viewmodel.MeetingRoomViewModel].
      * Emitted by [hangUp].
      */
-    internal val hangUpCommand: SharedFlow<Unit> = _hangUpCommand
+    internal val hangUpCommand: SharedFlow<Unit> = _hangUpCommand.asSharedFlow()
 
     /**
      * Ends the active call programmatically.
