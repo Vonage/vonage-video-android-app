@@ -75,7 +75,9 @@ internal class MeetingRoomViewModel(
         }
         viewModelScope.launch {
             prebuilt.hangUpCommand.collect {
-                _uiState.update { state -> state.copy(isEndCall = true) }
+                if (!callEnded.get()) {
+                    _uiState.update { state -> state.copy(isEndCall = true) }
+                }
             }
         }
         observeUiStateForPublicBridge()
