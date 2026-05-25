@@ -55,7 +55,9 @@ internal fun DefaultPermissionContent(
     onGrant: () -> Unit,
 ) {
     if (permissions.isEmpty()) {
-        onGrant()
+        // Use LaunchedEffect rather than calling onGrant() directly during composition —
+        // invoking it synchronously here could trigger state mutations in callers mid-composition.
+        LaunchedEffect(Unit) { onGrant() }
         return
     }
 
