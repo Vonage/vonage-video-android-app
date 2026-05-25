@@ -30,6 +30,10 @@ import kotlinx.coroutines.flow.asStateFlow
  * val state by prebuilt.stateHolder.callState.collectAsStateWithLifecycle()
  * ```
  *
+ * The SDK proactively requests required permissions before rendering the meeting room UI.
+ * Provide a custom permission composable via [MeetingRoomBuilder.permissionContent] to replace
+ * the built-in permission UI with your own.
+ *
  * @property stateHolder Read-only view of the current call state. Populated once [content] is
  *   first composed and the call setup begins.
  * @property content     Fully composed meeting room UI. Embed in any Compose hierarchy.
@@ -46,6 +50,7 @@ class MeetingRoomPrebuilt internal constructor(
     internal val theme: MeetingRoomTheme,
     internal val isDebug: Boolean,
     internal val reportingContent: (@Composable (() -> Unit) -> Unit)?,
+    internal val permissionContent: @Composable (List<String>, () -> Unit) -> Unit,
 ) {
     private val _callState = MutableStateFlow(MeetingRoomCallState(roomName = roomName))
 
