@@ -67,8 +67,8 @@ internal fun MeetingRoomContent(
 }
 
 object MeetingRoomContentTestTags {
-    const val MEETING_ROOM_PARTICIPANTS_GRID = "meeting_room_participants_grid"
-    const val MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT = "meeting_room_participants_speaker_layout"
+    const val MEETING_ROOM_PARTICIPANTS_GRID = "meeting-room-participants-grid"
+    const val MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT = "meeting-room-participants-speaker-layout"
 }
 
 @PreviewLightDark

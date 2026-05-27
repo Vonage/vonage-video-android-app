@@ -57,9 +57,10 @@ data class GoodbyeScreenActions(
 )
 
 object GoodbyeScreenTestTags {
-    const val GOODBYE_HEADER_TAG = "goodbye_header"
-    const val GOODBYE_REJOIN_CONTAINER_TAG = "goodbye_rejoin_container"
-    const val GOODBYE_ARCHIVES_CONTAINER_TAG = "goodbye_archives_container"
-    const val GOODBYE_REJOIN_BUTTON_TAG = "goodbye_rejoin_button"
-    const val GOODBYE_GO_HOME_BUTTON_TAG = "goodbye_go_home_button"
+    const val GOODBYE_SCREEN_TAG = "goodbye-screen"
+    const val GOODBYE_HEADER_TAG = "goodbye-header"
+    const val GOODBYE_REJOIN_CONTAINER_TAG = "goodbye-rejoin-container"
+    const val GOODBYE_ARCHIVES_CONTAINER_TAG = "goodbye-archives-container"
+    const val GOODBYE_REJOIN_BUTTON_TAG = "goodbye-reenter-button"
+    const val GOODBYE_GO_HOME_BUTTON_TAG = "goodbye-landing-page-button"
 }

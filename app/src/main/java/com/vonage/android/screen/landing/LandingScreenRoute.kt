@@ -35,14 +35,15 @@ internal fun LandingScreenRoute(
 }
 
 object LandingScreenTestTags {
-    const val LANDING_SCREEN_TAG = "landing_screen"
-    const val TITLE_TAG = "landing_screen_title"
-    const val VONAGE_ICON_TAG = "landing_screen_icon"
-    const val SUBTITLE_TAG = "landing_screen_subtitle"
-    const val CREATE_ROOM_BUTTON_TAG = "landing_screen_create_room_button"
-    const val JOIN_BUTTON_TAG = "landing_screen_join_button"
-    const val ROOM_INPUT_TAG = "landing_screen_room_input"
-    const val ROOM_INPUT_ERROR_TAG = "landing_screen_room_error_label"
+    const val LANDING_SCREEN_TAG = "landing-screen"
+    const val TITLE_TAG = "landing-screen-title"
+    const val VONAGE_ICON_TAG = "landing-screen-icon"
+    const val SUBTITLE_TAG = "landing-screen-subtitle"
+    const val CREATE_ROOM_BUTTON_TAG = "landing-screen-create-room-button"
+    const val JOIN_BUTTON_TAG = "join-waiting-room-button"
+    const val ROOM_INPUT_TAG = "room-name-input"
+    const val ROOM_INPUT_ERROR_TAG = "landing-screen-room-error-label"
+    const val GITHUB_REPO_BUTTON_TAG = "github-repo-button"
 }
 
 @Stable

@@ -266,13 +266,14 @@ private fun actionsFactory(
 }
 
 object BottomBarTestTags {
-    const val BOTTOM_BAR_PARTICIPANTS_BUTTON = "bottom_bar_participants_button"
-    const val BOTTOM_BAR_PARTICIPANTS_BADGE = "bottom_bar_participants_badge"
-    const val BOTTOM_BAR_END_CALL_BUTTON = "bottom_bar_end_call_button"
-    const val BOTTOM_BAR_CAMERA_BUTTON = "bottom_bar_camera_button"
-    const val BOTTOM_BAR_MIC_BUTTON = "bottom_bar_mic_button"
-    const val BOTTOM_BAR_GRID_LAYOUT_BUTTON = "bottom_bar_grid_layout_button"
-    const val BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON = "bottom_bar_active_speaker_layout_button"
+    const val BOTTOM_BAR_PARTICIPANTS_BUTTON = "bottom-bar-participants-button"
+    const val BOTTOM_BAR_PARTICIPANTS_BADGE = "bottom-bar-participants-badge"
+    const val BOTTOM_BAR_END_CALL_BUTTON = "meeting-room-end-call-button"
+    const val BOTTOM_BAR_CAMERA_BUTTON = "meeting-room-camera"
+    const val BOTTOM_BAR_MIC_BUTTON = "meeting-room-mic"
+    const val BOTTOM_BAR_GRID_LAYOUT_BUTTON = "bottom-bar-grid-layout-button"
+    const val BOTTOM_BAR_ACTIVE_SPEAKER_LAYOUT_BUTTON = "bottom-bar-active-speaker-layout-button"
+    const val BOTTOM_BAR_MORE_BUTTON = "more-options"
 }
 
 @PreviewLightDark
