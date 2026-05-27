@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import com.vonage.android.compose.icons.PlusIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 
 @Composable
@@ -62,6 +63,34 @@ internal fun VonageOutlinedButtonPreview() {
                 text = "Button label",
                 onClick = {},
             )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun VonageOutlinedButtonDisabledPreview() {
+    VonageVideoTheme {
+        Box(
+            modifier = Modifier
+                .background(VonageVideoTheme.colors.background)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
+        ) {
+            VonageOutlinedButton(text = "Continue", onClick = {}, enabled = false)
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun VonageOutlinedButtonWithIconPreview() {
+    VonageVideoTheme {
+        Box(
+            modifier = Modifier
+                .background(VonageVideoTheme.colors.background)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
+        ) {
+            VonageOutlinedButton(text = "Join", onClick = {}, leadingIcon = { PlusIcon() })
         }
     }
 }
