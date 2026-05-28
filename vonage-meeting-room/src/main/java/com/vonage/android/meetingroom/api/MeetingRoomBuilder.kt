@@ -46,6 +46,7 @@ class MeetingRoomBuilder(
     private var theme: MeetingRoomTheme = MeetingRoomTheme.vonage
     private var isDebug: Boolean = false
     private var reportingContent: (@Composable (() -> Unit) -> Unit)? = null
+    private var foregroundServiceEnabled: Boolean = true
 
     /**
      * Defines which optional features are active at runtime.
@@ -111,6 +112,19 @@ class MeetingRoomBuilder(
     }
 
     /**
+     * Controls whether the SDK starts its own foreground service for the duration of the call.
+     * Defaults to `true`.
+     *
+     * Set to `false` when the host application already manages a foreground service that keeps
+     * the process alive during the call (e.g. a host-owned in-call notification service). In
+     * that case, use [MeetingRoomPrebuilt.hangUp] to forward hang-up signals from the host
+     * notification to the SDK.
+     */
+    fun foregroundServiceEnabled(enabled: Boolean): MeetingRoomBuilder = apply {
+        foregroundServiceEnabled = enabled
+    }
+
+    /**
      * Provides a custom composable shown inside the report-issue bottom sheet.
      *
      * The composable receives an `onDismiss` callback. When `null` (the default), the SDK
@@ -136,5 +150,6 @@ class MeetingRoomBuilder(
         theme = theme,
         isDebug = isDebug,
         reportingContent = reportingContent,
+        foregroundServiceEnabled = foregroundServiceEnabled,
     )
 }

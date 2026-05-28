@@ -77,6 +77,7 @@ class MeetingRoomViewModelTest {
     private val foregroundServiceHandler: MeetingRoomForegroundServiceHandler = mockk(relaxed = true) {
         every { actions } returns MutableSharedFlow()
     }
+    private val hangUpCommands = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val activityContextHolder: ActivityContextHolder = mockk(relaxed = true)
     private val getBackgroundsUseCase: GetBackgroundsUseCase = mockk {
         coEvery { invoke(captureResolution = null) } returns BackgroundsResult(
@@ -109,6 +110,8 @@ class MeetingRoomViewModelTest {
         every { prebuilt.configuration } returns MeetingRoomConfiguration()
         every { prebuilt.publisherSettings } returns PublisherSettings()
         every { prebuilt.enabledFeatures } returns MeetingRoomFeature.all
+        every { prebuilt.foregroundServiceEnabled } returns true
+        every { prebuilt.hangUpCommand } returns hangUpCommands
 
         sut = MeetingRoomViewModel(container)
     }
@@ -783,6 +786,41 @@ class MeetingRoomViewModelTest {
 
         // Then
         verify(exactly = 0) { mockCall.applyLocalVideoEffect(any()) }
+    }
+
+    // endregion
+
+    // region Foreground service configurability
+
+    @Test
+    fun `given foregroundServiceEnabled false when initialize then foreground service is NOT started`() = runTest {
+        val freshHandler: MeetingRoomForegroundServiceHandler = mockk(relaxed = true) {
+            every { actions } returns MutableSharedFlow()
+        }
+        every { container.foregroundServiceHandler } returns freshHandler
+        every { prebuilt.foregroundServiceEnabled } returns false
+        MeetingRoomViewModel(container)
+        testScheduler.advanceUntilIdle()
+        verify(exactly = 0) { freshHandler.startForegroundService(any()) }
+    }
+
+    @Test
+    fun `given foregroundServiceEnabled false when endCall then foreground service is NOT stopped`() = runTest {
+        every { prebuilt.foregroundServiceEnabled } returns false
+        val vm = MeetingRoomViewModel(container)
+        testScheduler.advanceUntilIdle()
+        vm.endCall()
+        verify(exactly = 0) { foregroundServiceHandler.stopForegroundService() }
+    }
+
+    @Test
+    fun `given hangUpCommand emits then isEndCall becomes true`() = runTest {
+        sut.uiState.test {
+            awaitItem() // initial state
+            hangUpCommands.emit(Unit)
+            val updated = awaitItem()
+            assertTrue(updated.isEndCall)
+        }
     }
 
     // endregion
