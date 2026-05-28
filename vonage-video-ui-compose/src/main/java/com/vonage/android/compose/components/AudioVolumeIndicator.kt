@@ -2,7 +2,6 @@ package com.vonage.android.compose.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,7 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -61,15 +60,26 @@ fun AudioVolumeIndicator(
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
-internal fun ActiveSoundLevelsPreview() {
+internal fun AudioVolumeIndicatorSilentPreview() {
     VonageVideoTheme {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            AudioVolumeIndicator(audioLevel = 0f)
-            AudioVolumeIndicator(audioLevel = 1f)
-        }
+        AudioVolumeIndicator(audioLevel = 0f)
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun AudioVolumeIndicatorMediumPreview() {
+    VonageVideoTheme {
+        AudioVolumeIndicator(audioLevel = 0.5f)
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun AudioVolumeIndicatorLoudPreview() {
+    VonageVideoTheme {
+        AudioVolumeIndicator(audioLevel = 1f)
     }
 }

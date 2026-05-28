@@ -55,6 +55,7 @@ fun MeetingRoomScreenRoute(
                 }
             }
             .isDebug(BuildConfig.DEBUG)
+            .foregroundServiceEnabled(false)
             .reportingContent { onDismiss -> ReportIssueScreen(onClose = onDismiss) }
             .permissionContent { requiredPermissions, onGranted ->
                 // Read context inside the @Composable slot lambda so it always reflects the

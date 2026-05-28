@@ -26,6 +26,7 @@ import com.vonage.android.screen.components.TopBanner
 import com.vonage.android.screen.goodbye.GoodbyeScreenTestTags.GOODBYE_ARCHIVES_CONTAINER_TAG
 import com.vonage.android.screen.goodbye.GoodbyeScreenTestTags.GOODBYE_HEADER_TAG
 import com.vonage.android.screen.goodbye.GoodbyeScreenTestTags.GOODBYE_REJOIN_CONTAINER_TAG
+import com.vonage.android.screen.goodbye.GoodbyeScreenTestTags.GOODBYE_SCREEN_TAG
 import com.vonage.android.screen.goodbye.components.GoodbyeScreenHeader
 import com.vonage.android.screen.goodbye.components.RejoiningContainer
 import kotlinx.collections.immutable.persistentListOf
@@ -40,7 +41,9 @@ fun GoodbyeScreen(
     modifier: Modifier = Modifier,
 ) {
     TwoPaneScaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .testTag(GOODBYE_SCREEN_TAG)
+            .fillMaxSize(),
         topBar = { TopBanner(onBack = actions.onReEnter) },
         firstPane = {
             GoodbyeScreenHeader(

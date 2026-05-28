@@ -20,9 +20,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 /**
  * A reusable themed dropdown selector.
@@ -195,3 +197,20 @@ data class DropdownItem<out T>(
     val label: String,
     val description: String? = null,
 )
+
+@PreviewLightDark
+@Composable
+internal fun DropdownSelectorPreview() {
+    VonageVideoTheme {
+        DropdownSelector(
+            title = "Audio output",
+            selectedLabel = "Speaker",
+            dropdownLabel = "Select device",
+            items = persistentListOf(
+                DropdownItem(value = "speaker", label = "Speaker"),
+                DropdownItem(value = "earpiece", label = "Earpiece"),
+            ),
+            onSelectItem = {},
+        )
+    }
+}

@@ -19,6 +19,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
@@ -30,6 +31,7 @@ import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.fx.ui.VideoEffectsScreen
 import com.vonage.android.screen.components.audio.AudioDevicesMenu
+import com.vonage.android.screen.waiting.WaitingRoomTestTags.WAITING_ROOM_SCREEN_TAG
 import com.vonage.android.screen.waiting.components.DeviceSelectionPanel
 import com.vonage.android.screen.waiting.components.JoinRoomSection
 import com.vonage.android.screen.waiting.components.VideoControlPanel
@@ -95,7 +97,7 @@ fun WaitingRoomScreen(
     }
 
     TwoPaneScaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.testTag(WAITING_ROOM_SCREEN_TAG).fillMaxSize(),
         topBar = {
             WaitingRoomTopBar(
                 actions = actions,

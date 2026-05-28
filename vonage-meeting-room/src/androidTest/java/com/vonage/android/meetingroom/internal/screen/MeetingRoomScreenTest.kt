@@ -4,7 +4,6 @@ import android.content.Context
 import android.media.projection.MediaProjection
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -100,8 +99,8 @@ class MeetingRoomScreenTest {
             .assertIsDisplayed()
             .assertTextEquals("sample-name")
         compose.onNodeWithTag(MEETING_ROOM_CONTENT).assertIsDisplayed()
-        compose.onNodeWithTag(BOTTOM_BAR_CAMERA_BUTTON, useUnmergedTree = true).assertIsDisplayed()
-        compose.onNodeWithTag(BOTTOM_BAR_MIC_BUTTON, useUnmergedTree = true).assertIsNotDisplayed()
+        compose.onNodeWithTag("$BOTTOM_BAR_CAMERA_BUTTON-enabled", useUnmergedTree = true).assertIsDisplayed()
+        compose.onNodeWithTag("$BOTTOM_BAR_MIC_BUTTON-enabled", useUnmergedTree = true).assertDoesNotExist()
     }
 
     @Test
@@ -127,8 +126,8 @@ class MeetingRoomScreenTest {
             .assertIsDisplayed()
             .assertTextEquals("sample-name")
         compose.onNodeWithTag(MEETING_ROOM_CONTENT).assertIsDisplayed()
-        compose.onNodeWithTag(BOTTOM_BAR_CAMERA_BUTTON, useUnmergedTree = true).assertIsNotDisplayed()
-        compose.onNodeWithTag(BOTTOM_BAR_MIC_BUTTON, useUnmergedTree = true).assertIsDisplayed()
+        compose.onNodeWithTag("$BOTTOM_BAR_CAMERA_BUTTON-enabled", useUnmergedTree = true).assertDoesNotExist()
+        compose.onNodeWithTag("$BOTTOM_BAR_MIC_BUTTON-enabled", useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test

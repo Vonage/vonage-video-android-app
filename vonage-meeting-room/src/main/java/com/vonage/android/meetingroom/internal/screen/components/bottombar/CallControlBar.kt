@@ -31,6 +31,8 @@ import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_CAMERA_BUTTON
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_END_CALL_BUTTON
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_MIC_BUTTON
+import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_MORE_BUTTON
+import com.vonage.android.shared.buildTestTag
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
@@ -90,7 +92,7 @@ private fun MicButton(
 ) {
     ControlButton(
         modifier = Modifier
-            .testTag(BOTTOM_BAR_MIC_BUTTON),
+            .testTag(BOTTOM_BAR_MIC_BUTTON.buildTestTag(isMicEnabled)),
         onClick = roomActions.onToggleMic,
         icon = if (isMicEnabled) VividIcons.Solid.Microphone2 else VividIcons.Solid.MicMute,
         isActive = isMicEnabled,
@@ -101,7 +103,7 @@ private fun MicButton(
 private fun CameraButton(roomActions: MeetingRoomActions, isCameraEnabled: Boolean) {
     ControlButton(
         modifier = Modifier
-            .testTag(BOTTOM_BAR_CAMERA_BUTTON),
+            .testTag(BOTTOM_BAR_CAMERA_BUTTON.buildTestTag(isCameraEnabled)),
         onClick = roomActions.onToggleCamera,
         icon = if (isCameraEnabled) VividIcons.Solid.Video else VividIcons.Solid.VideoOff,
         isActive = isCameraEnabled,
@@ -111,6 +113,7 @@ private fun CameraButton(roomActions: MeetingRoomActions, isCameraEnabled: Boole
 @Composable
 private fun MenuButton(onShowMore: () -> Unit) {
     ControlButton(
+        modifier = Modifier.testTag(BOTTOM_BAR_MORE_BUTTON),
         onClick = onShowMore,
         icon = VividIcons.Solid.MoreVertical,
     )

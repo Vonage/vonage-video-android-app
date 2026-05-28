@@ -45,12 +45,6 @@
                 <data android:host="${hostName}" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name=".service.VeraForegroundService"
-            android:exported="false"
-            android:foregroundServiceType="camera|microphone"
-            tools:ignore="ForegroundServicePermission" />
     </application>
 
 </manifest>
