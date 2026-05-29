@@ -34,3 +34,45 @@ Use this file as the default guidance for this repository. For deeper context, s
 - Compose lint rules are strict via detekt (`build-tools/detekt/detekt.yml`).
 - Contributions are expected from `develop` branch (see `docs/CONTRIBUTING.md`).
 
+---
+
+# PR Authorship Labeling
+
+After creating a pull request, always label it based on the percentage of AI-authored lines.
+
+- **Rule:** After every `gh pr create`, run the labeling script immediately.
+- **Rule:** Never skip labeling, even for trivial PRs.
+
+## Workflow
+
+1. Create the PR and capture its number:
+
+```bash
+PR_URL=$(gh pr create --title "..." --body "...")
+PR_NUMBER=$(echo "$PR_URL" | grep -oE '[0-9]+$')
+```
+
+2. Run the labeling script:
+
+```bash
+~/.claude/skills/label-pr-by-ai/scripts/label-pr-by-ai.sh "$PR_NUMBER"
+```
+
+If the PR number cannot be parsed from the URL, omit it — the script auto-detects from the current branch:
+
+```bash
+~/.claude/skills/label-pr-by-ai/scripts/label-pr-by-ai.sh
+```
+
+## Labeling criteria
+
+The script uses `git-ai stats --json` to measure AI authorship across every commit in the PR, then applies exactly one label:
+
+| Condition                     | Label applied   |
+|-------------------------------|-----------------|
+| AI% of added lines > 80%      | `ai-generated`  |
+| AI% of added lines > 20%      | `ai-assisted`   |
+| AI% of added lines > 0%       | `ai-touched`    |
+| AI% = 0%                      | *(no label)*    |
+
+The script creates missing labels automatically and removes stale AI labels before applying the new one.
