@@ -34,9 +34,11 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
+import com.vonage.android.meetingroom.internal.util.MAX_FILMSTRIP_TILES
 import com.vonage.android.meetingroom.internal.util.lazyStateVisibilityTracker
 import com.vonage.android.meetingroom.internal.util.noOpCall
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
@@ -48,12 +50,29 @@ internal fun ActiveSpeakerLayout(
     modifier: Modifier = Modifier,
     spotlightWeight: Float = 0.7f,
     otherParticipantsWeight: Float = 0.3f,
-    otherParticipantsSize: Dp = 200.dp
+    otherParticipantsSize: Dp = 200.dp,
 ) {
     val mainParticipant by call.activeSpeaker.collectAsStateWithLifecycle()
     val nonMainParticipant by remember(mainParticipant) {
         derivedStateOf { participants.filterNot { it.id == mainParticipant?.id } }
     }
+
+    val filmstripTakeCount = remember(nonMainParticipant.size) {
+        when {
+            nonMainParticipant.size <= MAX_FILMSTRIP_TILES -> nonMainParticipant.size
+            else -> (MAX_FILMSTRIP_TILES - 1).coerceAtLeast(1)
+        }
+    }
+    val visibleFilmstripItems = nonMainParticipant.take(filmstripTakeCount).toImmutableList()
+    val overflowFilmstripNames = if (nonMainParticipant.size > filmstripTakeCount) {
+        nonMainParticipant
+            .takeLast(nonMainParticipant.size - filmstripTakeCount)
+            .map { it.name }
+            .toImmutableList()
+    } else {
+        persistentListOf()
+    }
+
     val listState = lazyStateVisibilityTracker(call = call, lazyState = rememberLazyListState())
     val pinnedIds by call.pinnedParticipantIds.collectAsStateWithLifecycle()
 
@@ -69,7 +88,8 @@ internal fun ActiveSpeakerLayout(
                     spotlightWeight = spotlightWeight,
                     listState = listState,
                     otherParticipantsWeight = otherParticipantsWeight,
-                    nonMainParticipant = nonMainParticipant.toImmutableList(),
+                    visibleFilmstripItems = visibleFilmstripItems,
+                    overflowFilmstripNames = overflowFilmstripNames,
                     otherParticipantsSize = otherParticipantsSize,
                     pinnedIds = pinnedIds,
                 )
@@ -82,7 +102,8 @@ internal fun ActiveSpeakerLayout(
                     spotlightWeight = spotlightWeight,
                     listState = listState,
                     otherParticipantsWeight = otherParticipantsWeight,
-                    nonMainParticipant = nonMainParticipant.toImmutableList(),
+                    visibleFilmstripItems = visibleFilmstripItems,
+                    overflowFilmstripNames = overflowFilmstripNames,
                     otherParticipantsSize = otherParticipantsSize,
                     pinnedIds = pinnedIds,
                 )
@@ -99,7 +120,8 @@ private fun ActiveSpeakerVerticalLayout(
     spotlightWeight: Float,
     listState: LazyListState,
     otherParticipantsWeight: Float,
-    nonMainParticipant: ImmutableList<Participant>,
+    visibleFilmstripItems: ImmutableList<Participant>,
+    overflowFilmstripNames: ImmutableList<String>,
     otherParticipantsSize: Dp,
     pinnedIds: Set<String> = emptySet(),
 ) {
@@ -116,14 +138,15 @@ private fun ActiveSpeakerVerticalLayout(
         } ?: Spacer(modifier = Modifier.weight(spotlightWeight))
         LazyRow(
             state = listState,
-            modifier = Modifier
-                .weight(otherParticipantsWeight),
+            modifier = Modifier.weight(otherParticipantsWeight),
             horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
             verticalAlignment = Alignment.CenterVertically,
+            userScrollEnabled = false,
+            overscrollEffect = null,
         ) {
             items(
-                items = nonMainParticipant,
-                key = { it.id }
+                items = visibleFilmstripItems,
+                key = { it.id },
             ) { participant ->
                 ParticipantVideoCard(
                     modifier = Modifier
@@ -133,6 +156,16 @@ private fun ActiveSpeakerVerticalLayout(
                     actions = actions,
                     isPinned = participant.id in pinnedIds,
                 )
+            }
+            if (overflowFilmstripNames.isNotEmpty()) {
+                item(key = "placeholder") {
+                    ParticipantsPlaceholders(
+                        modifier = Modifier
+                            .width(otherParticipantsSize)
+                            .height(otherParticipantsSize),
+                        participantNames = overflowFilmstripNames,
+                    )
+                }
             }
         }
     }
@@ -146,7 +179,8 @@ private fun ActiveSpeakerHorizontalLayout(
     spotlightWeight: Float,
     listState: LazyListState,
     otherParticipantsWeight: Float,
-    nonMainParticipant: ImmutableList<Participant>,
+    visibleFilmstripItems: ImmutableList<Participant>,
+    overflowFilmstripNames: ImmutableList<String>,
     otherParticipantsSize: Dp,
     pinnedIds: Set<String> = emptySet(),
 ) {
@@ -163,14 +197,15 @@ private fun ActiveSpeakerHorizontalLayout(
         } ?: Spacer(modifier = Modifier.weight(spotlightWeight))
         LazyColumn(
             state = listState,
-            modifier = Modifier
-                .weight(otherParticipantsWeight),
+            modifier = Modifier.weight(otherParticipantsWeight),
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
+            userScrollEnabled = false,
+            overscrollEffect = null,
         ) {
             items(
-                items = nonMainParticipant,
-                key = { it.id }
+                items = visibleFilmstripItems,
+                key = { it.id },
             ) { participant ->
                 ParticipantVideoCard(
                     modifier = Modifier
@@ -180,6 +215,16 @@ private fun ActiveSpeakerHorizontalLayout(
                     actions = actions,
                     isPinned = participant.id in pinnedIds,
                 )
+            }
+            if (overflowFilmstripNames.isNotEmpty()) {
+                item(key = "placeholder") {
+                    ParticipantsPlaceholders(
+                        modifier = Modifier
+                            .height(otherParticipantsSize)
+                            .aspectRatio(ASPECT_RATIO_16_9),
+                        participantNames = overflowFilmstripNames,
+                    )
+                }
             }
         }
     }

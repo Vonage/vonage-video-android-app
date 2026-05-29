@@ -1,5 +1,6 @@
 package com.vonage.android.meetingroom.internal.screen.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
@@ -24,6 +26,8 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
+import com.vonage.android.meetingroom.internal.util.MAX_GRID_TILES
+import com.vonage.android.meetingroom.internal.util.gridLayoutFor
 import com.vonage.android.meetingroom.internal.util.lazyStateVisibilityTracker
 import com.vonage.android.meetingroom.internal.util.noOpCall
 import kotlinx.collections.immutable.ImmutableList
@@ -35,16 +39,19 @@ internal fun AdaptiveGrid(
     call: CallFacade,
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
-    columns: Int = 2,
-    rows: Int = 3,
-    spacing: Dp = 8.dp
+    spacing: Dp = 8.dp,
 ) {
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val dimensions = remember(participants.size, isLandscape) {
+        gridLayoutFor(participantCount = minOf(participants.size, MAX_GRID_TILES), isLandscape = isLandscape)
+    }
+
     BoxWithConstraints(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        val maxVisibleItems = remember { columns * rows }
-        val takeCount = remember(participants.size) {
+        val maxVisibleItems = dimensions.columns * dimensions.rows
+        val takeCount = remember(participants.size, dimensions) {
             when {
                 maxVisibleItems >= participants.size -> maxVisibleItems
                 else -> (maxVisibleItems - 1).coerceAtLeast(1)
@@ -53,10 +60,10 @@ internal fun AdaptiveGrid(
         val visibleItems = participants.take(takeCount)
 
         val itemHeight = with(LocalDensity.current) {
-            (constraints.maxHeight / rows).toDp() - spacing
+            (constraints.maxHeight / dimensions.rows).toDp() - spacing
         }
         val itemWidth = with(LocalDensity.current) {
-            (constraints.maxWidth / columns).toDp() - spacing
+            (constraints.maxWidth / dimensions.columns).toDp() - spacing
         }
 
         val listState = lazyStateVisibilityTracker(call = call, lazyState = rememberLazyGridState())
@@ -64,7 +71,7 @@ internal fun AdaptiveGrid(
 
         LazyVerticalGrid(
             modifier = Modifier.fillMaxSize(),
-            columns = GridCells.Fixed(columns),
+            columns = GridCells.Fixed(dimensions.columns),
             state = listState,
             verticalArrangement = Arrangement.spacedBy(spacing),
             horizontalArrangement = Arrangement.spacedBy(spacing),

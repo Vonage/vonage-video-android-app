@@ -21,7 +21,7 @@ internal fun layoutSelectorAction(
             type = BottomBarActionType.CHANGE_LAYOUT,
             icon = VividIcons.Solid.Layout2,
             label = stringResource(R.string.change_layout),
-            onClick = { roomActions.onChangeLayout(CallLayoutType.GRID) },
+            onClick = { roomActions.onChangeLayout(CallLayoutType.ADAPTIVE_GRID) },
         )
 
         else -> BottomBarAction(
