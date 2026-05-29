@@ -1,0 +1,40 @@
+CONTEXT.md
+  s_c7bfc7b9a32ddc::t_7e5c8175571fde 1-62
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/bottombar/layoutSelectorAction.kt
+  s_c7bfc7b9a32ddc::t_a4e0a96d916c93 24
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/ActiveSpeakerLayout.kt
+  s_c7bfc7b9a32ddc::t_eb2406cefd913a 37,41,53,59-75,91-92,105-106,123-124,141,144-145,148-149,160-169,182-183,200,203-204,207-208,219-227
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/util/GridLayoutCalculator.kt
+  s_c7bfc7b9a32ddc::t_4c0757bc9eb08d 3-4,9-10,26,32
+  s_c7bfc7b9a32ddc::t_c547417e5771d3 6-8
+  s_c7bfc7b9a32ddc::t_7ad2d24c4983d1 1-2,5,11-25,27-31,33-37
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/util/GridDimensions.kt
+  s_c7bfc7b9a32ddc::t_3e941dd1f1ee9b 1-3
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/AdaptiveGrid.kt
+  s_c7bfc7b9a32ddc::t_fa460414c65d49 3,18,30
+  s_c7bfc7b9a32ddc::t_d2d4531fc05989 42,44-45,47-48,53-54,63,66,74
+  s_c7bfc7b9a32ddc::t_a469b5bd490d9e 46
+  s_c7bfc7b9a32ddc::t_77d5101f0f22c8 29
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomUiState.kt
+  s_c7bfc7b9a32ddc::t_573ca00ca6a9bd 27
+docs/adr/0001-adaptive-grid-as-primary-layout.md
+  s_c7bfc7b9a32ddc::t_b451e70f4a77d3 1-7
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/util/GridLayoutCalculatorTest.kt
+  s_c7bfc7b9a32ddc::t_c06231b10092ee 1-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "fcf7a1698af4df288b9fc58b6a79b1f7a70f6b46",
+  "prompts": {},
+  "sessions": {
+    "s_c7bfc7b9a32ddc": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_190b3a0a2ffey7keXDurkdkYZH",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
