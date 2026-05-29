@@ -1,0 +1,39 @@
+vonage-feature-captions/src/enabled/java/com/vonage/android/captions/EnabledVonageCaptions.kt
+  s_cd6c36e1a6e250::t_6c1f5ba76e0145 10-11
+vonage-feature-captions/src/disabled/java/com/vonage/android/captions/DisabledVonageCaptions.kt
+  s_cd6c36e1a6e250::t_88032359a9cd64 8-9
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/PublisherConfig.kt
+  s_cd6c36e1a6e250::t_acc22c1656523d 11-12,33
+vonage-video-core/src/test/java/com/vonage/android/kotlin/internal/PublisherFactoryTest.kt
+  s_cd6c36e1a6e250::t_f53d0e79fa834c 1-72
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  s_cd6c36e1a6e250::t_ebd33dd53aefae 302
+  s_cd6c36e1a6e250::t_fd42635d2027f3 90
+vonage-feature-captions/src/testEnabled/java/com/vonage/android/captions/EnabledVonageCaptionsTest.kt
+  s_cd6c36e1a6e250::t_1bd393a74c3892 25-28
+vonage-video-core/src/main/java/com/vonage/android/kotlin/internal/PublisherFactory.kt
+  s_cd6c36e1a6e250::t_a77b120b5afe34 63
+vonage-feature-captions/src/main/java/com/vonage/android/captions/VonageCaptions.kt
+  s_cd6c36e1a6e250::t_47a53d106040b9 7-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "47ba04749fde9e57d83381d08aeb9b1cb9f1bc2f",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_cd6c36e1a6e250": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_18bc1a93affexepMDCBkKLA7Zy",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
