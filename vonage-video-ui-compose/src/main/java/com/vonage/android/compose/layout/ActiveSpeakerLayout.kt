@@ -1,7 +1,8 @@
-package com.vonage.android.meetingroom.internal.screen.components
+package com.vonage.android.compose.layout
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -29,24 +31,26 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.compose.components.AvatarInitials
+import com.vonage.android.compose.components.ParticipantsPlaceholders
+import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.util.lazyStateVisibilityTracker
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
-import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
-import com.vonage.android.meetingroom.internal.util.MAX_FILMSTRIP_TILES
-import com.vonage.android.meetingroom.internal.util.lazyStateVisibilityTracker
-import com.vonage.android.meetingroom.internal.util.noOpCall
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
+internal const val ASPECT_RATIO_16_9 = 16f / 9f
+
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-internal fun ActiveSpeakerLayout(
+fun ActiveSpeakerLayout(
     participants: ImmutableList<Participant>,
     call: CallFacade,
-    actions: MeetingRoomActions,
+    participantContent: @Composable (Participant, Modifier) -> Unit,
     modifier: Modifier = Modifier,
     spotlightWeight: Float = 0.7f,
     otherParticipantsWeight: Float = 0.3f,
@@ -74,7 +78,7 @@ internal fun ActiveSpeakerLayout(
     }
 
     val listState = lazyStateVisibilityTracker(call = call, lazyState = rememberLazyListState())
-    val pinnedIds by call.pinnedParticipantIds.collectAsStateWithLifecycle()
+    val movableParticipantContent = remember(participantContent) { movableContentOf(participantContent) }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -84,56 +88,53 @@ internal fun ActiveSpeakerLayout(
             Configuration.ORIENTATION_LANDSCAPE -> {
                 ActiveSpeakerHorizontalLayout(
                     mainParticipant = mainParticipant,
-                    actions = actions,
+                    participantContent = movableParticipantContent,
                     spotlightWeight = spotlightWeight,
                     listState = listState,
                     otherParticipantsWeight = otherParticipantsWeight,
                     visibleFilmstripItems = visibleFilmstripItems,
                     overflowFilmstripNames = overflowFilmstripNames,
                     otherParticipantsSize = otherParticipantsSize,
-                    pinnedIds = pinnedIds,
                 )
             }
 
             else -> {
                 ActiveSpeakerVerticalLayout(
                     mainParticipant = mainParticipant,
-                    actions = actions,
+                    participantContent = movableParticipantContent,
                     spotlightWeight = spotlightWeight,
                     listState = listState,
                     otherParticipantsWeight = otherParticipantsWeight,
                     visibleFilmstripItems = visibleFilmstripItems,
                     overflowFilmstripNames = overflowFilmstripNames,
                     otherParticipantsSize = otherParticipantsSize,
-                    pinnedIds = pinnedIds,
                 )
             }
         }
     }
 }
 
-@Suppress("LongParameterList")
+@Suppress("LongParameterList", "ContentSlotReused")
 @Composable
 private fun ActiveSpeakerVerticalLayout(
     mainParticipant: Participant?,
-    actions: MeetingRoomActions,
+    participantContent: @Composable (Participant, Modifier) -> Unit,
     spotlightWeight: Float,
     listState: LazyListState,
     otherParticipantsWeight: Float,
     visibleFilmstripItems: ImmutableList<Participant>,
     overflowFilmstripNames: ImmutableList<String>,
     otherParticipantsSize: Dp,
-    pinnedIds: Set<String> = emptySet(),
 ) {
     Column(
         verticalArrangement = Arrangement.Bottom,
     ) {
         mainParticipant?.let {
-            SpotlightSpeaker(
-                modifier = Modifier.weight(spotlightWeight),
-                participant = it,
-                actions = actions,
-                isPinned = it.id in pinnedIds,
+            participantContent(
+                it,
+                Modifier
+                    .weight(spotlightWeight)
+                    .padding(VonageVideoTheme.dimens.paddingSmall),
             )
         } ?: Spacer(modifier = Modifier.weight(spotlightWeight))
         LazyRow(
@@ -148,13 +149,11 @@ private fun ActiveSpeakerVerticalLayout(
                 items = visibleFilmstripItems,
                 key = { it.id },
             ) { participant ->
-                ParticipantVideoCard(
-                    modifier = Modifier
+                participantContent(
+                    participant,
+                    Modifier
                         .width(otherParticipantsSize)
                         .height(otherParticipantsSize),
-                    participant = participant,
-                    actions = actions,
-                    isPinned = participant.id in pinnedIds,
                 )
             }
             if (overflowFilmstripNames.isNotEmpty()) {
@@ -171,28 +170,27 @@ private fun ActiveSpeakerVerticalLayout(
     }
 }
 
-@Suppress("LongParameterList")
+@Suppress("LongParameterList", "ContentSlotReused")
 @Composable
 private fun ActiveSpeakerHorizontalLayout(
     mainParticipant: Participant?,
-    actions: MeetingRoomActions,
+    participantContent: @Composable (Participant, Modifier) -> Unit,
     spotlightWeight: Float,
     listState: LazyListState,
     otherParticipantsWeight: Float,
     visibleFilmstripItems: ImmutableList<Participant>,
     overflowFilmstripNames: ImmutableList<String>,
     otherParticipantsSize: Dp,
-    pinnedIds: Set<String> = emptySet(),
 ) {
     Row(
         horizontalArrangement = Arrangement.End,
     ) {
         mainParticipant?.let {
-            SpotlightSpeaker(
-                modifier = Modifier.weight(spotlightWeight),
-                participant = it,
-                actions = actions,
-                isPinned = it.id in pinnedIds,
+            participantContent(
+                it,
+                Modifier
+                    .weight(spotlightWeight)
+                    .padding(VonageVideoTheme.dimens.paddingSmall),
             )
         } ?: Spacer(modifier = Modifier.weight(spotlightWeight))
         LazyColumn(
@@ -207,13 +205,11 @@ private fun ActiveSpeakerHorizontalLayout(
                 items = visibleFilmstripItems,
                 key = { it.id },
             ) { participant ->
-                ParticipantVideoCard(
-                    modifier = Modifier
+                participantContent(
+                    participant,
+                    Modifier
                         .height(otherParticipantsSize)
                         .aspectRatio(ASPECT_RATIO_16_9),
-                    participant = participant,
-                    actions = actions,
-                    isPinned = participant.id in pinnedIds,
                 )
             }
             if (overflowFilmstripNames.isNotEmpty()) {
@@ -230,33 +226,62 @@ private fun ActiveSpeakerHorizontalLayout(
     }
 }
 
-const val ASPECT_RATIO_16_9 = 16f / 9f
-
+@PreviewLightDark
 @Composable
-private fun SpotlightSpeaker(
-    participant: Participant,
-    actions: MeetingRoomActions,
-    modifier: Modifier = Modifier,
-    isPinned: Boolean = false,
-) {
-    ParticipantVideoCard(
-        modifier = modifier
-            .padding(VonageVideoTheme.dimens.paddingSmall),
-        participant = participant,
-        actions = actions,
-        isPinned = isPinned,
-    )
+internal fun ActiveSpeakerLayoutNoSpeakerPreview() {
+    VonageVideoTheme {
+        ActiveSpeakerLayout(
+            participants = buildParticipants(3).toImmutableList(),
+            call = buildCallWithParticipants(3),
+            participantContent = { participant, modifier ->
+                Box(
+                    modifier = modifier.background(VonageVideoTheme.colors.surface),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AvatarInitials(userName = participant.name)
+                }
+            },
+        )
+    }
 }
 
 @PreviewLightDark
 @PreviewScreenSizes
 @Composable
-internal fun ActiveSpeakerLayoutPreview() {
+internal fun ActiveSpeakerLayoutFilledSpotlightPreview() {
+    val participants = buildParticipants(3).toImmutableList()
     VonageVideoTheme {
         ActiveSpeakerLayout(
-            participants = buildParticipants(10).toImmutableList(),
-            call = noOpCall,
-            actions = MeetingRoomActions(),
+            participants = participants,
+            call = buildCallWithParticipants(3, activeSpeaker = participants.first()),
+            participantContent = { participant, modifier ->
+                Box(
+                    modifier = modifier.background(VonageVideoTheme.colors.surface),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AvatarInitials(userName = participant.name)
+                }
+            },
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun ActiveSpeakerLayoutFilmstripOverflowPreview() {
+    val participants = buildParticipants(4).toImmutableList()
+    VonageVideoTheme {
+        ActiveSpeakerLayout(
+            participants = participants,
+            call = buildCallWithParticipants(4, activeSpeaker = participants.first()),
+            participantContent = { participant, modifier ->
+                Box(
+                    modifier = modifier.background(VonageVideoTheme.colors.surface),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AvatarInitials(userName = participant.name)
+                }
+            },
         )
     }
 }

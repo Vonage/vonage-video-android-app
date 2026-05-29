@@ -1,4 +1,4 @@
-package com.vonage.android.meetingroom.internal.util
+package com.vonage.android.compose.util
 
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.lazy.LazyListState
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 @Composable
-internal fun <T : ScrollableState> lazyStateVisibilityTracker(call: CallFacade, lazyState: T): T {
+fun <T : ScrollableState> lazyStateVisibilityTracker(call: CallFacade, lazyState: T): T {
     val snapshotFlow: Flow<List<String>> = when (lazyState) {
         is LazyGridState -> {
             snapshotFlow {

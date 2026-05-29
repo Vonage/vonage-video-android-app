@@ -1,4 +1,4 @@
-package com.vonage.android.meetingroom.internal.util
+package com.vonage.android.compose.layout
 
 /** Maximum number of participant tiles rendered simultaneously in the Adaptive Grid. */
 internal const val MAX_GRID_TILES = 6

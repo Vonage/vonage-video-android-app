@@ -3,9 +3,13 @@ package com.vonage.android.meetingroom.internal.screen.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.compose.layout.AdaptiveGrid
+import com.vonage.android.compose.layout.ActiveSpeakerLayout
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
@@ -26,6 +30,8 @@ internal fun MeetingRoomContent(
     layoutType: CallLayoutType,
     modifier: Modifier = Modifier,
 ) {
+    val pinnedIds by call.pinnedParticipantIds.collectAsStateWithLifecycle()
+
     Column(
         modifier = modifier
             .fillMaxSize(),
@@ -46,9 +52,15 @@ internal fun MeetingRoomContent(
                 AdaptiveGrid(
                     call = call,
                     participants = participants,
-                    actions = actions,
-                    modifier = Modifier
-                        .fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(),
+                    participantContent = { participant, tileModifier ->
+                        ParticipantVideoCard(
+                            participant = participant,
+                            actions = actions,
+                            modifier = tileModifier,
+                            isPinned = participant.id in pinnedIds,
+                        )
+                    },
                 )
             }
 
@@ -56,10 +68,17 @@ internal fun MeetingRoomContent(
                 ActiveSpeakerLayout(
                     call = call,
                     participants = participants,
-                    actions = actions,
                     modifier = Modifier
                         .fillMaxSize()
                         .testTag(MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT),
+                    participantContent = { participant, tileModifier ->
+                        ParticipantVideoCard(
+                            participant = participant,
+                            actions = actions,
+                            modifier = tileModifier,
+                            isPinned = participant.id in pinnedIds,
+                        )
+                    },
                 )
             }
         }

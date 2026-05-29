@@ -24,7 +24,7 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
-import com.vonage.android.meetingroom.internal.util.lazyStateVisibilityTracker
+import com.vonage.android.compose.util.lazyStateVisibilityTracker
 import com.vonage.android.meetingroom.internal.util.noOpCall
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList

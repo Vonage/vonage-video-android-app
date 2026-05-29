@@ -1,4 +1,4 @@
-package com.vonage.android.meetingroom.internal.util
+package com.vonage.android.compose.layout
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
