@@ -1,0 +1,14 @@
+.github/copilot-instructions.md
+  h_25498f8d57a266 37-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b81f3af639bf12246151369e1654eba2cd4b9a76",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
