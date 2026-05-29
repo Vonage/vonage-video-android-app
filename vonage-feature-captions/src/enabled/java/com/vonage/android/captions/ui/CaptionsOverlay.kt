@@ -53,7 +53,7 @@ fun CaptionsOverlay(
                     Text(
                         text = buildAnnotatedString {
                             withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                val displayName = if (line.isYou) {
+                                val displayName = if (line.isMe) {
                                     stringResource(R.string.captions_self_name)
                                 } else line.subscriberName
                                 append("$displayName: ")
@@ -80,8 +80,8 @@ internal fun CaptionsOverlayPreview() {
         ) {
             CaptionsOverlay(
                 captionLines = persistentListOf(
-                    CaptionLine(streamId = "1", subscriberName = "Alice", isYou = false, text = "Hello, how are you?"),
-                    CaptionLine(streamId = "2", subscriberName = "Bob", isYou = false, text = "I'm doing great, thanks!"),
+                    CaptionLine(streamId = "1", subscriberName = "Alice", isMe = false, text = "Hello, how are you?"),
+                    CaptionLine(streamId = "2", subscriberName = "Bob", isMe = false, text = "I'm doing great, thanks!"),
                 ),
             )
         }

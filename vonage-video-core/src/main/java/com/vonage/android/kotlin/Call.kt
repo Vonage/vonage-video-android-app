@@ -597,16 +597,16 @@ class Call internal constructor(
      * Creates a [VonageCaptionsListener] that upserts a [CaptionLine] into [_captionsStateFlow]
      * and drives the hide-cooldown scheduler.
      *
-     * @param isYou `true` for the local publisher's hidden self-subscriber so the UI can
+     * @param isMe `true` for the local publisher's hidden self-subscriber so the UI can
      *              render the "You" label instead of the stream name.
      */
-    private fun captionsListenerFor(isYou: Boolean): VonageCaptionsListener =
+    private fun captionsListenerFor(isMe: Boolean): VonageCaptionsListener =
         VonageCaptionsListener { name, streamId, text, isFinal ->
             // Cancel any pending hide — the stream is either still active or
             // about to schedule a fresh cooldown.
             captionsHideScheduler.cancel(streamId)
             _captionsStateFlow.update { lines ->
-                val line = CaptionLine(streamId = streamId, subscriberName = name, isYou = isYou, text = text)
+                val line = CaptionLine(streamId = streamId, subscriberName = name, isMe = isMe, text = text)
                 lines.filter { it.streamId != streamId }.plus(line).toImmutableList()
             }
             if (isFinal) {
@@ -614,11 +614,11 @@ class Call internal constructor(
             }
         }
 
-    /** Captions listener for remote participants ([isYou] = `false`). */
-    private val captionsDelegate: VonageCaptionsListener = captionsListenerFor(isYou = false)
+    /** Captions listener for remote participants ([isMe] = `false`). */
+    private val captionsDelegate: VonageCaptionsListener = captionsListenerFor(isMe = false)
 
-    /** Captions listener for the local publisher's hidden self-subscriber ([isYou] = `true`). */
-    private val selfCaptionsDelegate: VonageCaptionsListener = captionsListenerFor(isYou = true)
+    /** Captions listener for the local publisher's hidden self-subscriber ([isMe] = `true`). */
+    private val selfCaptionsDelegate: VonageCaptionsListener = captionsListenerFor(isMe = true)
 
     /**
      * Enables captions.

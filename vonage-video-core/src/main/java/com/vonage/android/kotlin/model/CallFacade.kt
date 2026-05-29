@@ -173,6 +173,6 @@ sealed interface ArchivingState {
 data class CaptionLine(
     val streamId: String,
     val subscriberName: String,
-    val isYou: Boolean,
+    val isMe: Boolean,
     val text: String,
 )
