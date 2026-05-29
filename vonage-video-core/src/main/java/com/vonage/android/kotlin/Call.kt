@@ -641,9 +641,6 @@ class Call internal constructor(
             captionsEnabled = enable
             
             if (enable) {
-                // Enable captions on publisher
-                publisher()?.vonagePublisher?.publishCaptions = true
-                
                 // Enable captions on all existing remote subscribers
                 participants.values.filterIsInstance<ParticipantState>()
                     .forEach { participant -> 
@@ -661,9 +658,6 @@ class Call internal constructor(
                     pendingSelfCaptionsSubscription = true
                 }
             } else {
-                // Disable captions on publisher
-                publisher()?.vonagePublisher?.publishCaptions = false
-                
                 // Disable captions on all remote subscribers
                 participants.values.filterIsInstance<ParticipantState>()
                     .forEach { participant -> 

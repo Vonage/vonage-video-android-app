@@ -7,6 +7,8 @@ class EnabledVonageCaptions(
     private val captionsRepository: CaptionsRepository,
 ) : VonageCaptions {
 
+    override val isCapable: Boolean = true
+
     private var call: CallFacade? = null
     private var currentCaptionsId: String? = null
     private var roomName: String = ""

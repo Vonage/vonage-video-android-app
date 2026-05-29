@@ -87,6 +87,7 @@ internal class MeetingRoomViewModel(
                 publishVideo = prebuilt.publisherSettings.publishVideo,
                 initialVideoEffect = prebuilt.publisherSettings.initialVideoEffect,
                 cameraIndex = 1, // default to front camera
+                publishCaptions = container.vonageCaptions.isCapable,
             ),
         )
 
@@ -298,6 +299,7 @@ internal class MeetingRoomViewModel(
                                 opusDtxEnabled = holder.opusDtxEnabled.value,
                                 publisherAudioFallback = holder.publisherAudioFallbackEnabled.value,
                                 subscriberAudioFallback = holder.subscriberAudioFallbackEnabled.value,
+                                publishCaptions = container.vonageCaptions.isCapable,
                             ),
                         )
                         vonageLogger.d("MeetingRoomViewModel", "Refresh publisher (${activeCall.publisher.value?.name})")

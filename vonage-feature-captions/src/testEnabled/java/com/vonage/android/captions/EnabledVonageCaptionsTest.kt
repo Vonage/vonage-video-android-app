@@ -22,6 +22,11 @@ class EnabledVonageCaptionsTest {
     )
 
     @Test
+    fun `isCapable should be true`() {
+        assertTrue(sut.isCapable)
+    }
+
+    @Test
     fun `when enable success then enableCaptions`() = runTest {
         val roomName = "test-room"
         val captionsId = "captions-456"

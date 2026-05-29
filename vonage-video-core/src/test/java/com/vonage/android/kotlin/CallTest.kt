@@ -495,38 +495,6 @@ class CallTest {
     // region Captions
 
     @Test
-    fun `enableCaptions should set publishCaptions to true on publisher`() = runTest(testDispatcher) {
-        val call = createCall()
-
-        call.connect(mockContext).test {
-            triggerConnectedAndWaitForPublisher()
-            awaitItem()
-
-            call.enableCaptions()
-            runCurrent()
-
-            verify { mockVonagePublisher.publishCaptions = true }
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `disableCaptions should set publishCaptions to false on publisher`() = runTest(testDispatcher) {
-        val call = createCall()
-
-        call.connect(mockContext).test {
-            triggerConnectedAndWaitForPublisher()
-            awaitItem()
-
-            call.disableCaptions()
-            runCurrent()
-
-            verify { mockVonagePublisher.publishCaptions = false }
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun `captions state flow should be empty initially`() = runTest(testDispatcher) {
         val call = createCall()
         assertTrue(call.captionsStateFlow.value.isEmpty())
