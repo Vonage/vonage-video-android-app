@@ -1,0 +1,58 @@
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/preview/buildCallWithParticipants.kt
+  s_c7bfc7b9a32ddc::t_312e59ff54a307 42
+  s_c7bfc7b9a32ddc::t_0b8ffd6433295f 34
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/layout/ActiveSpeakerLayoutScreenshotTest.kt
+  s_c7bfc7b9a32ddc::t_768d336f3ba6f8 72
+  s_c7bfc7b9a32ddc::t_2832c9c395d3cd 1-71,73-77
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/ParticipantsPlaceholdersScreenshotTest.kt
+  s_c7bfc7b9a32ddc::t_442979bc15d6cb 1-37
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/layout/AdaptiveGridScreenshotTest.kt
+  s_c7bfc7b9a32ddc::t_1152e851ebaed6 59
+  s_c7bfc7b9a32ddc::t_1ccee8d461a1b7 1-58,60-64
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/ParticipantsLazyVerticalGridLayout.kt
+  s_c7bfc7b9a32ddc::t_3d371e2f8489ca 27
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/layout/GridDimensions.kt
+  s_c7bfc7b9a32ddc::t_5f9fee4bf040b4 1-3
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/layout/GridLayoutCalculator.kt
+  s_c7bfc7b9a32ddc::t_e26aa06c765b32 1-37
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/layout/ActiveSpeakerLayout.kt
+  s_c7bfc7b9a32ddc::t_08715c2e0eb8ac 25
+  s_c7bfc7b9a32ddc::t_a7a8da817c350d 81,91,104
+  s_c7bfc7b9a32ddc::t_1ec75d14592679 173
+  s_c7bfc7b9a32ddc::t_0751955947213f 117
+  s_c7bfc7b9a32ddc::t_e91b1b4b7b2881 1-24,26-80,82-90,92-103,105-116,118-172,174-287
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/ParticipantsPlaceholders.kt
+  s_c7bfc7b9a32ddc::t_085b6d4af60c69 1-114
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/layout/AdaptiveGrid.kt
+  s_c7bfc7b9a32ddc::t_65434097536a60 1-144
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/MeetingRoomContent.kt
+  s_c7bfc7b9a32ddc::t_bd476eecf042ff 6,10-12,33-34,55,57-59,61-63,75-77,79-81
+  s_c7bfc7b9a32ddc::t_508972193b1aeb 56,60,74,78
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/util/lazyStateVisibilityTracker.kt
+  s_c7bfc7b9a32ddc::t_753522b645de06 1-36
+vonage-video-ui-compose/build.gradle.kts
+  s_c7bfc7b9a32ddc::t_0acc0a6806ddb7 52
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/layout/GridLayoutCalculatorTest.kt
+  s_c7bfc7b9a32ddc::t_66538e3316a89b 1-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "892b151bc83448e4971b659d8b95fe169fadef0a",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_c7bfc7b9a32ddc": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_190b3a0a2ffey7keXDurkdkYZH",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
