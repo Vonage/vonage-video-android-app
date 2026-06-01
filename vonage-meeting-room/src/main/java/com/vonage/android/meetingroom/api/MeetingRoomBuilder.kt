@@ -1,6 +1,7 @@
 package com.vonage.android.meetingroom.api
 
 import androidx.compose.runtime.Composable
+import com.vonage.android.meetingroom.internal.permissions.DefaultPermissionContent
 
 /**
  * Fluent builder for the meeting room SDK.
@@ -46,6 +47,7 @@ class MeetingRoomBuilder(
     private var theme: MeetingRoomTheme = MeetingRoomTheme.vonage
     private var isDebug: Boolean = false
     private var reportingContent: (@Composable (() -> Unit) -> Unit)? = null
+    private var permissionContent: (@Composable (List<String>, () -> Unit) -> Unit)? = null
     private var foregroundServiceEnabled: Boolean = true
 
     /**
@@ -63,8 +65,7 @@ class MeetingRoomBuilder(
     /**
      * Registers a handler for navigation callbacks emitted by the SDK.
      *
-     * The host app must handle all [MeetingRoomSDKAction] cases. Permission prompts and error
-     * alerts are presented automatically by the SDK itself.
+     * The host app must handle all [MeetingRoomSDKAction] cases.
      */
     fun onAction(handler: (MeetingRoomSDKAction) -> Unit): MeetingRoomBuilder = apply {
         onAction = handler
@@ -135,6 +136,31 @@ class MeetingRoomBuilder(
     }
 
     /**
+     * Overrides the permission gate composable shown before the meeting room renders.
+     *
+     * The SDK invokes this composable proactively, passing:
+     * - [requiredPermissions]: the Android runtime permissions the SDK needs (`CAMERA`,
+     *   `RECORD_AUDIO`, and API-33+ additions). The host may use this list or ignore it
+     *   and manage permissions independently.
+     * - [onGrant]: a callback the composable **must** call once all required permissions
+     *   are granted. The meeting room renders only after this is called.
+     *
+     * When not set, [DefaultPermissionContent] is used automatically.
+     *
+     * Example with Accompanist:
+     * ```kotlin
+     * .permissionContent { _, onGrant ->
+     *     MyPermissionScreen(onAllGranted = onGrant)
+     * }
+     * ```
+     */
+    fun permissionContent(
+        content: @Composable (requiredPermissions: List<String>, onGranted: () -> Unit) -> Unit,
+    ): MeetingRoomBuilder = apply {
+        permissionContent = content
+    }
+
+    /**
      * Constructs the [MeetingRoomPrebuilt] with the current configuration.
      *
      * Call [MeetingRoomPrebuilt.launch] or embed [MeetingRoomPrebuilt.content] to display the
@@ -150,6 +176,9 @@ class MeetingRoomBuilder(
         theme = theme,
         isDebug = isDebug,
         reportingContent = reportingContent,
+        permissionContent = permissionContent ?: { permissions, onGrant ->
+            DefaultPermissionContent(permissions = permissions, onGrant = onGrant)
+        },
         foregroundServiceEnabled = foregroundServiceEnabled,
     )
 }
