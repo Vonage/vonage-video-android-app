@@ -161,11 +161,7 @@ internal class MeetingRoomViewModel(
                         roomName = roomName,
                         call = activeCall,
                         archivingUiState = ArchivingUiState.IDLE,
-                        captionsUiState = if (sessionInfo.captionsId.isNullOrBlank()) {
-                            CaptionsUiState.IDLE
-                        } else {
-                            CaptionsUiState.ENABLED
-                        },
+                        captionsUiState = CaptionsUiState.IDLE,
                         isLoading = false,
                         isError = false,
                     )

@@ -17,10 +17,6 @@ class EnabledVonageCaptions(
         this.call = callFacade
         this.roomName = roomName
         this.currentCaptionsId = captionsId
-        
-        if (!captionsId.isNullOrBlank()) {
-            callFacade.enableCaptions()
-        }
     }
 
     override suspend fun enable(): Result<Unit> =
