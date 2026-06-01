@@ -40,7 +40,6 @@ internal data class MeetingRoomUiState(
 )
 
 internal enum class CallLayoutType {
-    GRID,
     SPEAKER_LAYOUT,
     ADAPTIVE_GRID,
 }

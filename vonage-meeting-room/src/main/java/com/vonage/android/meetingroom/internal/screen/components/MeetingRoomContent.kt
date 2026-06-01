@@ -37,22 +37,13 @@ internal fun MeetingRoomContent(
             .fillMaxSize(),
     ) {
         when (layoutType) {
-            CallLayoutType.GRID -> {
-                ParticipantsLazyVerticalGridLayout(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
-                    participants = participants,
-                    call = call,
-                    actions = actions,
-                )
-            }
-
             CallLayoutType.ADAPTIVE_GRID -> {
                 AdaptiveGrid(
                     call = call,
                     participants = participants,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
                     participantContent = { participant, tileModifier ->
                         ParticipantVideoCard(
                             participant = participant,
@@ -98,7 +89,7 @@ internal fun MeetingRoomContentPreview() {
             call = noOpCall,
             actions = MeetingRoomActions(),
             participants = buildParticipants(25).toImmutableList(),
-            layoutType = CallLayoutType.GRID,
+            layoutType = CallLayoutType.ADAPTIVE_GRID,
         )
     }
 }
