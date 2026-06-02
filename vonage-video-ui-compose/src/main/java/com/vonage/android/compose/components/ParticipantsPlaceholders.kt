@@ -39,7 +39,7 @@ fun ParticipantsPlaceholders(
     Box(
         modifier = modifier
             .background(
-                color = VonageVideoTheme.colors.background,
+                color = VonageVideoTheme.colors.surface,
                 shape = VonageVideoTheme.shapes.medium,
             ),
         contentAlignment = Alignment.Center,
@@ -54,7 +54,7 @@ fun ParticipantsPlaceholders(
             visiblePlaceholders.forEachIndexed { index, participant ->
                 AvatarInitials(
                     userName = participant,
-                    textStyle = VonageVideoTheme.typography.caption,
+                    textStyle = VonageVideoTheme.typography.heading3,
                     size = 64.dp,
                     modifier = Modifier
                         .zIndex((visiblePlaceholders.size - index).toFloat())
@@ -67,7 +67,7 @@ fun ParticipantsPlaceholders(
                     count = additionalCount,
                     size = 64.dp,
                     zIndex = 0f,
-                    textStyle = VonageVideoTheme.typography.bodyBase,
+                    textStyle = VonageVideoTheme.typography.heading3,
                 )
             }
         }
