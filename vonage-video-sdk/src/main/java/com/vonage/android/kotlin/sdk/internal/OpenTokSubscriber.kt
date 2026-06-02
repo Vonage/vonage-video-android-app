@@ -31,6 +31,10 @@ internal class OpenTokSubscriber(
         get() = raw.subscribeToVideo
         set(value) { raw.subscribeToVideo = value }
 
+    override var subscribeToAudio: Boolean
+        get() = raw.subscribeToAudio
+        set(value) { raw.subscribeToAudio = value }
+
     override var subscribeToCaptions: Boolean
         get() = raw.subscribeToCaptions
         set(value) { raw.subscribeToCaptions = value }

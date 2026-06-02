@@ -7,6 +7,7 @@ import com.vonage.android.kotlin.ext.extractSenderName
 import com.vonage.android.kotlin.ext.firstScreenSharing
 import com.vonage.android.kotlin.ext.sorted
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
+import com.vonage.android.kotlin.internal.CaptionsHideScheduler
 import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
@@ -27,9 +28,11 @@ import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.kotlin.sdk.VonageArchiveListener
 import com.vonage.android.kotlin.sdk.VonageCaptionsListener
 import com.vonage.android.kotlin.sdk.VonageError
+import com.vonage.android.kotlin.sdk.VonagePublisherKitListener
 import com.vonage.android.kotlin.sdk.VonageSession
 import com.vonage.android.kotlin.sdk.VonageSessionListener
 import com.vonage.android.kotlin.sdk.VonageStream
+import com.vonage.android.kotlin.sdk.VonageSubscriber
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.kotlin.signal.SignalPlugin
 import com.vonage.logger.vonageLogger
@@ -185,6 +188,23 @@ class Call internal constructor(
         MutableStateFlow<ImmutableList<CaptionLine>>(persistentListOf())
     override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = _captionsStateFlow
 
+    private val captionsHideScheduler = CaptionsHideScheduler(
+        coroutineScope = coroutineScope,
+    ) { streamId ->
+        _captionsStateFlow.update { lines ->
+            lines.filter { it.streamId != streamId }.toImmutableList()
+        }
+    }
+
+    /** Hidden subscriber for receiving captions from the publisher's own stream */
+    private var selfCaptionsSubscriber: VonageSubscriber? = null
+    
+    /** Tracks whether captions are currently enabled */
+    private var captionsEnabled: Boolean = false
+    
+    /** Flag for deferred self-captions subscription when publisher stream not yet available */
+    private var pendingSelfCaptionsSubscription: Boolean = false
+
     private val _archivingStateFlow = MutableStateFlow<ArchivingState>(ArchivingState.Idle)
     override val archivingStateFlow: StateFlow<ArchivingState> = _archivingStateFlow
 
@@ -292,7 +312,13 @@ class Call internal constructor(
      * Unpublishes the local stream and disconnects from the session.
      */
     override fun endSession() {
-        publisher()?.vonagePublisher?.let { session.unpublish(it) }
+        // Defensive cleanup of hidden self-captions subscriber
+        cleanupHiddenSelfSubscriber()
+        
+        publisher()?.vonagePublisher?.let { 
+            it.setPublisherListener(null)
+            session.unpublish(it) 
+        }
 
         session.setSessionListener(null)
         session.setSignalListener(null)
@@ -426,6 +452,9 @@ class Call internal constructor(
     override fun refreshPublisher(context: Context) {
         vonageLogger.i("PublisherFactory", "Refresh publisher")
         coroutineScope.launch(Dispatchers.Default) {
+            // Clean up hidden self-subscriber before refreshing publisher
+            cleanupHiddenSelfSubscriber()
+            
             val old = publisher() ?: return@launch
             val wasVideoOn = old.isCameraEnabled.value
             val wasAudioOn = old.isMicEnabled.value
@@ -452,6 +481,29 @@ class Call internal constructor(
             val newPublisher = withContext(Dispatchers.Main) {
                 val publisherState = publisherFactory.createPublisherState(context)
                 session.publish(publisherState.vonagePublisher)
+                
+                // Attach listener to detect when publisher stream becomes available
+                publisherState.vonagePublisher.setPublisherListener(object : VonagePublisherKitListener {
+                    override fun onStreamCreated(stream: VonageStream) {
+                        // Register publisher stream in session's streamMap for self-subscription
+                        session.registerPublisherStream(publisherState.vonagePublisher)
+                        
+                        if (pendingSelfCaptionsSubscription && captionsEnabled) {
+                            createHiddenSelfSubscriber(stream)
+                            pendingSelfCaptionsSubscription = false
+                        }
+                    }
+                    
+                    override fun onStreamDestroyed(stream: VonageStream) {
+                        // Unregister publisher stream from session's streamMap
+                        session.unregisterPublisherStream(publisherState.vonagePublisher)
+                    }
+                    
+                    override fun onError(error: VonageError) {
+                        vonageLogger.e(TAG, "Publisher error: ${error.message}")
+                    }
+                })
+                
                 publisherState
             }
             participants[PUBLISHER_ID] = newPublisher
@@ -469,6 +521,29 @@ class Call internal constructor(
             val newPublisher = withContext(Dispatchers.Main) {
                 val publisherState = publisherFactory.createPublisherState(context)
                 session.publish(publisherState.vonagePublisher)
+                
+                // Attach listener to detect when publisher stream becomes available
+                publisherState.vonagePublisher.setPublisherListener(object : VonagePublisherKitListener {
+                    override fun onStreamCreated(stream: VonageStream) {
+                        // Register publisher stream in session's streamMap for self-subscription
+                        session.registerPublisherStream(publisherState.vonagePublisher)
+                        
+                        if (pendingSelfCaptionsSubscription && captionsEnabled) {
+                            createHiddenSelfSubscriber(stream)
+                            pendingSelfCaptionsSubscription = false
+                        }
+                    }
+                    
+                    override fun onStreamDestroyed(stream: VonageStream) {
+                        // Unregister publisher stream from session's streamMap
+                        session.unregisterPublisherStream(publisherState.vonagePublisher)
+                    }
+                    
+                    override fun onError(error: VonageError) {
+                        vonageLogger.e(TAG, "Publisher error: ${error.message}")
+                    }
+                })
+                
                 publisherState
             }
             participants[PUBLISHER_ID] = newPublisher
@@ -519,20 +594,31 @@ class Call internal constructor(
     //region Captions
 
     /**
-     * Listener for receiving captions from remote participants.
-     * Updates the captions state flow with speaker name and text.
+     * Creates a [VonageCaptionsListener] that upserts a [CaptionLine] into [_captionsStateFlow]
+     * and drives the hide-cooldown scheduler.
+     *
+     * @param isMe `true` for the local publisher's hidden self-subscriber so the UI can
+     *              render the "You" label instead of the stream name.
      */
-    private val captionsDelegate: VonageCaptionsListener =
+    private fun captionsListenerFor(isMe: Boolean): VonageCaptionsListener =
         VonageCaptionsListener { name, streamId, text, isFinal ->
+            // Cancel any pending hide — the stream is either still active or
+            // about to schedule a fresh cooldown.
+            captionsHideScheduler.cancel(streamId)
             _captionsStateFlow.update { lines ->
-                if (isFinal) {
-                    lines.filter { it.streamId != streamId }.toImmutableList()
-                } else {
-                    val line = CaptionLine(streamId = streamId, subscriberName = name, text = text)
-                    lines.filter { it.streamId != streamId }.plus(line).toImmutableList()
-                }
+                val line = CaptionLine(streamId = streamId, subscriberName = name, isMe = isMe, text = text)
+                lines.filter { it.streamId != streamId }.plus(line).toImmutableList()
+            }
+            if (isFinal) {
+                captionsHideScheduler.schedule(streamId)
             }
         }
+
+    /** Captions listener for remote participants ([isMe] = `false`). */
+    private val captionsDelegate: VonageCaptionsListener = captionsListenerFor(isMe = false)
+
+    /** Captions listener for the local publisher's hidden self-subscriber ([isMe] = `true`). */
+    private val selfCaptionsDelegate: VonageCaptionsListener = captionsListenerFor(isMe = true)
 
     /**
      * Enables captions.
@@ -545,14 +631,79 @@ class Call internal constructor(
      * Disables captions.
      */
     override fun disableCaptions() {
+        captionsHideScheduler.cancelAll()
+        _captionsStateFlow.update { persistentListOf() }
         setCaptions(false)
     }
 
     private fun setCaptions(enable: Boolean) {
         coroutineScope.launch {
-            publisher()?.vonagePublisher?.publishCaptions = enable
-            participants.values.filterIsInstance<ParticipantState>()
-                .forEach { participant -> participant.vonageSubscriber.subscribeToCaptions = enable }
+            captionsEnabled = enable
+            
+            if (enable) {
+                // Enable captions on all existing remote subscribers
+                participants.values.filterIsInstance<ParticipantState>()
+                    .forEach { participant -> 
+                        participant.vonageSubscriber.subscribeToCaptions = true 
+                    }
+                
+                // Create hidden self-subscriber
+                val publisherVonagePublisher = publisher()?.vonagePublisher
+                val publisherStream = publisherVonagePublisher?.stream
+                if (publisherStream != null) {
+                    // Ensure publisher stream is registered before subscribing
+                    session.registerPublisherStream(publisherVonagePublisher)
+                    createHiddenSelfSubscriber(publisherStream)
+                } else {
+                    pendingSelfCaptionsSubscription = true
+                }
+            } else {
+                // Disable captions on all remote subscribers
+                participants.values.filterIsInstance<ParticipantState>()
+                    .forEach { participant -> 
+                        participant.vonageSubscriber.subscribeToCaptions = false 
+                    }
+                
+                // Clean up hidden self-subscriber
+                cleanupHiddenSelfSubscriber()
+                pendingSelfCaptionsSubscription = false
+            }
+        }
+    }
+
+    /**
+     * Creates a hidden subscriber for the publisher's own stream to receive self-captions.
+     * Configures the subscriber with audio and video disabled to avoid echo and rendering overhead.
+     */
+    @Suppress("TooGenericExceptionCaught")
+    private fun createHiddenSelfSubscriber(stream: VonageStream) {
+        coroutineScope.launch {
+            try {
+                val subscriber = withContext(Dispatchers.Main) {
+                    session.subscribe(context, stream)
+                }
+                subscriber.subscribeToAudio = false
+                subscriber.subscribeToVideo = false
+                subscriber.subscribeToCaptions = true
+                subscriber.setCaptionsListener(selfCaptionsDelegate)
+                selfCaptionsSubscriber = subscriber
+                vonageLogger.d(TAG, "Created hidden self-captions subscriber for stream ${stream.streamId}")
+            } catch (e: Exception) {
+                vonageLogger.e(TAG, "Failed to create hidden self-captions subscriber", e)
+            }
+        }
+    }
+
+    /**
+     * Cleans up the hidden self-captions subscriber.
+     * Removes listeners and unsubscribes from the session.
+     */
+    private fun cleanupHiddenSelfSubscriber() {
+        selfCaptionsSubscriber?.let { subscriber ->
+            subscriber.setCaptionsListener(null)
+            session.unsubscribe(subscriber)
+            selfCaptionsSubscriber = null
+            vonageLogger.d(TAG, "Cleaned up hidden self-captions subscriber")
         }
     }
     //endregion
@@ -571,6 +722,7 @@ class Call internal constructor(
                 val participant = withContext(Dispatchers.Main) {
                     val subscriber = session.subscribe(context, stream)
                     subscriber.setCaptionsListener(captionsDelegate)
+                    subscriber.subscribeToCaptions = captionsEnabled
                     ParticipantState(vonageSubscriber = subscriber)
                 }
                 launch { participant.setup() }

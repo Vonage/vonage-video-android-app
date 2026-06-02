@@ -29,6 +29,17 @@ interface VonageSession {
     fun sendSignal(type: String, data: String)
     fun forceMuteStream(stream: VonageStream)
 
+    /**
+     * Registers a publisher's stream for internal tracking.
+     * Used to enable self-subscription for features like self-captions.
+     */
+    fun registerPublisherStream(publisher: VonagePublisher)
+
+    /**
+     * Unregisters a publisher's stream from internal tracking.
+     */
+    fun unregisterPublisherStream(publisher: VonagePublisher)
+
     fun setSessionListener(listener: VonageSessionListener?)
     fun setSignalListener(listener: VonageSignalListener?)
     fun setArchiveListener(listener: VonageArchiveListener?)

@@ -8,6 +8,7 @@ import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.kotlin.sdk.VonageArchiveListener
+import com.vonage.android.kotlin.sdk.VonageCaptionsListener
 import com.vonage.android.kotlin.sdk.VonageConnection
 import com.vonage.android.kotlin.sdk.VonageError
 import com.vonage.android.kotlin.sdk.VonagePublisher
@@ -494,42 +495,149 @@ class CallTest {
     // region Captions
 
     @Test
-    fun `enableCaptions should set publishCaptions to true on publisher`() = runTest(testDispatcher) {
-        val call = createCall()
-
-        call.connect(mockContext).test {
-            triggerConnectedAndWaitForPublisher()
-            awaitItem()
-
-            call.enableCaptions()
-            runCurrent()
-
-            verify { mockVonagePublisher.publishCaptions = true }
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `disableCaptions should set publishCaptions to false on publisher`() = runTest(testDispatcher) {
-        val call = createCall()
-
-        call.connect(mockContext).test {
-            triggerConnectedAndWaitForPublisher()
-            awaitItem()
-
-            call.disableCaptions()
-            runCurrent()
-
-            verify { mockVonagePublisher.publishCaptions = false }
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun `captions state flow should be empty initially`() = runTest(testDispatcher) {
         val call = createCall()
         assertTrue(call.captionsStateFlow.value.isEmpty())
     }
+
+    @Test
+    fun `captionsDelegate should keep line visible immediately after isFinal`() =
+        runTest(testDispatcher) {
+            val call = createCall()
+            val stream = createVonageStream("stream-1", "Alice")
+            var capturedCaptionsListener: VonageCaptionsListener? = null
+            val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+                every { this@mockk.stream } returns stream
+                every { setCaptionsListener(any()) } answers { capturedCaptionsListener = firstArg() }
+            }
+            every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+            call.connect(mockContext).test {
+                triggerConnectedAndWaitForPublisher()
+                awaitItem() // Connected
+
+                capturedSessionListener!!.onStreamReceived(stream)
+                runCurrent()
+                awaitItem() // StreamReceived
+
+                capturedCaptionsListener!!.onCaption("Alice", "stream-1", "Hello!", isFinal = true)
+                runCurrent()
+
+                // Cooldown not elapsed — line must still be visible
+                assertEquals(1, call.captionsStateFlow.value.size)
+                assertEquals("Hello!", call.captionsStateFlow.value.first().text)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `captionsDelegate should hide line after 2s cooldown`() = runTest(testDispatcher) {
+        val call = createCall()
+        val stream = createVonageStream("stream-1", "Alice")
+        var capturedCaptionsListener: VonageCaptionsListener? = null
+        val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+            every { this@mockk.stream } returns stream
+            every { setCaptionsListener(any()) } answers { capturedCaptionsListener = firstArg() }
+        }
+        every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+        call.connect(mockContext).test {
+            triggerConnectedAndWaitForPublisher()
+            awaitItem() // Connected
+
+            capturedSessionListener!!.onStreamReceived(stream)
+            runCurrent()
+            awaitItem() // StreamReceived
+
+            capturedCaptionsListener!!.onCaption("Alice", "stream-1", "Hello!", isFinal = true)
+            runCurrent()
+
+            assertEquals(1, call.captionsStateFlow.value.size)
+
+            // Advance past the 2-second cooldown
+            callScheduler.advanceTimeBy(2_001L)
+
+            assertTrue(call.captionsStateFlow.value.isEmpty())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `captionsDelegate should cancel cooldown when new caption arrives for same stream`() =
+        runTest(testDispatcher) {
+            val call = createCall()
+            val stream = createVonageStream("stream-1", "Alice")
+            var capturedCaptionsListener: VonageCaptionsListener? = null
+            val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+                every { this@mockk.stream } returns stream
+                every { setCaptionsListener(any()) } answers { capturedCaptionsListener = firstArg() }
+            }
+            every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+            call.connect(mockContext).test {
+                triggerConnectedAndWaitForPublisher()
+                awaitItem() // Connected
+
+                capturedSessionListener!!.onStreamReceived(stream)
+                runCurrent()
+                awaitItem() // StreamReceived
+
+                // Final caption starts cooldown
+                capturedCaptionsListener!!.onCaption("Alice", "stream-1", "Hello!", isFinal = true)
+                runCurrent()
+
+                // New caption arrives before 2s — cancels timer
+                capturedCaptionsListener!!.onCaption("Alice", "stream-1", "World!", isFinal = false)
+                runCurrent()
+
+                // Advance past the original 2-second window
+                callScheduler.advanceTimeBy(2_001L)
+
+                // Line still visible — hide timer was cancelled by the new caption
+                assertEquals(1, call.captionsStateFlow.value.size)
+                assertEquals("World!", call.captionsStateFlow.value.first().text)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `disableCaptions should cancel all pending timers and clear state immediately`() =
+        runTest(testDispatcher) {
+            val call = createCall()
+            val stream = createVonageStream("stream-1", "Alice")
+            var capturedCaptionsListener: VonageCaptionsListener? = null
+            val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+                every { this@mockk.stream } returns stream
+                every { setCaptionsListener(any()) } answers { capturedCaptionsListener = firstArg() }
+            }
+            every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+            call.connect(mockContext).test {
+                triggerConnectedAndWaitForPublisher()
+                awaitItem() // Connected
+
+                capturedSessionListener!!.onStreamReceived(stream)
+                runCurrent()
+                awaitItem() // StreamReceived
+
+                capturedCaptionsListener!!.onCaption("Alice", "stream-1", "Hello!", isFinal = true)
+                runCurrent()
+
+                assertEquals(1, call.captionsStateFlow.value.size)
+
+                // Disable clears state immediately without waiting for timers
+                call.disableCaptions()
+                runCurrent()
+
+                assertTrue(call.captionsStateFlow.value.isEmpty())
+
+                // Advance past cooldown — state must remain empty (timer was cancelled)
+                callScheduler.advanceTimeBy(2_001L)
+
+                assertTrue(call.captionsStateFlow.value.isEmpty())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     // endregion
 

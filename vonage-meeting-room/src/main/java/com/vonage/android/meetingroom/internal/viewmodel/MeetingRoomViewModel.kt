@@ -94,6 +94,7 @@ internal class MeetingRoomViewModel(
                 publishVideo = prebuilt.publisherSettings.publishVideo,
                 initialVideoEffect = prebuilt.publisherSettings.initialVideoEffect,
                 cameraIndex = 1, // default to front camera
+                publishCaptions = container.vonageCaptions.isCapable,
             ),
         )
 
@@ -169,11 +170,7 @@ internal class MeetingRoomViewModel(
                         roomName = roomName,
                         call = activeCall,
                         archivingUiState = ArchivingUiState.IDLE,
-                        captionsUiState = if (sessionInfo.captionsId.isNullOrBlank()) {
-                            CaptionsUiState.IDLE
-                        } else {
-                            CaptionsUiState.ENABLED
-                        },
+                        captionsUiState = CaptionsUiState.IDLE,
                         isLoading = false,
                         isError = false,
                     )
@@ -300,6 +297,7 @@ internal class MeetingRoomViewModel(
                                 opusDtxEnabled = holder.opusDtxEnabled.value,
                                 publisherAudioFallback = holder.publisherAudioFallbackEnabled.value,
                                 subscriberAudioFallback = holder.subscriberAudioFallbackEnabled.value,
+                                publishCaptions = container.vonageCaptions.isCapable,
                             ),
                         )
                         vonageLogger.d("MeetingRoomViewModel", "Refresh publisher (${activeCall.publisher.value?.name})")

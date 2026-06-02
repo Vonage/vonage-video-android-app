@@ -8,6 +8,8 @@ package com.vonage.android.kotlin.model
  * @property publishAudio Initial audio enabled state
  * @property initialVideoEffect Initial video effect (blur level or background image)
  * @property cameraIndex Initial camera (0 = back, 1 = front)
+ * @property publishCaptions Whether to publish audio for captions transcription. Should be true
+ *   when the captions feature is compiled in (captionsEnabled flavor).
  */
 data class PublisherConfig(
     val name: String,
@@ -28,4 +30,5 @@ data class PublisherConfig(
     val captureResolution: CaptureResolution? = null,
     val preferredVideoCodecOrder: List<VideoCodec>? = null,
     val audioBitrate: Int? = null,
+    val publishCaptions: Boolean = false,
 )
