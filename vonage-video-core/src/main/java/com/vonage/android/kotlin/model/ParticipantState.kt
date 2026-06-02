@@ -80,9 +80,21 @@ data class ParticipantState(
 
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
-            true -> vonageSubscriber.subscribeToVideo = vonageSubscriber.stream.hasVideo
+            // Use the live _isCameraEnabled state rather than the stale stream snapshot
+            // so that toggling visibility after a remote camera-off event is correct.
+            true  -> vonageSubscriber.subscribeToVideo = _isCameraEnabled.value
             false -> vonageSubscriber.subscribeToVideo = false
         }
+    }
+
+    /**
+     * Updates camera and microphone state from a session-level stream-property change.
+     * Called by [com.vonage.android.kotlin.Call] when the remote publisher toggles their
+     * camera or microphone via [com.vonage.android.kotlin.sdk.VonageSessionListener.onStreamPropertyChanged].
+     */
+    internal fun updateStreamProperties(hasVideo: Boolean, hasAudio: Boolean) {
+        _isCameraEnabled.value = hasVideo
+        _isMicEnabled.value    = hasAudio
     }
 
     suspend fun setup() {
@@ -97,13 +109,23 @@ data class ParticipantState(
         })
         vonageSubscriber.setVideoListener(object : VonageSubscriberVideoListener {
             override fun onVideoEnabled(reason: String) {
-                vonageLogger.d(logTag, "Subscriber video enabled")
-                _isCameraEnabled.value = true
+                vonageLogger.d(logTag, "Subscriber video enabled, reason=$reason")
+                // Ignore the "subscribe" reason: it fires when we locally set
+                // subscribeToVideo = true as a bandwidth optimisation and must not
+                // be treated as the remote publisher re-enabling their camera.
+                //if (reason != VIDEO_REASON_SUBSCRIBE) {
+                    _isCameraEnabled.value = true
+                //}
             }
 
             override fun onVideoDisabled(reason: String) {
-                vonageLogger.d(logTag, "Subscriber video disabled")
-                _isCameraEnabled.value = false
+                vonageLogger.d(logTag, "Subscriber video disabled, reason=$reason")
+                // Ignore the "subscribe" reason: it fires when we locally set
+                // subscribeToVideo = false (scroll-based visibility optimisation)
+                // and must not corrupt the remote camera-state flag.
+                //if (reason != VIDEO_REASON_SUBSCRIBE) {
+                    _isCameraEnabled.value = false
+                //}
             }
 
             override fun onVideoDataReceived() {
@@ -177,6 +199,13 @@ data class ParticipantState(
 // region Extension helpers
 
 private const val DEBOUNCE_SUBSCRIBER_AUDIO_LEVEL_MILLIS = 100L
+
+/**
+ * Reason string fired by the OpenTok SDK when [VonageSubscriber.subscribeToVideo] is changed
+ * locally (e.g. the scroll-based bandwidth-optimisation path).
+ * Events carrying this reason must NOT be used to update remote camera state.
+ */
+private const val VIDEO_REASON_SUBSCRIBE = "subscribe"
 
 private fun VonageStream.toVideoSource(): VideoSource = when (videoType) {
     VonageVideoType.CAMERA -> VideoSource.CAMERA

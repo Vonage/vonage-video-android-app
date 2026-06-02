@@ -42,7 +42,10 @@ fun AdaptiveGrid(
 ) {
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val dimensions = remember(participants.size, isLandscape) {
-        gridLayoutFor(participantCount = minOf(participants.size, MAX_GRID_TILES), isLandscape = isLandscape)
+        gridLayoutFor(
+            participantCount = minOf(participants.size, MAX_GRID_TILES),
+            isLandscape = isLandscape,
+        )
     }
 
     BoxWithConstraints(

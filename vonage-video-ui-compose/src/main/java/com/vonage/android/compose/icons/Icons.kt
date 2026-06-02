@@ -1,17 +1,25 @@
 package com.vonage.android.compose.icons
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.line.ArrowBoldLeft
 import com.vonage.android.compose.vivid.icons.line.CameraSwitch
 import com.vonage.android.compose.vivid.icons.line.Plus
 import com.vonage.android.compose.vivid.icons.solid.AudioMid
+import com.vonage.android.compose.vivid.icons.solid.MicMute
+import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.compose.vivid.icons.solid.Share2
 import com.vonage.android.compose.vivid.icons.solid.User2
 
@@ -92,4 +100,36 @@ fun CameraSwitchIcon(
         tint = VonageVideoTheme.colors.onSurface,
         modifier = modifier.size(VonageVideoTheme.dimens.iconSizeDefault)
     )
+}
+
+@Composable
+fun MicrophoneIcon(
+    isMicEnabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
+    val iconSize = remember { Modifier.size(16.dp) }
+
+    Box(
+        modifier = modifier
+            .padding(12.dp)
+            .background(backgroundColor, CircleShape)
+            .padding(6.dp)
+    ) {
+        if (isMicEnabled) {
+            Icon(
+                imageVector = VividIcons.Solid.Microphone2,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = iconSize,
+            )
+        } else {
+            Icon(
+                imageVector = VividIcons.Solid.MicMute,
+                contentDescription = null,
+                tint = Color.Red,
+                modifier = iconSize,
+            )
+        }
+    }
 }

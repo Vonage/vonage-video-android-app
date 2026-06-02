@@ -43,6 +43,16 @@ interface VonageSessionListener {
     fun onStreamReceived(stream: VonageStream)
     fun onStreamDropped(stream: VonageStream)
     fun onError(error: VonageError)
+
+    /**
+     * Called when a remote stream's audio or video property changes.
+     * Fires when the remote publisher toggles their microphone or camera.
+     *
+     * @param streamId The affected stream ID.
+     * @param hasVideo Current video state of the stream.
+     * @param hasAudio Current audio state of the stream.
+     */
+    fun onStreamPropertyChanged(streamId: String, hasVideo: Boolean, hasAudio: Boolean) {}
 }
 
 /**

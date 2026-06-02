@@ -34,6 +34,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.components.AudioVolumeIndicator
 import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.components.ParticipantVideoRenderer
+import com.vonage.android.compose.components.PinIndicator
+import com.vonage.android.compose.components.VideoLabel
+import com.vonage.android.compose.icons.MicrophoneIcon
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
@@ -236,38 +239,6 @@ private fun MicrophoneIndicator(
                 modifier = Modifier
                     .align(Alignment.TopEnd),
                 isMicEnabled = isMicEnabled,
-            )
-        }
-    }
-}
-
-@Composable
-private fun MicrophoneIcon(
-    isMicEnabled: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
-    val iconSize = remember { Modifier.size(16.dp) }
-
-    Box(
-        modifier = modifier
-            .padding(12.dp)
-            .background(backgroundColor, CircleShape)
-            .padding(6.dp)
-    ) {
-        if (isMicEnabled) {
-            Icon(
-                imageVector = VividIcons.Solid.Microphone2,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = iconSize,
-            )
-        } else {
-            Icon(
-                imageVector = VividIcons.Solid.MicMute,
-                contentDescription = null,
-                tint = Color.Red,
-                modifier = iconSize,
             )
         }
     }

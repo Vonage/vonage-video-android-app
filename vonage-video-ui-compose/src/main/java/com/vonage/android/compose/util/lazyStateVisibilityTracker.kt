@@ -8,7 +8,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.snapshotFlow
 import com.vonage.android.kotlin.model.CallFacade
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun <T : ScrollableState> lazyStateVisibilityTracker(call: CallFacade, lazyState: T): T {
@@ -26,11 +25,9 @@ fun <T : ScrollableState> lazyStateVisibilityTracker(call: CallFacade, lazyState
 
         else -> throw UnsupportedOperationException("Wrong initial state.")
     }
-    DisposableEffect(call) {
+    DisposableEffect(call, lazyState) {
         call.updateParticipantVisibilityFlow(snapshotFlow)
-        onDispose {
-            call.updateParticipantVisibilityFlow(flowOf())
-        }
+        onDispose { }
     }
     return lazyState
 }
