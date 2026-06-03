@@ -1,0 +1,16 @@
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/ParticipantState.kt
+  h_25498f8d57a266 208
+app/src/main/java/com/vonage/android/screen/waiting/components/VideoPreviewContainer.kt
+  h_25498f8d57a266 31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "cace18a42761920c66e713d9512b67b0be27c66f",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
