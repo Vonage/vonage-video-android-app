@@ -205,7 +205,7 @@ private const val DEBOUNCE_SUBSCRIBER_AUDIO_LEVEL_MILLIS = 100L
  * locally (e.g. the scroll-based bandwidth-optimisation path).
  * Events carrying this reason must NOT be used to update remote camera state.
  */
-private const val VIDEO_REASON_SUBSCRIBE = "subscribe"
+//private const val VIDEO_REASON_SUBSCRIBE = "subscribe"
 
 private fun VonageStream.toVideoSource(): VideoSource = when (videoType) {
     VonageVideoType.CAMERA -> VideoSource.CAMERA
