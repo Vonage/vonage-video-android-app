@@ -1,0 +1,19 @@
+README.md
+  s_a75f236f2ccf03::t_fcca906ae90b43 252-253
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0a8345c26575ee80f8a24e1af8e44efd66e4f033",
+  "prompts": {},
+  "sessions": {
+    "s_a75f236f2ccf03": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_17263ea88ffe6kv9JQ40nvLzIj",
+        "model": "claude-sonnet-4.5"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
