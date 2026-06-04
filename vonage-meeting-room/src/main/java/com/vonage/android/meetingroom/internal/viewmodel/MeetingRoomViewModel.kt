@@ -367,7 +367,7 @@ internal class MeetingRoomViewModel(
                                 }
                                 // Reset the overlay flag after the overlay duration
                                 if (startedByOthers) {
-                                    delay(5000L)
+                                    delay(RECORDING_OVERLAY_DELAY_MS)
                                     _uiState.update { state ->
                                         state.copy(recordingStartedByOthers = false)
                                     }
@@ -434,5 +434,6 @@ internal class MeetingRoomViewModel(
 
     private companion object {
         const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
+        const val RECORDING_OVERLAY_DELAY_MS: Long = 5_000
     }
 }
