@@ -154,6 +154,8 @@ internal fun MeetingRoomScreen(
                     onToggleRecording = { enable ->
                         if (enable && uiState.archivingUiState == ArchivingUiState.IDLE) {
                             showRecordingConfirmDialog = true
+                        } else if (!enable && uiState.archivingUiState == ArchivingUiState.RECORDING) {
+                            showRecordingConfirmDialog = true
                         } else {
                             actions.onToggleRecording(enable)
                         }
@@ -310,6 +312,20 @@ internal fun MeetingRoomScreen(
             onAccept = {
                 showRecordingConfirmDialog = false
                 actions.onToggleRecording(true)
+            },
+            onCancel = {
+                showRecordingConfirmDialog = false
+            }
+        )
+    }
+    if (showRecordingConfirmDialog && uiState.archivingUiState == ArchivingUiState.RECORDING) {
+        BasicAlertDialog(
+            text = stringResource(R.string.recording_stop_confirm_dialog_message),
+            acceptLabel = stringResource(R.string.recording_stop_confirm_button),
+            cancelLabel = stringResource(R.string.generic_cancel),
+            onAccept = {
+                showRecordingConfirmDialog = false
+                actions.onToggleRecording(false)
             },
             onCancel = {
                 showRecordingConfirmDialog = false

@@ -19,7 +19,9 @@
     <string name="recording_stop_recording">Stop Recording</string>
     <string name="recording_start_recording">Start Recording</string>
     <string name="recording_confirm_dialog_message">Start recording this meeting?</string>
+    <string name="recording_stop_confirm_dialog_message">Stop recording this meeting?</string>
     <string name="recording_confirm_button">Start Recording</string>
+    <string name="recording_stop_confirm_button">Stop Recording</string>
     <string name="recording_started_notification">Recording started</string>
 
     <!-- Screen Share -->
