@@ -415,6 +415,61 @@ class MeetingRoomViewModelTest {
         }
     }
 
+    @Test
+    fun `given local user starts recording then recordingStartedByOthers is false`() = runTest {
+        val mockCall = givenMockCall()
+        val archivingStateFlow = MutableSharedFlow<ArchivingState>()
+        every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+        coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(
+            com.vonage.android.archiving.ArchiveId("archiveId"),
+        )
+
+        sut.uiState.test {
+            awaitItem()
+            sut.setup(context)
+            testScheduler.advanceUntilIdle()
+            awaitItem() // audio devices
+            awaitItem() // connected
+
+            sut.archiveCall(true)
+            skipItems(1) // STARTING
+
+            // Emit the Started event
+            archivingStateFlow.emit(ArchivingState.Started("archiveId"))
+
+            val recordingState = awaitItem()
+            assertEquals(ArchivingUiState.RECORDING, recordingState.archivingUiState)
+            assertEquals(false, recordingState.recordingStartedByOthers)
+        }
+    }
+
+    @Test
+    fun `given remote participant starts recording then recordingStartedByOthers is true`() = runTest {
+        val mockCall = givenMockCall()
+        val archivingStateFlow = MutableSharedFlow<ArchivingState>()
+        every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+
+        sut.uiState.test {
+            awaitItem()
+            sut.setup(context)
+            testScheduler.advanceUntilIdle()
+            awaitItem() // audio devices
+            awaitItem() // connected
+
+            // Remote participant starts recording (without local archiveCall)
+            archivingStateFlow.emit(ArchivingState.Started("remote-archive-id"))
+
+            val recordingState = awaitItem()
+            assertEquals(ArchivingUiState.RECORDING, recordingState.archivingUiState)
+            assertEquals(true, recordingState.recordingStartedByOthers)
+
+            // Wait for overlay auto-dismiss
+            testScheduler.advanceTimeBy(6000L)
+            val afterTimeout = awaitItem()
+            assertEquals(false, afterTimeout.recordingStartedByOthers)
+        }
+    }
+
     // endregion
 
     // region Screen sharing

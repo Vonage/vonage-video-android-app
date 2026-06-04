@@ -37,6 +37,8 @@ internal data class MeetingRoomUiState(
     val remainingBackgroundSlots: Int = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
     /** Runtime feature set — applied on top of compile-time flavor toggles. */
     val enabledFeatures: Set<MeetingRoomFeature> = MeetingRoomFeature.all,
+    /** Flag indicating recording was started by another participant (triggers overlay notification). */
+    val recordingStartedByOthers: Boolean = false,
 )
 
 internal enum class CallLayoutType {
