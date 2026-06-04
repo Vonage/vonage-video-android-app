@@ -1,0 +1,22 @@
+vonage-meeting-room/src/main/res/values/strings.xml
+  h_25498f8d57a266 22,24
+.maestro/flows/recording.yaml
+  h_25498f8d57a266 1-135
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/MeetingTopBar.kt
+  h_25498f8d57a266 32,71,135
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  h_25498f8d57a266 157-158,321-328
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/ui/ArchivesList.kt
+  h_25498f8d57a266 18,23,135,162-163
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "6d4bc10c4a77244fa61fb450b89d396704f93f66",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
