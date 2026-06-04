@@ -1,0 +1,20 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  s_bd4fa4a7dc95d2::t_4f06128a8a1ba5 437
+  s_bd4fa4a7dc95d2::t_380d806ea485a6 370
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "fb9ac068037bac91992793c00bb44a72f657d7e0",
+  "prompts": {},
+  "sessions": {
+    "s_bd4fa4a7dc95d2": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_16ca75b50ffehreEIcixtfElnp",
+        "model": "claude-sonnet-4.5"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
