@@ -432,15 +432,15 @@ class MeetingRoomViewModelTest {
             awaitItem() // connected
 
             sut.archiveCall(true)
-            skipItems(1) // STARTING
+            assertEquals(ArchivingUiState.STARTING, awaitItem().archivingUiState)
+            assertEquals(ArchivingUiState.RECORDING, awaitItem().archivingUiState)
 
-            // Emit the Started event
+            // Emit the Started event (may not emit a new uiState item if we're already RECORDING)
             archivingStateFlow.emit(ArchivingState.Started("archiveId"))
+            testScheduler.advanceUntilIdle()
 
-            val recordingState = awaitItem()
-            assertEquals(ArchivingUiState.RECORDING, recordingState.archivingUiState)
-            assertEquals(false, recordingState.recordingStartedByOthers)
-        }
+            assertEquals(ArchivingUiState.RECORDING, sut.uiState.value.archivingUiState)
+            assertEquals(false, sut.uiState.value.recordingStartedByOthers)
     }
 
     @Test
