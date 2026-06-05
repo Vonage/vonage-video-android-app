@@ -441,8 +441,8 @@ class MeetingRoomViewModelTest {
 
             assertEquals(ArchivingUiState.RECORDING, sut.uiState.value.archivingUiState)
             assertEquals(false, sut.uiState.value.recordingStartedByOthers)
+        }
     }
-
     @Test
     fun `given remote participant starts recording then recordingStartedByOthers is true`() = runTest {
         val mockCall = givenMockCall()
