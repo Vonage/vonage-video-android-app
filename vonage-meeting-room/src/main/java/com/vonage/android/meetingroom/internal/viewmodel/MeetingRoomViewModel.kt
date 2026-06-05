@@ -367,9 +367,9 @@ internal class MeetingRoomViewModel(
                                 }
                                 // Reset the overlay flag after the overlay duration
                                 if (startedByOthers) {
-                                    delay(RECORDING_OVERLAY_DELAY_MS)
-                                    _uiState.update { state ->
-                                        state.copy(recordingStartedByOthers = false)
+                                    launch {
+                                        delay(RECORDING_OVERLAY_DELAY_MS)
+                                        _uiState.update { state -> state.copy(recordingStartedByOthers = false) }
                                     }
                                 }
                                 // Reset the local flag for next recording
