@@ -109,7 +109,7 @@ fun AppNavHost(
                 dismissOnClickOutside = true,
                 usePlatformDefaultWidth = false,
             )
-        ){
+        ) {
             SettingsScreenRoute(
                 onDismiss = { navController.popBackStack() }
             )
