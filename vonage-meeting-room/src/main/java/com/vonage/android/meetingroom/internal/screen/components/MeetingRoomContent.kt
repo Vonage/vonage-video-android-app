@@ -45,12 +45,14 @@ internal fun MeetingRoomContent(
                         .fillMaxSize()
                         .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
                     participantContent = { participant, tileModifier ->
-                        ParticipantVideoCard(
-                            participant = participant,
-                            actions = actions,
-                            modifier = tileModifier,
-                            isPinned = participant.id in pinnedIds,
-                        )
+                        androidx.compose.runtime.key("${participant.id}_grid") {
+                            ParticipantVideoCard(
+                                participant = participant,
+                                actions = actions,
+                                modifier = tileModifier,
+                                isPinned = participant.id in pinnedIds,
+                            )
+                        }
                     },
                 )
             }
@@ -63,12 +65,14 @@ internal fun MeetingRoomContent(
                         .fillMaxSize()
                         .testTag(MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT),
                     participantContent = { participant, tileModifier ->
-                        ParticipantVideoCard(
-                            participant = participant,
-                            actions = actions,
-                            modifier = tileModifier,
-                            isPinned = participant.id in pinnedIds,
-                        )
+                        androidx.compose.runtime.key("${participant.id}_speaker") {
+                            ParticipantVideoCard(
+                                participant = participant,
+                                actions = actions,
+                                modifier = tileModifier,
+                                isPinned = participant.id in pinnedIds,
+                            )
+                        }
                     },
                 )
             }

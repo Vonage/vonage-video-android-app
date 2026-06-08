@@ -57,6 +57,12 @@ interface Participant {
     fun changeVisibility(visible: Boolean) {}
 
     /**
+     * Reinitializes the video renderer to fix layout issues when container size changes.
+     * This forces the OpenTok renderer to remeasure and apply correct scaling/cropping.
+     */
+    fun reinitializeRenderer() {}
+
+    /**
      * Cleans up resources when removing the participant.
      *
      * @param session The session to unsubscribe from

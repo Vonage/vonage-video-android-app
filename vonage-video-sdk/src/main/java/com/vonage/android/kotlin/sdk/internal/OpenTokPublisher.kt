@@ -1,6 +1,7 @@
 package com.vonage.android.kotlin.sdk.internal
 
 import android.view.View
+import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.OpentokError
 import com.opentok.android.Publisher
 import com.opentok.android.PublisherKit
@@ -61,6 +62,15 @@ internal class OpenTokPublisher(
     override fun destroy() = raw.destroy()
 
     override fun stop() = raw.onStop()
+
+    override fun reinitializeRenderer() {
+        // Reinitialize the renderer by setting the style again
+        // This forces the OpenTok SDK to remeasure and apply correct scaling/cropping
+        raw.renderer?.setStyle(
+            BaseVideoRenderer.STYLE_VIDEO_SCALE,
+            BaseVideoRenderer.STYLE_VIDEO_FIT,
+        )
+    }
 
     // region Noise suppression
 

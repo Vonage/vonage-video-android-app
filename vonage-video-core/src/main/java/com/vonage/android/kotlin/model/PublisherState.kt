@@ -170,6 +170,10 @@ data class PublisherState(
         vonageLogger.d(logTag, "Applied degradation preference: ${preference.label}")
     }
 
+    override fun reinitializeRenderer() {
+        vonagePublisher.reinitializeRenderer()
+    }
+
     @Stable
     data class VideoStats(
         val duration: Double,

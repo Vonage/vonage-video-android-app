@@ -87,6 +87,10 @@ data class ParticipantState(
         }
     }
 
+    override fun reinitializeRenderer() {
+        vonageSubscriber.reinitializeRenderer()
+    }
+
     /**
      * Updates camera and microphone state from a session-level stream-property change.
      * Called by [com.vonage.android.kotlin.Call] when the remote publisher toggles their

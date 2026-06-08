@@ -1,6 +1,5 @@
 package com.vonage.android.compose.layout
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,8 +20,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.movableContentOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -45,7 +44,6 @@ import kotlinx.collections.immutable.toImmutableList
 
 internal const val ASPECT_RATIO_16_9 = 16f / 9f
 
-@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun ActiveSpeakerLayout(
     participants: ImmutableList<Participant>,
@@ -77,8 +75,10 @@ fun ActiveSpeakerLayout(
         persistentListOf()
     }
 
-    val listState = lazyStateVisibilityTracker(call = call, lazyState = rememberLazyListState())
-    val movableParticipantContent = remember(participantContent) { movableContentOf(participantContent) }
+//    val listState = lazyStateVisibilityTracker(call = call, lazyState = rememberLazyListState())
+    val listState = rememberLazyListState()
+    //val movableParticipantContent = remember(participantContent) { movableContentOf(participantContent) }
+    val movableParticipantContent = remember(participantContent) { participantContent }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -134,6 +134,7 @@ private fun ActiveSpeakerVerticalLayout(
                 it,
                 Modifier
                     .weight(spotlightWeight)
+                    .fillMaxSize()
                     .padding(VonageVideoTheme.dimens.paddingSmall),
             )
         } ?: Spacer(modifier = Modifier.weight(spotlightWeight))
@@ -190,6 +191,7 @@ private fun ActiveSpeakerHorizontalLayout(
                 it,
                 Modifier
                     .weight(spotlightWeight)
+                    .fillMaxSize()
                     .padding(VonageVideoTheme.dimens.paddingSmall),
             )
         } ?: Spacer(modifier = Modifier.weight(spotlightWeight))

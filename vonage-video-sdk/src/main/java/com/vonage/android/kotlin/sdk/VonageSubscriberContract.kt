@@ -16,6 +16,7 @@ interface VonageSubscriber {
     var subscribeToVideo: Boolean
     var subscribeToCaptions: Boolean
 
+    fun reinitializeRenderer()
     fun setStreamListener(listener: VonageSubscriberStreamListener?)
     fun setVideoListener(listener: VonageSubscriberVideoListener?)
     fun setAudioLevelListener(listener: VonageAudioLevelListener?)
