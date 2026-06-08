@@ -1,0 +1,59 @@
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/layout/ActiveSpeakerLayout.kt
+  s_5a02c857055863::t_af08206afae12e 137
+  h_25498f8d57a266 24,78-81
+  s_5a02c857055863::t_6b30420aed73e7 194
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/ForcedSizeFrameLayout.kt
+  s_5a02c857055863::t_91d66d65afcff6 20-22,25-26,33-36,42-44,49,51-60,62,64
+  s_5a02c857055863::t_0113fe934d3fe6 1-19,23-24,27-32,37-41,45-48,50,61,63
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/VonagePublisherContract.kt
+  s_5a02c857055863::t_8eccc00affaeae 24
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/VonageSubscriberContract.kt
+  s_5a02c857055863::t_2a639e121b032d 19
+PLAN.md
+  s_5a02c857055863::t_4afb723aad78f8 1,5,7,11,13,17,21,23,25,27-32,36,38-46,48,53-57,59,61-67,69,71-72,74,76-77,79,81-82,84,86-87,89,91-92,94,96,98,100-106,108-111,113-116,118-121,123-126,128-131,133,135,137-138,141,143-145,147,149-154,157-159,161,163-170,172,174,176-180,182,184,186-192,194,196-199,201-205,207-210,212-217,219,221-224,226,228,230-242,244-245
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/internal/OpenTokPublisher.kt
+  s_5a02c857055863::t_1df03326f40aaf 4
+  s_5a02c857055863::t_2f8edf66f0055a 66-74
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/ParticipantState.kt
+  s_5a02c857055863::t_2a7db06e2748cd 90-93
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/PublisherState.kt
+  s_5a02c857055863::t_9303d5c8cc0558 173-176
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/VideoRenderer.kt
+  h_25498f8d57a266 5,11,74
+  s_5a02c857055863::t_1ca69e365ae17e 54-55
+  s_5a02c857055863::t_bdf1eeed3d0337 26-28
+  s_5a02c857055863::t_0ac8704271581b 24-25,45,48-50
+  s_5a02c857055863::t_0a28fdd2bd6e9f 37-44,53,56-67
+  s_5a02c857055863::t_dac230ae74b058 52
+  s_5a02c857055863::t_d1723be358a583 8,30-36,46-47,51,68-73,75-76
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/MeetingRoomContent.kt
+  s_5a02c857055863::t_10ac80d806c22c 48-55,68-75
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomUiState.kt
+  h_25498f8d57a266 27
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/Participant.kt
+  s_5a02c857055863::t_53f7aa43c9bbd2 60-64
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/internal/OpenTokSubscriber.kt
+  s_5a02c857055863::t_584be13973034c 39-47
+  s_5a02c857055863::t_8b212d0314537a 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "1dab40641d076751a51b153a389d1fb7ed4dbd20",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_5a02c857055863": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_168d21ef8ffeLKDsqmMtDGcbfT",
+        "model": "claude-sonnet-4.5"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
