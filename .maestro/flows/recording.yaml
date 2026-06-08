@@ -15,7 +15,9 @@ appId: ${APP_ID}
 - tapOn:
     id: "room-name-input"
 
-- inputText: "testroom"
+- inputText: "testroomandroid"
+
+- hideKeyboard
 
 - tapOn:
     id: "join-waiting-room-button"
@@ -39,6 +41,8 @@ appId: ${APP_ID}
 
 - inputText: "Test User"
 
+- hideKeyboard
+
 - tapOn:
     id: "join-meeting-button"
 
@@ -61,7 +65,9 @@ appId: ${APP_ID}
     timeout: 3000
 
 # Confirm start recording alert
-- tapOn: "OK"
+- tapOn: "Start Recording"
+
+- pressKey: BACK
 
 - waitForAnimationToEnd:
     timeout: 5000
@@ -87,7 +93,9 @@ appId: ${APP_ID}
     timeout: 3000
 
 # Confirm stop recording alert
-- tapOn: "OK"
+- tapOn: "Stop Recording"
+
+- pressKey: BACK
 
 - waitForAnimationToEnd:
     timeout: 5000
@@ -110,18 +118,18 @@ appId: ${APP_ID}
 
 # Verify archive list is visible on goodbye page
 - assertVisible:
-    id: "archiving-archive-list"
+    id: "goodbye-archives-container"
 
 - takeScreenshot: 04-goodbye-archives
 
 # Wait for archive to process (up to 3 minutes)
 - extendedWaitUntil:
     visible:
-      id: "archiving-download-button"
+      id: "archive-row-download-button"
     timeout: 180000
 
 # Verify download button is available
 - assertVisible:
-    id: "archiving-download-button"
+    id: "archive-row-download-button"
 
 - takeScreenshot: 05-archive-download-ready
