@@ -1,5 +1,6 @@
 package com.vonage.android.integration
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
@@ -9,9 +10,13 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.mockk
 import io.mockk.verify
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import javax.inject.Inject
 
 /**
@@ -19,6 +24,7 @@ import javax.inject.Inject
  * properly propagates settings changes to an active call.
  */
 @HiltAndroidTest
+@RunWith(AndroidJUnit4::class)
 class MeetingRoomSettingsIntegrationTest {
 
     @get:Rule(order = 0)
@@ -78,8 +84,8 @@ class MeetingRoomSettingsIntegrationTest {
         callSettingsHolder.clearCall()
 
         // Then: Call reference is null but settings persist
-        assert(callSettingsHolder.call.value == null)
-        assert(callSettingsHolder.senderStatsEnabled.value == false)
-        assert(callSettingsHolder.videoBitrateConfig.value == customConfig)
+        assertNull(callSettingsHolder.call.value)
+        assertFalse(callSettingsHolder.senderStatsEnabled.value)
+        assertEquals(customConfig, callSettingsHolder.videoBitrateConfig.value)
     }
 }

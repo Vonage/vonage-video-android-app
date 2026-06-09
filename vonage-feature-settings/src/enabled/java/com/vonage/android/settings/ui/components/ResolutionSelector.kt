@@ -58,7 +58,7 @@ internal fun ResolutionSelector(
             selectedLabel = selected?.label ?: AUTO_LABEL,
             dropdownLabel = stringResource(R.string.settings_resolution_label),
             items = items.toImmutableList(),
-            onSelectItem = if (enabled) onSelectionChange else { {} },
+            onSelectItem = if (enabled) onSelectionChange else { _ -> },
             modifier = Modifier.alpha(if (enabled) 1f else DISABLED_ALPHA),
         )
 
