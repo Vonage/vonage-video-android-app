@@ -1,0 +1,14 @@
+app/build.gradle.kts
+  h_25498f8d57a266 264
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "ecab4d95f1c36756b841d83e674181ac3136039b",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
