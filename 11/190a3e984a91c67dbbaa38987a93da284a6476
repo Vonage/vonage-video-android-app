@@ -1,0 +1,59 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  h_25498f8d57a266 283-287,294-307
+  s_5519b0f69bca25::t_fa12145cf2bcb0 262
+app/src/main/java/com/vonage/android/screen/room/MeetingRoomScreenRoute.kt
+  s_5519b0f69bca25::t_fa8a190c0d4be6 14
+  s_5519b0f69bca25::t_7a5da37eac1111 44
+  s_5519b0f69bca25::t_48a9461eab00f7 32
+app/src/main/java/com/vonage/android/navigation/AppNavHost.kt
+  s_5519b0f69bca25::t_5dbc0a36056e0b 90
+  s_5519b0f69bca25::t_31c4abe67bf03b 31
+  s_5519b0f69bca25::t_359a51b93613e4 38
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomBuilder.kt
+  s_5519b0f69bca25::t_9845676c44897d 192
+  s_5519b0f69bca25::t_31722f1c46685a 48
+  s_5519b0f69bca25::t_8a03b57239d7b1 5
+  s_5519b0f69bca25::t_d62b8400fbb97c 93-105
+app/src/main/java/com/vonage/android/di/FeaturesModule.kt
+  s_5519b0f69bca25::t_ba14e99362b6d5 23-29
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomPrebuilt.kt
+  s_5519b0f69bca25::t_644411da900a69 9
+  s_5519b0f69bca25::t_90cfe6dd603419 54
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTest.kt
+  s_5519b0f69bca25::t_82531a2600510e 275
+app/src/main/java/com/vonage/android/MainActivity.kt
+  s_5519b0f69bca25::t_06510afa9aba8e 72,74,77-79,94
+  s_5519b0f69bca25::t_2f57ab56accc7c 11,13
+  s_5519b0f69bca25::t_c3f75b870f05d6 75-76
+  s_5519b0f69bca25::t_db2fcf9e0a13f5 24,28
+vonage-feature-settings/src/main/java/com/vonage/android/settings/CallSettingsHolder.kt
+  s_5519b0f69bca25::t_d691e15609cf35 98
+  h_25498f8d57a266 3,15
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/container/MeetingRoomContainer.kt
+  s_5519b0f69bca25::t_cef4e436348491 105
+app/src/androidTest/java/com/vonage/android/integration/MeetingRoomSettingsIntegrationTest.kt
+  s_5519b0f69bca25::t_39fffa101829e1 1-85
+vonage-feature-settings/src/testEnabled/java/com/vonage/android/settings/CallSettingsHolderTest.kt
+  s_5519b0f69bca25::t_4353937218b311 145,148,153-154,161,163,165-173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "11190a3e984a91c67dbbaa38987a93da284a6476",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_5519b0f69bca25": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_15852f00fffePKITkYXXd3Z3uC",
+        "model": "claude-sonnet-4.5"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
