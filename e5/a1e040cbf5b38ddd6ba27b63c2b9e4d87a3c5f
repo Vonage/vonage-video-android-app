@@ -1,0 +1,18 @@
+app/src/androidTest/java/com/vonage/android/integration/MeetingRoomSettingsIntegrationTest.kt
+  h_25498f8d57a266 3,13-15,19,27,87-89
+vonage-feature-settings/src/enabled/java/com/vonage/android/settings/ui/components/ResolutionSelector.kt
+  h_25498f8d57a266 61
+app/build.gradle.kts
+  h_25498f8d57a266 264
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "e5a1e040cbf5b38ddd6ba27b63c2b9e4d87a3c5f",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
