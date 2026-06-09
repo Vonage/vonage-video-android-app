@@ -240,83 +240,151 @@ private fun LazyListScope.settingItem(
     actions: SettingsScreenActions,
 ) {
     when (setting) {
-        Setting.FRAME_RATE -> item {
-            FrameRateSelector(
-                selected = uiState.captureFrameRate,
-                onSelectionChange = actions.onFrameRateChange,
-            )
-        }
+        Setting.FRAME_RATE -> frameRateItem(uiState, actions)
+        Setting.RESOLUTION -> resolutionItem(uiState, actions)
+        Setting.VIDEO_BITRATE -> videoBitrateItem(uiState, actions)
+        Setting.DEGRADATION_PREFERENCE -> degradationPreferenceItem(uiState, actions)
+        Setting.PREFERRED_CODEC_ORDER -> codecOrderItem(uiState, actions)
+        Setting.OPUS_DTX -> opusDtxItem(uiState, actions)
+        Setting.AUDIO_BITRATE -> audioBitrateItem(uiState, actions)
+        Setting.PUBLISHER_AUDIO_FALLBACK -> publisherAudioFallbackItem(uiState, actions)
+        Setting.SUBSCRIBER_AUDIO_FALLBACK -> subscriberAudioFallbackItem(uiState, actions)
+        Setting.SENDER_STATS -> senderStatsItem(uiState, actions)
+    }
+}
 
-        Setting.RESOLUTION -> item {
-            ResolutionSelector(
-                selected = uiState.captureResolution,
-                onSelectionChange = actions.onResolutionChange,
-            )
-        }
+@Composable
+private fun disabledHelperText(isCallActive: Boolean): String? =
+    if (isCallActive) stringResource(R.string.settings_disabled_during_call) else null
 
-        Setting.VIDEO_BITRATE -> item {
-            VideoBitrateSelector(
-                config = uiState.videoBitrateConfig,
-                onConfigChange = actions.onVideoBitrateConfigChange,
-            )
-        }
+private fun LazyListScope.frameRateItem(uiState: SettingsUiState, actions: SettingsScreenActions) {
+    item {
+        val isCallActive = uiState.call != null
+        FrameRateSelector(
+            selected = uiState.captureFrameRate,
+            onSelectionChange = actions.onFrameRateChange,
+            enabled = !isCallActive,
+            helperText = disabledHelperText(isCallActive),
+        )
+    }
+}
 
-        Setting.DEGRADATION_PREFERENCE -> item {
-            DegradationPreferenceSelector(
-                selected = uiState.degradationPreference,
-                onSelectionChange = actions.onDegradationPreferenceChange,
-            )
-        }
+private fun LazyListScope.resolutionItem(uiState: SettingsUiState, actions: SettingsScreenActions) {
+    item {
+        val isCallActive = uiState.call != null
+        ResolutionSelector(
+            selected = uiState.captureResolution,
+            onSelectionChange = actions.onResolutionChange,
+            enabled = !isCallActive,
+            helperText = disabledHelperText(isCallActive),
+        )
+    }
+}
 
-        Setting.PREFERRED_CODEC_ORDER -> item {
-            PreferredCodecOrderSelector(
-                selectedOrder = uiState.preferredVideoCodecOrder,
-                onOrderChange = actions.onPreferredVideoCodecOrderChange,
-            )
-        }
+private fun LazyListScope.videoBitrateItem(uiState: SettingsUiState, actions: SettingsScreenActions) {
+    item {
+        VideoBitrateSelector(
+            config = uiState.videoBitrateConfig,
+            onConfigChange = actions.onVideoBitrateConfigChange,
+        )
+    }
+}
 
-        Setting.OPUS_DTX -> item {
-            SettingsToggleRow(
-                title = stringResource(R.string.settings_opus_dtx),
-                description = stringResource(R.string.settings_opus_dtx_description),
-                isChecked = uiState.opusDtxEnabled,
-                onCheckedChange = actions.onOpusDtxToggle,
-            )
-        }
+private fun LazyListScope.degradationPreferenceItem(
+    uiState: SettingsUiState,
+    actions: SettingsScreenActions,
+) {
+    item {
+        DegradationPreferenceSelector(
+            selected = uiState.degradationPreference,
+            onSelectionChange = actions.onDegradationPreferenceChange,
+        )
+    }
+}
 
-        Setting.AUDIO_BITRATE -> item {
-            AudioBitrateSelector(
-                audioBitrate = uiState.audioBitrate,
-                onAudioBitrateChange = actions.onAudioBitrateChange,
-            )
-        }
+private fun LazyListScope.codecOrderItem(uiState: SettingsUiState, actions: SettingsScreenActions) {
+    item {
+        val isCallActive = uiState.call != null
+        PreferredCodecOrderSelector(
+            selectedOrder = uiState.preferredVideoCodecOrder,
+            onOrderChange = actions.onPreferredVideoCodecOrderChange,
+            enabled = !isCallActive,
+            helperText = disabledHelperText(isCallActive),
+        )
+    }
+}
 
-        Setting.PUBLISHER_AUDIO_FALLBACK -> item {
-            SettingsToggleRow(
-                title = stringResource(R.string.settings_publisher_audio_fallback),
-                description = stringResource(R.string.settings_publisher_audio_fallback_description),
-                isChecked = uiState.publisherAudioFallbackEnabled,
-                onCheckedChange = actions.onPublisherAudioFallbackToggle,
-            )
-        }
+private fun LazyListScope.opusDtxItem(uiState: SettingsUiState, actions: SettingsScreenActions) {
+    item {
+        val isCallActive = uiState.call != null
+        SettingsToggleRow(
+            title = stringResource(R.string.settings_opus_dtx),
+            description = stringResource(R.string.settings_opus_dtx_description),
+            isChecked = uiState.opusDtxEnabled,
+            onCheckedChange = actions.onOpusDtxToggle,
+            enabled = !isCallActive,
+            helperText = disabledHelperText(isCallActive),
+        )
+    }
+}
 
-        Setting.SUBSCRIBER_AUDIO_FALLBACK -> item {
-            SettingsToggleRow(
-                title = stringResource(R.string.settings_subscriber_audio_fallback),
-                description = stringResource(R.string.settings_subscriber_audio_fallback_description),
-                isChecked = uiState.subscriberAudioFallbackEnabled,
-                onCheckedChange = actions.onSubscriberAudioFallbackToggle,
-            )
-        }
+private fun LazyListScope.audioBitrateItem(uiState: SettingsUiState, actions: SettingsScreenActions) {
+    item {
+        val isCallActive = uiState.call != null
+        AudioBitrateSelector(
+            audioBitrate = uiState.audioBitrate,
+            onAudioBitrateChange = actions.onAudioBitrateChange,
+            enabled = !isCallActive,
+            helperText = disabledHelperText(isCallActive),
+        )
+    }
+}
 
-        Setting.SENDER_STATS -> item {
-            SettingsToggleRow(
-                title = stringResource(R.string.settings_sender_stats_title),
-                description = stringResource(R.string.settings_sender_stats_description),
-                isChecked = uiState.senderStatsEnabled,
-                onCheckedChange = actions.onSenderStatsTrackToggle,
-            )
-        }
+private fun LazyListScope.publisherAudioFallbackItem(
+    uiState: SettingsUiState,
+    actions: SettingsScreenActions,
+) {
+    item {
+        val isCallActive = uiState.call != null
+        SettingsToggleRow(
+            title = stringResource(R.string.settings_publisher_audio_fallback),
+            description = stringResource(R.string.settings_publisher_audio_fallback_description),
+            isChecked = uiState.publisherAudioFallbackEnabled,
+            onCheckedChange = actions.onPublisherAudioFallbackToggle,
+            enabled = !isCallActive,
+            helperText = disabledHelperText(isCallActive),
+        )
+    }
+}
+
+private fun LazyListScope.subscriberAudioFallbackItem(
+    uiState: SettingsUiState,
+    actions: SettingsScreenActions,
+) {
+    item {
+        val isCallActive = uiState.call != null
+        SettingsToggleRow(
+            title = stringResource(R.string.settings_subscriber_audio_fallback),
+            description = stringResource(R.string.settings_subscriber_audio_fallback_description),
+            isChecked = uiState.subscriberAudioFallbackEnabled,
+            onCheckedChange = actions.onSubscriberAudioFallbackToggle,
+            enabled = !isCallActive,
+            helperText = disabledHelperText(isCallActive),
+        )
+    }
+}
+
+private fun LazyListScope.senderStatsItem(uiState: SettingsUiState, actions: SettingsScreenActions) {
+    item {
+        val isCallActive = uiState.call != null
+        SettingsToggleRow(
+            title = stringResource(R.string.settings_sender_stats_title),
+            description = stringResource(R.string.settings_sender_stats_description),
+            isChecked = uiState.senderStatsEnabled,
+            onCheckedChange = actions.onSenderStatsTrackToggle,
+            enabled = !isCallActive,
+            helperText = disabledHelperText(isCallActive),
+        )
     }
 }
 

@@ -23,6 +23,8 @@ internal fun SettingsToggleRow(
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    helperText: String? = null,
 ) {
     Row(
         modifier = modifier
@@ -34,27 +36,44 @@ internal fun SettingsToggleRow(
             Text(
                 text = title,
                 style = VonageVideoTheme.typography.bodyBaseSemibold,
-                color = VonageVideoTheme.colors.secondary,
+                color = if (enabled) {
+                    VonageVideoTheme.colors.secondary
+                } else {
+                    VonageVideoTheme.colors.textDisabled
+                },
             )
             Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = description,
                     style = VonageVideoTheme.typography.caption,
-                    color = VonageVideoTheme.colors.tertiary,
+                    color = if (enabled) {
+                        VonageVideoTheme.colors.tertiary
+                    } else {
+                        VonageVideoTheme.colors.textDisabled
+                    },
                 )
+            }
+            helperText?.let {
+                SettingHelperText(text = it)
             }
         }
         Spacer(modifier = Modifier.width(VonageVideoTheme.dimens.spaceDefault))
         Switch(
             checked = isChecked,
             onCheckedChange = onCheckedChange,
+            enabled = enabled,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
                 checkedTrackColor = VonageVideoTheme.colors.primary,
                 uncheckedThumbColor = Color.White,
                 uncheckedTrackColor = VonageVideoTheme.colors.border,
                 uncheckedBorderColor = VonageVideoTheme.colors.border,
+                disabledCheckedThumbColor = Color.White,
+                disabledCheckedTrackColor = VonageVideoTheme.colors.disabled,
+                disabledUncheckedThumbColor = Color.White,
+                disabledUncheckedTrackColor = VonageVideoTheme.colors.disabled,
+                disabledUncheckedBorderColor = VonageVideoTheme.colors.disabled,
             ),
         )
     }

@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -27,11 +28,15 @@ import com.vonage.android.kotlin.model.DEFAULT_VIDEO_CODEC_ORDER
 import com.vonage.android.kotlin.model.VideoCodec
 import com.vonage.android.settings.R
 
+private const val DISABLED_ALPHA = 0.5f
+
 @Composable
 internal fun PreferredCodecOrderSelector(
     selectedOrder: List<VideoCodec>?,
     onOrderChange: (List<VideoCodec>?) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    helperText: String? = null,
 ) {
     val isManual = selectedOrder != null
     val displayOrder = selectedOrder ?: DEFAULT_VIDEO_CODEC_ORDER
@@ -39,7 +44,8 @@ internal fun PreferredCodecOrderSelector(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = VonageVideoTheme.dimens.paddingSmall),
+            .padding(vertical = VonageVideoTheme.dimens.paddingSmall)
+            .alpha(if (enabled) 1f else DISABLED_ALPHA),
     ) {
         Text(
             text = stringResource(R.string.settings_codec_order_title),
@@ -61,9 +67,14 @@ internal fun PreferredCodecOrderSelector(
             )
             Switch(
                 checked = !isManual,
-                onCheckedChange = { auto ->
-                    onOrderChange(if (auto) null else DEFAULT_VIDEO_CODEC_ORDER)
+                onCheckedChange = if (enabled) {
+                    { auto ->
+                        onOrderChange(if (auto) null else DEFAULT_VIDEO_CODEC_ORDER)
+                    }
+                } else {
+                    {}
                 },
+                enabled = enabled,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Color.White,
                     checkedTrackColor = VonageVideoTheme.colors.primary,
@@ -82,20 +93,34 @@ internal fun PreferredCodecOrderSelector(
                     codec = codec,
                     canMoveUp = index > 0,
                     canMoveDown = index < displayOrder.lastIndex,
-                    onMoveUp = {
-                        val mutable = displayOrder.toMutableList()
-                        mutable[index] =
-                            mutable[index - 1].also { mutable[index - 1] = mutable[index] }
-                        onOrderChange(mutable)
+                    onMoveUp = if (enabled) {
+                        {
+                            val mutable = displayOrder.toMutableList()
+                            mutable[index] =
+                                mutable[index - 1].also { mutable[index - 1] = mutable[index] }
+                            onOrderChange(mutable)
+                        }
+                    } else {
+                        {}
                     },
-                    onMoveDown = {
-                        val mutable = displayOrder.toMutableList()
-                        mutable[index] =
-                            mutable[index + 1].also { mutable[index + 1] = mutable[index] }
-                        onOrderChange(mutable)
+                    onMoveDown = if (enabled) {
+                        {
+                            val mutable = displayOrder.toMutableList()
+                            mutable[index] =
+                                mutable[index + 1].also { mutable[index + 1] = mutable[index] }
+                            onOrderChange(mutable)
+                        }
+                    } else {
+                        {}
                     },
+                    enabled = enabled,
                 )
             }
+        }
+
+        helperText?.let {
+            Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
+            SettingHelperText(text = it)
         }
     }
 }
@@ -108,6 +133,7 @@ private fun CodecRow(
     canMoveDown: Boolean,
     onMoveUp: () -> Unit,
     onMoveDown: () -> Unit,
+    enabled: Boolean,
 ) {
     Row(
         modifier = Modifier
@@ -129,24 +155,24 @@ private fun CodecRow(
         )
         IconButton(
             onClick = onMoveUp,
-            enabled = canMoveUp,
+            enabled = enabled && canMoveUp,
             modifier = Modifier.size(36.dp),
         ) {
             Icon(
                 imageVector = VividIcons.Line.ChevronUp,
                 contentDescription = null,
-                tint = if (canMoveUp) VonageVideoTheme.colors.primary else VonageVideoTheme.colors.border,
+                tint = if (enabled && canMoveUp) VonageVideoTheme.colors.primary else VonageVideoTheme.colors.border,
             )
         }
         IconButton(
             onClick = onMoveDown,
-            enabled = canMoveDown,
+            enabled = enabled && canMoveDown,
             modifier = Modifier.size(36.dp),
         ) {
             Icon(
                 imageVector = VividIcons.Line.ChevronDown,
                 contentDescription = null,
-                tint = if (canMoveDown) VonageVideoTheme.colors.primary else VonageVideoTheme.colors.border,
+                tint = if (enabled && canMoveDown) VonageVideoTheme.colors.primary else VonageVideoTheme.colors.border,
             )
         }
     }

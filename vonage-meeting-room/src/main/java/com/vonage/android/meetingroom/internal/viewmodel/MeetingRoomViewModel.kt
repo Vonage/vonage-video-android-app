@@ -280,11 +280,6 @@ internal class MeetingRoomViewModel(
             ) { it }
                 .drop(1)
                 .collect {
-                    /*
-                    video bit rate - runtime
-                    degradation preference - runtime
-
-                     */
                     call?.let { activeCall ->
                         container.videoClient.configurePublisher(
                             PublisherConfig(
