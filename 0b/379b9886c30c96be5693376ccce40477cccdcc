@@ -1,0 +1,14 @@
+vonage-feature-settings/src/enabled/java/com/vonage/android/settings/ui/components/SettingHelperText.kt
+  h_25498f8d57a266 8,18,25-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "0b379b9886c30c96be5693376ccce40477cccdcc",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
