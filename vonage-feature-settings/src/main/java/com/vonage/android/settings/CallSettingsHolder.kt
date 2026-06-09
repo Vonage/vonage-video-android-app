@@ -1,5 +1,6 @@
 package com.vonage.android.settings
 
+import androidx.compose.runtime.Stable
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+@Stable
 class CallSettingsHolder {
 
     private val _call = MutableStateFlow<CallFacade?>(null)
@@ -93,21 +95,8 @@ class CallSettingsHolder {
         _audioBitrate.value = bitrate
     }
 
-    fun clear() {
+    fun clearCall() {
         _call.value = null
-        _senderStatsEnabled.value = true
-        _videoBitrateConfig.value = VideoBitrateConfig(
-            preset = VideoBitratePreset.DEFAULT,
-            maxBitrate = VideoBitratePreset.DEFAULT.defaultMaxBitrate,
-        )
-        _degradationPreference.value = DegradationPreference.NOT_SET
-        _captureFrameRate.value = CaptureFrameRate.FPS_15
-        _captureResolution.value = null
-        _publisherAudioFallbackEnabled.value = true
-        _subscriberAudioFallbackEnabled.value = true
-        _preferredVideoCodecOrder.value = null
-        _audioBitrate.value = null
-        _opusDtxEnabled.value = true
     }
 
     fun bind(call: CallFacade) {

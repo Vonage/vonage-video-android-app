@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import com.vonage.android.meetingroom.internal.MeetingRoomActivity
 import com.vonage.android.meetingroom.internal.MeetingRoomContent
 import com.vonage.android.meetingroom.internal.MeetingRoomPrebuiltHolder
+import com.vonage.android.settings.CallSettingsHolder
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -50,6 +51,7 @@ class MeetingRoomPrebuilt internal constructor(
     internal val onAction: (MeetingRoomSDKAction) -> Unit,
     internal val configuration: MeetingRoomConfiguration,
     internal val publisherSettings: PublisherSettings,
+    internal val callSettingsHolder: CallSettingsHolder?,
     internal val theme: MeetingRoomTheme,
     internal val isDebug: Boolean,
     internal val reportingContent: (@Composable (() -> Unit) -> Unit)?,

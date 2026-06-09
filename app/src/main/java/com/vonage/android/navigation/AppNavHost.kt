@@ -28,12 +28,14 @@ import com.vonage.android.screen.landing.LandingScreenRoute
 import com.vonage.android.screen.room.MeetingRoomScreenRoute
 import com.vonage.android.screen.settings.SettingsScreenRoute
 import com.vonage.android.screen.waiting.WaitingRoomRoute
+import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.util.navigateToShare
 import com.vonage.android.util.navigateToSystemPermissions
 
 @Composable
 fun AppNavHost(
     navController: NavHostController,
+    callSettingsHolder: CallSettingsHolder,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -85,6 +87,7 @@ fun AppNavHost(
             SideEffect { pendingPublisherSettings = null }
             MeetingRoomScreenRoute(
                 roomName = roomName,
+                callSettingsHolder = callSettingsHolder,
                 initialPublisherSettings = settings,
                 navigateToGoodBye = { navController.navigate(Goodbye(roomName = roomName)) },
                 navigateToShare = { roomName -> context.navigateToShare(roomName) },

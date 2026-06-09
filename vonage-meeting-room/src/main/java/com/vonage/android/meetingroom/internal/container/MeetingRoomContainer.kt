@@ -102,7 +102,7 @@ internal class MeetingRoomContainer(
     }
 
     val callSettingsHolder: CallSettingsHolder by lazy {
-        CallSettingsHolder()
+        prebuilt.callSettingsHolder ?: CallSettingsHolder()
     }
 
     val foregroundServiceHandler: MeetingRoomForegroundServiceHandler by lazy {

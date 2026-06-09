@@ -259,7 +259,7 @@ internal class MeetingRoomViewModel(
         }
         container.vonageScreenSharing.stopSharingScreen()
         container.audioDevicesHandler.stop()
-        container.callSettingsHolder.clear()
+        container.callSettingsHolder.clearCall()
         call?.endSession()
     }
 
@@ -280,26 +280,31 @@ internal class MeetingRoomViewModel(
             ) { it }
                 .drop(1)
                 .collect {
+                    /*
+                    video bit rate - runtime
+                    degradation preference - runtime
+
+                     */
                     call?.let { activeCall ->
                         container.videoClient.configurePublisher(
                             PublisherConfig(
                                 // Prefer the name set by PublisherSettings; fall back to the active publisher name
                                 name = prebuilt.publisherSettings.username.ifEmpty {
                                     activeCall.publisher.value?.name.orEmpty()
-                                },
-                                publishVideo = activeCall.publisher.value?.isCameraEnabled?.value ?: true,
-                                publishAudio = activeCall.publisher.value?.isMicEnabled?.value ?: true,
-                                initialVideoEffect = activeCall.publisher.value?.videoEffect?.value ?: VideoEffect.None,
-                                cameraIndex = activeCall.publisher.value?.camera?.value?.index ?: 1,
-                                captureFrameRate = holder.captureFrameRate.value,
-                                captureResolution = holder.captureResolution.value,
-                                preferredVideoCodecOrder = holder.preferredVideoCodecOrder.value,
-                                audioBitrate = holder.audioBitrate.value,
-                                senderStatsTrack = holder.senderStatsEnabled.value,
-                                opusDtxEnabled = holder.opusDtxEnabled.value,
-                                publisherAudioFallback = holder.publisherAudioFallbackEnabled.value,
-                                subscriberAudioFallback = holder.subscriberAudioFallbackEnabled.value,
-                                publishCaptions = container.vonageCaptions.isCapable,
+                                }, // builder level
+                                publishVideo = activeCall.publisher.value?.isCameraEnabled?.value ?: true, // runtime
+                                publishAudio = activeCall.publisher.value?.isMicEnabled?.value ?: true, // runtime
+                                publishCaptions = container.vonageCaptions.isCapable, // builder level
+                                initialVideoEffect = activeCall.publisher.value?.videoEffect?.value ?: VideoEffect.None, // runtime
+                                cameraIndex = activeCall.publisher.value?.camera?.value?.index ?: 1, // runtime
+                                captureFrameRate = holder.captureFrameRate.value, // builder level
+                                captureResolution = holder.captureResolution.value, // builder level
+                                preferredVideoCodecOrder = holder.preferredVideoCodecOrder.value, // builder level
+                                audioBitrate = holder.audioBitrate.value, // builder level
+                                senderStatsTrack = holder.senderStatsEnabled.value, // builder level
+                                opusDtxEnabled = holder.opusDtxEnabled.value, // builder level
+                                publisherAudioFallback = holder.publisherAudioFallbackEnabled.value, // builder level
+                                subscriberAudioFallback = holder.subscriberAudioFallbackEnabled.value, // builder level
                             ),
                         )
                         vonageLogger.d("MeetingRoomViewModel", "Refresh publisher (${activeCall.publisher.value?.name})")
