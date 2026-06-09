@@ -23,22 +23,18 @@ import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler.CallAction
 import com.vonage.android.screensharing.ScreenSharingState
-import com.vonage.logger.vonageLogger
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 
 @Suppress("LongParameterList")
 internal class MeetingRoomViewModel(
@@ -131,7 +127,6 @@ internal class MeetingRoomViewModel(
         }
 
         container.audioDevicesHandler.start()
-        observePublisherSettings()
     }
 
     /** Bridges the internal [MeetingRoomUiState] to the public [MeetingRoomCallState]. */
@@ -261,52 +256,6 @@ internal class MeetingRoomViewModel(
         container.audioDevicesHandler.stop()
         container.callSettingsHolder.clearCall()
         call?.endSession()
-    }
-
-    private fun observePublisherSettings() {
-        viewModelScope.launch {
-            val holder = container.callSettingsHolder
-            combine(
-                listOf<Flow<Any?>>(
-                    holder.captureFrameRate,
-                    holder.captureResolution,
-                    holder.preferredVideoCodecOrder,
-                    holder.audioBitrate,
-                    holder.opusDtxEnabled,
-                    holder.publisherAudioFallbackEnabled,
-                    holder.subscriberAudioFallbackEnabled,
-                    holder.senderStatsEnabled,
-                ),
-            ) { it }
-                .drop(1)
-                .collect {
-                    call?.let { activeCall ->
-                        container.videoClient.configurePublisher(
-                            PublisherConfig(
-                                // Prefer the name set by PublisherSettings; fall back to the active publisher name
-                                name = prebuilt.publisherSettings.username.ifEmpty {
-                                    activeCall.publisher.value?.name.orEmpty()
-                                }, // builder level
-                                publishVideo = activeCall.publisher.value?.isCameraEnabled?.value ?: true, // runtime
-                                publishAudio = activeCall.publisher.value?.isMicEnabled?.value ?: true, // runtime
-                                publishCaptions = container.vonageCaptions.isCapable, // builder level
-                                initialVideoEffect = activeCall.publisher.value?.videoEffect?.value ?: VideoEffect.None, // runtime
-                                cameraIndex = activeCall.publisher.value?.camera?.value?.index ?: 1, // runtime
-                                captureFrameRate = holder.captureFrameRate.value, // builder level
-                                captureResolution = holder.captureResolution.value, // builder level
-                                preferredVideoCodecOrder = holder.preferredVideoCodecOrder.value, // builder level
-                                audioBitrate = holder.audioBitrate.value, // builder level
-                                senderStatsTrack = holder.senderStatsEnabled.value, // builder level
-                                opusDtxEnabled = holder.opusDtxEnabled.value, // builder level
-                                publisherAudioFallback = holder.publisherAudioFallbackEnabled.value, // builder level
-                                subscriberAudioFallback = holder.subscriberAudioFallbackEnabled.value, // builder level
-                            ),
-                        )
-                        vonageLogger.d("MeetingRoomViewModel", "Refresh publisher (${activeCall.publisher.value?.name})")
-                        activeCall.refreshPublisher(context)
-                    }
-                }
-        }
     }
 
     fun sendMessage(message: String) { call?.sendChatMessage(message) }

@@ -100,7 +100,6 @@ interface PublisherFacade {
     fun applyLocalVideoEffect(effect: VideoEffect)
     fun setVideoBitrate(config: VideoBitrateConfig)
     fun setDegradationPreference(preference: DegradationPreference)
-    fun refreshPublisher(context: Context)
 }
 
 interface SessionFacade {
