@@ -24,7 +24,7 @@ internal data class MeetingRoomUiState(
     val isError: Boolean = false,
     val errorMessage: String? = null,
     val isEndCall: Boolean = false,
-    val layoutType: CallLayoutType = CallLayoutType.SPEAKER_LAYOUT,
+    val layoutType: CallLayoutType = CallLayoutType.ADAPTIVE_GRID,
     val allowMicrophoneControl: Boolean = true,
     val allowCameraControl: Boolean = true,
     val allowShowParticipantList: Boolean = true,

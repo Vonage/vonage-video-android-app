@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,7 +34,6 @@ import com.vonage.android.compose.components.ParticipantsPlaceholders
 import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.compose.util.lazyStateVisibilityTracker
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import kotlinx.collections.immutable.ImmutableList

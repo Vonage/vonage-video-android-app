@@ -52,6 +52,11 @@ internal class OpenTokSdkFactory(
         val session = Session.Builder(context, apiKey, sessionId)
             .setSinglePeerConnection(true)
             .setSessionMigration(true)
+            .sessionOptions(object : Session.SessionOptions() {
+                override fun useTextureViews(): Boolean {
+                    return true
+                }
+            })
             .build()
         return OpenTokSession(session)
     }

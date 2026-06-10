@@ -2,19 +2,19 @@ package com.vonage.android.compose.components
 
 import android.content.Context
 import android.view.ViewGroup
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.Participant
+
+const val DELAY_MILLIS = 16L
 
 @Composable
 fun ParticipantVideoRenderer(
@@ -23,11 +23,8 @@ fun ParticipantVideoRenderer(
 ) {
     // Use ForcedSizeFrameLayout instead of regular FrameLayout to force proper measurement
     val factory = remember { { context: Context -> ForcedSizeFrameLayout(context) } }
-    // Use modifier toString as key to force recreation when layout changes significantly
-    // This prevents the OpenTok native view from retaining cached dimensions from previous containers
-    val modifierKey = remember(modifier) { modifier.toString() }
 
-    key(modifierKey) {
+    key(participant.id) {
         AndroidView(
             factory = factory,
             update = { container ->
@@ -63,15 +60,14 @@ fun ParticipantVideoRenderer(
                         container.postDelayed({
                             view.forceLayout()
                             container.requestLayout()
-                        }, 16) // One frame delay
+                        }, DELAY_MILLIS) // One frame delay
                     }
                 }
             },
             onRelease = { container ->
                 container.removeAllViews()
             },
-            modifier = modifier
-                .background(Color.Red),
+            modifier = modifier,
         )
     }
 }
