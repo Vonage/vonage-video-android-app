@@ -1,0 +1,19 @@
+docs/ARCHITECTURE.md
+  s_94e5b471f94a84::t_035e782783ac08 1-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.12",
+  "base_commit_sha": "ac084a8452512704ff579a1866147c8aec9c9a17",
+  "prompts": {},
+  "sessions": {
+    "s_94e5b471f94a84": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "adecb864-a7b2-4b43-bfa5-ddadcd26ffb6",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Ivan <210490533+VZaphod@users.noreply.github.com>"
+    }
+  }
+}
