@@ -79,7 +79,7 @@ This application provides features for common conferencing use cases, such as:
 - **JDK**: 17 or higher
 - **Gradle**: 8.13.0+ (via wrapper)
 
-## 📚 Documentation
+## Documentation
 
 | Document | Description |
 |---|---|
