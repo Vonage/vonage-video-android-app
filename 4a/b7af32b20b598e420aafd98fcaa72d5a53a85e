@@ -1,0 +1,29 @@
+docs/GETTING_STARTED.md
+  s_94e5b471f94a84::t_bd7f3b74e12397 1-61
+.github/copilot-instructions.md
+  s_94e5b471f94a84::t_bd71d69b4452dd 37-50
+docs/CONFIGURATION.md
+  s_94e5b471f94a84::t_cea94f3e7d22ab 1-54
+docs/CODE_STYLE.md
+  s_94e5b471f94a84::t_51dad669a99ae1 1-38
+README.md
+  s_94e5b471f94a84::t_927be689106765 73,75-77,79,82,84-95,97,99,101,105,108,110
+docs/TESTING.md
+  s_94e5b471f94a84::t_e17371970a2a55 1-218
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.12",
+  "base_commit_sha": "4ab7af32b20b598e420aafd98fcaa72d5a53a85e",
+  "prompts": {},
+  "sessions": {
+    "s_94e5b471f94a84": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "adecb864-a7b2-4b43-bfa5-ddadcd26ffb6",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Ivan <210490533+VZaphod@users.noreply.github.com>"
+    }
+  }
+}
