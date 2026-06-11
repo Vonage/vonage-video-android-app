@@ -70,181 +70,44 @@ This application provides features for common conferencing use cases, such as:
 
 - Foreground Service: Keeps the video call running in the background with proper Android notification handling.
 
-## Project Architecture
+## Platforms & Requirements
 
-This reference app requires the user to deploy a backend and then use the backend API URL as the base URL in the app configuration. You can find backend code and deploying instructions in the [vonage-video-react-app](https://github.com/Vonage/vonage-video-react-app) repository.
-
-The backend communicates with the Vonage video platform using the Vonage Server SDK and is responsible for generating the session IDs and tokens used to connect to the video rooms by the Vonage Client SDK.
-
-## Module Overview
-
-The Vonage Android reference app is built with a modular architecture. The app is organized into the following modules:
-
-- **app**: Main application module and composition root
-- **vonage-video-core**: Core video SDK wrapper providing the `VonageVideoClient`, `Call` abstraction, signaling, and domain models on top of the OpenTok Android SDK
-- **vonage-video-ui-compose**: Jetpack Compose UI component library with a JSON-driven theme generator, reusable widgets, and permission handling
-- **vonage-video-shared**: Shared utilities and common code used across all other modules
-- **vonage-feature-chat**: In-call text chat using OpenTok signaling (optional feature module)
-- **vonage-feature-reactions**: In-call emoji reactions (optional feature module)
-- **vonage-feature-captions**: Live captions and subtitles (optional feature module)
-- **vonage-feature-archiving**: Call recording and archive management (optional feature module)
-- **vonage-feature-screensharing**: Screen sharing via MediaProjection and foreground service (optional feature module)
-- **vonage-feature-video-effects**: Video effects such as background blur and replacement (optional feature module)
-- **vonage-audio-selector**: Audio output device selector with support for Bluetooth, wired headset, earpiece, and speaker
-- **vonage-android-logger**: Lightweight logging library with an interceptor pipeline and structured log events
-- **vonage-config-idea-plugin**: Android Studio / IntelliJ plugin for managing configurable features
-- **build-tools**: Custom Gradle plugins for JSON-to-Kotlin config generation, theme generation, Detekt, Kover, and SonarQube integration
-
-## Platforms supported
-
-The current minimum deployment target for the reference app is Android 7.0 (API 24+). The app is optimized for phones and tablets and supports the following architectures: ARM64-v8a, ARMv7, x86, and x86_64.
-
-## Vonage Video SDK Compatibility
-
-This reference app has been tested with **Vonage Video SDK 2.32** and **2.33**. We strongly recommend using the latest available SDK version to take advantage of the newest features and avoid potential issues with older releases.
-
-The SDK version is declared in the version catalog file (`gradle/libs.versions.toml`) and can be adjusted there if needed.
-
-## Requirements
-
+- **Minimum Android version**: 7.0 (API 24+), optimized for phones and tablets
+- **Architectures**: ARM64-v8a, ARMv7, x86, x86_64
+- **Vonage Video SDK**: Tested with 2.32 and 2.33 — use the latest available version
 - **Android Studio**: Ladybug (2024.2.1) or newer
-- **JDK**: Version 17 or higher
+- **JDK**: 17 or higher
 - **Gradle**: 8.13.0+ (via wrapper)
 
-## Running Locally
+## 📚 Documentation
 
-First follow the steps to create the Vonage account, application and backend set up and deployment at the [vonage-video-react-app](https://github.com/Vonage/vonage-video-react-app?tab=readme-ov-file#running-locally) URL.
+| Document | Description |
+|---|---|
+| [Getting Started](docs/GETTING_STARTED.md) | Clone, configure the backend URL, build, and run the app |
+| [Architecture](docs/ARCHITECTURE.md) | Project architecture, module overview, session flow, and DI |
+| [Configuration](docs/CONFIGURATION.md) | Feature flags, theme customization, and base URL setup |
+| [Config System](docs/CONFIG-SYSTEM.md) | Deep-dive into the JSON-driven config plugin system |
+| [Localization](docs/LOCALIZATION.md) | Multi-language support and how to add a new language |
+| [Testing](docs/TESTING.md) | Unit tests, instrumented tests, snapshot tests, and Maestro E2E |
+| [Code Style](docs/CODE_STYLE.md) | Detekt, Spotless, and code conventions |
+| [Contributing](docs/CONTRIBUTING.md) | How to contribute to this project |
+| [Known Issues](docs/KNOWN_ISSUES.md) | Tracked known issues |
+| [Code of Conduct](docs/CODE_OF_CONDUCT.md) | Community code of conduct |
 
-Clone the repository:
+## Contributing
 
-```bash
-git clone https://github.com/Vonage/vonage-video-android-app.git
-cd vonage-video-android-app
-```
+If you wish to contribute to this project, read how in [Contributing](docs/CONTRIBUTING.md). Please also read our [Code of Conduct](docs/CODE_OF_CONDUCT.md).
 
-Configure the application by editing the JSON files in the `config` folder:
-
-- `app-config.json`: Feature flags and application settings
-- `theme.json`: UI theme configuration
-
-Modify the base URL constant in your configuration to point to your deployed backend.
-
-You could create `local.properties` in the project root (good for local development):
-```properties
-BASE_API_URL=https://your-backend-url.com
-```
-or create a environment variable named `BASE_API_URL` (good for CI/CD pipelines):
-```bash
-export BASE_API_URL=https://your-backend-url.com
-```
-or even modify `app-config.json` replacing the current placeholder with your URL.
-
-Then regenerate the configuration:
-```bash
-./gradlew generateVonageConfig
-```
-
-Open the project in Android Studio and let Gradle sync complete.
-
-Build and run the app:
-
-```bash
-./gradlew installDebug
-```
-
-Or use Android Studio's run button (▶️) to build and deploy to a connected device or emulator.
-
-Note: If you need to run the app in an emulator consuming a local backend, you could set `BASE_API_URL` to the special alias `10.0.2.2`
-
-## Feature configuration
-
-You can fork the repository and start modifying it for your needs. Or you can modify the configuration files in the `config` folder:
-
-- `app-config.json`: Configure feature flags like chat, captions, screen sharing, background blur, etc.
-- The custom Gradle plugin (`JsonConfigPlugin`) reads these configuration files at build time
-- Features can be enabled/disabled without code changes
-- Some features use product flavors (e.g., chat module with enabled/disabled variants)
-
-See [docs/CONFIG-SYSTEM.md](docs/CONFIG-SYSTEM.md) for detailed configuration documentation.
-
-## Theme customization
-
-You can customize the app colors by editing the `config/theme.json` file with your desired color scheme values. The `ThemeGeneratorPlugin` Gradle plugin will generate the necessary theme resources in the `compose` module at build time.
-
-## Multi-Language Support
-
-The app is fully prepared for internationalization using Android's **string resources** (`strings.xml`). All user-facing strings are localized through `stringResource()` in Jetpack Compose, making it straightforward to add support for new languages.
-
-## Testing
-
-This project uses a combination of frameworks for comprehensive test coverage:
-
-- **Unit tests**: JUnit 4/5, MockK, Turbine (Flow testing), Kotlinx Coroutines Test, and AndroidX Core Testing
-- **UI / Instrumented tests**: Compose UI Test, Espresso, Hilt Testing, and AndroidX Test Runner/Rules
-- **Coverage**: Kover for code coverage reports, integrated with SonarQube
-
-Unit tests are spread across multiple modules (`app`, `vonage-video-core`, `vonage-audio-selector`, `vonage-video-shared`, `vonage-android-logger`, `vonage-feature-chat`, and `vonage-config-idea-plugin`). Instrumented tests live in the `app` module and follow a Page Object / Screen Object pattern with a custom `HiltTestRunner` for dependency injection support.
-
-Run tests from the command line:
-
-```bash
-# Run all unit tests
-./gradlew test
-
-# Run tests for a specific module
-./gradlew :vonage-video-core:test
-
-# Run instrumented tests (requires connected device/emulator)
-./gradlew connectedAndroidTest
-
-# Run instrumented tests on Gradle Managed Devices (no physical device needed)
-./gradlew pixelDebugAndroidTest
-
-# Generate code coverage report
-./gradlew koverHtmlReport
-```
-
-Or run tests in Android Studio by right-clicking on test files or packages and selecting "Run Tests".
-
-### E2E Testing with Maestro
-
-See [.maestro/README.md](.maestro/README.md).
-
-## Code style
-
-We use Detekt for static analysis and Spotless for code formatting. Check and fix code style by running:
-
-```bash
-# Check code style
-./gradlew detekt
-
-# Run all quality checks
-./gradlew check
-```
-
-## Code of Conduct
-
-Please read our [Code of Conduct](docs/CODE_OF_CONDUCT.md).
-
-## Getting Involved
-
-If you wish to contribute to this project, read how in [Contributing](docs/CONTRIBUTING.md).
-
-## Known Issues
-
-We track known issues in [Known Issues](docs/KNOWN_ISSUES.md). Please refer to it for details.
-
-## Report Issues
-
-If you have any issues, feel free to open an issue or reach out to support via [support@api.vonage.com](mailto:support@api.vonage.com).
+We track known issues in [Known Issues](docs/KNOWN_ISSUES.md).
 
 ## Getting Help
 
-We love to hear from you so if you have questions, comments or find a bug in the project, let us know! You can either:
+We love to hear from you! If you have questions, comments, or find a bug:
 
 * Open an issue on this repository
+* Reach out via [support@api.vonage.com](mailto:support@api.vonage.com)
 * Tweet at us! We're [@VonageDev on Twitter](https://twitter.com/VonageDev)
-* Or [join the Vonage Developer Community Slack](https://developer.vonage.com/community/slack)
+* [Join the Vonage Developer Community Slack](https://developer.vonage.com/community/slack)
 
 ## Further Reading
 
