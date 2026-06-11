@@ -1,0 +1,18 @@
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/internal/OpenTokSdkFactory.kt
+  h_25498f8d57a266 55-59
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomUiState.kt
+  h_25498f8d57a266 27
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/VideoRenderer.kt
+  h_25498f8d57a266 73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "cbc051e860179b9a8cd993650cfcdc4539dba9b0",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
