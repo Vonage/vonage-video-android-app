@@ -39,7 +39,6 @@ Use this file as the default guidance for this repository. For deeper context, s
 | Document | Description |
 |---|---|
 | [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) | Clone, configure the backend URL, build, and run |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Project architecture, module overview, session flow |
 | [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md) | Feature flags, theme customization, base URL |
 | [`docs/CONFIG-SYSTEM.md`](docs/CONFIG-SYSTEM.md) | Deep-dive into the JSON-driven config plugin |
 | [`docs/LOCALIZATION.md`](docs/LOCALIZATION.md) | Multi-language support, adding a new language |

@@ -84,7 +84,6 @@ This application provides features for common conferencing use cases, such as:
 | Document | Description |
 |---|---|
 | [Getting Started](docs/GETTING_STARTED.md) | Clone, configure the backend URL, build, and run the app |
-| [Architecture](docs/ARCHITECTURE.md) | Project architecture, module overview, session flow, and DI |
 | [Configuration](docs/CONFIGURATION.md) | Feature flags, theme customization, and base URL setup |
 | [Config System](docs/CONFIG-SYSTEM.md) | Deep-dive into the JSON-driven config plugin system |
 | [Localization](docs/LOCALIZATION.md) | Multi-language support and how to add a new language |
