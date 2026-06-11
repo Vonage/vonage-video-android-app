@@ -1,0 +1,19 @@
+AGENTS.md
+  s_94e5b471f94a84::t_8bedac12d0473a 42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.12",
+  "base_commit_sha": "7be65c7d01b5d6f694497684257bece9bf738329",
+  "prompts": {},
+  "sessions": {
+    "s_94e5b471f94a84": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "adecb864-a7b2-4b43-bfa5-ddadcd26ffb6",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Ivan <210490533+VZaphod@users.noreply.github.com>"
+    }
+  }
+}
