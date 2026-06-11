@@ -1,0 +1,19 @@
+README.md
+  s_94e5b471f94a84::t_a28fde6ef4f6a6 82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.12",
+  "base_commit_sha": "a8911e8471f3c8c01f85e7bbfaf88e123b8cb83b",
+  "prompts": {},
+  "sessions": {
+    "s_94e5b471f94a84": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "adecb864-a7b2-4b43-bfa5-ddadcd26ffb6",
+        "model": "claude-sonnet-4.6"
+      },
+      "human_author": "Ivan <210490533+VZaphod@users.noreply.github.com>"
+    }
+  }
+}
