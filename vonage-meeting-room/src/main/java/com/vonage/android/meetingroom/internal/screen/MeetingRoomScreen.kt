@@ -28,21 +28,26 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.captions.ui.CaptionsOverlay
 import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.components.GenericLoading
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
+import com.vonage.android.fx.ui.VideoEffectsScreen
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.R
 import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
+import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_SCREEN_TAG
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
 import com.vonage.android.meetingroom.internal.screen.audio.AudioDevicesMenu
 import com.vonage.android.meetingroom.internal.screen.components.MeetingRoomContent
 import com.vonage.android.meetingroom.internal.screen.components.MeetingTopBar
+import com.vonage.android.meetingroom.internal.screen.components.RecordingStartedOverlay
 import com.vonage.android.meetingroom.internal.screen.components.SpeakingWhileMutedOverlay
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBar
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarState
@@ -73,7 +78,7 @@ private fun enabledBottomBarActions(
     }
 }.toImmutableList()
 
-@Suppress("LongMethod")
+@Suppress("LongMethod", "CyclomaticComplexMethod")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 internal fun MeetingRoomScreen(
@@ -84,6 +89,21 @@ internal fun MeetingRoomScreen(
 ) {
     var showAudioOutputs by remember { mutableStateOf(false) }
     val audioOutputsSheetState = rememberModalBottomSheetState()
+
+    var showRecordingConfirmDialog by remember { mutableStateOf(false) }
+
+    var showVideoEffects by remember { mutableStateOf(false) }
+    var selectedEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
+    val videoEffectsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // Wire onOpenVideoEffects to local sheet state so no VM involvement is needed.
+    val effectsActions = remember(actions, uiState.enabledFeatures) {
+        actions.copy(onOpenVideoEffects = {
+            if (MeetingRoomFeature.BACKGROUND_EFFECTS in uiState.enabledFeatures) {
+                showVideoEffects = true
+            }
+        })
+    }
 
     val navigator = rememberSupportingPaneScaffoldNavigator()
     val scope = rememberCoroutineScope()
@@ -107,8 +127,44 @@ internal fun MeetingRoomScreen(
             val participants by call.participantsStateFlow.collectAsStateWithLifecycle()
             val publisher by call.publisher.collectAsStateWithLifecycle()
             val captionLines by call.captionsStateFlow.collectAsStateWithLifecycle()
+            // Sync selectedEffect to the real publisher's current effect each time the sheet
+            // opens, so the grid always highlights the correct initial selection.
+            LaunchedEffect(showVideoEffects) {
+                if (showVideoEffects) {
+                    selectedEffect = publisher?.videoEffect?.value ?: VideoEffect.None
+                }
+            }
+            // If the user deletes the active background while the sheet is open, reset the
+            // local selection so the grid no longer highlights a non-existent item.
+            // Guard with isNotEmpty() so the effect doesn't fire while the list is still
+            // loading (empty initial state would otherwise clear any active selection).
+            LaunchedEffect(uiState.backgrounds) {
+                val current = selectedEffect
+                if (current is VideoEffect.BackgroundImage &&
+                    uiState.backgrounds.isNotEmpty() &&
+                    uiState.backgrounds.none { it.id == current.id }
+                ) {
+                    selectedEffect = VideoEffect.None
+                }
+            }
+
+            // Wrap actions to show confirmation dialog before starting recording
+            val wrappedActions = remember(actions, uiState.archivingUiState) {
+                actions.copy(
+                    onToggleRecording = { enable ->
+                        if (enable && uiState.archivingUiState == ArchivingUiState.IDLE) {
+                            showRecordingConfirmDialog = true
+                        } else if (!enable && uiState.archivingUiState == ArchivingUiState.RECORDING) {
+                            showRecordingConfirmDialog = true
+                        } else {
+                            actions.onToggleRecording(enable)
+                        }
+                    }
+                )
+            }
+
             Scaffold(
-                modifier = modifier.systemBarsPadding(),
+                modifier = modifier.testTag(MEETING_ROOM_SCREEN_TAG).systemBarsPadding(),
                 topBar = {
                     MeetingTopBar(
                         modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
@@ -123,7 +179,7 @@ internal fun MeetingRoomScreen(
                     BottomBar(
                         modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
                         call = call,
-                        roomActions = actions,
+                        roomActions = wrappedActions,
                         actions = remember(uiState.enabledFeatures) {
                             enabledBottomBarActions(uiState.enabledFeatures)
                         },
@@ -156,10 +212,13 @@ internal fun MeetingRoomScreen(
                             EmojiReactionOverlay(call = call)
                             CaptionsOverlay(captionLines = captionLines)
                             SpeakingWhileMutedOverlay(publisher = publisher)
+                            RecordingStartedOverlay(isRecordingStartedByOthers = uiState.recordingStartedByOthers)
+                            // MeetingRoomContent is always visible — the effects sheet is a
+                            // ModalBottomSheet that overlays it without disturbing the publisher.
                             MeetingRoomContent(
                                 modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
                                 call = call,
-                                actions = actions,
+                                actions = effectsActions,
                                 participants = participants,
                                 layoutType = uiState.layoutType,
                             )
@@ -200,6 +259,25 @@ internal fun MeetingRoomScreen(
                     }
                 }
             }
+
+            if (showVideoEffects && MeetingRoomFeature.BACKGROUND_EFFECTS in uiState.enabledFeatures) {
+                ModalBottomSheet(
+                    onDismissRequest = { showVideoEffects = false },
+                    sheetState = videoEffectsSheetState,
+                ) {
+                    VideoEffectsScreen(
+                        backgrounds = uiState.backgrounds,
+                        selectedEffect = selectedEffect,
+                        remainingBackgroundSlots = uiState.remainingBackgroundSlots,
+                        onEffectSelect = { effect ->
+                            selectedEffect = effect
+                            actions.onApplyVideoEffect(effect)
+                        },
+                        onAddBackground = actions.onAddBackground,
+                        onDeleteBackground = actions.onDeleteBackground,
+                    )
+                }
+            }
         }
 
         uiState.isLoading -> GenericLoading()
@@ -223,6 +301,36 @@ internal fun MeetingRoomScreen(
                 actions.onEndCall()
             }
         }
+    }
+
+    // Recording confirmation dialog
+    if (showRecordingConfirmDialog && uiState.archivingUiState == ArchivingUiState.IDLE) {
+        BasicAlertDialog(
+            text = stringResource(R.string.recording_confirm_dialog_message),
+            acceptLabel = stringResource(R.string.recording_confirm_button),
+            cancelLabel = stringResource(R.string.generic_cancel),
+            onAccept = {
+                showRecordingConfirmDialog = false
+                actions.onToggleRecording(true)
+            },
+            onCancel = {
+                showRecordingConfirmDialog = false
+            }
+        )
+    }
+    if (showRecordingConfirmDialog && uiState.archivingUiState == ArchivingUiState.RECORDING) {
+        BasicAlertDialog(
+            text = stringResource(R.string.recording_stop_confirm_dialog_message),
+            acceptLabel = stringResource(R.string.recording_stop_confirm_button),
+            cancelLabel = stringResource(R.string.generic_cancel),
+            onAccept = {
+                showRecordingConfirmDialog = false
+                actions.onToggleRecording(false)
+            },
+            onCancel = {
+                showRecordingConfirmDialog = false
+            }
+        )
     }
 }
 
@@ -249,7 +357,9 @@ private fun ThreePaneScaffoldPaneScope.ExtraPane(
 }
 
 internal object MeetingRoomScreenTestTags {
-    const val MEETING_ROOM_TOP_BAR = "meeting_room_top_bar"
-    const val MEETING_ROOM_CONTENT = "meeting_room_content"
-    const val MEETING_ROOM_BOTTOM_BAR = "meeting_room_bottom_bar"
+    const val MEETING_ROOM_SCREEN_TAG = "meeting-room-screen"
+    const val MEETING_ROOM_TOP_BAR = "meeting-room-top-bar"
+    const val MEETING_ROOM_CONTENT = "meeting-room-content"
+    const val MEETING_ROOM_BOTTOM_BAR = "meeting-room-bottom-bar"
+    const val MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON = "meeting-room-publisher-effects-button"
 }

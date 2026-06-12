@@ -3,6 +3,7 @@ package com.vonage.android.compose.components.bottombar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Badge
@@ -18,8 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.Chat2
+import com.vonage.android.compose.vivid.icons.solid.Microphone2
 
 @Composable
 fun ControlButton(
@@ -66,6 +71,48 @@ fun ControlButton(
                 tint = iconColor,
                 modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeDefault),
             )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun ControlButtonInactivePreview() {
+    VonageVideoTheme {
+        Box(
+            modifier = Modifier
+                .background(VonageVideoTheme.colors.background)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
+        ) {
+            ControlButton(icon = VividIcons.Solid.Microphone2, onClick = {})
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun ControlButtonActivePreview() {
+    VonageVideoTheme {
+        Box(
+            modifier = Modifier
+                .background(VonageVideoTheme.colors.background)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
+        ) {
+            ControlButton(icon = VividIcons.Solid.Microphone2, onClick = {}, isActive = true)
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun ControlButtonWithBadgePreview() {
+    VonageVideoTheme {
+        Box(
+            modifier = Modifier
+                .background(VonageVideoTheme.colors.background)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
+        ) {
+            ControlButton(icon = VividIcons.Solid.Chat2, onClick = {}, badgeCount = 3)
         }
     }
 }

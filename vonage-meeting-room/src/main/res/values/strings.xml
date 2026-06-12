@@ -18,6 +18,11 @@
     <!-- Recordings -->
     <string name="recording_stop_recording">Stop Recording</string>
     <string name="recording_start_recording">Start Recording</string>
+    <string name="recording_confirm_dialog_message">Start recording this meeting?</string>
+    <string name="recording_stop_confirm_dialog_message">Stop recording this meeting?</string>
+    <string name="recording_confirm_button">Start Recording</string>
+    <string name="recording_stop_confirm_button">Stop Recording</string>
+    <string name="recording_started_notification">Recording started</string>
 
     <!-- Screen Share -->
     <string name="screen_share_start">Share screen</string>
@@ -33,6 +38,7 @@
 
     <!-- Generic -->
     <string name="generic_retry">Retry</string>
+    <string name="generic_cancel">Cancel</string>
     <string name="change_layout">Change layout</string>
     <string name="chat">Chat</string>
     <string name="speaking_while_muted_message">You are muted. Unmute to speak.</string>
@@ -45,6 +51,11 @@
     <string name="audio_device_selector_bluetooth_audio_device">Bluetooth</string>
     <string name="audio_device_selector_speaker_audio_device">Speaker</string>
     <string name="audio_device_selector_headset_audio_device">Headset</string>
+
+    <!-- Permissions -->
+    <string name="meeting_room_permission_required_title">Permissions needed to join the room</string>
+    <string name="meeting_room_permission_request_button">Request Permissions</string>
+    <string name="meeting_room_permission_open_settings_button">Open Settings</string>
 
     <!-- Reporting -->
     <string name="report_bottombar_button_label">Report Issue</string>

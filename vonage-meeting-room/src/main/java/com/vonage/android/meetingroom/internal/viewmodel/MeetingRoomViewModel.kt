@@ -2,14 +2,19 @@ package com.vonage.android.meetingroom.internal.viewmodel
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.captions.CaptionsUiState
+import com.vonage.android.fx.data.BackgroundsResult
+import com.vonage.android.fx.data.UserBackgroundRepository
+import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.SessionEvent
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.MeetingRoomCallState
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
@@ -20,6 +25,9 @@ import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServ
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.logger.vonageLogger
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,7 +39,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @Suppress("LongParameterList")
 internal class MeetingRoomViewModel(
@@ -62,9 +69,19 @@ internal class MeetingRoomViewModel(
 
     private var call: CallFacade? = null
     private val callEnded = AtomicBoolean(false)
+    private var localUserStartedRecording = false
 
     init {
-        container.foregroundServiceHandler.startForegroundService(roomName)
+        if (prebuilt.foregroundServiceEnabled) {
+            container.foregroundServiceHandler.startForegroundService(roomName)
+        }
+        viewModelScope.launch {
+            prebuilt.hangUpCommand.collect {
+                if (!callEnded.get()) {
+                    _uiState.update { state -> state.copy(isEndCall = true) }
+                }
+            }
+        }
         observeUiStateForPublicBridge()
     }
 
@@ -77,10 +94,13 @@ internal class MeetingRoomViewModel(
                 name = prebuilt.publisherSettings.username,
                 publishAudio = prebuilt.publisherSettings.publishAudio,
                 publishVideo = prebuilt.publisherSettings.publishVideo,
-                blurLevel = com.vonage.android.kotlin.model.BlurLevel.NONE,
+                initialVideoEffect = prebuilt.publisherSettings.initialVideoEffect,
                 cameraIndex = 1, // default to front camera
+                publishCaptions = container.vonageCaptions.isCapable,
             ),
         )
+
+        viewModelScope.launch { refreshBackgrounds() }
 
         viewModelScope.launch {
             _uiState.update { state ->
@@ -99,14 +119,16 @@ internal class MeetingRoomViewModel(
                 }
         }
 
-        container.foregroundServiceHandler.actions
-            .onEach { callAction ->
-                when (callAction) {
-                    CallAction.HangUp -> _uiState.update { state -> state.copy(isEndCall = true) }
-                    else -> {}
+        if (prebuilt.foregroundServiceEnabled) {
+            container.foregroundServiceHandler.actions
+                .onEach { callAction ->
+                    when (callAction) {
+                        CallAction.HangUp -> _uiState.update { state -> state.copy(isEndCall = true) }
+                        else -> {}
+                    }
                 }
-            }
-            .launchIn(viewModelScope)
+                .launchIn(viewModelScope)
+        }
 
         container.audioDevicesHandler.start()
         observePublisherSettings()
@@ -150,11 +172,7 @@ internal class MeetingRoomViewModel(
                         roomName = roomName,
                         call = activeCall,
                         archivingUiState = ArchivingUiState.IDLE,
-                        captionsUiState = if (sessionInfo.captionsId.isNullOrBlank()) {
-                            CaptionsUiState.IDLE
-                        } else {
-                            CaptionsUiState.ENABLED
-                        },
+                        captionsUiState = CaptionsUiState.IDLE,
                         isLoading = false,
                         isError = false,
                     )
@@ -186,11 +204,59 @@ internal class MeetingRoomViewModel(
 
     fun onSwitchCamera() { call?.toggleLocalCamera() }
 
-    fun onCycleLocalCameraBlur() { call?.cycleLocalCameraBlur() }
+    /**
+     * Applies [effect] to the real session publisher immediately.
+     * Invoked when the user selects an effect tile in the effects sheet.
+     */
+    fun applyVideoEffect(effect: VideoEffect) {
+        call?.applyLocalVideoEffect(effect)
+    }
+
+    /**
+     * Saves each image in [uris] to persistent storage and refreshes the backgrounds list.
+     * Images are saved sequentially; saves that hit the cap or encounter an unreadable URI are
+     * silently skipped (the repository returns `null` for those).
+     */
+    fun addBackground(uris: List<Uri>) {
+        viewModelScope.launch {
+            val resolution = container.callSettingsHolder.captureResolution.value
+            uris.forEach { uri -> container.addBackgroundUseCase(uri, resolution) }
+            refreshBackgrounds()
+        }
+    }
+
+    /**
+     * Deletes the user-uploaded background identified by [item]. If the deleted background is
+     * currently active on the publisher, the effect is reset to [VideoEffect.None].
+     */
+    fun deleteBackground(item: VideoBackgroundItem) {
+        viewModelScope.launch {
+            container.deleteBackgroundUseCase(item.id)
+            val currentEffect = call?.publisher?.value?.videoEffect?.value
+            if (currentEffect is VideoEffect.BackgroundImage && currentEffect.id == item.id) {
+                applyVideoEffect(VideoEffect.None)
+            }
+            refreshBackgrounds()
+        }
+    }
+
+    /**
+     * Fetches the merged backgrounds list via [GetBackgroundsUseCase] and updates the UI state.
+     */
+    private suspend fun refreshBackgrounds() {
+        val resolution = container.callSettingsHolder.captureResolution.value
+        val result = runCatching {
+            container.getBackgroundsUseCase(resolution)
+        }.getOrElse { BackgroundsResult(persistentListOf(), remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS) }
+
+        _uiState.update { it.copy(backgrounds = result.backgrounds, remainingBackgroundSlots = result.remainingBackgroundSlots) }
+    }
 
     fun endCall() {
         if (!callEnded.compareAndSet(false, true)) return
-        container.foregroundServiceHandler.stopForegroundService()
+        if (prebuilt.foregroundServiceEnabled) {
+            container.foregroundServiceHandler.stopForegroundService()
+        }
         container.vonageScreenSharing.stopSharingScreen()
         container.audioDevicesHandler.stop()
         container.callSettingsHolder.clear()
@@ -223,7 +289,7 @@ internal class MeetingRoomViewModel(
                                 },
                                 publishVideo = activeCall.publisher.value?.isCameraEnabled?.value ?: true,
                                 publishAudio = activeCall.publisher.value?.isMicEnabled?.value ?: true,
-                                blurLevel = com.vonage.android.kotlin.model.BlurLevel.NONE,
+                                initialVideoEffect = activeCall.publisher.value?.videoEffect?.value ?: VideoEffect.None,
                                 cameraIndex = activeCall.publisher.value?.camera?.value?.index ?: 1,
                                 captureFrameRate = holder.captureFrameRate.value,
                                 captureResolution = holder.captureResolution.value,
@@ -233,6 +299,7 @@ internal class MeetingRoomViewModel(
                                 opusDtxEnabled = holder.opusDtxEnabled.value,
                                 publisherAudioFallback = holder.publisherAudioFallbackEnabled.value,
                                 subscriberAudioFallback = holder.subscriberAudioFallbackEnabled.value,
+                                publishCaptions = container.vonageCaptions.isCapable,
                             ),
                         )
                         vonageLogger.d("MeetingRoomViewModel", "Refresh publisher (${activeCall.publisher.value?.name})")
@@ -259,6 +326,7 @@ internal class MeetingRoomViewModel(
     //region Archiving
     fun archiveCall(enable: Boolean) {
         if (enable) {
+            localUserStartedRecording = true
             _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.STARTING) }
         } else {
             _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.STOPPING) }
@@ -267,10 +335,16 @@ internal class MeetingRoomViewModel(
             if (enable) {
                 container.vonageArchiving.startArchive(roomName)
                     .onSuccess { _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.RECORDING) } }
-                    .onFailure { _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.IDLE) } }
+                    .onFailure {
+                        localUserStartedRecording = false
+                        _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.IDLE) }
+                    }
             } else {
                 container.vonageArchiving.stopArchive(roomName)
-                    .onSuccess { _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.IDLE) } }
+                    .onSuccess {
+                        localUserStartedRecording = false
+                        _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.IDLE) }
+                    }
                     .onFailure { _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.RECORDING) } }
             }
         }
@@ -283,8 +357,23 @@ internal class MeetingRoomViewModel(
                     .onEach { archivingState ->
                         when (archivingState) {
                             is ArchivingState.Idle -> {}
-                            is ArchivingState.Started -> _uiState.update { state ->
-                                state.copy(archivingUiState = ArchivingUiState.RECORDING)
+                            is ArchivingState.Started -> {
+                                val startedByOthers = !localUserStartedRecording
+                                _uiState.update { state ->
+                                    state.copy(
+                                        archivingUiState = ArchivingUiState.RECORDING,
+                                        recordingStartedByOthers = startedByOthers
+                                    )
+                                }
+                                // Reset the overlay flag after the overlay duration
+                                if (startedByOthers) {
+                                    launch {
+                                        delay(RECORDING_OVERLAY_DELAY_MS)
+                                        _uiState.update { state -> state.copy(recordingStartedByOthers = false) }
+                                    }
+                                }
+                                // Reset the local flag for next recording
+                                localUserStartedRecording = false
                             }
                             is ArchivingState.Stopped -> _uiState.update { state ->
                                 state.copy(archivingUiState = ArchivingUiState.IDLE)
@@ -345,5 +434,6 @@ internal class MeetingRoomViewModel(
 
     private companion object {
         const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
+        const val RECORDING_OVERLAY_DELAY_MS: Long = 5_000
     }
 }

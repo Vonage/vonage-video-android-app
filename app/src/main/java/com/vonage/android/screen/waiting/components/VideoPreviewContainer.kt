@@ -35,7 +35,7 @@ import com.vonage.android.compose.vivid.icons.solid.MicMute
 import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.compose.vivid.icons.solid.Video
 import com.vonage.android.compose.vivid.icons.solid.VideoOff
-import com.vonage.android.fx.ui.BlurIndicator
+import com.vonage.android.fx.ui.VideoEffectIndicator
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.screen.components.VideoLabel
 import com.vonage.android.screen.waiting.WaitingRoomActions
@@ -44,7 +44,7 @@ import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.MIC_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_INITIALS_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.VOLUME_INDICATOR_TAG
-import com.vonage.android.util.buildTestTag
+import com.vonage.android.shared.buildTestTag
 
 @Composable
 fun VideoPreviewContainer(
@@ -102,7 +102,7 @@ internal fun VideoControlPanel(
     val isCameraEnabled by publisher.isCameraEnabled.collectAsStateWithLifecycle()
     val isMicEnabled by publisher.isMicEnabled.collectAsStateWithLifecycle()
     val audioLevel by publisher.audioLevel.collectAsStateWithLifecycle()
-    val blurLevel by publisher.blurLevel.collectAsStateWithLifecycle()
+    val videoEffect by publisher.videoEffect.collectAsStateWithLifecycle()
 
     Row(
         modifier = modifier
@@ -154,12 +154,11 @@ internal fun VideoControlPanel(
             }
         }
 
-        BlurIndicator(
+        VideoEffectIndicator(
             modifier = Modifier
                 .testTag(CAMERA_BLUR_BUTTON_TAG),
-            isCameraEnabled = isCameraEnabled,
-            blurLevel = blurLevel,
-            onCameraBlur = actions.onCameraBlur,
+            videoEffect = videoEffect,
+            onClick = actions.onOpenVideoEffects,
         )
     }
 }

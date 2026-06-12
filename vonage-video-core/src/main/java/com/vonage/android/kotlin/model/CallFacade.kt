@@ -97,7 +97,7 @@ interface PublisherFacade {
     fun toggleLocalVideo()
     fun toggleLocalCamera()
     fun toggleLocalAudio()
-    fun cycleLocalCameraBlur()
+    fun applyLocalVideoEffect(effect: VideoEffect)
     fun setVideoBitrate(config: VideoBitrateConfig)
     fun setDegradationPreference(preference: DegradationPreference)
     fun refreshPublisher(context: Context)
@@ -173,5 +173,6 @@ sealed interface ArchivingState {
 data class CaptionLine(
     val streamId: String,
     val subscriberName: String,
+    val isMe: Boolean,
     val text: String,
 )

@@ -14,7 +14,7 @@ import com.vonage.android.archiving.Archive
 @Composable
 fun GoodbyeScreenRoute(
     roomName: String,
-    navigateToMeeting: (String) -> Unit,
+    navigateToWaiting: (String) -> Unit,
     navigateToLanding: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GoodbyeScreenViewModel =
@@ -28,9 +28,9 @@ fun GoodbyeScreenRoute(
 
     val actions = remember {
         GoodbyeScreenActions(
-            onReEnter = { navigateToMeeting(roomName) },
+            onReEnter = { navigateToWaiting(roomName) },
             onGoHome = navigateToLanding,
-            onBack = { navigateToMeeting(roomName) },
+            onBack = { navigateToWaiting(roomName) },
             onDownloadArchive = { archive ->
                 viewModel.downloadArchive(archive)
             }
@@ -38,7 +38,7 @@ fun GoodbyeScreenRoute(
     }
 
     BackHandler {
-        navigateToMeeting(roomName)
+        navigateToWaiting(roomName)
     }
 
     GoodbyeScreen(
@@ -57,9 +57,10 @@ data class GoodbyeScreenActions(
 )
 
 object GoodbyeScreenTestTags {
-    const val GOODBYE_HEADER_TAG = "goodbye_header"
-    const val GOODBYE_REJOIN_CONTAINER_TAG = "goodbye_rejoin_container"
-    const val GOODBYE_ARCHIVES_CONTAINER_TAG = "goodbye_archives_container"
-    const val GOODBYE_REJOIN_BUTTON_TAG = "goodbye_rejoin_button"
-    const val GOODBYE_GO_HOME_BUTTON_TAG = "goodbye_go_home_button"
+    const val GOODBYE_SCREEN_TAG = "goodbye-screen"
+    const val GOODBYE_HEADER_TAG = "goodbye-header"
+    const val GOODBYE_REJOIN_CONTAINER_TAG = "goodbye-rejoin-container"
+    const val GOODBYE_ARCHIVES_CONTAINER_TAG = "goodbye-archives-container"
+    const val GOODBYE_REJOIN_BUTTON_TAG = "goodbye-reenter-button"
+    const val GOODBYE_GO_HOME_BUTTON_TAG = "goodbye-landing-page-button"
 }

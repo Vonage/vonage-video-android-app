@@ -4,6 +4,13 @@ import android.content.Context
 import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.captions.VonageCaptions
 import com.vonage.android.chat.ChatModule
+import com.vonage.android.fx.data.AddBackgroundUseCase
+import com.vonage.android.fx.data.BackgroundEffectsRepository
+import com.vonage.android.fx.data.DefaultBackgroundEffectsRepository
+import com.vonage.android.fx.data.DefaultUserBackgroundRepository
+import com.vonage.android.fx.data.DeleteBackgroundUseCase
+import com.vonage.android.fx.data.GetBackgroundsUseCase
+import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.sdk.VonageSdkFactory
@@ -114,5 +121,25 @@ internal class MeetingRoomContainer(
 
     val activityContextHolder: ActivityContextHolder by lazy {
         ActivityContextHolder()
+    }
+
+    private val backgroundEffectsRepository: BackgroundEffectsRepository by lazy {
+        DefaultBackgroundEffectsRepository(applicationContext)
+    }
+
+    private val userBackgroundRepository: UserBackgroundRepository by lazy {
+        DefaultUserBackgroundRepository(applicationContext)
+    }
+
+    val getBackgroundsUseCase: GetBackgroundsUseCase by lazy {
+        GetBackgroundsUseCase(backgroundEffectsRepository, userBackgroundRepository)
+    }
+
+    val addBackgroundUseCase: AddBackgroundUseCase by lazy {
+        AddBackgroundUseCase(userBackgroundRepository)
+    }
+
+    val deleteBackgroundUseCase: DeleteBackgroundUseCase by lazy {
+        DeleteBackgroundUseCase(userBackgroundRepository)
     }
 }

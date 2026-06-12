@@ -4,12 +4,12 @@ import android.content.Context
 import android.media.projection.MediaProjection
 import com.vonage.android.kotlin.Call.Companion.PUBLISHER_ID
 import com.vonage.android.kotlin.Call.Companion.PUBLISHER_SCREEN_ID
+import com.vonage.android.kotlin.sdk.VonageBlurLevel
 import com.vonage.android.kotlin.sdk.VonageCaptureFrameRate
 import com.vonage.android.kotlin.sdk.VonageCaptureResolution
 import com.vonage.android.kotlin.sdk.VonagePublisherConfig
 import com.vonage.android.kotlin.sdk.VonageScreenShareConfig
 import com.vonage.android.kotlin.sdk.VonageSdkFactory
-import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference.NOT_SET
@@ -17,8 +17,8 @@ import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.VideoBitratePreset.DEFAULT
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.kotlin.model.toVonageBitratePreset
-import com.vonage.android.kotlin.model.toVonageBlurLevel
 import com.vonage.android.kotlin.model.toVonageDegradationPref
 import com.vonage.android.kotlin.model.toVonageVideoCodec
 import com.vonage.logger.vonageLogger
@@ -46,20 +46,32 @@ class PublisherFactory(
     fun createPreviewPublisher(context: Context): PreviewPublisherState {
         val vonagePublisher = sdkFactory.createPublisher(context, buildVonageConfig())
         publisherHolder = VeraPublisherHolder(publisher = vonagePublisher)
-        return PreviewPublisherState(
+        val effect = currentConfig?.initialVideoEffect ?: VideoEffect.None
+        val state = PreviewPublisherState(
             vonagePublisher,
-            captureInfoLabel = buildCaptureInfoLabel(context)
+            captureInfoLabel = buildCaptureInfoLabel(context),
+            initialVideoEffect = effect,
         )
+        if (effect is VideoEffect.BackgroundImage) {
+            vonagePublisher.applyBackgroundImage(effect.imagePath)
+        }
+        return state
     }
 
     fun createPublisherState(context: Context): PublisherState {
         val vonagePublisher = sdkFactory.createPublisher(context, buildVonageConfig())
+        vonagePublisher.publishCaptions = currentConfig?.publishCaptions ?: false
+        val effect = currentConfig?.initialVideoEffect ?: VideoEffect.None
         val participant = PublisherState(
             publisherId = PUBLISHER_ID,
             vonagePublisher = vonagePublisher,
             captureInfoLabel = buildCaptureInfoLabel(context),
+            initialVideoEffect = effect,
         )
         publisherHolder = VeraPublisherHolder(publisher = vonagePublisher)
+        if (effect is VideoEffect.BackgroundImage) {
+            vonagePublisher.applyBackgroundImage(effect.imagePath)
+        }
         return participant
     }
 
@@ -96,7 +108,7 @@ class PublisherFactory(
             hasAudioTrack = true,
             publishVideo = config?.publishVideo ?: true,
             publishAudio = config?.publishAudio ?: true,
-            blurLevel = (config?.blurLevel ?: BlurLevel.NONE).toVonageBlurLevel(),
+            blurLevel = videoEffectToVonageBlurLevel(config?.initialVideoEffect),
             cameraIndex = config?.cameraIndex ?: DEFAULT_CAMERA_INDEX,
             captureResolution = config?.captureResolution?.toVonageCaptureResolution(),
             captureFrameRate = (config?.captureFrameRate ?: CaptureFrameRate.FPS_15).toVonageCaptureFrameRate(),
@@ -142,6 +154,12 @@ class PublisherFactory(
 }
 
 // region Domain → SDK config mapping
+
+private fun videoEffectToVonageBlurLevel(effect: VideoEffect?): VonageBlurLevel = when (effect) {
+    VideoEffect.BlurLow -> VonageBlurLevel.LOW
+    VideoEffect.BlurHigh -> VonageBlurLevel.HIGH
+    else -> VonageBlurLevel.NONE // None and BackgroundImage both start with no blur in SDK config
+}
 
 private fun CaptureResolution.toVonageCaptureResolution(): VonageCaptureResolution = when (this) {
     CaptureResolution.LOW -> VonageCaptureResolution.LOW

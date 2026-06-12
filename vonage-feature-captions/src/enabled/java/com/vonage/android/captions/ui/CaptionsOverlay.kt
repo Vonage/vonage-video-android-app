@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -17,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.zIndex
+import com.vonage.android.captions.R
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CaptionLine
 import kotlinx.collections.immutable.ImmutableList
@@ -51,7 +53,10 @@ fun CaptionsOverlay(
                     Text(
                         text = buildAnnotatedString {
                             withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("${line.subscriberName}: ")
+                                val displayName = if (line.isMe) {
+                                    stringResource(R.string.captions_self_name)
+                                } else line.subscriberName
+                                append("$displayName: ")
                             }
                             append(line.text)
                         },
@@ -75,8 +80,8 @@ internal fun CaptionsOverlayPreview() {
         ) {
             CaptionsOverlay(
                 captionLines = persistentListOf(
-                    CaptionLine(streamId = "1", subscriberName = "Alice", text = "Hello, how are you?"),
-                    CaptionLine(streamId = "2", subscriberName = "Bob", text = "I'm doing great, thanks!"),
+                    CaptionLine(streamId = "1", subscriberName = "Alice", isMe = false, text = "Hello, how are you?"),
+                    CaptionLine(streamId = "2", subscriberName = "Bob", isMe = false, text = "I'm doing great, thanks!"),
                 ),
             )
         }

@@ -18,8 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
+import androidx.window.core.layout.computeWindowSizeClass
 import com.vonage.android.compose.theme.VonageVideoTheme
 
 @Composable
@@ -132,5 +134,53 @@ private fun HorizontalLayout(
         ) {
             secondPane()
         }
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun TwoPaneScaffoldCompactPreview() {
+    VonageVideoTheme {
+        TwoPaneScaffold(
+            windowSizeClass = WindowSizeClass.BREAKPOINTS_V1.computeWindowSizeClass(widthDp = 400f, heightDp = 800f),
+            firstPane = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Gray),
+                )
+            },
+            secondPane = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.LightGray),
+                )
+            },
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun TwoPaneScaffoldExpandedPreview() {
+    VonageVideoTheme {
+        TwoPaneScaffold(
+            windowSizeClass = WindowSizeClass.BREAKPOINTS_V1.computeWindowSizeClass(widthDp = 840f, heightDp = 640f),
+            firstPane = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Gray),
+                )
+            },
+            secondPane = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.LightGray),
+                )
+            },
+        )
     }
 }

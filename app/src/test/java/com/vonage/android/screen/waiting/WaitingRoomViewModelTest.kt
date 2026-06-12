@@ -6,12 +6,18 @@ import com.vonage.android.MainDispatcherRule
 import com.vonage.android.config.Config
 import com.vonage.android.config.GetConfig
 import com.vonage.android.data.UserRepository
+import com.vonage.android.fx.data.AddBackgroundUseCase
+import com.vonage.android.fx.data.BackgroundsResult
+import com.vonage.android.fx.data.DeleteBackgroundUseCase
+import com.vonage.android.fx.data.GetBackgroundsUseCase
+import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.kotlin.VonageVideoClient
-import com.vonage.android.kotlin.model.BlurLevel
 import com.vonage.android.kotlin.model.CameraType
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.VideoBitrateConfig
+import com.vonage.android.kotlin.model.VideoEffect
+import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
 import com.vonage.android.settings.CallSettingsHolder
 import io.mockk.coEvery
@@ -19,9 +25,11 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -48,6 +56,14 @@ class WaitingRoomViewModelTest {
         every { subscriberAudioFallbackEnabled } returns MutableStateFlow(true)
         every { videoBitrateConfig } returns MutableStateFlow(VideoBitrateConfig())
     }
+    private val getBackgroundsUseCase: GetBackgroundsUseCase = mockk {
+        coEvery { invoke(captureResolution = null) } returns BackgroundsResult(
+            persistentListOf(),
+            remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
+        )
+    }
+    private val addBackgroundUseCase: AddBackgroundUseCase = mockk(relaxed = true)
+    private val deleteBackgroundUseCase: DeleteBackgroundUseCase = mockk(relaxed = true)
 
     private lateinit var sut: WaitingRoomViewModel
 
@@ -60,6 +76,9 @@ class WaitingRoomViewModelTest {
             getConfig = getConfig,
             audioDevicesHandler = audioDevicesHandler,
             callSettingsHolder = callSettingsHolder,
+            getBackgroundsUseCase = getBackgroundsUseCase,
+            addBackgroundUseCase = addBackgroundUseCase,
+            deleteBackgroundUseCase = deleteBackgroundUseCase,
         )
 
         every { getConfig.invoke() } returns Config(
@@ -162,14 +181,63 @@ class WaitingRoomViewModelTest {
         every { videoClient.destroyPublisher() } returns Unit
 
         sut.uiState.test {
-            awaitItem()
+            awaitItem()                // initial state
             sut.init(context)
+            awaitItem()                // post-init: publisher now set in uiState
             sut.joinRoom("save user name")
-            assertTrue(awaitItem().isSuccess)
+            val state = awaitItem()    // post-join: isSuccess = true
+            assertTrue(state.isSuccess)
+            assertEquals("save user name", state.joinSettings.username)
         }
 
         coVerify { userRepository.saveUserName("save user name") }
         verify { videoClient.destroyPublisher() }
+    }
+
+    @Test
+    fun `given viewmodel when join room with whitespace-only name then state is invalid and room is not joined`() = runTest {
+        coEvery { userRepository.getUserName() } returns "initial"
+        givenPreviewPublisher()
+        every { videoClient.destroyPublisher() } returns Unit
+
+        sut.uiState.test {
+            awaitItem()                // initial state
+            sut.init(context)
+            awaitItem()                // post-init: publisher now set in uiState
+            sut.joinRoom("   ")        // whitespace-only — trimmed to empty, must be rejected
+            val state = awaitItem()
+            assertFalse(state.isSuccess)
+            assertFalse(state.isUserNameValid)
+        }
+
+        coVerify(exactly = 0) { userRepository.saveUserName(any()) }
+    }
+
+    @Test
+    fun `given initialized viewmodel when join room then joinSettings contains publisher state`() = runTest {
+        coEvery { userRepository.getUserName() } returns "initial"
+        coEvery { userRepository.saveUserName(any()) } returns Unit
+        givenPreviewPublisher()
+        every { videoClient.configurePublisher(any()) } returns Unit
+        every { videoClient.destroyPublisher() } returns Unit
+
+        sut.uiState.test {
+            awaitItem() // initial state
+            sut.init(context)
+            awaitItem() // post-init: publisher is now set in _uiState
+            sut.joinRoom("Alice")
+            val state = awaitItem() // post-join state
+            assertTrue(state.isSuccess)
+            assertEquals(
+                PublisherSettings(
+                    username = "Alice",
+                    publishAudio = false,      // isMicEnabled = false per buildMockPublisher()
+                    publishVideo = true,       // isCameraEnabled = true per buildMockPublisher()
+                    initialVideoEffect = VideoEffect.None,
+                ),
+                state.joinSettings,
+            )
+        }
     }
 
     @Test
@@ -191,20 +259,20 @@ class WaitingRoomViewModelTest {
     }
 
     @Test
-    fun `given viewmodel when onCycleCameraBlur then publisher set camera blur`() = runTest {
+    fun `given viewmodel when applyVideoEffect then delegate to publisher`() = runTest {
         val publisher = givenPreviewPublisher()
-        coEvery { userRepository.getUserName() } returns "not relevant"
+        coEvery { userRepository.getUserName() } returns ""
 
         sut.init(context)
-
         sut.uiState.test {
             awaitItem() // initial state
             awaitItem() // after init
 
-            sut.onCycleCameraBlur()
+            sut.applyVideoEffect(VideoEffect.BlurLow)
+            cancelAndIgnoreRemainingEvents()
         }
 
-        verify { publisher.cycleCameraBlur() }
+        verify(exactly = 1) { publisher.applyVideoEffect(VideoEffect.BlurLow) }
     }
 
     @Test
@@ -226,7 +294,7 @@ class WaitingRoomViewModelTest {
     private fun buildMockPublisher() = mockk<PreviewPublisherState>(relaxed = true) {
         every { isCameraEnabled } returns MutableStateFlow(true)
         every { isMicEnabled } returns MutableStateFlow(false)
-        every { blurLevel } returns MutableStateFlow(BlurLevel.NONE)
+        every { videoEffect } returns MutableStateFlow(VideoEffect.None)
         every { camera } returns MutableStateFlow(CameraType.BACK)
     }
 

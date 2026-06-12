@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.opentok.android.sdk)
     enabledImplementation(libs.opentok.android.video.transformers)
+    enabledImplementation(libs.androidx.activity.compose)
 
     testImplementation(libs.junit.junit)
     testImplementation(libs.mockk)

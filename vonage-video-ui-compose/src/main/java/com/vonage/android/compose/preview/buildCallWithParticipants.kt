@@ -16,6 +16,7 @@ import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VideoBitrateConfig
+import com.vonage.android.kotlin.model.VideoEffect
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -56,7 +57,7 @@ fun buildCallWithParticipants(
     override fun toggleLocalVideo() { /* empty on purpose */ }
     override fun toggleLocalCamera() { /* empty on purpose */ }
     override fun toggleLocalAudio() { /* empty on purpose */ }
-    override fun cycleLocalCameraBlur() { /* empty on purpose */ }
+    override fun applyLocalVideoEffect(effect: VideoEffect) { /* empty on purpose */ }
     override fun setVideoBitrate(config: VideoBitrateConfig) { /* empty on purpose */ }
     override fun setDegradationPreference(preference: DegradationPreference) { /* empty on purpose */ }
     override fun refreshPublisher(context: Context) { /* empty on purpose */ }

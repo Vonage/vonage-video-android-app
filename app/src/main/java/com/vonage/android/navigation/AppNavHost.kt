@@ -1,6 +1,11 @@
 package com.vonage.android.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.DialogProperties
@@ -12,6 +17,7 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.vonage.android.BuildConfig
+import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.navigation.AppRoute.Goodbye
 import com.vonage.android.navigation.AppRoute.Landing
 import com.vonage.android.navigation.AppRoute.Meeting
@@ -31,6 +37,7 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    var pendingPublisherSettings by remember { mutableStateOf<PublisherSettings?>(null) }
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -49,7 +56,8 @@ fun AppNavHost(
             val roomName = backStackEntry.toRoute<Waiting>().roomName
             WaitingRoomRoute(
                 roomName = roomName,
-                navigateToRoom = { roomName ->
+                navigateToRoom = { roomName, settings ->
+                    pendingPublisherSettings = settings
                     navController.navigate(
                         route = Meeting(roomName),
                         navOptions = NavOptions.Builder().setLaunchSingleTop(true).build(),
@@ -70,8 +78,14 @@ fun AppNavHost(
             )
         ) { backStackEntry ->
             val roomName = backStackEntry.toRoute<Meeting>().roomName
+            // Capture once per navigation event; re-entry that bypasses the waiting room
+            // (e.g. Goodbye → Re-enter) will find null here and receive clean defaults.
+            val settings = remember(roomName) { pendingPublisherSettings ?: PublisherSettings() }
+            // Reset so any future arrival at Meeting without a waiting-room join gets defaults.
+            SideEffect { pendingPublisherSettings = null }
             MeetingRoomScreenRoute(
                 roomName = roomName,
+                initialPublisherSettings = settings,
                 navigateToGoodBye = { navController.navigate(Goodbye(roomName = roomName)) },
                 navigateToShare = { roomName -> context.navigateToShare(roomName) },
                 navigateToSettings = { navController.navigate(Settings) },
@@ -81,7 +95,7 @@ fun AppNavHost(
             val roomName = backStackEntry.toRoute<Goodbye>().roomName
             GoodbyeScreenRoute(
                 roomName = roomName,
-                navigateToMeeting = { roomName -> navController.navigate(Meeting(roomName = roomName)) },
+                navigateToWaiting = { roomName -> navController.navigate(Waiting(roomName = roomName)) },
                 navigateToLanding = {
                     navController.navigate(Landing) {
                         popUpTo(Landing) { inclusive = true }

@@ -34,16 +34,18 @@ import kotlinx.coroutines.launch
 /**
  * Represents the local publisher (current user's camera/screen) in the video call.
  *
- * Manages the publisher's stream state, camera controls, blur effects, and audio monitoring.
+ * Manages the publisher's stream state, camera controls, video effects, and audio monitoring.
  *
  * @param publisherId Unique identifier for this publisher
  * @param vonagePublisher The wrapped Vonage Publisher instance
+ * @param initialVideoEffect The video effect to set on the publisher at creation time
  */
 @Stable
 data class PublisherState(
     private val publisherId: String,
     val vonagePublisher: VonagePublisher,
     override val captureInfoLabel: String = "",
+    private val initialVideoEffect: VideoEffect = VideoEffect.None,
 ) : PublisherParticipant {
 
     override val id: String = publisherId
@@ -65,14 +67,23 @@ data class PublisherState(
         MutableStateFlow(vonagePublisher.publishVideo)
     override val isCameraEnabled: StateFlow<Boolean> = _isCameraEnabled
 
+    /**
+     * Tracks the user's explicit camera intent.
+     * Only mutated by [toggleVideo]; never touched by [changeVisibility] or SDK callbacks.
+     * This prevents the self-corruption that occurs when [changeVisibility] sets
+     * `publishVideo = false` (causing `stream.hasVideo = false`), which would otherwise
+     * make a subsequent `changeVisibility(true)` also set `publishVideo = false`.
+     */
+    private var userIntendedVideoOn: Boolean = vonagePublisher.publishVideo
+
     private val _audioLevel: MutableStateFlow<Float> = MutableStateFlow(0F)
     override val audioLevel: StateFlow<Float> = _audioLevel
 
     private val _isSpeaking: MutableStateFlow<Boolean> = MutableStateFlow(false)
     override val isTalking: StateFlow<Boolean> = _isSpeaking
 
-    private val _blurLevel: MutableStateFlow<BlurLevel> = MutableStateFlow(BlurLevel.NONE)
-    override val blurLevel: StateFlow<BlurLevel> = _blurLevel
+    private val _videoEffect: MutableStateFlow<VideoEffect> = MutableStateFlow(initialVideoEffect)
+    override val videoEffect: StateFlow<VideoEffect> = _videoEffect
 
     private val _camera: MutableStateFlow<CameraType> = MutableStateFlow(CameraType.FRONT)
     override val camera: StateFlow<CameraType> = _camera
@@ -97,16 +108,21 @@ data class PublisherState(
 
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
-            true -> vonagePublisher.publishVideo =
-                vonagePublisher.stream?.hasVideo == true
-
+            // Use userIntendedVideoOn instead of stream?.hasVideo.
+            // stream.hasVideo is dynamic: it becomes false when publishVideo is set to false,
+            // so reading it here would permanently lock the publisher video off.
+            true  -> vonagePublisher.publishVideo = userIntendedVideoOn
             false -> vonagePublisher.publishVideo = false
         }
     }
 
     override fun toggleVideo() {
-        vonagePublisher.publishVideo = vonagePublisher.publishVideo.toggle()
-        _isCameraEnabled.update { vonagePublisher.publishVideo }
+        // Toggle userIntendedVideoOn, not vonagePublisher.publishVideo.
+        // publishVideo may be temporarily false due to a changeVisibility(false) call;
+        // toggling it directly would invert the wrong value.
+        userIntendedVideoOn = !userIntendedVideoOn
+        vonagePublisher.publishVideo = userIntendedVideoOn
+        _isCameraEnabled.update { userIntendedVideoOn }
     }
 
     override fun toggleAudio() {
@@ -118,11 +134,14 @@ data class PublisherState(
         vonagePublisher.cycleCamera()
     }
 
-    override fun cycleCameraBlur() {
-        var index = BlurLevel.entries.first { it == _blurLevel.value }.ordinal
-        val newLevel = BlurLevel by ++index
-        vonagePublisher.applyBlur(newLevel.toVonageBlurLevel())
-        _blurLevel.value = newLevel
+    override fun applyVideoEffect(effect: VideoEffect) {
+        when (effect) {
+            VideoEffect.None -> vonagePublisher.applyBlur(VonageBlurLevel.NONE)
+            VideoEffect.BlurLow -> vonagePublisher.applyBlur(VonageBlurLevel.LOW)
+            VideoEffect.BlurHigh -> vonagePublisher.applyBlur(VonageBlurLevel.HIGH)
+            is VideoEffect.BackgroundImage -> vonagePublisher.applyBackgroundImage(effect.imagePath)
+        }
+        _videoEffect.value = effect
     }
 
     override fun toggleNoiseSuppression() {
@@ -330,12 +349,6 @@ internal fun VonagePublisher.observeAudioStats(): Flow<PublisherState.AudioStats
         }
         awaitClose { setAudioStatsListener(null) }
     }
-
-internal fun BlurLevel.toVonageBlurLevel(): VonageBlurLevel = when (this) {
-    BlurLevel.NONE -> VonageBlurLevel.NONE
-    BlurLevel.LOW -> VonageBlurLevel.LOW
-    BlurLevel.HIGH -> VonageBlurLevel.HIGH
-}
 
 internal fun NoiseSuppression.toVonageNoiseSuppression(): VonageNoiseSuppression = when (this) {
     NoiseSuppression.ENABLED -> VonageNoiseSuppression.ENABLED

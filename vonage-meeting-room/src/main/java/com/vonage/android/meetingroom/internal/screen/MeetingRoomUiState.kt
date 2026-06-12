@@ -3,10 +3,14 @@ package com.vonage.android.meetingroom.internal.screen
 import androidx.compose.runtime.Immutable
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.captions.CaptionsUiState
+import com.vonage.android.fx.data.UserBackgroundRepository
+import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.internal.screen.audio.AudioDevicesState
 import com.vonage.android.screensharing.ScreenSharingState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
 internal data class MeetingRoomUiState(
@@ -24,8 +28,17 @@ internal data class MeetingRoomUiState(
     val allowMicrophoneControl: Boolean = true,
     val allowCameraControl: Boolean = true,
     val allowShowParticipantList: Boolean = true,
+    val backgrounds: ImmutableList<VideoBackgroundItem> = persistentListOf(),
+    /**
+     * Number of additional user backgrounds the user may still upload before reaching the cap.
+     * Zero means the "Add image" tile should be hidden. Used to select the correct photo picker
+     * (single vs. multi-image) and to cap the number of images the user can pick in one go.
+     */
+    val remainingBackgroundSlots: Int = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
     /** Runtime feature set — applied on top of compile-time flavor toggles. */
     val enabledFeatures: Set<MeetingRoomFeature> = MeetingRoomFeature.all,
+    /** Flag indicating recording was started by another participant (triggers overlay notification). */
+    val recordingStartedByOthers: Boolean = false,
 )
 
 internal enum class CallLayoutType {

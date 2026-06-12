@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
  * Retrieve an instance via [MeetingRoomPrebuilt.stateHolder]. State is populated once the
  * meeting room composable is first displayed and the call setup begins.
  */
+@ExperimentalMeetingRoomApi
 interface MeetingRoomStateHolder {
     val callState: StateFlow<MeetingRoomCallState>
 }
@@ -21,6 +22,7 @@ interface MeetingRoomStateHolder {
  * @param isLocalCameraEnabled `true` when the local camera is publishing video.
  * @param roomName            Name of the meeting room.
  */
+@ExperimentalMeetingRoomApi
 data class MeetingRoomCallState(
     val isConnected: Boolean = false,
     val participantCount: Int = 0,

@@ -59,4 +59,5 @@ object FeaturesModule {
     @Singleton
     @Provides
     fun provideCallSettingsHolder(): CallSettingsHolder = CallSettingsHolder()
+
 }
