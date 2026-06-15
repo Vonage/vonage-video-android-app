@@ -18,8 +18,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +34,7 @@ import com.vonage.android.compose.components.ParticipantsPlaceholders
 import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.util.lazyStateVisibilityTracker
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import kotlinx.collections.immutable.ImmutableList
@@ -53,11 +54,11 @@ fun ActiveSpeakerLayout(
     otherParticipantsSize: Dp = 200.dp,
 ) {
     val mainParticipant by call.activeSpeaker.collectAsStateWithLifecycle()
-    val nonMainParticipant by remember(mainParticipant) {
-        derivedStateOf { participants.filterNot { it.id == mainParticipant?.id } }
+    val nonMainParticipant = remember(participants, mainParticipant) {
+        participants.filterNot { it.id == mainParticipant?.id }
     }
 
-    val filmstripTakeCount = remember(nonMainParticipant.size) {
+    val filmstripTakeCount = remember(nonMainParticipant) {
         when {
             nonMainParticipant.size <= MAX_FILMSTRIP_TILES -> nonMainParticipant.size
             else -> (MAX_FILMSTRIP_TILES - 1).coerceAtLeast(1)
@@ -73,10 +74,8 @@ fun ActiveSpeakerLayout(
         persistentListOf()
     }
 
-//    val listState = lazyStateVisibilityTracker(call = call, lazyState = rememberLazyListState())
-    val listState = rememberLazyListState()
-    //val movableParticipantContent = remember(participantContent) { movableContentOf(participantContent) }
-    val movableParticipantContent = remember(participantContent) { participantContent }
+    val listState = lazyStateVisibilityTracker(call = call, lazyState = rememberLazyListState())
+    val movableParticipantContent = remember(participantContent) { movableContentOf(participantContent) }
 
     Box(
         modifier = modifier.fillMaxSize(),
