@@ -39,7 +39,7 @@
 - `BASE_API_URL` propagates to three locations: Retrofit base URL (`RetrofitModule.kt`), deep links (`AppNavHost.kt`), and sharing links (`util/navigateToShare.kt`).
 - Hilt DI is used in `app/`. `vonage-meeting-room` uses a **manual** `MeetingRoomContainer` — do not introduce Hilt into that module.
 - Feature signal plugins (chat, reactions) are injected into `VonageVideoClient` via `SdkModule.provideVonageVideoClient(...)` in `app/`.
-- `docs/ARCHITECTURE.md` describes an active refactoring plan for `vonage-meeting-room`: adding use cases, splitting `Call.kt` (~800 lines) into focused collaborators. Consult it before changing that module.
+- `vonage-meeting-room` is under active refactoring: use cases are being introduced and `Call.kt` (~800 lines) is being split into focused collaborators. Consult the inline comments in that module before making changes there.
 - Debug builds append `.debug` to `applicationId` and `-DEBUG` to `versionName`, allowing debug and release to co-exist on device.
 - Firebase/Crashlytics plugins are **only applied for release builds** (guarded by `isReleaseBuild` check in `app/build.gradle.kts`).
 
