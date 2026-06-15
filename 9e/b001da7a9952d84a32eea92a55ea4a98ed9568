@@ -1,0 +1,14 @@
+.vonage/catalog-info.yaml
+  h_5ddc9d372ac6a1 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "9eb001da7a9952d84a32eea92a55ea4a98ed9568",
+  "prompts": {},
+  "humans": {
+    "h_5ddc9d372ac6a1": {
+      "author": "Ivan <210490533+VZaphod@users.noreply.github.com>"
+    }
+  }
+}
