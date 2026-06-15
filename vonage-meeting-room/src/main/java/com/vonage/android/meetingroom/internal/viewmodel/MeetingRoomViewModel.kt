@@ -27,6 +27,7 @@ import com.vonage.logger.vonageLogger
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -68,6 +69,7 @@ internal class MeetingRoomViewModel(
 
     private var call: CallFacade? = null
     private val callEnded = AtomicBoolean(false)
+    private var localUserStartedRecording = false
 
     init {
         if (prebuilt.foregroundServiceEnabled) {
@@ -94,6 +96,7 @@ internal class MeetingRoomViewModel(
                 publishVideo = prebuilt.publisherSettings.publishVideo,
                 initialVideoEffect = prebuilt.publisherSettings.initialVideoEffect,
                 cameraIndex = 1, // default to front camera
+                publishCaptions = container.vonageCaptions.isCapable,
             ),
         )
 
@@ -169,11 +172,7 @@ internal class MeetingRoomViewModel(
                         roomName = roomName,
                         call = activeCall,
                         archivingUiState = ArchivingUiState.IDLE,
-                        captionsUiState = if (sessionInfo.captionsId.isNullOrBlank()) {
-                            CaptionsUiState.IDLE
-                        } else {
-                            CaptionsUiState.ENABLED
-                        },
+                        captionsUiState = CaptionsUiState.IDLE,
                         isLoading = false,
                         isError = false,
                     )
@@ -300,6 +299,7 @@ internal class MeetingRoomViewModel(
                                 opusDtxEnabled = holder.opusDtxEnabled.value,
                                 publisherAudioFallback = holder.publisherAudioFallbackEnabled.value,
                                 subscriberAudioFallback = holder.subscriberAudioFallbackEnabled.value,
+                                publishCaptions = container.vonageCaptions.isCapable,
                             ),
                         )
                         vonageLogger.d("MeetingRoomViewModel", "Refresh publisher (${activeCall.publisher.value?.name})")
@@ -326,6 +326,7 @@ internal class MeetingRoomViewModel(
     //region Archiving
     fun archiveCall(enable: Boolean) {
         if (enable) {
+            localUserStartedRecording = true
             _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.STARTING) }
         } else {
             _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.STOPPING) }
@@ -334,10 +335,16 @@ internal class MeetingRoomViewModel(
             if (enable) {
                 container.vonageArchiving.startArchive(roomName)
                     .onSuccess { _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.RECORDING) } }
-                    .onFailure { _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.IDLE) } }
+                    .onFailure {
+                        localUserStartedRecording = false
+                        _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.IDLE) }
+                    }
             } else {
                 container.vonageArchiving.stopArchive(roomName)
-                    .onSuccess { _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.IDLE) } }
+                    .onSuccess {
+                        localUserStartedRecording = false
+                        _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.IDLE) }
+                    }
                     .onFailure { _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.RECORDING) } }
             }
         }
@@ -350,8 +357,23 @@ internal class MeetingRoomViewModel(
                     .onEach { archivingState ->
                         when (archivingState) {
                             is ArchivingState.Idle -> {}
-                            is ArchivingState.Started -> _uiState.update { state ->
-                                state.copy(archivingUiState = ArchivingUiState.RECORDING)
+                            is ArchivingState.Started -> {
+                                val startedByOthers = !localUserStartedRecording
+                                _uiState.update { state ->
+                                    state.copy(
+                                        archivingUiState = ArchivingUiState.RECORDING,
+                                        recordingStartedByOthers = startedByOthers
+                                    )
+                                }
+                                // Reset the overlay flag after the overlay duration
+                                if (startedByOthers) {
+                                    launch {
+                                        delay(RECORDING_OVERLAY_DELAY_MS)
+                                        _uiState.update { state -> state.copy(recordingStartedByOthers = false) }
+                                    }
+                                }
+                                // Reset the local flag for next recording
+                                localUserStartedRecording = false
                             }
                             is ArchivingState.Stopped -> _uiState.update { state ->
                                 state.copy(archivingUiState = ArchivingUiState.IDLE)
@@ -412,5 +434,6 @@ internal class MeetingRoomViewModel(
 
     private companion object {
         const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
+        const val RECORDING_OVERLAY_DELAY_MS: Long = 5_000
     }
 }

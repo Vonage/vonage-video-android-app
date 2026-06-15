@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.captions.ui.CaptionsOverlay
 import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
@@ -46,6 +47,7 @@ import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.
 import com.vonage.android.meetingroom.internal.screen.audio.AudioDevicesMenu
 import com.vonage.android.meetingroom.internal.screen.components.MeetingRoomContent
 import com.vonage.android.meetingroom.internal.screen.components.MeetingTopBar
+import com.vonage.android.meetingroom.internal.screen.components.RecordingStartedOverlay
 import com.vonage.android.meetingroom.internal.screen.components.SpeakingWhileMutedOverlay
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBar
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarState
@@ -87,6 +89,8 @@ internal fun MeetingRoomScreen(
 ) {
     var showAudioOutputs by remember { mutableStateOf(false) }
     val audioOutputsSheetState = rememberModalBottomSheetState()
+
+    var showRecordingConfirmDialog by remember { mutableStateOf(false) }
 
     var showVideoEffects by remember { mutableStateOf(false) }
     var selectedEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
@@ -144,6 +148,21 @@ internal fun MeetingRoomScreen(
                 }
             }
 
+            // Wrap actions to show confirmation dialog before starting recording
+            val wrappedActions = remember(actions, uiState.archivingUiState) {
+                actions.copy(
+                    onToggleRecording = { enable ->
+                        if (enable && uiState.archivingUiState == ArchivingUiState.IDLE) {
+                            showRecordingConfirmDialog = true
+                        } else if (!enable && uiState.archivingUiState == ArchivingUiState.RECORDING) {
+                            showRecordingConfirmDialog = true
+                        } else {
+                            actions.onToggleRecording(enable)
+                        }
+                    }
+                )
+            }
+
             Scaffold(
                 modifier = modifier.testTag(MEETING_ROOM_SCREEN_TAG).systemBarsPadding(),
                 topBar = {
@@ -160,7 +179,7 @@ internal fun MeetingRoomScreen(
                     BottomBar(
                         modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
                         call = call,
-                        roomActions = actions,
+                        roomActions = wrappedActions,
                         actions = remember(uiState.enabledFeatures) {
                             enabledBottomBarActions(uiState.enabledFeatures)
                         },
@@ -193,6 +212,7 @@ internal fun MeetingRoomScreen(
                             EmojiReactionOverlay(call = call)
                             CaptionsOverlay(captionLines = captionLines)
                             SpeakingWhileMutedOverlay(publisher = publisher)
+                            RecordingStartedOverlay(isRecordingStartedByOthers = uiState.recordingStartedByOthers)
                             // MeetingRoomContent is always visible — the effects sheet is a
                             // ModalBottomSheet that overlays it without disturbing the publisher.
                             MeetingRoomContent(
@@ -281,6 +301,36 @@ internal fun MeetingRoomScreen(
                 actions.onEndCall()
             }
         }
+    }
+
+    // Recording confirmation dialog
+    if (showRecordingConfirmDialog && uiState.archivingUiState == ArchivingUiState.IDLE) {
+        BasicAlertDialog(
+            text = stringResource(R.string.recording_confirm_dialog_message),
+            acceptLabel = stringResource(R.string.recording_confirm_button),
+            cancelLabel = stringResource(R.string.generic_cancel),
+            onAccept = {
+                showRecordingConfirmDialog = false
+                actions.onToggleRecording(true)
+            },
+            onCancel = {
+                showRecordingConfirmDialog = false
+            }
+        )
+    }
+    if (showRecordingConfirmDialog && uiState.archivingUiState == ArchivingUiState.RECORDING) {
+        BasicAlertDialog(
+            text = stringResource(R.string.recording_stop_confirm_dialog_message),
+            acceptLabel = stringResource(R.string.recording_stop_confirm_button),
+            cancelLabel = stringResource(R.string.generic_cancel),
+            onAccept = {
+                showRecordingConfirmDialog = false
+                actions.onToggleRecording(false)
+            },
+            onCancel = {
+                showRecordingConfirmDialog = false
+            }
+        )
     }
 }
 

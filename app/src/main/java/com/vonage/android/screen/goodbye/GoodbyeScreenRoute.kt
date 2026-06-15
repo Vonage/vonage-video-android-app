@@ -14,7 +14,7 @@ import com.vonage.android.archiving.Archive
 @Composable
 fun GoodbyeScreenRoute(
     roomName: String,
-    navigateToMeeting: (String) -> Unit,
+    navigateToWaiting: (String) -> Unit,
     navigateToLanding: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GoodbyeScreenViewModel =
@@ -28,9 +28,9 @@ fun GoodbyeScreenRoute(
 
     val actions = remember {
         GoodbyeScreenActions(
-            onReEnter = { navigateToMeeting(roomName) },
+            onReEnter = { navigateToWaiting(roomName) },
             onGoHome = navigateToLanding,
-            onBack = { navigateToMeeting(roomName) },
+            onBack = { navigateToWaiting(roomName) },
             onDownloadArchive = { archive ->
                 viewModel.downloadArchive(archive)
             }
@@ -38,7 +38,7 @@ fun GoodbyeScreenRoute(
     }
 
     BackHandler {
-        navigateToMeeting(roomName)
+        navigateToWaiting(roomName)
     }
 
     GoodbyeScreen(

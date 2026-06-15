@@ -95,7 +95,7 @@ fun AppNavHost(
             val roomName = backStackEntry.toRoute<Goodbye>().roomName
             GoodbyeScreenRoute(
                 roomName = roomName,
-                navigateToMeeting = { roomName -> navController.navigate(Meeting(roomName = roomName)) },
+                navigateToWaiting = { roomName -> navController.navigate(Waiting(roomName = roomName)) },
                 navigateToLanding = {
                     navController.navigate(Landing) {
                         popUpTo(Landing) { inclusive = true }

@@ -166,6 +166,27 @@ internal class OpenTokSession(
             }
         })
     }
+
+    /**
+     * Registers a publisher's stream in the internal stream map.
+     * This is needed to allow subscribing to the publisher's own stream for self-captions.
+     */
+    override fun registerPublisherStream(publisher: VonagePublisher) {
+        val real = (publisher as OpenTokPublisher).raw
+        real.stream?.let { stream ->
+            streamMap[stream.streamId] = stream
+        }
+    }
+
+    /**
+     * Unregisters a publisher's stream from the internal stream map.
+     */
+    override fun unregisterPublisherStream(publisher: VonagePublisher) {
+        val real = (publisher as OpenTokPublisher).raw
+        real.stream?.let { stream ->
+            streamMap.remove(stream.streamId)
+        }
+    }
 }
 
 // region Mapping helpers

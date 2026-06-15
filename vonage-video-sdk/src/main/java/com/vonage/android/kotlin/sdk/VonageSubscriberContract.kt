@@ -14,6 +14,7 @@ interface VonageSubscriber {
     val view: View
 
     var subscribeToVideo: Boolean
+    var subscribeToAudio: Boolean
     var subscribeToCaptions: Boolean
 
     fun reinitializeRenderer()

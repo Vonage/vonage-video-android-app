@@ -8,8 +8,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -17,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.api.MeetingRoomSDKAction
+import com.vonage.android.meetingroom.internal.permissions.computeRequiredPermissions
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreen
 import com.vonage.android.meetingroom.internal.screen.PipMeetingRoomScreen
@@ -48,7 +52,14 @@ internal fun MeetingRoomContent(
         lightColors = prebuilt.theme.lightColors,
         darkColors = prebuilt.theme.darkColors,
     ) {
-        MeetingRoomContentInner(prebuilt = prebuilt, onActivityFinish = onActivityFinish)
+        var permissionsGranted by rememberSaveable { mutableStateOf(false) }
+        val requiredPermissions = remember { computeRequiredPermissions() }
+
+        if (permissionsGranted) {
+            MeetingRoomContentInner(prebuilt = prebuilt, onActivityFinish = onActivityFinish)
+        } else {
+            prebuilt.permissionContent(requiredPermissions) { permissionsGranted = true }
+        }
     }
 }
 
