@@ -1,0 +1,14 @@
+gradle/libs.versions.toml
+  h_25498f8d57a266 14,23,29,33,42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "a96266fe92ecffee45802f17b9d8af20fe384b78",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
