@@ -53,6 +53,7 @@ fun <T> DropdownSelector(
     items: ImmutableList<DropdownItem<T>>,
     onSelectItem: (T) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     note: String? = null,
     selectedDescription: String? = null,
     extraContent: @Composable (() -> Unit)? = null,
@@ -83,7 +84,7 @@ fun <T> DropdownSelector(
 
         DropdownMenu(
             expanded = expanded,
-            onExpandedChange = { expanded = it },
+            onExpandedChange = { if (enabled) expanded = it },
             selectedLabel = selectedLabel,
             dropdownLabel = dropdownLabel,
             items = items,

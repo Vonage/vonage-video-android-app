@@ -60,6 +60,7 @@ internal fun ResolutionSelector(
             items = items.toImmutableList(),
             onSelectItem = if (enabled) onSelectionChange else { _ -> },
             modifier = Modifier.alpha(if (enabled) 1f else DISABLED_ALPHA),
+            enabled = enabled,
         )
 
         helperText?.let {
