@@ -46,6 +46,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -440,9 +441,20 @@ class Call internal constructor(
 
     /**
      * Applies a degradation preference to the publisher at runtime.
+     * Cycles publishVideo off/on with a brief delay to force the encoder to
+     * reinitialize cleanly and avoid a video freeze.
      */
     override fun setDegradationPreference(preference: DegradationPreference) {
-        publisher()?.applyDegradationPreference(preference)
+        val pub = publisher() ?: return
+        val wasVideoOn = pub.vonagePublisher.publishVideo
+        pub.applyDegradationPreference(preference)
+        if (wasVideoOn) {
+            coroutineScope.launch(Dispatchers.Main) {
+                pub.vonagePublisher.publishVideo = false
+                delay(DEGRADATION_PREF_RESTART_DELAY_MS)
+                pub.vonagePublisher.publishVideo = true
+            }
+        }
     }
 
     /**
@@ -772,6 +784,7 @@ class Call internal constructor(
 
         private const val PARTICIPANTS_DEBOUNCE_MILLIS = 100L
         private const val ACTIVE_SPEAKER_DEBOUNCE_MILLIS = 250L
+        private const val DEGRADATION_PREF_RESTART_DELAY_MS = 200L
         private const val VISIBILITY_MONITOR_ENABLED = true
     }
 }
