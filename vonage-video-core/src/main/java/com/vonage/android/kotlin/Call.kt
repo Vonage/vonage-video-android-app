@@ -46,6 +46,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -448,75 +449,19 @@ class Call internal constructor(
 
     /**
      * Applies a degradation preference to the publisher at runtime.
+     * Cycles publishVideo off/on with a brief delay to force the encoder to
+     * reinitialize cleanly and avoid a video freeze.
      */
     override fun setDegradationPreference(preference: DegradationPreference) {
-        publisher()?.applyDegradationPreference(preference)
-    }
-
-    /**
-     * Refreshes the publisher by unpublishing, destroying, recreating, and republishing.
-     * The publisher factory must be reconfigured with the new settings before calling.
-     */
-    override fun refreshPublisher(context: Context) {
-        vonageLogger.i("PublisherFactory", "Refresh publisher")
-        coroutineScope.launch(Dispatchers.Default) {
-            // Clean up hidden self-subscriber before refreshing publisher
-            cleanupHiddenSelfSubscriber()
-            
-            val old = publisher() ?: return@launch
-            val wasVideoOn = old.isCameraEnabled.value
-            val wasAudioOn = old.isMicEnabled.value
-            val videoEffect = old.videoEffect.value
-            val cameraIndex = old.camera.value.index
-            val name = old.name
-
-            old.clean()
-
-            publisherFactory.destroyPublisher()
-            participants.remove(PUBLISHER_ID)
-
-            vonageLogger.i("PublisherFactory", "Publisher name = $name")
-
-            publisherFactory.init(
-                publisherFactory.currentConfig!!.copy(
-                    name = name,
-                    publishVideo = wasVideoOn,
-                    publishAudio = wasAudioOn,
-                    initialVideoEffect = videoEffect,
-                    cameraIndex = cameraIndex,
-                ),
-            )
-            val newPublisher = withContext(Dispatchers.Main) {
-                val publisherState = publisherFactory.createPublisherState(context)
-                session.publish(publisherState.vonagePublisher)
-                
-                // Attach listener to detect when publisher stream becomes available
-                publisherState.vonagePublisher.setPublisherListener(object : VonagePublisherKitListener {
-                    override fun onStreamCreated(stream: VonageStream) {
-                        // Register publisher stream in session's streamMap for self-subscription
-                        session.registerPublisherStream(publisherState.vonagePublisher)
-                        
-                        if (pendingSelfCaptionsSubscription && captionsEnabled) {
-                            createHiddenSelfSubscriber(stream)
-                            pendingSelfCaptionsSubscription = false
-                        }
-                    }
-                    
-                    override fun onStreamDestroyed(stream: VonageStream) {
-                        // Unregister publisher stream from session's streamMap
-                        session.unregisterPublisherStream(publisherState.vonagePublisher)
-                    }
-                    
-                    override fun onError(error: VonageError) {
-                        vonageLogger.e(TAG, "Publisher error: ${error.message}")
-                    }
-                })
-                
-                publisherState
+        val pub = publisher() ?: return
+        val wasVideoOn = pub.vonagePublisher.publishVideo
+        pub.applyDegradationPreference(preference)
+        if (wasVideoOn) {
+            coroutineScope.launch(Dispatchers.Main) {
+                pub.vonagePublisher.publishVideo = false
+                delay(DEGRADATION_PREF_RESTART_DELAY_MS)
+                pub.vonagePublisher.publishVideo = true
             }
-            participants[PUBLISHER_ID] = newPublisher
-            coroutineScope.launch { newPublisher.setup() }
-            updateParticipants()
         }
     }
 
@@ -816,12 +761,6 @@ class Call internal constructor(
                         screenSharingParticipant != null -> {
                             _activeSpeaker.update { screenSharingParticipant }
                         }
-                        // Only promote participants with their camera on.
-                        // A camera-off participant talking does not deserve the spotlight.
-//                        mainSpeaker.isCameraEnabled.value -> {
-//                            mainSpeaker.changeVisibility(true)
-//                            _activeSpeaker.update { mainSpeaker }
-//                        }
                     }
                 }
             }
@@ -858,5 +797,6 @@ class Call internal constructor(
         private const val PARTICIPANTS_DEBOUNCE_MILLIS = 100L
         private const val ACTIVE_SPEAKER_DEBOUNCE_MILLIS = 250L
         private const val VISIBILITY_MONITOR_ENABLED = false
+        private const val DEGRADATION_PREF_RESTART_DELAY_MS = 200L
     }
 }

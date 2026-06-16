@@ -2,6 +2,7 @@ package com.vonage.android.meetingroom.api
 
 import androidx.compose.runtime.Composable
 import com.vonage.android.meetingroom.internal.permissions.DefaultPermissionContent
+import com.vonage.android.settings.CallSettingsHolder
 
 /**
  * Fluent builder for the meeting room SDK.
@@ -44,6 +45,7 @@ class MeetingRoomBuilder(
     private var onAction: (MeetingRoomSDKAction) -> Unit = {}
     private var configuration: MeetingRoomConfiguration = MeetingRoomConfiguration()
     private var publisherSettings: PublisherSettings = PublisherSettings()
+    private var callSettingsHolder: CallSettingsHolder? = null
     private var theme: MeetingRoomTheme = MeetingRoomTheme.vonage
     private var isDebug: Boolean = false
     private var reportingContent: (@Composable (() -> Unit) -> Unit)? = null
@@ -85,6 +87,20 @@ class MeetingRoomBuilder(
      */
     fun publisherSettings(settings: PublisherSettings): MeetingRoomBuilder = apply {
         publisherSettings = settings
+    }
+
+    /**
+     * Provides a shared [CallSettingsHolder] instance for coordinating settings
+     * across the host app and the meeting room.
+     *
+     * Use this when your app has a Settings screen that should affect active calls.
+     * Without this, the SDK creates its own isolated instance and settings changes
+     * from outside the meeting room will not be reflected.
+     *
+     * @param holder The shared settings holder, or null to use SDK's internal instance.
+     */
+    fun callSettingsHolder(holder: CallSettingsHolder?): MeetingRoomBuilder = apply {
+        this.callSettingsHolder = holder
     }
 
     /**
@@ -173,6 +189,7 @@ class MeetingRoomBuilder(
         onAction = onAction,
         configuration = configuration,
         publisherSettings = publisherSettings,
+        callSettingsHolder = callSettingsHolder,
         theme = theme,
         isDebug = isDebug,
         reportingContent = reportingContent,

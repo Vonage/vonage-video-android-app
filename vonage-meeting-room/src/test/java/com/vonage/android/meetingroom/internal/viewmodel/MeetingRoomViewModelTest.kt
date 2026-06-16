@@ -272,7 +272,7 @@ class MeetingRoomViewModelTest {
         testScheduler.advanceUntilIdle()
 
         sut.endCall()
-        testScheduler.advanceUntilIdle() // let observePublisherSettings settle after callSettingsHolder.clear()
+        testScheduler.advanceUntilIdle() // let observePublisherSettings settle after callSettingsHolder.clearCall()
 
         sut.endCall()
 

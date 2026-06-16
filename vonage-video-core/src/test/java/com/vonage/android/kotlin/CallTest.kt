@@ -4,6 +4,7 @@ import android.content.Context
 import app.cash.turbine.test
 import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.model.ArchivingState
+import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VideoEffect
@@ -920,6 +921,58 @@ class CallTest {
             )
             assertEquals("sub-camera-on", call.activeSpeaker.value?.id)
         }
+
+    // endregion
+
+    // region Degradation Preference
+
+    @Test
+    fun `setDegradationPreference should apply preference and cycle video`() = runTest(testDispatcher) {
+        val call = createCall()
+        every { mockVonagePublisher.publishVideo } returns true
+
+        call.connect(mockContext).test {
+            triggerConnectedAndWaitForPublisher()
+            awaitItem()
+
+            call.setDegradationPreference(DegradationPreference.MAINTAIN_FRAME_RATE)
+            callScheduler.runCurrent()
+            testScheduler.advanceTimeBy(200L)
+            testScheduler.runCurrent()
+
+            verify { mockPublisherState.applyDegradationPreference(DegradationPreference.MAINTAIN_FRAME_RATE) }
+            verify { mockVonagePublisher.publishVideo = false }
+            verify { mockVonagePublisher.publishVideo = true }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `setDegradationPreference should not cycle video when video is off`() = runTest(testDispatcher) {
+        val call = createCall()
+        every { mockVonagePublisher.publishVideo } returns false
+
+        call.connect(mockContext).test {
+            triggerConnectedAndWaitForPublisher()
+            awaitItem()
+
+            call.setDegradationPreference(DegradationPreference.BALANCED)
+
+            verify { mockPublisherState.applyDegradationPreference(DegradationPreference.BALANCED) }
+            verify(exactly = 0) { mockVonagePublisher.publishVideo = false }
+            verify(exactly = 0) { mockVonagePublisher.publishVideo = true }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `setDegradationPreference without publisher should be no-op`() = runTest(testDispatcher) {
+        val call = createCall()
+
+        call.setDegradationPreference(DegradationPreference.MAINTAIN_RESOLUTION)
+
+        verify(exactly = 0) { mockPublisherState.applyDegradationPreference(any()) }
+    }
 
     // endregion
 

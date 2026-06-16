@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -29,19 +30,23 @@ import kotlin.math.roundToInt
 private const val AUDIO_BITRATE_MIN = 6_000f
 private const val AUDIO_BITRATE_MAX = 510_000f
 private const val AUDIO_BITRATE_DEFAULT = 40_000
+private const val DISABLED_ALPHA = 0.5f
 
 @Composable
 internal fun AudioBitrateSelector(
     audioBitrate: Int?,
     onAudioBitrateChange: (Int?) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    helperText: String? = null,
 ) {
     val isCustom = audioBitrate != null
 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = VonageVideoTheme.dimens.paddingSmall),
+            .padding(vertical = VonageVideoTheme.dimens.paddingSmall)
+            .alpha(if (enabled) 1f else DISABLED_ALPHA),
     ) {
         Text(
             text = stringResource(R.string.settings_audio_bitrate_title),
@@ -63,9 +68,14 @@ internal fun AudioBitrateSelector(
             )
             Switch(
                 checked = !isCustom,
-                onCheckedChange = { auto ->
-                    onAudioBitrateChange(if (auto) null else AUDIO_BITRATE_DEFAULT)
+                onCheckedChange = if (enabled) {
+                    { auto ->
+                        onAudioBitrateChange(if (auto) null else AUDIO_BITRATE_DEFAULT)
+                    }
+                } else {
+                    {}
                 },
+                enabled = enabled,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Color.White,
                     checkedTrackColor = VonageVideoTheme.colors.primary,
@@ -80,7 +90,13 @@ internal fun AudioBitrateSelector(
             AudioBitrateSlider(
                 bitrate = audioBitrate,
                 onBitrateChange = onAudioBitrateChange,
+                enabled = enabled,
             )
+        }
+
+        helperText?.let {
+            Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
+            SettingHelperText(text = it)
         }
     }
 }
@@ -89,6 +105,7 @@ internal fun AudioBitrateSelector(
 private fun AudioBitrateSlider(
     bitrate: Int,
     onBitrateChange: (Int?) -> Unit,
+    enabled: Boolean,
 ) {
     var sliderValue by remember(bitrate) {
         mutableFloatStateOf(
@@ -119,12 +136,21 @@ private fun AudioBitrateSlider(
 
         Slider(
             value = sliderValue,
-            onValueChange = { sliderValue = it },
-            onValueChangeFinished = {
-                onBitrateChange(sliderValue.roundToInt())
+            onValueChange = if (enabled) {
+                { sliderValue = it }
+            } else {
+                {}
+            },
+            onValueChangeFinished = if (enabled) {
+                {
+                    onBitrateChange(sliderValue.roundToInt())
+                }
+            } else {
+                {}
             },
             valueRange = AUDIO_BITRATE_MIN..AUDIO_BITRATE_MAX,
             modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
             colors = SliderDefaults.colors(
                 thumbColor = VonageVideoTheme.colors.primary,
                 activeTrackColor = VonageVideoTheme.colors.primary,

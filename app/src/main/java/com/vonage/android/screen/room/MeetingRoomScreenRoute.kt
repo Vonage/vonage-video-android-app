@@ -11,6 +11,7 @@ import com.vonage.android.meetingroom.api.MeetingRoomSDKAction
 import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.screen.components.permissions.CallPermissionHandler
 import com.vonage.android.screen.reporting.ReportIssueScreen
+import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.util.navigateToSystemPermissions
 
 /**
@@ -28,6 +29,7 @@ import com.vonage.android.util.navigateToSystemPermissions
 @Composable
 fun MeetingRoomScreenRoute(
     roomName: String,
+    callSettingsHolder: CallSettingsHolder,
     navigateToGoodBye: () -> Unit,
     navigateToShare: (String) -> Unit,
     navigateToSettings: () -> Unit,
@@ -39,6 +41,7 @@ fun MeetingRoomScreenRoute(
             roomName = roomName,
         )
             .publisherSettings(initialPublisherSettings)
+            .callSettingsHolder(callSettingsHolder)
             .configuration(
                 MeetingRoomConfiguration(
                     allowCameraControl = AppConfig.VideoSettings.ALLOW_CAMERA_CONTROL,
