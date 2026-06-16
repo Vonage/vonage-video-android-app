@@ -8,7 +8,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.Lifecycle
@@ -19,9 +21,11 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.layout.Box
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.di.CallSettingsHolderEntryPoint
 import com.vonage.android.navigation.AppNavHost
 import com.vonage.android.util.InAppUpdates
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -65,7 +69,14 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun InterceptorAppNavHost(intentFlow: Flow<Intent>) {
+    val context = LocalContext.current
     val navController = rememberNavController()
+    val callSettingsHolder = remember {
+        EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            CallSettingsHolderEntryPoint::class.java
+        ).callSettingsHolder()
+    }
     LaunchedEffect(intentFlow) {
         intentFlow.collectLatest {
             it.data?.let { uri ->
@@ -80,5 +91,5 @@ fun InterceptorAppNavHost(intentFlow: Flow<Intent>) {
             }
         }
     }
-    AppNavHost(navController = navController)
+    AppNavHost(navController = navController, callSettingsHolder = callSettingsHolder)
 }

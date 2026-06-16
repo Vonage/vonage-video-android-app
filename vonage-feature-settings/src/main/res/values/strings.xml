@@ -7,6 +7,7 @@
     <string name="settings_section_stats">Stats</string>
 
     <string name="settings_close">Close settings</string>
+    <string name="settings_disabled_during_call">Cannot be changed during an active call</string>
 
     <!-- Sender stats -->
     <string name="settings_sender_stats_title">Sender stats</string>

@@ -20,6 +20,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import javax.inject.Singleton
+import dagger.hilt.EntryPoint
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface CallSettingsHolderEntryPoint {
+    fun callSettingsHolder(): CallSettingsHolder
+}
 
 @Module
 @InstallIn(SingletonComponent::class)

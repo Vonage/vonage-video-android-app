@@ -142,33 +142,35 @@ class CallSettingsHolderTest {
 
     // endregion
 
-    // region clear
+    // region clearCall
 
     @Test
-    fun `when clear then all values are reset to defaults`() {
+    fun `when clearCall then only call reference is cleared`() {
         val call: CallFacade = mockk(relaxed = true)
         sut.bind(call)
         sut.updateSenderStatsEnabled(false)
         sut.updateOpusDtx(false)
-        sut.updateVideoBitrateConfig(
-            VideoBitrateConfig(preset = VideoBitratePreset.CUSTOM, maxBitrate = 9_999),
-        )
+        val customConfig = VideoBitrateConfig(preset = VideoBitratePreset.CUSTOM, maxBitrate = 9_999)
+        sut.updateVideoBitrateConfig(customConfig)
         sut.updateDegradationPreference(DegradationPreference.MAINTAIN_FRAME_RATE)
         sut.updateCaptureFrameRate(CaptureFrameRate.FPS_30)
         sut.updateCaptureResolution(CaptureResolution.HIGH_1080P)
         sut.updatePublisherAudioFallback(false)
         sut.updateSubscriberAudioFallback(false)
 
-        sut.clear()
+        sut.clearCall()
 
+        // Call reference is cleared
         assertNull(sut.call.value)
-        assertTrue(sut.senderStatsEnabled.value)
-        assertEquals(VideoBitratePreset.DEFAULT, sut.videoBitrateConfig.value.preset)
-        assertEquals(DegradationPreference.NOT_SET, sut.degradationPreference.value)
-        assertEquals(CaptureFrameRate.FPS_15, sut.captureFrameRate.value)
-        assertNull(sut.captureResolution.value)
-        assertTrue(sut.publisherAudioFallbackEnabled.value)
-        assertTrue(sut.subscriberAudioFallbackEnabled.value)
+        // But user preferences remain
+        assertEquals(false, sut.senderStatsEnabled.value)
+        assertEquals(false, sut.opusDtxEnabled.value)
+        assertEquals(customConfig, sut.videoBitrateConfig.value)
+        assertEquals(DegradationPreference.MAINTAIN_FRAME_RATE, sut.degradationPreference.value)
+        assertEquals(CaptureFrameRate.FPS_30, sut.captureFrameRate.value)
+        assertEquals(CaptureResolution.HIGH_1080P, sut.captureResolution.value)
+        assertEquals(false, sut.publisherAudioFallbackEnabled.value)
+        assertEquals(false, sut.subscriberAudioFallbackEnabled.value)
     }
 
     // endregion
