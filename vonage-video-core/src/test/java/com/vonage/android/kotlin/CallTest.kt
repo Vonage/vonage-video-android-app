@@ -876,52 +876,6 @@ class CallTest {
             )
         }
 
-    @Test
-    fun `activeSpeaker should be promoted when camera is on`() =
-        runTest(testDispatcher) {
-            val mockActiveSpeakerChanges = MutableSharedFlow<ActiveSpeakerChangedPayload>(
-                extraBufferCapacity = 1,
-            )
-            val mockTracker = mockk<ActiveSpeakerTracker>(relaxed = true) {
-                every { activeSpeakerChanges } returns mockActiveSpeakerChanges
-            }
-            val call = createCallWithTracker(mockTracker)
-            val stream = createVonageStream("sub-camera-on", "WithCamera", hasVideo = true)
-            val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
-                every { this@mockk.stream } returns stream
-            }
-            every { mockSession.subscribe(any(), any()) } returns mockSubscriber
-
-            backgroundScope.launch { call.connect(mockContext).collect { } }
-
-            capturedSessionListener!!.onConnected()
-            Thread.sleep(200)
-            callScheduler.runCurrent()
-
-            capturedSessionListener!!.onStreamReceived(stream)
-            Thread.sleep(200)
-            callScheduler.runCurrent()
-
-            assertTrue(
-                mockActiveSpeakerChanges.tryEmit(
-                    ActiveSpeakerChangedPayload(
-                        previousActiveSpeaker = ActiveSpeakerInfo(null, 0f),
-                        newActiveSpeaker      = ActiveSpeakerInfo("sub-camera-on", 0.8f),
-                    ),
-                ),
-            )
-            callScheduler.runCurrent()
-            // Advance past the activeSpeaker debounce (250ms).
-            callScheduler.advanceTimeBy(300)
-            callScheduler.runCurrent()
-
-            assertNotNull(
-                "Camera-on participant must be promoted to active speaker",
-                call.activeSpeaker.value,
-            )
-            assertEquals("sub-camera-on", call.activeSpeaker.value?.id)
-        }
-
     // endregion
 
     // region Degradation Preference

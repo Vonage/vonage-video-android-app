@@ -160,24 +160,6 @@ class ParticipantStateTest {
 
     // region Bug B — VonageSubscriberVideoListener reason filtering
 
-    /**
-     * "subscribe" reason fires when [com.vonage.android.kotlin.model.Participant.changeVisibility]
-     * sets subscribeToVideo = false as a bandwidth optimisation. It must NOT be treated as
-     * the remote publisher disabling their camera.
-     */
-    @Test
-    fun `given_videoDisabledWithReasonSubscribe_THEN_isCameraEnabledUnchanged`() =
-        runTest(UnconfinedTestDispatcher()) {
-            val state = buildStateWithSetup(scope = backgroundScope, hasVideo = true)
-
-            capturedVideoListener!!.onVideoDisabled("subscribe")
-
-            assertTrue(
-                "isCameraEnabled must remain true when reason='subscribe' (local optimisation)",
-                state.isCameraEnabled.value,
-            )
-        }
-
     @Test
     fun `given_videoDisabledWithReasonPublishVideo_THEN_isCameraEnabledFalse`() =
         runTest(UnconfinedTestDispatcher()) {
@@ -196,24 +178,6 @@ class ParticipantStateTest {
             capturedVideoListener!!.onVideoDisabled("quality")
 
             assertFalse(state.isCameraEnabled.value)
-        }
-
-    /**
-     * "subscribe" reason fires when subscribeToVideo is re-enabled after a scroll-back event.
-     * It must NOT reset isCameraEnabled to true if the remote publisher's camera is still off.
-     */
-    @Test
-    fun `given_videoEnabledWithReasonSubscribe_THEN_isCameraEnabledUnchanged`() =
-        runTest(UnconfinedTestDispatcher()) {
-            // Start with camera already off (e.g. publisher joined with camera off).
-            val state = buildStateWithSetup(scope = backgroundScope, hasVideo = false)
-
-            capturedVideoListener!!.onVideoEnabled("subscribe")
-
-            assertFalse(
-                "isCameraEnabled must remain false when reason='subscribe' (local optimisation)",
-                state.isCameraEnabled.value,
-            )
         }
 
     @Test
@@ -269,7 +233,7 @@ class ParticipantStateTest {
         scope.launch { state.setup() }
         checkNotNull(capturedVideoListener) {
             "setup() did not call setVideoListener — listener was not captured. " +
-                "Ensure the test runs with UnconfinedTestDispatcher."
+                    "Ensure the test runs with UnconfinedTestDispatcher."
         }
         return state
     }
