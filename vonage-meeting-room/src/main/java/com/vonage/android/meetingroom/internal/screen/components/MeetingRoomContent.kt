@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -45,7 +46,7 @@ internal fun MeetingRoomContent(
                         .fillMaxSize()
                         .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
                     participantContent = { participant, tileModifier ->
-                        androidx.compose.runtime.key("${participant.id}_grid") {
+                        key("${participant.id}_grid") {
                             ParticipantVideoCard(
                                 participant = participant,
                                 actions = actions,
@@ -65,7 +66,7 @@ internal fun MeetingRoomContent(
                         .fillMaxSize()
                         .testTag(MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT),
                     participantContent = { participant, tileModifier ->
-                        androidx.compose.runtime.key("${participant.id}_speaker") {
+                        key("${participant.id}_speaker") {
                             ParticipantVideoCard(
                                 participant = participant,
                                 actions = actions,
