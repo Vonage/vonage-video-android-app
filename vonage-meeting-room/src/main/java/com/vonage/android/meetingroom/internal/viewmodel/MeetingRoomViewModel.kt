@@ -93,6 +93,15 @@ internal class MeetingRoomViewModel(
                 initialVideoEffect = prebuilt.publisherSettings.initialVideoEffect,
                 cameraIndex = 1, // default to front camera
                 publishCaptions = container.vonageCaptions.isCapable,
+                senderStatsTrack = container.callSettingsHolder.senderStatsEnabled.value,
+                opusDtxEnabled = container.callSettingsHolder.opusDtxEnabled.value,
+                publisherAudioFallback = container.callSettingsHolder.publisherAudioFallbackEnabled.value,
+                subscriberAudioFallback = container.callSettingsHolder.subscriberAudioFallbackEnabled.value,
+                videoBitrateConfig = container.callSettingsHolder.videoBitrateConfig.value,
+                captureFrameRate = container.callSettingsHolder.captureFrameRate.value,
+                captureResolution = container.callSettingsHolder.captureResolution.value,
+                preferredVideoCodecOrder = container.callSettingsHolder.preferredVideoCodecOrder.value,
+                audioBitrate = container.callSettingsHolder.audioBitrate.value,
             ),
         )
 

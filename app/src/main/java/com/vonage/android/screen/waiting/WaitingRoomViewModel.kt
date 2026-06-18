@@ -31,6 +31,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -69,6 +70,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     }
 
     fun init(context: Context) {
+        callSettingsHolder.clearCall()
         viewModelScope.launch {
             val config = getConfig()
             val name = userRepository.getUserName()
@@ -178,15 +180,17 @@ class WaitingRoomViewModel @AssistedInject constructor(
                     initialVideoEffect = effect,
                 )
             } ?: PublisherSettings(username = sanitizedUserName)
-            onStop()
             _uiState.update { uiState -> uiState.copy(isSuccess = true, joinSettings = joinSettings) }
+            onStop()
         }
     }
 
     fun onStop() {
         publisherSetupJob?.cancel()
         currentPublisher()?.clean()
+        callSettingsHolder.clearCall()
         videoClient.destroyPublisher()
+        viewModelScope.cancel()
     }
 
     /**

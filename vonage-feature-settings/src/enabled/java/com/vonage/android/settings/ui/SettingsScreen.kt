@@ -254,8 +254,8 @@ private fun LazyListScope.settingItem(
 }
 
 @Composable
-private fun disabledHelperText(isCallActive: Boolean): String? =
-    if (isCallActive) stringResource(R.string.settings_disabled_during_call) else null
+private fun nextCallNotice(isCallActive: Boolean): String? =
+    if (isCallActive) stringResource(R.string.settings_next_call_notice) else null
 
 private fun LazyListScope.frameRateItem(uiState: SettingsUiState, actions: SettingsScreenActions) {
     item {
@@ -263,8 +263,7 @@ private fun LazyListScope.frameRateItem(uiState: SettingsUiState, actions: Setti
         FrameRateSelector(
             selected = uiState.captureFrameRate,
             onSelectionChange = actions.onFrameRateChange,
-            enabled = !isCallActive,
-            helperText = disabledHelperText(isCallActive),
+            helperText = nextCallNotice(isCallActive),
         )
     }
 }
@@ -275,8 +274,7 @@ private fun LazyListScope.resolutionItem(uiState: SettingsUiState, actions: Sett
         ResolutionSelector(
             selected = uiState.captureResolution,
             onSelectionChange = actions.onResolutionChange,
-            enabled = !isCallActive,
-            helperText = disabledHelperText(isCallActive),
+            helperText = nextCallNotice(isCallActive),
         )
     }
 }
@@ -308,8 +306,7 @@ private fun LazyListScope.codecOrderItem(uiState: SettingsUiState, actions: Sett
         PreferredCodecOrderSelector(
             selectedOrder = uiState.preferredVideoCodecOrder,
             onOrderChange = actions.onPreferredVideoCodecOrderChange,
-            enabled = !isCallActive,
-            helperText = disabledHelperText(isCallActive),
+            helperText = nextCallNotice(isCallActive),
         )
     }
 }
@@ -322,8 +319,7 @@ private fun LazyListScope.opusDtxItem(uiState: SettingsUiState, actions: Setting
             description = stringResource(R.string.settings_opus_dtx_description),
             isChecked = uiState.opusDtxEnabled,
             onCheckedChange = actions.onOpusDtxToggle,
-            enabled = !isCallActive,
-            helperText = disabledHelperText(isCallActive),
+            helperText = nextCallNotice(isCallActive),
         )
     }
 }
@@ -334,8 +330,7 @@ private fun LazyListScope.audioBitrateItem(uiState: SettingsUiState, actions: Se
         AudioBitrateSelector(
             audioBitrate = uiState.audioBitrate,
             onAudioBitrateChange = actions.onAudioBitrateChange,
-            enabled = !isCallActive,
-            helperText = disabledHelperText(isCallActive),
+            helperText = nextCallNotice(isCallActive),
         )
     }
 }
@@ -351,8 +346,7 @@ private fun LazyListScope.publisherAudioFallbackItem(
             description = stringResource(R.string.settings_publisher_audio_fallback_description),
             isChecked = uiState.publisherAudioFallbackEnabled,
             onCheckedChange = actions.onPublisherAudioFallbackToggle,
-            enabled = !isCallActive,
-            helperText = disabledHelperText(isCallActive),
+            helperText = nextCallNotice(isCallActive),
         )
     }
 }
@@ -368,8 +362,7 @@ private fun LazyListScope.subscriberAudioFallbackItem(
             description = stringResource(R.string.settings_subscriber_audio_fallback_description),
             isChecked = uiState.subscriberAudioFallbackEnabled,
             onCheckedChange = actions.onSubscriberAudioFallbackToggle,
-            enabled = !isCallActive,
-            helperText = disabledHelperText(isCallActive),
+            helperText = nextCallNotice(isCallActive),
         )
     }
 }
@@ -382,8 +375,7 @@ private fun LazyListScope.senderStatsItem(uiState: SettingsUiState, actions: Set
             description = stringResource(R.string.settings_sender_stats_description),
             isChecked = uiState.senderStatsEnabled,
             onCheckedChange = actions.onSenderStatsTrackToggle,
-            enabled = !isCallActive,
-            helperText = disabledHelperText(isCallActive),
+            helperText = nextCallNotice(isCallActive),
         )
     }
 }

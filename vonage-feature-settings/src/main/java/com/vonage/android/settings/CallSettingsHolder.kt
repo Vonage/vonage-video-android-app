@@ -8,12 +8,19 @@ import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.kotlin.model.VideoCodec
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 @Stable
-class CallSettingsHolder {
+class CallSettingsHolder(
+    private val storage: CallSettingsStorage = NoOpCallSettingsStorage(),
+    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
+) {
 
     private val _call = MutableStateFlow<CallFacade?>(null)
     val call: StateFlow<CallFacade?> = _call.asStateFlow()
@@ -53,46 +60,72 @@ class CallSettingsHolder {
     private val _audioBitrate = MutableStateFlow<Int?>(null)
     val audioBitrate: StateFlow<Int?> = _audioBitrate.asStateFlow()
 
+    init {
+        scope.launch {
+            val p = storage.load()
+            _captureFrameRate.value = p.captureFrameRate
+            _captureResolution.value = p.captureResolution
+            _preferredVideoCodecOrder.value = p.preferredVideoCodecOrder
+            _audioBitrate.value = p.audioBitrate
+            _opusDtxEnabled.value = p.opusDtxEnabled
+            _publisherAudioFallbackEnabled.value = p.publisherAudioFallbackEnabled
+            _subscriberAudioFallbackEnabled.value = p.subscriberAudioFallbackEnabled
+            _senderStatsEnabled.value = p.senderStatsEnabled
+            _videoBitrateConfig.value = p.videoBitrateConfig
+            _degradationPreference.value = p.degradationPreference
+        }
+    }
+
     fun updateSenderStatsEnabled(enabled: Boolean) {
         _senderStatsEnabled.value = enabled
+        save()
     }
 
     fun updateOpusDtx(enabled: Boolean) {
         _opusDtxEnabled.value = enabled
+        save()
     }
 
     fun updateVideoBitrateConfig(config: VideoBitrateConfig) {
         _videoBitrateConfig.value = config
         _call.value?.setVideoBitrate(config)
+        save()
     }
 
     fun updateDegradationPreference(preference: DegradationPreference) {
         _degradationPreference.value = preference
         _call.value?.setDegradationPreference(preference)
+        save()
     }
 
     fun updateCaptureFrameRate(frameRate: CaptureFrameRate) {
         _captureFrameRate.value = frameRate
+        save()
     }
 
     fun updateCaptureResolution(resolution: CaptureResolution?) {
         _captureResolution.value = resolution
+        save()
     }
 
     fun updatePublisherAudioFallback(enabled: Boolean) {
         _publisherAudioFallbackEnabled.value = enabled
+        save()
     }
 
     fun updateSubscriberAudioFallback(enabled: Boolean) {
         _subscriberAudioFallbackEnabled.value = enabled
+        save()
     }
 
     fun updatePreferredVideoCodecOrder(order: List<VideoCodec>?) {
         _preferredVideoCodecOrder.value = order
+        save()
     }
 
     fun updateAudioBitrate(bitrate: Int?) {
         _audioBitrate.value = bitrate
+        save()
     }
 
     fun clearCall() {
@@ -102,4 +135,21 @@ class CallSettingsHolder {
     fun bind(call: CallFacade) {
         _call.value = call
     }
+
+    private fun save() {
+        scope.launch { storage.save(snapshot()) }
+    }
+
+    private fun snapshot() = PersistedCallSettings(
+        captureFrameRate = _captureFrameRate.value,
+        captureResolution = _captureResolution.value,
+        preferredVideoCodecOrder = _preferredVideoCodecOrder.value,
+        audioBitrate = _audioBitrate.value,
+        opusDtxEnabled = _opusDtxEnabled.value,
+        publisherAudioFallbackEnabled = _publisherAudioFallbackEnabled.value,
+        subscriberAudioFallbackEnabled = _subscriberAudioFallbackEnabled.value,
+        senderStatsEnabled = _senderStatsEnabled.value,
+        videoBitrateConfig = _videoBitrateConfig.value,
+        degradationPreference = _degradationPreference.value,
+    )
 }
