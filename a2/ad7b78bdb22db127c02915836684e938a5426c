@@ -1,0 +1,14 @@
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomViewModel.kt
+  h_25498f8d57a266 34,73,184,191,193
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "a2ad7b78bdb22db127c02915836684e938a5426c",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
