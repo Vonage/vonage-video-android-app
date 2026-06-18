@@ -190,7 +190,6 @@ class WaitingRoomViewModel @AssistedInject constructor(
         currentPublisher()?.clean()
         callSettingsHolder.clearCall()
         videoClient.destroyPublisher()
-        viewModelScope.cancel()
     }
 
     /**
