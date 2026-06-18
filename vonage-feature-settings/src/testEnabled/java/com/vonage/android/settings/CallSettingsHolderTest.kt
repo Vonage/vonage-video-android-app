@@ -10,6 +10,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -27,7 +28,8 @@ class FakeCallSettingsStorage(
 
 class CallSettingsHolderTest {
 
-    private val sut = CallSettingsHolder()
+    private val testScope = TestScope(UnconfinedTestDispatcher())
+    private val sut = CallSettingsHolder(scope = testScope)
 
     // region defaults
 
@@ -193,6 +195,7 @@ class CallSettingsHolderTest {
     fun `when updateCaptureFrameRate then storage receives save with new value`() = runTest {
         val fake = FakeCallSettingsStorage()
         val holder = CallSettingsHolder(storage = fake, scope = this)
+        advanceUntilIdle() // let init load complete
 
         holder.updateCaptureFrameRate(CaptureFrameRate.FPS_30)
         advanceUntilIdle()
@@ -225,6 +228,7 @@ class CallSettingsHolderTest {
     fun `when updateOpusDtx then storage receives save with new value`() = runTest {
         val fake = FakeCallSettingsStorage()
         val holder = CallSettingsHolder(storage = fake, scope = this)
+        advanceUntilIdle() // let init load complete
 
         holder.updateOpusDtx(false)
         advanceUntilIdle()
