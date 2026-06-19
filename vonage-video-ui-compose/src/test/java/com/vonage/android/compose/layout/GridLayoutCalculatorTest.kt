@@ -20,14 +20,14 @@ class GridLayoutCalculatorTest(
             // Portrait
             arrayOf(1, false, 1, 1),
             arrayOf(2, false, 1, 2),
-            arrayOf(3, false, 2, 2),
+            arrayOf(3, false, 1, 3),
             arrayOf(4, false, 2, 2),
             arrayOf(5, false, 2, 3),
             arrayOf(6, false, 2, 3),
             // Landscape (columns and rows flipped)
             arrayOf(1, true, 1, 1),
             arrayOf(2, true, 2, 1),
-            arrayOf(3, true, 2, 2),
+            arrayOf(3, true, 3, 1),
             arrayOf(4, true, 2, 2),
             arrayOf(5, true, 3, 2),
             arrayOf(6, true, 3, 2),
