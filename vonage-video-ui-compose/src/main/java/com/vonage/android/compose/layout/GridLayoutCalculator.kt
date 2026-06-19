@@ -25,10 +25,12 @@ private const val QUAD_PARTICIPANT_THRESHOLD = 4
  *
  * The [MAX_GRID_TILES] cap and overflow placeholder are enforced by the composable, not here.
  */
+@Suppress("MagicNumber")
 internal fun gridLayoutFor(participantCount: Int, isLandscape: Boolean): GridDimensions {
     val portrait = when {
         participantCount <= 1 -> GridDimensions(columns = 1, rows = 1)
         participantCount <= 2 -> GridDimensions(columns = 1, rows = 2)
+        participantCount <= 3 -> GridDimensions(columns = 1, rows = 3)
         participantCount <= QUAD_PARTICIPANT_THRESHOLD -> GridDimensions(columns = 2, rows = 2)
         else -> GridDimensions(columns = 2, rows = 3)
     }
