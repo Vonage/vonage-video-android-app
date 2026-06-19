@@ -1,0 +1,14 @@
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/layout/GridLayoutCalculator.kt
+  h_25498f8d57a266 28,33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "dec098e0da4cbddbc5f28e4d5fa65777346df491",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
