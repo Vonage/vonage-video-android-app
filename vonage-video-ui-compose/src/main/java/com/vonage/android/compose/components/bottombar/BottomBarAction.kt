@@ -20,7 +20,6 @@ enum class BottomBarActionType {
     RECORD_SESSION,
     SCREEN_SHARING,
     CAPTIONS,
-    REPORT,
-    /** Sentinel type used for buttons injected by the host app via [MeetingRoomBuilder.additionalBottomBarActions]. */
+    /** Sentinel type used for buttons injected externally (custom host actions and the reporting action). */
     CUSTOM,
 }

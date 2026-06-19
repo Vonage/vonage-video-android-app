@@ -35,13 +35,14 @@ import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.compose.components.bottombar.ControlButton
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
+import com.vonage.android.compose.vivid.icons.VividIcons
+import com.vonage.android.compose.vivid.icons.solid.Warning
 import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.meetingroom.R
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
-import com.vonage.android.meetingroom.internal.screen.reporting.reportingAction
 import com.vonage.android.meetingroom.internal.util.noOpCall
 import com.vonage.android.reactions.ui.EmojiSelector
 import com.vonage.android.screensharing.ScreenSharingState
@@ -123,16 +124,28 @@ internal fun BottomBar(
                 showMoreActions = false
             }
         },
-        onShowReporting = {
-            scope.launch {
-                showReporting = showReporting.toggle()
-                moreActionsSheetState.hide()
-                showMoreActions = false
-            }
-        }
     )
-    val allActions = remember(bottomBarActions, additionalActions) {
-        (bottomBarActions + additionalActions).toImmutableList()
+
+    // Reporting is always appended last as a CUSTOM action so it participates in the same
+    // responsive overflow logic as the built-in buttons and host-injected extra actions.
+    val reportingLabel = stringResource(R.string.report_bottombar_button_label)
+    val reportingAction = remember(reportingLabel) {
+        BottomBarAction(
+            type = BottomBarActionType.CUSTOM,
+            icon = VividIcons.Solid.Warning,
+            label = reportingLabel,
+            isSelected = false,
+            onClick = {
+                scope.launch {
+                    showReporting = showReporting.toggle()
+                    moreActionsSheetState.hide()
+                    showMoreActions = false
+                }
+            },
+        )
+    }
+    val allActions = remember(bottomBarActions, additionalActions, reportingAction) {
+        (bottomBarActions + additionalActions + reportingAction).toImmutableList()
     }
     val visibleActions = allActions.take(actionsVisibleCount)
     val overflowActions = allActions.drop(actionsVisibleCount)
@@ -211,7 +224,6 @@ private fun actionsFactory(
     state: BottomBarState,
     roomActions: MeetingRoomActions,
     call: CallFacade,
-    onShowReporting: () -> Unit,
     onShowParticipants: () -> Unit,
     onShowChat: () -> Unit,
 ): ImmutableList<BottomBarAction> {
@@ -263,12 +275,8 @@ private fun actionsFactory(
                 captionsUiState = state.captionsUiState,
             )
 
-            BottomBarActionType.REPORT -> reportingAction(
-                onClick = onShowReporting,
-            )
-
-            // CUSTOM entries are injected externally via additionalActions and never
-            // appear in the BottomBarActionType list passed to actionsFactory.
+            // CUSTOM entries are injected externally and never appear in the
+            // BottomBarActionType list passed to actionsFactory.
             BottomBarActionType.CUSTOM -> null
         }
     }.toImmutableList()

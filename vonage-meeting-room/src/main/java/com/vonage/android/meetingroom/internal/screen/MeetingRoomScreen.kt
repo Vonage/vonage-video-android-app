@@ -63,7 +63,6 @@ import com.vonage.android.meetingroom.internal.util.rememberNoiseSuppression
 import com.vonage.android.reactions.ui.EmojiReactionOverlay
 import com.vonage.android.screensharing.ScreenSharingState
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -73,6 +72,7 @@ import kotlinx.coroutines.launch
  * Maps the runtime [MeetingRoomFeature] set to the [BottomBarActionType] list that should be
  * shown. Features absent from [enabledFeatures] are filtered out; the compile-time flavor system
  * already handles the disabled case for flavor-gated features, so this is purely additive.
+ * Note: REPORT is intentionally excluded — it is always appended as a CUSTOM action in BottomBar.
  */
 private fun enabledBottomBarActions(
     enabledFeatures: Set<MeetingRoomFeature>,
@@ -82,7 +82,9 @@ private fun enabledBottomBarActions(
         BottomBarActionType.RECORD_SESSION -> MeetingRoomFeature.ARCHIVING in enabledFeatures
         BottomBarActionType.CAPTIONS -> MeetingRoomFeature.CAPTIONS in enabledFeatures
         BottomBarActionType.SCREEN_SHARING -> MeetingRoomFeature.SCREEN_SHARE in enabledFeatures
-        // CHANGE_LAYOUT, PARTICIPANTS, REPORT are always allowed (not feature-gated)
+        // CUSTOM is never in the action type list — it is injected via additionalActions
+        BottomBarActionType.CUSTOM -> false
+        // CHANGE_LAYOUT, PARTICIPANTS are always allowed (not feature-gated)
         else -> true
     }
 }.toImmutableList()
