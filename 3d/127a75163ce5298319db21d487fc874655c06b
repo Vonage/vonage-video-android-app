@@ -1,0 +1,26 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/bottombar/BottomBar.kt
+  s_97885e6e29cbe7::t_552a7281bfa31b 278-279
+  s_97885e6e29cbe7::t_06417178577808 135
+  s_97885e6e29cbe7::t_457a66e80ae375 38-39
+  s_97885e6e29cbe7::t_4b1aae0facfaa5 128-134,136-148
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  s_97885e6e29cbe7::t_dadb28af2804f4 75,85-87
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/bottombar/BottomBarAction.kt
+  s_97885e6e29cbe7::t_eb713d952d24dd 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "3d127a75163ce5298319db21d487fc874655c06b",
+  "prompts": {},
+  "sessions": {
+    "s_97885e6e29cbe7": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_12012c48cffeToQNH4Zjwn5mSE",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": null
+    }
+  }
+}
