@@ -318,7 +318,8 @@ class Call internal constructor(
         
         publisher()?.vonagePublisher?.let { 
             it.setPublisherListener(null)
-            session.unpublish(it) 
+            session.unpublish(it)
+            it.destroy()
         }
 
         session.setSessionListener(null)

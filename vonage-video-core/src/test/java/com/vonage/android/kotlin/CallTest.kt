@@ -243,7 +243,7 @@ class CallTest {
     }
 
     @Test
-    fun `endSession should unpublish, disconnect, and clear listeners`() = runTest(testDispatcher) {
+    fun `endSession should unpublish, destroy publisher, disconnect, and clear listeners`() = runTest(testDispatcher) {
         val call = createCall()
 
         call.connect(mockContext).test {
@@ -253,6 +253,7 @@ class CallTest {
             call.endSession()
 
             verify { mockSession.unpublish(mockVonagePublisher) }
+            verify { mockVonagePublisher.destroy() }
             verify { mockSession.setSessionListener(null) }
             verify { mockSession.setSignalListener(null) }
             verify { mockSession.disconnect() }
