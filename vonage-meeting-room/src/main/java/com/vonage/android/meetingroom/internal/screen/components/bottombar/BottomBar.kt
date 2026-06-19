@@ -47,6 +47,7 @@ import com.vonage.android.reactions.ui.EmojiSelector
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.ui.screenSharingAction
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
@@ -76,6 +77,7 @@ internal fun BottomBar(
     state: BottomBarState,
     modifier: Modifier = Modifier,
     actions: ImmutableList<BottomBarActionType> = BottomBarActionType.entries.toImmutableList(),
+    additionalActions: ImmutableList<BottomBarAction> = persistentListOf(),
     reportingContent: @Composable (() -> Unit) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
@@ -129,8 +131,11 @@ internal fun BottomBar(
             }
         }
     )
-    val visibleActions = bottomBarActions.take(actionsVisibleCount)
-    val overflowActions = bottomBarActions.drop(actionsVisibleCount)
+    val allActions = remember(bottomBarActions, additionalActions) {
+        (bottomBarActions + additionalActions).toImmutableList()
+    }
+    val visibleActions = allActions.take(actionsVisibleCount)
+    val overflowActions = allActions.drop(actionsVisibleCount)
 
     Row(
         modifier = modifier
@@ -261,6 +266,10 @@ private fun actionsFactory(
             BottomBarActionType.REPORT -> reportingAction(
                 onClick = onShowReporting,
             )
+
+            // CUSTOM entries are injected externally via additionalActions and never
+            // appear in the BottomBarActionType list passed to actionsFactory.
+            BottomBarActionType.CUSTOM -> null
         }
     }.toImmutableList()
 }

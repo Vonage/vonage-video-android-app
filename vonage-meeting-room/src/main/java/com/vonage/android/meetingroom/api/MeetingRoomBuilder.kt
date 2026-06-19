@@ -3,6 +3,7 @@ package com.vonage.android.meetingroom.api
 import androidx.compose.runtime.Composable
 import com.vonage.android.meetingroom.internal.permissions.DefaultPermissionContent
 import com.vonage.android.settings.CallSettingsHolder
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Fluent builder for the meeting room SDK.
@@ -51,6 +52,8 @@ class MeetingRoomBuilder(
     private var reportingContent: (@Composable (() -> Unit) -> Unit)? = null
     private var permissionContent: (@Composable (List<String>, () -> Unit) -> Unit)? = null
     private var foregroundServiceEnabled: Boolean = true
+    private var additionalBottomBarActions: StateFlow<List<MeetingRoomBottomBarAction>>? = null
+    private var customBottomBar: (@Composable (MeetingRoomBottomBarState, MeetingRoomCustomActions) -> Unit)? = null
 
     /**
      * Defines which optional features are active at runtime.
@@ -177,6 +180,40 @@ class MeetingRoomBuilder(
     }
 
     /**
+     * Provides a [StateFlow] of custom buttons to append after the built-in bottom bar actions.
+     *
+     * The flow is collected with `collectAsStateWithLifecycle`, so [MeetingRoomBottomBarAction.isSelected]
+     * and [MeetingRoomBottomBarAction.badgeCount] can be updated at runtime (e.g. to show an
+     * unread-count badge on a custom panel button).
+     *
+     * Custom buttons participate in the same responsive overflow logic as built-in ones: if there
+     * is not enough horizontal space, they spill into the "more" bottom sheet automatically.
+     *
+     * If [bottomBar] is also set, this method has no effect — the custom bar takes full control.
+     */
+    fun additionalBottomBarActions(
+        actions: StateFlow<List<MeetingRoomBottomBarAction>>,
+    ): MeetingRoomBuilder = apply {
+        additionalBottomBarActions = actions
+    }
+
+    /**
+     * Replaces the entire bottom bar with a custom composable.
+     *
+     * The composable receives:
+     * - [MeetingRoomBottomBarState]: minimal read-only call state (mic, camera, sharing, recording,
+     *   captions). Updated on every relevant state change.
+     * - [MeetingRoomCustomActions]: pre-wired SDK callbacks (toggle mic/camera, end call, etc.).
+     *
+     * When set, any value passed to [additionalBottomBarActions] is ignored.
+     */
+    fun bottomBar(
+        content: @Composable (MeetingRoomBottomBarState, MeetingRoomCustomActions) -> Unit,
+    ): MeetingRoomBuilder = apply {
+        customBottomBar = content
+    }
+
+    /**
      * Constructs the [MeetingRoomPrebuilt] with the current configuration.
      *
      * Call [MeetingRoomPrebuilt.launch] or embed [MeetingRoomPrebuilt.content] to display the
@@ -197,5 +234,7 @@ class MeetingRoomBuilder(
             DefaultPermissionContent(permissions = permissions, onGrant = onGrant)
         },
         foregroundServiceEnabled = foregroundServiceEnabled,
+        additionalBottomBarActions = additionalBottomBarActions,
+        customBottomBar = customBottomBar,
     )
 }

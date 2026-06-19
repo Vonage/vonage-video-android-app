@@ -21,4 +21,6 @@ enum class BottomBarActionType {
     SCREEN_SHARING,
     CAPTIONS,
     REPORT,
+    /** Sentinel type used for buttons injected by the host app via [MeetingRoomBuilder.additionalBottomBarActions]. */
+    CUSTOM,
 }
