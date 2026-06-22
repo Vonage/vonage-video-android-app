@@ -1,0 +1,24 @@
+vonage-video-core/src/main/java/com/vonage/android/kotlin/Call.kt
+  s_089d4c0e643e87::t_ac4c3c4325037c 751,764-765
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "e81aa0b608028f1728eb8ff96942a34a39d147a9",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_089d4c0e643e87": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_110ed958fffeJMYQCzz7upQfPX",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
