@@ -748,7 +748,7 @@ class Call internal constructor(
      * Starts monitoring active speaker changes and updates visibility accordingly.
      * Ensures the active speaker is always visible even if scrolled off-screen.
      * Screen sharing participants are automatically set as the active speaker.
-     * Camera-off participants are not promoted to the spotlight.
+     * Audio-only participants are also promotable to the spotlight.
      */
     private fun startActiveSpeakerTracker() {
         activeSpeakerTrackerJob?.cancel()
@@ -760,6 +760,9 @@ class Call internal constructor(
                     when {
                         screenSharingParticipant != null -> {
                             _activeSpeaker.update { screenSharingParticipant }
+                        }
+                        else -> {
+                            _activeSpeaker.update { mainSpeaker }
                         }
                     }
                 }
