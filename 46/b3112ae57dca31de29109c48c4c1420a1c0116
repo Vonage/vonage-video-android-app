@@ -1,0 +1,25 @@
+app/src/test/java/com/vonage/android/screen/settings/SettingsScreenViewModelTest.kt
+  s_8866a49fb9beec::t_8616dd2b3383c5 21
+  s_8866a49fb9beec::t_f9b5eac29c4896 12-13
+  s_8866a49fb9beec::t_ba83ee7d98ac76 27-28
+  s_8866a49fb9beec::t_f72f9607d8060b 11
+app/src/test/java/com/vonage/android/screen/settings/SettingsActionsTest.kt
+  s_8866a49fb9beec::t_fe2fe3a9e89196 16
+  s_8866a49fb9beec::t_6b1510bbd06f62 27-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.10",
+  "base_commit_sha": "46b3112ae57dca31de29109c48c4c1420a1c0116",
+  "prompts": {},
+  "sessions": {
+    "s_8866a49fb9beec": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_10c351e08ffetpfLT67ViZXuU4",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
