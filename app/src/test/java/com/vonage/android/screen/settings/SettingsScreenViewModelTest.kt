@@ -8,6 +8,9 @@ import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.settings.CallSettingsHolder
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -15,12 +18,14 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SettingsScreenViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val callSettingsHolder = CallSettingsHolder()
+    private val testScope = TestScope(UnconfinedTestDispatcher())
+    private val callSettingsHolder = CallSettingsHolder(scope = testScope)
 
     private fun sut() = SettingsScreenViewModel(
         appVersion = APP_VERSION,
