@@ -1,6 +1,7 @@
 package com.vonage.android.kotlin.sdk.internal
 
 import android.view.View
+import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
 import com.vonage.android.kotlin.sdk.VonageAudioLevelListener
@@ -38,6 +39,15 @@ internal class OpenTokSubscriber(
     override var subscribeToCaptions: Boolean
         get() = raw.subscribeToCaptions
         set(value) { raw.subscribeToCaptions = value }
+
+    override fun reinitializeRenderer() {
+        // Reinitialize the renderer by setting the style again
+        // This forces the OpenTok SDK to remeasure and apply correct scaling/cropping
+        raw.renderer?.setStyle(
+            BaseVideoRenderer.STYLE_VIDEO_SCALE,
+            BaseVideoRenderer.STYLE_VIDEO_FIT,
+        )
+    }
 
     override fun setStreamListener(listener: VonageSubscriberStreamListener?) {
         if (listener == null) { raw.setStreamListener(null); return }

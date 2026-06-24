@@ -1,4 +1,4 @@
-package com.vonage.android.util
+package com.vonage.android.compose.util
 
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.lazy.LazyListState
@@ -8,10 +8,9 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.snapshotFlow
 import com.vonage.android.kotlin.model.CallFacade
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 @Composable
-internal fun <T : ScrollableState> lazyStateVisibilityTracker(call: CallFacade, lazyState: T): T {
+fun <T : ScrollableState> lazyStateVisibilityTracker(call: CallFacade, lazyState: T): T {
     val snapshotFlow: Flow<List<String>> = when (lazyState) {
         is LazyGridState -> {
             snapshotFlow {
@@ -26,11 +25,9 @@ internal fun <T : ScrollableState> lazyStateVisibilityTracker(call: CallFacade, 
 
         else -> throw UnsupportedOperationException("Wrong initial state.")
     }
-    DisposableEffect(call) {
+    DisposableEffect(call, lazyState) {
         call.updateParticipantVisibilityFlow(snapshotFlow)
-        onDispose {
-            call.updateParticipantVisibilityFlow(flowOf())
-        }
+        onDispose { }
     }
     return lazyState
 }

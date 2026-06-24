@@ -1,4 +1,4 @@
-package com.vonage.android.meetingroom.internal.screen.components
+package com.vonage.android.compose.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -10,13 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Pin2
 
 @Composable
-internal fun PinIndicator(
+fun PinIndicator(
     modifier: Modifier = Modifier,
 ) {
     val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
@@ -32,5 +33,13 @@ internal fun PinIndicator(
             tint = Color.White,
             modifier = Modifier.size(VonageVideoTheme.dimens.iconSizeSmall),
         )
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun PinIndicatorPreview() {
+    VonageVideoTheme {
+        PinIndicator()
     }
 }

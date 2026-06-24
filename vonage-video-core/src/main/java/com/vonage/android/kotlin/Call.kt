@@ -84,6 +84,8 @@ import java.util.concurrent.ConcurrentHashMap
  * @param publisherFactory Publisher factory
  * @param signalPlugins List of plugins for handling custom signals
  * @param coroutineDispatcher Dispatcher for coroutine operations (defaults to IO)
+ * @param activeSpeakerTrackerOverride Optional override for [ActiveSpeakerTracker]; when null
+ *   a default instance is created. Intended for testing only.
  */
 @OptIn(FlowPreview::class)
 @Stable
@@ -93,6 +95,7 @@ class Call internal constructor(
     private val publisherFactory: PublisherFactory,
     private val signalPlugins: List<SignalPlugin>,
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    activeSpeakerTrackerOverride: ActiveSpeakerTracker? = null,
 ) : CallFacade {
 
     private lateinit var context: Context
@@ -103,7 +106,8 @@ class Call internal constructor(
     private var signalsJob: Job? = null
 
     /** Tracks active speaker based on audio levels across all participants */
-    private val activeSpeakerTracker = ActiveSpeakerTracker(coroutineScope = coroutineScope)
+    private val activeSpeakerTracker = activeSpeakerTrackerOverride
+        ?: ActiveSpeakerTracker(coroutineScope = coroutineScope)
 
     /** Thread-safe map of all participants (publishers and subscribers) keyed by stream ID */
     private val participants = ConcurrentHashMap<String, Participant>()
@@ -265,6 +269,10 @@ class Call internal constructor(
             override fun onError(error: VonageError) {
                 trySend(SessionEvent.Error(error))
             }
+
+            override fun onStreamPropertyChanged(streamId: String, hasVideo: Boolean, hasAudio: Boolean) {
+                (participants[streamId] as? ParticipantState)?.updateStreamProperties(hasVideo, hasAudio)
+            }
         })
         session.setSignalListener { type, data, conn ->
             signalPlugins.forEach { plugin ->
@@ -318,7 +326,8 @@ class Call internal constructor(
         
         publisher()?.vonagePublisher?.let { 
             it.setPublisherListener(null)
-            session.unpublish(it) 
+            session.unpublish(it)
+            it.destroy()
         }
 
         session.setSessionListener(null)
@@ -740,16 +749,23 @@ class Call internal constructor(
      * Starts monitoring active speaker changes and updates visibility accordingly.
      * Ensures the active speaker is always visible even if scrolled off-screen.
      * Screen sharing participants are automatically set as the active speaker.
+     * Audio-only participants are also promotable to the spotlight.
      */
     private fun startActiveSpeakerTracker() {
         activeSpeakerTrackerJob?.cancel()
         activeSpeakerTrackerJob = activeSpeakerTracker.activeSpeakerChanges
             .onEach { payload ->
                 participants[payload.newActiveSpeaker.streamId]?.let { mainSpeaker ->
-                    mainSpeaker.changeVisibility(true)
-                    // Override active speaker if someone is screen sharing
+                    // Screen share always wins regardless of camera state.
                     val screenSharingParticipant = participants.values.firstScreenSharing()
-                    _activeSpeaker.update { screenSharingParticipant ?: mainSpeaker }
+                    when {
+                        screenSharingParticipant != null -> {
+                            _activeSpeaker.update { screenSharingParticipant }
+                        }
+                        else -> {
+                            _activeSpeaker.update { mainSpeaker }
+                        }
+                    }
                 }
             }
             .launchIn(coroutineScope)
@@ -784,7 +800,7 @@ class Call internal constructor(
 
         private const val PARTICIPANTS_DEBOUNCE_MILLIS = 100L
         private const val ACTIVE_SPEAKER_DEBOUNCE_MILLIS = 250L
+        private const val VISIBILITY_MONITOR_ENABLED = false
         private const val DEGRADATION_PREF_RESTART_DELAY_MS = 200L
-        private const val VISIBILITY_MONITOR_ENABLED = true
     }
 }

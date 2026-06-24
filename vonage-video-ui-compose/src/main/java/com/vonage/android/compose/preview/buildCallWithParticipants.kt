@@ -31,6 +31,7 @@ fun buildCallWithParticipants(
     participantCount: Int = 3,
     unreadCount: Int = 1,
     messagesCount: Int = 5,
+    activeSpeaker: Participant? = null,
 ): CallFacade = object : CallFacade {
     override fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>) { }
 
@@ -38,7 +39,7 @@ fun buildCallWithParticipants(
     override val participantsStateFlow: StateFlow<ImmutableList<Participant>> =
         MutableStateFlow(buildParticipants(participantCount).toImmutableList())
     override val participantsCount: StateFlow<Int> = MutableStateFlow(participantCount)
-    override val activeSpeaker: StateFlow<Participant?> = MutableStateFlow(null)
+    override val activeSpeaker: StateFlow<Participant?> = MutableStateFlow(activeSpeaker)
     override val pinnedParticipantIds: StateFlow<Set<String>> = MutableStateFlow(emptySet())
     override fun togglePinParticipant(participantId: String) { /* empty on purpose */ }
     override fun forceMuteParticipant(participantId: String) { /* empty on purpose */ }

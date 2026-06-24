@@ -8,14 +8,28 @@ import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+class FakeCallSettingsStorage(
+    private val initial: PersistedCallSettings = PersistedCallSettings(),
+) : CallSettingsStorage {
+    var saved: PersistedCallSettings? = null
+    override suspend fun load() = initial
+    override suspend fun save(settings: PersistedCallSettings) { saved = settings }
+}
+
 class CallSettingsHolderTest {
 
-    private val sut = CallSettingsHolder()
+    private val testScope = TestScope(UnconfinedTestDispatcher())
+    private val sut = CallSettingsHolder(scope = testScope)
 
     // region defaults
 
@@ -171,6 +185,55 @@ class CallSettingsHolderTest {
         assertEquals(CaptureResolution.HIGH_1080P, sut.captureResolution.value)
         assertEquals(false, sut.publisherAudioFallbackEnabled.value)
         assertEquals(false, sut.subscriberAudioFallbackEnabled.value)
+    }
+
+    // endregion
+
+    // region storage
+
+    @Test
+    fun `when updateCaptureFrameRate then storage receives save with new value`() = runTest {
+        val fake = FakeCallSettingsStorage()
+        val holder = CallSettingsHolder(storage = fake, scope = this)
+        advanceUntilIdle() // let init load complete
+
+        holder.updateCaptureFrameRate(CaptureFrameRate.FPS_30)
+        advanceUntilIdle()
+
+        assertEquals(CaptureFrameRate.FPS_30, fake.saved?.captureFrameRate)
+    }
+
+    @Test
+    fun `given storage with persisted values then holder restores them on init`() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val testScope = TestScope(dispatcher)
+        val persisted = PersistedCallSettings(
+            captureFrameRate = CaptureFrameRate.FPS_30,
+            captureResolution = CaptureResolution.HIGH,
+            opusDtxEnabled = false,
+            senderStatsEnabled = false,
+        )
+        val fake = FakeCallSettingsStorage(initial = persisted)
+
+        val holder = CallSettingsHolder(storage = fake, scope = testScope)
+        testScope.advanceUntilIdle()
+
+        assertEquals(CaptureFrameRate.FPS_30, holder.captureFrameRate.value)
+        assertEquals(CaptureResolution.HIGH, holder.captureResolution.value)
+        assertEquals(false, holder.opusDtxEnabled.value)
+        assertEquals(false, holder.senderStatsEnabled.value)
+    }
+
+    @Test
+    fun `when updateOpusDtx then storage receives save with new value`() = runTest {
+        val fake = FakeCallSettingsStorage()
+        val holder = CallSettingsHolder(storage = fake, scope = this)
+        advanceUntilIdle() // let init load complete
+
+        holder.updateOpusDtx(false)
+        advanceUntilIdle()
+
+        assertEquals(false, fake.saved?.opusDtxEnabled)
     }
 
     // endregion
