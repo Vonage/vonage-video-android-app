@@ -19,6 +19,10 @@ import com.vonage.android.kotlin.sdk.VonageSignalListener
 import com.vonage.android.kotlin.sdk.VonageStream
 import com.vonage.android.kotlin.sdk.VonageSubscriber
 import com.vonage.android.kotlin.sdk.VonageVideoType
+import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
+import com.vonage.android.kotlin.internal.ActiveSpeakerChangedPayload
+import com.vonage.android.kotlin.internal.ActiveSpeakerInfo
+import com.vonage.android.kotlin.model.ParticipantState
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.kotlin.signal.RawSignal
 import com.vonage.android.kotlin.signal.SignalPlugin
@@ -29,7 +33,9 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -38,6 +44,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -740,6 +748,137 @@ class CallTest {
 
     // endregion
 
+    // region Stream property changes (Bug A)
+
+    @Test
+    fun `onStreamPropertyChanged with unknown streamId should be a no-op`() =
+        runTest(testDispatcher) {
+            val call = createCall()
+
+            call.connect(mockContext).test {
+                triggerConnectedAndWaitForPublisher()
+                awaitItem() // Connected
+
+                // Firing a property change for a stream that was never subscribed must not throw
+                // and must not change any observable state.
+                capturedSessionListener!!.onStreamPropertyChanged(
+                    streamId = "unknown-stream",
+                    hasVideo = false,
+                    hasAudio = false,
+                )
+                runCurrent()
+
+                // Participant count must remain 1 (only the publisher)
+                assertEquals(1, call.participantsCount.value)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `onStreamPropertyChanged with known streamId should update participant mic state`() =
+        runTest(testDispatcher) {
+            val call = createCall()
+            val stream = createVonageStream("sub-1", "Bob")
+            val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+                every { this@mockk.stream } returns stream
+            }
+            every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+            call.connect(mockContext).test {
+                triggerConnectedAndWaitForPublisher()
+                awaitItem() // Connected
+
+                // Subscribe to participantsStateFlow so its upstream (sample) becomes active.
+                val participantsCollectorJob = launch {
+                    call.participantsStateFlow.collect { }
+                }
+
+                capturedSessionListener!!.onStreamReceived(stream)
+                Thread.sleep(200)
+                callScheduler.runCurrent()
+                awaitItem() // StreamReceived
+
+                // Advance past the 100ms sample on participantsStateFlow so the subscriber
+                // appears in the emitted list.
+                callScheduler.advanceTimeBy(200)
+                runCurrent()
+
+                val participant = call.participantsStateFlow.value
+                    .filterIsInstance<ParticipantState>()
+                    .firstOrNull { it.id == "sub-1" }
+                assertNotNull("Subscriber must appear in participantsStateFlow", participant)
+                assertTrue("Mic should initially be enabled", participant!!.isMicEnabled.value)
+
+                // Simulate remote publisher muting their mic.
+                capturedSessionListener!!.onStreamPropertyChanged("sub-1", hasVideo = true, hasAudio = false)
+
+                assertFalse(
+                    "isMicEnabled must be false after onStreamPropertyChanged(hasAudio=false)",
+                    participant.isMicEnabled.value,
+                )
+
+                participantsCollectorJob.cancel()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    // endregion
+
+    // region Active speaker promotion gate (Bug D)
+
+    @Test
+    fun `activeSpeaker should not be promoted when camera is off`() =
+        runTest(testDispatcher) {
+            // extraBufferCapacity = 1 so tryEmit can buffer without suspending (avoids a
+            // deadlock between the test-body coroutine and the callDispatcher collector).
+            val mockActiveSpeakerChanges = MutableSharedFlow<ActiveSpeakerChangedPayload>(
+                extraBufferCapacity = 1,
+            )
+            val mockTracker = mockk<ActiveSpeakerTracker>(relaxed = true) {
+                every { activeSpeakerChanges } returns mockActiveSpeakerChanges
+            }
+            val call = createCallWithTracker(mockTracker)
+            val stream = createVonageStream("sub-camera-off", "NoCamera", hasVideo = false)
+            val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+                every { this@mockk.stream } returns stream
+            }
+            every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+            // Start collecting in backgroundScope so capturedSessionListener is set eagerly
+            // and the collection coroutine is auto-cancelled when the test body finishes.
+            backgroundScope.launch { call.connect(mockContext).collect { } }
+
+            // Drive the session lifecycle.
+            capturedSessionListener!!.onConnected()
+            Thread.sleep(200)
+            callScheduler.runCurrent()
+
+            // Subscribe a camera-off participant.
+            capturedSessionListener!!.onStreamReceived(stream)
+            Thread.sleep(200)
+            callScheduler.runCurrent()
+
+            // Emit an active-speaker change for the camera-off participant; tryEmit is
+            // non-suspending so there is no deadlock with callScheduler processing.
+            assertTrue(
+                mockActiveSpeakerChanges.tryEmit(
+                    ActiveSpeakerChangedPayload(
+                        previousActiveSpeaker = ActiveSpeakerInfo(null, 0f),
+                        newActiveSpeaker      = ActiveSpeakerInfo("sub-camera-off", 0.8f),
+                    ),
+                ),
+            )
+            callScheduler.runCurrent()
+
+            // Camera-off participant must NOT be promoted; activeSpeaker stays null.
+            assertNull(
+                "Camera-off participant must not be promoted to active speaker",
+                call.activeSpeaker.value,
+            )
+        }
+
+    // endregion
+
     // region Degradation Preference
 
     @Test
@@ -798,14 +937,25 @@ class CallTest {
         streamId: String,
         name: String,
         videoType: VonageVideoType = VonageVideoType.CAMERA,
+        hasVideo: Boolean = true,
+        hasAudio: Boolean = true,
     ): VonageStream = VonageStream(
         streamId = streamId,
         name = name,
         connection = VonageConnection(connectionId = "conn-$streamId"),
         creationTime = System.currentTimeMillis(),
         videoType = videoType,
-        hasVideo = true,
-        hasAudio = true,
+        hasVideo = hasVideo,
+        hasAudio = hasAudio,
+    )
+
+    private fun createCallWithTracker(tracker: ActiveSpeakerTracker): Call = Call(
+        token = "test-token",
+        session = mockSession,
+        publisherFactory = mockPublisherFactory,
+        signalPlugins = emptyList(),
+        coroutineDispatcher = callDispatcher,
+        activeSpeakerTrackerOverride = tracker,
     )
 
     // endregion

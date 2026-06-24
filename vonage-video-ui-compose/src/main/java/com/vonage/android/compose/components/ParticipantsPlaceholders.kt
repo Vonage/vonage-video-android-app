@@ -1,4 +1,4 @@
-package com.vonage.android.meetingroom.internal.screen.components
+package com.vonage.android.compose.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -20,15 +20,14 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.theme.VonageVideoTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
-const val DEFAULT_OVERLAP_SPACE = -8
+internal const val DEFAULT_OVERLAP_SPACE = -8
 
 @Composable
-internal fun ParticipantsPlaceholders(
+fun ParticipantsPlaceholders(
     participantNames: ImmutableList<String>,
     modifier: Modifier = Modifier,
     maxVisiblePlaceholders: Int = 2,
@@ -40,7 +39,7 @@ internal fun ParticipantsPlaceholders(
     Box(
         modifier = modifier
             .background(
-                color = VonageVideoTheme.colors.background,
+                color = VonageVideoTheme.colors.surface,
                 shape = VonageVideoTheme.shapes.medium,
             ),
         contentAlignment = Alignment.Center,
@@ -55,7 +54,7 @@ internal fun ParticipantsPlaceholders(
             visiblePlaceholders.forEachIndexed { index, participant ->
                 AvatarInitials(
                     userName = participant,
-                    textStyle = VonageVideoTheme.typography.caption,
+                    textStyle = VonageVideoTheme.typography.heading3,
                     size = 64.dp,
                     modifier = Modifier
                         .zIndex((visiblePlaceholders.size - index).toFloat())
@@ -68,7 +67,7 @@ internal fun ParticipantsPlaceholders(
                     count = additionalCount,
                     size = 64.dp,
                     zIndex = 0f,
-                    textStyle = VonageVideoTheme.typography.bodyBase,
+                    textStyle = VonageVideoTheme.typography.heading3,
                 )
             }
         }
@@ -76,7 +75,7 @@ internal fun ParticipantsPlaceholders(
 }
 
 @Composable
-internal fun AdditionalParticipantsAvatar(
+fun AdditionalParticipantsAvatar(
     count: Int,
     textStyle: TextStyle,
     modifier: Modifier = Modifier,
