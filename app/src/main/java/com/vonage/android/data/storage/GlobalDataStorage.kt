@@ -3,6 +3,7 @@ package com.vonage.android.data.storage
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -17,5 +18,7 @@ class GlobalDataStorage @Inject constructor(
 ) : DataStore<Preferences> by context.dataStore {
     companion object {
         val USER_NAME = stringPreferencesKey("user_name")
+        val CLIENT_LOGS_ENABLED = booleanPreferencesKey("client_logs_enabled")
+        val CLIENT_LOG_LEVEL = stringPreferencesKey("client_log_level")
     }
 }

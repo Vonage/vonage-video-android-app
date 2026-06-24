@@ -25,6 +25,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.gson)
     testImplementation(libs.junit.junit)
     testImplementation(libs.mockk)
 }

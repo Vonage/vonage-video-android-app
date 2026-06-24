@@ -9,6 +9,7 @@ import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.kotlin.model.VideoCodec
 import com.vonage.android.shared.ViewState
+import com.vonage.logger.LogLevel
 
 @Stable
 data class SettingsUiState(
@@ -16,6 +17,9 @@ data class SettingsUiState(
     val sdkVersion: String = "",
     val call: CallFacade? = null,
     val senderStatsEnabled: Boolean = true,
+    val logsEnabled: Boolean = false,
+    val logLevel: LogLevel = LogLevel.INFO,
+    val isSendingLogs: Boolean = false,
     val opusDtxEnabled: Boolean = true,
     val publisherAudioFallbackEnabled: Boolean = true,
     val subscriberAudioFallbackEnabled: Boolean = true,

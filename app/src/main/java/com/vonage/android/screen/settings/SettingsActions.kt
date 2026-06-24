@@ -2,12 +2,14 @@ package com.vonage.android.screen.settings
 
 import com.vonage.android.core.ActionScope
 import com.vonage.android.core.ViewAction
+import com.vonage.android.data.SendClientLogsResult
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoCodec
 import com.vonage.android.settings.SettingsUiState
+import com.vonage.logger.LogLevel
 import kotlinx.coroutines.launch
 
 class ObserveSettingsAction :
@@ -67,6 +69,16 @@ class ObserveSettingsAction :
         scope.launch {
             holder.audioBitrate.collect { bitrate ->
                 actionScope.setState { copy(audioBitrate = bitrate) }
+            }
+        }
+        scope.launch {
+            dependencies.clientLogsRepository.logsEnabled.collect { enabled ->
+                actionScope.setState { copy(logsEnabled = enabled) }
+            }
+        }
+        scope.launch {
+            dependencies.clientLogsRepository.logLevel.collect { level ->
+                actionScope.setState { copy(logLevel = level) }
             }
         }
     }
@@ -179,5 +191,58 @@ class UpdateAudioBitrateAction(
         actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
     ) {
         dependencies.callSettingsHolder.updateAudioBitrate(bitrate)
+    }
+}
+
+class ToggleLogsAction(
+    private val enabled: Boolean,
+) : ViewAction<SettingsActionDependencies, SettingsUiState, SettingsViewEvent> {
+    override suspend fun execute(
+        dependencies: SettingsActionDependencies,
+        actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
+    ) {
+        dependencies.clientLogsRepository.setLogsEnabled(enabled)
+    }
+}
+
+class UpdateLogLevelAction(
+    private val level: LogLevel,
+) : ViewAction<SettingsActionDependencies, SettingsUiState, SettingsViewEvent> {
+    override suspend fun execute(
+        dependencies: SettingsActionDependencies,
+        actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
+    ) {
+        dependencies.clientLogsRepository.setLogLevel(level)
+    }
+}
+
+class SendClientLogsAction : ViewAction<SettingsActionDependencies, SettingsUiState, SettingsViewEvent> {
+    override suspend fun execute(
+        dependencies: SettingsActionDependencies,
+        actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
+    ) {
+        actionScope.setState { copy(isSendingLogs = true) }
+
+        when (dependencies.clientLogsRepository.sendLogs()) {
+            SendClientLogsResult.Success -> actionScope.sendEvent(SettingsViewEvent.LogsSent)
+            SendClientLogsResult.NoLogsAvailable -> actionScope.sendEvent(SettingsViewEvent.NoLogsAvailable)
+            SendClientLogsResult.Failure -> actionScope.sendEvent(SettingsViewEvent.LogsSendFailed)
+        }
+
+        actionScope.setState { copy(isSendingLogs = false) }
+    }
+}
+
+class ShareClientLogsAction : ViewAction<SettingsActionDependencies, SettingsUiState, SettingsViewEvent> {
+    override suspend fun execute(
+        dependencies: SettingsActionDependencies,
+        actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
+    ) {
+        val uri = dependencies.clientLogsRepository.getLatestLogUri()
+        if (uri == null) {
+            actionScope.sendEvent(SettingsViewEvent.NoLogsToShare)
+        } else {
+            actionScope.sendEvent(SettingsViewEvent.ShareLogs(uri))
+        }
     }
 }

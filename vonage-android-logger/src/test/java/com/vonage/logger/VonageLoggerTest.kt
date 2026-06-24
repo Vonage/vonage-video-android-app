@@ -1,12 +1,19 @@
 package com.vonage.logger
 
 import com.vonage.logger.interceptor.LogInterceptor
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class VonageLoggerTest {
+
+    @After
+    fun tearDown() {
+        DefaultVonageLogger.setEnabled(true)
+        DefaultVonageLogger.setMinLogLevel(LogLevel.VERBOSE)
+    }
 
     private fun collectingInterceptor(events: MutableList<LogEvent>): LogInterceptor =
         LogInterceptor { event ->
@@ -202,5 +209,12 @@ class VonageLoggerTest {
         assertEquals(1, events.size)
         assertTrue(events[0].timestamp in before..after)
         assertEquals(Thread.currentThread().name, events[0].thread)
+    }
+
+    @Test
+    fun `default logger stores configured min log level`() {
+        DefaultVonageLogger.setMinLogLevel(LogLevel.WARN)
+
+        assertEquals(LogLevel.WARN, DefaultVonageLogger.currentMinLogLevel)
     }
 }

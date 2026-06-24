@@ -6,6 +6,7 @@ import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoCodec
+import com.vonage.logger.LogLevel
 
 @Immutable
 data class SettingsScreenActions(
@@ -15,6 +16,10 @@ data class SettingsScreenActions(
     val onDegradationPreferenceChange: (DegradationPreference) -> Unit = {},
     val onPreferredVideoCodecOrderChange: (List<VideoCodec>?) -> Unit = {},
     val onOpusDtxToggle: (Boolean) -> Unit = {},
+    val onLogsToggle: (Boolean) -> Unit = {},
+    val onLogLevelChange: (LogLevel) -> Unit = {},
+    val onSendLogsClick: () -> Unit = {},
+    val onShareLogsClick: () -> Unit = {},
     val onAudioBitrateChange: (Int?) -> Unit = {},
     val onPublisherAudioFallbackToggle: (Boolean) -> Unit = {},
     val onSubscriberAudioFallbackToggle: (Boolean) -> Unit = {},
