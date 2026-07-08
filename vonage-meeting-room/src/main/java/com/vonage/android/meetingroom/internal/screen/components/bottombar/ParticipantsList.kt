@@ -42,8 +42,8 @@ import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 import java.text.Normalizer
 
-const val PARTICIPANT_ITEM_TAG = "ParticipantItemTestTag"
-const val SEARCH_TAG = "SearchTestTag"
+const val PARTICIPANT_ITEM_TAG = "participant-item"
+const val SEARCH_TAG = "search"
 
 @Composable
 internal fun ParticipantsList(

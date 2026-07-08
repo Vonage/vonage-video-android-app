@@ -28,6 +28,7 @@ import com.vonage.android.compose.components.AudioVolumeIndicator
 import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.components.CircularControlButton
 import com.vonage.android.compose.components.ParticipantVideoRenderer
+import com.vonage.android.compose.components.VideoLabel
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
@@ -37,14 +38,13 @@ import com.vonage.android.compose.vivid.icons.solid.Video
 import com.vonage.android.compose.vivid.icons.solid.VideoOff
 import com.vonage.android.fx.ui.VideoEffectIndicator
 import com.vonage.android.kotlin.model.PublisherParticipant
-import com.vonage.android.screen.components.VideoLabel
 import com.vonage.android.screen.waiting.WaitingRoomActions
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BLUR_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.CAMERA_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.MIC_BUTTON_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.USER_INITIALS_TAG
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.VOLUME_INDICATOR_TAG
-import com.vonage.android.util.buildTestTag
+import com.vonage.android.shared.buildTestTag
 
 @Composable
 fun VideoPreviewContainer(

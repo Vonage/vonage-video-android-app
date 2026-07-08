@@ -4,10 +4,12 @@ import android.content.Context
 import app.cash.turbine.test
 import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.model.ArchivingState
+import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.kotlin.sdk.VonageArchiveListener
+import com.vonage.android.kotlin.sdk.VonageCaptionsListener
 import com.vonage.android.kotlin.sdk.VonageConnection
 import com.vonage.android.kotlin.sdk.VonageError
 import com.vonage.android.kotlin.sdk.VonagePublisher
@@ -17,6 +19,10 @@ import com.vonage.android.kotlin.sdk.VonageSignalListener
 import com.vonage.android.kotlin.sdk.VonageStream
 import com.vonage.android.kotlin.sdk.VonageSubscriber
 import com.vonage.android.kotlin.sdk.VonageVideoType
+import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
+import com.vonage.android.kotlin.internal.ActiveSpeakerChangedPayload
+import com.vonage.android.kotlin.internal.ActiveSpeakerInfo
+import com.vonage.android.kotlin.model.ParticipantState
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.kotlin.signal.RawSignal
 import com.vonage.android.kotlin.signal.SignalPlugin
@@ -27,6 +33,9 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -35,6 +44,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -240,7 +251,7 @@ class CallTest {
     }
 
     @Test
-    fun `endSession should unpublish, disconnect, and clear listeners`() = runTest(testDispatcher) {
+    fun `endSession should unpublish, destroy publisher, disconnect, and clear listeners`() = runTest(testDispatcher) {
         val call = createCall()
 
         call.connect(mockContext).test {
@@ -250,6 +261,7 @@ class CallTest {
             call.endSession()
 
             verify { mockSession.unpublish(mockVonagePublisher) }
+            verify { mockVonagePublisher.destroy() }
             verify { mockSession.setSessionListener(null) }
             verify { mockSession.setSignalListener(null) }
             verify { mockSession.disconnect() }
@@ -493,42 +505,149 @@ class CallTest {
     // region Captions
 
     @Test
-    fun `enableCaptions should set publishCaptions to true on publisher`() = runTest(testDispatcher) {
-        val call = createCall()
-
-        call.connect(mockContext).test {
-            triggerConnectedAndWaitForPublisher()
-            awaitItem()
-
-            call.enableCaptions()
-            runCurrent()
-
-            verify { mockVonagePublisher.publishCaptions = true }
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `disableCaptions should set publishCaptions to false on publisher`() = runTest(testDispatcher) {
-        val call = createCall()
-
-        call.connect(mockContext).test {
-            triggerConnectedAndWaitForPublisher()
-            awaitItem()
-
-            call.disableCaptions()
-            runCurrent()
-
-            verify { mockVonagePublisher.publishCaptions = false }
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun `captions state flow should be empty initially`() = runTest(testDispatcher) {
         val call = createCall()
         assertTrue(call.captionsStateFlow.value.isEmpty())
     }
+
+    @Test
+    fun `captionsDelegate should keep line visible immediately after isFinal`() =
+        runTest(testDispatcher) {
+            val call = createCall()
+            val stream = createVonageStream("stream-1", "Alice")
+            var capturedCaptionsListener: VonageCaptionsListener? = null
+            val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+                every { this@mockk.stream } returns stream
+                every { setCaptionsListener(any()) } answers { capturedCaptionsListener = firstArg() }
+            }
+            every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+            call.connect(mockContext).test {
+                triggerConnectedAndWaitForPublisher()
+                awaitItem() // Connected
+
+                capturedSessionListener!!.onStreamReceived(stream)
+                runCurrent()
+                awaitItem() // StreamReceived
+
+                capturedCaptionsListener!!.onCaption("Alice", "stream-1", "Hello!", isFinal = true)
+                runCurrent()
+
+                // Cooldown not elapsed — line must still be visible
+                assertEquals(1, call.captionsStateFlow.value.size)
+                assertEquals("Hello!", call.captionsStateFlow.value.first().text)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `captionsDelegate should hide line after 2s cooldown`() = runTest(testDispatcher) {
+        val call = createCall()
+        val stream = createVonageStream("stream-1", "Alice")
+        var capturedCaptionsListener: VonageCaptionsListener? = null
+        val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+            every { this@mockk.stream } returns stream
+            every { setCaptionsListener(any()) } answers { capturedCaptionsListener = firstArg() }
+        }
+        every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+        call.connect(mockContext).test {
+            triggerConnectedAndWaitForPublisher()
+            awaitItem() // Connected
+
+            capturedSessionListener!!.onStreamReceived(stream)
+            runCurrent()
+            awaitItem() // StreamReceived
+
+            capturedCaptionsListener!!.onCaption("Alice", "stream-1", "Hello!", isFinal = true)
+            runCurrent()
+
+            assertEquals(1, call.captionsStateFlow.value.size)
+
+            // Advance past the 2-second cooldown
+            callScheduler.advanceTimeBy(2_001L)
+
+            assertTrue(call.captionsStateFlow.value.isEmpty())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `captionsDelegate should cancel cooldown when new caption arrives for same stream`() =
+        runTest(testDispatcher) {
+            val call = createCall()
+            val stream = createVonageStream("stream-1", "Alice")
+            var capturedCaptionsListener: VonageCaptionsListener? = null
+            val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+                every { this@mockk.stream } returns stream
+                every { setCaptionsListener(any()) } answers { capturedCaptionsListener = firstArg() }
+            }
+            every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+            call.connect(mockContext).test {
+                triggerConnectedAndWaitForPublisher()
+                awaitItem() // Connected
+
+                capturedSessionListener!!.onStreamReceived(stream)
+                runCurrent()
+                awaitItem() // StreamReceived
+
+                // Final caption starts cooldown
+                capturedCaptionsListener!!.onCaption("Alice", "stream-1", "Hello!", isFinal = true)
+                runCurrent()
+
+                // New caption arrives before 2s — cancels timer
+                capturedCaptionsListener!!.onCaption("Alice", "stream-1", "World!", isFinal = false)
+                runCurrent()
+
+                // Advance past the original 2-second window
+                callScheduler.advanceTimeBy(2_001L)
+
+                // Line still visible — hide timer was cancelled by the new caption
+                assertEquals(1, call.captionsStateFlow.value.size)
+                assertEquals("World!", call.captionsStateFlow.value.first().text)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `disableCaptions should cancel all pending timers and clear state immediately`() =
+        runTest(testDispatcher) {
+            val call = createCall()
+            val stream = createVonageStream("stream-1", "Alice")
+            var capturedCaptionsListener: VonageCaptionsListener? = null
+            val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+                every { this@mockk.stream } returns stream
+                every { setCaptionsListener(any()) } answers { capturedCaptionsListener = firstArg() }
+            }
+            every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+            call.connect(mockContext).test {
+                triggerConnectedAndWaitForPublisher()
+                awaitItem() // Connected
+
+                capturedSessionListener!!.onStreamReceived(stream)
+                runCurrent()
+                awaitItem() // StreamReceived
+
+                capturedCaptionsListener!!.onCaption("Alice", "stream-1", "Hello!", isFinal = true)
+                runCurrent()
+
+                assertEquals(1, call.captionsStateFlow.value.size)
+
+                // Disable clears state immediately without waiting for timers
+                call.disableCaptions()
+                runCurrent()
+
+                assertTrue(call.captionsStateFlow.value.isEmpty())
+
+                // Advance past cooldown — state must remain empty (timer was cancelled)
+                callScheduler.advanceTimeBy(2_001L)
+
+                assertTrue(call.captionsStateFlow.value.isEmpty())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     // endregion
 
@@ -603,20 +722,240 @@ class CallTest {
 
     // endregion
 
+    // region Visibility
+
+    @Test
+    fun `updateParticipantVisibilityFlow should never call changeVisibility on publisher`() =
+        runTest(testDispatcher) {
+            val call = createCall()
+
+            call.connect(mockContext).test {
+                triggerConnectedAndWaitForPublisher()
+                awaitItem() // Connected
+
+                // Snapshot flow that does NOT include PUBLISHER_ID — simulates the publisher
+                // tile being off-screen (e.g. scrolled off thumbnail strip in SPEAKER_LAYOUT).
+                val visibilityFlow = MutableStateFlow(listOf("some-remote-id"))
+                call.updateParticipantVisibilityFlow(visibilityFlow)
+                Thread.sleep(200)
+                runCurrent()
+
+                // Publisher's changeVisibility must never be called by the visibility system.
+                verify(exactly = 0) { mockPublisherState.changeVisibility(any()) }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    // endregion
+
+    // region Stream property changes (Bug A)
+
+    @Test
+    fun `onStreamPropertyChanged with unknown streamId should be a no-op`() =
+        runTest(testDispatcher) {
+            val call = createCall()
+
+            call.connect(mockContext).test {
+                triggerConnectedAndWaitForPublisher()
+                awaitItem() // Connected
+
+                // Firing a property change for a stream that was never subscribed must not throw
+                // and must not change any observable state.
+                capturedSessionListener!!.onStreamPropertyChanged(
+                    streamId = "unknown-stream",
+                    hasVideo = false,
+                    hasAudio = false,
+                )
+                runCurrent()
+
+                // Participant count must remain 1 (only the publisher)
+                assertEquals(1, call.participantsCount.value)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `onStreamPropertyChanged with known streamId should update participant mic state`() =
+        runTest(testDispatcher) {
+            val call = createCall()
+            val stream = createVonageStream("sub-1", "Bob")
+            val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+                every { this@mockk.stream } returns stream
+            }
+            every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+            call.connect(mockContext).test {
+                triggerConnectedAndWaitForPublisher()
+                awaitItem() // Connected
+
+                // Subscribe to participantsStateFlow so its upstream (sample) becomes active.
+                val participantsCollectorJob = launch {
+                    call.participantsStateFlow.collect { }
+                }
+
+                capturedSessionListener!!.onStreamReceived(stream)
+                Thread.sleep(200)
+                callScheduler.runCurrent()
+                awaitItem() // StreamReceived
+
+                // Advance past the 100ms sample on participantsStateFlow so the subscriber
+                // appears in the emitted list.
+                callScheduler.advanceTimeBy(200)
+                runCurrent()
+
+                val participant = call.participantsStateFlow.value
+                    .filterIsInstance<ParticipantState>()
+                    .firstOrNull { it.id == "sub-1" }
+                assertNotNull("Subscriber must appear in participantsStateFlow", participant)
+                assertTrue("Mic should initially be enabled", participant!!.isMicEnabled.value)
+
+                // Simulate remote publisher muting their mic.
+                capturedSessionListener!!.onStreamPropertyChanged("sub-1", hasVideo = true, hasAudio = false)
+
+                assertFalse(
+                    "isMicEnabled must be false after onStreamPropertyChanged(hasAudio=false)",
+                    participant.isMicEnabled.value,
+                )
+
+                participantsCollectorJob.cancel()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    // endregion
+
+    // region Active speaker promotion gate (Bug D)
+
+    @Test
+    fun `activeSpeaker should not be promoted when camera is off`() =
+        runTest(testDispatcher) {
+            // extraBufferCapacity = 1 so tryEmit can buffer without suspending (avoids a
+            // deadlock between the test-body coroutine and the callDispatcher collector).
+            val mockActiveSpeakerChanges = MutableSharedFlow<ActiveSpeakerChangedPayload>(
+                extraBufferCapacity = 1,
+            )
+            val mockTracker = mockk<ActiveSpeakerTracker>(relaxed = true) {
+                every { activeSpeakerChanges } returns mockActiveSpeakerChanges
+            }
+            val call = createCallWithTracker(mockTracker)
+            val stream = createVonageStream("sub-camera-off", "NoCamera", hasVideo = false)
+            val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+                every { this@mockk.stream } returns stream
+            }
+            every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+            // Start collecting in backgroundScope so capturedSessionListener is set eagerly
+            // and the collection coroutine is auto-cancelled when the test body finishes.
+            backgroundScope.launch { call.connect(mockContext).collect { } }
+
+            // Drive the session lifecycle.
+            capturedSessionListener!!.onConnected()
+            Thread.sleep(200)
+            callScheduler.runCurrent()
+
+            // Subscribe a camera-off participant.
+            capturedSessionListener!!.onStreamReceived(stream)
+            Thread.sleep(200)
+            callScheduler.runCurrent()
+
+            // Emit an active-speaker change for the camera-off participant; tryEmit is
+            // non-suspending so there is no deadlock with callScheduler processing.
+            assertTrue(
+                mockActiveSpeakerChanges.tryEmit(
+                    ActiveSpeakerChangedPayload(
+                        previousActiveSpeaker = ActiveSpeakerInfo(null, 0f),
+                        newActiveSpeaker      = ActiveSpeakerInfo("sub-camera-off", 0.8f),
+                    ),
+                ),
+            )
+            callScheduler.runCurrent()
+
+            // Camera-off participant must NOT be promoted; activeSpeaker stays null.
+            assertNull(
+                "Camera-off participant must not be promoted to active speaker",
+                call.activeSpeaker.value,
+            )
+        }
+
+    // endregion
+
+    // region Degradation Preference
+
+    @Test
+    fun `setDegradationPreference should apply preference and cycle video`() = runTest(testDispatcher) {
+        val call = createCall()
+        every { mockVonagePublisher.publishVideo } returns true
+
+        call.connect(mockContext).test {
+            triggerConnectedAndWaitForPublisher()
+            awaitItem()
+
+            call.setDegradationPreference(DegradationPreference.MAINTAIN_FRAME_RATE)
+            callScheduler.runCurrent()
+            testScheduler.advanceTimeBy(200L)
+            testScheduler.runCurrent()
+
+            verify { mockPublisherState.applyDegradationPreference(DegradationPreference.MAINTAIN_FRAME_RATE) }
+            verify { mockVonagePublisher.publishVideo = false }
+            verify { mockVonagePublisher.publishVideo = true }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `setDegradationPreference should not cycle video when video is off`() = runTest(testDispatcher) {
+        val call = createCall()
+        every { mockVonagePublisher.publishVideo } returns false
+
+        call.connect(mockContext).test {
+            triggerConnectedAndWaitForPublisher()
+            awaitItem()
+
+            call.setDegradationPreference(DegradationPreference.BALANCED)
+
+            verify { mockPublisherState.applyDegradationPreference(DegradationPreference.BALANCED) }
+            verify(exactly = 0) { mockVonagePublisher.publishVideo = false }
+            verify(exactly = 0) { mockVonagePublisher.publishVideo = true }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `setDegradationPreference without publisher should be no-op`() = runTest(testDispatcher) {
+        val call = createCall()
+
+        call.setDegradationPreference(DegradationPreference.MAINTAIN_RESOLUTION)
+
+        verify(exactly = 0) { mockPublisherState.applyDegradationPreference(any()) }
+    }
+
+    // endregion
+
     // region Helpers
 
     private fun createVonageStream(
         streamId: String,
         name: String,
         videoType: VonageVideoType = VonageVideoType.CAMERA,
+        hasVideo: Boolean = true,
+        hasAudio: Boolean = true,
     ): VonageStream = VonageStream(
         streamId = streamId,
         name = name,
         connection = VonageConnection(connectionId = "conn-$streamId"),
         creationTime = System.currentTimeMillis(),
         videoType = videoType,
-        hasVideo = true,
-        hasAudio = true,
+        hasVideo = hasVideo,
+        hasAudio = hasAudio,
+    )
+
+    private fun createCallWithTracker(tracker: ActiveSpeakerTracker): Call = Call(
+        token = "test-token",
+        session = mockSession,
+        publisherFactory = mockPublisherFactory,
+        signalPlugins = emptyList(),
+        coroutineDispatcher = callDispatcher,
+        activeSpeakerTrackerOverride = tracker,
     )
 
     // endregion

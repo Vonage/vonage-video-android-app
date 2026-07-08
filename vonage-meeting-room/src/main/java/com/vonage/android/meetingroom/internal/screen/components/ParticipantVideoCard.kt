@@ -1,7 +1,6 @@
 package com.vonage.android.meetingroom.internal.screen.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,11 +32,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.components.AudioVolumeIndicator
 import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.components.ParticipantVideoRenderer
+import com.vonage.android.compose.components.PinIndicator
+import com.vonage.android.compose.components.VideoLabel
+import com.vonage.android.compose.icons.MicrophoneIcon
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
-import com.vonage.android.compose.vivid.icons.solid.MicMute
-import com.vonage.android.compose.vivid.icons.solid.Microphone2
 import com.vonage.android.compose.vivid.icons.solid.MoreVertical
 import com.vonage.android.fx.ui.VideoEffectIndicator
 import com.vonage.android.kotlin.model.Participant
@@ -54,6 +53,7 @@ internal fun ParticipantVideoCard(
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
     isPinned: Boolean = false,
+    showVideoEffectsButton: Boolean = true,
 ) {
     val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
     val isSpeaking by participant.isTalking.collectAsStateWithLifecycle()
@@ -128,18 +128,19 @@ internal fun ParticipantVideoCard(
                 modifier = Modifier.align(Alignment.TopStart),
             )
 
-            val videoEffect by publisherParticipant.videoEffect.collectAsStateWithLifecycle()
-
-            VideoEffectIndicator(
-                modifier = Modifier
-                    .testTag(MeetingRoomScreenTestTags.MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON)
-                    .align(Alignment.BottomEnd)
-                    .padding(VonageVideoTheme.dimens.paddingSmall),
-                videoEffect = videoEffect,
-                onClick = actions.onOpenVideoEffects,
-                size = VonageVideoTheme.dimens.minTouchTarget,
-                iconSize = VonageVideoTheme.dimens.iconSizeSmall,
-            )
+            if (showVideoEffectsButton) {
+                val videoEffect by publisherParticipant.videoEffect.collectAsStateWithLifecycle()
+                VideoEffectIndicator(
+                    modifier = Modifier
+                        .testTag(MeetingRoomScreenTestTags.MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON)
+                        .align(Alignment.BottomEnd)
+                        .padding(VonageVideoTheme.dimens.paddingSmall),
+                    videoEffect = videoEffect,
+                    onClick = actions.onOpenVideoEffects,
+                    size = VonageVideoTheme.dimens.minTouchTarget,
+                    iconSize = VonageVideoTheme.dimens.iconSizeSmall,
+                )
+            }
         }
     }
 
@@ -234,38 +235,6 @@ private fun MicrophoneIndicator(
                 modifier = Modifier
                     .align(Alignment.TopEnd),
                 isMicEnabled = isMicEnabled,
-            )
-        }
-    }
-}
-
-@Composable
-private fun MicrophoneIcon(
-    isMicEnabled: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    val backgroundColor = remember { Color.Black.copy(alpha = 0.6f) }
-    val iconSize = remember { Modifier.size(16.dp) }
-
-    Box(
-        modifier = modifier
-            .padding(12.dp)
-            .background(backgroundColor, CircleShape)
-            .padding(6.dp)
-    ) {
-        if (isMicEnabled) {
-            Icon(
-                imageVector = VividIcons.Solid.Microphone2,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = iconSize,
-            )
-        } else {
-            Icon(
-                imageVector = VividIcons.Solid.MicMute,
-                contentDescription = null,
-                tint = Color.Red,
-                modifier = iconSize,
             )
         }
     }

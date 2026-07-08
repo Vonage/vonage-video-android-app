@@ -11,9 +11,9 @@ import kotlinx.collections.immutable.ImmutableList
 fun VideoEffectsScreen(
     backgrounds: ImmutableList<VideoBackgroundItem>,
     selectedEffect: VideoEffect,
-    canAddBackground: Boolean,
+    remainingBackgroundSlots: Int,
     onEffectSelect: (VideoEffect) -> Unit,
-    onAddBackground: (Uri) -> Unit,
+    onAddBackground: (List<Uri>) -> Unit,
     onDeleteBackground: (VideoBackgroundItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {}

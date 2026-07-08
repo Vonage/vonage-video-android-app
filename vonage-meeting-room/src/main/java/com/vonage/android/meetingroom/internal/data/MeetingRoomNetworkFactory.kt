@@ -1,6 +1,5 @@
 package com.vonage.android.meetingroom.internal.data
 
-import android.os.Build
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -18,16 +17,6 @@ internal object MeetingRoomNetworkFactory {
                     else HttpLoggingInterceptor.Level.NONE
                 }
             )
-            .addInterceptor { chain ->
-                val request = chain.request()
-                    .newBuilder()
-                    .header(
-                        "User-Agent",
-                        "VeraNativeAndroid/${Build.VERSION.RELEASE}"
-                    )
-                    .build()
-                chain.proceed(request)
-            }
             .build()
 
         val json = Json { ignoreUnknownKeys = true }

@@ -67,3 +67,31 @@ internal fun VonageButtonPreview() {
         }
     }
 }
+
+@PreviewLightDark
+@Composable
+internal fun VonageButtonEnabledPreview() {
+    VonageVideoTheme {
+        Box(
+            modifier = Modifier
+                .background(VonageVideoTheme.colors.background)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
+        ) {
+            VonageButton(text = "Continue", onClick = {})
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun VonageButtonDisabledPreview() {
+    VonageVideoTheme {
+        Box(
+            modifier = Modifier
+                .background(VonageVideoTheme.colors.background)
+                .padding(VonageVideoTheme.dimens.paddingDefault)
+        ) {
+            VonageButton(text = "Continue", onClick = {}, enabled = false)
+        }
+    }
+}

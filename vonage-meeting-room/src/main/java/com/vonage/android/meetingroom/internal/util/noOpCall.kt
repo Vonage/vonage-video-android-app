@@ -52,7 +52,6 @@ internal val noOpCall = object : CallFacade {
     override fun applyLocalVideoEffect(effect: VideoEffect) {}
     override fun setVideoBitrate(config: VideoBitrateConfig) {}
     override fun setDegradationPreference(preference: DegradationPreference) {}
-    override fun refreshPublisher(context: Context) {}
     override fun sendChatMessage(message: String) {}
     override fun listenUnreadChatMessages(enable: Boolean) {}
     override fun sendEmoji(emoji: String) {}

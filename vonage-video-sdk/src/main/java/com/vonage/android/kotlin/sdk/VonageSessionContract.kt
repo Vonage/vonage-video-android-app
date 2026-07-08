@@ -29,6 +29,17 @@ interface VonageSession {
     fun sendSignal(type: String, data: String)
     fun forceMuteStream(stream: VonageStream)
 
+    /**
+     * Registers a publisher's stream for internal tracking.
+     * Used to enable self-subscription for features like self-captions.
+     */
+    fun registerPublisherStream(publisher: VonagePublisher)
+
+    /**
+     * Unregisters a publisher's stream from internal tracking.
+     */
+    fun unregisterPublisherStream(publisher: VonagePublisher)
+
     fun setSessionListener(listener: VonageSessionListener?)
     fun setSignalListener(listener: VonageSignalListener?)
     fun setArchiveListener(listener: VonageArchiveListener?)
@@ -43,6 +54,16 @@ interface VonageSessionListener {
     fun onStreamReceived(stream: VonageStream)
     fun onStreamDropped(stream: VonageStream)
     fun onError(error: VonageError)
+
+    /**
+     * Called when a remote stream's audio or video property changes.
+     * Fires when the remote publisher toggles their microphone or camera.
+     *
+     * @param streamId The affected stream ID.
+     * @param hasVideo Current video state of the stream.
+     * @param hasAudio Current audio state of the stream.
+     */
+    fun onStreamPropertyChanged(streamId: String, hasVideo: Boolean, hasAudio: Boolean) {}
 }
 
 /**

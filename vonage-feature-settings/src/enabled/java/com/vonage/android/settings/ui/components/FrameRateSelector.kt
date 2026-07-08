@@ -23,6 +23,8 @@ internal fun FrameRateSelector(
     selected: CaptureFrameRate,
     onSelectionChange: (CaptureFrameRate) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    helperText: String? = null,
 ) {
     val entries = CaptureFrameRate.entries
 
@@ -34,7 +36,11 @@ internal fun FrameRateSelector(
         Text(
             text = stringResource(R.string.settings_frame_rate_title),
             style = VonageVideoTheme.typography.bodyBaseSemibold,
-            color = VonageVideoTheme.colors.secondary,
+            color = if (enabled) {
+                VonageVideoTheme.colors.secondary
+            } else {
+                VonageVideoTheme.colors.textDisabled
+            },
         )
 
         Spacer(modifier = Modifier.height(VonageVideoTheme.dimens.spaceXSmall))
@@ -43,7 +49,8 @@ internal fun FrameRateSelector(
             entries.forEachIndexed { index, frameRate ->
                 SegmentedButton(
                     selected = frameRate == selected,
-                    onClick = { onSelectionChange(frameRate) },
+                    onClick = { if (enabled) onSelectionChange(frameRate) },
+                    enabled = enabled,
                     shape = SegmentedButtonDefaults.itemShape(
                         index = index,
                         count = entries.size,
@@ -56,6 +63,12 @@ internal fun FrameRateSelector(
                         inactiveContentColor = VonageVideoTheme.colors.secondary,
                         activeBorderColor = VonageVideoTheme.colors.primary,
                         inactiveBorderColor = VonageVideoTheme.colors.border,
+                        disabledActiveContainerColor = VonageVideoTheme.colors.disabled,
+                        disabledActiveContentColor = VonageVideoTheme.colors.textDisabled,
+                        disabledInactiveContainerColor = VonageVideoTheme.colors.disabled,
+                        disabledInactiveContentColor = VonageVideoTheme.colors.textDisabled,
+                        disabledActiveBorderColor = VonageVideoTheme.colors.disabled,
+                        disabledInactiveBorderColor = VonageVideoTheme.colors.disabled,
                     ),
                 ) {
                     Text(
@@ -64,6 +77,10 @@ internal fun FrameRateSelector(
                     )
                 }
             }
+        }
+        
+        helperText?.let {
+            SettingHelperText(text = it)
         }
     }
 }

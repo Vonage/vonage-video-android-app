@@ -67,6 +67,15 @@ data class PublisherState(
         MutableStateFlow(vonagePublisher.publishVideo)
     override val isCameraEnabled: StateFlow<Boolean> = _isCameraEnabled
 
+    /**
+     * Tracks the user's explicit camera intent.
+     * Only mutated by [toggleVideo]; never touched by [changeVisibility] or SDK callbacks.
+     * This prevents the self-corruption that occurs when [changeVisibility] sets
+     * `publishVideo = false` (causing `stream.hasVideo = false`), which would otherwise
+     * make a subsequent `changeVisibility(true)` also set `publishVideo = false`.
+     */
+    private var userIntendedVideoOn: Boolean = vonagePublisher.publishVideo
+
     private val _audioLevel: MutableStateFlow<Float> = MutableStateFlow(0F)
     override val audioLevel: StateFlow<Float> = _audioLevel
 
@@ -99,16 +108,21 @@ data class PublisherState(
 
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
-            true -> vonagePublisher.publishVideo =
-                vonagePublisher.stream?.hasVideo == true
-
+            // Use userIntendedVideoOn instead of stream?.hasVideo.
+            // stream.hasVideo is dynamic: it becomes false when publishVideo is set to false,
+            // so reading it here would permanently lock the publisher video off.
+            true  -> vonagePublisher.publishVideo = userIntendedVideoOn
             false -> vonagePublisher.publishVideo = false
         }
     }
 
     override fun toggleVideo() {
-        vonagePublisher.publishVideo = vonagePublisher.publishVideo.toggle()
-        _isCameraEnabled.update { vonagePublisher.publishVideo }
+        // Toggle userIntendedVideoOn, not vonagePublisher.publishVideo.
+        // publishVideo may be temporarily false due to a changeVisibility(false) call;
+        // toggling it directly would invert the wrong value.
+        userIntendedVideoOn = !userIntendedVideoOn
+        vonagePublisher.publishVideo = userIntendedVideoOn
+        _isCameraEnabled.update { userIntendedVideoOn }
     }
 
     override fun toggleAudio() {
@@ -154,6 +168,10 @@ data class PublisherState(
     fun applyDegradationPreference(preference: DegradationPreference) {
         vonagePublisher.applyDegradationPreference(preference.toVonageDegradationPref())
         vonageLogger.d(logTag, "Applied degradation preference: ${preference.label}")
+    }
+
+    override fun reinitializeRenderer() {
+        vonagePublisher.reinitializeRenderer()
     }
 
     @Stable

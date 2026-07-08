@@ -22,6 +22,11 @@ class EnabledVonageCaptionsTest {
     )
 
     @Test
+    fun `isCapable should be true`() {
+        assertTrue(sut.isCapable)
+    }
+
+    @Test
     fun `when enable success then enableCaptions`() = runTest {
         val roomName = "test-room"
         val captionsId = "captions-456"
@@ -128,5 +133,33 @@ class EnabledVonageCaptionsTest {
         sut.enable()
 
         verify { callFacade.enableCaptions() }
+    }
+
+    @Test
+    fun `when init with existing captionsId then enableCaptions is called`() = runTest {
+        val roomName = "test-room"
+        val existingCaptionsId = "pre-existing-captions-id"
+
+        sut.init(callFacade, roomName, existingCaptionsId)
+
+        verify { callFacade.enableCaptions() }
+    }
+
+    @Test
+    fun `when init with null captionsId then enableCaptions is not called`() = runTest {
+        val roomName = "test-room"
+
+        sut.init(callFacade, roomName, null)
+
+        verify(exactly = 0) { callFacade.enableCaptions() }
+    }
+
+    @Test
+    fun `when init with blank captionsId then enableCaptions is not called`() = runTest {
+        val roomName = "test-room"
+
+        sut.init(callFacade, roomName, "")
+
+        verify(exactly = 0) { callFacade.enableCaptions() }
     }
 }

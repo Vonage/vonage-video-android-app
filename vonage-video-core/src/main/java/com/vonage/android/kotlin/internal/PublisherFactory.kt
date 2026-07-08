@@ -60,6 +60,7 @@ class PublisherFactory(
 
     fun createPublisherState(context: Context): PublisherState {
         val vonagePublisher = sdkFactory.createPublisher(context, buildVonageConfig())
+        vonagePublisher.publishCaptions = currentConfig?.publishCaptions ?: false
         val effect = currentConfig?.initialVideoEffect ?: VideoEffect.None
         val participant = PublisherState(
             publisherId = PUBLISHER_ID,

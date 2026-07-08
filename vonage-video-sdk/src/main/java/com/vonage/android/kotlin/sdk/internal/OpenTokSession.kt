@@ -82,6 +82,7 @@ internal class OpenTokSession(
     override fun setSessionListener(listener: VonageSessionListener?) {
         if (listener == null) {
             session.setSessionListener(null)
+            session.setStreamPropertiesListener(null)
             return
         }
         session.setSessionListener(object : Session.SessionListener {
@@ -105,6 +106,31 @@ internal class OpenTokSession(
 
             override fun onError(session: Session, error: OpentokError) {
                 listener.onError(error.toVonage())
+            }
+        })
+        session.setStreamPropertiesListener(object : Session.StreamPropertiesListener {
+            override fun onStreamHasAudioChanged(session: Session, stream: Stream, hasAudio: Boolean) {
+                listener.onStreamPropertyChanged(
+                    streamId = stream.streamId,
+                    hasVideo = stream.hasVideo(),
+                    hasAudio = hasAudio,
+                )
+            }
+
+            override fun onStreamHasVideoChanged(session: Session, stream: Stream, hasVideo: Boolean) {
+                listener.onStreamPropertyChanged(
+                    streamId = stream.streamId,
+                    hasVideo = hasVideo,
+                    hasAudio = stream.hasAudio(),
+                )
+            }
+
+            override fun onStreamVideoDimensionsChanged(session: Session, stream: Stream, width: Int, height: Int) {
+                // Intentionally ignored — dimension changes do not affect audio/video state.
+            }
+
+            override fun onStreamVideoTypeChanged(session: Session, stream: Stream, videoType: Stream.StreamVideoType) {
+                // Intentionally ignored — video type is fixed at subscribe time.
             }
         })
     }
@@ -139,6 +165,27 @@ internal class OpenTokSession(
                 listener.onArchiveStopped(id)
             }
         })
+    }
+
+    /**
+     * Registers a publisher's stream in the internal stream map.
+     * This is needed to allow subscribing to the publisher's own stream for self-captions.
+     */
+    override fun registerPublisherStream(publisher: VonagePublisher) {
+        val real = (publisher as OpenTokPublisher).raw
+        real.stream?.let { stream ->
+            streamMap[stream.streamId] = stream
+        }
+    }
+
+    /**
+     * Unregisters a publisher's stream from the internal stream map.
+     */
+    override fun unregisterPublisherStream(publisher: VonagePublisher) {
+        val real = (publisher as OpenTokPublisher).raw
+        real.stream?.let { stream ->
+            streamMap.remove(stream.streamId)
+        }
     }
 }
 

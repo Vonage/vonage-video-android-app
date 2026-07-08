@@ -6,6 +6,11 @@ import com.vonage.android.MainDispatcherRule
 import com.vonage.android.config.Config
 import com.vonage.android.config.GetConfig
 import com.vonage.android.data.UserRepository
+import com.vonage.android.fx.data.AddBackgroundUseCase
+import com.vonage.android.fx.data.BackgroundsResult
+import com.vonage.android.fx.data.DeleteBackgroundUseCase
+import com.vonage.android.fx.data.GetBackgroundsUseCase
+import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.CameraType
 import com.vonage.android.kotlin.model.CaptureFrameRate
@@ -20,6 +25,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -50,6 +56,14 @@ class WaitingRoomViewModelTest {
         every { subscriberAudioFallbackEnabled } returns MutableStateFlow(true)
         every { videoBitrateConfig } returns MutableStateFlow(VideoBitrateConfig())
     }
+    private val getBackgroundsUseCase: GetBackgroundsUseCase = mockk {
+        coEvery { invoke(captureResolution = null) } returns BackgroundsResult(
+            persistentListOf(),
+            remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
+        )
+    }
+    private val addBackgroundUseCase: AddBackgroundUseCase = mockk(relaxed = true)
+    private val deleteBackgroundUseCase: DeleteBackgroundUseCase = mockk(relaxed = true)
 
     private lateinit var sut: WaitingRoomViewModel
 
@@ -57,12 +71,14 @@ class WaitingRoomViewModelTest {
     fun setUp() {
         sut = WaitingRoomViewModel(
             roomName = ANY_ROOM_NAME,
-            appContext = context,
             userRepository = userRepository,
             videoClient = videoClient,
             getConfig = getConfig,
             audioDevicesHandler = audioDevicesHandler,
             callSettingsHolder = callSettingsHolder,
+            getBackgroundsUseCase = getBackgroundsUseCase,
+            addBackgroundUseCase = addBackgroundUseCase,
+            deleteBackgroundUseCase = deleteBackgroundUseCase,
         )
 
         every { getConfig.invoke() } returns Config(

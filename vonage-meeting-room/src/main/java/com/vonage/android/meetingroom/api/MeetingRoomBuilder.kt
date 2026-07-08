@@ -1,6 +1,8 @@
 package com.vonage.android.meetingroom.api
 
 import androidx.compose.runtime.Composable
+import com.vonage.android.meetingroom.internal.permissions.DefaultPermissionContent
+import com.vonage.android.settings.CallSettingsHolder
 
 /**
  * Fluent builder for the meeting room SDK.
@@ -43,9 +45,12 @@ class MeetingRoomBuilder(
     private var onAction: (MeetingRoomSDKAction) -> Unit = {}
     private var configuration: MeetingRoomConfiguration = MeetingRoomConfiguration()
     private var publisherSettings: PublisherSettings = PublisherSettings()
+    private var callSettingsHolder: CallSettingsHolder? = null
     private var theme: MeetingRoomTheme = MeetingRoomTheme.vonage
     private var isDebug: Boolean = false
     private var reportingContent: (@Composable (() -> Unit) -> Unit)? = null
+    private var permissionContent: (@Composable (List<String>, () -> Unit) -> Unit)? = null
+    private var foregroundServiceEnabled: Boolean = true
 
     /**
      * Defines which optional features are active at runtime.
@@ -62,8 +67,7 @@ class MeetingRoomBuilder(
     /**
      * Registers a handler for navigation callbacks emitted by the SDK.
      *
-     * The host app must handle all [MeetingRoomSDKAction] cases. Permission prompts and error
-     * alerts are presented automatically by the SDK itself.
+     * The host app must handle all [MeetingRoomSDKAction] cases.
      */
     fun onAction(handler: (MeetingRoomSDKAction) -> Unit): MeetingRoomBuilder = apply {
         onAction = handler
@@ -83,6 +87,20 @@ class MeetingRoomBuilder(
      */
     fun publisherSettings(settings: PublisherSettings): MeetingRoomBuilder = apply {
         publisherSettings = settings
+    }
+
+    /**
+     * Provides a shared [CallSettingsHolder] instance for coordinating settings
+     * across the host app and the meeting room.
+     *
+     * Use this when your app has a Settings screen that should affect active calls.
+     * Without this, the SDK creates its own isolated instance and settings changes
+     * from outside the meeting room will not be reflected.
+     *
+     * @param holder The shared settings holder, or null to use SDK's internal instance.
+     */
+    fun callSettingsHolder(holder: CallSettingsHolder?): MeetingRoomBuilder = apply {
+        this.callSettingsHolder = holder
     }
 
     /**
@@ -111,6 +129,19 @@ class MeetingRoomBuilder(
     }
 
     /**
+     * Controls whether the SDK starts its own foreground service for the duration of the call.
+     * Defaults to `true`.
+     *
+     * Set to `false` when the host application already manages a foreground service that keeps
+     * the process alive during the call (e.g. a host-owned in-call notification service). In
+     * that case, use [MeetingRoomPrebuilt.hangUp] to forward hang-up signals from the host
+     * notification to the SDK.
+     */
+    fun foregroundServiceEnabled(enabled: Boolean): MeetingRoomBuilder = apply {
+        foregroundServiceEnabled = enabled
+    }
+
+    /**
      * Provides a custom composable shown inside the report-issue bottom sheet.
      *
      * The composable receives an `onDismiss` callback. When `null` (the default), the SDK
@@ -118,6 +149,31 @@ class MeetingRoomBuilder(
      */
     fun reportingContent(content: @Composable (() -> Unit) -> Unit): MeetingRoomBuilder = apply {
         reportingContent = content
+    }
+
+    /**
+     * Overrides the permission gate composable shown before the meeting room renders.
+     *
+     * The SDK invokes this composable proactively, passing:
+     * - [requiredPermissions]: the Android runtime permissions the SDK needs (`CAMERA`,
+     *   `RECORD_AUDIO`, and API-33+ additions). The host may use this list or ignore it
+     *   and manage permissions independently.
+     * - [onGrant]: a callback the composable **must** call once all required permissions
+     *   are granted. The meeting room renders only after this is called.
+     *
+     * When not set, [DefaultPermissionContent] is used automatically.
+     *
+     * Example with Accompanist:
+     * ```kotlin
+     * .permissionContent { _, onGrant ->
+     *     MyPermissionScreen(onAllGranted = onGrant)
+     * }
+     * ```
+     */
+    fun permissionContent(
+        content: @Composable (requiredPermissions: List<String>, onGranted: () -> Unit) -> Unit,
+    ): MeetingRoomBuilder = apply {
+        permissionContent = content
     }
 
     /**
@@ -133,8 +189,13 @@ class MeetingRoomBuilder(
         onAction = onAction,
         configuration = configuration,
         publisherSettings = publisherSettings,
+        callSettingsHolder = callSettingsHolder,
         theme = theme,
         isDebug = isDebug,
         reportingContent = reportingContent,
+        permissionContent = permissionContent ?: { permissions, onGrant ->
+            DefaultPermissionContent(permissions = permissions, onGrant = onGrant)
+        },
+        foregroundServiceEnabled = foregroundServiceEnabled,
     )
 }

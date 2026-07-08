@@ -21,6 +21,7 @@ interface VonagePublisher {
     fun cycleCamera()
     fun destroy()
     fun stop()
+    fun reinitializeRenderer()
 
     fun applyBlur(level: VonageBlurLevel)
     fun applyBackgroundImage(imageFilePath: String)

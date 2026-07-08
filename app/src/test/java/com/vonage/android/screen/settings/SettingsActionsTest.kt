@@ -13,6 +13,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -23,7 +24,8 @@ import kotlin.test.assertTrue
 @OptIn(ExperimentalCoroutinesApi::class)
 class SettingsActionsTest {
 
-    private val callSettingsHolder = CallSettingsHolder()
+    private val testScope = TestScope(UnconfinedTestDispatcher())
+    private val callSettingsHolder = CallSettingsHolder(scope = testScope)
 
     private fun actionScope(
         initialState: SettingsUiState = SettingsUiState(),

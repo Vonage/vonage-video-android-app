@@ -31,7 +31,7 @@ fun ChatBadgeButton(
                 ) {
                     Text(
                         modifier = Modifier
-                            .testTag("BOTTOM_BAR_CHAT_BADGE"),
+                            .testTag("bottom-bar-chat-badge"),
                         text = "$unreadCount",
                     )
                 }
@@ -40,7 +40,7 @@ fun ChatBadgeButton(
     ) {
         ControlButton(
             modifier = Modifier
-                .testTag("BOTTOM_BAR_CHAT_BUTTON"),
+                .testTag("bottom-bar-chat-button"),
             onClick = onShowChat,
             icon = VividIcons.Solid.Chat2,
             isActive = isChatShow,

@@ -80,9 +80,25 @@ data class ParticipantState(
 
     override fun changeVisibility(visible: Boolean) {
         when (visible) {
-            true -> vonageSubscriber.subscribeToVideo = vonageSubscriber.stream.hasVideo
+            // Use the live _isCameraEnabled state rather than the stale stream snapshot
+            // so that toggling visibility after a remote camera-off event is correct.
+            true  -> vonageSubscriber.subscribeToVideo = _isCameraEnabled.value
             false -> vonageSubscriber.subscribeToVideo = false
         }
+    }
+
+    override fun reinitializeRenderer() {
+        vonageSubscriber.reinitializeRenderer()
+    }
+
+    /**
+     * Updates camera and microphone state from a session-level stream-property change.
+     * Called by [com.vonage.android.kotlin.Call] when the remote publisher toggles their
+     * camera or microphone via [com.vonage.android.kotlin.sdk.VonageSessionListener.onStreamPropertyChanged].
+     */
+    internal fun updateStreamProperties(hasVideo: Boolean, hasAudio: Boolean) {
+        _isCameraEnabled.value = hasVideo
+        _isMicEnabled.value    = hasAudio
     }
 
     suspend fun setup() {
@@ -97,12 +113,12 @@ data class ParticipantState(
         })
         vonageSubscriber.setVideoListener(object : VonageSubscriberVideoListener {
             override fun onVideoEnabled(reason: String) {
-                vonageLogger.d(logTag, "Subscriber video enabled")
+                vonageLogger.d(logTag, "Subscriber video enabled, reason=$reason")
                 _isCameraEnabled.value = true
             }
 
             override fun onVideoDisabled(reason: String) {
-                vonageLogger.d(logTag, "Subscriber video disabled")
+                vonageLogger.d(logTag, "Subscriber video disabled, reason=$reason")
                 _isCameraEnabled.value = false
             }
 

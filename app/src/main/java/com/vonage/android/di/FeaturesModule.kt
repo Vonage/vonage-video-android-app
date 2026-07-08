@@ -12,6 +12,7 @@ import com.vonage.android.reactions.ReactionSignalPlugin
 import com.vonage.android.reactions.di.ReactionsModule
 import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.screensharing.di.ScreenSharingModule
+import com.vonage.android.data.storage.DataStoreCallSettingsStorage
 import com.vonage.android.settings.CallSettingsHolder
 import dagger.Module
 import dagger.Provides
@@ -20,6 +21,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import javax.inject.Singleton
+import dagger.hilt.EntryPoint
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface CallSettingsHolderEntryPoint {
+    fun callSettingsHolder(): CallSettingsHolder
+}
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -58,5 +66,7 @@ object FeaturesModule {
 
     @Singleton
     @Provides
-    fun provideCallSettingsHolder(): CallSettingsHolder = CallSettingsHolder()
+    fun provideCallSettingsHolder(storage: DataStoreCallSettingsStorage): CallSettingsHolder =
+        CallSettingsHolder(storage = storage)
+
 }

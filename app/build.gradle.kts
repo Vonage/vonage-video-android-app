@@ -37,8 +37,8 @@ android {
         targetSdk = 36
         // NOTE: The following versionCode and versionName are placeholders.
         // Actual values are set dynamically by the GitHub Actions workflow during CI/CD.
-        versionCode = 110
-        versionName = "1.1.0"
+        versionCode = 121
+        versionName = "1.2.1"
 
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
@@ -261,6 +261,7 @@ dependencies {
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.mockk.android)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.hilt.android.testing)

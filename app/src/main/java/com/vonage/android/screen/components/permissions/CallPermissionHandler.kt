@@ -13,20 +13,21 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CallPermissionHandler(
+    permissions: List<String>? = null,
     onGrantPermissions: () -> Unit = {},
     navigateToPermissions: () -> Unit = {},
 ) {
     if (LocalInspectionMode.current) return
 
-    val permissions = mutableListOf(
-        Manifest.permission.CAMERA,
-        Manifest.permission.RECORD_AUDIO,
-    )
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        permissions += Manifest.permission.BLUETOOTH_CONNECT
-        permissions += Manifest.permission.POST_NOTIFICATIONS
+    val resolvedPermissions = permissions ?: buildList {
+        add(Manifest.permission.CAMERA)
+        add(Manifest.permission.RECORD_AUDIO)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            add(Manifest.permission.BLUETOOTH_CONNECT)
+            add(Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
-    val state = rememberMultiplePermissionsState(permissions)
+    val state = rememberMultiplePermissionsState(resolvedPermissions)
     LaunchedEffect(state) {
         state.launchMultiplePermissionRequest()
     }

@@ -3,9 +3,14 @@ package com.vonage.android.meetingroom.internal.screen.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vonage.android.compose.layout.AdaptiveGrid
+import com.vonage.android.compose.layout.ActiveSpeakerLayout
 import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
@@ -26,29 +31,30 @@ internal fun MeetingRoomContent(
     layoutType: CallLayoutType,
     modifier: Modifier = Modifier,
 ) {
+    val pinnedIds by call.pinnedParticipantIds.collectAsStateWithLifecycle()
+
     Column(
         modifier = modifier
             .fillMaxSize(),
     ) {
         when (layoutType) {
-            CallLayoutType.GRID -> {
-                ParticipantsLazyVerticalGridLayout(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
-                    participants = participants,
-                    call = call,
-                    actions = actions,
-                )
-            }
-
             CallLayoutType.ADAPTIVE_GRID -> {
                 AdaptiveGrid(
                     call = call,
                     participants = participants,
-                    actions = actions,
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .fillMaxSize()
+                        .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
+                    participantContent = { participant, tileModifier ->
+                        key("${participant.id}_grid") {
+                            ParticipantVideoCard(
+                                participant = participant,
+                                actions = actions,
+                                modifier = tileModifier,
+                                isPinned = participant.id in pinnedIds,
+                            )
+                        }
+                    },
                 )
             }
 
@@ -56,10 +62,19 @@ internal fun MeetingRoomContent(
                 ActiveSpeakerLayout(
                     call = call,
                     participants = participants,
-                    actions = actions,
                     modifier = Modifier
                         .fillMaxSize()
                         .testTag(MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT),
+                    participantContent = { participant, tileModifier ->
+                        key("${participant.id}_speaker") {
+                            ParticipantVideoCard(
+                                participant = participant,
+                                actions = actions,
+                                modifier = tileModifier,
+                                isPinned = participant.id in pinnedIds,
+                            )
+                        }
+                    },
                 )
             }
         }
@@ -67,8 +82,8 @@ internal fun MeetingRoomContent(
 }
 
 object MeetingRoomContentTestTags {
-    const val MEETING_ROOM_PARTICIPANTS_GRID = "meeting_room_participants_grid"
-    const val MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT = "meeting_room_participants_speaker_layout"
+    const val MEETING_ROOM_PARTICIPANTS_GRID = "meeting-room-participants-grid"
+    const val MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT = "meeting-room-participants-speaker-layout"
 }
 
 @PreviewLightDark
@@ -79,7 +94,7 @@ internal fun MeetingRoomContentPreview() {
             call = noOpCall,
             actions = MeetingRoomActions(),
             participants = buildParticipants(25).toImmutableList(),
-            layoutType = CallLayoutType.GRID,
+            layoutType = CallLayoutType.ADAPTIVE_GRID,
         )
     }
 }

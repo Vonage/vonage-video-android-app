@@ -34,3 +34,16 @@ Use this file as the default guidance for this repository. For deeper context, s
 - Compose lint rules are strict via detekt (`build-tools/detekt/detekt.yml`).
 - Contributions are expected from `develop` branch (see `docs/CONTRIBUTING.md`).
 
+## Documentation
+
+| Document | Description |
+|---|---|
+| [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) | Clone, configure the backend URL, build, and run |
+| [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md) | Feature flags, theme customization, base URL |
+| [`docs/CONFIG-SYSTEM.md`](docs/CONFIG-SYSTEM.md) | Deep-dive into the JSON-driven config plugin |
+| [`docs/LOCALIZATION.md`](docs/LOCALIZATION.md) | Multi-language support, adding a new language |
+| [`docs/TESTING.md`](docs/TESTING.md) | Unit tests, instrumented tests, snapshot tests, Maestro E2E |
+| [`docs/CODE_STYLE.md`](docs/CODE_STYLE.md) | Detekt, Spotless, and code conventions |
+| [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) | How to contribute |
+| [`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md) | Tracked known issues |
+

@@ -15,10 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import com.vonage.android.archiving.Archive
 import com.vonage.android.archiving.ArchiveListStyle
 import com.vonage.android.archiving.ArchiveStatus
+import com.vonage.android.archiving.ui.ArchivingTestTags.ARCHIVE_ROW_DOWNLOAD_BUTTON_TAG
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Download
@@ -129,7 +131,8 @@ private fun ArchiveRow(
             ArchiveStatus.AVAILABLE -> {
                 Icon(
                     modifier = Modifier
-                        .size(VonageVideoTheme.dimens.iconSizeDefault),
+                        .size(VonageVideoTheme.dimens.iconSizeDefault)
+                        .testTag(ARCHIVE_ROW_DOWNLOAD_BUTTON_TAG),
                     imageVector = VividIcons.Solid.Download,
                     contentDescription = null,
                     tint = VonageVideoTheme.colors.primary,
@@ -154,6 +157,10 @@ private fun ArchiveRow(
             }
         }
     }
+}
+
+object ArchivingTestTags {
+    const val ARCHIVE_ROW_DOWNLOAD_BUTTON_TAG = "archive-row-download-button"
 }
 
 @Suppress("MagicNumber")

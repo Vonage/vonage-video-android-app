@@ -78,17 +78,18 @@ fun WaitingRoomRoute(
 }
 
 object WaitingRoomTestTags {
-    const val JOIN_BUTTON_TAG = "waiting_room_join_button"
-    const val PREPARE_TO_JOIN_TEXT_TAG = "waiting_room_prepare_to_join_text"
-    const val ROOM_NAME_TEXT_TAG = "waiting_room_room_name_text"
-    const val WHATS_YOU_NAME_TEXT_TAG = "waiting_room_whats_you_name_text"
-    const val USER_NAME_INPUT_TAG = "waiting_room_user_name_input"
-    const val USER_NAME_INPUT_ERROR_TAG = "waiting_room_user_name_input_error"
-    const val MIC_BUTTON_TAG = "waiting_room_mic_button"
-    const val VOLUME_INDICATOR_TAG = "waiting_room_volume_indicator"
-    const val CAMERA_BUTTON_TAG = "waiting_room_camera_button"
-    const val CAMERA_BLUR_BUTTON_TAG = "waiting_room_camera_blur_button"
-    const val USER_INITIALS_TAG = "user_initials_view"
+    const val WAITING_ROOM_SCREEN_TAG = "waiting-room-screen"
+    const val JOIN_BUTTON_TAG = "join-meeting-button"
+    const val PREPARE_TO_JOIN_TEXT_TAG = "waiting-room-prepare-to-join-text"
+    const val ROOM_NAME_TEXT_TAG = "waiting-room-room-name-text"
+    const val WHATS_YOU_NAME_TEXT_TAG = "waiting-room-whats-your-name-text"
+    const val USER_NAME_INPUT_TAG = "username-input"
+    const val USER_NAME_INPUT_ERROR_TAG = "waiting-room-user-name-input-error"
+    const val MIC_BUTTON_TAG = "waiting-room-mic"
+    const val VOLUME_INDICATOR_TAG = "waiting-room-volume-indicator"
+    const val CAMERA_BUTTON_TAG = "waiting-room-camera"
+    const val CAMERA_BLUR_BUTTON_TAG = "waiting-room-camera-blur-button"
+    const val USER_INITIALS_TAG = "user-initials-view"
 }
 
 @Stable
@@ -99,7 +100,7 @@ data class WaitingRoomActions(
     val onCameraToggle: () -> Unit = {},
     val onOpenVideoEffects: () -> Unit = {},
     val onApplyVideoEffect: (VideoEffect) -> Unit = {},
-    val onAddBackground: (Uri) -> Unit = {},
+    val onAddBackground: (List<Uri>) -> Unit = {},
     val onDeleteBackground: (VideoBackgroundItem) -> Unit = {},
     val onCameraSwitch: () -> Unit = {},
     val onBack: () -> Unit = {},

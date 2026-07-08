@@ -5,6 +5,8 @@ import com.vonage.android.kotlin.model.CallFacade
 @Suppress("EmptyFunctionBlock")
 class DisabledVonageCaptions : VonageCaptions {
 
+    override val isCapable: Boolean = false
+
     override fun init(
         callFacade: CallFacade,
         roomName: String,
