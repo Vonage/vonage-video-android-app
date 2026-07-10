@@ -1,0 +1,19 @@
+vonage-video-core/src/test/java/com/vonage/android/kotlin/CallSortingLogicTest.kt
+  s_5957b4fa90a0ee::t_595d62860c7fde 219-296,300-301,305
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "19cc7209c19ae9e7a935f764fb5decb4c79753d2",
+  "prompts": {},
+  "sessions": {
+    "s_5957b4fa90a0ee": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_0b37ba843ffeIHr91kk3gJV1Ky",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
