@@ -1,6 +1,11 @@
 package com.vonage.android.meetingroom.internal.screen
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -87,6 +93,8 @@ internal fun MeetingRoomScreen(
     modifier: Modifier = Modifier,
     reportingContent: (@Composable (() -> Unit) -> Unit)? = null,
 ) {
+    var showBars by remember { mutableStateOf(true) }
+
     var showAudioOutputs by remember { mutableStateOf(false) }
     val audioOutputsSheetState = rememberModalBottomSheetState()
 
@@ -166,38 +174,62 @@ internal fun MeetingRoomScreen(
             Scaffold(
                 modifier = modifier.testTag(MEETING_ROOM_SCREEN_TAG).systemBarsPadding(),
                 topBar = {
-                    MeetingTopBar(
-                        modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
-                        roomName = uiState.roomName,
-                        archivingUiState = uiState.archivingUiState,
-                        actions = actions,
-                        onToggleAudioDeviceSelector = { showAudioOutputs = showAudioOutputs.toggle() },
-                        audioDevicesState = uiState.audioDevicesState,
-                    )
+                    AnimatedVisibility(
+                        visible = showBars,
+                        enter = slideInVertically(
+                            animationSpec = tween(durationMillis = BAR_TOGGLE_DURATION_MS),
+                            initialOffsetY = { -it },
+                        ),
+                        exit = slideOutVertically(
+                            animationSpec = tween(durationMillis = BAR_TOGGLE_DURATION_MS),
+                            targetOffsetY = { -it },
+                        ),
+                    ) {
+                        MeetingTopBar(
+                            modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
+                            roomName = uiState.roomName,
+                            archivingUiState = uiState.archivingUiState,
+                            actions = actions,
+                            onToggleAudioDeviceSelector = { showAudioOutputs = showAudioOutputs.toggle() },
+                            audioDevicesState = uiState.audioDevicesState,
+                        )
+                    }
                 },
                 bottomBar = {
-                    BottomBar(
-                        modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
-                        call = call,
-                        roomActions = wrappedActions,
-                        actions = remember(uiState.enabledFeatures) {
-                            enabledBottomBarActions(uiState.enabledFeatures)
-                        },
-                        state = BottomBarState(
-                            onShowChat = { scope.launch { navigator.toggleChat() } },
-                            isChatShow = isChatShow,
-                            publisher = publisher,
-                            participants = participants,
-                            layoutType = uiState.layoutType,
-                            archivingUiState = uiState.archivingUiState,
-                            screenSharingState = uiState.screenSharingState,
-                            captionsUiState = uiState.captionsUiState,
-                            allowShowParticipantList = uiState.allowShowParticipantList,
-                            allowMicrophoneControl = uiState.allowMicrophoneControl,
-                            allowCameraControl = uiState.allowCameraControl,
+                    AnimatedVisibility(
+                        visible = showBars,
+                        enter = slideInVertically(
+                            animationSpec = tween(durationMillis = BAR_TOGGLE_DURATION_MS),
+                            initialOffsetY = { it },
                         ),
-                        reportingContent = reportingContent ?: { onDismiss -> DefaultReportingContent(onDismiss) },
-                    )
+                        exit = slideOutVertically(
+                            animationSpec = tween(durationMillis = BAR_TOGGLE_DURATION_MS),
+                            targetOffsetY = { it },
+                        ),
+                    ) {
+                        BottomBar(
+                            modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
+                            call = call,
+                            roomActions = wrappedActions,
+                            actions = remember(uiState.enabledFeatures) {
+                                enabledBottomBarActions(uiState.enabledFeatures)
+                            },
+                            state = BottomBarState(
+                                onShowChat = { scope.launch { navigator.toggleChat() } },
+                                isChatShow = isChatShow,
+                                publisher = publisher,
+                                participants = participants,
+                                layoutType = uiState.layoutType,
+                                archivingUiState = uiState.archivingUiState,
+                                screenSharingState = uiState.screenSharingState,
+                                captionsUiState = uiState.captionsUiState,
+                                allowShowParticipantList = uiState.allowShowParticipantList,
+                                allowMicrophoneControl = uiState.allowMicrophoneControl,
+                                allowCameraControl = uiState.allowCameraControl,
+                            ),
+                            reportingContent = reportingContent ?: { onDismiss -> DefaultReportingContent(onDismiss) },
+                        )
+                    }
                 }
             ) { paddingValues ->
                 SupportingPaneScaffold(
@@ -208,7 +240,13 @@ internal fun MeetingRoomScreen(
                     directive = navigator.scaffoldDirective,
                     value = navigator.scaffoldValue,
                     mainPane = {
-                        Box(modifier = Modifier.fillMaxSize()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onTap = { showBars = !showBars })
+                                },
+                        ) {
                             EmojiReactionOverlay(call = call)
                             CaptionsOverlay(captionLines = captionLines)
                             SpeakingWhileMutedOverlay(publisher = publisher)
@@ -355,6 +393,8 @@ private fun ThreePaneScaffoldPaneScope.ExtraPane(
         )
     }
 }
+
+private const val BAR_TOGGLE_DURATION_MS = 300
 
 internal object MeetingRoomScreenTestTags {
     const val MEETING_ROOM_SCREEN_TAG = "meeting-room-screen"
