@@ -1,0 +1,24 @@
+.opencode/plans/VIDSOL-946.md
+  s_40b5d1d39426a9::t_81fec479d51988 1-45
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  s_40b5d1d39426a9::t_94d82535cf507a 177-196,199-203,205-232,243-249
+  s_40b5d1d39426a9::t_4880da646a62fc 96-97
+  s_40b5d1d39426a9::t_fcdc58f8a4e06f 397-398
+  s_40b5d1d39426a9::t_cdb1e6dae48c84 4-8,32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "ca9fbd9c98710df8227c7d2e87e07cde2648909c",
+  "prompts": {},
+  "sessions": {
+    "s_40b5d1d39426a9": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_0b3624f33ffeyE2zOXubqvx3tO",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
