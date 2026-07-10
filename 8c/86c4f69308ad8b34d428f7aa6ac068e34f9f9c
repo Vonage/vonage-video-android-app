@@ -1,0 +1,19 @@
+.gitignore
+  s_40b5d1d39426a9::t_50bf088d2dbe14 48-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "8c86c4f69308ad8b34d428f7aa6ac068e34f9f9c",
+  "prompts": {},
+  "sessions": {
+    "s_40b5d1d39426a9": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_0b3624f33ffeyE2zOXubqvx3tO",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
