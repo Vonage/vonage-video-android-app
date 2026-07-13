@@ -14,6 +14,7 @@ import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.CameraType
 import com.vonage.android.kotlin.model.CaptureFrameRate
+import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoEffect
@@ -26,7 +27,9 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -45,10 +48,13 @@ class WaitingRoomViewModelTest {
     private val userRepository: UserRepository = mockk()
     private val getConfig: GetConfig = mockk()
     private val audioDevicesHandler: AudioDevicesHandler = mockk(relaxed = true)
+    private val callSettingsHolderCallFlow = MutableStateFlow<com.vonage.android.kotlin.model.CallFacade?>(null)
+    private val callSettingsHolderResolutionFlow = MutableStateFlow<CaptureResolution?>(null)
     private val callSettingsHolder: CallSettingsHolder = mockk(relaxed = true) {
+        every { call } returns callSettingsHolderCallFlow
         every { senderStatsEnabled } returns MutableStateFlow(true)
         every { captureFrameRate } returns MutableStateFlow(CaptureFrameRate.FPS_15)
-        every { captureResolution } returns MutableStateFlow(null)
+        every { captureResolution } returns callSettingsHolderResolutionFlow
         every { preferredVideoCodecOrder } returns MutableStateFlow(null)
         every { audioBitrate } returns MutableStateFlow(null)
         every { opusDtxEnabled } returns MutableStateFlow(true)
@@ -282,6 +288,47 @@ class WaitingRoomViewModelTest {
         sut.onStop()
 
         verify { videoClient.destroyPublisher() }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `observeBuildTimeSettings should NOT recreate publisher when a call is active`() = runTest {
+        // Arrange: a publisher exists and a call is active
+        val publisher = givenPreviewPublisher()
+        coEvery { userRepository.getUserName() } returns "user"
+        every { videoClient.destroyPublisher() } returns Unit
+
+        sut.init(context)
+        advanceUntilIdle()
+        // Simulate call becoming active (MeetingRoomViewModel calls callSettingsHolder.bind())
+        callSettingsHolderCallFlow.value = mockk()
+
+        // Act: change a build-time setting (e.g. resolution) — the trigger that used to freeze video
+        callSettingsHolderResolutionFlow.value = CaptureResolution.HIGH
+        advanceUntilIdle()
+
+        // Assert: destroyPublisher must NOT have been called — the live session publisher is intact
+        verify(exactly = 0) { videoClient.destroyPublisher() }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `observeBuildTimeSettings should recreate publisher when no call is active`() = runTest {
+        // Arrange: a publisher exists, no active call
+        val publisher = givenPreviewPublisher()
+        coEvery { userRepository.getUserName() } returns "user"
+        every { videoClient.destroyPublisher() } returns Unit
+
+        sut.init(context)
+        advanceUntilIdle()
+        // callSettingsHolderCallFlow stays null — no active call
+
+        // Act: change resolution
+        callSettingsHolderResolutionFlow.value = CaptureResolution.HIGH
+        advanceUntilIdle()
+
+        // Assert: preview publisher is recreated (this is the correct waiting-room behaviour)
+        verify(atLeast = 1) { videoClient.destroyPublisher() }
     }
 
     private fun givenPreviewPublisher(): PreviewPublisherState {
