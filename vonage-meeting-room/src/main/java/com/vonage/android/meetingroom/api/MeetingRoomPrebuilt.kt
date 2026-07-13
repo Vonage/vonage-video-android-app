@@ -57,6 +57,10 @@ class MeetingRoomPrebuilt internal constructor(
     internal val reportingContent: (@Composable (() -> Unit) -> Unit)?,
     internal val permissionContent: @Composable (List<String>, () -> Unit) -> Unit,
     internal val foregroundServiceEnabled: Boolean,
+    /** Dynamic list of extra buttons appended after the built-in bottom bar actions. */
+    internal val additionalBottomBarActions: StateFlow<List<MeetingRoomBottomBarAction>>? = null,
+    /** Full replacement for the bottom bar. When set, [additionalBottomBarActions] is ignored. */
+    internal val customBottomBar: (@Composable (MeetingRoomBottomBarState, MeetingRoomCustomActions) -> Unit)? = null,
 ) {
     private val _callState = MutableStateFlow(MeetingRoomCallState(roomName = roomName))
 
