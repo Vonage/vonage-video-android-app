@@ -1,0 +1,14 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  h_25498f8d57a266 38,43,50-52,70,73-74,81,91-93,106-107,151-184,257-269,277
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "1a7a4ab430cdd14e92a66a53c6f3e06ef3d36b69",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
