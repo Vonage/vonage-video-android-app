@@ -1,0 +1,12 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "9dae9a8e1fb5a6a9f3ad69c01c9f3d2d44145514",
+  "prompts": {},
+  "humans": {
+    "h_4202290f411bdc": {
+      "author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  }
+}
