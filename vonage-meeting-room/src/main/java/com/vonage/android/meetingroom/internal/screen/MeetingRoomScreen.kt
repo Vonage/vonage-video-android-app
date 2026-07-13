@@ -33,7 +33,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.captions.CaptionsUiState
 import com.vonage.android.captions.ui.CaptionsOverlay
@@ -62,7 +61,6 @@ import com.vonage.android.meetingroom.internal.screen.components.RecordingStarte
 import com.vonage.android.meetingroom.internal.screen.components.SpeakingWhileMutedOverlay
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBar
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarState
-import com.vonage.android.meetingroom.internal.factory.ReportingContent as DefaultReportingContent
 import com.vonage.android.meetingroom.internal.util.ext.isExtraPaneShow
 import com.vonage.android.meetingroom.internal.util.ext.toggleChat
 import com.vonage.android.meetingroom.internal.util.rememberNoiseSuppression
@@ -73,6 +71,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import com.vonage.android.meetingroom.internal.factory.ReportingContent as DefaultReportingContent
 
 /**
  * Maps the runtime [MeetingRoomFeature] set to the [BottomBarActionType] list that should be
@@ -219,7 +218,9 @@ internal fun MeetingRoomScreen(
             }
 
             Scaffold(
-                modifier = modifier.testTag(MEETING_ROOM_SCREEN_TAG).systemBarsPadding(),
+                modifier = modifier
+                    .testTag(MEETING_ROOM_SCREEN_TAG)
+                    .systemBarsPadding(),
                 topBar = {
                     AnimatedVisibility(
                         visible = showBars,
@@ -237,7 +238,9 @@ internal fun MeetingRoomScreen(
                             roomName = uiState.roomName,
                             archivingUiState = uiState.archivingUiState,
                             actions = actions,
-                            onToggleAudioDeviceSelector = { showAudioOutputs = showAudioOutputs.toggle() },
+                            onToggleAudioDeviceSelector = {
+                                showAudioOutputs = showAudioOutputs.toggle()
+                            },
                             audioDevicesState = uiState.audioDevicesState,
                         )
                     }
@@ -254,44 +257,45 @@ internal fun MeetingRoomScreen(
                             targetOffsetY = { it },
                         ),
                     ) {
-                    if (customBottomBar != null) {
-                        val customActions = remember(wrappedActions) {
-                            MeetingRoomCustomActions(
-                                onToggleMic = wrappedActions.onToggleMic,
-                                onToggleCamera = wrappedActions.onToggleCamera,
-                                onEndCall = wrappedActions.onEndCall,
-                                onToggleRecording = wrappedActions.onToggleRecording,
-                                onToggleCaptions = wrappedActions.onToggleCaptions,
-                                onToggleScreenSharing = wrappedActions.onToggleScreenSharing,
+                        if (customBottomBar != null) {
+                            val customActions = remember(wrappedActions) {
+                                MeetingRoomCustomActions(
+                                    onToggleMic = wrappedActions.onToggleMic,
+                                    onToggleCamera = wrappedActions.onToggleCamera,
+                                    onEndCall = wrappedActions.onEndCall,
+                                    onToggleRecording = wrappedActions.onToggleRecording,
+                                    onToggleCaptions = wrappedActions.onToggleCaptions,
+                                    onToggleScreenSharing = wrappedActions.onToggleScreenSharing,
+                                )
+                            }
+                            customBottomBar(bottomBarState, customActions)
+                        } else {
+                            BottomBar(
+                                modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
+                                call = call,
+                                roomActions = wrappedActions,
+                                actions = remember(uiState.enabledFeatures) {
+                                    enabledBottomBarActions(uiState.enabledFeatures)
+                                },
+                                additionalActions = mappedExtraActions,
+                                state = BottomBarState(
+                                    onShowChat = { scope.launch { navigator.toggleChat() } },
+                                    isChatShow = isChatShow,
+                                    publisher = publisher,
+                                    participants = participants,
+                                    layoutType = uiState.layoutType,
+                                    archivingUiState = uiState.archivingUiState,
+                                    screenSharingState = uiState.screenSharingState,
+                                    captionsUiState = uiState.captionsUiState,
+                                    allowShowParticipantList = uiState.allowShowParticipantList,
+                                    allowMicrophoneControl = uiState.allowMicrophoneControl,
+                                    allowCameraControl = uiState.allowCameraControl,
+                                ),
+                                reportingContent = reportingContent
+                                    ?: { onDismiss -> DefaultReportingContent(onDismiss) },
                             )
                         }
-                        customBottomBar(bottomBarState, customActions)
-                    } else {
-                        BottomBar(
-                            modifier = Modifier.testTag(MEETING_ROOM_BOTTOM_BAR),
-                            call = call,
-                            roomActions = wrappedActions,
-                            actions = remember(uiState.enabledFeatures) {
-                                enabledBottomBarActions(uiState.enabledFeatures)
-                            },
-                            additionalActions = mappedExtraActions,
-                            state = BottomBarState(
-                                onShowChat = { scope.launch { navigator.toggleChat() } },
-                                isChatShow = isChatShow,
-                                publisher = publisher,
-                                participants = participants,
-                                layoutType = uiState.layoutType,
-                                archivingUiState = uiState.archivingUiState,
-                                screenSharingState = uiState.screenSharingState,
-                                captionsUiState = uiState.captionsUiState,
-                                allowShowParticipantList = uiState.allowShowParticipantList,
-                                allowMicrophoneControl = uiState.allowMicrophoneControl,
-                                allowCameraControl = uiState.allowCameraControl,
-                            ),
-                            reportingContent = reportingContent ?: { onDismiss -> DefaultReportingContent(onDismiss) },
-                        )
                     }
-                }
                 }
             ) { paddingValues ->
                 SupportingPaneScaffold(
