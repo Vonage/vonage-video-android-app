@@ -159,6 +159,8 @@ private fun MeetingRoomContentInner(
             actions = actions,
             uiState = uiState,
             reportingContent = prebuilt.reportingContent,
+            additionalBottomBarActions = prebuilt.additionalBottomBarActions,
+            customBottomBar = prebuilt.customBottomBar,
         )
     }
 }

@@ -6,21 +6,21 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.config.GetConfig
+import com.vonage.android.data.UserRepository
 import com.vonage.android.fx.data.AddBackgroundUseCase
 import com.vonage.android.fx.data.BackgroundsResult
 import com.vonage.android.fx.data.DeleteBackgroundUseCase
 import com.vonage.android.fx.data.GetBackgroundsUseCase
 import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.fx.ui.VideoBackgroundItem
-import com.vonage.android.kotlin.model.VideoEffect
-import com.vonage.android.meetingroom.api.PublisherSettings
-import com.vonage.android.settings.CallSettingsHolder
-import com.vonage.android.data.UserRepository
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherParticipant
+import com.vonage.android.kotlin.model.VideoEffect
+import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
 import com.vonage.android.screen.components.audio.AudioDevicesState
+import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.util.isValidUserName
 import com.vonage.android.util.sanitizeUserName
 import dagger.assisted.Assisted
@@ -31,7 +31,6 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -180,7 +179,12 @@ class WaitingRoomViewModel @AssistedInject constructor(
                     initialVideoEffect = effect,
                 )
             } ?: PublisherSettings(username = sanitizedUserName)
-            _uiState.update { uiState -> uiState.copy(isSuccess = true, joinSettings = joinSettings) }
+            _uiState.update { uiState ->
+                uiState.copy(
+                    isSuccess = true,
+                    joinSettings = joinSettings
+                )
+            }
             onStop()
         }
     }
@@ -199,7 +203,12 @@ class WaitingRoomViewModel @AssistedInject constructor(
         val resolution = callSettingsHolder.captureResolution.value
         val result = runCatching {
             getBackgroundsUseCase(resolution)
-        }.getOrElse { BackgroundsResult(persistentListOf(), remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS) }
+        }.getOrElse {
+            BackgroundsResult(
+                persistentListOf(),
+                remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
+            )
+        }
         _uiState.update {
             it.copy(
                 backgrounds = result.backgrounds,
@@ -223,7 +232,11 @@ class WaitingRoomViewModel @AssistedInject constructor(
                 ),
             ) { it }
                 .drop(1)
-                .collect { refreshPreviewPublisher(context) }
+                .collect {
+                    if (callSettingsHolder.call.value == null) {
+                        refreshPreviewPublisher(context)
+                    }
+                }
         }
     }
 
