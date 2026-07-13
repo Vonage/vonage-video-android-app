@@ -1,0 +1,14 @@
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/bottombar/BottomBarAction.kt
+  h_25498f8d57a266 24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "a1dfbb91910b0a8967f36c30541719c49a8a8978",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
