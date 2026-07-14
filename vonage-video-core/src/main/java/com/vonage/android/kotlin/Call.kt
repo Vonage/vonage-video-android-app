@@ -750,6 +750,9 @@ class Call internal constructor(
      * Ensures the active speaker is always visible even if scrolled off-screen.
      * Screen sharing participants are automatically set as the active speaker.
      * Audio-only participants are also promotable to the spotlight.
+     *
+     * Also observes [ActiveSpeakerTracker.currentActiveSpeaker] to detect when audio goes
+     * silent (streamId becomes null) and restores the latest-joiner fallback in that case.
      */
     private fun startActiveSpeakerTracker() {
         activeSpeakerTrackerJob?.cancel()
@@ -769,12 +772,32 @@ class Call internal constructor(
                 }
             }
             .launchIn(coroutineScope)
+
+        // When the tracker resets to silence (streamId == null — triggered by
+        // onSubscriberDestroyed), revert the spotlight to the latest joiner instead of
+        // keeping the departed speaker or going blank.
+        activeSpeakerTracker.currentActiveSpeaker
+            .onEach { info ->
+                if (info.streamId == null) {
+                    _activeSpeaker.update { latestJoinerFallback() }
+                }
+            }
+            .launchIn(coroutineScope)
     }
+
+    /**
+     * Returns the participant with the highest [Participant.creationTime] across all current
+     * participants (including the local publisher), or `null` when the call has no participants.
+     *
+     * Used as the spotlight fallback when no one is actively speaking.
+     */
+    private fun latestJoinerFallback(): Participant? =
+        participants.values.maxByOrNull { it.creationTime }
 
     /**
      * Updates the participants flow and count whenever the participants map changes.
      * Also updates active speaker if a screen sharing participant is present.
-     * If the current active speaker left, clears it or sets to screen sharing participant.
+     * If the current active speaker left, falls back to the latest joiner.
      */
     private fun updateParticipants() {
         _participantsInternalFlow.update { participants.values.toImmutableList() }
@@ -782,12 +805,16 @@ class Call internal constructor(
 
         // Set screen sharing participant as active speaker
         val screenSharingParticipant = participants.values.firstScreenSharing()
-        // Update active speaker: prioritize screen sharing, or clear if current speaker left
+        // Update active speaker: prioritize screen sharing, keep current speaker if still present,
+        // otherwise fall back to the latest joiner (or null if the call is empty).
         _activeSpeaker.update { currentSpeaker ->
+            val hasRealSpeaker = activeSpeakerTracker.currentActiveSpeaker.value.streamId != null
             when {
                 screenSharingParticipant != null -> screenSharingParticipant
-                currentSpeaker != null && participants.containsKey(currentSpeaker.id) -> currentSpeaker
-                else -> null
+                // Keep a real (audio-detected) active speaker if they're still in the call.
+                hasRealSpeaker && currentSpeaker != null && participants.containsKey(currentSpeaker.id) -> currentSpeaker
+                // No real speaker — always show the latest joiner as fallback.
+                else -> latestJoinerFallback()
             }
         }
     }
