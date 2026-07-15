@@ -46,7 +46,6 @@ google-services.json
 # Android Profiling
 *.hprof
 
-
 # Kiro
 .kiro/specs/
 .kiro/steering/
