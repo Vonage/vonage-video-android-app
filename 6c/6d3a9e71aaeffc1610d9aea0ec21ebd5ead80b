@@ -1,0 +1,14 @@
+.gitignore
+  h_4202290f411bdc 48-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "6c6d3a9e71aaeffc1610d9aea0ec21ebd5ead80b",
+  "prompts": {},
+  "humans": {
+    "h_4202290f411bdc": {
+      "author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  }
+}
