@@ -1,0 +1,14 @@
+README.md
+  h_25498f8d57a266 114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "586b126714f72780f7765e02ef348ce0534ade5a",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}

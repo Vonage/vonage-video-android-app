@@ -1,0 +1,14 @@
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/layout/ActiveSpeakerLayout.kt
+  h_25498f8d57a266 126,134,138-139,163-168,186,194,198-199,223-228,253-260
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "ddd20579f158e6794957cd2117665c85e882ff81",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
