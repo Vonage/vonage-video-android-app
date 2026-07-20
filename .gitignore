@@ -51,3 +51,10 @@ google-services.json
 
 # OpenCode
 .opencode/plans/
+
+# Kiro
+.kiro/specs/
+.kiro/steering/
+.kiro/settings/
+.kiro/settings.json
+.kiro/skills/
