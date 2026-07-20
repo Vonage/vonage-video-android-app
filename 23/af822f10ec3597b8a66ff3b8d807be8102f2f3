@@ -1,0 +1,14 @@
+.gitignore
+  h_25498f8d57a266 54-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "23af822f10ec3597b8a66ff3b8d807be8102f2f3",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
