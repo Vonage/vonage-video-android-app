@@ -1,0 +1,34 @@
+vonage-video-core/src/test/java/com/vonage/android/kotlin/model/ParticipantStateTest.kt
+  s_5f924938836faa::t_e3fa84590f2f82 219-220,222-224,229,232
+vonage-video-core/src/main/java/com/vonage/android/kotlin/Call.kt
+  s_5f924938836faa::t_6666411f94e1d2 775-778
+  s_5f924938836faa::t_636ad08acb0ff8 684,687
+  s_5f924938836faa::t_b16fb9f349a476 762-764,766
+  s_5f924938836faa::t_e5c004c362ad13 175-179
+vonage-video-core/src/test/java/com/vonage/android/kotlin/CallActiveSpeakerTest.kt
+  s_5f924938836faa::t_5ade9e27d6aa91 186,199-203,205-211,213,220-221,225-234,239-253,260-264
+  s_5f924938836faa::t_a6b8f5f492baf7 257
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/ParticipantState.kt
+  s_5f924938836faa::t_242a8a38f7f087 104-112,145,147-151
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "8c82f2af3810e4c4b07865ee64d90f58479cb664",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_5f924938836faa": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_080ead70bffe71WYhrh0Ud0O7B",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
