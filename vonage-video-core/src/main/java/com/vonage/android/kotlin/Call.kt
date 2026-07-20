@@ -172,11 +172,13 @@ class Call internal constructor(
 
     /**
      * StateFlow of the currently active speaker based on audio level analysis.
-     * Debounced to prevent rapid changes when multiple people speak.
+     *
+     * Structural join/leave changes (written by [updateParticipants]) are immediate so that the
+     * new joiner's tile reaches the spotlight in the same recomposition that adds them to the
+     * participants list. Audio-driven speaker switches are debounced inside
+     * [startActiveSpeakerTracker] to prevent rapid spotlight flickering.
      */
     override val activeSpeaker: StateFlow<Participant?> = _activeSpeaker
-        .debounce(ACTIVE_SPEAKER_DEBOUNCE_MILLIS)
-        .distinctUntilChanged()
         .stateIn(
             scope = coroutineScope,
             started = SharingStarted.Eagerly,
@@ -679,9 +681,10 @@ class Call internal constructor(
                     subscriber.subscribeToCaptions = captionsEnabled
                     ParticipantState(vonageSubscriber = subscriber)
                 }
-                launch { participant.setup() }
+                participant.registerListeners()
                 participants[stream.streamId] = participant
                 updateParticipants()
+                launch { participant.setup() }
                 observeSubscriberAudioLevel(participant)
             } catch (e: Exception) {
                 vonageLogger.e(TAG, "Failed to add subscriber ${stream.streamId}", e)
@@ -756,7 +759,11 @@ class Call internal constructor(
      */
     private fun startActiveSpeakerTracker() {
         activeSpeakerTrackerJob?.cancel()
+        // Debounce audio-driven speaker switches here so rapid level changes don't cause
+        // spotlight flickering. Join/leave writes in updateParticipants() bypass this by
+        // writing directly to _activeSpeaker, which is now undebounced on the public flow.
         activeSpeakerTrackerJob = activeSpeakerTracker.activeSpeakerChanges
+            .debounce(ACTIVE_SPEAKER_DEBOUNCE_MILLIS)
             .onEach { payload ->
                 participants[payload.newActiveSpeaker.streamId]?.let { mainSpeaker ->
                     // Screen share always wins regardless of camera state.
@@ -765,6 +772,10 @@ class Call internal constructor(
                         screenSharingParticipant != null -> {
                             _activeSpeaker.update { screenSharingParticipant }
                         }
+                        // Do not promote a participant whose camera is off to active speaker —
+                        // placing a blank tile in the spotlight is worse than keeping the current
+                        // speaker or the latest-joiner fallback.
+                        !mainSpeaker.isCameraEnabled.value -> Unit
                         else -> {
                             _activeSpeaker.update { mainSpeaker }
                         }

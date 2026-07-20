@@ -183,7 +183,7 @@ class CallActiveSpeakerTest : CallTestBase() {
         }
 
     @Test
-    fun `activeSpeaker should not be promoted when camera is off`() =
+    fun `activeSpeaker should not be audio-promoted when camera is off`() =
         runTest(testDispatcher) {
             // extraBufferCapacity = 1 so tryEmit can buffer without suspending (avoids a
             // deadlock between the test-body coroutine and the callDispatcher collector).
@@ -196,42 +196,72 @@ class CallActiveSpeakerTest : CallTestBase() {
                 every { currentActiveSpeaker } returns mockCurrentActiveSpeaker
             }
             val call = createCallWithTracker(mockTracker)
-            val stream = createVonageStream("sub-camera-off", "NoCamera", hasVideo = false)
-            val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
-                every { this@mockk.stream } returns stream
-            }
-            every { mockSession.subscribe(any(), any()) } returns mockSubscriber
 
-            // Start collecting in backgroundScope so capturedSessionListener is set eagerly
-            // and the collection coroutine is auto-cancelled when the test body finishes.
+            // Camera-on speaker added first (lower creationTime).
+            val cameraOnStream = createVonageStream("sub-camera-on", "CameraOn", hasVideo = true, creationTime = 2000L)
+            val cameraOnSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+                every { this@mockk.stream } returns cameraOnStream
+            }
+            // Camera-off participant added second (higher creationTime, becomes latestJoinerFallback).
+            val cameraOffStream = createVonageStream("sub-camera-off", "NoCamera", hasVideo = false, creationTime = 3000L)
+            val cameraOffSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+                every { this@mockk.stream } returns cameraOffStream
+            }
+            every { mockSession.subscribe(any(), eq(cameraOnStream)) } returns cameraOnSubscriber
+            every { mockSession.subscribe(any(), eq(cameraOffStream)) } returns cameraOffSubscriber
+
+            // Start collecting in backgroundScope so capturedSessionListener is set eagerly.
             backgroundScope.launch { call.connect(mockContext).collect { } }
 
-            // Drive the session lifecycle.
             capturedSessionListener!!.onConnected()
             Thread.sleep(200)
             callScheduler.runCurrent()
 
-            // Subscribe a camera-off participant.
-            capturedSessionListener!!.onStreamReceived(stream)
+            // Subscribe both participants.
+            capturedSessionListener!!.onStreamReceived(cameraOnStream)
             Thread.sleep(200)
             callScheduler.runCurrent()
 
-            // Emit an active-speaker change for the camera-off participant; tryEmit is
-            // non-suspending so there is no deadlock with callScheduler processing.
+            capturedSessionListener!!.onStreamReceived(cameraOffStream)
+            Thread.sleep(200)
+            callScheduler.runCurrent()
+
+            // activeSpeaker is now the camera-off joiner via latestJoinerFallback (expected —
+            // the fallback path is allowed regardless of camera state so the spotlight is never blank).
+            assertEquals("sub-camera-off", call.activeSpeaker.value?.id)
+
+            // The camera-on participant is now speaking. Promote them so there is a known
+            // real speaker before we test the camera-off guard.
             assertTrue(
                 mockActiveSpeakerChanges.tryEmit(
                     ActiveSpeakerChangedPayload(
                         previousActiveSpeaker = ActiveSpeakerInfo(null, 0f),
-                        newActiveSpeaker      = ActiveSpeakerInfo("sub-camera-off", 0.8f),
+                        newActiveSpeaker      = ActiveSpeakerInfo("sub-camera-on", 0.8f),
                     ),
                 ),
             )
+            callScheduler.advanceTimeBy(activeSpeakerDebounceMillis)
+            callScheduler.runCurrent()
+            assertEquals("sub-camera-on", call.activeSpeaker.value?.id)
+
+            // Now the camera-off participant emits an audio-level event that would normally
+            // cause a speaker switch. The guard must block this promotion.
+            assertTrue(
+                mockActiveSpeakerChanges.tryEmit(
+                    ActiveSpeakerChangedPayload(
+                        previousActiveSpeaker = ActiveSpeakerInfo("sub-camera-on", 0.8f),
+                        newActiveSpeaker      = ActiveSpeakerInfo("sub-camera-off", 0.9f),
+                    ),
+                ),
+            )
+            callScheduler.advanceTimeBy(activeSpeakerDebounceMillis)
             callScheduler.runCurrent()
 
-            // Camera-off participant must NOT be promoted; activeSpeaker stays null.
-            assertNull(
-                "Camera-off participant must not be promoted to active speaker",
-                call.activeSpeaker.value,
+            // Camera-off participant must NOT be promoted; active speaker stays the camera-on participant.
+            assertEquals(
+                "Camera-off participant must not be audio-promoted to active speaker",
+                "sub-camera-on",
+                call.activeSpeaker.value?.id,
             )
         }
 
