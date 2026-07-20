@@ -1,0 +1,34 @@
+.gitignore
+  a707342ccc6c1a7c 48-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "6c6d3a9e71aaeffc1610d9aea0ec21ebd5ead80b",
+  "prompts": {
+    "a707342ccc6c1a7c": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "59039f85-3fe6-4895-8836-f86112c51233",
+        "model": "auto"
+      },
+      "human_author": "aos-svg <artur.osinski@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vonage-git-ai override: 100% AI]",
+          "timestamp": "2026-07-15T12:43:07.000Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vonage-git-ai override (kiro/auto).",
+          "timestamp": "2026-07-15T12:43:07.000Z"
+        }
+      ],
+      "total_additions": 8,
+      "total_deletions": 0,
+      "accepted_lines": 8,
+      "overriden_lines": 0
+    }
+  }
+}
