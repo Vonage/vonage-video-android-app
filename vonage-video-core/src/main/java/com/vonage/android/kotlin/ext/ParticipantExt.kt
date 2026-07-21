@@ -16,6 +16,7 @@ internal fun List<Participant>.sorted(
 ): ImmutableList<Participant> =
     sortedWith(
         compareByDescending<Participant> { it.isScreenShare }
+            .thenByDescending { it.isPublisher }
             .thenByDescending { it.id in pinnedIds }
             .thenByDescending { it.creationTime }
     ).toImmutableList()

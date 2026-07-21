@@ -298,8 +298,8 @@ class MeetingRoomViewModelTest {
             sut.changeLayout(CallLayoutType.SPEAKER_LAYOUT)
             assertEquals(CallLayoutType.SPEAKER_LAYOUT, awaitItem().layoutType)
 
-            sut.changeLayout(CallLayoutType.GRID)
-            assertEquals(CallLayoutType.GRID, awaitItem().layoutType)
+            sut.changeLayout(CallLayoutType.ADAPTIVE_GRID)
+            assertEquals(CallLayoutType.ADAPTIVE_GRID, awaitItem().layoutType)
         }
     }
 
