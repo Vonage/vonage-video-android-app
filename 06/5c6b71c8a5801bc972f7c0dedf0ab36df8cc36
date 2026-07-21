@@ -1,0 +1,14 @@
+.github/workflows/release-notification.yml
+  h_25498f8d57a266 12,16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "065c6b71c8a5801bc972f7c0dedf0ab36df8cc36",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
