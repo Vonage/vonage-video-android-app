@@ -216,14 +216,93 @@ class CallSortingLogicTest {
         assertEquals("camera3", sorted[2].id) // Unpinned
     }
 
+    @Test
+    fun `should sort publisher before remotes even when publisher has oldest creation time`() = runTest {
+        val publisher = createMockParticipant(
+            id = "publisher",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 1000L,
+            isPublisher = true,
+        )
+        val remote1 = createMockParticipant(
+            id = "remote1",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 3000L,
+        )
+        val remote2 = createMockParticipant(
+            id = "remote2",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 2000L,
+        )
+
+        val sorted = listOf(remote1, remote2, publisher).sorted()
+
+        assertEquals("publisher", sorted[0].id) // Publisher always first
+        assertEquals("remote1", sorted[1].id)   // Newest remote
+        assertEquals("remote2", sorted[2].id)
+    }
+
+    @Test
+    fun `should sort publisher before pinned remote`() = runTest {
+        val publisher = createMockParticipant(
+            id = "publisher",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 1000L,
+            isPublisher = true,
+        )
+        val pinnedRemote = createMockParticipant(
+            id = "pinned",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 3000L,
+        )
+        val unpinnedRemote = createMockParticipant(
+            id = "unpinned",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 2000L,
+        )
+
+        val sorted = listOf(pinnedRemote, unpinnedRemote, publisher).sorted(pinnedIds = setOf("pinned"))
+
+        assertEquals("publisher", sorted[0].id)  // Publisher before pinned
+        assertEquals("pinned", sorted[1].id)     // Pinned before unpinned
+        assertEquals("unpinned", sorted[2].id)
+    }
+
+    @Test
+    fun `should sort screen share before publisher`() = runTest {
+        val publisher = createMockParticipant(
+            id = "publisher",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 1000L,
+            isPublisher = true,
+        )
+        val screenShare = createMockParticipant(
+            id = "screen1",
+            videoSource = VideoSource.SCREEN,
+            creationTime = 500L,
+        )
+        val remote = createMockParticipant(
+            id = "remote1",
+            videoSource = VideoSource.CAMERA,
+            creationTime = 2000L,
+        )
+
+        val sorted = listOf(remote, publisher, screenShare).sorted()
+
+        assertEquals("screen1", sorted[0].id)   // Screen share first
+        assertEquals("publisher", sorted[1].id) // Publisher second
+        assertEquals("remote1", sorted[2].id)   // Remote last
+    }
+
     private fun createMockParticipant(
         id: String,
         videoSource: VideoSource,
-        creationTime: Long
+        creationTime: Long,
+        isPublisher: Boolean = false,
     ): Participant {
         return object : Participant {
             override val id: String = id
-            override val isPublisher: Boolean = false
+            override val isPublisher: Boolean = isPublisher
             override val connectionId: String = "conn-$id"
             override val creationTime: Long = creationTime
             override val isScreenShare: Boolean = videoSource == VideoSource.SCREEN

@@ -20,6 +20,7 @@ enum class BottomBarActionType {
     RECORD_SESSION,
     SCREEN_SHARING,
     CAPTIONS,
-    /** Sentinel type used for buttons injected externally (custom host actions and the reporting action). */
+    /** Sentinel type used for buttons injected externally
+     * (custom host actions and the reporting action). */
     CUSTOM,
 }

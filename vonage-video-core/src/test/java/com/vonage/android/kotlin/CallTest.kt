@@ -1,150 +1,41 @@
 package com.vonage.android.kotlin
 
-import android.content.Context
 import app.cash.turbine.test
-import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.DegradationPreference
-import com.vonage.android.kotlin.model.PublisherState
+import com.vonage.android.kotlin.model.ParticipantState
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VideoEffect
-import com.vonage.android.kotlin.sdk.VonageArchiveListener
 import com.vonage.android.kotlin.sdk.VonageCaptionsListener
 import com.vonage.android.kotlin.sdk.VonageConnection
 import com.vonage.android.kotlin.sdk.VonageError
-import com.vonage.android.kotlin.sdk.VonagePublisher
-import com.vonage.android.kotlin.sdk.VonageSession
-import com.vonage.android.kotlin.sdk.VonageSessionListener
-import com.vonage.android.kotlin.sdk.VonageSignalListener
-import com.vonage.android.kotlin.sdk.VonageStream
 import com.vonage.android.kotlin.sdk.VonageSubscriber
-import com.vonage.android.kotlin.sdk.VonageVideoType
-import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
-import com.vonage.android.kotlin.internal.ActiveSpeakerChangedPayload
-import com.vonage.android.kotlin.internal.ActiveSpeakerInfo
-import com.vonage.android.kotlin.model.ParticipantState
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.kotlin.signal.RawSignal
 import com.vonage.android.kotlin.signal.SignalPlugin
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineScheduler
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 
 /**
- * Unit tests for [Call].
+ * Unit tests for [Call] — session lifecycle, signals, publisher, captions, subscribers,
+ * pinning, archiving, and degradation preference.
  *
- * Uses a two-dispatcher strategy:
- * - [StandardTestDispatcher] for Call's internal CoroutineScope (prevents infinite loops
- *   from sample()/debounce() operators when advancing virtual time).
- * - [UnconfinedTestDispatcher] for tests & Dispatchers.Main (ensures callbackFlow body
- *   runs eagerly so listeners are captured before test assertions).
- *
- * [runCurrent] is used instead of advanceUntilIdle to avoid processing perpetual delay ticks
- * from ActiveSpeakerTracker's sample() and activeSpeaker's debounce().
+ * Active-speaker tests live in [CallActiveSpeakerTest].
+ * Shared test infrastructure is in [CallTestBase].
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class CallTest {
-
-    private val testScheduler = TestCoroutineScheduler()
-    // Separate scheduler for Call's internal CoroutineScope so that runTest cleanup
-    // does not attempt to process the perpetual sample()/debounce() delay loops.
-    private val callScheduler = TestCoroutineScheduler()
-    private val callDispatcher = StandardTestDispatcher(callScheduler)
-    private val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-
-    private lateinit var mockSession: VonageSession
-    private lateinit var mockPublisherFactory: PublisherFactory
-    private lateinit var mockContext: Context
-    private lateinit var mockVonagePublisher: VonagePublisher
-    private lateinit var mockPublisherState: PublisherState
-
-    private var capturedSessionListener: VonageSessionListener? = null
-    private var capturedSignalListener: VonageSignalListener? = null
-    private var capturedArchiveListener: VonageArchiveListener? = null
-
-    @Before
-    fun setup() {
-        Dispatchers.setMain(testDispatcher)
-
-        capturedSessionListener = null
-        capturedSignalListener = null
-        capturedArchiveListener = null
-
-        mockContext = mockk(relaxed = true)
-        mockVonagePublisher = mockk(relaxed = true)
-        mockPublisherState = mockk(relaxed = true) {
-            every { id } returns Call.PUBLISHER_ID
-            every { vonagePublisher } returns mockVonagePublisher
-            every { connectionId } returns "conn-local"
-            every { isPublisher } returns true
-        }
-        mockPublisherFactory = mockk(relaxed = true) {
-            every { createPublisherState(any()) } returns mockPublisherState
-        }
-        mockSession = mockk(relaxed = true) {
-            every { setSessionListener(any()) } answers { capturedSessionListener = firstArg() }
-            every { setSignalListener(any()) } answers { capturedSignalListener = firstArg() }
-            every { setArchiveListener(any()) } answers { capturedArchiveListener = firstArg() }
-            every { connect(any()) } just Runs
-            every { publish(any()) } just Runs
-            every { unpublish(any()) } just Runs
-            every { disconnect() } just Runs
-            every { pause() } just Runs
-            every { resume() } just Runs
-            every { sendSignal(any(), any()) } just Runs
-        }
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
-    private fun createCall(
-        token: String = "test-token",
-        signalPlugins: List<SignalPlugin> = emptyList(),
-    ): Call = Call(
-        token = token,
-        session = mockSession,
-        publisherFactory = mockPublisherFactory,
-        signalPlugins = signalPlugins,
-        coroutineDispatcher = callDispatcher,
-    )
-
-    /**
-     * Triggers [VonageSessionListener.onConnected] and waits for [Call.publishToSession]
-     * (which internally uses [Dispatchers.Default]) to complete, then processes any remaining
-     * queued work on [callDispatcher].
-     */
-    @Suppress("MagicNumber")
-    private fun triggerConnectedAndWaitForPublisher() {
-        capturedSessionListener!!.onConnected()
-        Thread.sleep(200)
-        callScheduler.runCurrent()
-    }
-
-    private fun runCurrent() = callScheduler.runCurrent()
+class CallTest : CallTestBase() {
 
     // region Session lifecycle
 
@@ -696,16 +587,6 @@ class CallTest {
 
     // endregion
 
-    // region Active speaker
-
-    @Test
-    fun `activeSpeaker should be null initially`() = runTest(testDispatcher) {
-        val call = createCall()
-        assertNull(call.activeSpeaker.value)
-    }
-
-    // endregion
-
     // region Initial state
 
     @Test
@@ -824,61 +705,6 @@ class CallTest {
 
     // endregion
 
-    // region Active speaker promotion gate (Bug D)
-
-    @Test
-    fun `activeSpeaker should not be promoted when camera is off`() =
-        runTest(testDispatcher) {
-            // extraBufferCapacity = 1 so tryEmit can buffer without suspending (avoids a
-            // deadlock between the test-body coroutine and the callDispatcher collector).
-            val mockActiveSpeakerChanges = MutableSharedFlow<ActiveSpeakerChangedPayload>(
-                extraBufferCapacity = 1,
-            )
-            val mockTracker = mockk<ActiveSpeakerTracker>(relaxed = true) {
-                every { activeSpeakerChanges } returns mockActiveSpeakerChanges
-            }
-            val call = createCallWithTracker(mockTracker)
-            val stream = createVonageStream("sub-camera-off", "NoCamera", hasVideo = false)
-            val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
-                every { this@mockk.stream } returns stream
-            }
-            every { mockSession.subscribe(any(), any()) } returns mockSubscriber
-
-            // Start collecting in backgroundScope so capturedSessionListener is set eagerly
-            // and the collection coroutine is auto-cancelled when the test body finishes.
-            backgroundScope.launch { call.connect(mockContext).collect { } }
-
-            // Drive the session lifecycle.
-            capturedSessionListener!!.onConnected()
-            Thread.sleep(200)
-            callScheduler.runCurrent()
-
-            // Subscribe a camera-off participant.
-            capturedSessionListener!!.onStreamReceived(stream)
-            Thread.sleep(200)
-            callScheduler.runCurrent()
-
-            // Emit an active-speaker change for the camera-off participant; tryEmit is
-            // non-suspending so there is no deadlock with callScheduler processing.
-            assertTrue(
-                mockActiveSpeakerChanges.tryEmit(
-                    ActiveSpeakerChangedPayload(
-                        previousActiveSpeaker = ActiveSpeakerInfo(null, 0f),
-                        newActiveSpeaker      = ActiveSpeakerInfo("sub-camera-off", 0.8f),
-                    ),
-                ),
-            )
-            callScheduler.runCurrent()
-
-            // Camera-off participant must NOT be promoted; activeSpeaker stays null.
-            assertNull(
-                "Camera-off participant must not be promoted to active speaker",
-                call.activeSpeaker.value,
-            )
-        }
-
-    // endregion
-
     // region Degradation Preference
 
     @Test
@@ -928,35 +754,6 @@ class CallTest {
 
         verify(exactly = 0) { mockPublisherState.applyDegradationPreference(any()) }
     }
-
-    // endregion
-
-    // region Helpers
-
-    private fun createVonageStream(
-        streamId: String,
-        name: String,
-        videoType: VonageVideoType = VonageVideoType.CAMERA,
-        hasVideo: Boolean = true,
-        hasAudio: Boolean = true,
-    ): VonageStream = VonageStream(
-        streamId = streamId,
-        name = name,
-        connection = VonageConnection(connectionId = "conn-$streamId"),
-        creationTime = System.currentTimeMillis(),
-        videoType = videoType,
-        hasVideo = hasVideo,
-        hasAudio = hasAudio,
-    )
-
-    private fun createCallWithTracker(tracker: ActiveSpeakerTracker): Call = Call(
-        token = "test-token",
-        session = mockSession,
-        publisherFactory = mockPublisherFactory,
-        signalPlugins = emptyList(),
-        coroutineDispatcher = callDispatcher,
-        activeSpeakerTrackerOverride = tracker,
-    )
 
     // endregion
 }

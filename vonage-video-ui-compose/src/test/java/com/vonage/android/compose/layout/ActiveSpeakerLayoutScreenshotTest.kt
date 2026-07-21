@@ -74,4 +74,17 @@ class ActiveSpeakerLayoutScreenshotTest {
         composeTestRule.setContent { ActiveSpeakerLayoutFilledSpotlightPreview() }
         composeTestRule.onRoot().captureRoboImage(roborazziOptions = options)
     }
+
+    @Test
+    fun activeSpeakerLayout_singleParticipant_light() {
+        composeTestRule.setContent { ActiveSpeakerLayoutSingleParticipantPreview() }
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = options)
+    }
+
+    @Test
+    @Config(qualifiers = "+night")
+    fun activeSpeakerLayout_singleParticipant_dark() {
+        composeTestRule.setContent { ActiveSpeakerLayoutSingleParticipantPreview() }
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = options)
+    }
 }

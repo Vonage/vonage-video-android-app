@@ -123,6 +123,7 @@ private fun ActiveSpeakerVerticalLayout(
     overflowFilmstripNames: ImmutableList<String>,
     otherParticipantsSize: Dp,
 ) {
+    val hasFilmstripContent = visibleFilmstripItems.isNotEmpty() || overflowFilmstripNames.isNotEmpty()
     Column(
         verticalArrangement = Arrangement.Bottom,
     ) {
@@ -130,38 +131,40 @@ private fun ActiveSpeakerVerticalLayout(
             participantContent(
                 it,
                 Modifier
-                    .weight(spotlightWeight)
+                    .weight(if (hasFilmstripContent) spotlightWeight else 1f)
                     .fillMaxSize()
                     .padding(VonageVideoTheme.dimens.paddingSmall),
             )
-        } ?: Spacer(modifier = Modifier.weight(spotlightWeight))
-        LazyRow(
-            state = listState,
-            modifier = Modifier.weight(otherParticipantsWeight),
-            horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
-            verticalAlignment = Alignment.CenterVertically,
-            userScrollEnabled = false,
-            overscrollEffect = null,
-        ) {
-            items(
-                items = visibleFilmstripItems,
-                key = { it.id },
-            ) { participant ->
-                participantContent(
-                    participant,
-                    Modifier
-                        .width(otherParticipantsSize)
-                        .height(otherParticipantsSize),
-                )
-            }
-            if (overflowFilmstripNames.isNotEmpty()) {
-                item(key = "placeholder") {
-                    ParticipantsPlaceholders(
-                        modifier = Modifier
+        } ?: Spacer(modifier = Modifier.weight(if (hasFilmstripContent) spotlightWeight else 1f))
+        if (hasFilmstripContent) {
+            LazyRow(
+                state = listState,
+                modifier = Modifier.weight(otherParticipantsWeight),
+                horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
+                verticalAlignment = Alignment.CenterVertically,
+                userScrollEnabled = false,
+                overscrollEffect = null,
+            ) {
+                items(
+                    items = visibleFilmstripItems,
+                    key = { it.id },
+                ) { participant ->
+                    participantContent(
+                        participant,
+                        Modifier
                             .width(otherParticipantsSize)
                             .height(otherParticipantsSize),
-                        participantNames = overflowFilmstripNames,
                     )
+                }
+                if (overflowFilmstripNames.isNotEmpty()) {
+                    item(key = "placeholder") {
+                        ParticipantsPlaceholders(
+                            modifier = Modifier
+                                .width(otherParticipantsSize)
+                                .height(otherParticipantsSize),
+                            participantNames = overflowFilmstripNames,
+                        )
+                    }
                 }
             }
         }
@@ -180,6 +183,7 @@ private fun ActiveSpeakerHorizontalLayout(
     overflowFilmstripNames: ImmutableList<String>,
     otherParticipantsSize: Dp,
 ) {
+    val hasFilmstripContent = visibleFilmstripItems.isNotEmpty() || overflowFilmstripNames.isNotEmpty()
     Row(
         horizontalArrangement = Arrangement.End,
     ) {
@@ -187,38 +191,40 @@ private fun ActiveSpeakerHorizontalLayout(
             participantContent(
                 it,
                 Modifier
-                    .weight(spotlightWeight)
+                    .weight(if (hasFilmstripContent) spotlightWeight else 1f)
                     .fillMaxSize()
                     .padding(VonageVideoTheme.dimens.paddingSmall),
             )
-        } ?: Spacer(modifier = Modifier.weight(spotlightWeight))
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.weight(otherParticipantsWeight),
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
-            userScrollEnabled = false,
-            overscrollEffect = null,
-        ) {
-            items(
-                items = visibleFilmstripItems,
-                key = { it.id },
-            ) { participant ->
-                participantContent(
-                    participant,
-                    Modifier
-                        .height(otherParticipantsSize)
-                        .aspectRatio(ASPECT_RATIO_16_9),
-                )
-            }
-            if (overflowFilmstripNames.isNotEmpty()) {
-                item(key = "placeholder") {
-                    ParticipantsPlaceholders(
-                        modifier = Modifier
+        } ?: Spacer(modifier = Modifier.weight(if (hasFilmstripContent) spotlightWeight else 1f))
+        if (hasFilmstripContent) {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.weight(otherParticipantsWeight),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
+                userScrollEnabled = false,
+                overscrollEffect = null,
+            ) {
+                items(
+                    items = visibleFilmstripItems,
+                    key = { it.id },
+                ) { participant ->
+                    participantContent(
+                        participant,
+                        Modifier
                             .height(otherParticipantsSize)
                             .aspectRatio(ASPECT_RATIO_16_9),
-                        participantNames = overflowFilmstripNames,
                     )
+                }
+                if (overflowFilmstripNames.isNotEmpty()) {
+                    item(key = "placeholder") {
+                        ParticipantsPlaceholders(
+                            modifier = Modifier
+                                .height(otherParticipantsSize)
+                                .aspectRatio(ASPECT_RATIO_16_9),
+                            participantNames = overflowFilmstripNames,
+                        )
+                    }
                 }
             }
         }
@@ -232,6 +238,26 @@ internal fun ActiveSpeakerLayoutNoSpeakerPreview() {
         ActiveSpeakerLayout(
             participants = buildParticipants(3).toImmutableList(),
             call = buildCallWithParticipants(3),
+            participantContent = { participant, modifier ->
+                Box(
+                    modifier = modifier.background(VonageVideoTheme.colors.surface),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AvatarInitials(userName = participant.name)
+                }
+            },
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun ActiveSpeakerLayoutSingleParticipantPreview() {
+    val participants = buildParticipants(1).toImmutableList()
+    VonageVideoTheme {
+        ActiveSpeakerLayout(
+            participants = participants,
+            call = buildCallWithParticipants(1, activeSpeaker = participants.first()),
             participantContent = { participant, modifier ->
                 Box(
                     modifier = modifier.background(VonageVideoTheme.colors.surface),

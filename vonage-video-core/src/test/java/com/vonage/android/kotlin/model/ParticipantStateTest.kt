@@ -216,24 +216,20 @@ class ParticipantStateTest {
     }
 
     /**
-     * Builds a [ParticipantState] and launches [ParticipantState.setup] in the given [scope]
-     * so that the [VonageSubscriberVideoListener] is registered before this function returns.
+     * Builds a [ParticipantState] and calls [ParticipantState.registerListeners] so that the
+     * [VonageSubscriberVideoListener] is registered before this function returns.
      *
-     * With [UnconfinedTestDispatcher], the launched coroutine runs eagerly on the calling
-     * thread until its first suspension point (inside the audio-level `coroutineScope` block).
-     * By that point all synchronous listener-registration calls in [ParticipantState.setup]
-     * have already executed and [capturedVideoListener] is populated.
-     *
-     * The launched job is a child of [scope] and will be automatically cancelled when the
-     * test completes.
+     * [registerListeners] is synchronous and completes immediately, so no dispatcher tricks are
+     * needed. The long-running [ParticipantState.setup] coroutine is launched separately in
+     * [scope] to cover audio-level observations; it is auto-cancelled when the test completes.
      */
     private fun buildStateWithSetup(scope: CoroutineScope, hasVideo: Boolean): ParticipantState {
         val subscriber = buildMockSubscriber(hasVideo = hasVideo)
         val state = ParticipantState(vonageSubscriber = subscriber)
+        state.registerListeners()
         scope.launch { state.setup() }
         checkNotNull(capturedVideoListener) {
-            "setup() did not call setVideoListener — listener was not captured. " +
-                    "Ensure the test runs with UnconfinedTestDispatcher."
+            "registerListeners() did not call setVideoListener — listener was not captured."
         }
         return state
     }
