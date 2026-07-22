@@ -58,3 +58,6 @@ google-services.json
 .kiro/settings/
 .kiro/settings.json
 .kiro/skills/
+
+# OpenCode plans
+.opencode/plans/

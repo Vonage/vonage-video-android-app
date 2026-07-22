@@ -2,6 +2,7 @@ package com.vonage.android.compose.components
 
 import android.content.Context
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
@@ -21,8 +22,7 @@ fun ParticipantVideoRenderer(
     participant: Participant,
     modifier: Modifier = Modifier,
 ) {
-    // Use ForcedSizeFrameLayout instead of regular FrameLayout to force proper measurement
-    val factory = remember { { context: Context -> ForcedSizeFrameLayout(context) } }
+    val factory = remember { { context: Context -> FrameLayout(context) } }
 
     key(participant.id) {
         AndroidView(
