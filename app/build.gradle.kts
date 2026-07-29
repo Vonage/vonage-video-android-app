@@ -3,7 +3,6 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.dagger.hilt)
@@ -100,10 +99,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-        freeCompilerArgs += "-opt-in=com.vonage.android.meetingroom.api.ExperimentalMeetingRoomApi"
-    }
     buildFeatures {
         compose = true
         buildConfig = true
@@ -184,7 +179,7 @@ android {
     }
 
     sourceSets.configureEach {
-        kotlin.srcDir(layout.buildDirectory.dir("generated/source/jsonConfig"))
+        kotlin.srcDir(layout.buildDirectory.dir("generated/source/jsonConfig").get())
     }
 }
 
@@ -287,6 +282,12 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 tasks.matching { it.name.startsWith("ksp") }.configureEach {
     dependsOn("generateVonageConfig")
+}
+
+kotlin {
+    compilerOptions {
+        optIn.add("com.vonage.android.meetingroom.api.ExperimentalMeetingRoomApi")
+    }
 }
 
 jsonConfig {
