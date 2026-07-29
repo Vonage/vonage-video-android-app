@@ -1,0 +1,33 @@
+gradle/libs.versions.toml
+  s_746c2f4ef6276b::t_b5f999f6f4dea1 116
+vonage-android-logger/build.gradle.kts
+  s_746c2f4ef6276b::t_773bbdbe0174f6 54-55
+  s_746c2f4ef6276b::t_98159c7708c0c0 26-30,39-41,43-52
+  s_746c2f4ef6276b::t_9b46e7831dc49d 31-36,38,42
+  s_746c2f4ef6276b::t_d4c1869292c8a9 37
+  s_746c2f4ef6276b::t_08cb61b23acc06 53,56
+vonage-audio-selector/build.gradle.kts
+  s_746c2f4ef6276b::t_7bbb7724835587 57-62,64,68
+  s_746c2f4ef6276b::t_657a8da5fadde7 63
+  s_746c2f4ef6276b::t_4dea8dfd6591ee 79
+  s_746c2f4ef6276b::t_e2f7d7a78c40b9 80-81
+  s_746c2f4ef6276b::t_2afb7e81dd2335 52-56,65-67,69-78
+.github/workflows/android.yml
+  s_746c2f4ef6276b::t_ca97ee0d24db66 39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "f74347d997f6d53d3a85122dd944f6a492e5cb5b",
+  "prompts": {},
+  "sessions": {
+    "s_746c2f4ef6276b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_051e09ca8ffeZ5AjRVYlpP54VR",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
