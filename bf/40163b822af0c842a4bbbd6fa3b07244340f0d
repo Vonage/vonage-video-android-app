@@ -1,0 +1,19 @@
+vonage-feature-captions/src/enabled/java/com/vonage/android/captions/EnabledVonageCaptions.kt
+  s_746c2f4ef6276b::t_980724d46d5ba6 20-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "bf40163b822af0c842a4bbbd6fa3b07244340f0d",
+  "prompts": {},
+  "sessions": {
+    "s_746c2f4ef6276b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_051e09ca8ffeZ5AjRVYlpP54VR",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
