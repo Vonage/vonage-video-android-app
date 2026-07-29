@@ -1,0 +1,21 @@
+vonage-video-shared/build.gradle.kts
+  s_746c2f4ef6276b::t_1182869b79c5df 17-19
+  s_746c2f4ef6276b::t_d7d6bb531db809 29
+  s_746c2f4ef6276b::t_d4074dc6cbf7db 30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "c747f3307a2add038b041f8fddbb022eeeadd50e",
+  "prompts": {},
+  "sessions": {
+    "s_746c2f4ef6276b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_051e09ca8ffeZ5AjRVYlpP54VR",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
