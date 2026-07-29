@@ -36,7 +36,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: API check
-        run: ./gradlew apiCheck
+        run: ./gradlew vonage-android-logger:androidApiCheck vonage-audio-selector:androidApiCheck
 
   build-and-test:
     name: Build and Unit Tests
