@@ -1,0 +1,47 @@
+gradle/wrapper/gradle-wrapper.properties
+  s_746c2f4ef6276b::t_7652ebc4c98fdb 4
+app/build.gradle.kts
+  s_746c2f4ef6276b::t_75a51aa068d6c3 287-292
+  s_746c2f4ef6276b::t_b1c89c0d07411f 182
+vonage-meeting-room/build.gradle.kts
+  s_746c2f4ef6276b::t_da48b354bb7ed6 88
+  s_746c2f4ef6276b::t_09db84f20d8897 49-54
+gradle.properties
+  s_746c2f4ef6276b::t_fa71c97b2f0986 27
+vonage-meeting-room-sample-app/build.gradle.kts
+  s_746c2f4ef6276b::t_f0a0db35374066 39-41
+  s_746c2f4ef6276b::t_44016b5fc17b4b 37-38
+gradle/libs.versions.toml
+  s_746c2f4ef6276b::t_d2d53deaad7c3e 21
+  s_746c2f4ef6276b::t_474b1149ada8bd 42
+  s_746c2f4ef6276b::t_39ee1d80e93007 117
+  s_746c2f4ef6276b::t_30d0140f428f82 121
+  s_746c2f4ef6276b::t_f428698e3e34f3 122
+  s_746c2f4ef6276b::t_62451ac1f774f0 120
+  s_746c2f4ef6276b::t_9cd551e5b497fd 48-50
+  s_746c2f4ef6276b::t_9a08442f68d1ad 16
+  s_746c2f4ef6276b::t_bca2c6837b8ac7 4
+  s_746c2f4ef6276b::t_f343a82b02347c 115
+  s_746c2f4ef6276b::t_ee57cea6eae1e7 119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "c67801eae7fb1ae13fd49aac3e7db770c706afb8",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_746c2f4ef6276b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_051e09ca8ffeZ5AjRVYlpP54VR",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
