@@ -1,0 +1,27 @@
+gradle/libs.versions.toml
+  s_746c2f4ef6276b::t_535d8f2a21ec8c 9
+  s_746c2f4ef6276b::t_2d8512e986cea0 17,25-26,38-39,61-63,90-91,106,112,115-117,119-120,122-123
+  s_746c2f4ef6276b::t_d4a3a684ccf043 7
+  s_746c2f4ef6276b::t_95c9c2abc06080 30
+  s_746c2f4ef6276b::t_7cc8678150be74 54
+  s_746c2f4ef6276b::t_c5a9f4a6ae57d7 47-49,51
+  s_746c2f4ef6276b::t_9071ed94a17616 8
+  s_746c2f4ef6276b::t_0593729e0201c6 10
+  s_746c2f4ef6276b::t_bf745e7b16c8cc 53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "fd08829690f541dc24419a5bcdd2db2a9799ca3c",
+  "prompts": {},
+  "sessions": {
+    "s_746c2f4ef6276b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_051e09ca8ffeZ5AjRVYlpP54VR",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
