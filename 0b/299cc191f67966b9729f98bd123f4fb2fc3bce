@@ -1,0 +1,19 @@
+gradle/libs.versions.toml
+  s_746c2f4ef6276b::t_d43f544d8952d3 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "0b299cc191f67966b9729f98bd123f4fb2fc3bce",
+  "prompts": {},
+  "sessions": {
+    "s_746c2f4ef6276b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_051e09ca8ffeZ5AjRVYlpP54VR",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
