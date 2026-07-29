@@ -1,0 +1,23 @@
+vonage-meeting-room/build.gradle.kts
+  s_746c2f4ef6276b::t_74dccb23d8c676 86
+vonage-feature-settings/build.gradle.kts
+  s_746c2f4ef6276b::t_10bcc259412e96 46
+vonage-video-ui-compose/build.gradle.kts
+  s_746c2f4ef6276b::t_10bcc259412e96 57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "63a2813af01500a51976771381d680329c05a1b1",
+  "prompts": {},
+  "sessions": {
+    "s_746c2f4ef6276b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_051e09ca8ffeZ5AjRVYlpP54VR",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
