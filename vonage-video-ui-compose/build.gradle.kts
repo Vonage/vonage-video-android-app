@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.stability.analyzer)
     alias(libs.plugins.roborazzi)
@@ -20,9 +19,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -58,7 +54,7 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.adaptive)
+    implementation(libs.androidx.adaptive)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

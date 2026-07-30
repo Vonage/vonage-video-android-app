@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -15,8 +14,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+    testOptions {
+        unitTests.all { it.useJUnitPlatform() }
     }
 }
 
@@ -27,4 +26,6 @@ dependencies {
     testImplementation(libs.junit.junit)
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.params)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${libs.versions.junit.get()}")
 }
