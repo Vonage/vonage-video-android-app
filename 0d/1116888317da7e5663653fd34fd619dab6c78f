@@ -1,0 +1,14 @@
+app/src/main/java/com/vonage/android/core/BaseViewModel.kt
+  h_25498f8d57a266 5-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.12",
+  "base_commit_sha": "0d1116888317da7e5663653fd34fd619dab6c78f",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
