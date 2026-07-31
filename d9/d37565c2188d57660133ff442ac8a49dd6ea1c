@@ -1,0 +1,28 @@
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/PreviewPublisherState.kt
+  s_03251f42111600::t_7dde238d47e57e 67
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/PublisherState.kt
+  s_03251f42111600::t_ce6cf273527d7d 126
+vonage-video-core/src/test/java/com/vonage/android/kotlin/model/PublisherStateTest.kt
+  s_03251f42111600::t_2b468d6ba8ccc2 127-131,133-147,149-178
+  s_03251f42111600::t_f50055929fc1a4 132,148
+  s_03251f42111600::t_946c51be8bd159 3,7
+vonage-video-core/src/test/java/com/vonage/android/kotlin/model/PreviewPublisherStateTest.kt
+  s_03251f42111600::t_67cadb98645035 51,62
+  s_03251f42111600::t_eb2d2e4b79d62c 1-50,52-61,63-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "d9d37565c2188d57660133ff442ac8a49dd6ea1c",
+  "prompts": {},
+  "sessions": {
+    "s_03251f42111600": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_0482303e1ffeKC0arx3h28lQB6",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
