@@ -7,15 +7,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-
-class CoroutinePollerProvider<T> @Inject constructor() {
-    fun get(
-        dispatcher: CoroutineDispatcher,
-        fetchData: suspend () -> T,
-    ): CoroutinePoller<T> =
-        CoroutinePoller(dispatcher, fetchData)
-}
 
 class CoroutinePoller<T>(
     private val dispatcher: CoroutineDispatcher,

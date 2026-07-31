@@ -595,12 +595,6 @@ class CallTest : CallTestBase() {
         assertTrue(call.participantsStateFlow.value.isEmpty())
     }
 
-    @Test
-    fun `initial signalStateFlow should be null`() = runTest(testDispatcher) {
-        val call = createCall()
-        assertNull(call.signalStateFlow.value)
-    }
-
     // endregion
 
     // region Visibility

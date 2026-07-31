@@ -19,8 +19,6 @@ import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.ParticipantState
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
-import com.vonage.android.kotlin.model.SignalFlows
-import com.vonage.android.kotlin.model.SignalState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VideoBitrateConfig
@@ -103,7 +101,6 @@ class Call internal constructor(
     private val coroutineScope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
     private var participantsOnScreenJob: Job? = null
     private var activeSpeakerTrackerJob: Job? = null
-    private var signalsJob: Job? = null
 
     /** Tracks active speaker based on audio levels across all participants */
     private val activeSpeakerTracker = activeSpeakerTrackerOverride
@@ -188,9 +185,6 @@ class Call internal constructor(
     private val _participantsCount = MutableStateFlow(0)
     override val participantsCount: StateFlow<Int> = _participantsCount
 
-    private val _signalStateFlow = MutableStateFlow<SignalState?>(null)
-    override val signalStateFlow: StateFlow<SignalState?> = _signalStateFlow
-
     private val _captionsStateFlow =
         MutableStateFlow<ImmutableList<CaptionLine>>(persistentListOf())
     override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = _captionsStateFlow
@@ -215,22 +209,23 @@ class Call internal constructor(
     private val _archivingStateFlow = MutableStateFlow<ArchivingState>(ArchivingState.Idle)
     override val archivingStateFlow: StateFlow<ArchivingState> = _archivingStateFlow
 
-    private val signalState: SignalFlows = mutableMapOf()
-    override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> =
-        signalPlugins
-            .filter { it.canHandle(signalType.signal) }
-            .map { it.output }
-            .firstOrNull() ?: MutableStateFlow(null)
-
     override val chatSignalState: StateFlow<ChatState?> =
-        signalState(SignalType.CHAT)
-            .map { it as? ChatState }
-            .stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)
+        signalPlugins
+            .filter { it.canHandle(SignalType.CHAT.signal) }
+            .map { it.output }
+            .firstOrNull()
+            ?.map { it as? ChatState }
+            ?.stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)
+            ?: MutableStateFlow(null)
 
     override val emojiSignalState: StateFlow<EmojiState?> =
-        signalState(SignalType.REACTION)
-            .map { it as? EmojiState }
-            .stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)
+        signalPlugins
+            .filter { it.canHandle(SignalType.REACTION.signal) }
+            .map { it.output }
+            .firstOrNull()
+            ?.map { it as? EmojiState }
+            ?.stateIn(scope = coroutineScope, started = SharingStarted.Lazily, initialValue = null)
+            ?: MutableStateFlow(null)
 
     //region Session lifecycle
 
@@ -250,7 +245,6 @@ class Call internal constructor(
             override fun onConnected() {
                 publishToSession()
                 startActiveSpeakerTracker()
-                startListeningSignals()
                 trySend(SessionEvent.Connected)
             }
 
@@ -339,7 +333,6 @@ class Call internal constructor(
         coroutineScope.cancel()
         participantsOnScreenJob?.cancel()
         activeSpeakerTrackerJob?.cancel()
-        signalsJob?.cancel()
     }
     //endregion
 
@@ -390,22 +383,6 @@ class Call internal constructor(
             .forEach { chatPlugin -> chatPlugin.listenUnread(enable) }
     }
 
-    /**
-     * Initializes signal listening by mapping plugin outputs to signal type flows.
-     */
-    private fun startListeningSignals() {
-        signalsJob?.cancel()
-        signalsJob = coroutineScope.launch {
-            signalPlugins.forEach {
-                if (it.canHandle(SignalType.CHAT.signal)) {
-                    signalState[SignalType.CHAT] = it.output
-                }
-                if (it.canHandle(SignalType.REACTION.signal)) {
-                    signalState[SignalType.REACTION] = it.output
-                }
-            }
-        }
-    }
     //endregion
 
     //region Publisher

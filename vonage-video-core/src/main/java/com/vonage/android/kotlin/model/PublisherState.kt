@@ -16,7 +16,6 @@ import com.vonage.android.kotlin.sdk.VonageSession
 import com.vonage.android.kotlin.sdk.VonageStream
 import com.vonage.android.kotlin.sdk.VonageVideoType
 import com.vonage.android.kotlin.ext.movingAverage
-import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.SpeakingWhileMutedDetector
 import com.vonage.logger.vonageLogger
 import kotlinx.collections.immutable.ImmutableList
@@ -126,7 +125,7 @@ data class PublisherState(
     }
 
     override fun toggleAudio() {
-        vonagePublisher.publishAudio = vonagePublisher.publishAudio.toggle()
+        vonagePublisher.publishAudio = !vonagePublisher.publishAudio
         _isMicEnabled.update { vonagePublisher.publishAudio }
     }
 

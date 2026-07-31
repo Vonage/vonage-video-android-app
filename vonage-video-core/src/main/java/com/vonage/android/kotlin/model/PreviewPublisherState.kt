@@ -6,7 +6,6 @@ import com.vonage.android.kotlin.sdk.VonageBlurLevel
 import com.vonage.android.kotlin.sdk.VonageCameraListener
 import com.vonage.android.kotlin.sdk.VonageError
 import com.vonage.android.kotlin.sdk.VonagePublisher
-import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.internal.MicVolumeListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -62,12 +61,12 @@ data class PreviewPublisherState(
     override val noiseSuppression: StateFlow<NoiseSuppression> = _noiseSuppression
 
     override fun toggleVideo() {
-        vonagePublisher.publishVideo = vonagePublisher.publishVideo.toggle()
+        vonagePublisher.publishVideo = !vonagePublisher.publishVideo
         _isCameraEnabled.update { vonagePublisher.publishVideo }
     }
 
     override fun toggleAudio() {
-        vonagePublisher.publishAudio = vonagePublisher.publishAudio.toggle()
+        vonagePublisher.publishAudio = !vonagePublisher.publishAudio
         _isMicEnabled.update { vonagePublisher.publishAudio }
     }
 

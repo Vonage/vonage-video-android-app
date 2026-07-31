@@ -42,7 +42,6 @@ import com.vonage.android.compose.components.GenericLoading
 import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.fx.ui.VideoEffectsScreen
-import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.R
@@ -239,7 +238,7 @@ internal fun MeetingRoomScreen(
                             archivingUiState = uiState.archivingUiState,
                             actions = actions,
                             onToggleAudioDeviceSelector = {
-                                showAudioOutputs = showAudioOutputs.toggle()
+                                showAudioOutputs = !showAudioOutputs
                             },
                             audioDevicesState = uiState.audioDevicesState,
                         )

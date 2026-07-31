@@ -12,9 +12,6 @@ import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.ParticipantState
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
-import com.vonage.android.kotlin.model.SignalState
-import com.vonage.android.kotlin.model.SignalStateContent
-import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoEffect
 import kotlinx.collections.immutable.ImmutableList
@@ -33,10 +30,8 @@ internal val noOpCall = object : CallFacade {
     override val pinnedParticipantIds: StateFlow<Set<String>> = MutableStateFlow(emptySet())
     override fun togglePinParticipant(participantId: String) {}
     override fun forceMuteParticipant(participantId: String) {}
-    override val signalStateFlow: StateFlow<SignalState?> = MutableStateFlow(null)
     override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = MutableStateFlow(persistentListOf())
     override val archivingStateFlow: StateFlow<ArchivingState> = MutableStateFlow(ArchivingState.Idle)
-    override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> = MutableStateFlow(null)
     override val chatSignalState: StateFlow<ChatState?> = MutableStateFlow(null)
     override val emojiSignalState: StateFlow<EmojiState?> = MutableStateFlow(null)
     override fun connect(context: Context): Flow<SessionEvent> = flowOf()

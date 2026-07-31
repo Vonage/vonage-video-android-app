@@ -6,8 +6,7 @@ import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.kotlin.signal.RawSignal
 import com.vonage.android.shared.ChatMessage
-import com.vonage.android.shared.DateProvider
-import com.vonage.android.shared.ForegroundChecker
+import com.vonage.android.shared.isInBackground
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,13 +14,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import java.util.Date
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 
 class EnabledChatSignalPlugin(
     private val chatNotifications: ChatNotifications,
-    private val foregroundChecker: ForegroundChecker,
-    private val dateProvider: DateProvider,
+    private val currentDate: () -> Date = ::Date,
+    private val inBackground: () -> Boolean = ::isInBackground,
 ) : ChatSignalPlugin {
 
     private val chatMessages: MutableList<ChatMessage> = CopyOnWriteArrayList()
@@ -44,7 +44,7 @@ class EnabledChatSignalPlugin(
 
         val message = ChatMessage(
             id = UUID.randomUUID(),
-            date = dateProvider.current(),
+            date = currentDate(),
             participantName = chatSignal.participantName,
             text = chatSignal.text,
         )
@@ -86,7 +86,7 @@ class EnabledChatSignalPlugin(
     }
 
     private fun showNotificationWhenInBackground() {
-        if (foregroundChecker.isInBackground()) {
+        if (inBackground()) {
             chatNotifications.showChatNotification(chatMessages.take(chatMessagesUnreadCount))
         }
     }

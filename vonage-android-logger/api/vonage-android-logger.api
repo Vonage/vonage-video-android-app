@@ -1,7 +1,3 @@
-public final class com/vonage/logger/DefaultVonageLogger {
-	public static final field INSTANCE Lcom/vonage/logger/DefaultVonageLogger;
-	public final fun getLog ()Lcom/vonage/logger/VonageLogger;
-}
 
 public final class com/vonage/logger/LogEvent {
 	public fun <init> (Lcom/vonage/logger/LogLevel;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;JLjava/lang/String;)V
