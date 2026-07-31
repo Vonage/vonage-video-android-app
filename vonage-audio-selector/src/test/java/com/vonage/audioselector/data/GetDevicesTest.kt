@@ -66,7 +66,7 @@ internal class GetDevicesTest {
                     AudioDevice(id = 4, type = AudioDeviceType.EARPIECE),
                 )
             ),
-            // bluetooth connected, wired plugged and earpiece
+            // bluetooth connected, wired plugged — earpiece suppressed by wired headset
             of(
                 BluetoothState.Connected, WiredState.Plugged, true, listOf(
                     AudioDevice(id = 1, type = AudioDeviceType.BLUETOOTH),
@@ -74,7 +74,7 @@ internal class GetDevicesTest {
                     AudioDevice(id = 3, type = AudioDeviceType.SPEAKER),
                 )
             ),
-            // bluetooth disconnected, wired plugged and earpiece
+            // bluetooth disconnected, wired plugged — earpiece suppressed by wired headset
             of(
                 BluetoothState.Disconnected, WiredState.Plugged, true, listOf(
                     AudioDevice(id = 2, type = AudioDeviceType.WIRED_HEADSET),
