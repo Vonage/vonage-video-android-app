@@ -8,6 +8,7 @@ import com.vonage.android.archiving.ArchiveStatus
 import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.util.DownloadManager
 import com.vonage.android.util.coroutines.CoroutinePoller
+import com.vonage.android.util.coroutines.CoroutinePollerFactory
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -31,8 +32,7 @@ class GoodbyeScreenViewModelTest {
         roomName = ANY_ROOM_NAME,
         vonageArchiving = vonageArchiving,
         downloadManager = downloadManager,
-        dispatcher = mainDispatcherRule.testDispatcher,
-        pollerFactory = { fetchData ->
+        pollerFactory = CoroutinePollerFactory { fetchData ->
             mockk<CoroutinePoller<Unit>>(relaxed = true).also { poller ->
                 every { poller.poll(any()) } answers {
                     flow {
