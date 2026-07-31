@@ -1,7 +1,188 @@
+app/build.gradle.kts
+  e4335e1720873e3c 110,254-255
+app/src/test/java/com/vonage/android/MainDispatcherRule.kt
+  e4335e1720873e3c 10-12,15,20,24
+app/src/test/java/com/vonage/android/audio/AudioPlayerTest.kt
+  e4335e1720873e3c 13-17,27,36
+app/src/test/java/com/vonage/android/audio/AudioPlayerViewModelTest.kt
+  e4335e1720873e3c 11-14,18,28
+app/src/test/java/com/vonage/android/config/GetConfigTest.kt
+  e4335e1720873e3c 3
+app/src/test/java/com/vonage/android/data/ReportingRepositoryTest.kt
+  e4335e1720873e3c 15
+app/src/test/java/com/vonage/android/data/UserRepositoryTest.kt
+  e4335e1720873e3c 8
+app/src/test/java/com/vonage/android/data/network/interceptor/VeraHeaderRequestDecoratorTest.kt
+  e4335e1720873e3c 12-14,23,30
+app/src/test/java/com/vonage/android/data/storage/DataStoreCallSettingsStorageTest.kt
+  e4335e1720873e3c 26
+app/src/test/java/com/vonage/android/data/storage/UserStorageTest.kt
+  e4335e1720873e3c 9
+app/src/test/java/com/vonage/android/screen/components/audio/AudioDevicesHandlerTest.kt
+  e4335e1720873e3c 12-14,26,33
+app/src/test/java/com/vonage/android/screen/goodbye/GoodbyeScreenViewModelTest.kt
+  e4335e1720873e3c 19-21,25,46,138
+app/src/test/java/com/vonage/android/screen/landing/LandingScreenViewModelTest.kt
+  e4335e1720873e3c 9-12,16,23
+app/src/test/java/com/vonage/android/screen/reporting/ReportingViewModelTest.kt
+  e4335e1720873e3c 17-23,27,36
+app/src/test/java/com/vonage/android/screen/settings/SettingsActionsTest.kt
+  e4335e1720873e3c 19
+app/src/test/java/com/vonage/android/screen/settings/SettingsScreenViewModelTest.kt
+  e4335e1720873e3c 15-16,24
+app/src/test/java/com/vonage/android/screen/waiting/WaitingRoomViewModelTest.kt
+  e4335e1720873e3c 34-39,43,76,190,192,194,210,212-213,231,233,235,240-241,257-258,274-275
+app/src/test/java/com/vonage/android/util/ActivityContextProviderTest.kt
+  e4335e1720873e3c 6-8,17,22,61
+app/src/test/java/com/vonage/android/util/ImageProcessorTest.kt
+  e4335e1720873e3c 15-16,31,96
+app/src/test/java/com/vonage/android/util/InAppUpdatesTest.kt
+  e4335e1720873e3c 26-28,38,59
+app/src/test/java/com/vonage/android/util/RoomNameGeneratorTest.kt
+  e4335e1720873e3c 3-4
+app/src/test/java/com/vonage/android/util/coroutines/CoroutinePollerTest.kt
+  e4335e1720873e3c 12
+gradle/libs.versions.toml
+  e4335e1720873e3c 86,88
+vonage-android-logger/build.gradle.kts
+  e4335e1720873e3c 19-22,27,29-30
+vonage-android-logger/src/test/java/com/vonage/logger/VonageLoggerTest.kt
+  e4335e1720873e3c 4-7
+vonage-android-logger/src/test/java/com/vonage/logger/interceptor/FileLogInterceptorTest.kt
+  e4335e1720873e3c 5-10,17,23
+vonage-audio-selector/build.gradle.kts
+  e4335e1720873e3c 33-36,50,55-57
+vonage-audio-selector/src/test/java/com/vonage/audioselector/AudioDeviceSelectorTest.kt
+  e4335e1720873e3c 20-22,49,56,65,74,83
+vonage-audio-selector/src/test/java/com/vonage/audioselector/data/CurrentDeviceTest.kt
+  e4335e1720873e3c 11-12,34,41,47,55,64
+vonage-audio-selector/src/test/java/com/vonage/audioselector/data/GetDevicesTest.kt
+  e4335e1720873e3c 16,58-59,65-66,74,81
+vonage-audio-selector/src/test/java/com/vonage/audioselector/data/bluetooth/VeraBluetoothManagerTest.kt
+  e4335e1720873e3c 23-25,40
+vonage-feature-archiving/build.gradle.kts
+  e4335e1720873e3c 25-28,57,62-63
+vonage-feature-archiving/src/testEnabled/java/com/vonage/android/archiving/EnabledVonageArchivingTest.kt
+  e4335e1720873e3c 12-15,25
+vonage-feature-archiving/src/testEnabled/java/com/vonage/android/archiving/data/ArchiveRepositoryTest.kt
+  e4335e1720873e3c 10-12
+vonage-feature-audio-effects/build.gradle.kts
+  e4335e1720873e3c 25-28,56,61-62
+vonage-feature-captions/build.gradle.kts
+  e4335e1720873e3c 25-28,58,63-64
+vonage-feature-captions/src/testEnabled/java/com/vonage/android/captions/EnabledVonageCaptionsTest.kt
+  e4335e1720873e3c 10
+vonage-feature-captions/src/testEnabled/java/com/vonage/android/captions/data/CaptionsRepositoryTest.kt
+  e4335e1720873e3c 7
+vonage-feature-chat/build.gradle.kts
+  e4335e1720873e3c 25-28,53,58-59
+vonage-feature-chat/src/testEnabled/java/com/vonage/android/chat/EnabledChatSignalPluginTest.kt
+  e4335e1720873e3c 12,14-16
+vonage-feature-reactions/build.gradle.kts
+  e4335e1720873e3c 25-28,53,57-58
+vonage-feature-reactions/src/testEnabled/java/com/vonage/android/reactions/ReactionSignalPluginTest.kt
+  e4335e1720873e3c 5-6,13-15,23
+vonage-feature-screensharing/build.gradle.kts
+  e4335e1720873e3c 26-29,55,60-61
+vonage-feature-screensharing/src/testEnabled/java/com/vonage/android/screensharing/EnabledScreenSharingTest.kt
+  e4335e1720873e3c 26-28,47,67
+vonage-feature-settings/build.gradle.kts
+  e4335e1720873e3c 25-28,54,58-59
+vonage-feature-settings/src/testEnabled/java/com/vonage/android/settings/CallSettingsHolderTest.kt
+  e4335e1720873e3c 16
+vonage-feature-settings/src/testEnabled/java/com/vonage/android/settings/NoOpCallSettingsStorageTest.kt
+  e4335e1720873e3c 4
+vonage-feature-video-effects/build.gradle.kts
+  e4335e1720873e3c 25-28,57,62-63
+vonage-feature-video-effects/src/testEnabled/java/com/vonage/android/fx/data/AddBackgroundUseCaseTest.kt
+  e4335e1720873e3c 10-13,17
+vonage-feature-video-effects/src/testEnabled/java/com/vonage/android/fx/data/DeleteBackgroundUseCaseTest.kt
+  e4335e1720873e3c 7-10,14
+vonage-feature-video-effects/src/testEnabled/java/com/vonage/android/fx/data/GetBackgroundsUseCaseTest.kt
+  e4335e1720873e3c 11-14,18
+vonage-feature-video-effects/src/testEnabled/java/com/vonage/android/fx/data/ImageCropUtilsTest.kt
+  e4335e1720873e3c 4-5
+vonage-feature-video-effects/src/testEnabled/java/com/vonage/android/fx/data/MainDispatcherRule.kt
+  e4335e1720873e3c 10-12,15,20,24
+vonage-meeting-room/build.gradle.kts
+  e4335e1720873e3c 31-34,99,104-105
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/MainDispatcherRule.kt
+  e4335e1720873e3c 10-12,15,20,24
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/data/MeetingRoomSessionRepositoryTest.kt
+  e4335e1720873e3c 7
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/permissions/MeetingRoomRequiredPermissionsTest.kt
+  e4335e1720873e3c 5
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTest.kt
+  e4335e1720873e3c 44-48,61,93
+vonage-video-core/build.gradle.kts
+  e4335e1720873e3c 25,49,53-54
+vonage-video-core/src/test/java/com/vonage/android/kotlin/CallActiveSpeakerTest.kt
+  e4335e1720873e3c 15-18,49,89,131,165,176,248,303,356
+vonage-video-core/src/test/java/com/vonage/android/kotlin/CallSortingLogicTest.kt
+  e4335e1720873e3c 20-23,30,35
+vonage-video-core/src/test/java/com/vonage/android/kotlin/CallTest.kt
+  e4335e1720873e3c 23-28,690-691,698
+vonage-video-core/src/test/java/com/vonage/android/kotlin/CallTestBase.kt
+  e4335e1720873e3c 27-28,65,99
+vonage-video-core/src/test/java/com/vonage/android/kotlin/ext/BooleanExtTest.kt
+  e4335e1720873e3c 3-5
+vonage-video-core/src/test/java/com/vonage/android/kotlin/ext/ConnectionExtTest.kt
+  e4335e1720873e3c 10-11
+vonage-video-core/src/test/java/com/vonage/android/kotlin/ext/FloatExtTest.kt
+  e4335e1720873e3c 3-4
+vonage-video-core/src/test/java/com/vonage/android/kotlin/ext/FlowExtTest.kt
+  e4335e1720873e3c 7-8
+vonage-video-core/src/test/java/com/vonage/android/kotlin/ext/FlowMovingAverageTest.kt
+  e4335e1720873e3c 7
+vonage-video-core/src/test/java/com/vonage/android/kotlin/ext/FlowTalkingTrackerTest.kt
+  e4335e1720873e3c 3-5
+vonage-video-core/src/test/java/com/vonage/android/kotlin/ext/ParticipantExtTest.kt
+  e4335e1720873e3c 9-11
+vonage-video-core/src/test/java/com/vonage/android/kotlin/internal/CaptionsHideSchedulerTest.kt
+  e4335e1720873e3c 9-11
+vonage-video-core/src/test/java/com/vonage/android/kotlin/internal/PublisherFactoryTest.kt
+  e4335e1720873e3c 10-11,20
+vonage-video-core/src/test/java/com/vonage/android/kotlin/internal/SpeakingWhileMutedDetectorTest.kt
+  e4335e1720873e3c 7-9
+vonage-video-core/src/test/java/com/vonage/android/kotlin/model/BackgroundBlurTest.kt
+  e4335e1720873e3c 4-6
+vonage-video-core/src/test/java/com/vonage/android/kotlin/model/BlurLevelTest.kt
+  e4335e1720873e3c 3-4
+vonage-video-core/src/test/java/com/vonage/android/kotlin/model/CameraTypeTest.kt
+  e4335e1720873e3c 3-5
+vonage-video-core/src/test/java/com/vonage/android/kotlin/model/ParticipantStateTest.kt
+  e4335e1720873e3c 16-19,39
+vonage-video-core/src/test/java/com/vonage/android/kotlin/model/PublisherConfigTest.kt
+  e4335e1720873e3c 3-4
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.6.19",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "0df6d8dbc29137bf9a0ee911b6616241e98e0d23",
-  "prompts": {}
+  "prompts": {
+    "e4335e1720873e3c": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "e8f47f28-e27c-427c-81f4-c2a53ba4c52b",
+        "model": "gpt-4o"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 95% AI]",
+          "timestamp": "2026-07-31T13:33:29.099Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (github-copilot/gpt-4o).",
+          "timestamp": "2026-07-31T13:33:29.099Z"
+        }
+      ],
+      "total_additions": 380,
+      "total_deletions": 371,
+      "accepted_lines": 361,
+      "overriden_lines": 0
+    }
+  }
 }
