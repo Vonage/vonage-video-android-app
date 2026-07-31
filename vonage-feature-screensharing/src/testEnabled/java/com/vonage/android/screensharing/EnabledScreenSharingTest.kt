@@ -23,9 +23,9 @@ import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkAll
 import io.mockk.verify
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -44,7 +44,7 @@ class EnabledScreenSharingTest {
 
     private lateinit var sut: EnabledScreenSharing
 
-    @Before
+    @BeforeEach
     fun setup() {
         mockkStatic("androidx.core.content.ContextCompat")
         mockkStatic(android.provider.Settings::class)
@@ -64,7 +64,7 @@ class EnabledScreenSharingTest {
         sut = EnabledScreenSharing(context)
     }
 
-    @After
+    @AfterEach
     fun teardown() {
         unmockkAll()
     }

@@ -22,6 +22,10 @@ android {
         buildConfig = true
     }
 
+    testOptions {
+        unitTests.all { it.useJUnitPlatform() }
+    }
+
     flavorDimensions += "captions"
     productFlavors {
         create("enabled") {
@@ -51,9 +55,11 @@ dependencies {
     enabledImplementation(libs.retrofit)
     enabledImplementation(libs.okhttp)
 
-    testImplementation(libs.junit.junit)
+    testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(kotlin("test"))
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }

@@ -22,6 +22,10 @@ android {
         buildConfig = true
     }
 
+    testOptions {
+        unitTests.all { it.useJUnitPlatform() }
+    }
+
     flavorDimensions += "audiofx"
     productFlavors {
         create("enabled") {
@@ -49,9 +53,11 @@ dependencies {
     implementation(libs.opentok.android.sdk)
     enabledImplementation(libs.opentok.android.video.transformers)
 
-    testImplementation(libs.junit.junit)
+    testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(kotlin("test"))
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }

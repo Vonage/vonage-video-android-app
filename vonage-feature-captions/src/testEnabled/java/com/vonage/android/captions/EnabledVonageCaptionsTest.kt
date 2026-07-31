@@ -7,7 +7,7 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
 import kotlin.test.assertEquals

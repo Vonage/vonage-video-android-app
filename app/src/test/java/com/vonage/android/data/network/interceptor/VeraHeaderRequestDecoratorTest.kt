@@ -9,9 +9,9 @@ import io.mockk.verify
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class VeraHeaderRequestDecoratorTest {
@@ -20,14 +20,14 @@ class VeraHeaderRequestDecoratorTest {
     private val mockChain: Interceptor.Chain = mockk(relaxed = true)
     private val mockResponse: Response = mockk(relaxed = true)
 
-    @Before
+    @BeforeEach
     fun setUp() {
         val requestBuilder = Request.Builder().url("https://example.com")
         every { mockChain.request() } returns requestBuilder.build()
         every { mockChain.proceed(any()) } returns mockResponse
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         clearAllMocks()
     }

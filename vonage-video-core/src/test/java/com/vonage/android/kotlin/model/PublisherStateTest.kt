@@ -3,10 +3,10 @@ package com.vonage.android.kotlin.model
 import com.vonage.android.kotlin.sdk.VonagePublisher
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 /**
  * Unit tests for [PublisherState.changeVisibility] and [PublisherState.toggleVideo].
@@ -27,7 +27,7 @@ class PublisherStateTest {
     private lateinit var mockPublisher: VonagePublisher
     private lateinit var publisherState: PublisherState
 
-    @Before
+    @BeforeEach
     fun setUp() {
         publishVideoState = true
         mockPublisher = mockk(relaxed = true) {

@@ -107,6 +107,7 @@ android {
         unitTests {
             isIncludeAndroidResources = true
             isReturnDefaultValues = true
+            all { it.useJUnitPlatform() }
         }
         animationsDisabled = true
         managedDevices {
@@ -245,12 +246,13 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
-    testImplementation(libs.junit.junit)
     testImplementation(libs.junit.jupiter.params)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.core.testing)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.test.rules)

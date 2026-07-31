@@ -7,14 +7,14 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.Test
 
 class AddBackgroundUseCaseTest {
 
-    @get:Rule
+    @RegisterExtension
     val mainDispatcherRule = MainDispatcherRule()
 
     private val userBackgroundRepository = mockk<UserBackgroundRepository>()

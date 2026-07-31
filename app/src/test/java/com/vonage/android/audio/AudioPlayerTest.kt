@@ -10,11 +10,11 @@ import io.mockk.slot
 import io.mockk.unmockkStatic
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class AudioPlayerTest {
 
@@ -24,7 +24,7 @@ class AudioPlayerTest {
 
     private lateinit var sut: AudioPlayer
 
-    @Before
+    @BeforeEach
     fun setUp() {
         mockkStatic(MediaPlayer::class)
         every { MediaPlayer.create(any(), any<Int>()) } returns mediaPlayer
@@ -33,7 +33,7 @@ class AudioPlayerTest {
         sut = AudioPlayer(context)
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         unmockkStatic(MediaPlayer::class)
     }

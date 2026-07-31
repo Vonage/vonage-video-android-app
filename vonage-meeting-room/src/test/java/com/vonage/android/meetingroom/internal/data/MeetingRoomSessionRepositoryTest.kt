@@ -4,7 +4,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import retrofit2.Response
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
