@@ -1,0 +1,28 @@
+gradle/libs.versions.toml
+  s_cf96f260159390::t_14bd6ef3c46741 22
+  s_cf96f260159390::t_3b1978132324b7 87,91
+  s_cf96f260159390::t_d285dff311dc6c 90
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/layout/GridLayoutCalculatorTest.kt
+  s_cf96f260159390::t_ace5590856de18 3-7,9-22,26,28-33,35-40
+vonage-audio-selector/src/test/java/com/vonage/audioselector/data/GetDevicesTest.kt
+  s_cf96f260159390::t_d3d7db344a5cec 69,77
+vonage-video-ui-compose/build.gradle.kts
+  s_cf96f260159390::t_f63d9922049f81 29
+  s_cf96f260159390::t_4cbefca51f96c6 65-67,73-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.12",
+  "base_commit_sha": "3ab281a06616de3d9796a432b394963b731419e3",
+  "prompts": {},
+  "sessions": {
+    "s_cf96f260159390": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_b43009df-28f3-4314-8955-85bca921ff65",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
