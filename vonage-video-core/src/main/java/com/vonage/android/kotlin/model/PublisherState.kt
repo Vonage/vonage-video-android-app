@@ -123,6 +123,7 @@ data class PublisherState(
         userIntendedVideoOn = !userIntendedVideoOn
         vonagePublisher.publishVideo = userIntendedVideoOn
         _isCameraEnabled.update { userIntendedVideoOn }
+        if (userIntendedVideoOn) applyVideoEffect(_videoEffect.value)
     }
 
     override fun toggleAudio() {

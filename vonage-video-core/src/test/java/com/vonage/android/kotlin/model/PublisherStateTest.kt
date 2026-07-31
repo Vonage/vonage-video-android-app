@@ -1,8 +1,10 @@
 package com.vonage.android.kotlin.model
 
+import com.vonage.android.kotlin.sdk.VonageBlurLevel
 import com.vonage.android.kotlin.sdk.VonagePublisher
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -119,6 +121,58 @@ class PublisherStateTest {
         // User turns camera back on
         publisherState.toggleVideo()
         assertTrue(publishVideoState)
+    }
+
+    // endregion
+
+    // region toggleVideo — effect reapplication
+
+    @Test
+    fun `toggleVideo reapplies background image effect when camera is turned back on`() {
+        val effect = VideoEffect.BackgroundImage(id = "bg1", imagePath = "/path/to/image.jpg")
+        publisherState.applyVideoEffect(effect)
+
+        // Turn off
+        publisherState.toggleVideo()
+        assertFalse(publishVideoState)
+
+        // Turn back on — SDK must receive applyBackgroundImage again
+        publisherState.toggleVideo()
+        assertTrue(publishVideoState)
+
+        verify(exactly = 2) { mockPublisher.applyBackgroundImage("/path/to/image.jpg") }
+    }
+
+    @Test
+    fun `toggleVideo does not reapply effect when camera is turned off`() {
+        val effect = VideoEffect.BackgroundImage(id = "bg1", imagePath = "/path/to/image.jpg")
+        publisherState.applyVideoEffect(effect)
+
+        // Turn off — no additional applyBackgroundImage call expected
+        publisherState.toggleVideo()
+        assertFalse(publishVideoState)
+
+        verify(exactly = 1) { mockPublisher.applyBackgroundImage("/path/to/image.jpg") }
+    }
+
+    @Test
+    fun `toggleVideo reapplies blur effect when camera is turned back on`() {
+        publisherState.applyVideoEffect(VideoEffect.BlurHigh)
+
+        publisherState.toggleVideo() // off
+        publisherState.toggleVideo() // on
+
+        // Called once on applyVideoEffect, once on re-enable
+        verify(exactly = 2) { mockPublisher.applyBlur(VonageBlurLevel.HIGH) }
+    }
+
+    @Test
+    fun `toggleVideo with no effect does not call unnecessary SDK methods on re-enable`() {
+        // Default effect is None — re-enabling should call applyBlur(NONE) once
+        publisherState.toggleVideo() // off
+        publisherState.toggleVideo() // on
+
+        verify(exactly = 1) { mockPublisher.applyBlur(VonageBlurLevel.NONE) }
     }
 
     // endregion
