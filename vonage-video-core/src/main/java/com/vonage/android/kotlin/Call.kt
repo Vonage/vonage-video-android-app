@@ -19,7 +19,6 @@ import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.ParticipantState
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
-import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoEffect
