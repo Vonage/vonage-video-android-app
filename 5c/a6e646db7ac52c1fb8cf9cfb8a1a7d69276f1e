@@ -1,0 +1,14 @@
+.kiro/hooks/git-ai.json
+  h_5ddc9d372ac6a1 7-8,11,18-19,22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "5ca6e646db7ac52c1fb8cf9cfb8a1a7d69276f1e",
+  "prompts": {},
+  "humans": {
+    "h_5ddc9d372ac6a1": {
+      "author": "Ivan <210490533+VZaphod@users.noreply.github.com>"
+    }
+  }
+}
