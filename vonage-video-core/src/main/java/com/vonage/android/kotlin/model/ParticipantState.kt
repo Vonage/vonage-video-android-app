@@ -101,7 +101,15 @@ data class ParticipantState(
         _isMicEnabled.value    = hasAudio
     }
 
-    suspend fun setup() {
+    /**
+     * Registers stream and video listeners synchronously. Must be called before the participant
+     * is added to the participants map and made visible in the UI, so that SDK callbacks such as
+     * [VonageSubscriberVideoListener.onVideoEnabled] are never missed.
+     *
+     * Call [setup] afterwards (in a separate coroutine) to start the long-running audio-level
+     * and stats observations.
+     */
+    internal fun registerListeners() {
         vonageSubscriber.setStreamListener(object : VonageSubscriberStreamListener {
             override fun onReconnected() {
                 vonageLogger.d(logTag, "Subscriber reconnected")
@@ -134,7 +142,13 @@ data class ParticipantState(
                 vonageLogger.d(logTag, "Subscriber video disable warning lifted")
             }
         })
+    }
 
+    /**
+     * Starts long-running audio-level and stats observations. Suspends indefinitely.
+     * Listeners must be registered via [registerListeners] before calling this.
+     */
+    suspend fun setup() {
         coroutineScope {
             launch {
                 vonageSubscriber.observeVideoStats()

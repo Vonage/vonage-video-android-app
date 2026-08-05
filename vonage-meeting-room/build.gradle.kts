@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
 }
@@ -26,10 +25,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-        freeCompilerArgs += "-opt-in=com.vonage.android.meetingroom.api.ExperimentalMeetingRoomApi"
-    }
 
     buildFeatures {
         compose = true
@@ -48,6 +43,12 @@ android {
         create("captionsDisabled") { dimension = "captions"; matchingFallbacks += listOf("disabled") }
         create("screensharingEnabled") { dimension = "screensharing"; matchingFallbacks += listOf("enabled") }
         create("screensharingDisabled") { dimension = "screensharing"; matchingFallbacks += listOf("disabled") }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        optIn.add("com.vonage.android.meetingroom.api.ExperimentalMeetingRoomApi")
     }
 }
 
@@ -82,6 +83,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.adaptive)

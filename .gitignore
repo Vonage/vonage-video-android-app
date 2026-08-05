@@ -33,6 +33,9 @@ render.experimental.xml
 .vscode/
 .intellijPlatform/
 
+# Opencode
+.opencode/
+
 # Keystore files
 .sign/keystore.properties
 .sign/release.keystore.jks
@@ -45,3 +48,16 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# OpenCode
+.opencode/plans/
+
+# Kiro
+.kiro/specs/
+.kiro/steering/
+.kiro/settings/
+.kiro/settings.json
+.kiro/skills/
+
+# OpenCode plans
+.opencode/plans/

@@ -6,6 +6,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -53,6 +54,12 @@ class ActiveSpeakerTracker(
     private val subscriberAudioLevelsBySubscriberId: SubscriberAudioLevels = mutableMapOf()
 
     private val _activeSpeaker = MutableStateFlow(ActiveSpeakerInfo(null, 0F))
+
+    /**
+     * Exposes the current active speaker state so callers can react when it resets to null
+     * (i.e. when the speaking participant leaves and no new speaker has been detected yet).
+     */
+    val currentActiveSpeaker: StateFlow<ActiveSpeakerInfo> = _activeSpeaker
 
     private val _activeSpeakerChanges = MutableSharedFlow<ActiveSpeakerChangedPayload>()
     val activeSpeakerChanges: SharedFlow<ActiveSpeakerChangedPayload> = _activeSpeakerChanges.asSharedFlow()

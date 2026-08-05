@@ -172,11 +172,13 @@ class Call internal constructor(
 
     /**
      * StateFlow of the currently active speaker based on audio level analysis.
-     * Debounced to prevent rapid changes when multiple people speak.
+     *
+     * Structural join/leave changes (written by [updateParticipants]) are immediate so that the
+     * new joiner's tile reaches the spotlight in the same recomposition that adds them to the
+     * participants list. Audio-driven speaker switches are debounced inside
+     * [startActiveSpeakerTracker] to prevent rapid spotlight flickering.
      */
     override val activeSpeaker: StateFlow<Participant?> = _activeSpeaker
-        .debounce(ACTIVE_SPEAKER_DEBOUNCE_MILLIS)
-        .distinctUntilChanged()
         .stateIn(
             scope = coroutineScope,
             started = SharingStarted.Eagerly,
@@ -679,9 +681,10 @@ class Call internal constructor(
                     subscriber.subscribeToCaptions = captionsEnabled
                     ParticipantState(vonageSubscriber = subscriber)
                 }
-                launch { participant.setup() }
+                participant.registerListeners()
                 participants[stream.streamId] = participant
                 updateParticipants()
+                launch { participant.setup() }
                 observeSubscriberAudioLevel(participant)
             } catch (e: Exception) {
                 vonageLogger.e(TAG, "Failed to add subscriber ${stream.streamId}", e)
@@ -750,10 +753,17 @@ class Call internal constructor(
      * Ensures the active speaker is always visible even if scrolled off-screen.
      * Screen sharing participants are automatically set as the active speaker.
      * Audio-only participants are also promotable to the spotlight.
+     *
+     * Also observes [ActiveSpeakerTracker.currentActiveSpeaker] to detect when audio goes
+     * silent (streamId becomes null) and restores the latest-joiner fallback in that case.
      */
     private fun startActiveSpeakerTracker() {
         activeSpeakerTrackerJob?.cancel()
+        // Debounce audio-driven speaker switches here so rapid level changes don't cause
+        // spotlight flickering. Join/leave writes in updateParticipants() bypass this by
+        // writing directly to _activeSpeaker, which is now undebounced on the public flow.
         activeSpeakerTrackerJob = activeSpeakerTracker.activeSpeakerChanges
+            .debounce(ACTIVE_SPEAKER_DEBOUNCE_MILLIS)
             .onEach { payload ->
                 participants[payload.newActiveSpeaker.streamId]?.let { mainSpeaker ->
                     // Screen share always wins regardless of camera state.
@@ -762,6 +772,10 @@ class Call internal constructor(
                         screenSharingParticipant != null -> {
                             _activeSpeaker.update { screenSharingParticipant }
                         }
+                        // Do not promote a participant whose camera is off to active speaker —
+                        // placing a blank tile in the spotlight is worse than keeping the current
+                        // speaker or the latest-joiner fallback.
+                        !mainSpeaker.isCameraEnabled.value -> Unit
                         else -> {
                             _activeSpeaker.update { mainSpeaker }
                         }
@@ -769,12 +783,32 @@ class Call internal constructor(
                 }
             }
             .launchIn(coroutineScope)
+
+        // When the tracker resets to silence (streamId == null — triggered by
+        // onSubscriberDestroyed), revert the spotlight to the latest joiner instead of
+        // keeping the departed speaker or going blank.
+        activeSpeakerTracker.currentActiveSpeaker
+            .onEach { info ->
+                if (info.streamId == null) {
+                    _activeSpeaker.update { latestJoinerFallback() }
+                }
+            }
+            .launchIn(coroutineScope)
     }
+
+    /**
+     * Returns the participant with the highest [Participant.creationTime] across all current
+     * participants (including the local publisher), or `null` when the call has no participants.
+     *
+     * Used as the spotlight fallback when no one is actively speaking.
+     */
+    private fun latestJoinerFallback(): Participant? =
+        participants.values.maxByOrNull { it.creationTime }
 
     /**
      * Updates the participants flow and count whenever the participants map changes.
      * Also updates active speaker if a screen sharing participant is present.
-     * If the current active speaker left, clears it or sets to screen sharing participant.
+     * If the current active speaker left, falls back to the latest joiner.
      */
     private fun updateParticipants() {
         _participantsInternalFlow.update { participants.values.toImmutableList() }
@@ -782,12 +816,16 @@ class Call internal constructor(
 
         // Set screen sharing participant as active speaker
         val screenSharingParticipant = participants.values.firstScreenSharing()
-        // Update active speaker: prioritize screen sharing, or clear if current speaker left
+        // Update active speaker: prioritize screen sharing, keep current speaker if still present,
+        // otherwise fall back to the latest joiner (or null if the call is empty).
         _activeSpeaker.update { currentSpeaker ->
+            val hasRealSpeaker = activeSpeakerTracker.currentActiveSpeaker.value.streamId != null
             when {
                 screenSharingParticipant != null -> screenSharingParticipant
-                currentSpeaker != null && participants.containsKey(currentSpeaker.id) -> currentSpeaker
-                else -> null
+                // Keep a real (audio-detected) active speaker if they're still in the call.
+                hasRealSpeaker && currentSpeaker != null && participants.containsKey(currentSpeaker.id) -> currentSpeaker
+                // No real speaker — always show the latest joiner as fallback.
+                else -> latestJoinerFallback()
             }
         }
     }
