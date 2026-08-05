@@ -1,0 +1,16 @@
+.github/workflows/publish-play-store.yml
+  h_5ddc9d372ac6a1 66-67
+app/build.gradle.kts
+  h_5ddc9d372ac6a1 39-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "12bc5dff731b702663ce7560eb70ec257dbff828",
+  "prompts": {},
+  "humans": {
+    "h_5ddc9d372ac6a1": {
+      "author": "Ivan <210490533+VZaphod@users.noreply.github.com>"
+    }
+  }
+}
