@@ -1,0 +1,40 @@
+vonage-meeting-room/src/archivingDisabled/java/com/vonage/android/meetingroom/internal/factory/ArchivingFactory.kt
+  h_25498f8d57a266 9
+vonage-feature-archiving/src/disabled/java/com/vonage/android/archiving/di/ArchivingModule.kt
+  s_f35a1782167ac0::t_3e4b468c8ac77d 5,9
+vonage-feature-captions/build.gradle.kts
+  s_f35a1782167ac0::t_e91a28583780f4 51-53
+vonage-feature-settings/src/disabled/java/com/vonage/android/settings/ui/SettingsScreen.kt
+  s_f35a1782167ac0::t_4b4c02474f6579 12
+vonage-meeting-room/src/captionsDisabled/java/com/vonage/android/meetingroom/internal/factory/CaptionsFactory.kt
+  h_25498f8d57a266 9
+vonage-meeting-room/src/screensharingDisabled/java/com/vonage/android/meetingroom/internal/factory/ScreenSharingFactory.kt
+  h_25498f8d57a266 9
+vonage-feature-screensharing/src/disabled/java/com/vonage/android/screensharing/di/ScreenSharingModule.kt
+  s_f35a1782167ac0::t_0cf3c3b47b1f3f 5,9
+vonage-feature-archiving/build.gradle.kts
+  s_f35a1782167ac0::t_4ce317fe3ed342 50-52
+vonage-feature-captions/src/disabled/java/com/vonage/android/captions/di/CaptionsModule.kt
+  s_f35a1782167ac0::t_d49b15e8892a23 5,9-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "4bf6d8b3464a65891a7c8e398ece057a61e4e2a3",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_f35a1782167ac0": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_ff919a8a-d186-429e-a83a-d125cb52a1fb",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
