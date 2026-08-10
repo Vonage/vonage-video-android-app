@@ -52,7 +52,9 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.opentok.android.sdk)
 
-    enabledImplementation(libs.retrofit)
+    // retrofit is shared so the disabled flavor exposes the same provider signature
+    // (provideVonageCaptions(retrofit)) as enabled; the disabled stub ignores the arg.
+    implementation(libs.retrofit)
     enabledImplementation(libs.okhttp)
 
     testImplementation(libs.junit)

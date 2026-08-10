@@ -6,4 +6,4 @@ import com.vonage.android.screensharing.di.ScreenSharingModule
 
 @Suppress("UNUSED_PARAMETER")
 internal fun createVonageScreenSharing(context: Context): VonageScreenSharing =
-    ScreenSharingModule.provideVonageScreenSharing()
+    ScreenSharingModule.provideVonageScreenSharing(context)
