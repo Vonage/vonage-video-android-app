@@ -47,7 +47,9 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.tooling.preview)
 
-    enabledImplementation(libs.retrofit)
+    // retrofit is shared so the disabled flavor exposes the same provider signature
+    // (provideVonageArchiving(retrofit)) as enabled; the disabled stub ignores the arg.
+    implementation(libs.retrofit)
     enabledImplementation(libs.okhttp)
 
     testImplementation(libs.junit.junit)

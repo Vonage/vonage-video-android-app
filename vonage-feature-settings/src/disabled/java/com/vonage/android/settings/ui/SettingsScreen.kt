@@ -9,8 +9,8 @@ import com.vonage.android.settings.SettingsUiState
 @Composable
 fun SettingsScreen(
     uiState: SettingsUiState,
+    actions: SettingsScreenActions,
     modifier: Modifier = Modifier,
-    actions: SettingsScreenActions = SettingsScreenActions(),
 ) {
 
 }
