@@ -64,6 +64,7 @@ data class PreviewPublisherState(
     override fun toggleVideo() {
         vonagePublisher.publishVideo = vonagePublisher.publishVideo.toggle()
         _isCameraEnabled.update { vonagePublisher.publishVideo }
+        if (vonagePublisher.publishVideo) applyVideoEffect(_videoEffect.value)
     }
 
     override fun toggleAudio() {
