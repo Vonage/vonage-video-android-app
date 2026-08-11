@@ -13,8 +13,4 @@ import com.vonage.android.kotlin.model.Participant
  * @return The participant's display name, or empty string if not found
  */
 internal fun VonageConnection.extractSenderName(subs: Collection<Participant>): String =
-    subs
-        .filter { participant -> participant.connectionId == connectionId }
-        .map { participant -> participant.name }
-        .firstOrNull()
-        .orEmpty()
+    subs.firstOrNull { it.connectionId == connectionId }?.name.orEmpty()

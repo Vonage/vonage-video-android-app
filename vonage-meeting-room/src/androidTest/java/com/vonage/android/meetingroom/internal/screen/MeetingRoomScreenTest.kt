@@ -22,9 +22,6 @@ import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
-import com.vonage.android.kotlin.model.SignalState
-import com.vonage.android.kotlin.model.SignalStateContent
-import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
@@ -166,10 +163,8 @@ class MeetingRoomScreenTest {
             override val pinnedParticipantIds: StateFlow<Set<String>> = MutableStateFlow(emptySet())
             override fun togglePinParticipant(participantId: String) {}
             override fun forceMuteParticipant(participantId: String) {}
-            override val signalStateFlow: StateFlow<SignalState?> = MutableStateFlow(null)
             override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = MutableStateFlow(persistentListOf())
             override val archivingStateFlow: StateFlow<ArchivingState> = MutableStateFlow(ArchivingState.Idle)
-            override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> = MutableStateFlow(null)
             override val chatSignalState: StateFlow<ChatState?> = MutableStateFlow(null)
             override val emojiSignalState: StateFlow<EmojiState?> = MutableStateFlow(null)
             override fun connect(context: Context): Flow<SessionEvent> = flowOf()

@@ -7,9 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.config.GetConfig
 import com.vonage.android.data.UserRepository
-import com.vonage.android.fx.data.AddBackgroundUseCase
 import com.vonage.android.fx.data.BackgroundsResult
-import com.vonage.android.fx.data.DeleteBackgroundUseCase
 import com.vonage.android.fx.data.GetBackgroundsUseCase
 import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.fx.ui.VideoBackgroundItem
@@ -52,8 +50,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     private val audioDevicesHandler: AudioDevicesHandler,
     private val callSettingsHolder: CallSettingsHolder,
     private val getBackgroundsUseCase: GetBackgroundsUseCase,
-    private val addBackgroundUseCase: AddBackgroundUseCase,
-    private val deleteBackgroundUseCase: DeleteBackgroundUseCase,
+    private val userBackgroundRepository: UserBackgroundRepository,
 ) : ViewModel() {
 
     private var publisherSetupJob: Job? = null
@@ -125,7 +122,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     fun addBackground(uris: List<Uri>) {
         viewModelScope.launch(Dispatchers.IO) {
             val resolution = callSettingsHolder.captureResolution.value
-            uris.forEach { uri -> addBackgroundUseCase(uri, resolution) }
+            uris.forEach { uri -> userBackgroundRepository.saveBackground(uri, resolution) }
             refreshBackgrounds()
         }
     }
@@ -136,7 +133,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
      */
     fun deleteBackground(item: VideoBackgroundItem) {
         viewModelScope.launch(Dispatchers.IO) {
-            deleteBackgroundUseCase(item.id)
+            userBackgroundRepository.deleteBackground(item.id)
             val currentEffect = _uiState.value.publisher?.videoEffect?.value
             if (currentEffect is VideoEffect.BackgroundImage && currentEffect.id == item.id) {
                 withContext(Dispatchers.Main) { applyVideoEffect(VideoEffect.None) }

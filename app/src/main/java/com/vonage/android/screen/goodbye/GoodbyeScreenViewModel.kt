@@ -6,16 +6,14 @@ import androidx.lifecycle.viewModelScope
 import com.vonage.android.archiving.Archive
 import com.vonage.android.archiving.ArchiveStatus
 import com.vonage.android.archiving.VonageArchiving
-import com.vonage.android.di.IODispatcher
 import com.vonage.android.util.DownloadManager
-import com.vonage.android.util.coroutines.CoroutinePollerProvider
+import com.vonage.android.util.coroutines.CoroutinePollerFactory
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,8 +27,7 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
     private val vonageArchiving: VonageArchiving,
     private val downloadManager: DownloadManager,
-    private val coroutinePollerProvider: CoroutinePollerProvider<Unit>,
-    @param:IODispatcher private val dispatcher: CoroutineDispatcher,
+    private val pollerFactory: CoroutinePollerFactory,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<GoodbyeScreenUiState>(GoodbyeScreenUiState.Idle)
@@ -42,21 +39,18 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            coroutinePollerProvider.get(
-                dispatcher = dispatcher,
-                fetchData = {
-                    vonageArchiving.getRecordings(roomName)
-                        .onSuccess { archives ->
-                            archives
-                                .count { archive -> archive.status == ArchiveStatus.PENDING }
-                                .let { if (it == 0) cancel() }
-                            _uiState.value = GoodbyeScreenUiState.Content(
-                                archives = archives.toImmutableList()
-                            )
-                        }
-                        .onFailure { cancel() }
-                },
-            ).poll(POLLING_DELAY).collect()
+            pollerFactory.create {
+                vonageArchiving.getRecordings(roomName)
+                    .onSuccess { archives ->
+                        archives
+                            .count { archive -> archive.status == ArchiveStatus.PENDING }
+                            .let { if (it == 0) cancel() }
+                        _uiState.value = GoodbyeScreenUiState.Content(
+                            archives = archives.toImmutableList()
+                        )
+                    }
+                    .onFailure { cancel() }
+            }.poll(POLLING_DELAY).collect()
         }
     }
 

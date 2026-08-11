@@ -23,7 +23,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -593,12 +592,6 @@ class CallTest : CallTestBase() {
     fun `initial participantsStateFlow should be empty`() = runTest(testDispatcher) {
         val call = createCall()
         assertTrue(call.participantsStateFlow.value.isEmpty())
-    }
-
-    @Test
-    fun `initial signalStateFlow should be null`() = runTest(testDispatcher) {
-        val call = createCall()
-        assertNull(call.signalStateFlow.value)
     }
 
     // endregion

@@ -57,17 +57,6 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
     /** StateFlow of the currently active speaker based on audio levels */
     val activeSpeaker: StateFlow<Participant?>
 
-    /** StateFlow of signal state (use specific signal state methods) */
-    val signalStateFlow: StateFlow<SignalState?>
-
-    /**
-     * Gets the state flow for a specific signal type.
-     *
-     * @param signalType The type of signal to observe
-     * @return StateFlow emitting signal content for the specified type
-     */
-    fun signalState(signalType: SignalType): StateFlow<SignalStateContent?>
-
     /**
      * Gets the state flow for chat messages.
      *
@@ -129,13 +118,6 @@ enum class SignalType(val signal: String) {
     CHAT("chat"),
     REACTION("emoji");
 }
-
-data class SignalState(
-    val signals: Map<String, SignalStateContent>,
-)
-
-/** Type alias for map of signal type to its state flow */
-typealias SignalFlows = MutableMap<SignalType, StateFlow<SignalStateContent?>>
 
 /** Marker interface for signal state content */
 sealed interface SignalStateContent

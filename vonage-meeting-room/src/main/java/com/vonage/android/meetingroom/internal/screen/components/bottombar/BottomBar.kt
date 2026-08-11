@@ -37,7 +37,6 @@ import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Warning
-import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.meetingroom.R
@@ -112,7 +111,7 @@ internal fun BottomBar(
         call = call,
         onShowParticipants = {
             scope.launch {
-                showParticipants = showParticipants.toggle()
+                showParticipants = !showParticipants
                 moreActionsSheetState.hide()
                 showMoreActions = false
             }
@@ -137,7 +136,7 @@ internal fun BottomBar(
             isSelected = false,
             onClick = {
                 scope.launch {
-                    showReporting = showReporting.toggle()
+                    showReporting = !showReporting
                     moreActionsSheetState.hide()
                     showMoreActions = false
                 }
@@ -162,7 +161,7 @@ internal fun BottomBar(
             roomActions = roomActions,
             allowMicrophoneControl = state.allowMicrophoneControl,
             allowCameraControl = state.allowCameraControl,
-            onShowMore = { showMoreActions = showMoreActions.toggle() },
+            onShowMore = { showMoreActions = !showMoreActions },
         ) {
             visibleActions.forEach { action ->
                 ControlButton(
