@@ -30,7 +30,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     testOptions {
-        unitTests { isReturnDefaultValues = true }
+        unitTests {
+            isReturnDefaultValues = true
+            all { it.useJUnitPlatform() }
+        }
     }
     buildFeatures {
         compose = true
@@ -44,11 +47,14 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.kotlinx.collections.immutable)
 
-    testImplementation(libs.junit.junit)
+    testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.params)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(kotlin("test"))
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 // Workaround for https://github.com/Kotlin/binary-compatibility-validator/issues/312

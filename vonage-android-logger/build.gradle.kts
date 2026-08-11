@@ -16,13 +16,18 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     testOptions {
-        unitTests { isReturnDefaultValues = true }
+        unitTests {
+            isReturnDefaultValues = true
+            all { it.useJUnitPlatform() }
+        }
     }
 }
 
 dependencies {
-    testImplementation(libs.junit.junit)
+    testImplementation(libs.junit)
     testImplementation(libs.mockk)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 // Workaround for https://github.com/Kotlin/binary-compatibility-validator/issues/312

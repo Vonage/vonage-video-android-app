@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
 /**
  * Unit tests for active speaker fallback behaviour in [Call].
@@ -29,7 +29,6 @@ class CallActiveSpeakerTest : CallTestBase() {
     fun `activeSpeaker should be null initially before any participant joins`() =
         runTest(testDispatcher) {
             val call = createCall()
-            // No participants yet — latestJoinerFallback returns null
             assertNull(call.activeSpeaker.value)
         }
 
@@ -45,9 +44,9 @@ class CallActiveSpeakerTest : CallTestBase() {
                 runCurrent()
 
                 assertEquals(
-                    "Publisher should be the fallback when no one is speaking",
                     mockPublisherState,
                     call.activeSpeaker.value,
+                    "Publisher should be the fallback when no one is speaking",
                 )
                 cancelAndIgnoreRemainingEvents()
             }
@@ -85,9 +84,9 @@ class CallActiveSpeakerTest : CallTestBase() {
                 runCurrent()
 
                 assertEquals(
-                    "Latest joiner (newest creationTime) should be the fallback",
                     "sub-newer",
                     call.activeSpeaker.value?.id,
+                    "Latest joiner (newest creationTime) should be the fallback",
                 )
                 cancelAndIgnoreRemainingEvents()
             }
@@ -120,7 +119,6 @@ class CallActiveSpeakerTest : CallTestBase() {
                 runCurrent()
                 assertEquals("sub-first", call.activeSpeaker.value?.id)
 
-                // A newer participant joins — fallback should switch to them
                 capturedSessionListener!!.onStreamReceived(laterStream)
                 runCurrent()
                 awaitItem()
@@ -128,9 +126,9 @@ class CallActiveSpeakerTest : CallTestBase() {
                 runCurrent()
 
                 assertEquals(
-                    "Fallback should update to the newer joiner",
                     "sub-later",
                     call.activeSpeaker.value?.id,
+                    "Fallback should update to the newer joiner",
                 )
                 cancelAndIgnoreRemainingEvents()
             }
@@ -164,9 +162,8 @@ class CallActiveSpeakerTest : CallTestBase() {
                 awaitItem()
                 callScheduler.advanceTimeBy(activeSpeakerDebounceMillis)
                 runCurrent()
-                assertEquals("sub-newer should be initial fallback", "sub-newer", call.activeSpeaker.value?.id)
+                assertEquals("sub-newer", call.activeSpeaker.value?.id, "sub-newer should be initial fallback")
 
-                // The newest participant leaves
                 capturedSessionListener!!.onStreamDropped(newerStream)
                 runCurrent()
                 awaitItem()
@@ -174,9 +171,9 @@ class CallActiveSpeakerTest : CallTestBase() {
                 runCurrent()
 
                 assertEquals(
-                    "Fallback should revert to the next latest joiner after newest leaves",
                     "sub-older",
                     call.activeSpeaker.value?.id,
+                    "Fallback should revert to the next latest joiner after newest leaves",
                 )
                 cancelAndIgnoreRemainingEvents()
             }
@@ -185,8 +182,6 @@ class CallActiveSpeakerTest : CallTestBase() {
     @Test
     fun `activeSpeaker should not be audio-promoted when camera is off`() =
         runTest(testDispatcher) {
-            // extraBufferCapacity = 1 so tryEmit can buffer without suspending (avoids a
-            // deadlock between the test-body coroutine and the callDispatcher collector).
             val mockActiveSpeakerChanges = MutableSharedFlow<ActiveSpeakerChangedPayload>(
                 extraBufferCapacity = 1,
             )
@@ -197,12 +192,10 @@ class CallActiveSpeakerTest : CallTestBase() {
             }
             val call = createCallWithTracker(mockTracker)
 
-            // Camera-on speaker added first (lower creationTime).
             val cameraOnStream = createVonageStream("sub-camera-on", "CameraOn", hasVideo = true, creationTime = 2000L)
             val cameraOnSubscriber = mockk<VonageSubscriber>(relaxed = true) {
                 every { this@mockk.stream } returns cameraOnStream
             }
-            // Camera-off participant added second (higher creationTime, becomes latestJoinerFallback).
             val cameraOffStream = createVonageStream("sub-camera-off", "NoCamera", hasVideo = false, creationTime = 3000L)
             val cameraOffSubscriber = mockk<VonageSubscriber>(relaxed = true) {
                 every { this@mockk.stream } returns cameraOffStream
@@ -210,14 +203,12 @@ class CallActiveSpeakerTest : CallTestBase() {
             every { mockSession.subscribe(any(), eq(cameraOnStream)) } returns cameraOnSubscriber
             every { mockSession.subscribe(any(), eq(cameraOffStream)) } returns cameraOffSubscriber
 
-            // Start collecting in backgroundScope so capturedSessionListener is set eagerly.
             backgroundScope.launch { call.connect(mockContext).collect { } }
 
             capturedSessionListener!!.onConnected()
             Thread.sleep(200)
             callScheduler.runCurrent()
 
-            // Subscribe both participants.
             capturedSessionListener!!.onStreamReceived(cameraOnStream)
             Thread.sleep(200)
             callScheduler.runCurrent()
@@ -226,12 +217,8 @@ class CallActiveSpeakerTest : CallTestBase() {
             Thread.sleep(200)
             callScheduler.runCurrent()
 
-            // activeSpeaker is now the camera-off joiner via latestJoinerFallback (expected —
-            // the fallback path is allowed regardless of camera state so the spotlight is never blank).
             assertEquals("sub-camera-off", call.activeSpeaker.value?.id)
 
-            // The camera-on participant is now speaking. Promote them so there is a known
-            // real speaker before we test the camera-off guard.
             assertTrue(
                 mockActiveSpeakerChanges.tryEmit(
                     ActiveSpeakerChangedPayload(
@@ -244,8 +231,6 @@ class CallActiveSpeakerTest : CallTestBase() {
             callScheduler.runCurrent()
             assertEquals("sub-camera-on", call.activeSpeaker.value?.id)
 
-            // Now the camera-off participant emits an audio-level event that would normally
-            // cause a speaker switch. The guard must block this promotion.
             assertTrue(
                 mockActiveSpeakerChanges.tryEmit(
                     ActiveSpeakerChangedPayload(
@@ -257,11 +242,10 @@ class CallActiveSpeakerTest : CallTestBase() {
             callScheduler.advanceTimeBy(activeSpeakerDebounceMillis)
             callScheduler.runCurrent()
 
-            // Camera-off participant must NOT be promoted; active speaker stays the camera-on participant.
             assertEquals(
-                "Camera-off participant must not be audio-promoted to active speaker",
                 "sub-camera-on",
                 call.activeSpeaker.value?.id,
+                "Camera-off participant must not be audio-promoted to active speaker",
             )
         }
 
@@ -293,7 +277,6 @@ class CallActiveSpeakerTest : CallTestBase() {
             Thread.sleep(200)
             callScheduler.runCurrent()
 
-            // Promote Alice to active speaker
             assertTrue(
                 mockActiveSpeakerChanges.tryEmit(
                     ActiveSpeakerChangedPayload(
@@ -307,7 +290,6 @@ class CallActiveSpeakerTest : CallTestBase() {
             callScheduler.runCurrent()
             assertEquals("sub-speaker", call.activeSpeaker.value?.id)
 
-            // Alice's stream is destroyed — tracker resets to null
             mockCurrentActiveSpeaker.value = ActiveSpeakerInfo(null, 0F)
             capturedSessionListener!!.onStreamDropped(stream)
             Thread.sleep(200)
@@ -316,9 +298,9 @@ class CallActiveSpeakerTest : CallTestBase() {
             callScheduler.runCurrent()
 
             assertEquals(
-                "After real speaker leaves, fallback should be publisher (only remaining participant)",
                 Call.PUBLISHER_ID,
                 call.activeSpeaker.value?.id,
+                "After real speaker leaves, fallback should be publisher (only remaining participant)",
             )
         }
 
@@ -350,7 +332,6 @@ class CallActiveSpeakerTest : CallTestBase() {
             Thread.sleep(200)
             callScheduler.runCurrent()
 
-            // Promote Alice to active speaker
             assertTrue(
                 mockActiveSpeakerChanges.tryEmit(
                     ActiveSpeakerChangedPayload(
@@ -364,16 +345,15 @@ class CallActiveSpeakerTest : CallTestBase() {
             callScheduler.runCurrent()
             assertEquals("sub-speaker", call.activeSpeaker.value?.id)
 
-            // Audio goes silent — tracker signals nobody speaking (stream stays connected)
             mockCurrentActiveSpeaker.value = ActiveSpeakerInfo(null, 0F)
             callScheduler.runCurrent()
             callScheduler.advanceTimeBy(activeSpeakerDebounceMillis)
             callScheduler.runCurrent()
 
             assertEquals(
-                "After silence, fallback should be the latest joiner (Alice, creationTime=2000)",
                 "sub-speaker",
                 call.activeSpeaker.value?.id,
+                "After silence, fallback should be the latest joiner (Alice, creationTime=2000)",
             )
         }
 }

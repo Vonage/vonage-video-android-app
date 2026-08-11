@@ -2,7 +2,7 @@ package com.vonage.android.meetingroom.internal.permissions
 
 import android.Manifest
 import android.os.Build
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

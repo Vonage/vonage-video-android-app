@@ -7,8 +7,8 @@ import com.vonage.android.kotlin.sdk.VonageSdkFactory
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class PublisherFactoryTest {
 
@@ -17,7 +17,7 @@ class PublisherFactoryTest {
     private lateinit var mockContext: Context
     private lateinit var publisherFactory: PublisherFactory
 
-    @Before
+    @BeforeEach
     fun setup() {
         mockContext = mockk(relaxed = true)
         mockPublisher = mockk(relaxed = true)

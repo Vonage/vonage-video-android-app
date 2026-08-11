@@ -16,13 +16,13 @@ import io.mockk.verify
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class GoodbyeScreenViewModelTest {
 
-    @get:Rule
+    @RegisterExtension
     val mainDispatcherRule = MainDispatcherRule()
 
     private val vonageArchiving: VonageArchiving = mockk()
@@ -87,8 +87,6 @@ class GoodbyeScreenViewModelTest {
                     archives = archiveList.toImmutableList(),
                 ), awaitItem()
             )
-            // Let the test complete without checking for more emissions
-            // to avoid timing issues with the polling mechanism
         }
     }
 
@@ -125,7 +123,7 @@ class GoodbyeScreenViewModelTest {
                 ), awaitItem()
             )
 
-            sut.downloadArchive(archiveList[1]) // This is the pending archive
+            sut.downloadArchive(archiveList[1])
             verify(exactly = 0) { downloadManager.downloadByUrl("https://cdn.recording.io/potatoe-pending") }
         }
     }
@@ -137,8 +135,6 @@ class GoodbyeScreenViewModelTest {
         val sut = sut()
         sut.uiState.test {
             assertEquals(GoodbyeScreenUiState.Idle, awaitItem())
-            // Since the call fails, onSuccess is not called and state remains Idle
-            // The test completes successfully showing that failures don't crash the app
         }
     }
 

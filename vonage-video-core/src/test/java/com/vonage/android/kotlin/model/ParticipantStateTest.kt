@@ -13,10 +13,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 /**
  * Unit tests for [ParticipantState] covering the four subscriber-state bugs:
@@ -36,7 +36,7 @@ class ParticipantStateTest {
     /** Set by the mock when [ParticipantState.setup] registers the video listener. */
     private var capturedVideoListener: VonageSubscriberVideoListener? = null
 
-    @Before
+    @BeforeEach
     fun setUp() {
         capturedVideoListener = null
     }
