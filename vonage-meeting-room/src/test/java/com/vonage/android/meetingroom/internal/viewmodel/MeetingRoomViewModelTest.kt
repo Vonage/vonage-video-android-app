@@ -47,9 +47,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.Test
 import android.net.Uri
-import com.vonage.android.fx.data.AddBackgroundUseCase
 import com.vonage.android.fx.data.BackgroundsResult
-import com.vonage.android.fx.data.DeleteBackgroundUseCase
 import com.vonage.android.fx.data.GetBackgroundsUseCase
 import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.fx.ui.VideoBackgroundItem
@@ -85,8 +83,7 @@ class MeetingRoomViewModelTest {
             remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
         )
     }
-    private val addBackgroundUseCase: AddBackgroundUseCase = mockk(relaxed = true)
-    private val deleteBackgroundUseCase: DeleteBackgroundUseCase = mockk(relaxed = true)
+    private val userBackgroundRepository: UserBackgroundRepository = mockk(relaxed = true)
 
     private lateinit var sut: MeetingRoomViewModel
 
@@ -103,8 +100,7 @@ class MeetingRoomViewModelTest {
         every { container.audioDevicesHandler } returns audioDevicesHandler
         every { container.callSettingsHolder } returns callSettingsHolder
         every { container.getBackgroundsUseCase } returns getBackgroundsUseCase
-        every { container.addBackgroundUseCase } returns addBackgroundUseCase
-        every { container.deleteBackgroundUseCase } returns deleteBackgroundUseCase
+        every { container.userBackgroundRepository } returns userBackgroundRepository
 
         every { prebuilt.roomName } returns ANY_ROOM_NAME
         every { prebuilt.configuration } returns MeetingRoomConfiguration()
@@ -747,7 +743,7 @@ class MeetingRoomViewModelTest {
     }
 
     @Test
-    fun `given addBackground is called then delegates to addBackgroundUseCase and refreshes backgrounds in state`() = runTest {
+    fun `given addBackground is called then delegates to saveBackground and refreshes backgrounds in state`() = runTest {
         // Given
         val uri = mockk<Uri>()
         val updatedBackgrounds = persistentListOf(VideoBackgroundItem(id = "user-bg", isUserUploaded = true))
@@ -763,13 +759,13 @@ class MeetingRoomViewModelTest {
         testScheduler.advanceUntilIdle()
 
         // Then
-        coVerify(exactly = 1) { addBackgroundUseCase(uri, any()) }
+        coVerify(exactly = 1) { userBackgroundRepository.saveBackground(uri, any()) }
         assertEquals(updatedBackgrounds, sut.uiState.value.backgrounds)
         assertEquals(0, sut.uiState.value.remainingBackgroundSlots)
     }
 
     @Test
-    fun `given deleteBackground is called then delegates to deleteBackgroundUseCase and refreshes backgrounds`() = runTest {
+    fun `given deleteBackground is called then delegates to deleteBackground and refreshes backgrounds`() = runTest {
         // Given
         val item = VideoBackgroundItem(id = "user-bg", isUserUploaded = true)
         val updatedBackgrounds = persistentListOf(VideoBackgroundItem(id = "bg-1"))
@@ -785,7 +781,7 @@ class MeetingRoomViewModelTest {
         testScheduler.advanceUntilIdle()
 
         // Then
-        coVerify(exactly = 1) { deleteBackgroundUseCase("user-bg") }
+        coVerify(exactly = 1) { userBackgroundRepository.deleteBackground("user-bg") }
         assertEquals(updatedBackgrounds, sut.uiState.value.backgrounds)
     }
 

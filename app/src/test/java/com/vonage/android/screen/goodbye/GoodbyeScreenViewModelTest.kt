@@ -8,7 +8,7 @@ import com.vonage.android.archiving.ArchiveStatus
 import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.util.DownloadManager
 import com.vonage.android.util.coroutines.CoroutinePoller
-import com.vonage.android.util.coroutines.CoroutinePollerProvider
+import com.vonage.android.util.coroutines.CoroutinePollerFactory
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -27,19 +27,12 @@ class GoodbyeScreenViewModelTest {
 
     private val vonageArchiving: VonageArchiving = mockk()
     private val downloadManager: DownloadManager = mockk()
-    private val coroutinePollerProvider: CoroutinePollerProvider<Unit> = mockk()
 
     private fun sut() = GoodbyeScreenViewModel(
         roomName = ANY_ROOM_NAME,
         vonageArchiving = vonageArchiving,
         downloadManager = downloadManager,
-        coroutinePollerProvider = coroutinePollerProvider,
-        dispatcher = mainDispatcherRule.testDispatcher,
-    )
-
-    private fun setupPollerMock() {
-        every { coroutinePollerProvider.get(any(), any()) } answers {
-            val fetchData = secondArg<suspend () -> Unit>()
+        pollerFactory = CoroutinePollerFactory { fetchData ->
             mockk<CoroutinePoller<Unit>>(relaxed = true).also { poller ->
                 every { poller.poll(any()) } answers {
                     flow {
@@ -48,12 +41,11 @@ class GoodbyeScreenViewModelTest {
                     }
                 }
             }
-        }
-    }
+        },
+    )
 
     @Test
     fun `given viewmodel when initial state then returns archive list`() = runTest {
-        setupPollerMock()
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(archiveListAfterPolling)
         val sut = sut()
 
@@ -69,7 +61,6 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel when archives loaded then updates state to content`() = runTest {
-        setupPollerMock()
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(archiveListAfterPolling)
 
         val sut = sut()
@@ -85,7 +76,6 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel when archives update then emits new state`() = runTest {
-        setupPollerMock()
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns
                 Result.success(archiveList) andThen Result.success(archiveListAfterPolling)
 
@@ -102,7 +92,6 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel when download available archive then delegate to download manager`() = runTest {
-        setupPollerMock()
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(archiveListAfterPolling)
         every { downloadManager.downloadByUrl(any()) } returns Unit
 
@@ -122,7 +111,6 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel when download pending archive then ignore`() = runTest {
-        setupPollerMock()
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(archiveList)
         every { downloadManager.downloadByUrl(any()) } returns Unit
 
@@ -142,7 +130,6 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel when repository fails then continues polling silently`() = runTest {
-        setupPollerMock()
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.failure(Exception("Network error"))
 
         val sut = sut()
@@ -153,7 +140,6 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel with mixed archive states then loads correctly`() = runTest {
-        setupPollerMock()
         val mixedArchiveList = listOf(availableArchive, pendingArchive, pendingArchive)
 
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(mixedArchiveList)

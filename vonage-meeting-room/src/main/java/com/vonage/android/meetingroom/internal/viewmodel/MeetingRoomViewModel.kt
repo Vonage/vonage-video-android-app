@@ -224,7 +224,7 @@ internal class MeetingRoomViewModel(
     fun addBackground(uris: List<Uri>) {
         viewModelScope.launch {
             val resolution = container.callSettingsHolder.captureResolution.value
-            uris.forEach { uri -> container.addBackgroundUseCase(uri, resolution) }
+            uris.forEach { uri -> container.userBackgroundRepository.saveBackground(uri, resolution) }
             refreshBackgrounds()
         }
     }
@@ -235,7 +235,7 @@ internal class MeetingRoomViewModel(
      */
     fun deleteBackground(item: VideoBackgroundItem) {
         viewModelScope.launch {
-            container.deleteBackgroundUseCase(item.id)
+            container.userBackgroundRepository.deleteBackground(item.id)
             val currentEffect = call?.publisher?.value?.videoEffect?.value
             if (currentEffect is VideoEffect.BackgroundImage && currentEffect.id == item.id) {
                 applyVideoEffect(VideoEffect.None)

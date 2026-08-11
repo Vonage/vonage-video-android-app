@@ -6,9 +6,7 @@ import com.vonage.android.MainDispatcherRule
 import com.vonage.android.config.Config
 import com.vonage.android.config.GetConfig
 import com.vonage.android.data.UserRepository
-import com.vonage.android.fx.data.AddBackgroundUseCase
 import com.vonage.android.fx.data.BackgroundsResult
-import com.vonage.android.fx.data.DeleteBackgroundUseCase
 import com.vonage.android.fx.data.GetBackgroundsUseCase
 import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.kotlin.VonageVideoClient
@@ -68,8 +66,7 @@ class WaitingRoomViewModelTest {
             remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
         )
     }
-    private val addBackgroundUseCase: AddBackgroundUseCase = mockk(relaxed = true)
-    private val deleteBackgroundUseCase: DeleteBackgroundUseCase = mockk(relaxed = true)
+    private val userBackgroundRepository: UserBackgroundRepository = mockk(relaxed = true)
 
     private lateinit var sut: WaitingRoomViewModel
 
@@ -83,8 +80,7 @@ class WaitingRoomViewModelTest {
             audioDevicesHandler = audioDevicesHandler,
             callSettingsHolder = callSettingsHolder,
             getBackgroundsUseCase = getBackgroundsUseCase,
-            addBackgroundUseCase = addBackgroundUseCase,
-            deleteBackgroundUseCase = deleteBackgroundUseCase,
+            userBackgroundRepository = userBackgroundRepository,
         )
 
         every { getConfig.invoke() } returns Config(
