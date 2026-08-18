@@ -1,0 +1,28 @@
+{
+  "name": "@vonage/config-tui",
+  "version": "1.0.0",
+  "description": "TUI editor for Vonage Video app-config.json and theme.json",
+  "type": "module",
+  "bin": {
+    "vonage-config": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node --loader ts-node/esm src/index.tsx",
+    "dev": "tsx src/index.tsx"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "ink": "5.1.0",
+    "ink-select-input": "6.0.0",
+    "ink-spinner": "5.0.0",
+    "ink-text-input": "6.0.0",
+    "react": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "tsx": "4.19.2",
+    "typescript": "5.6.3"
+  }
+}

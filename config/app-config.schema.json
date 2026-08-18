@@ -1,0 +1,94 @@
+{
+  "title": "Vonage Video app-config",
+  "description": "Feature toggles and base URL consumed by ./gradlew generateVonageConfig. See docs/CONFIG-SYSTEM.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "baseApiUrl",
+    "videoSettings",
+    "audioSettings",
+    "waitingRoomSettings",
+    "meetingRoomSettings"
+  ],
+  "properties": {
+    "baseApiUrl": {
+      "type": "string",
+      "description": "Backend base URL. May be the literal placeholder (resolved from local.properties / env at generate time) or a concrete http(s) URL.",
+      "pattern": "^(\\$\\{BASE_API_URL\\}|https?://.+)$"
+    },
+    "videoSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowBackgroundEffects",
+        "allowCameraControl",
+        "allowVideoOnJoin",
+        "defaultResolution"
+      ],
+      "properties": {
+        "allowBackgroundEffects": { "type": "boolean" },
+        "allowCameraControl": { "type": "boolean" },
+        "allowVideoOnJoin": { "type": "boolean" },
+        "defaultResolution": {
+          "type": "string",
+          "description": "Camera capture resolution (WxH). Values come from CaptureResolution: LOW=352x288, MEDIUM=640x480, HIGH=1280x720.",
+          "enum": ["352x288", "640x480", "1280x720"]
+        }
+      }
+    },
+    "audioSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowAdvancedNoiseSuppression",
+        "allowAudioOnJoin",
+        "allowMicrophoneControl"
+      ],
+      "properties": {
+        "allowAdvancedNoiseSuppression": { "type": "boolean" },
+        "allowAudioOnJoin": { "type": "boolean" },
+        "allowMicrophoneControl": { "type": "boolean" }
+      }
+    },
+    "waitingRoomSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowDeviceSelection"],
+      "properties": {
+        "allowDeviceSelection": { "type": "boolean" }
+      }
+    },
+    "meetingRoomSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowSettings",
+        "allowArchiving",
+        "allowCaptions",
+        "allowChat",
+        "allowDeviceSelection",
+        "allowEmojis",
+        "allowScreenShare",
+        "defaultLayoutMode",
+        "showParticipantList"
+      ],
+      "properties": {
+        "allowSettings": { "type": "boolean" },
+        "allowArchiving": { 
+          "type": "boolean"
+        },
+        "allowCaptions": { "type": "boolean" },
+        "allowChat": { "type": "boolean" },
+        "allowDeviceSelection": { "type": "boolean" },
+        "allowEmojis": { "type": "boolean" },
+        "allowScreenShare": { "type": "boolean" },
+        "defaultLayoutMode": {
+          "type": "string",
+          "description": "Initial meeting-room layout. Values map to CallLayoutType: activespeaker=SPEAKER_LAYOUT, adaptivegrid=ADAPTIVE_GRID. Note: no code currently parses this string into the enum, so 'adaptivegrid' is the inferred counterpart to the in-use 'activespeaker'.",
+          "enum": ["activespeaker", "adaptivegrid"]
+        },
+        "showParticipantList": { "type": "boolean" }
+      }
+    }
+  }
+}
