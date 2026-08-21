@@ -102,8 +102,8 @@ logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", ver
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
-opentok-android-sdk = { module = "com.vonage:client-sdk-video", version.ref = "opentokAndroidSdk" }
-opentok-android-video-transformers = { module = "com.vonage:client-sdk-video-transformers", version.ref = "opentokAndroidSdk" }
+vonage-android-sdk = { module = "com.vonage:client-sdk-video", version.ref = "opentokAndroidSdk" }
+vonage-android-video-transformers = { module = "com.vonage:client-sdk-video-transformers", version.ref = "opentokAndroidSdk" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi", version.ref = "roborazzi" }
 roborazzi-compose = { module = "io.github.takahirom.roborazzi:roborazzi-compose", version.ref = "roborazzi" }

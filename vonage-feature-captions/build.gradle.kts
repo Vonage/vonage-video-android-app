@@ -50,7 +50,7 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.opentok.android.sdk)
+    implementation(libs.vonage.android.sdk)
 
     // retrofit is shared so the disabled flavor exposes the same provider signature
     // (provideVonageCaptions(retrofit)) as enabled; the disabled stub ignores the arg.

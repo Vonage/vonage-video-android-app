@@ -40,7 +40,7 @@ dependencies {
     implementation(project(":vonage-android-logger"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.opentok.android.sdk)
+    implementation(libs.vonage.android.sdk)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)

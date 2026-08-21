@@ -50,8 +50,8 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.opentok.android.sdk)
-    enabledImplementation(libs.opentok.android.video.transformers)
+    implementation(libs.vonage.android.sdk)
+    enabledImplementation(libs.vonage.android.video.transformers)
     enabledImplementation(libs.androidx.activity.compose)
 
     testImplementation(libs.junit)

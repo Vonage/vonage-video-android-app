@@ -41,7 +41,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.opentok.android.sdk)
+    implementation(libs.vonage.android.sdk)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.compose.runtime)

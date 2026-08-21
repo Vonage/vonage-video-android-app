@@ -242,7 +242,7 @@ dependencies {
     releaseImplementation(libs.firebase.analytics)
 
     // Vonage Video Android SDK, needed to customize Audio Device
-    implementation(libs.opentok.android.sdk)
+    implementation(libs.vonage.android.sdk)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)

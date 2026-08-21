@@ -93,7 +93,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.opentok.android.sdk)
+    implementation(libs.vonage.android.sdk)
     implementation(libs.androidx.material.icons.extended)
 
     testImplementation(libs.junit)
