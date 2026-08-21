@@ -6,10 +6,10 @@ plugins {
 
 android {
     namespace = "com.vonage.android.meetingroom"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 24
+        minSdk = libs.versions.minSdk.get().toInt()
         consumerProguardFiles("consumer-rules.pro")
         missingDimensionStrategy("chat", "enabled")
         missingDimensionStrategy("reactions", "enabled")
@@ -106,7 +106,7 @@ dependencies {
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
     debugImplementation(libs.androidx.ui.test.manifest)
 }
