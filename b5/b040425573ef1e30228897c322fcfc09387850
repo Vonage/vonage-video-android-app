@@ -1,35 +1,35 @@
 app/build.gradle.kts
-  a73e619a0b2fbd96 245
+  5acb1f074c977b02 245
 gradle/libs.versions.toml
-  a73e619a0b2fbd96 105-106
+  5acb1f074c977b02 105-106
 vonage-audio-selector/build.gradle.kts
-  a73e619a0b2fbd96 44
+  5acb1f074c977b02 44
 vonage-feature-audio-effects/build.gradle.kts
-  a73e619a0b2fbd96 53-54
+  5acb1f074c977b02 53-54
 vonage-feature-captions/build.gradle.kts
-  a73e619a0b2fbd96 53
+  5acb1f074c977b02 53
 vonage-feature-chat/build.gradle.kts
-  a73e619a0b2fbd96 51
+  5acb1f074c977b02 51
 vonage-feature-reactions/build.gradle.kts
-  a73e619a0b2fbd96 51
+  5acb1f074c977b02 51
 vonage-feature-settings/build.gradle.kts
-  a73e619a0b2fbd96 52
+  5acb1f074c977b02 52
 vonage-feature-video-effects/build.gradle.kts
-  a73e619a0b2fbd96 53-54
+  5acb1f074c977b02 53-54
 vonage-meeting-room/build.gradle.kts
-  a73e619a0b2fbd96 96
+  5acb1f074c977b02 96
 vonage-video-sdk/build.gradle.kts
-  a73e619a0b2fbd96 43
+  5acb1f074c977b02 43
 ---
 {
   "schema_version": "authorship/3.0.0",
   "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "b5b040425573ef1e30228897c322fcfc09387850",
   "prompts": {
-    "a73e619a0b2fbd96": {
+    "5acb1f074c977b02": {
       "agent_id": {
-        "tool": "github-copilot",
-        "id": "688b539f-6e91-4acc-9da2-2cdff947f6c6",
+        "tool": "kiro-cli",
+        "id": "47a72c99-9002-404e-8c38-76bc85e568e7",
         "model": "gpt-4o"
       },
       "human_author": "Manuel Vera <manuel.veranieto@vonage.com>",
@@ -37,12 +37,12 @@ vonage-video-sdk/build.gradle.kts
         {
           "type": "user",
           "text": "[vg-ai attribution override: 100% AI]",
-          "timestamp": "2026-08-21T09:44:19.562Z"
+          "timestamp": "2026-08-21T09:44:31.017Z"
         },
         {
           "type": "assistant",
-          "text": "Attribution set via vg-ai attribution override (github-copilot/gpt-4o).",
-          "timestamp": "2026-08-21T09:44:19.562Z"
+          "text": "Attribution set via vg-ai attribution override (kiro-cli/gpt-4o).",
+          "timestamp": "2026-08-21T09:44:31.017Z"
         }
       ],
       "total_additions": 14,
