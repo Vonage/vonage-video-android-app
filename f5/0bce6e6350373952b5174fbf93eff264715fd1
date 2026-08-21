@@ -1,81 +1,70 @@
-vonage-feature-screensharing/build.gradle.kts
-  s_bcac1a6120e547::t_4f64766709a016 9
-  s_bcac1a6120e547::t_115483522eec70 12
-vonage-meeting-room/build.gradle.kts
-  s_bcac1a6120e547::t_b2537670b281cb 12
-  s_bcac1a6120e547::t_fb9a88e32be8c1 9
-  h_25498f8d57a266 110
-vonage-feature-video-effects/build.gradle.kts
-  s_bcac1a6120e547::t_d4193f9236f042 12
-  s_bcac1a6120e547::t_4cc29f457759ad 9
-vonage-android-logger/build.gradle.kts
-  s_bcac1a6120e547::t_6821612a569840 8
-  s_bcac1a6120e547::t_2cfdc84033c429 11
 app/build.gradle.kts
-  s_bcac1a6120e547::t_3f09329ec50042 36
-  s_bcac1a6120e547::t_f17fd14251dc24 35
-  s_bcac1a6120e547::t_b9fa5779384c8b 31
-gradle/libs.versions.toml
-  h_25498f8d57a266 8,10-12,14-15,18,20,23,27,33-34,38-39,41,117,125,127-128
-  s_bcac1a6120e547::t_a4a4ddf4888c7e 5,7
-  s_bcac1a6120e547::t_d430ee8c91af78 6
-vonage-feature-settings/build.gradle.kts
-  s_bcac1a6120e547::t_25d91e007b6dbd 12
-  s_bcac1a6120e547::t_4d4c6b2cbdc5a0 9
-vonage-feature-audio-effects/build.gradle.kts
-  s_bcac1a6120e547::t_16bf249d86907b 12
-  s_bcac1a6120e547::t_89b0d6e08a8d6b 9
-vonage-feature-reactions/build.gradle.kts
-  s_bcac1a6120e547::t_427c552e372449 12
-  s_bcac1a6120e547::t_f84eb661fbc677 9
-vonage-video-core/build.gradle.kts
-  s_bcac1a6120e547::t_35b4885c76c09a 8
-  h_25498f8d57a266 11
-vonage-video-sdk/build.gradle.kts
-  s_bcac1a6120e547::t_dd38b5b19fe6ac 11
-  h_25498f8d57a266 8
-vonage-feature-archiving/build.gradle.kts
-  s_bcac1a6120e547::t_8556c87376be68 9
-  s_bcac1a6120e547::t_23de6746149e8d 12
-vonage-video-ui-compose/build.gradle.kts
-  s_bcac1a6120e547::t_acb1ce84929aa8 11
-  s_bcac1a6120e547::t_79fa5b830bd260 14
-vonage-video-shared/build.gradle.kts
-  s_bcac1a6120e547::t_55fe61a3cd76d7 10
-  h_25498f8d57a266 7
-vonage-feature-captions/build.gradle.kts
-  s_bcac1a6120e547::t_4b48ca2bab5c70 12
-  s_bcac1a6120e547::t_9bac8b61b3572d 9
-vonage-audio-selector/build.gradle.kts
-  s_bcac1a6120e547::t_bab2c2d1d12d6d 14
-vonage-feature-chat/build.gradle.kts
-  s_bcac1a6120e547::t_db5c4288627ded 12
-  s_bcac1a6120e547::t_f7fe4235b59cf5 9
+  054021f17d35543a 31,35-36
 build-tools/detekt/detekt.yml
-  h_25498f8d57a266 813
+  054021f17d35543a 813
+gradle/libs.versions.toml
+  054021f17d35543a 5-8,10-12,14-15,18,20,23,27,33-34,38-39,41,117,125,127-128
+vonage-android-logger/build.gradle.kts
+  054021f17d35543a 8,11
+vonage-audio-selector/build.gradle.kts
+  054021f17d35543a 14
+vonage-feature-archiving/build.gradle.kts
+  054021f17d35543a 9,12
+vonage-feature-audio-effects/build.gradle.kts
+  054021f17d35543a 9,12
+vonage-feature-captions/build.gradle.kts
+  054021f17d35543a 9,12
+vonage-feature-chat/build.gradle.kts
+  054021f17d35543a 9,12
+vonage-feature-reactions/build.gradle.kts
+  054021f17d35543a 9,12
+vonage-feature-screensharing/build.gradle.kts
+  054021f17d35543a 9,12
+vonage-feature-settings/build.gradle.kts
+  054021f17d35543a 9,12
+vonage-feature-video-effects/build.gradle.kts
+  054021f17d35543a 9,12
 vonage-meeting-room-sample-app/build.gradle.kts
-  s_bcac1a6120e547::t_006d3a08a85c2d 8
-  s_bcac1a6120e547::t_166622b5bae6ce 13
-  s_bcac1a6120e547::t_2fffce79e5badc 12
+  054021f17d35543a 8,12-13
+vonage-meeting-room/build.gradle.kts
+  054021f17d35543a 9,12,110
+vonage-video-core/build.gradle.kts
+  054021f17d35543a 8,11
+vonage-video-sdk/build.gradle.kts
+  054021f17d35543a 8,11
+vonage-video-shared/build.gradle.kts
+  054021f17d35543a 7,10
+vonage-video-ui-compose/build.gradle.kts
+  054021f17d35543a 11,14
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.6.23",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "f50bce6e6350373952b5174fbf93eff264715fd1",
-  "prompts": {},
-  "humans": {
-    "h_25498f8d57a266": {
-      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
-    }
-  },
-  "sessions": {
-    "s_bcac1a6120e547": {
+  "prompts": {
+    "054021f17d35543a": {
       "agent_id": {
-        "tool": "kiro",
-        "id": "sess_cc86fd39-5acf-4448-bfe3-ae92c0e9b2a7",
-        "model": "auto"
+        "tool": "github-copilot",
+        "id": "33f01a76-6023-4306-98f3-482fcb73cef7",
+        "model": "gpt-4o"
       },
-      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-08-21T09:27:37.042Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (github-copilot/gpt-4o).",
+          "timestamp": "2026-08-21T09:27:37.042Z"
+        }
+      ],
+      "total_additions": 59,
+      "total_deletions": 61,
+      "accepted_lines": 59,
+      "overriden_lines": 0
     }
   }
 }
