@@ -1,0 +1,34 @@
+vonage-feature-audio-effects/build.gradle.kts
+  h_25498f8d57a266 53-54
+gradle/libs.versions.toml
+  h_25498f8d57a266 105-106
+app/build.gradle.kts
+  h_25498f8d57a266 245
+vonage-feature-chat/build.gradle.kts
+  h_25498f8d57a266 51
+vonage-feature-reactions/build.gradle.kts
+  h_25498f8d57a266 51
+vonage-audio-selector/build.gradle.kts
+  h_25498f8d57a266 44
+vonage-feature-captions/build.gradle.kts
+  h_25498f8d57a266 53
+vonage-feature-settings/build.gradle.kts
+  h_25498f8d57a266 52
+vonage-meeting-room/build.gradle.kts
+  h_25498f8d57a266 96
+vonage-feature-video-effects/build.gradle.kts
+  h_25498f8d57a266 53-54
+vonage-video-sdk/build.gradle.kts
+  h_25498f8d57a266 43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "b5b040425573ef1e30228897c322fcfc09387850",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
