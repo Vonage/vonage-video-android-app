@@ -1,0 +1,62 @@
+app/src/main/java/com/vonage/android/core/ActionContracts.kt
+  h_25498f8d57a266 3-5,10-20
+app/src/main/java/com/vonage/android/core/BaseViewModel.kt
+  h_25498f8d57a266 5-6
+app/src/main/java/com/vonage/android/di/CoroutinesModule.kt
+  h_25498f8d57a266 3-4,29-35
+app/src/main/java/com/vonage/android/screen/goodbye/GoodbyeScreenViewModel.kt
+  h_25498f8d57a266 10,30,42-53
+app/src/main/java/com/vonage/android/screen/settings/SettingsContracts.kt
+  h_25498f8d57a266 4
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomViewModel.kt
+  h_25498f8d57a266 53,125,136
+app/src/main/java/com/vonage/android/util/coroutines/CoroutinePoller.kt
+  h_25498f8d57a266 11-12
+app/src/test/java/com/vonage/android/screen/goodbye/GoodbyeScreenViewModelTest.kt
+  h_25498f8d57a266 11,35,44-45
+app/src/test/java/com/vonage/android/screen/waiting/WaitingRoomViewModelTest.kt
+  h_25498f8d57a266 69,83
+vonage-android-logger/src/main/java/com/vonage/logger/VonageLogger.kt
+  h_25498f8d57a266 63-65
+vonage-feature-chat/src/enabled/java/com/vonage/android/chat/EnabledChatSignalPlugin.kt
+  h_25498f8d57a266 9,17,23-24,47,89
+vonage-feature-chat/src/testEnabled/java/com/vonage/android/chat/EnabledChatSignalPluginTest.kt
+  h_25498f8d57a266 19,24-25,136,140,142
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/container/MeetingRoomContainer.kt
+  h_25498f8d57a266 128
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/factory/ReportingFactory.kt
+  h_25498f8d57a266 3,20-21
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  h_25498f8d57a266 241
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/bottombar/BottomBar.kt
+  h_25498f8d57a266 114,139,164
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  h_25498f8d57a266 227,238
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTest.kt
+  h_25498f8d57a266 86,103,746,762,768,784
+vonage-video-core/src/main/java/com/vonage/android/kotlin/Call.kt
+  h_25498f8d57a266 211,213,215-218,221-227
+vonage-video-core/src/main/java/com/vonage/android/kotlin/ext/ConnectionExt.kt
+  h_25498f8d57a266 16
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/PreviewPublisherState.kt
+  h_25498f8d57a266 64,70
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/PublisherState.kt
+  h_25498f8d57a266 129
+vonage-video-shared/src/main/java/com/vonage/android/shared/ForegroundChecker.kt
+  h_25498f8d57a266 5-12
+vonage-video-shared/src/main/java/com/vonage/android/shared/linkify/Linkify.kt
+  h_25498f8d57a266 32
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/preview/buildCallWithParticipants.kt
+  h_25498f8d57a266 65-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "66bc8085cff46a61346ac381c4b34c92601389fb",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}

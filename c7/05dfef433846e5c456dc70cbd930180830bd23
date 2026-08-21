@@ -1,0 +1,88 @@
+tools/config-tui/src/lib/schema-to-fields.ts
+  s_a1bba77085a11a::t_c42cc116de738c 1-23,69,71-76,78-79,103,105-107,115,117-132,134-154,156-157,159-160,162-163,165-166,168,170-172,177
+  s_a1bba77085a11a::t_528b0af3bf7e0a 24-68,70,77,80-102,104,108-114,116,133,155,158,161,164,167,169,173-176
+tools/config-tui/src/index.tsx
+  s_a1bba77085a11a::t_8cc72eab900145 177
+  s_a1bba77085a11a::t_be970905ecf9bf 8,70-71,81-82,85,89,98-100,113,116,118-119,121-124,151-158,163,165-166
+  s_a1bba77085a11a::t_51f6bff06e4a50 2,28-67,72-73,101-112,114-115,117,120,164
+  s_a1bba77085a11a::t_3e2889a5b5b398 3,16,24
+  s_a1bba77085a11a::t_454339d81baf8d 15,17-23,25
+  s_a1bba77085a11a::t_51f428faba760f 1,4-7,9-14,26-27,68-69,74-80,83-84,86-88,90-97,125-150,159-162,167-176
+tools/config-tui/src/lib/gradle.ts
+  s_a1bba77085a11a::t_cbf70f09c86f22 9
+  s_a1bba77085a11a::t_2429ac99de9301 6-7
+  s_a1bba77085a11a::t_c0c0f66183ec25 14,17-19,28-30,37-59,61,64
+  s_a1bba77085a11a::t_d5148ca4aa887e 22-26
+  s_a1bba77085a11a::t_6d0439c43f2804 1-5,8,10-13,15-16,20-21,27,31-36,60,62-63,65-67
+tools/config-tui/src/components/theme.tsx
+  s_a1bba77085a11a::t_3c6c5b402f39e1 1-77
+tools/config-tui/.gitignore
+  h_25498f8d57a266 1
+tools/config-tui/package.json
+  s_a1bba77085a11a::t_c83df7ee777565 1-14,17-28
+  s_a1bba77085a11a::t_8cb6f8d338d90b 15-16
+tools/config-tui/tsconfig.json
+  s_a1bba77085a11a::t_8bb632f3755e2f 1-16
+tools/config-tui/src/components/form.tsx
+  s_a1bba77085a11a::t_fcdbd3658da0c4 3-8,10-24,28,30-33,38-39,49-75,77,81-97,123,128,150,169,211,213-241,243-246
+  s_a1bba77085a11a::t_2e52c969876941 79-80
+  s_a1bba77085a11a::t_d363d077ad3ab9 9
+  s_a1bba77085a11a::t_17ea8e5de322ef 25-27,29,40-48,76
+  s_a1bba77085a11a::t_e4a4998d73d240 78
+  s_a1bba77085a11a::t_c39d3aedd82d8d 103-106,108-117
+  s_a1bba77085a11a::t_d76ccc2d43ab9b 167
+  s_a1bba77085a11a::t_811efb573e81a0 1
+  s_a1bba77085a11a::t_14f0517c6c07b5 2,34-37,100,124-125,145,155-156,161,172,202,205-210,242
+  s_a1bba77085a11a::t_d35436e1fa2df0 118-122,126-127,129-144,146,148-149,151-154,157-160,162-166,168,170-171,173-201,203-204,212
+  s_a1bba77085a11a::t_8a9effa2fe0b51 147
+  s_a1bba77085a11a::t_d12069a226c644 99,101-102,107
+  s_a1bba77085a11a::t_1d39b0b28051cf 98
+tools/config-tui/src/screens/app-config.tsx
+  s_a1bba77085a11a::t_17422dcdead53d 1-3,6-7,9-13,15-20,22-23,25-32,34-63
+  s_a1bba77085a11a::t_ce17eb2678c6ce 4-5,8,14,21,24,33
+tools/config-tui/src/lib/file-writer.ts
+  s_a1bba77085a11a::t_399f89b1817bce 1-13
+config/app-config.schema.json
+  s_c9464243f44925::t_51acc6d757bfa1 1-92
+  s_c9464243f44925::t_528201fd9c7573 93-94
+tools/config-tui/src/screens/theme.tsx
+  s_a1bba77085a11a::t_e61ae518d479a2 4-5,8,16-63,83-85,88-89,98,127
+  s_a1bba77085a11a::t_83fa3829bf56cc 1-3,6-7,9-15,64-82,86-87,90-97,99-126,128-177
+tools/config-tui/src/lib/validator.ts
+  s_a1bba77085a11a::t_276f3b23f2c341 1,10
+  s_a1bba77085a11a::t_1cd827aaa87340 2-6,9,11-60
+  s_a1bba77085a11a::t_4e86b0b21182ea 7-8
+tools/config-tui/package-lock.json
+  s_a1bba77085a11a::t_9fb688a772bbb9 1-1303
+config/theme.schema.json
+  h_25498f8d57a266 1-173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c705dfef433846e5c456dc70cbd930180830bd23",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_a1bba77085a11a": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fea8b5189ffe41z0cyja1VnpLZ",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    },
+    "s_c9464243f44925": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_224e3c46-0dc1-43d1-bf5a-22deb7eaba4b",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+vonage-video-core/src/test/java/com/vonage/android/kotlin/model/PreviewPublisherStateTest.kt
+  h_25498f8d57a266 9-12,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "eea8cc334d5134554378c0acef58c15078d8c687",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
