@@ -37,6 +37,7 @@ import com.vonage.android.screen.waiting.components.JoinRoomSection
 import com.vonage.android.screen.waiting.components.VideoControlPanel
 import com.vonage.android.screen.waiting.components.VideoPreviewContainer
 import com.vonage.android.screen.waiting.components.WaitingRoomTopBar
+import com.vonage.android.kotlin.model.NoiseSuppression
 import com.vonage.android.util.rememberNoiseSuppression
 import kotlinx.coroutines.launch
 
@@ -87,7 +88,7 @@ fun WaitingRoomScreen(
                             showAudioDeviceSelector = false
                         }
                     },
-                    noiseSuppressionEnabled = noiseSuppression.isEnabled(),
+                    noiseSuppressionEnabled = noiseSuppression == NoiseSuppression.ENABLED,
                     onNoiseSuppressorToggle = { _ ->
                         uiState.publisher?.toggleNoiseSuppression()
                     },
