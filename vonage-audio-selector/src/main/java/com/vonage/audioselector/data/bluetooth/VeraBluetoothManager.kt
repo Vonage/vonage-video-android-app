@@ -38,8 +38,6 @@ internal class VeraBluetoothManager(
         data object Disconnected : BluetoothState
     }
 
-    var bluetoothState: BluetoothState = BluetoothState.Disconnected
-
     enum class WiredState {
         Plugged,
         UnPlugged
@@ -78,19 +76,16 @@ internal class VeraBluetoothManager(
                     when (state) {
                         BluetoothProfile.STATE_CONNECTED -> {
                             Log.d(TAG, "onReceive(): BluetoothHeadset.STATE_CONNECTED")
-                            bluetoothState = BluetoothState.Connected
                             _bluetoothStates.value = BluetoothState.Connected
                         }
 
                         BluetoothProfile.STATE_DISCONNECTED -> {
                             Log.d(TAG, "onReceive(): BluetoothHeadset.STATE_DISCONNECTED")
-                            bluetoothState = BluetoothState.Disconnected
                             _bluetoothStates.value = BluetoothState.Disconnected
                         }
 
                         BluetoothHeadset.STATE_AUDIO_CONNECTED -> {
                             Log.d(TAG, "onReceive(): BluetoothHeadset.STATE_AUDIO_CONNECTED")
-                            bluetoothState = BluetoothState.AudioConnected
                             _bluetoothStates.value = BluetoothState.AudioConnected
                         }
                     }
@@ -110,7 +105,6 @@ internal class VeraBluetoothManager(
                     Log.d(TAG, "Bluetooth ${device.name} connected")
                 }
                 if (devices.isNotEmpty()) {
-                    bluetoothState = BluetoothState.Connected
                     _bluetoothStates.value = BluetoothState.Connected
                 }
             }

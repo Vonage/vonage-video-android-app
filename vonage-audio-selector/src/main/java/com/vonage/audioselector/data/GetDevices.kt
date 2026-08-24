@@ -21,7 +21,7 @@ internal class GetDevices(
     operator fun invoke(): List<AudioDeviceSelector.AudioDevice> {
         val devices = mutableListOf<AudioDeviceSelector.AudioDevice>()
 
-        if (bluetoothManager.bluetoothState != VeraBluetoothManager.BluetoothState.Disconnected) {
+        if (bluetoothManager.bluetoothStates.value != VeraBluetoothManager.BluetoothState.Disconnected) {
             devices.add(AudioDeviceSelector.AudioDevice(type = AudioDeviceSelector.AudioDeviceType.BLUETOOTH))
         }
 
