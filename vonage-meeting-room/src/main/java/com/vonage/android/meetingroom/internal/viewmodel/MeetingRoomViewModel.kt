@@ -111,7 +111,7 @@ internal class MeetingRoomViewModel(
             _uiState.update { state ->
                 state.copy(
                     isLoading = true,
-                    audioDevicesState = container.audioDevicesHandler.audioDevicesState,
+                    audioDevicesState = container.audioDevicesState,
                 )
             }
 
@@ -135,7 +135,7 @@ internal class MeetingRoomViewModel(
                 .launchIn(viewModelScope)
         }
 
-        container.audioDevicesHandler.start()
+        container.audioDeviceSelector.start()
     }
 
     /** Bridges the internal [MeetingRoomUiState] to the public [MeetingRoomCallState]. */
@@ -262,7 +262,7 @@ internal class MeetingRoomViewModel(
             container.foregroundServiceHandler.stopForegroundService()
         }
         container.vonageScreenSharing.stopSharingScreen()
-        container.audioDevicesHandler.stop()
+        container.audioDeviceSelector.stop()
         container.callSettingsHolder.clearCall()
         call?.endSession()
     }
