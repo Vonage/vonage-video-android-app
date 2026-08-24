@@ -19,8 +19,6 @@ import com.squareup.kotlinpoet.UNIT
 import com.vonage.gradle.model.ColorScheme
 import com.vonage.gradle.model.Theme
 import com.vonage.gradle.model.ThemeConfig
-import com.vonage.gradle.VONAGE
-import com.vonage.gradle.VONAGE_PREFIX
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -33,6 +31,9 @@ import java.io.File
 import com.vonage.gradle.model.TextStyle as ThemeTextStyle
 
 private const val COLOR_LENGTH = 6
+
+private const val VONAGE = "Vonage"
+private const val VONAGE_PREFIX = "vonage"
 
 private val COLOR = ClassName("androidx.compose.ui.graphics", "Color")
 private val COLOR_SCHEME = ClassName("androidx.compose.material3", "ColorScheme")

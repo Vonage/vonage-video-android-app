@@ -113,20 +113,8 @@ abstract class GenerateConfigTask : DefaultTask() {
 
     private fun resolveConfigFile(): String {
         val configPath = configFile.get()
-
-        // Check if it's a system property or command line argument
-        val systemProperty = System.getProperty("config.file")
-        systemProperty?.let {
-            return systemProperty
-        }
-
-        // Check if it's an absolute path
-        if (File(configPath).isAbsolute) {
-            return configPath
-        }
-
-        // Relative to project root
-        return project.rootDir.resolve(configPath).absolutePath
+        return if (File(configPath).isAbsolute) configPath
+        else project.rootDir.resolve(configPath).absolutePath
     }
 
     private fun generateBuildConfigClass(
