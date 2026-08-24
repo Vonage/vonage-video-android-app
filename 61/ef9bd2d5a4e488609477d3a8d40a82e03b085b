@@ -1,0 +1,23 @@
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/NoiseSuppression.kt
+  s_79332d21d2c2b7::t_4c107021a9bbc1 5
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  s_79332d21d2c2b7::t_9a963e5be763e9 46
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomScreen.kt
+  s_79332d21d2c2b7::t_3a9a4d1463d076 40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "61ef9bd2d5a4e488609477d3a8d40a82e03b085b",
+  "prompts": {},
+  "sessions": {
+    "s_79332d21d2c2b7": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_963a333a-c658-443f-bcf8-85602964c40f",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
