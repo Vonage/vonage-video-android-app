@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-
 /**
  * The fully configured meeting room, produced by [MeetingRoomBuilder.build].
  *
@@ -31,14 +30,14 @@ import kotlinx.coroutines.flow.asStateFlow
  *
  * ## State observation
  * ```kotlin
- * val state by prebuilt.stateHolder.callState.collectAsStateWithLifecycle()
+ * val state by prebuilt.callState.collectAsStateWithLifecycle()
  * ```
  *
  * The SDK proactively requests required permissions before rendering the meeting room UI.
  * Provide a custom permission composable via [MeetingRoomBuilder.permissionContent] to replace
  * the built-in permission UI with your own.
  *
- * @property stateHolder Read-only view of the current call state. Populated once [content] is
+ * @property callState  Read-only view of the current call state. Populated once [content] is
  *   first composed and the call setup begins.
  * @property content     Fully composed meeting room UI. Embed in any Compose hierarchy.
  */
@@ -88,10 +87,7 @@ class MeetingRoomPrebuilt internal constructor(
         _hangUpCommand.tryEmit(Unit)
     }
 
-    val stateHolder: MeetingRoomStateHolder = object : MeetingRoomStateHolder {
-        override val callState: StateFlow<MeetingRoomCallState> = _callState.asStateFlow()
-    }
-
+    val callState: StateFlow<MeetingRoomCallState> = _callState.asStateFlow()
     /** Called internally by [com.vonage.android.meetingroom.internal.viewmodel.MeetingRoomViewModel]. */
     internal fun updateCallState(state: MeetingRoomCallState) {
         _callState.value = state
