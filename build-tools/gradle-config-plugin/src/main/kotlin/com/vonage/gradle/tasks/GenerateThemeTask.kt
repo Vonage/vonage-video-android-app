@@ -69,15 +69,6 @@ abstract class GenerateThemeTask : DefaultTask() {
     @get:InputDirectory
     abstract val themeDirectory: DirectoryProperty
 
-    @get:Input
-    abstract val generateColors: Property<Boolean>
-
-    @get:Input
-    abstract val generateTypography: Property<Boolean>
-
-    @get:Input
-    abstract val generateShapes: Property<Boolean>
-
     @TaskAction
     fun generate() {
         val themeFile = themeJsonFile.get().asFile
@@ -92,18 +83,9 @@ abstract class GenerateThemeTask : DefaultTask() {
 
         val packageName = outputPackage.get()
 
-        if (generateColors.get()) {
-            generateColorFile(theme, outputDirectory, packageName)
-        }
-
-        if (generateShapes.get()) {
-            generateShapeFile(theme, outputDirectory, packageName)
-        }
-
-        if (generateTypography.get()) {
-            generateTypographyFile(theme, outputDirectory, packageName)
-        }
-
+        generateColorFile(theme, outputDirectory, packageName)
+        generateShapeFile(theme, outputDirectory, packageName)
+        generateTypographyFile(theme, outputDirectory, packageName)
         generateThemeFile(outputDirectory, packageName)
     }
 
