@@ -111,7 +111,6 @@ class AudioDeviceSelector {
      */
     @Stable
     data class AudioDevice(
-        val id: Int,
         val type: AudioDeviceType,
     )
 

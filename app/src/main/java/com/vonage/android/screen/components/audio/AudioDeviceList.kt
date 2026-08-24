@@ -68,9 +68,9 @@ internal fun AudioDeviceList(
         }
         items(
             items = availableDevices,
-            key = { audioDevice -> audioDevice.id },
+            key = { audioDevice -> audioDevice.type.ordinal },
         ) { audioDevice ->
-            val isSelected = audioDevice.id == activeDevice?.id
+            val isSelected = audioDevice.type == activeDevice?.type
             AudioDeviceCell(
                 audioDevice = audioDevice,
                 selectDevice = selectDevice,

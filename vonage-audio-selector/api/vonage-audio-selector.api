@@ -11,13 +11,11 @@ public final class com/vonage/audioselector/AudioDeviceSelector {
 
 public final class com/vonage/audioselector/AudioDeviceSelector$AudioDevice {
 	public static final field $stable I
-	public fun <init> (ILcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;)V
-	public final fun component1 ()I
-	public final fun component2 ()Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;
-	public final fun copy (ILcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;)Lcom/vonage/audioselector/AudioDeviceSelector$AudioDevice;
-	public static synthetic fun copy$default (Lcom/vonage/audioselector/AudioDeviceSelector$AudioDevice;ILcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;ILjava/lang/Object;)Lcom/vonage/audioselector/AudioDeviceSelector$AudioDevice;
+	public fun <init> (Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;)V
+	public final fun component1 ()Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;
+	public final fun copy (Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;)Lcom/vonage/audioselector/AudioDeviceSelector$AudioDevice;
+	public static synthetic fun copy$default (Lcom/vonage/audioselector/AudioDeviceSelector$AudioDevice;Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;ILjava/lang/Object;)Lcom/vonage/audioselector/AudioDeviceSelector$AudioDevice;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getId ()I
 	public final fun getType ()Lcom/vonage/audioselector/AudioDeviceSelector$AudioDeviceType;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;

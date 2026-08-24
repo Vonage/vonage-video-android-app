@@ -22,39 +22,19 @@ internal class GetDevices(
         val devices = mutableListOf<AudioDeviceSelector.AudioDevice>()
 
         if (bluetoothManager.bluetoothState != VeraBluetoothManager.BluetoothState.Disconnected) {
-            devices.add(
-                AudioDeviceSelector.AudioDevice(
-                    id = 1,
-                    type = AudioDeviceSelector.AudioDeviceType.BLUETOOTH
-                )
-            )
+            devices.add(AudioDeviceSelector.AudioDevice(type = AudioDeviceSelector.AudioDeviceType.BLUETOOTH))
         }
 
         if (bluetoothManager.wiredState == VeraBluetoothManager.WiredState.Plugged) {
-            devices.add(
-                AudioDeviceSelector.AudioDevice(
-                    id = 2,
-                    type = AudioDeviceSelector.AudioDeviceType.WIRED_HEADSET
-                )
-            )
+            devices.add(AudioDeviceSelector.AudioDevice(type = AudioDeviceSelector.AudioDeviceType.WIRED_HEADSET))
         }
 
         if (hasSpeaker()) {
-            devices.add(
-                AudioDeviceSelector.AudioDevice(
-                    id = 3,
-                    type = AudioDeviceSelector.AudioDeviceType.SPEAKER
-                )
-            )
+            devices.add(AudioDeviceSelector.AudioDevice(type = AudioDeviceSelector.AudioDeviceType.SPEAKER))
         }
 
         if (hasEarpiece() && bluetoothManager.wiredState == VeraBluetoothManager.WiredState.UnPlugged) {
-            devices.add(
-                AudioDeviceSelector.AudioDevice(
-                    id = 4,
-                    type = AudioDeviceSelector.AudioDeviceType.EARPIECE
-                )
-            )
+            devices.add(AudioDeviceSelector.AudioDevice(type = AudioDeviceSelector.AudioDeviceType.EARPIECE))
         }
 
         return devices
