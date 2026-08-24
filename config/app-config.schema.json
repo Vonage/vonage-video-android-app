@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Vonage Video app-config",
   "description": "Feature toggles and base URL consumed by ./gradlew generateVonageConfig. See docs/CONFIG-SYSTEM.md.",
   "type": "object",
