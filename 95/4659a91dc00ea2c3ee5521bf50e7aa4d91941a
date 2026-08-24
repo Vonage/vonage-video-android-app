@@ -1,0 +1,19 @@
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/VonagePublisherContract.kt
+  s_79332d21d2c2b7::t_68b57067beaaa0 118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "954659a91dc00ea2c3ee5521bf50e7aa4d91941a",
+  "prompts": {},
+  "sessions": {
+    "s_79332d21d2c2b7": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_963a333a-c658-443f-bcf8-85602964c40f",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
