@@ -1,19 +1,5 @@
 package com.vonage.android.reactions
 
-object EmojiData {
-
-    val emojis: List<String> = listOf (
-        "👍",
-        "👎",
-        "👋",
-        "👏",
-        "🚀",
-        "🎉",
-        "🙏",
-        "💪",
-        "❤️",
-        "😭",
-        "😮",
-        "😂",
-    )
-}
+val emojis: List<String> = listOf(
+    "👍", "👎", "👋", "👏", "🚀", "🎉", "🙏", "💪", "❤️", "😭", "😮", "😂",
+)
