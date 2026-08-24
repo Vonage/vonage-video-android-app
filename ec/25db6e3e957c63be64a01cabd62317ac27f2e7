@@ -1,0 +1,24 @@
+vonage-config-idea-plugin/src/main/kotlin/com/vonage/confighelper/ui/MainPanelPresenter.kt
+  s_e3e57aec80d2b5::t_db9217e2eae7be 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "ec25db6e3e957c63be64a01cabd62317ac27f2e7",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_e3e57aec80d2b5": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_6d3bd4e5-286e-47ae-b1ca-d181c80fdfd7",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
