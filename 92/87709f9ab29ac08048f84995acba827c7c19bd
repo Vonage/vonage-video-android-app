@@ -1,0 +1,23 @@
+tools/config-tui-py/vonage_config_tui/gradle.py
+  s_79332d21d2c2b7::t_d4a29c121b3e90 12-25
+tools/config-tui-py/vonage_config_tui/validator.py
+  s_79332d21d2c2b7::t_c1817813389ded 15-31
+tools/config-tui-py/vonage_config_tui/screens.py
+  s_79332d21d2c2b7::t_b3770d4d86813f 409-410
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "9287709f9ab29ac08048f84995acba827c7c19bd",
+  "prompts": {},
+  "sessions": {
+    "s_79332d21d2c2b7": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_963a333a-c658-443f-bcf8-85602964c40f",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
