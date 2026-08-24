@@ -6,7 +6,8 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.config.GetConfig
-import com.vonage.android.data.UserRepository
+import com.vonage.android.data.storage.GlobalDataStorage
+import com.vonage.android.data.storage.GlobalDataStorage.Companion.USER_NAME
 import com.vonage.android.fx.data.BackgroundsResult
 import com.vonage.android.fx.data.GetBackgroundsUseCase
 import com.vonage.android.fx.data.UserBackgroundRepository
@@ -30,9 +31,11 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.datastore.preferences.core.edit
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.stateIn
@@ -45,7 +48,7 @@ import kotlinx.coroutines.withContext
 class WaitingRoomViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
     private val getConfig: GetConfig,
-    private val userRepository: UserRepository,
+    private val userRepository: GlobalDataStorage,
     private val videoClient: VonageVideoClient,
     private val audioDevicesHandler: AudioDevicesHandler,
     private val callSettingsHolder: CallSettingsHolder,
@@ -69,7 +72,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
         callSettingsHolder.clearCall()
         viewModelScope.launch {
             val config = getConfig()
-            val name = userRepository.getUserName()
+            val name = userRepository.data.firstOrNull()?.get(USER_NAME).orEmpty()
             videoClient.configurePublisher(buildPreviewConfig(name))
             videoClient.createPreviewPublisher(context)
                 .also { publisher ->
@@ -149,7 +152,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
                 _uiState.update { uiState -> uiState.copy(isUserNameValid = false) }
                 return@launch
             }
-            userRepository.saveUserName(sanitizedUserName)
+            userRepository.edit { it[USER_NAME] = sanitizedUserName }
             val joinSettings = currentPublisher()?.let { publisher ->
                 val effect = publisher.videoEffect.value
                 val publishAudio = publisher.isMicEnabled.value
