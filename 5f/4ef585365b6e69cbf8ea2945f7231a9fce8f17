@@ -1,0 +1,24 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomPrebuilt.kt
+  s_79332d21d2c2b7::t_05eb36391ae387 90
+  s_79332d21d2c2b7::t_655e22f3f7b611 33,40
+vonage-meeting-room/README.md
+  s_79332d21d2c2b7::t_c0b4796acfd5c0 124
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomCallState.kt
+  s_79332d21d2c2b7::t_b9fec09bc7b7cf 1-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "5f4ef585365b6e69cbf8ea2945f7231a9fce8f17",
+  "prompts": {},
+  "sessions": {
+    "s_79332d21d2c2b7": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_963a333a-c658-443f-bcf8-85602964c40f",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
