@@ -1,0 +1,19 @@
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/getParticipantColor.kt
+  s_79332d21d2c2b7::t_b7212440107e33 6-17,19,21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "ed76ad2bc2989cb50b9618e0f5cd7c0e043098e7",
+  "prompts": {},
+  "sessions": {
+    "s_79332d21d2c2b7": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_963a333a-c658-443f-bcf8-85602964c40f",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
