@@ -1,6 +1,5 @@
 package com.vonage.android.screen.landing
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -37,18 +35,10 @@ fun LandingScreen(
     modifier: Modifier = Modifier,
     navigateToRoom: (LandingScreenRouteParams) -> Unit = {},
 ) {
-    val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
-    val errorMessage = stringResource(R.string.landing_room_generic_error_message)
 
     when (uiState) {
         is LandingScreenUiState.Content -> {
-            LaunchedEffect(uiState.isError) {
-                if (uiState.isError) {
-                    Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-                }
-            }
-
             Box(modifier = modifier.fillMaxSize()) {
                 TwoPaneScaffold(
                     modifier = Modifier

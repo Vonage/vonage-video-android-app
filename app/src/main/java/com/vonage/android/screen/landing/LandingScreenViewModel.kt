@@ -50,7 +50,6 @@ sealed interface LandingScreenUiState {
     data class Content(
         val roomName: String = "",
         val isRoomNameWrong: Boolean = false,
-        val isError: Boolean = false,
     ) : LandingScreenUiState
 
     data class Success(
