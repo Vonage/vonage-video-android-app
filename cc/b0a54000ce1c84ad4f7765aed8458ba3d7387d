@@ -1,0 +1,21 @@
+vonage-audio-selector/api/vonage-audio-selector.api
+  s_79332d21d2c2b7::t_0863494ac0bb5b 14-17
+vonage-audio-selector/src/main/java/com/vonage/audioselector/data/GetDevices.kt
+  s_79332d21d2c2b7::t_02ca40363111bf 25,29,33,37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "ccb0a54000ce1c84ad4f7765aed8458ba3d7387d",
+  "prompts": {},
+  "sessions": {
+    "s_79332d21d2c2b7": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_963a333a-c658-443f-bcf8-85602964c40f",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
