@@ -1,0 +1,21 @@
+vonage-feature-reactions/src/enabled/java/com/vonage/android/reactions/ui/EmojiSelector.kt
+  s_79332d21d2c2b7::t_333e413fa67e78 26
+vonage-feature-reactions/src/enabled/java/com/vonage/android/reactions/EmojiData.kt
+  s_79332d21d2c2b7::t_d52219e24f3309 3-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "49fb9caa5419c46ba43fbf38550d5465310373af",
+  "prompts": {},
+  "sessions": {
+    "s_79332d21d2c2b7": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_963a333a-c658-443f-bcf8-85602964c40f",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
