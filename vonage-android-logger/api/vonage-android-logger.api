@@ -32,7 +32,7 @@ public final class com/vonage/logger/LogLevel : java/lang/Enum {
 }
 
 public final class com/vonage/logger/VonageLogger {
-	public synthetic fun <init> (Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> ([Lcom/vonage/logger/interceptor/LogInterceptor;)V
 	public final fun d (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
 	public static synthetic fun d$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
 	public final fun e (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
@@ -45,12 +45,6 @@ public final class com/vonage/logger/VonageLogger {
 	public static synthetic fun v$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
 	public final fun w (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
 	public static synthetic fun w$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
-}
-
-public final class com/vonage/logger/VonageLogger$Builder {
-	public fun <init> ()V
-	public final fun addInterceptor (Lcom/vonage/logger/interceptor/LogInterceptor;)Lcom/vonage/logger/VonageLogger$Builder;
-	public final fun build ()Lcom/vonage/logger/VonageLogger;
 }
 
 public final class com/vonage/logger/VonageLoggerKt {
