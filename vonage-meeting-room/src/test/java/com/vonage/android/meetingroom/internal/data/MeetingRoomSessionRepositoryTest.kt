@@ -15,55 +15,33 @@ class MeetingRoomSessionRepositoryTest {
     private val sut = MeetingRoomSessionRepository(apiService)
 
     @Test
-    fun `given api success returns mapped SessionInfo`() = runTest {
-        coEvery { apiService.getSession(any()) } returns Response.success(
-            GetSessionResponse(
-                apiKey = "apiKey",
-                sessionId = "sessionId",
-                token = "token",
-                captionsId = null,
-            )
+    fun `given api success returns GetSessionResponse`() = runTest {
+        val response = GetSessionResponse(
+            apiKey = "apiKey",
+            sessionId = "sessionId",
+            token = "token",
+            captionsId = null,
         )
+        coEvery { apiService.getSession(any()) } returns Response.success(response)
 
         val result = sut.getSession("any-room-name")
 
-        assertEquals(
-            Result.success(
-                SessionInfo(
-                    apiKey = "apiKey",
-                    sessionId = "sessionId",
-                    token = "token",
-                    captionsId = null,
-                )
-            ),
-            result,
-        )
+        assertEquals(Result.success(response), result)
     }
 
     @Test
-    fun `given api success with captionsId returns mapped SessionInfo with captionsId`() = runTest {
-        coEvery { apiService.getSession(any()) } returns Response.success(
-            GetSessionResponse(
-                apiKey = "apiKey",
-                sessionId = "sessionId",
-                token = "token",
-                captionsId = "captionsId",
-            )
+    fun `given api success with captionsId returns GetSessionResponse with captionsId`() = runTest {
+        val response = GetSessionResponse(
+            apiKey = "apiKey",
+            sessionId = "sessionId",
+            token = "token",
+            captionsId = "captionsId",
         )
+        coEvery { apiService.getSession(any()) } returns Response.success(response)
 
         val result = sut.getSession("any-room-name")
 
-        assertEquals(
-            Result.success(
-                SessionInfo(
-                    apiKey = "apiKey",
-                    sessionId = "sessionId",
-                    token = "token",
-                    captionsId = "captionsId",
-                )
-            ),
-            result,
-        )
+        assertEquals(Result.success(response), result)
     }
 
     @Test
@@ -88,11 +66,11 @@ class MeetingRoomSessionRepositoryTest {
 
     @Test
     fun `given api throws exception returns failure`() = runTest {
-        coEvery { apiService.getSession(any()) } throws Exception("Network error")
+        coEvery { apiService.getSession(any()) } throws RuntimeException("network error")
 
         val result = sut.getSession("any-room-name")
 
         assertTrue(result.isFailure)
-        assertEquals("Network error", result.exceptionOrNull()?.message)
+        assertEquals("network error", result.exceptionOrNull()?.message)
     }
 }

@@ -14,10 +14,3 @@ internal data class GetSessionResponse(
     @SerialName("captionsId")
     val captionsId: String? = null,
 )
-
-internal data class SessionInfo(
-    val apiKey: String,
-    val sessionId: String,
-    val token: String,
-    val captionsId: String?,
-)

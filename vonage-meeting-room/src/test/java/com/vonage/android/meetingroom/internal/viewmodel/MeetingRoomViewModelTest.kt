@@ -21,7 +21,7 @@ import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
 import com.vonage.android.meetingroom.internal.data.MeetingRoomSessionRepository
-import com.vonage.android.meetingroom.internal.data.SessionInfo
+import com.vonage.android.meetingroom.internal.data.GetSessionResponse
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
 import com.vonage.android.meetingroom.internal.screen.audio.AudioDevicesState
@@ -895,7 +895,7 @@ class MeetingRoomViewModelTest {
         token: String = "token",
         captionsId: String? = null,
     ) = success(
-        SessionInfo(apiKey = apiKey, sessionId = sessionId, token = token, captionsId = captionsId),
+        GetSessionResponse(apiKey = apiKey, sessionId = sessionId, token = token, captionsId = captionsId),
     )
 
     // endregion

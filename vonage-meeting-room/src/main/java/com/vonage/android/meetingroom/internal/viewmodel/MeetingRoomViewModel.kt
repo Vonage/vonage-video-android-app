@@ -18,7 +18,7 @@ import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.MeetingRoomCallState
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
-import com.vonage.android.meetingroom.internal.data.SessionInfo
+import com.vonage.android.meetingroom.internal.data.GetSessionResponse
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler.CallAction
@@ -158,7 +158,7 @@ internal class MeetingRoomViewModel(
     }
 
     private fun connect(
-        sessionInfo: SessionInfo,
+        sessionInfo: GetSessionResponse,
         roomName: String,
     ) {
         viewModelScope.launch {
