@@ -53,7 +53,7 @@ class VeraBluetoothManagerTest {
     fun `initial state is Disconnected`() {
         sut = createBluetoothManager()
 
-        assertEquals(VeraBluetoothManager.BluetoothState.Disconnected, sut.bluetoothState)
+        assertEquals(VeraBluetoothManager.BluetoothState.Disconnected, sut.bluetoothStates.value)
     }
 
     @Test
@@ -143,7 +143,7 @@ class VeraBluetoothManagerTest {
                 testDispatcher.scheduler.advanceUntilIdle()
 
                 assertEquals(VeraBluetoothManager.BluetoothState.Connected, awaitItem())
-                assertEquals(VeraBluetoothManager.BluetoothState.Connected, sut.bluetoothState)
+                assertEquals(VeraBluetoothManager.BluetoothState.Connected, sut.bluetoothStates.value)
             }
         }
 
@@ -163,7 +163,7 @@ class VeraBluetoothManagerTest {
 
         serviceListenerSlot.captured.onServiceConnected(BluetoothProfile.HEADSET, bluetoothProfile)
 
-        assertEquals(VeraBluetoothManager.BluetoothState.Disconnected, sut.bluetoothState)
+        assertEquals(VeraBluetoothManager.BluetoothState.Disconnected, sut.bluetoothStates.value)
     }
 
     @Test

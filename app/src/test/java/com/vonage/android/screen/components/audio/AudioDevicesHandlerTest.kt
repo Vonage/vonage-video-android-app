@@ -65,7 +65,7 @@ class AudioDevicesHandlerTest {
 
     @Test
     fun `audioDevicesState selectDevice should delegate to selector`() {
-        val device = AudioDevice(id = 1, type = AudioDeviceType.SPEAKER)
+        val device = AudioDevice(type = AudioDeviceType.SPEAKER)
 
         handler.audioDevicesState.selectDevice(device)
 
@@ -83,8 +83,8 @@ class AudioDevicesHandlerTest {
     @Test
     fun `audioDevicesState should reflect updated available devices`() {
         val devices = persistentListOf(
-            AudioDevice(id = 1, type = AudioDeviceType.SPEAKER),
-            AudioDevice(id = 2, type = AudioDeviceType.BLUETOOTH),
+            AudioDevice(type = AudioDeviceType.SPEAKER),
+            AudioDevice(type = AudioDeviceType.BLUETOOTH),
         )
         availableDevicesFlow.value = devices
 
@@ -95,7 +95,7 @@ class AudioDevicesHandlerTest {
 
     @Test
     fun `audioDevicesState should reflect updated active device`() {
-        val device = AudioDevice(id = 3, type = AudioDeviceType.EARPIECE)
+        val device = AudioDevice(type = AudioDeviceType.EARPIECE)
         activeDeviceFlow.value = device
 
         val result = handler.audioDevicesState.activeDevice.value

@@ -55,8 +55,8 @@ internal fun AudioDevicesMenuPreview() {
             audioDevicesState = AudioDevicesState(
                 availableDevices = MutableStateFlow(
                     persistentListOf(
-                        AudioDevice(1, AudioDeviceType.EARPIECE),
-                        AudioDevice(2, AudioDeviceType.SPEAKER),
+                        AudioDevice(AudioDeviceType.EARPIECE),
+                        AudioDevice(AudioDeviceType.SPEAKER),
                     )
                 ),
                 activeDevice = MutableStateFlow(null),

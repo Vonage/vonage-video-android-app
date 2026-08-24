@@ -43,8 +43,8 @@ class AudioDeviceSelectorTest {
         dispatcher = testDispatcher,
     )
 
-    private val headset = AudioDeviceSelector.AudioDevice(1, AudioDeviceSelector.AudioDeviceType.WIRED_HEADSET)
-    private val speaker = AudioDeviceSelector.AudioDevice(2, AudioDeviceSelector.AudioDeviceType.SPEAKER)
+    private val headset = AudioDeviceSelector.AudioDevice(AudioDeviceSelector.AudioDeviceType.WIRED_HEADSET)
+    private val speaker = AudioDeviceSelector.AudioDevice(AudioDeviceSelector.AudioDeviceType.SPEAKER)
 
     @BeforeEach
     fun setUpDispatchers() {

@@ -38,7 +38,7 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
     )
 
     init {
-        flow {
+        flow<Unit> {
             while (currentCoroutineContext().isActive) {
                 var stop = false
                 vonageArchiving.getRecordings(roomName)

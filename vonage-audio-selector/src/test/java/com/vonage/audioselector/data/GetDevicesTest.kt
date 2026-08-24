@@ -10,6 +10,7 @@ import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager.BluetoothSta
 import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager.WiredState
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments.of
 import org.junit.jupiter.params.provider.MethodSource
@@ -34,7 +35,7 @@ internal class GetDevicesTest {
         hasEarpiece: Boolean,
         expectedDeviceList: List<AudioDevice>,
     ) {
-        every { bluetoothManager.bluetoothState } returns bluetoothState
+        every { bluetoothManager.bluetoothStates } returns MutableStateFlow(bluetoothState)
         every { bluetoothManager.wiredState } returns wiredState
         every { context.packageManager } returns mockk<PackageManager> {
             every { hasSystemFeature(PackageManager.FEATURE_TELEPHONY) } returns hasEarpiece
@@ -54,31 +55,31 @@ internal class GetDevicesTest {
             // bluetooth connected, wired unplugged and earpiece
             of(
                 BluetoothState.Connected, WiredState.UnPlugged, true, listOf(
-                    AudioDevice(id = 1, type = AudioDeviceType.BLUETOOTH),
-                    AudioDevice(id = 3, type = AudioDeviceType.SPEAKER),
-                    AudioDevice(id = 4, type = AudioDeviceType.EARPIECE),
+                    AudioDevice(type = AudioDeviceType.BLUETOOTH),
+                    AudioDevice(type = AudioDeviceType.SPEAKER),
+                    AudioDevice(type = AudioDeviceType.EARPIECE),
                 )
             ),
             // bluetooth disconnected, wired unplugged and earpiece
             of(
                 BluetoothState.Disconnected, WiredState.UnPlugged, true, listOf(
-                    AudioDevice(id = 3, type = AudioDeviceType.SPEAKER),
-                    AudioDevice(id = 4, type = AudioDeviceType.EARPIECE),
+                    AudioDevice(type = AudioDeviceType.SPEAKER),
+                    AudioDevice(type = AudioDeviceType.EARPIECE),
                 )
             ),
             // bluetooth connected, wired plugged — earpiece suppressed by wired headset
             of(
                 BluetoothState.Connected, WiredState.Plugged, true, listOf(
-                    AudioDevice(id = 1, type = AudioDeviceType.BLUETOOTH),
-                    AudioDevice(id = 2, type = AudioDeviceType.WIRED_HEADSET),
-                    AudioDevice(id = 3, type = AudioDeviceType.SPEAKER),
+                    AudioDevice(type = AudioDeviceType.BLUETOOTH),
+                    AudioDevice(type = AudioDeviceType.WIRED_HEADSET),
+                    AudioDevice(type = AudioDeviceType.SPEAKER),
                 )
             ),
             // bluetooth disconnected, wired plugged — earpiece suppressed by wired headset
             of(
                 BluetoothState.Disconnected, WiredState.Plugged, true, listOf(
-                    AudioDevice(id = 2, type = AudioDeviceType.WIRED_HEADSET),
-                    AudioDevice(id = 3, type = AudioDeviceType.SPEAKER),
+                    AudioDevice(type = AudioDeviceType.WIRED_HEADSET),
+                    AudioDevice(type = AudioDeviceType.SPEAKER),
                 )
             ),
         )

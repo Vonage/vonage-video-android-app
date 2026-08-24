@@ -161,12 +161,12 @@ internal fun AudioDeviceListPreview() {
         AudioDeviceList(
             modifier = Modifier.background(VonageVideoTheme.colors.surface),
             availableDevices = persistentListOf(
-                AudioDevice(1, AudioDeviceType.BLUETOOTH),
-                AudioDevice(2, AudioDeviceType.EARPIECE),
-                AudioDevice(3, AudioDeviceType.SPEAKER),
-                AudioDevice(4, AudioDeviceType.WIRED_HEADSET),
+                AudioDevice(AudioDeviceType.BLUETOOTH),
+                AudioDevice(AudioDeviceType.EARPIECE),
+                AudioDevice(AudioDeviceType.SPEAKER),
+                AudioDevice(AudioDeviceType.WIRED_HEADSET),
             ),
-            activeDevice = AudioDevice(3, AudioDeviceType.SPEAKER),
+            activeDevice = AudioDevice(AudioDeviceType.SPEAKER),
             selectDevice = {},
         )
     }
