@@ -1,0 +1,25 @@
+vonage-config-idea-plugin/src/main/kotlin/com/vonage/confighelper/service/GradleExecutionService.kt
+  s_9716c11079bfee::t_45d8354539f680 6-7,50,88-90
+vonage-config-idea-plugin/README.md
+  s_9716c11079bfee::t_e4757fdc0fd067 1
+vonage-config-idea-plugin/build.gradle.kts
+  s_9716c11079bfee::t_badeb3897a31a3 27-35
+  s_9716c11079bfee::t_75c6cf6327f7e7 4,11-12,16,55,58
+  s_9716c11079bfee::t_b52ee7954c77f6 59-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "2d3a5de20836a156ffb03af21b9ff60d60272809",
+  "prompts": {},
+  "sessions": {
+    "s_9716c11079bfee": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_77797f19-eb90-4d28-81c3-a7f0e4fe3154",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
