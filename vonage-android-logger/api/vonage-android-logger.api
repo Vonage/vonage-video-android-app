@@ -62,17 +62,6 @@ public final class com/vonage/logger/interceptor/AndroidLogInterceptor : com/von
 	public fun intercept (Lcom/vonage/logger/LogEvent;)Lcom/vonage/logger/LogEvent;
 }
 
-public final class com/vonage/logger/interceptor/FileLogInterceptor : com/vonage/logger/interceptor/LogInterceptor {
-	public static final field Companion Lcom/vonage/logger/interceptor/FileLogInterceptor$Companion;
-	public static final field DEFAULT_DATE_FORMAT Ljava/lang/String;
-	public static final field DEFAULT_MAX_FILE_SIZE J
-	public fun <init> (Ljava/io/File;JLjava/lang/String;)V
-	public synthetic fun <init> (Ljava/io/File;JLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun intercept (Lcom/vonage/logger/LogEvent;)Lcom/vonage/logger/LogEvent;
-}
-
-public final class com/vonage/logger/interceptor/FileLogInterceptor$Companion {
-}
 
 public abstract interface class com/vonage/logger/interceptor/LogInterceptor {
 	public abstract fun intercept (Lcom/vonage/logger/LogEvent;)Lcom/vonage/logger/LogEvent;
