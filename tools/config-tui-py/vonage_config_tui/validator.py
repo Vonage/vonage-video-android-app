@@ -12,12 +12,23 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
-# tools/config-tui-py/vonage_config_tui/validator.py
-#   parents[0] = vonage_config_tui/
-#   parents[1] = config-tui-py/
-#   parents[2] = tools/
-#   parents[3] = project root
-CONFIG_ROOT: Path = Path(__file__).resolve().parents[3] / "config"
+def _find_config_root() -> Path:
+    """Locate the repo's config/ directory.
+
+    Walk upward from cwd until we find a directory that contains
+    config/app-config.json (the definitive repo marker). Falls back to the
+    __file__-relative path so that ``python -m vonage_config_tui`` from the
+    repo root still works without an install.
+    """
+    for parent in [Path.cwd(), *Path.cwd().parents]:
+        candidate = parent / "config" / "app-config.json"
+        if candidate.exists():
+            return parent / "config"
+    # fallback: __file__-relative (works when running from repo without install)
+    return Path(__file__).resolve().parents[3] / "config"
+
+
+CONFIG_ROOT: Path = _find_config_root()
 
 
 def _load_schema(filename: str) -> dict[str, Any]:

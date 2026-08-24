@@ -9,8 +9,20 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Optional
 
-# parents[3] = project root (see validator.py for the rationale)
-PROJECT_ROOT: Path = Path(__file__).resolve().parents[3]
+def _find_project_root() -> Path:
+    """Locate the repo root by walking upward from cwd until gradlew is found.
+
+    Falls back to the __file__-relative path so that ``python -m vonage_config_tui``
+    from the repo root still works without an install.
+    """
+    for parent in [Path.cwd(), *Path.cwd().parents]:
+        if (parent / "gradlew").exists() or (parent / "gradlew.bat").exists():
+            return parent
+    # fallback: __file__-relative (works when running from repo without install)
+    return Path(__file__).resolve().parents[3]
+
+
+PROJECT_ROOT: Path = _find_project_root()
 
 ProgressCallback = Callable[[str], None]
 

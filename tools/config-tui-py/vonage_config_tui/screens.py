@@ -406,6 +406,8 @@ def _set_nested(obj: dict[str, Any], path: list[str], value: Any) -> dict[str, A
     clone = deepcopy(obj)
     target = clone
     for key in path[:-1]:
+        if not isinstance(target.get(key), dict):  # type: ignore[union-attr]
+            target[key] = {}  # type: ignore[index]
         target = target[key]  # type: ignore[assignment]
     target[path[-1]] = value
     return clone
