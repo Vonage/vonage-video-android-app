@@ -115,12 +115,7 @@ data class VonagePublisherAudioStatsEntry(
 enum class VonageBlurLevel {
     NONE,
     LOW,
-    HIGH;
-
-    companion object {
-        private val map = entries.toTypedArray()
-        infix fun by(index: Int): VonageBlurLevel = map[index % entries.size]
-    }
+    HIGH,
 }
 
 enum class VonageNoiseSuppression {
