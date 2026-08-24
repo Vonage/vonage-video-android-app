@@ -4,7 +4,7 @@ import java.lang.ref.WeakReference
 
 /**
  * Lightweight holder for the current Activity context, scoped to the meeting room session.
- * Replaces Hilt's [ActivityContextProvider] without requiring DI.
+ * Replaces a context provider without requiring DI.
  */
 internal class ActivityContextHolder {
 
