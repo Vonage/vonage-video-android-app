@@ -1,0 +1,21 @@
+build-tools/gradle-config-plugin/src/main/kotlin/com/vonage/gradle/ThemeGeneratorPlugin.kt
+  s_79332d21d2c2b7::t_b5c9ded3c4c8e9 22
+build-tools/gradle-config-plugin/src/main/kotlin/com/vonage/gradle/tasks/GenerateThemeTask.kt
+  s_79332d21d2c2b7::t_036b32e2ccac2c 86-88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "e6a0edf37a9c763994f1bd86fdaed39cf7c700b0",
+  "prompts": {},
+  "sessions": {
+    "s_79332d21d2c2b7": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_963a333a-c658-443f-bcf8-85602964c40f",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
