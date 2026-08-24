@@ -1,4 +1,4 @@
-# Vonage Reference App Config Plugin
+# Vonage Reference App Config
 
 An Android Studio / IntelliJ IDEA plugin that helps to work with configurable features in Vonage Reference App.
 
