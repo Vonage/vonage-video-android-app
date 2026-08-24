@@ -5,10 +5,10 @@ plugins {
 
 android {
     namespace = "com.vonage.android.kotlin.sdk"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 24
+        minSdk = libs.versions.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -40,7 +40,7 @@ dependencies {
     implementation(project(":vonage-android-logger"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.opentok.android.sdk)
+    implementation(libs.vonage.android.sdk)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)

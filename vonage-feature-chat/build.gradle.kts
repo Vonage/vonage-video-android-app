@@ -6,10 +6,10 @@ plugins {
 
 android {
     namespace = "com.vonage.android.chat"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 24
+        minSdk = libs.versions.minSdk.get().toInt()
     }
 
     compileOptions {
@@ -48,7 +48,7 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.opentok.android.sdk)
+    implementation(libs.vonage.android.sdk)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

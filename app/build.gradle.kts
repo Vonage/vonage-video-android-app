@@ -28,12 +28,12 @@ if (configFile.exists()) {
 
 android {
     namespace = "com.vonage.android"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         applicationId = "com.vonage.android"
-        minSdk = 24
-        targetSdk = 36
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
         // NOTE: The following versionCode and versionName are placeholders.
         // Actual values are set dynamically by the GitHub Actions workflow during CI/CD.
         versionCode = 130
@@ -242,7 +242,7 @@ dependencies {
     releaseImplementation(libs.firebase.analytics)
 
     // Vonage Video Android SDK, needed to customize Audio Device
-    implementation(libs.opentok.android.sdk)
+    implementation(libs.vonage.android.sdk)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
