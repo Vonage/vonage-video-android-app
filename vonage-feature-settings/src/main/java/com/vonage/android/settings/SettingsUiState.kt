@@ -7,7 +7,6 @@ import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoCodec
-import com.vonage.android.settings.PersistedCallSettings
 import com.vonage.android.shared.ViewState
 
 @Stable
