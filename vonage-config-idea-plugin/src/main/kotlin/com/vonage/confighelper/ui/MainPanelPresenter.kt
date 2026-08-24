@@ -9,9 +9,9 @@ import com.vonage.confighelper.service.GradleExecutionService
 import com.vonage.confighelper.service.JsonParserService
 import com.vonage.confighelper.service.VonageConfigHelper
 import java.io.File
-import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Date
+import java.util.Date // used by LogEntry
 
 class MainPanelPresenter(
     private val project: Project,
@@ -43,7 +43,7 @@ class MainPanelPresenter(
 
     fun refresh() {
         loadConfigFile()
-        val timestamp = dateFormat.format(LocalDate.now())
+        val timestamp = dateFormat.format(LocalDateTime.now())
         addLog("[$timestamp] Manually refreshed config file")
         handleConfigChange(timestamp)
     }
@@ -52,7 +52,7 @@ class MainPanelPresenter(
         val fileChangeListener = project.service<FileChangeListener>()
         fileChangeListener.addListener { file, changeType ->
             if (file.name == "app-config.json" && changeType == FileChangeListener.ChangeType.MODIFIED) {
-                val timestamp = dateFormat.format(LocalDate.now())
+                val timestamp = dateFormat.format(LocalDateTime.now())
                 loadConfigFile()
                 val settings = VonageConfigHelper.getInstance(project)
                 if (settings.state.autoRunGradleTasks) {
@@ -73,17 +73,17 @@ class MainPanelPresenter(
                 }
 
                 override fun onOutput(message: String) {
-                    val ts = dateFormat.format(LocalDate.now())
+                    val ts = dateFormat.format(LocalDateTime.now())
                     addLog("[$ts] $message")
                 }
 
                 override fun onSuccess() {
-                    val ts = dateFormat.format(LocalDate.now())
+                    val ts = dateFormat.format(LocalDateTime.now())
                     addLog("[$ts] Gradle tasks completed successfully")
                 }
 
                 override fun onFailure(exitCode: Int) {
-                    val ts = dateFormat.format(LocalDate.now())
+                    val ts = dateFormat.format(LocalDateTime.now())
                     if (exitCode >= 0) {
                         addLog("[$ts] Gradle tasks failed with exit code $exitCode")
                     }
