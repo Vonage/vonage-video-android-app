@@ -1,0 +1,23 @@
+vonage-android-logger/api/vonage-android-logger.api
+  s_79332d21d2c2b7::t_78fe864b60872e 35
+vonage-android-logger/src/main/java/com/vonage/logger/VonageLogger.kt
+  s_79332d21d2c2b7::t_a50a0a2663c955 11,16-17,43
+vonage-android-logger/src/test/java/com/vonage/logger/VonageLoggerTest.kt
+  s_79332d21d2c2b7::t_8e21afc5c7baee 20,33,46,66,78,90-94,104-107,118-121,130,138,150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "a5d7d68c981ad79f1101bf758e559cb23e636b3f",
+  "prompts": {},
+  "sessions": {
+    "s_79332d21d2c2b7": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_963a333a-c658-443f-bcf8-85602964c40f",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
