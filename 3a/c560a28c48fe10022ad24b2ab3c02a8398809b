@@ -1,0 +1,22 @@
+vonage-feature-settings/src/main/java/com/vonage/android/settings/SettingsUiState.kt
+  s_79332d21d2c2b7::t_81f4fd4634df44 22
+  s_79332d21d2c2b7::t_8e94cd9f75b08f 10
+vonage-feature-settings/src/main/java/com/vonage/android/settings/CallSettingsHolder.kt
+  s_79332d21d2c2b7::t_c11c385f6ab0ab 33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "3ac560a28c48fe10022ad24b2ab3c02a8398809b",
+  "prompts": {},
+  "sessions": {
+    "s_79332d21d2c2b7": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_963a333a-c658-443f-bcf8-85602964c40f",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
