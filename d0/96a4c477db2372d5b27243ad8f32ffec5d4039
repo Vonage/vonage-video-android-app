@@ -1,0 +1,20 @@
+app/src/main/java/com/vonage/android/screen/goodbye/GoodbyeScreenViewModel.kt
+  s_79332d21d2c2b7::t_61420f97c8ccae 16-17,21-22,24
+  s_79332d21d2c2b7::t_8003a8f9d96baa 41-43,46-47,49-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "d096a4c477db2372d5b27243ad8f32ffec5d4039",
+  "prompts": {},
+  "sessions": {
+    "s_79332d21d2c2b7": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_963a333a-c658-443f-bcf8-85602964c40f",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
