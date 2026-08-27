@@ -44,6 +44,7 @@ class Form(Widget, can_focus=True):
     cursor: reactive[int] = reactive(0)
     editing: reactive[bool] = reactive(False)
     redraw_tick: reactive[int] = reactive(0)
+    scroll_offset: reactive[int] = reactive(0)
 
     def __init__(
         self,
@@ -62,6 +63,7 @@ class Form(Widget, can_focus=True):
         first = next((i for i, f in enumerate(fields) if f.type != "section"), 0)
         # Set before mount so no watcher fires yet.
         self.set_reactive(Form.cursor, first)
+        self.set_reactive(Form.scroll_offset, 0)
 
     # ------------------------------------------------------------------ mount
 
@@ -85,6 +87,13 @@ class Form(Widget, can_focus=True):
 
     def watch_redraw_tick(self, _old: int, _new: int) -> None:
         self.refresh()
+
+    def watch_scroll_offset(self, _old: int, _new: int) -> None:
+        self.refresh()
+
+    def _visible_height(self) -> int:
+        """Usable lines for the fields column (total height minus the hint line + blank)."""
+        return max(1, self.size.height - 2)
 
     def _next_editable(self, from_idx: int, direction: int) -> int:
         i = from_idx + direction
@@ -170,6 +179,9 @@ class Form(Widget, can_focus=True):
 
     def _render_fields(self) -> RenderableType:
         rows: list[Text] = []
+        # Map from field index → row index (so scroll-to-cursor works correctly).
+        field_to_row: dict[int, int] = {}
+
         for i, field in enumerate(self.fields):
             if field.type == "section":
                 if i > 0:
@@ -180,6 +192,7 @@ class Form(Widget, can_focus=True):
                 rows.append(header)
                 continue
 
+            field_to_row[i] = len(rows)
             active = i == self.cursor
             line = Text()
             line.append("❯ " if active else "  ", style=pal.PRIMARY if active else pal.MUTED)
@@ -198,12 +211,26 @@ class Form(Widget, can_focus=True):
                 line.append(self._render_value(field, self.values.get(field.key), active))
             rows.append(line)
 
-        rows.append(Text(""))
-        rows.append(Text(
-            "↑↓ navigate  ⏎/space toggle  s/ctrl+s save  q/esc back",
+        # Scroll to keep the cursor row visible (using actual row index, not field index).
+        visible = self._visible_height()
+        cursor_row = field_to_row.get(self.cursor, 0)
+        if cursor_row < self.scroll_offset:
+            self.scroll_offset = cursor_row
+        elif cursor_row >= self.scroll_offset + visible:
+            self.scroll_offset = cursor_row - visible + 1
+
+        total = len(rows)
+        offset = max(0, min(self.scroll_offset, max(0, total - visible)))
+        visible_rows = rows[offset: offset + visible]
+
+        # Scroll position indicator appended to the hint line.
+        pos_hint = f" ({offset + 1}-{min(offset + visible, total)}/{total})" if total > visible else ""
+        visible_rows.append(Text(""))
+        visible_rows.append(Text(
+            f"↑↓ navigate  ⏎/space toggle  s/ctrl+s save  q/esc back{pos_hint}",
             style=pal.MUTED,
         ))
-        return Group(*rows)
+        return Group(*visible_rows)
 
     def _render_value(self, field: FormField, value: Any, active: bool) -> Text:
         t = Text()
