@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Vonage Video theme",
+  "description": "Design tokens consumed by ./gradlew :vonage-video-ui-compose:generateTheme.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["themes"],
+  "properties": {
+    "themes": {
+      "type": "object",
+      "description": "Theme set. Only the 'vonage' theme is consumed by the generator.",
+      "additionalProperties": false,
+      "required": ["vonage"],
+      "properties": { "vonage": { "$ref": "#/$defs/theme" } }
+    }
+  },
+  "$defs": {
+    "theme": {
+      "type": "object",
+      "description": "One theme: color schemes, corner radii, and type scale.",
+      "additionalProperties": false,
+      "required": ["colors", "borderRadius", "typography"],
+      "properties": {
+        "colors": {
+          "type": "object",
+          "description": "Light and dark color schemes.",
+          "additionalProperties": false,
+          "required": ["light", "dark"],
+          "properties": {
+            "light": { "$ref": "#/$defs/colorScheme" },
+            "dark": { "$ref": "#/$defs/colorScheme" }
+          }
+        },
+        "borderRadius": { "$ref": "#/$defs/borderRadius" },
+        "typography": { "$ref": "#/$defs/typography" }
+      }
+    },
+    "colorScheme": {
+      "type": "object",
+      "description": "The 26 color roles generated into Color.kt. Every role is required.",
+      "additionalProperties": false,
+      "required": [
+        "primary", "text-primary", "on-primary", "primary-hover",
+        "secondary", "text-secondary", "on-secondary",
+        "tertiary", "text-tertiary", "on-tertiary",
+        "background", "on-background", "surface", "on-surface",
+        "error", "on-error", "error-hover",
+        "warning", "on-warning", "warning-hover",
+        "success", "on-success", "success-hover",
+        "border", "disabled", "text-disabled"
+      ],
+      "properties": {
+        "primary": { "$ref": "#/$defs/hexColor" },
+        "text-primary": { "$ref": "#/$defs/hexColor" },
+        "on-primary": { "$ref": "#/$defs/hexColor" },
+        "primary-hover": { "$ref": "#/$defs/hexColor" },
+        "secondary": { "$ref": "#/$defs/hexColor" },
+        "text-secondary": { "$ref": "#/$defs/hexColor" },
+        "on-secondary": { "$ref": "#/$defs/hexColor" },
+        "tertiary": { "$ref": "#/$defs/hexColor" },
+        "text-tertiary": { "$ref": "#/$defs/hexColor" },
+        "on-tertiary": { "$ref": "#/$defs/hexColor" },
+        "background": { "$ref": "#/$defs/hexColor" },
+        "on-background": { "$ref": "#/$defs/hexColor" },
+        "surface": { "$ref": "#/$defs/hexColor" },
+        "on-surface": { "$ref": "#/$defs/hexColor" },
+        "error": { "$ref": "#/$defs/hexColor" },
+        "on-error": { "$ref": "#/$defs/hexColor" },
+        "error-hover": { "$ref": "#/$defs/hexColor" },
+        "warning": { "$ref": "#/$defs/hexColor" },
+        "on-warning": { "$ref": "#/$defs/hexColor" },
+        "warning-hover": { "$ref": "#/$defs/hexColor" },
+        "success": { "$ref": "#/$defs/hexColor" },
+        "on-success": { "$ref": "#/$defs/hexColor" },
+        "success-hover": { "$ref": "#/$defs/hexColor" },
+        "border": { "$ref": "#/$defs/hexColor" },
+        "disabled": { "$ref": "#/$defs/hexColor" },
+        "text-disabled": { "$ref": "#/$defs/hexColor" }
+      }
+    },
+    "hexColor": {
+      "type": "string",
+      "description": "6-digit hex color, e.g. #9941FF.",
+      "pattern": "^#[0-9A-Fa-f]{6}$"
+    },
+    "borderRadius": {
+      "type": "object",
+      "description": "Corner radii in dp.",
+      "additionalProperties": false,
+      "required": ["none", "extra-small", "small", "medium", "large", "extra-large"],
+      "properties": {
+        "none": { "$ref": "#/$defs/radius" },
+        "extra-small": { "$ref": "#/$defs/radius" },
+        "small": { "$ref": "#/$defs/radius" },
+        "medium": { "$ref": "#/$defs/radius" },
+        "large": { "$ref": "#/$defs/radius" },
+        "extra-large": { "$ref": "#/$defs/radius" }
+      }
+    },
+    "radius": {
+      "type": "integer",
+      "description": "Corner radius in dp, 0 to 64.",
+      "minimum": 0,
+      "maximum": 64
+    },
+    "typography": {
+      "type": "object",
+      "description": "Font family plus the mobile and desktop type scales.",
+      "additionalProperties": false,
+      "required": ["font-family", "mobile", "desktop"],
+      "properties": {
+        "font-family": {
+          "type": "string",
+          "description": "Font family name, e.g. Inter.",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "mobile": { "$ref": "#/$defs/typographyStyles" },
+        "desktop": { "$ref": "#/$defs/typographyStyles" }
+      }
+    },
+    "typographyStyles": {
+      "type": "object",
+      "description": "The twelve text styles generated into Typography.kt. Every style is required.",
+      "additionalProperties": false,
+      "required": [
+        "headline", "subtitle",
+        "heading-1", "heading-2", "heading-3", "heading-4",
+        "body-extended", "body-extended-semibold",
+        "body-base", "body-base-semibold",
+        "caption", "caption-semibold"
+      ],
+      "properties": {
+        "headline": { "$ref": "#/$defs/textStyle" },
+        "subtitle": { "$ref": "#/$defs/textStyle" },
+        "heading-1": { "$ref": "#/$defs/textStyle" },
+        "heading-2": { "$ref": "#/$defs/textStyle" },
+        "heading-3": { "$ref": "#/$defs/textStyle" },
+        "heading-4": { "$ref": "#/$defs/textStyle" },
+        "body-extended": { "$ref": "#/$defs/textStyle" },
+        "body-extended-semibold": { "$ref": "#/$defs/textStyle" },
+        "body-base": { "$ref": "#/$defs/textStyle" },
+        "body-base-semibold": { "$ref": "#/$defs/textStyle" },
+        "caption": { "$ref": "#/$defs/textStyle" },
+        "caption-semibold": { "$ref": "#/$defs/textStyle" }
+      }
+    },
+    "textStyle": {
+      "type": "object",
+      "description": "One text style: size, line height, and weight.",
+      "additionalProperties": false,
+      "required": ["font-size", "line-height", "font-weight"],
+      "properties": {
+        "font-size": {
+          "type": "string",
+          "description": "Font size in px, e.g. 16px.",
+          "pattern": "^[0-9]+px$"
+        },
+        "line-height": {
+          "type": "string",
+          "description": "Line height in px, e.g. 24px.",
+          "pattern": "^[0-9]+px$"
+        },
+        "font-weight": {
+          "type": "integer",
+          "description": "Font weight, 100 to 900.",
+          "minimum": 100,
+          "maximum": 900
+        }
+      }
+    }
+  }
+}

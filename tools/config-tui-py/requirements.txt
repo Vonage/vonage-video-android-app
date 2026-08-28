@@ -1,0 +1,2 @@
+textual>=0.79
+jsonschema>=4.20
