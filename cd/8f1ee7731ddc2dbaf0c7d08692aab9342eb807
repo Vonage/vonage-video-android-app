@@ -1,0 +1,28 @@
+app/src/main/java/com/vonage/android/screen/landing/LandingScreen.kt
+  s_5c093a0471425c::t_f0afbb14671c42 40
+  s_5c093a0471425c::t_0f43c1028fe4a4 59
+  s_5c093a0471425c::t_a7e7864bc537c0 6
+app/src/main/java/com/vonage/android/screen/landing/LandingScreenRoute.kt
+  s_5c093a0471425c::t_fec0f0e8a69fd3 10-11,16,37-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "cd8f1ee7731ddc2dbaf0c7d08692aab9342eb807",
+  "prompts": {},
+  "humans": {
+    "h_4202290f411bdc": {
+      "author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_5c093a0471425c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0a1d86fc-eba4-4e37-9b3a-6f41a733cdea",
+        "model": "claude-fable-5"
+      },
+      "human_author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  }
+}
