@@ -1,0 +1,41 @@
+config/app-config.schema.json
+  s_5c093a0471425c::t_4a2a151db4bc12 55-63
+  s_5c093a0471425c::t_c0939951973afc 11
+  s_5c093a0471425c::t_d6f86823378a42 64-65
+build-tools/gradle-config-plugin/src/main/kotlin/com/vonage/gradle/tasks/GenerateConfigTask.kt
+  s_5c093a0471425c::t_360aeb038f79dc 143
+  s_5c093a0471425c::t_8c57a62d3507a6 250-255
+  s_5c093a0471425c::t_7a1351a5acfb4e 256-258
+  s_af656cf98ad718::t_931136ece871b4 259
+config/app-config.json
+  s_af656cf98ad718::t_6e5523e98e1923 14-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c060ebcf0ffd11bcb6ee649975929573855f7be3",
+  "prompts": {},
+  "humans": {
+    "h_4202290f411bdc": {
+      "author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_5c093a0471425c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0a1d86fc-eba4-4e37-9b3a-6f41a733cdea",
+        "model": "claude-fable-5"
+      },
+      "human_author": "aos-svg <artur.osinski@vonage.com>"
+    },
+    "s_af656cf98ad718": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2226b86b-5da7-4fd6-9cb8-f7021e49c9aa",
+        "model": "unknown"
+      },
+      "human_author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  }
+}
