@@ -1,0 +1,30 @@
+app/src/main/java/com/vonage/android/di/RetrofitModule.kt
+  s_5c093a0471425c::t_35905b182c4c76 25-27,39
+  s_5c093a0471425c::t_1dc6e473e9124b 5
+app/src/main/java/com/vonage/android/navigation/AppNavHost.kt
+  s_5c093a0471425c::t_500ee9e4b98307 100
+  s_5c093a0471425c::t_825f17e7e0b019 20,22
+  s_5c093a0471425c::t_8763f9a9198dea 58
+  s_5c093a0471425c::t_d4fee9eb237dee 36,42,47-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "251a302ffbd77f0d28486b16459c49f1203c7a91",
+  "prompts": {},
+  "humans": {
+    "h_4202290f411bdc": {
+      "author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_5c093a0471425c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0a1d86fc-eba4-4e37-9b3a-6f41a733cdea",
+        "model": "claude-fable-5"
+      },
+      "human_author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  }
+}
