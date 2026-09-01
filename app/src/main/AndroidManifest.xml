@@ -22,7 +22,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="false"
-        android:theme="@style/Theme.VonageVideoAndroid">
+        android:theme="@style/Theme.VonageVideoAndroid"
+        tools:replace="android:fullBackupContent,android:dataExtractionRules">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

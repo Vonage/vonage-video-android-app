@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.layout.Box
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.di.CallSettingsHolderEntryPoint
+import com.vonage.android.di.VonageOktaAuthEntryPoint
 import com.vonage.android.navigation.AppNavHost
 import com.vonage.android.util.InAppUpdates
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,6 +78,12 @@ fun InterceptorAppNavHost(intentFlow: Flow<Intent>) {
             CallSettingsHolderEntryPoint::class.java
         ).callSettingsHolder()
     }
+    val oktaAuth = remember {
+        EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            VonageOktaAuthEntryPoint::class.java
+        ).vonageOktaAuth()
+    }
     LaunchedEffect(intentFlow) {
         intentFlow.collectLatest {
             it.data?.let { uri ->
@@ -91,5 +98,5 @@ fun InterceptorAppNavHost(intentFlow: Flow<Intent>) {
             }
         }
     }
-    AppNavHost(navController = navController, callSettingsHolder = callSettingsHolder)
+    AppNavHost(navController = navController, callSettingsHolder = callSettingsHolder, oktaAuth = oktaAuth)
 }
