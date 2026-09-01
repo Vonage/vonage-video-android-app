@@ -1,0 +1,26 @@
+vonage-feature-okta/src/main/java/com/vonage/android/okta/IdProvider.kt
+  s_5c093a0471425c::t_7a323fbdae6674 1-18
+vonage-feature-okta/src/main/java/com/vonage/android/okta/OktaConfig.kt
+  s_5c093a0471425c::t_605b9bf904f57b 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "bf254eead816c30cec6a5063bb5269ba00d9d669",
+  "prompts": {},
+  "humans": {
+    "h_4202290f411bdc": {
+      "author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_5c093a0471425c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0a1d86fc-eba4-4e37-9b3a-6f41a733cdea",
+        "model": "claude-fable-5"
+      },
+      "human_author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  }
+}
