@@ -1,0 +1,32 @@
+app/build.gradle.kts
+  s_5c093a0471425c::t_7382043ddaab26 235
+  s_5c093a0471425c::t_b1a7152d47cafe 304-307
+  s_5c093a0471425c::t_cf7e6419c8cb54 104-108,113-123
+  s_5c093a0471425c::t_94ecbd03bd293a 29-36
+  s_5c093a0471425c::t_655da80ae609be 109-112
+  s_5c093a0471425c::t_226a8acc8f7226 303
+  s_5c093a0471425c::t_44ec46d12102fa 308
+settings.gradle.kts
+  s_5c093a0471425c::t_caa6975c98eb13 37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "61709a8b3b486bdc9c8a6941096b38ac13dd0508",
+  "prompts": {},
+  "humans": {
+    "h_4202290f411bdc": {
+      "author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_5c093a0471425c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0a1d86fc-eba4-4e37-9b3a-6f41a733cdea",
+        "model": "claude-fable-5"
+      },
+      "human_author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  }
+}
