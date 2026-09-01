@@ -11,6 +11,7 @@
 | `vonage-video-sdk/` | Mockable Kotlin interfaces over the OpenTok SDK (`VonageSession`, `VonageSdkFactory`, etc.). Other modules depend on these, never on OpenTok directly. |
 | `vonage-video-ui-compose/` | Reusable Compose components + JSON-driven theme generator |
 | `vonage-feature-*/` | Optional capabilities with `enabled`/`disabled` flavor variants |
+| `vonage-feature-okta/` | Optional Okta OIDC authentication (off by default via `authSettings.allowAuthentication`). Contract in `src/main`, Okta SDK only in `src/enabled`. See `docs/AUTHENTICATION.md`. |
 | `vonage-video-shared/` | Shared utilities |
 | `vonage-android-logger/` | Logging pipeline with interceptor model |
 | `vonage-audio-selector/` | Audio output selector (Bluetooth, wired, earpiece, speaker) |
@@ -39,6 +40,7 @@
 - `BASE_API_URL` propagates to three locations: Retrofit base URL (`RetrofitModule.kt`), deep links (`AppNavHost.kt`), and sharing links (`util/navigateToShare.kt`).
 - Hilt DI is used in `app/`. `vonage-meeting-room` uses a **manual** `MeetingRoomContainer` — do not introduce Hilt into that module.
 - Feature signal plugins (chat, reactions) are injected into `VonageVideoClient` via `SdkModule.provideVonageVideoClient(...)` in `app/`.
+- Backend authentication (optional, Okta): `AuthorizationInterceptor` on the app OkHttp client and `MeetingRoomBuilder.authTokenProvider(...)` for the meeting-room's own Retrofit both attach `Authorization: Bearer` only when a token exists — no token never blocks a request. Okta credentials come from `local.properties`/env (`OKTA_*` keys), not from `app-config.json`.
 - `vonage-meeting-room` is under active refactoring: use cases are being introduced and `Call.kt` (~800 lines) is being split into focused collaborators. Consult the inline comments in that module before making changes there.
 - Debug builds append `.debug` to `applicationId` and `-DEBUG` to `versionName`, allowing debug and release to co-exist on device.
 - Firebase/Crashlytics plugins are **only applied for release builds** (guarded by `isReleaseBuild` check in `app/build.gradle.kts`).
