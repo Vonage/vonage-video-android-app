@@ -2,6 +2,7 @@ package com.vonage.android.di
 
 import com.vonage.android.BuildConfig
 import com.vonage.android.data.network.APIService
+import com.vonage.android.data.network.interceptor.AuthorizationInterceptor
 import com.vonage.android.data.network.interceptor.VeraHeaderRequestDecorator
 import dagger.Module
 import dagger.Provides
@@ -21,7 +22,9 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(): OkHttpClient = OkHttpClient.Builder()
+    fun provideHttpClient(
+        authorizationInterceptor: AuthorizationInterceptor,
+    ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(
             HttpLoggingInterceptor()
                 .apply {
@@ -33,6 +36,7 @@ object RetrofitModule {
                 }
         )
         .addInterceptor(VeraHeaderRequestDecorator())
+        .addInterceptor(authorizationInterceptor)
         .build()
 
     @Provides
