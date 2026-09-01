@@ -26,6 +26,14 @@ if (configFile.exists()) {
     configFile.inputStream().use { configProps.load(it) }
 }
 
+// Okta OIDC credentials — only needed when authSettings.allowAuthentication is true.
+// Loaded from local.properties, overridable via environment variables (CI/CD).
+val localProps = Properties()
+val localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    localPropsFile.inputStream().use { localProps.load(it) }
+}
+
 android {
     namespace = "com.vonage.android"
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -93,6 +101,26 @@ android {
         val settingsProperty = configProps.getProperty("vonage.meetingRoom.allow_settings", "true")
         buildConfigField("boolean", "FEATURE_SETTINGS_ENABLED", "$settingsProperty")
         missingDimensionStrategy("settings", settingsProperty.toEnabledString())
+
+        // Authentication (Okta) feature — disabled by default
+        val authProperty = configProps.getProperty("vonage.auth.allow_authentication", "false")
+        buildConfigField("boolean", "FEATURE_AUTHENTICATION_ENABLED", "$authProperty")
+        missingDimensionStrategy("okta", authProperty.toEnabledString())
+        if (authProperty.toBoolean()) {
+            // okta-mobile-kotlin requires API 26+; only raised when authentication is enabled
+            minSdk = 26
+        }
+
+        // Okta OIDC configuration (see docs/AUTHENTICATION.md); empty when not configured
+        val oktaSignInRedirectUri = oktaSecret("OKTA_SIGN_IN_REDIRECT_URI")
+        buildConfigField("String", "OKTA_ISSUER_URL", "\"${oktaSecret("OKTA_ISSUER_URL")}\"")
+        buildConfigField("String", "OKTA_CLIENT_ID", "\"${oktaSecret("OKTA_CLIENT_ID")}\"")
+        buildConfigField("String", "OKTA_SIGN_IN_REDIRECT_URI", "\"$oktaSignInRedirectUri\"")
+        buildConfigField("String", "OKTA_SCOPE", "\"${oktaSecret("OKTA_SCOPE")}\"")
+        // The Okta SDK's redirect activity intent-filter resolves this placeholder; it must
+        // match the scheme portion of OKTA_SIGN_IN_REDIRECT_URI (before the ":").
+        manifestPlaceholders["webAuthenticationRedirectScheme"] =
+            oktaSignInRedirectUri.substringBefore(":", "").ifBlank { "com.vonage.android" }
     }
 
     compileOptions {
@@ -204,6 +232,7 @@ dependencies {
     implementation(project(":vonage-feature-video-effects"))
     implementation(project(":vonage-feature-audio-effects"))
     implementation(project(":vonage-feature-captions"))
+    implementation(project(":vonage-feature-okta"))
     implementation(project(":vonage-feature-settings"))
     implementation(project(":vonage-audio-selector"))
     implementation(project(":vonage-android-logger"))
@@ -270,6 +299,12 @@ dependencies {
 }
 
 fun String.toEnabledString(): String = if (toBoolean()) "enabled" else "disabled"
+
+/**
+ * Resolves an Okta secret from the environment (CI/CD) or local.properties (local dev).
+ * Returns an empty string when unset so unauthenticated builds keep working.
+ */
+fun oktaSecret(name: String): String = System.getenv(name) ?: localProps.getProperty(name, "")
 
 /**
  * Returns the prefixed flavor name used by the vonage-meeting-room module,
