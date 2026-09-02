@@ -61,7 +61,7 @@ fun AppNavHost(
         }
         composable<Waiting>(
             deepLinks = listOf(
-                navDeepLink<Waiting>("${BuildConfig.BASE_API_URL}/waiting-room"),
+                navDeepLink<Waiting>("$DEEP_LINK_BASE_URL/waiting-room"),
             )
         ) { backStackEntry ->
             val roomName = backStackEntry.toRoute<Waiting>().roomName
@@ -85,7 +85,7 @@ fun AppNavHost(
         }
         composable<Meeting>(
             deepLinks = listOf(
-                navDeepLink<Meeting>("${BuildConfig.BASE_API_URL}/room"),
+                navDeepLink<Meeting>("$DEEP_LINK_BASE_URL/room"),
             )
         ) { backStackEntry ->
             val roomName = backStackEntry.toRoute<Meeting>().roomName
@@ -129,3 +129,6 @@ fun AppNavHost(
         }
     }
 }
+
+/** BASE_API_URL may carry a trailing slash; deep-link patterns must not double it. */
+private val DEEP_LINK_BASE_URL = BuildConfig.BASE_API_URL.trimEnd('/')

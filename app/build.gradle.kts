@@ -56,7 +56,8 @@ android {
         // Set up base API URL
         val baseApiUrl = configProps.getProperty("vonage.baseApiUrl", "")
         buildConfigField("String", "BASE_API_URL", "\"$baseApiUrl\"")
-        manifestPlaceholders["hostName"] = baseApiUrl
+        // App Link filters match on the bare authority, so strip the scheme and any path.
+        manifestPlaceholders["hostName"] = baseApiUrl.substringAfter("://").substringBefore("/")
 
         // Chat feature
         val chatProperty = configProps.getProperty("vonage.meetingRoom.allow_chat", "true")
@@ -117,10 +118,30 @@ android {
         buildConfigField("String", "OKTA_CLIENT_ID", "\"${oktaSecret("OKTA_CLIENT_ID")}\"")
         buildConfigField("String", "OKTA_SIGN_IN_REDIRECT_URI", "\"$oktaSignInRedirectUri\"")
         buildConfigField("String", "OKTA_SCOPE", "\"${oktaSecret("OKTA_SCOPE")}\"")
-        // The Okta SDK's redirect activity intent-filter resolves this placeholder; it must
-        // match the scheme portion of OKTA_SIGN_IN_REDIRECT_URI (before the ":").
-        manifestPlaceholders["webAuthenticationRedirectScheme"] =
+
+        // The OIDC callback arrives as a verified App Link, the same way iOS receives it
+        // through its `applinks:` entitlement. The Okta SDK's own redirect intent-filter can
+        // only express a scheme, so it is pinned to an inert one and the real https filter is
+        // declared in vonage-feature-okta/src/enabled/AndroidManifest.xml from the host and
+        // path below. A custom-scheme redirect URI still works: the SDK filter then handles it
+        // and the https filter is pointed at an unroutable host.
+        val isHttpsRedirect = oktaSignInRedirectUri.startsWith("https://", ignoreCase = true)
+        manifestPlaceholders["webAuthenticationRedirectScheme"] = if (isHttpsRedirect) {
+            "com.vonage.android.okta.unused"
+        } else {
             oktaSignInRedirectUri.substringBefore(":", "").ifBlank { "com.vonage.android" }
+        }
+        val redirectAuthority = oktaSignInRedirectUri.substringAfter("://", "")
+        manifestPlaceholders["oktaRedirectHost"] = if (isHttpsRedirect) {
+            redirectAuthority.substringBefore("/")
+        } else {
+            "okta-redirect.invalid"
+        }
+        manifestPlaceholders["oktaRedirectPath"] = if (isHttpsRedirect) {
+            "/" + redirectAuthority.substringAfter("/", "")
+        } else {
+            "/okta-callback"
+        }
     }
 
     compileOptions {

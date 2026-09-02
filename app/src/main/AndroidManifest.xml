@@ -37,6 +37,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Scoped to the deep-linked routes only. Without path prefixes this claims every
+                 URL on the host, including the backend's own OIDC callback and web pages. -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -44,6 +46,8 @@
                 <data android:scheme="http" />
                 <data android:scheme="https" />
                 <data android:host="${hostName}" />
+                <data android:pathPrefix="/room" />
+                <data android:pathPrefix="/waiting-room" />
             </intent-filter>
         </activity>
     </application>

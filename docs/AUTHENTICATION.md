@@ -38,7 +38,7 @@ The OIDC client credentials are **never committed to the repository**. They are 
 # local.properties
 OKTA_ISSUER_URL=https://your-org.okta.com
 OKTA_CLIENT_ID=your_okta_client_id
-OKTA_SIGN_IN_REDIRECT_URI=com.vonage.android:/callback
+OKTA_SIGN_IN_REDIRECT_URI=https://your-backend.example.com/api/auth/callback/okta
 # Optional, defaults to "openid profile offline_access"
 OKTA_SCOPE=openid profile offline_access
 ```
@@ -47,7 +47,7 @@ OKTA_SCOPE=openid profile offline_access
 |---|---|
 | `OKTA_ISSUER_URL` | Your Okta authorization server URL |
 | `OKTA_CLIENT_ID` | The OIDC client ID registered in your Okta application |
-| `OKTA_SIGN_IN_REDIRECT_URI` | The URI Okta redirects to after authentication. Its scheme (the part before `:`) is registered as the `webAuthenticationRedirectScheme` manifest placeholder so the SDK's redirect activity can capture the callback. Register the same URI in your Okta application. |
+| `OKTA_SIGN_IN_REDIRECT_URI` | The URI Okta redirects to after authentication. Must be registered in your Okta application. An `https://` value is received as an [App Link](#receiving-the-callback-app-links) — the same URI the iOS app uses; a custom-scheme value (`myapp:/callback`) also works and skips domain verification entirely. |
 | `OKTA_SCOPE` | OIDC scopes (default: `openid profile offline_access`) |
 
 The values reach the app as `BuildConfig` fields and are assembled into an `OktaConfig` in `app/src/main/java/com/vonage/android/di/AuthModule.kt`.
@@ -60,6 +60,41 @@ env:
   OKTA_CLIENT_ID: ${{ secrets.OKTA_CLIENT_ID }}
   OKTA_SIGN_IN_REDIRECT_URI: ${{ secrets.OKTA_SIGN_IN_REDIRECT_URI }}
 ```
+
+## Receiving the callback (App Links)
+
+After the user authenticates in the browser, Okta redirects to `OKTA_SIGN_IN_REDIRECT_URI`. Android only hands that URL to the app if an activity has registered an intent filter for it, so the app declares one for the Okta SDK's `RedirectActivity` in [`vonage-feature-okta/src/enabled/AndroidManifest.xml`](../vonage-feature-okta/src/enabled/AndroidManifest.xml), with the host and path substituted from the redirect URI at build time.
+
+Using an `https://` redirect keeps Android and iOS on a **single redirect URI** — iOS receives the same URL through its `applinks:` entitlement — so only one URI needs registering in Okta. In exchange, Android requires the redirect host to prove it trusts this app:
+
+1. The host must serve `https://<host>/.well-known/assetlinks.json`.
+2. That file must list the app's `package_name` and the SHA-256 fingerprint of the **signing certificate for each variant you run** — debug and release are different certificates, and Play App Signing replaces the release one again.
+
+```json
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.vonage.android",
+    "sha256_cert_fingerprints": ["<your release fingerprint>"]
+  }
+}]
+```
+
+Get a fingerprint with `keytool -list -v -keystore <keystore> -alias <alias> | grep SHA256`.
+
+Verify it worked on a device:
+
+```bash
+adb shell pm get-app-links com.vonage.android.debug
+# meet.vonagenetworks.net: verified
+```
+
+> **If verification fails, sign-in hangs silently** — the browser simply displays the callback URL and never returns to the app. `pm get-app-links` showing anything other than `verified` (commonly after a fingerprint mismatch or no network at install time) is the first thing to check. `adb shell pm verify-app-links --re-verify <package>` retriggers it.
+
+**Forking this app?** If you point `BASE_API_URL` at your own backend, that domain needs its own `assetlinks.json` with your fingerprints. If you would rather not host one, use a custom-scheme redirect URI instead — e.g. `com.yourcompany.app:/callback` registered in Okta. The build then wires the scheme straight into the SDK's own redirect filter, no domain verification involved, and everything else works identically.
+
+Note that the app also claims `/room` and `/waiting-room` on `BASE_API_URL`'s host for meeting deep links. Those path prefixes are deliberately narrow: a filter without them would claim every URL on the host, including the backend's own web pages and this OIDC callback.
 
 ## Architecture
 
@@ -74,6 +109,7 @@ vonage-feature-okta/
 │   ├── OktaConfig.kt              #   OIDC client configuration value type
 │   └── ui/AuthTestTags.kt         #   Test tags (aligned with iOS accessibility ids)
 ├── src/enabled/                   # Real implementation (Okta SDK compiled in)
+│   ├── AndroidManifest.xml        #   App Link filter for the OIDC callback
 │   ├── EnabledVonageOktaAuth.kt   #   State machine over sign-in/sign-out results
 │   ├── data/
 │   │   ├── BrowserSignInProvider.kt      # SDK abstraction for testability
