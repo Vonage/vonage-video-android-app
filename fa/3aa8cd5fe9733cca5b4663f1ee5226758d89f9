@@ -1,0 +1,38 @@
+docs/AUTHENTICATION.md
+  s_af656cf98ad718::t_00ed439958de13 41,50
+  s_af656cf98ad718::t_9442eba8dd9f9d 64-98
+  s_af656cf98ad718::t_f878a9a9e1b577 112
+app/build.gradle.kts
+  s_af656cf98ad718::t_196bb21e53eee1 121-131,133-144
+  s_af656cf98ad718::t_38c5d242d65224 59-60
+app/src/main/java/com/vonage/android/navigation/AppNavHost.kt
+  s_af656cf98ad718::t_4002ea3ae7f32a 132-134
+  s_af656cf98ad718::t_eb953296e0417e 88
+  s_af656cf98ad718::t_9053e4017d72e5 64
+app/src/main/AndroidManifest.xml
+  s_af656cf98ad718::t_da7b1924df85da 40-41,49-50
+vonage-feature-okta/src/enabled/AndroidManifest.xml
+  s_af656cf98ad718::t_8d45cead496132 18-20
+  s_af656cf98ad718::t_a7443e0254f3a6 1-17,21-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "fa3aa8cd5fe9733cca5b4663f1ee5226758d89f9",
+  "prompts": {},
+  "humans": {
+    "h_4202290f411bdc": {
+      "author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_af656cf98ad718": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2226b86b-5da7-4fd6-9cb8-f7021e49c9aa",
+        "model": "claude-opus-5"
+      },
+      "human_author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  }
+}
