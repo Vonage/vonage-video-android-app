@@ -38,5 +38,6 @@ class EnabledVonageOktaAuth(
             _authState.value = AuthState.NotAuthenticated
         }
 
-    override suspend fun currentToken(): String? = browserSignIn.currentToken()
+    override suspend fun currentToken(): String? =
+        runCatching { browserSignIn.currentToken() }.getOrNull()
 }

@@ -114,4 +114,12 @@ class EnabledVonageOktaAuthTest {
 
         assertNull(auth.currentToken())
     }
+
+    @Test
+    fun `given provider throws when currentToken returns null instead of propagating`() = runTest {
+        coEvery { browserSignIn.currentToken() } throws
+            IllegalArgumentException("issuerUrl must be a valid https URL.")
+
+        assertNull(auth.currentToken())
+    }
 }
