@@ -1,0 +1,32 @@
+tools/config-tui-py/README.md
+  s_7b9c31bfecf272::t_ac8f50c38d376a 4-7
+tools/config-tui-py/.gitignore
+  s_7b9c31bfecf272::t_bfb8fd93b635d3 9
+build-tools/README.md
+  s_7b9c31bfecf272::t_1d7365c3cd358c 21-23
+config/app-config.json
+  s_7b9c31bfecf272::t_d45dc0ef41901d 2-7
+tools/config-tui-py/vonage_config_tui/schema_to_fields.py
+  s_7b9c31bfecf272::t_5fdcdb867b2428 1,25-32
+  s_7b9c31bfecf272::t_69e03cdb814b11 87-97
+  s_7b9c31bfecf272::t_718e778ac91626 142-149,152,159,161-163,167
+  s_7b9c31bfecf272::t_a2118e243dbc38 33
+tools/config-tui-py/vonage_config_tui/validator.py
+  s_7b9c31bfecf272::t_913a7c7e2d7d82 3-6,12-13,20-31,51-52,54-82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "d11fc237dbee79cfe9ddaa57776305e5e9b945ca",
+  "prompts": {},
+  "sessions": {
+    "s_7b9c31bfecf272": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_4d9533e7-43ea-432e-8091-7b24d305b010",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
