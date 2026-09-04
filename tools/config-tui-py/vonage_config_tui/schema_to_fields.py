@@ -1,4 +1,4 @@
-"""JSON Schema → flat list of FormField. Mirrors src/lib/schema-to-fields.ts."""
+"""JSON Schema → flat list of FormField."""
 
 from __future__ import annotations
 
@@ -21,6 +21,15 @@ class FormField:
 
 
 _CAMEL_SPLIT = re.compile(r"([a-z])([A-Z])")
+
+_HEX_COLOR_PATTERNS = {
+    "^#[0-9A-Fa-f]{6}$",
+    "^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+}
+
+
+def _is_hex_color_pattern(pattern: Optional[str]) -> bool:
+    return pattern in _HEX_COLOR_PATTERNS
 
 
 def _format_label(key: str) -> str:
@@ -75,7 +84,17 @@ def _property_to_field(full_key: str, raw_key: str, prop: dict[str, Any], value:
             max=prop.get("maximum"),
             description=desc,
         )
-    if prop.get("type") == "string" and prop.get("pattern") == "^#[0-9A-Fa-f]{6}$":
+    if prop.get("type") == "number":
+        return FormField(
+            key=full_key,
+            label=label,
+            type="integer",
+            value=value if value is not None else 0,
+            min=prop.get("minimum"),
+            max=prop.get("maximum"),
+            description=desc,
+        )
+    if prop.get("type") == "string" and _is_hex_color_pattern(prop.get("pattern")):
         return FormField(
             key=full_key,
             label=label,
@@ -120,20 +139,32 @@ def _object_to_fields(
 
 
 def schema_to_fields(schema: dict[str, Any], data: dict[str, Any]) -> list[FormField]:
-    """Flatten a schema into an ordered list of fields with 'section' separators."""
+    """Flatten a schema into an ordered list of fields with 'section' separators.
+
+    Optional object properties (not in the schema's ``required`` list) that are absent
+    from ``data`` are skipped entirely, rather than materialized as an empty section —
+    otherwise saving would write out an empty object that fails the sub-schema's own
+    ``required`` fields (e.g. platform-specific sections like ``localizationSettings``
+    that Android's app-config.json never populates).
+    """
     props = schema.get("properties", {}) or {}
     defs = schema.get("$defs", {}) or {}
+    required = set(schema.get("required", []) or [])
 
     general: list[FormField] = []
     sections: list[tuple[str, list[FormField]]] = []
 
     for key, prop in props.items():
         resolved = _resolve_ref(prop, defs)
-        value = data.get(key) if isinstance(data, dict) else None
+        is_present = isinstance(data, dict) and key in data
         if resolved.get("type") == "object" and "properties" in resolved:
+            if key not in required and not is_present:
+                continue
+            value = data.get(key) if isinstance(data, dict) else None
             section_fields = _object_to_fields(resolved["properties"], defs, value or {}, key)
             sections.append((_format_label(key), section_fields))
         else:
+            value = data.get(key) if isinstance(data, dict) else None
             general.append(_property_to_field(key, key, resolved, value))
 
     out: list[FormField] = []

@@ -18,7 +18,9 @@ Custom Gradle plugins and build configuration for the Vonage Video Android App.
 
 **Plugin ID**: `com.vonage.json-config`
 
-Generates Kotlin configuration classes from `config/app-config.json`.
+Generates Kotlin configuration classes from `config/app-config.json`, validated by the config
+TUI against a schema fetched from a canonical URL (shared with the iOS and React Vonage Video
+apps; cached locally for offline use — see `tools/config-tui-py/vonage_config_tui/validator.py`).
 
 **Configuration**:
 ```kotlin
