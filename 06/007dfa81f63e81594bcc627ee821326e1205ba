@@ -1,0 +1,32 @@
+app/src/main/java/com/vonage/android/util/navigateToShare.kt
+  s_af656cf98ad718::t_cc4bf2034017a0 8
+app/src/main/java/com/vonage/android/navigation/AppNavHost.kt
+  s_af656cf98ad718::t_58d822c4ee7b0a 33
+app/src/main/java/com/vonage/android/MainActivity.kt
+  s_af656cf98ad718::t_adedc48d8c0e8b 94-102
+app/src/main/java/com/vonage/android/util/DeepLinkBaseUrl.kt
+  s_af656cf98ad718::t_692ee34939d375 1-13
+app/src/main/AndroidManifest.xml
+  s_af656cf98ad718::t_8bcb3fecb03945 49-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "06007dfa81f63e81594bcc627ee821326e1205ba",
+  "prompts": {},
+  "humans": {
+    "h_4202290f411bdc": {
+      "author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_af656cf98ad718": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2226b86b-5da7-4fd6-9cb8-f7021e49c9aa",
+        "model": "claude-opus-5"
+      },
+      "human_author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  }
+}
