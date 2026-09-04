@@ -91,10 +91,15 @@ fun InterceptorAppNavHost(intentFlow: Flow<Intent>) {
                     .fromUri(uri)
                     .build()
 
-                navController.navigate(
-                    request,
-                    navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
-                )
+                // The manifest filter is necessarily broader than the nav graph (it cannot
+                // express the {roomName} argument), so a link such as /room/a/b reaches us
+                // with no matching destination — navigate() would throw on it.
+                if (navController.graph.hasDeepLink(request)) {
+                    navController.navigate(
+                        request,
+                        navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
+                    )
+                }
             }
         }
     }

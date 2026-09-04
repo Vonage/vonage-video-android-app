@@ -46,8 +46,8 @@
                 <data android:scheme="http" />
                 <data android:scheme="https" />
                 <data android:host="${hostName}" />
-                <data android:pathPrefix="/room" />
-                <data android:pathPrefix="/waiting-room" />
+                <data android:pathPattern="/room/.*" />
+                <data android:pathPattern="/waiting-room/.*" />
             </intent-filter>
         </activity>
     </application>

@@ -16,7 +16,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import com.vonage.android.BuildConfig
 import com.vonage.android.meetingroom.api.MeetingRoomAuthTokenProvider
 import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.okta.VonageOktaAuth
@@ -31,6 +30,7 @@ import com.vonage.android.screen.room.MeetingRoomScreenRoute
 import com.vonage.android.screen.settings.SettingsScreenRoute
 import com.vonage.android.screen.waiting.WaitingRoomRoute
 import com.vonage.android.settings.CallSettingsHolder
+import com.vonage.android.util.DEEP_LINK_BASE_URL
 import com.vonage.android.util.navigateToShare
 import com.vonage.android.util.navigateToSystemPermissions
 import kotlinx.coroutines.runBlocking
@@ -129,6 +129,3 @@ fun AppNavHost(
         }
     }
 }
-
-/** BASE_API_URL may carry a trailing slash; deep-link patterns must not double it. */
-private val DEEP_LINK_BASE_URL = BuildConfig.BASE_API_URL.trimEnd('/')
