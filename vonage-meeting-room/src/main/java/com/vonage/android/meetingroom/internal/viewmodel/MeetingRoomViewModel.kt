@@ -18,7 +18,7 @@ import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.MeetingRoomCallState
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
-import com.vonage.android.meetingroom.internal.data.SessionInfo
+import com.vonage.android.meetingroom.internal.data.GetSessionResponse
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler.CallAction
@@ -111,7 +111,7 @@ internal class MeetingRoomViewModel(
             _uiState.update { state ->
                 state.copy(
                     isLoading = true,
-                    audioDevicesState = container.audioDevicesHandler.audioDevicesState,
+                    audioDevicesState = container.audioDevicesState,
                 )
             }
 
@@ -135,7 +135,7 @@ internal class MeetingRoomViewModel(
                 .launchIn(viewModelScope)
         }
 
-        container.audioDevicesHandler.start()
+        container.audioDeviceSelector.start()
     }
 
     /** Bridges the internal [MeetingRoomUiState] to the public [MeetingRoomCallState]. */
@@ -158,7 +158,7 @@ internal class MeetingRoomViewModel(
     }
 
     private fun connect(
-        sessionInfo: SessionInfo,
+        sessionInfo: GetSessionResponse,
         roomName: String,
     ) {
         viewModelScope.launch {
@@ -262,7 +262,7 @@ internal class MeetingRoomViewModel(
             container.foregroundServiceHandler.stopForegroundService()
         }
         container.vonageScreenSharing.stopSharingScreen()
-        container.audioDevicesHandler.stop()
+        container.audioDeviceSelector.stop()
         container.callSettingsHolder.clearCall()
         call?.endSession()
     }

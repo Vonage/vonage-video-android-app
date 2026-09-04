@@ -22,10 +22,10 @@ class CurrentDeviceTest {
         getDevices = getDevices,
     )
 
-    private val bluetooth = AudioDevice(1, AudioDeviceType.BLUETOOTH)
-    private val wiredHeadset = AudioDevice(2, AudioDeviceType.WIRED_HEADSET)
-    private val earpiece = AudioDevice(3, AudioDeviceType.EARPIECE)
-    private val speaker = AudioDevice(4, AudioDeviceType.SPEAKER)
+    private val bluetooth = AudioDevice(AudioDeviceType.BLUETOOTH)
+    private val wiredHeadset = AudioDevice(AudioDeviceType.WIRED_HEADSET)
+    private val earpiece = AudioDevice(AudioDeviceType.EARPIECE)
+    private val speaker = AudioDevice(AudioDeviceType.SPEAKER)
 
     @Test
     fun `given no user selected device when getCurrentActiveDevice returns first available device`() =

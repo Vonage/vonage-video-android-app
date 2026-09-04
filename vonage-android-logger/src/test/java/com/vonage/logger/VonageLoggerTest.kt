@@ -17,10 +17,7 @@ class VonageLoggerTest {
     @Test
     fun `log dispatches event through interceptor`() {
         val events = mutableListOf<LogEvent>()
-
-        val logger = VonageLogger.Builder()
-            .addInterceptor(collectingInterceptor(events))
-            .build()
+        val logger = VonageLogger(collectingInterceptor(events))
 
         logger.d("TestTag", "hello")
 
@@ -33,10 +30,7 @@ class VonageLoggerTest {
     @Test
     fun `tag is set per call`() {
         val events = mutableListOf<LogEvent>()
-
-        val logger = VonageLogger.Builder()
-            .addInterceptor(collectingInterceptor(events))
-            .build()
+        val logger = VonageLogger(collectingInterceptor(events))
 
         logger.i("TagA", "first")
         logger.i("TagB", "second")
@@ -49,10 +43,7 @@ class VonageLoggerTest {
     @Test
     fun `all log level methods produce correct levels`() {
         val events = mutableListOf<LogEvent>()
-
-        val logger = VonageLogger.Builder()
-            .addInterceptor(collectingInterceptor(events))
-            .build()
+        val logger = VonageLogger(collectingInterceptor(events))
 
         logger.v("T", "v")
         logger.d("T", "d")
@@ -72,10 +63,7 @@ class VonageLoggerTest {
     fun `throwable is passed into LogEvent`() {
         val events = mutableListOf<LogEvent>()
         val exception = RuntimeException("boom")
-
-        val logger = VonageLogger.Builder()
-            .addInterceptor(collectingInterceptor(events))
-            .build()
+        val logger = VonageLogger(collectingInterceptor(events))
 
         logger.e("T", "something failed", exception)
 
@@ -87,10 +75,7 @@ class VonageLoggerTest {
     @Test
     fun `message without throwable has null throwable`() {
         val events = mutableListOf<LogEvent>()
-
-        val logger = VonageLogger.Builder()
-            .addInterceptor(collectingInterceptor(events))
-            .build()
+        val logger = VonageLogger(collectingInterceptor(events))
 
         logger.i("T", "heartbeat")
 
@@ -102,25 +87,11 @@ class VonageLoggerTest {
     @Test
     fun `interceptors are called in order`() {
         val callOrder = mutableListOf<String>()
-
-        val first = LogInterceptor { event ->
-            callOrder.add("first")
-            event
-        }
-        val second = LogInterceptor { event ->
-            callOrder.add("second")
-            event
-        }
-        val third = LogInterceptor { event ->
-            callOrder.add("third")
-            event
-        }
-
-        val logger = VonageLogger.Builder()
-            .addInterceptor(first)
-            .addInterceptor(second)
-            .addInterceptor(third)
-            .build()
+        val logger = VonageLogger(
+            LogInterceptor { event -> callOrder.add("first"); event },
+            LogInterceptor { event -> callOrder.add("second"); event },
+            LogInterceptor { event -> callOrder.add("third"); event },
+        )
 
         logger.d("T", "test")
 
@@ -129,17 +100,11 @@ class VonageLoggerTest {
 
     @Test
     fun `interceptor can transform event`() {
-        val transforming = LogInterceptor { event ->
-            event.copy(tag = "Transformed")
-        }
-
         val events = mutableListOf<LogEvent>()
-        val collecting = collectingInterceptor(events)
-
-        val logger = VonageLogger.Builder()
-            .addInterceptor(transforming)
-            .addInterceptor(collecting)
-            .build()
+        val logger = VonageLogger(
+            LogInterceptor { event -> event.copy(tag = "Transformed") },
+            collectingInterceptor(events),
+        )
 
         logger.d("Original", "test")
 
@@ -149,15 +114,11 @@ class VonageLoggerTest {
 
     @Test
     fun `interceptor can short-circuit by returning null`() {
-        val blocker = LogInterceptor { null }
-
         val events = mutableListOf<LogEvent>()
-        val collecting = collectingInterceptor(events)
-
-        val logger = VonageLogger.Builder()
-            .addInterceptor(blocker)
-            .addInterceptor(collecting)
-            .build()
+        val logger = VonageLogger(
+            LogInterceptor { null },
+            collectingInterceptor(events),
+        )
 
         logger.d("T", "should not reach second interceptor")
 
@@ -166,8 +127,7 @@ class VonageLoggerTest {
 
     @Test
     fun `no interceptors does not crash`() {
-        val logger = VonageLogger.Builder().build()
-
+        val logger = VonageLogger()
         // Should not throw
         logger.d("T", "nothing listening")
     }
@@ -175,10 +135,7 @@ class VonageLoggerTest {
     @Test
     fun `log method with explicit level works`() {
         val events = mutableListOf<LogEvent>()
-
-        val logger = VonageLogger.Builder()
-            .addInterceptor(collectingInterceptor(events))
-            .build()
+        val logger = VonageLogger(collectingInterceptor(events))
 
         logger.log(LogLevel.WARN, "T", "explicit warn")
 
@@ -190,10 +147,7 @@ class VonageLoggerTest {
     @Test
     fun `event contains timestamp and thread`() {
         val events = mutableListOf<LogEvent>()
-
-        val logger = VonageLogger.Builder()
-            .addInterceptor(collectingInterceptor(events))
-            .build()
+        val logger = VonageLogger(collectingInterceptor(events))
 
         val before = System.currentTimeMillis()
         logger.d("T", "timestamped")

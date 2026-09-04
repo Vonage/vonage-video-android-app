@@ -6,7 +6,6 @@ import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
-import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.kotlin.model.VideoCodec
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,12 +30,7 @@ class CallSettingsHolder(
     private val _opusDtxEnabled = MutableStateFlow(true)
     val opusDtxEnabled: StateFlow<Boolean> = _opusDtxEnabled.asStateFlow()
 
-    private val _videoBitrateConfig = MutableStateFlow(
-        VideoBitrateConfig(
-            preset = VideoBitratePreset.DEFAULT,
-            maxBitrate = VideoBitratePreset.DEFAULT.defaultMaxBitrate,
-        ),
-    )
+    private val _videoBitrateConfig = MutableStateFlow(PersistedCallSettings().videoBitrateConfig)
     val videoBitrateConfig: StateFlow<VideoBitrateConfig> = _videoBitrateConfig.asStateFlow()
 
     private val _degradationPreference = MutableStateFlow(DegradationPreference.NOT_SET)

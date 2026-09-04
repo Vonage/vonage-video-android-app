@@ -43,6 +43,7 @@ import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.fx.ui.VideoEffectsScreen
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.NoiseSuppression
 import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.R
 import com.vonage.android.meetingroom.api.MeetingRoomBottomBarAction
@@ -354,7 +355,7 @@ internal fun MeetingRoomScreen(
                                     showAudioOutputs = false
                                 }
                             },
-                            noiseSuppressionEnabled = noiseSuppression.isEnabled(),
+                            noiseSuppressionEnabled = noiseSuppression == NoiseSuppression.ENABLED,
                             onNoiseSuppressorToggle = {
                                 publisher?.toggleNoiseSuppression()
                             }

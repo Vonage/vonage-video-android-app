@@ -8,13 +8,4 @@ abstract class ThemeGeneratorExtension {
     abstract val themeJsonFile: RegularFileProperty
     abstract val outputPackage: Property<String>
     abstract val themeDirectory: DirectoryProperty
-    abstract val generateColors: Property<Boolean>
-    abstract val generateTypography: Property<Boolean>
-    abstract val generateShapes: Property<Boolean>
-
-    init {
-        generateColors.convention(true)
-        generateTypography.convention(true)
-        generateShapes.convention(true)
-    }
 }

@@ -1,18 +1,5 @@
 package com.vonage.android.meetingroom.api
 
-import kotlinx.coroutines.flow.StateFlow
-
-/**
- * Public interface for observing call state from outside the meeting room SDK.
- *
- * Retrieve an instance via [MeetingRoomPrebuilt.stateHolder]. State is populated once the
- * meeting room composable is first displayed and the call setup begins.
- */
-@ExperimentalMeetingRoomApi
-interface MeetingRoomStateHolder {
-    val callState: StateFlow<MeetingRoomCallState>
-}
-
 /**
  * Snapshot of the current call state exposed to the host application.
  *

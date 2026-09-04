@@ -68,9 +68,9 @@ internal fun AudioDeviceList(
         }
         items(
             items = availableDevices,
-            key = { audioDevice -> audioDevice.id },
+            key = { audioDevice -> audioDevice.type.ordinal },
         ) { audioDevice ->
-            val isSelected = audioDevice.id == activeDevice?.id
+            val isSelected = audioDevice.type == activeDevice?.type
             AudioDeviceCell(
                 audioDevice = audioDevice,
                 selectDevice = selectDevice,
@@ -161,12 +161,12 @@ internal fun AudioDeviceListPreview() {
         AudioDeviceList(
             modifier = Modifier.background(VonageVideoTheme.colors.surface),
             availableDevices = persistentListOf(
-                AudioDevice(1, AudioDeviceType.BLUETOOTH),
-                AudioDevice(2, AudioDeviceType.EARPIECE),
-                AudioDevice(3, AudioDeviceType.SPEAKER),
-                AudioDevice(4, AudioDeviceType.WIRED_HEADSET),
+                AudioDevice(AudioDeviceType.BLUETOOTH),
+                AudioDevice(AudioDeviceType.EARPIECE),
+                AudioDevice(AudioDeviceType.SPEAKER),
+                AudioDevice(AudioDeviceType.WIRED_HEADSET),
             ),
-            activeDevice = AudioDevice(3, AudioDeviceType.SPEAKER),
+            activeDevice = AudioDevice(AudioDeviceType.SPEAKER),
             selectDevice = {},
         )
     }

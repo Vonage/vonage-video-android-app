@@ -32,7 +32,7 @@ public final class com/vonage/logger/LogLevel : java/lang/Enum {
 }
 
 public final class com/vonage/logger/VonageLogger {
-	public synthetic fun <init> (Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> ([Lcom/vonage/logger/interceptor/LogInterceptor;)V
 	public final fun d (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
 	public static synthetic fun d$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
 	public final fun e (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
@@ -47,12 +47,6 @@ public final class com/vonage/logger/VonageLogger {
 	public static synthetic fun w$default (Lcom/vonage/logger/VonageLogger;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILjava/lang/Object;)V
 }
 
-public final class com/vonage/logger/VonageLogger$Builder {
-	public fun <init> ()V
-	public final fun addInterceptor (Lcom/vonage/logger/interceptor/LogInterceptor;)Lcom/vonage/logger/VonageLogger$Builder;
-	public final fun build ()Lcom/vonage/logger/VonageLogger;
-}
-
 public final class com/vonage/logger/VonageLoggerKt {
 	public static final fun getVonageLogger ()Lcom/vonage/logger/VonageLogger;
 }
@@ -62,17 +56,6 @@ public final class com/vonage/logger/interceptor/AndroidLogInterceptor : com/von
 	public fun intercept (Lcom/vonage/logger/LogEvent;)Lcom/vonage/logger/LogEvent;
 }
 
-public final class com/vonage/logger/interceptor/FileLogInterceptor : com/vonage/logger/interceptor/LogInterceptor {
-	public static final field Companion Lcom/vonage/logger/interceptor/FileLogInterceptor$Companion;
-	public static final field DEFAULT_DATE_FORMAT Ljava/lang/String;
-	public static final field DEFAULT_MAX_FILE_SIZE J
-	public fun <init> (Ljava/io/File;JLjava/lang/String;)V
-	public synthetic fun <init> (Ljava/io/File;JLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun intercept (Lcom/vonage/logger/LogEvent;)Lcom/vonage/logger/LogEvent;
-}
-
-public final class com/vonage/logger/interceptor/FileLogInterceptor$Companion {
-}
 
 public abstract interface class com/vonage/logger/interceptor/LogInterceptor {
 	public abstract fun intercept (Lcom/vonage/logger/LogEvent;)Lcom/vonage/logger/LogEvent;

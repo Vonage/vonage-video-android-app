@@ -7,14 +7,11 @@ import com.vonage.android.archiving.ArchiveId
 import com.vonage.android.archiving.ArchiveStatus
 import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.util.DownloadManager
-import com.vonage.android.util.coroutines.CoroutinePoller
-import com.vonage.android.util.coroutines.CoroutinePollerFactory
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -32,16 +29,6 @@ class GoodbyeScreenViewModelTest {
         roomName = ANY_ROOM_NAME,
         vonageArchiving = vonageArchiving,
         downloadManager = downloadManager,
-        pollerFactory = CoroutinePollerFactory { fetchData ->
-            mockk<CoroutinePoller<Unit>>(relaxed = true).also { poller ->
-                every { poller.poll(any()) } answers {
-                    flow {
-                        fetchData()
-                        emit(Unit)
-                    }
-                }
-            }
-        },
     )
 
     @Test
@@ -129,7 +116,7 @@ class GoodbyeScreenViewModelTest {
     }
 
     @Test
-    fun `given viewmodel when repository fails then continues polling silently`() = runTest {
+    fun `given viewmodel when repository fails then stops polling`() = runTest {
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.failure(Exception("Network error"))
 
         val sut = sut()

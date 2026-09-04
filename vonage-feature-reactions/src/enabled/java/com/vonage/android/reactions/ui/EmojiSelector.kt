@@ -10,7 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.vonage.android.compose.modifier.debouncedClickable
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.reactions.EmojiData
+import com.vonage.android.reactions.emojis
 
 private const val DEBOUNCE_CLICK_MILLIS = 500L
 
@@ -23,7 +23,7 @@ fun EmojiSelector(
         modifier = modifier,
     ) {
         items(
-            items = EmojiData.emojis,
+            items = emojis,
             key = { emoji -> emoji },
         ) { emoji ->
             Text(

@@ -1,7 +1,5 @@
 package com.vonage.android.di
 
-import com.vonage.android.util.coroutines.CoroutinePoller
-import com.vonage.android.util.coroutines.CoroutinePollerFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,20 +16,9 @@ object CoroutinesModule {
     @Provides
     fun provideIODispatcher(): CoroutineDispatcher = Dispatchers.IO
 
-    @MainDispatcher
-    @Provides
-    fun provideMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
-
     @DefaultDispatcher
     @Provides
     fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
-
-    @Provides
-    fun provideCoroutinePollerFactory(
-        @IODispatcher dispatcher: CoroutineDispatcher,
-    ): CoroutinePollerFactory = CoroutinePollerFactory { fetchData ->
-        CoroutinePoller(dispatcher, fetchData)
-    }
 
 }
 

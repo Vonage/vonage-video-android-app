@@ -17,9 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.api.MeetingRoomSDKAction
+import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
 import com.vonage.android.meetingroom.internal.permissions.computeRequiredPermissions
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreen
@@ -27,7 +30,6 @@ import com.vonage.android.meetingroom.internal.screen.PipMeetingRoomScreen
 import com.vonage.android.meetingroom.internal.util.pip.pipEffect
 import com.vonage.android.meetingroom.internal.util.pip.rememberIsInPipMode
 import com.vonage.android.meetingroom.internal.viewmodel.MeetingRoomViewModel
-import com.vonage.android.meetingroom.internal.viewmodel.MeetingRoomViewModelFactory
 import kotlinx.coroutines.launch
 
 /**
@@ -73,10 +75,16 @@ private fun MeetingRoomContentInner(
     val context = LocalContext.current
     @Suppress("ViewModelInjection")
     val viewModel: MeetingRoomViewModel = viewModel(
-        factory = MeetingRoomViewModelFactory(
-            applicationContext = context.applicationContext,
-            prebuilt = prebuilt,
-        ),
+        factory = viewModelFactory {
+            initializer {
+                MeetingRoomViewModel(
+                    container = MeetingRoomContainer(
+                        applicationContext = context.applicationContext,
+                        prebuilt = prebuilt,
+                    ),
+                )
+            }
+        },
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val inPipMode = rememberIsInPipMode()

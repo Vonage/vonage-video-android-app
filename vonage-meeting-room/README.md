@@ -30,7 +30,7 @@ prebuilt.launch(context)
 setContent { prebuilt.content() }
 
 // Observe call state from outside
-val state by prebuilt.stateHolder.callState.collectAsStateWithLifecycle()
+val state by prebuilt.callState.collectAsStateWithLifecycle()
 ```
 
 ---
@@ -62,7 +62,7 @@ val prebuilt: MeetingRoomPrebuilt = MeetingRoomBuilder(...).build()
 
 prebuilt.launch(context)          // Option A — Activity
 prebuilt.content()                // Option B — @Composable
-prebuilt.stateHolder.callState    // StateFlow<MeetingRoomCallState>
+prebuilt.callState    // StateFlow<MeetingRoomCallState>
 ```
 
 ### `MeetingRoomSDKAction`
@@ -121,7 +121,7 @@ MeetingRoomTheme(
 )
 ```
 
-### `MeetingRoomStateHolder` / `MeetingRoomCallState`
+### `MeetingRoomCallState`
 
 ```kotlin
 data class MeetingRoomCallState(
@@ -173,7 +173,7 @@ vonage-meeting-room/
 │   ├── MeetingRoomConfiguration.kt
 │   ├── PublisherSettings.kt
 │   ├── MeetingRoomTheme.kt
-│   └── MeetingRoomStateHolder.kt
+│   └── MeetingRoomCallState.kt
 └── internal/
     ├── MeetingRoomActivity.kt    ← Activity entry point (launched via MeetingRoomPrebuilt)
     ├── MeetingRoomContent.kt     ← Composable entry point (embedded via prebuilt.content())

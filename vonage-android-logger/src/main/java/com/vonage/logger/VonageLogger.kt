@@ -8,16 +8,13 @@ import com.vonage.logger.interceptor.LogInterceptor
  * a list of [LogInterceptor]s.
  *
  * ```kotlin
- * val logger = VonageLogger.Builder()
- *     .addInterceptor(AndroidLogInterceptor())
- *     .build()
- *
+ * val logger = VonageLogger(AndroidLogInterceptor())
  * logger.d("MyApp", "User logged in")
  * logger.e("MyApp", "Something failed", exception)
  * ```
  */
-class VonageLogger private constructor(
-    private val interceptors: List<LogInterceptor>,
+class VonageLogger(
+    private vararg val interceptors: LogInterceptor,
 ) {
 
     fun v(tag: String, message: String, throwable: Throwable? = null) =
@@ -41,25 +38,6 @@ class VonageLogger private constructor(
             event = interceptor.intercept(event ?: return)
         }
     }
-
-    /**
-     * ```kotlin
-     * val logger = VonageLogger.Builder()
-     *     .addInterceptor(AndroidLogInterceptor())
-     *     .build()
-     * ```
-     */
-    class Builder {
-        private val interceptors = mutableListOf<LogInterceptor>()
-
-        fun addInterceptor(interceptor: LogInterceptor): Builder = apply {
-            interceptors.add(interceptor)
-        }
-
-        fun build(): VonageLogger = VonageLogger(interceptors.toList())
-    }
 }
 
-val vonageLogger: VonageLogger = VonageLogger.Builder()
-    .addInterceptor(AndroidLogInterceptor())
-    .build()
+val vonageLogger: VonageLogger = VonageLogger(AndroidLogInterceptor())

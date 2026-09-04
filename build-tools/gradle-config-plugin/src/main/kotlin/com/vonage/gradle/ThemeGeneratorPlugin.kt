@@ -19,22 +19,10 @@ class ThemeGeneratorPlugin : Plugin<Project> {
     }
 
     private fun configureAndroidProject(project: Project, extension: ThemeGeneratorExtension) {
-        val taskName = "generateTheme"
-
-        val generateTask = project.tasks.register(taskName, GenerateThemeTask::class.java) {
+        project.tasks.register("generateTheme", GenerateThemeTask::class.java) {
             themeJsonFile.set(extension.themeJsonFile)
             outputPackage.set(extension.outputPackage)
             themeDirectory.set(extension.themeDirectory)
-            generateColors.set(extension.generateColors)
-            generateTypography.set(extension.generateTypography)
-            generateShapes.set(extension.generateShapes)
-        }
-
-        // Don't auto-run on preBuild, let it be manually triggered
-        project.tasks.register("updateTheme") {
-            group = VONAGE_PREFIX
-            description = "Updates theme files from theme.json"
-            dependsOn(generateTask)
         }
     }
 }

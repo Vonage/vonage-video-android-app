@@ -21,10 +21,10 @@ import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
 import com.vonage.android.meetingroom.internal.data.MeetingRoomSessionRepository
-import com.vonage.android.meetingroom.internal.data.SessionInfo
+import com.vonage.android.meetingroom.internal.data.GetSessionResponse
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
-import com.vonage.android.meetingroom.internal.screen.audio.MeetingRoomAudioDevicesHandler
+import com.vonage.android.meetingroom.internal.screen.audio.AudioDevicesState
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler.CallAction
 import com.vonage.android.meetingroom.internal.util.ActivityContextHolder
@@ -67,11 +67,8 @@ class MeetingRoomViewModelTest {
     private val vonageCaptions: VonageCaptions = mockk(relaxed = true)
     private val vonageScreenSharing: VonageScreenSharing = mockk(relaxed = true)
     private val videoClient: VonageVideoClient = mockk(relaxed = true)
-    private val audioDevicesStateMock = mockk<com.vonage.android.meetingroom.internal.screen.audio.AudioDevicesState>(relaxed = true)
+    private val audioDevicesStateMock = mockk<AudioDevicesState>(relaxed = true)
     private val callSettingsHolder: CallSettingsHolder = CallSettingsHolder()
-    private val audioDevicesHandler: MeetingRoomAudioDevicesHandler = mockk(relaxed = true) {
-        every { audioDevicesState } returns audioDevicesStateMock
-    }
     private val foregroundServiceHandler: MeetingRoomForegroundServiceHandler = mockk(relaxed = true) {
         every { actions } returns MutableSharedFlow()
     }
@@ -97,7 +94,7 @@ class MeetingRoomViewModelTest {
         every { container.videoClient } returns videoClient
         every { container.foregroundServiceHandler } returns foregroundServiceHandler
         every { container.activityContextHolder } returns activityContextHolder
-        every { container.audioDevicesHandler } returns audioDevicesHandler
+        every { container.audioDevicesState } returns audioDevicesStateMock
         every { container.callSettingsHolder } returns callSettingsHolder
         every { container.getBackgroundsUseCase } returns getBackgroundsUseCase
         every { container.userBackgroundRepository } returns userBackgroundRepository
@@ -898,7 +895,7 @@ class MeetingRoomViewModelTest {
         token: String = "token",
         captionsId: String? = null,
     ) = success(
-        SessionInfo(apiKey = apiKey, sessionId = sessionId, token = token, captionsId = captionsId),
+        GetSessionResponse(apiKey = apiKey, sessionId = sessionId, token = token, captionsId = captionsId),
     )
 
     // endregion

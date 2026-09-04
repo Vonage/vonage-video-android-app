@@ -7,27 +7,27 @@ import com.vonage.android.archiving.Archive
 import com.vonage.android.archiving.ArchiveStatus
 import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.util.DownloadManager
-import com.vonage.android.util.coroutines.CoroutinePollerFactory
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.isActive
 
 @HiltViewModel(assistedFactory = GoodbyeScreenViewModelFactory::class)
 class GoodbyeScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
     private val vonageArchiving: VonageArchiving,
     private val downloadManager: DownloadManager,
-    private val pollerFactory: CoroutinePollerFactory,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<GoodbyeScreenUiState>(GoodbyeScreenUiState.Idle)
@@ -38,20 +38,19 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
     )
 
     init {
-        viewModelScope.launch {
-            pollerFactory.create {
+        flow<Unit> {
+            while (currentCoroutineContext().isActive) {
+                var stop = false
                 vonageArchiving.getRecordings(roomName)
                     .onSuccess { archives ->
-                        archives
-                            .count { archive -> archive.status == ArchiveStatus.PENDING }
-                            .let { if (it == 0) cancel() }
-                        _uiState.value = GoodbyeScreenUiState.Content(
-                            archives = archives.toImmutableList()
-                        )
+                        if (archives.count { it.status == ArchiveStatus.PENDING } == 0) stop = true
+                        _uiState.value = GoodbyeScreenUiState.Content(archives = archives.toImmutableList())
                     }
-                    .onFailure { cancel() }
-            }.poll(POLLING_DELAY).collect()
-        }
+                    .onFailure { stop = true }
+                if (stop) return@flow
+                delay(POLLING_DELAY)
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun downloadArchive(archive: Archive) {
