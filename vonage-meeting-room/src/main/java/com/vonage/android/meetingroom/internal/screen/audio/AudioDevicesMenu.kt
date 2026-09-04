@@ -22,6 +22,7 @@ internal fun AudioDevicesMenu(
     onNoiseSuppressorToggle: (Boolean) -> Unit,
     noiseSuppressionEnabled: Boolean,
     modifier: Modifier = Modifier,
+    showNoiseSuppressionToggle: Boolean = true,
     testSpeakerContent: @Composable () -> Unit = {},
 ) {
     val availableDevices by audioDevicesState.availableDevices.collectAsStateWithLifecycle()
@@ -30,11 +31,13 @@ internal fun AudioDevicesMenu(
     Column(
         modifier = modifier,
     ) {
-        NoiseSuppressorToggle(
-            title = stringResource(R.string.advanced_noise_suppression),
-            isChecked = noiseSuppressionEnabled,
-            onCheckedChange = onNoiseSuppressorToggle,
-        )
+        if (showNoiseSuppressionToggle) {
+            NoiseSuppressorToggle(
+                title = stringResource(R.string.advanced_noise_suppression),
+                isChecked = noiseSuppressionEnabled,
+                onCheckedChange = onNoiseSuppressorToggle,
+            )
+        }
         testSpeakerContent()
         AudioDeviceList(
             availableDevices = availableDevices,
