@@ -8,6 +8,7 @@
     "baseApiUrl",
     "videoSettings",
     "audioSettings",
+    "authSettings",
     "waitingRoomSettings",
     "meetingRoomSettings"
   ],
@@ -49,6 +50,17 @@
         "allowAdvancedNoiseSuppression": { "type": "boolean" },
         "allowAudioOnJoin": { "type": "boolean" },
         "allowMicrophoneControl": { "type": "boolean" }
+      }
+    },
+    "authSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowAuthentication"],
+      "properties": {
+        "allowAuthentication": {
+          "type": "boolean",
+          "description": "Compiles in the optional Okta authentication module (vonage-feature-okta) and shows the sign-in entry point on the landing screen. Requires Okta OIDC credentials in local.properties or environment variables — see docs/AUTHENTICATION.md."
+        }
       }
     },
     "waitingRoomSettings": {

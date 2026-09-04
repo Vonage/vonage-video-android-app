@@ -27,6 +27,10 @@ Some features use product flavors with `enabled`/`disabled` variants (for exampl
 
 For a deep dive into the full configuration plugin system (JSON schema, generated constants, multi-config setups, and troubleshooting), see [CONFIG-SYSTEM.md](CONFIG-SYSTEM.md).
 
+### Authentication (Okta)
+
+`authSettings.allowAuthentication` (default `false`) compiles in the optional `vonage-feature-okta` module and shows a sign-in entry point on the landing screen. It additionally requires Okta OIDC credentials from `local.properties` or environment variables — see [AUTHENTICATION.md](AUTHENTICATION.md).
+
 ## Theme customization
 
 The app's visual theme is driven by `config/theme.json`. Edit this file with your desired color scheme values:

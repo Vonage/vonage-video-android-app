@@ -26,6 +26,14 @@ if (configFile.exists()) {
     configFile.inputStream().use { configProps.load(it) }
 }
 
+// Okta OIDC credentials — only needed when authSettings.allowAuthentication is true.
+// Loaded from local.properties, overridable via environment variables (CI/CD).
+val localProps = Properties()
+val localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    localPropsFile.inputStream().use { localProps.load(it) }
+}
+
 android {
     namespace = "com.vonage.android"
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -48,7 +56,8 @@ android {
         // Set up base API URL
         val baseApiUrl = configProps.getProperty("vonage.baseApiUrl", "")
         buildConfigField("String", "BASE_API_URL", "\"$baseApiUrl\"")
-        manifestPlaceholders["hostName"] = baseApiUrl
+        // App Link filters match on the bare authority, so strip the scheme and any path.
+        manifestPlaceholders["hostName"] = baseApiUrl.substringAfter("://").substringBefore("/")
 
         // Chat feature
         val chatProperty = configProps.getProperty("vonage.meetingRoom.allow_chat", "true")
@@ -93,6 +102,46 @@ android {
         val settingsProperty = configProps.getProperty("vonage.meetingRoom.allow_settings", "true")
         buildConfigField("boolean", "FEATURE_SETTINGS_ENABLED", "$settingsProperty")
         missingDimensionStrategy("settings", settingsProperty.toEnabledString())
+
+        // Authentication (Okta) feature — disabled by default
+        val authProperty = configProps.getProperty("vonage.auth.allow_authentication", "false")
+        buildConfigField("boolean", "FEATURE_AUTHENTICATION_ENABLED", "$authProperty")
+        missingDimensionStrategy("okta", authProperty.toEnabledString())
+        if (authProperty.toBoolean()) {
+            // okta-mobile-kotlin requires API 26+; only raised when authentication is enabled
+            minSdk = 26
+        }
+
+        // Okta OIDC configuration (see docs/AUTHENTICATION.md); empty when not configured
+        val oktaSignInRedirectUri = oktaSecret("OKTA_SIGN_IN_REDIRECT_URI")
+        buildConfigField("String", "OKTA_ISSUER_URL", "\"${oktaSecret("OKTA_ISSUER_URL")}\"")
+        buildConfigField("String", "OKTA_CLIENT_ID", "\"${oktaSecret("OKTA_CLIENT_ID")}\"")
+        buildConfigField("String", "OKTA_SIGN_IN_REDIRECT_URI", "\"$oktaSignInRedirectUri\"")
+        buildConfigField("String", "OKTA_SCOPE", "\"${oktaSecret("OKTA_SCOPE")}\"")
+
+        // The OIDC callback arrives as a verified App Link, the same way iOS receives it
+        // through its `applinks:` entitlement. The Okta SDK's own redirect intent-filter can
+        // only express a scheme, so it is pinned to an inert one and the real https filter is
+        // declared in vonage-feature-okta/src/enabled/AndroidManifest.xml from the host and
+        // path below. A custom-scheme redirect URI still works: the SDK filter then handles it
+        // and the https filter is pointed at an unroutable host.
+        val isHttpsRedirect = oktaSignInRedirectUri.startsWith("https://", ignoreCase = true)
+        manifestPlaceholders["webAuthenticationRedirectScheme"] = if (isHttpsRedirect) {
+            "com.vonage.android.okta.unused"
+        } else {
+            oktaSignInRedirectUri.substringBefore(":", "").ifBlank { "com.vonage.android" }
+        }
+        val redirectAuthority = oktaSignInRedirectUri.substringAfter("://", "")
+        manifestPlaceholders["oktaRedirectHost"] = if (isHttpsRedirect) {
+            redirectAuthority.substringBefore("/")
+        } else {
+            "okta-redirect.invalid"
+        }
+        manifestPlaceholders["oktaRedirectPath"] = if (isHttpsRedirect) {
+            "/" + redirectAuthority.substringAfter("/", "")
+        } else {
+            "/okta-callback"
+        }
     }
 
     compileOptions {
@@ -204,6 +253,7 @@ dependencies {
     implementation(project(":vonage-feature-video-effects"))
     implementation(project(":vonage-feature-audio-effects"))
     implementation(project(":vonage-feature-captions"))
+    implementation(project(":vonage-feature-okta"))
     implementation(project(":vonage-feature-settings"))
     implementation(project(":vonage-audio-selector"))
     implementation(project(":vonage-android-logger"))
@@ -270,6 +320,12 @@ dependencies {
 }
 
 fun String.toEnabledString(): String = if (toBoolean()) "enabled" else "disabled"
+
+/**
+ * Resolves an Okta secret from the environment (CI/CD) or local.properties (local dev).
+ * Returns an empty string when unset so unauthenticated builds keep working.
+ */
+fun oktaSecret(name: String): String = System.getenv(name) ?: localProps.getProperty(name, "")
 
 /**
  * Returns the prefixed flavor name used by the vonage-meeting-room module,

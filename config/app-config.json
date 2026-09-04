@@ -11,6 +11,9 @@
     "allowAudioOnJoin": true,
     "allowMicrophoneControl": true
   },
+  "authSettings": {
+    "allowAuthentication": true
+  },
   "waitingRoomSettings": {
     "allowDeviceSelection": true
   },

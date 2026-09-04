@@ -36,6 +36,7 @@ mockk = "1.14.11"
 navigationCompose = "2.9.8"
 navigationRuntimeAndroid = "2.9.8"
 okhttp = "5.5.0"
+oktaMobileKotlin = "3.1.0"
 opentokAndroidSdk = "2.35.1"
 retrofit = "3.0.0"
 roborazzi = "1.72.0"
@@ -102,6 +103,10 @@ logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", ver
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okta-auth-foundation = { module = "com.okta.kotlin:auth-foundation" }
+okta-bom = { module = "com.okta.kotlin:bom", version.ref = "oktaMobileKotlin" }
+okta-oauth2 = { module = "com.okta.kotlin:oauth2" }
+okta-web-authentication-ui = { module = "com.okta.kotlin:web-authentication-ui" }
 vonage-android-sdk = { module = "com.vonage:client-sdk-video", version.ref = "opentokAndroidSdk" }
 vonage-android-video-transformers = { module = "com.vonage:client-sdk-video-transformers", version.ref = "opentokAndroidSdk" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }

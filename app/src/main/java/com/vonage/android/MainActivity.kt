@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.layout.Box
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.di.CallSettingsHolderEntryPoint
+import com.vonage.android.di.VonageOktaAuthEntryPoint
 import com.vonage.android.navigation.AppNavHost
 import com.vonage.android.util.InAppUpdates
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,6 +78,12 @@ fun InterceptorAppNavHost(intentFlow: Flow<Intent>) {
             CallSettingsHolderEntryPoint::class.java
         ).callSettingsHolder()
     }
+    val oktaAuth = remember {
+        EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            VonageOktaAuthEntryPoint::class.java
+        ).vonageOktaAuth()
+    }
     LaunchedEffect(intentFlow) {
         intentFlow.collectLatest {
             it.data?.let { uri ->
@@ -84,12 +91,17 @@ fun InterceptorAppNavHost(intentFlow: Flow<Intent>) {
                     .fromUri(uri)
                     .build()
 
-                navController.navigate(
-                    request,
-                    navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
-                )
+                // The manifest filter is necessarily broader than the nav graph (it cannot
+                // express the {roomName} argument), so a link such as /room/a/b reaches us
+                // with no matching destination — navigate() would throw on it.
+                if (navController.graph.hasDeepLink(request)) {
+                    navController.navigate(
+                        request,
+                        navOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
+                    )
+                }
             }
         }
     }
-    AppNavHost(navController = navController, callSettingsHolder = callSettingsHolder)
+    AppNavHost(navController = navController, callSettingsHolder = callSettingsHolder, oktaAuth = oktaAuth)
 }

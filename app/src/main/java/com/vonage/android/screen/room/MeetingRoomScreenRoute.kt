@@ -5,6 +5,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.vonage.android.BuildConfig
 import com.vonage.android.config.AppConfig
+import com.vonage.android.meetingroom.api.MeetingRoomAuthTokenProvider
 import com.vonage.android.meetingroom.api.MeetingRoomBuilder
 import com.vonage.android.meetingroom.api.MeetingRoomConfiguration
 import com.vonage.android.meetingroom.api.MeetingRoomSDKAction
@@ -34,6 +35,7 @@ fun MeetingRoomScreenRoute(
     navigateToShare: (String) -> Unit,
     navigateToSettings: () -> Unit,
     initialPublisherSettings: PublisherSettings = PublisherSettings(),
+    authTokenProvider: MeetingRoomAuthTokenProvider? = null,
 ) {
     val prebuilt = remember(roomName, initialPublisherSettings) {
         MeetingRoomBuilder(
@@ -42,6 +44,7 @@ fun MeetingRoomScreenRoute(
         )
             .publisherSettings(initialPublisherSettings)
             .callSettingsHolder(callSettingsHolder)
+            .authTokenProvider(authTokenProvider)
             .configuration(
                 MeetingRoomConfiguration(
                     allowCameraControl = AppConfig.VideoSettings.ALLOW_CAMERA_CONTROL,

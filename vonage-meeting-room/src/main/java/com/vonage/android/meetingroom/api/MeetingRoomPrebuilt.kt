@@ -61,6 +61,8 @@ class MeetingRoomPrebuilt internal constructor(
     internal val additionalBottomBarActions: StateFlow<List<MeetingRoomBottomBarAction>>? = null,
     /** Full replacement for the bottom bar. When set, [additionalBottomBarActions] is ignored. */
     internal val customBottomBar: (@Composable (MeetingRoomBottomBarState, MeetingRoomCustomActions) -> Unit)? = null,
+    /** Optional supplier of a bearer token attached to the SDK's backend requests. */
+    internal val authTokenProvider: MeetingRoomAuthTokenProvider? = null,
 ) {
     private val _callState = MutableStateFlow(MeetingRoomCallState(roomName = roomName))
 

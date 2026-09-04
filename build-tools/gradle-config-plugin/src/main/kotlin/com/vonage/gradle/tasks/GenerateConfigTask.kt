@@ -140,6 +140,7 @@ abstract class GenerateConfigTask : DefaultTask() {
         listOf(
             Triple("videoSettings", "VideoSettings", "Video Settings Configuration"),
             Triple("audioSettings", "AudioSettings", "Audio Settings Configuration"),
+            Triple("authSettings", "AuthSettings", "Authentication Settings Configuration"),
             Triple(
                 "waitingRoomSettings",
                 "WaitingRoomSettings",
@@ -242,6 +243,16 @@ abstract class GenerateConfigTask : DefaultTask() {
             sb.appendLine("# Audio Settings")
             audioSettings.entrySet().forEach { (key, value) ->
                 sb.appendProp("vonage.audio.${key.toSnakeCase()}", value)
+            }
+            sb.appendLine()
+        }
+
+        // Authentication Settings
+        val authSettings = jsonObject.getAsJsonObject("authSettings")
+        if (authSettings != null) {
+            sb.appendLine("# Authentication Settings")
+            authSettings.entrySet().forEach { (key, value) ->
+                sb.appendProp("vonage.auth.${key.toSnakeCase()}", value)
             }
             sb.appendLine()
         }

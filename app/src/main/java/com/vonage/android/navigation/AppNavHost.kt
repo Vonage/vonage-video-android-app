@@ -16,8 +16,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import com.vonage.android.BuildConfig
+import com.vonage.android.meetingroom.api.MeetingRoomAuthTokenProvider
 import com.vonage.android.meetingroom.api.PublisherSettings
+import com.vonage.android.okta.VonageOktaAuth
 import com.vonage.android.navigation.AppRoute.Goodbye
 import com.vonage.android.navigation.AppRoute.Landing
 import com.vonage.android.navigation.AppRoute.Meeting
@@ -29,17 +30,24 @@ import com.vonage.android.screen.room.MeetingRoomScreenRoute
 import com.vonage.android.screen.settings.SettingsScreenRoute
 import com.vonage.android.screen.waiting.WaitingRoomRoute
 import com.vonage.android.settings.CallSettingsHolder
+import com.vonage.android.util.DEEP_LINK_BASE_URL
 import com.vonage.android.util.navigateToShare
 import com.vonage.android.util.navigateToSystemPermissions
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun AppNavHost(
     navController: NavHostController,
     callSettingsHolder: CallSettingsHolder,
+    oktaAuth: VonageOktaAuth,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     var pendingPublisherSettings by remember { mutableStateOf<PublisherSettings?>(null) }
+    val authTokenProvider = remember(oktaAuth) {
+        // Called by OkHttp on a background thread, so blocking is safe here.
+        MeetingRoomAuthTokenProvider { runBlocking { oktaAuth.currentToken() } }
+    }
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -47,12 +55,13 @@ fun AppNavHost(
     ) {
         composable<Landing> {
             LandingScreenRoute(
+                oktaAuth = oktaAuth,
                 navigateToRoom = { params -> navController.navigate(Waiting(params.roomName)) },
             )
         }
         composable<Waiting>(
             deepLinks = listOf(
-                navDeepLink<Waiting>("${BuildConfig.BASE_API_URL}/waiting-room"),
+                navDeepLink<Waiting>("$DEEP_LINK_BASE_URL/waiting-room"),
             )
         ) { backStackEntry ->
             val roomName = backStackEntry.toRoute<Waiting>().roomName
@@ -76,7 +85,7 @@ fun AppNavHost(
         }
         composable<Meeting>(
             deepLinks = listOf(
-                navDeepLink<Meeting>("${BuildConfig.BASE_API_URL}/room"),
+                navDeepLink<Meeting>("$DEEP_LINK_BASE_URL/room"),
             )
         ) { backStackEntry ->
             val roomName = backStackEntry.toRoute<Meeting>().roomName
@@ -88,6 +97,7 @@ fun AppNavHost(
             MeetingRoomScreenRoute(
                 roomName = roomName,
                 callSettingsHolder = callSettingsHolder,
+                authTokenProvider = authTokenProvider,
                 initialPublisherSettings = settings,
                 navigateToGoodBye = { navController.navigate(Goodbye(roomName = roomName)) },
                 navigateToShare = { roomName -> context.navigateToShare(roomName) },

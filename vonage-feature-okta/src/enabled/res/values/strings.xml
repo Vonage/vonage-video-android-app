@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auth_sign_in">Sign in</string>
+    <string name="auth_signed_in">Signed in</string>
+    <string name="auth_sign_in_title">Sign in</string>
+    <string name="auth_sign_in_subtitle">Use your organization account to continue</string>
+    <string name="auth_sign_in_with">Sign in with %1$s</string>
+    <string name="auth_sign_in_error">Sign-in failed. Please try again.</string>
+    <string name="auth_sign_out">Sign out</string>
+</resources>
