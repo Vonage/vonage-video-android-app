@@ -29,6 +29,20 @@ class GetConfigTest {
     }
 
     @Test
+    fun `invoke should return Config with allowVideoOnJoin from AppConfig`() {
+        val config = getConfig()
+
+        assertEquals(AppConfig.VideoSettings.ALLOW_VIDEO_ON_JOIN, config.allowVideoOnJoin)
+    }
+
+    @Test
+    fun `invoke should return Config with allowAudioOnJoin from AppConfig`() {
+        val config = getConfig()
+
+        assertEquals(AppConfig.AudioSettings.ALLOW_AUDIO_ON_JOIN, config.allowAudioOnJoin)
+    }
+
+    @Test
     fun `invoke should return consistent results on multiple calls`() {
         val first = getConfig()
         val second = getConfig()
