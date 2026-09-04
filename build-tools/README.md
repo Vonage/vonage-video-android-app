@@ -76,22 +76,26 @@ plugins {
 ./gradlew updateTheme
 ```
 
-**Input** (`config/theme.json`):
+**Input** (`config/theme.json`), validated by the config TUI against the unified theme schema
+fetched from `THEME_SCHEMA_URL` in `tools/config-tui-py/vonage_config_tui/validator.py`
+(shared with the iOS and React Vonage Video apps; cached locally for offline use):
 ```json
 {
-  "themes": {
-    "vonage": {
-      "colors": {
-        "light": { "primary": "#0000FF", "background": "#FFFFFF" },
-        "dark": { "primary": "#4444FF", "background": "#121212" }
-      },
-      "borderRadius": { "small": 8, "medium": 12, "large": 16 },
-      "typography": {
-        "mobile": {
-          "headline": { "font-size": "32px", "font-weight": 700 }
-        }
-      }
-    }
+  "metadata": {
+    "name": "vonage",
+    "version": "1.0.0",
+    "created": "2026-09-04",
+    "description": "Default Vonage Video app theme."
+  },
+  "colors": {
+    "light": { "primary": "#0000FF", "background": "#FFFFFF", "...": "..." },
+    "dark": { "primary": "#4444FF", "background": "#121212", "...": "..." }
+  },
+  "borderRadius": { "small": 8, "medium": 12, "large": 16 },
+  "typography": {
+    "font-family": "Inter",
+    "desktop": { "headline": { "font-size": "66px", "line-height": "88px", "font-weight": 500 } },
+    "mobile": { "headline": { "font-size": "32px", "line-height": "40px", "font-weight": 500 } }
   }
 }
 ```

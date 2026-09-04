@@ -1,4 +1,4 @@
-"""Textual App entrypoint. Mirrors src/index.tsx App component."""
+"""Textual App entrypoint"""
 
 from __future__ import annotations
 

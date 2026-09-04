@@ -1,4 +1,4 @@
-"""Writes app-config.json / theme.json back to disk. Mirrors src/lib/file-writer.ts."""
+"""Writes app-config.json / theme.json back to disk"""
 
 from __future__ import annotations
 

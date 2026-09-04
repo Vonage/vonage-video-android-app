@@ -1,4 +1,4 @@
-"""Runs Gradle tasks. Mirrors src/lib/gradle.ts."""
+"""Runs Gradle tasks."""
 
 from __future__ import annotations
 
