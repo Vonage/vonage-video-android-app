@@ -113,6 +113,20 @@ def _property_to_field(full_key: str, raw_key: str, prop: dict[str, Any], value:
     )
 
 
+def _synthetic_properties(resolved: dict[str, Any]) -> dict[str, Any]:
+    """Build a properties map for object schemas that declare only ``required`` +
+    a typed ``additionalProperties`` (e.g. ``colorSet``, ``typographyScale``) instead of an
+    explicit ``properties`` map. Falls back to an empty dict when neither is usable.
+    """
+    if "properties" in resolved:
+        return resolved["properties"]
+    additional = resolved.get("additionalProperties")
+    required = resolved.get("required")
+    if isinstance(additional, dict) and isinstance(required, list):
+        return {key: additional for key in required}
+    return {}
+
+
 def _object_to_fields(
     properties: dict[str, Any],
     defs: dict[str, Any],
@@ -124,14 +138,15 @@ def _object_to_fields(
         resolved = _resolve_ref(prop, defs)
         full_key = f"{parent_key}.{key}"
         value = data.get(key) if isinstance(data, dict) else None
-        if resolved.get("type") == "object" and "properties" in resolved:
+        nested_props = _synthetic_properties(resolved) if resolved.get("type") == "object" else {}
+        if resolved.get("type") == "object" and nested_props:
             fields.append(FormField(
                 key=f"__section__{full_key}",
                 label=_format_label(key),
                 type="section",
             ))
             fields.extend(
-                _object_to_fields(resolved["properties"], defs, value or {}, full_key)
+                _object_to_fields(nested_props, defs, value or {}, full_key)
             )
         else:
             fields.append(_property_to_field(full_key, key, resolved, value))
@@ -147,7 +162,7 @@ def schema_to_fields(schema: dict[str, Any], data: dict[str, Any]) -> list[FormF
     ``required`` fields (e.g. platform-specific sections like ``localizationSettings``
     that Android's app-config.json never populates).
     """
-    props = schema.get("properties", {}) or {}
+    props = _synthetic_properties(schema)
     defs = schema.get("$defs", {}) or {}
     required = set(schema.get("required", []) or [])
 
@@ -157,11 +172,12 @@ def schema_to_fields(schema: dict[str, Any], data: dict[str, Any]) -> list[FormF
     for key, prop in props.items():
         resolved = _resolve_ref(prop, defs)
         is_present = isinstance(data, dict) and key in data
-        if resolved.get("type") == "object" and "properties" in resolved:
+        nested_props = _synthetic_properties(resolved) if resolved.get("type") == "object" else {}
+        if resolved.get("type") == "object" and nested_props:
             if key not in required and not is_present:
                 continue
             value = data.get(key) if isinstance(data, dict) else None
-            section_fields = _object_to_fields(resolved["properties"], defs, value or {}, key)
+            section_fields = _object_to_fields(nested_props, defs, value or {}, key)
             sections.append((_format_label(key), section_fields))
         else:
             value = data.get(key) if isinstance(data, dict) else None

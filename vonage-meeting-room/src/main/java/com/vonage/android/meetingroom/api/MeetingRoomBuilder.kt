@@ -54,6 +54,7 @@ class MeetingRoomBuilder(
     private var foregroundServiceEnabled: Boolean = true
     private var additionalBottomBarActions: StateFlow<List<MeetingRoomBottomBarAction>>? = null
     private var customBottomBar: (@Composable (MeetingRoomBottomBarState, MeetingRoomCustomActions) -> Unit)? = null
+    private var authTokenProvider: MeetingRoomAuthTokenProvider? = null
 
     /**
      * Defines which optional features are active at runtime.
@@ -214,6 +215,18 @@ class MeetingRoomBuilder(
     }
 
     /**
+     * Supplies an access token attached as an `Authorization: Bearer` header to every
+     * backend request made by the SDK (session fetch, archiving, captions).
+     *
+     * The provider is invoked by OkHttp on a background thread and may block. Returning
+     * null sends the request without the header, so backends without authentication
+     * keep working. Defaults to null (no header — same behavior as before).
+     */
+    fun authTokenProvider(provider: MeetingRoomAuthTokenProvider?): MeetingRoomBuilder = apply {
+        authTokenProvider = provider
+    }
+
+    /**
      * Constructs the [MeetingRoomPrebuilt] with the current configuration.
      *
      * Call [MeetingRoomPrebuilt.launch] or embed [MeetingRoomPrebuilt.content] to display the
@@ -236,5 +249,6 @@ class MeetingRoomBuilder(
         foregroundServiceEnabled = foregroundServiceEnabled,
         additionalBottomBarActions = additionalBottomBarActions,
         customBottomBar = customBottomBar,
+        authTokenProvider = authTokenProvider,
     )
 }

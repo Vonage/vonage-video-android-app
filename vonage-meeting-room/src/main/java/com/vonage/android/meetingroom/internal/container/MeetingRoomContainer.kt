@@ -47,6 +47,7 @@ internal class MeetingRoomContainer(
         MeetingRoomNetworkFactory.createRetrofit(
             baseUrl = prebuilt.baseUrl,
             isDebug = prebuilt.isDebug,
+            authTokenProvider = prebuilt.authTokenProvider,
         )
     }
 
