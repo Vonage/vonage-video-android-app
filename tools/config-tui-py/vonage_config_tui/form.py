@@ -1,7 +1,4 @@
-"""Form widget: fields on the left, details panel on the right.
-
-Mirrors src/components/form.tsx.
-"""
+"""Form widget: fields on the left, details panel on the right."""
 
 from __future__ import annotations
 

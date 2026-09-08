@@ -1,7 +1,4 @@
-"""Textual screens: main menu, app-config editor, theme editor.
-
-Mirrors src/index.tsx + src/screens/{app-config,theme}.tsx.
-"""
+"""Textual screens: main menu, app-config editor, theme editor."""
 
 from __future__ import annotations
 
@@ -374,23 +371,39 @@ class AppConfigScreen(Screen):
 # =========================================================================== #
 
 _THEME_SECTIONS: list[tuple[str, str, list[str]]] = [
-    ("colors-light", "Light Colors", ["themes", "vonage", "colors", "light"]),
-    ("colors-dark", "Dark Colors", ["themes", "vonage", "colors", "dark"]),
-    ("border-radius", "Border Radius", ["themes", "vonage", "borderRadius"]),
-    ("typography", "Typography", ["themes", "vonage", "typography"]),
+    ("metadata", "Metadata", ["metadata"]),
+    ("colors-light", "Light Colors", ["colors", "light"]),
+    ("colors-dark", "Dark Colors", ["colors", "dark"]),
+    ("border-radius", "Border Radius", ["borderRadius"]),
+    ("typography", "Typography", ["typography"]),
 ]
 
-_SECTION_DEF_REF: dict[str, str] = {
-    "colors-light": "colorScheme",
-    "colors-dark": "colorScheme",
-    "border-radius": "borderRadius",
-    "typography": "typography",
+# Maps each section to where its sub-schema lives: "defs" sections resolve via
+# THEME_SCHEMA["$defs"][ref], "properties" sections resolve via THEME_SCHEMA["properties"][ref]
+# (some schema objects, like borderRadius/typography, are defined inline rather than as a $def).
+_SECTION_SCHEMA_REF: dict[str, tuple[str, str]] = {
+    "metadata": ("properties", "metadata"),
+    "colors-light": ("defs", "colorSet"),
+    "colors-dark": ("defs", "colorSet"),
+    "border-radius": ("properties", "borderRadius"),
+    "typography": ("properties", "typography"),
 }
 
 
 def _resolve_def(schema: dict[str, Any], ref_path: str) -> dict[str, Any]:
     name = ref_path.replace("#/$defs/", "")
     return schema.get("$defs", {}).get(name, {})
+
+
+def _resolve_section_schema(schema: dict[str, Any], ref: tuple[str, str]) -> dict[str, Any]:
+    """Resolves a sub-schema by (location, name), where location is 'defs' or 'properties'."""
+    location, name = ref
+    if location == "defs":
+        return schema.get("$defs", {}).get(name, {})
+    prop = schema.get("properties", {}).get(name, {})
+    if "$ref" in prop:
+        return _resolve_def(schema, prop["$ref"])
+    return prop
 
 
 def _get_nested(obj: Any, path: list[str]) -> Any:
@@ -527,8 +540,8 @@ class ThemeScreen(Screen):
         self.query_one("#th-content", Static).update(_header(f"Theme: {label}"))
 
         # Build sub-schema
-        ref_name = _SECTION_DEF_REF[section_key]
-        sub = _resolve_def(THEME_SCHEMA, f"#/$defs/{ref_name}")
+        section_ref = _SECTION_SCHEMA_REF[section_key]
+        sub = _resolve_section_schema(THEME_SCHEMA, section_ref)
         # Inject $defs so nested $refs still resolve.
         sub_schema = dict(sub)
         sub_schema["$defs"] = THEME_SCHEMA.get("$defs", {})

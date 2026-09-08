@@ -18,9 +18,30 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.UNIT
 import com.vonage.gradle.model.ColorScheme
 import com.vonage.gradle.model.Theme
-import com.vonage.gradle.model.ThemeConfig
+import com.vonage.gradle.model.background
+import com.vonage.gradle.model.border
+import com.vonage.gradle.model.disabled
+import com.vonage.gradle.model.error
+import com.vonage.gradle.model.errorHover
+import com.vonage.gradle.model.onBackground
+import com.vonage.gradle.model.onError
+import com.vonage.gradle.model.onPrimary
+import com.vonage.gradle.model.onSecondary
+import com.vonage.gradle.model.onSuccess
+import com.vonage.gradle.model.onSurface
+import com.vonage.gradle.model.onTertiary
+import com.vonage.gradle.model.onWarning
+import com.vonage.gradle.model.primary
+import com.vonage.gradle.model.primaryHover
+import com.vonage.gradle.model.secondary
+import com.vonage.gradle.model.success
+import com.vonage.gradle.model.successHover
+import com.vonage.gradle.model.surface
+import com.vonage.gradle.model.tertiary
+import com.vonage.gradle.model.textDisabled
+import com.vonage.gradle.model.warning
+import com.vonage.gradle.model.warningHover
 import com.vonage.gradle.VONAGE
-import com.vonage.gradle.VONAGE_PREFIX
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -33,6 +54,7 @@ import java.io.File
 import com.vonage.gradle.model.TextStyle as ThemeTextStyle
 
 private const val COLOR_LENGTH = 6
+private const val COLOR_LENGTH_WITH_ALPHA = 8
 
 private val COLOR = ClassName("androidx.compose.ui.graphics", "Color")
 private val COLOR_SCHEME = ClassName("androidx.compose.material3", "ColorScheme")
@@ -83,9 +105,7 @@ abstract class GenerateThemeTask : DefaultTask() {
         val themeFile = themeJsonFile.get().asFile
         require(themeFile.exists())
 
-        val themeConfig = Gson().fromJson(themeFile.readText(), ThemeConfig::class.java)
-        val theme =
-            themeConfig.themes[VONAGE_PREFIX] ?: throw IllegalArgumentException("Vonage theme not found")
+        val theme = Gson().fromJson(themeFile.readText(), Theme::class.java)
 
         val outputDirectory = themeDirectory.get().asFile
         require(outputDirectory.exists())
@@ -478,12 +498,21 @@ abstract class GenerateThemeTask : DefaultTask() {
         logger.debug("Updated Theme.kt")
     }
 
+    /**
+     * Converts a schema hex color to the ARGB hex string expected by [Color]'s Long constructor.
+     * The schema uses `#RRGGBB` (opaque) or `#RRGGBBAA` (alpha channel last); Compose's `Color`
+     * expects `AARRGGBB`, so an 8-digit input needs its alpha byte moved to the front.
+     */
     private fun String.hexToArgb(): String {
         val cleanHex = removePrefix("#")
-        return if (cleanHex.length == COLOR_LENGTH) {
-            "FF$cleanHex"
-        } else {
-            cleanHex
+        return when (cleanHex.length) {
+            COLOR_LENGTH -> "FF$cleanHex"
+            COLOR_LENGTH_WITH_ALPHA -> {
+                val rgb = cleanHex.substring(0, COLOR_LENGTH)
+                val alpha = cleanHex.substring(COLOR_LENGTH)
+                "$alpha$rgb"
+            }
+            else -> cleanHex
         }
     }
 

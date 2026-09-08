@@ -1,4 +1,4 @@
-"""Claude-inspired amber/gray palette. Mirrors src/components/theme.tsx."""
+"""Claude-inspired amber/gray palette."""
 
 PRIMARY = "#D97706"      # warm amber
 SECONDARY = "#6B7280"    # gray-500

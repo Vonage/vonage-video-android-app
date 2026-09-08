@@ -1,8 +1,10 @@
 # vonage-config-tui (Python)
 
 Python port of [`tools/config-tui`](../config-tui). A terminal UI for editing
-`config/app-config.json` and `config/theme.json`, validating them against the
-JSON schemas in `config/`, and running the associated Gradle tasks.
+`config/app-config.json` and `config/theme.json`, validating them against
+`config/app-config.schema.json` (local) and the unified theme schema (fetched
+from a canonical URL, shared with the iOS and React Vonage Video apps), and
+running the associated Gradle tasks.
 
 ## Install
 
@@ -31,7 +33,8 @@ python -m vonage_config_tui
 
 - Main menu: **App Config**, **Theme**, **Launch App** (runs `./gradlew installDebug`).
 - Live ✓/✗ validation indicators next to App Config and Theme.
-- Form-driven editing derived from the JSON Schemas in `config/`:
+- Form-driven editing derived from JSON Schemas — app-config from
+  `config/app-config.schema.json`, theme from the schema fetched at runtime:
   - `boolean` — toggle with ⏎ / space
   - `enum` — cycle with ⏎ / space
   - `string` / `integer` / hex-`color` — inline edit; ⏎ commits, esc cancels

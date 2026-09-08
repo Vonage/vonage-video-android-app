@@ -1,4 +1,4 @@
-"""JSON Schema → flat list of FormField. Mirrors src/lib/schema-to-fields.ts."""
+"""JSON Schema → flat list of FormField."""
 
 from __future__ import annotations
 
@@ -21,6 +21,16 @@ class FormField:
 
 
 _CAMEL_SPLIT = re.compile(r"([a-z])([A-Z])")
+
+
+_HEX_COLOR_PATTERNS = {
+    "^#[0-9A-Fa-f]{6}$",
+    "^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+}
+
+
+def _is_hex_color_pattern(pattern: Optional[str]) -> bool:
+    return pattern in _HEX_COLOR_PATTERNS
 
 
 def _format_label(key: str) -> str:
@@ -75,7 +85,17 @@ def _property_to_field(full_key: str, raw_key: str, prop: dict[str, Any], value:
             max=prop.get("maximum"),
             description=desc,
         )
-    if prop.get("type") == "string" and prop.get("pattern") == "^#[0-9A-Fa-f]{6}$":
+    if prop.get("type") == "number":
+        return FormField(
+            key=full_key,
+            label=label,
+            type="integer",
+            value=value if value is not None else 0,
+            min=prop.get("minimum"),
+            max=prop.get("maximum"),
+            description=desc,
+        )
+    if prop.get("type") == "string" and _is_hex_color_pattern(prop.get("pattern")):
         return FormField(
             key=full_key,
             label=label,
@@ -94,6 +114,20 @@ def _property_to_field(full_key: str, raw_key: str, prop: dict[str, Any], value:
     )
 
 
+def _synthetic_properties(resolved: dict[str, Any]) -> dict[str, Any]:
+    """Build a properties map for object schemas that declare only ``required`` +
+    a typed ``additionalProperties`` (e.g. ``colorSet``, ``typographyScale``) instead of an
+    explicit ``properties`` map. Falls back to an empty dict when neither is usable.
+    """
+    if "properties" in resolved:
+        return resolved["properties"]
+    additional = resolved.get("additionalProperties")
+    required = resolved.get("required")
+    if isinstance(additional, dict) and isinstance(required, list):
+        return {key: additional for key in required}
+    return {}
+
+
 def _object_to_fields(
     properties: dict[str, Any],
     defs: dict[str, Any],
@@ -105,14 +139,15 @@ def _object_to_fields(
         resolved = _resolve_ref(prop, defs)
         full_key = f"{parent_key}.{key}"
         value = data.get(key) if isinstance(data, dict) else None
-        if resolved.get("type") == "object" and "properties" in resolved:
+        nested_props = _synthetic_properties(resolved) if resolved.get("type") == "object" else {}
+        if resolved.get("type") == "object" and nested_props:
             fields.append(FormField(
                 key=f"__section__{full_key}",
                 label=_format_label(key),
                 type="section",
             ))
             fields.extend(
-                _object_to_fields(resolved["properties"], defs, value or {}, full_key)
+                _object_to_fields(nested_props, defs, value or {}, full_key)
             )
         else:
             fields.append(_property_to_field(full_key, key, resolved, value))
@@ -121,7 +156,7 @@ def _object_to_fields(
 
 def schema_to_fields(schema: dict[str, Any], data: dict[str, Any]) -> list[FormField]:
     """Flatten a schema into an ordered list of fields with 'section' separators."""
-    props = schema.get("properties", {}) or {}
+    props = _synthetic_properties(schema)
     defs = schema.get("$defs", {}) or {}
 
     general: list[FormField] = []
@@ -130,8 +165,9 @@ def schema_to_fields(schema: dict[str, Any], data: dict[str, Any]) -> list[FormF
     for key, prop in props.items():
         resolved = _resolve_ref(prop, defs)
         value = data.get(key) if isinstance(data, dict) else None
-        if resolved.get("type") == "object" and "properties" in resolved:
-            section_fields = _object_to_fields(resolved["properties"], defs, value or {}, key)
+        nested_props = _synthetic_properties(resolved) if resolved.get("type") == "object" else {}
+        if resolved.get("type") == "object" and nested_props:
+            section_fields = _object_to_fields(nested_props, defs, value or {}, key)
             sections.append((_format_label(key), section_fields))
         else:
             general.append(_property_to_field(key, key, resolved, value))
