@@ -289,6 +289,7 @@ internal fun MeetingRoomScreen(
                                     allowShowParticipantList = uiState.allowShowParticipantList,
                                     allowMicrophoneControl = uiState.allowMicrophoneControl,
                                     allowCameraControl = uiState.allowCameraControl,
+                                    enabledFeatures = uiState.enabledFeatures,
                                 ),
                                 reportingContent = reportingContent
                                     ?: { onDismiss -> DefaultReportingContent(onDismiss) },
@@ -357,7 +358,8 @@ internal fun MeetingRoomScreen(
                             noiseSuppressionEnabled = noiseSuppression.isEnabled(),
                             onNoiseSuppressorToggle = {
                                 publisher?.toggleNoiseSuppression()
-                            }
+                            },
+                            showNoiseSuppressionToggle = MeetingRoomFeature.AUDIO_EFFECTS in uiState.enabledFeatures,
                         )
                     }
                 }

@@ -87,6 +87,8 @@ class WaitingRoomViewModelTest {
             allowCameraControl = true,
             allowMicrophoneControl = true,
             allowShowParticipantList = true,
+            allowVideoOnJoin = true,
+            allowAudioOnJoin = true,
         )
         every { videoClient.configurePublisher(any()) } returns Unit
     }

@@ -8,6 +8,7 @@ import com.vonage.android.config.AppConfig
 import com.vonage.android.meetingroom.api.MeetingRoomAuthTokenProvider
 import com.vonage.android.meetingroom.api.MeetingRoomBuilder
 import com.vonage.android.meetingroom.api.MeetingRoomConfiguration
+import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.api.MeetingRoomSDKAction
 import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.screen.components.permissions.CallPermissionHandler
@@ -42,6 +43,7 @@ fun MeetingRoomScreenRoute(
             baseUrl = BuildConfig.BASE_API_URL,
             roomName = roomName,
         )
+            .enabledFeatures(configuredMeetingRoomFeatures())
             .publisherSettings(initialPublisherSettings)
             .callSettingsHolder(callSettingsHolder)
             .authTokenProvider(authTokenProvider)
@@ -78,4 +80,18 @@ fun MeetingRoomScreenRoute(
     }
 
     prebuilt.content()
+}
+
+/**
+ * Maps [AppConfig] toggles to the runtime [MeetingRoomFeature] set. This is layered on top of
+ * the compile-time Gradle flavors — a feature is only active when both are enabled.
+ */
+private fun configuredMeetingRoomFeatures(): Set<MeetingRoomFeature> = buildSet {
+    if (AppConfig.MeetingRoomSettings.ALLOW_CHAT) add(MeetingRoomFeature.CHAT)
+    if (AppConfig.MeetingRoomSettings.ALLOW_ARCHIVING) add(MeetingRoomFeature.ARCHIVING)
+    if (AppConfig.MeetingRoomSettings.ALLOW_CAPTIONS) add(MeetingRoomFeature.CAPTIONS)
+    if (AppConfig.MeetingRoomSettings.ALLOW_EMOJIS) add(MeetingRoomFeature.REACTIONS)
+    if (AppConfig.MeetingRoomSettings.ALLOW_SCREEN_SHARE) add(MeetingRoomFeature.SCREEN_SHARE)
+    if (AppConfig.VideoSettings.ALLOW_BACKGROUND_EFFECTS) add(MeetingRoomFeature.BACKGROUND_EFFECTS)
+    if (AppConfig.AudioSettings.ALLOW_ADVANCED_NOISE_SUPPRESSION) add(MeetingRoomFeature.AUDIO_EFFECTS)
 }

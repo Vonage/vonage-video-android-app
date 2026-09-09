@@ -40,6 +40,7 @@ import com.vonage.android.compose.vivid.icons.solid.Warning
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.meetingroom.R
+import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
 import com.vonage.android.meetingroom.internal.util.noOpCall
@@ -64,6 +65,7 @@ internal data class BottomBarState(
     val allowShowParticipantList: Boolean,
     val allowMicrophoneControl: Boolean,
     val allowCameraControl: Boolean,
+    val enabledFeatures: Set<MeetingRoomFeature> = MeetingRoomFeature.all,
 )
 
 // 4 because mic + camera + menu + end
@@ -179,9 +181,11 @@ internal fun BottomBar(
             onDismissRequest = { showMoreActions = false },
             sheetState = moreActionsSheetState,
         ) {
-            EmojiSelector(
-                onEmojiClick = { emoji -> roomActions.onEmojiSent(emoji) },
-            )
+            if (MeetingRoomFeature.REACTIONS in state.enabledFeatures) {
+                EmojiSelector(
+                    onEmojiClick = { emoji -> roomActions.onEmojiSent(emoji) },
+                )
+            }
             MoreActionsGrid(
                 actions = overflowActions.toImmutableList(),
             )

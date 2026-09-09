@@ -70,7 +70,13 @@ class WaitingRoomViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val config = getConfig()
             val name = userRepository.getUserName()
-            videoClient.configurePublisher(buildPreviewConfig(name))
+            videoClient.configurePublisher(
+                buildPreviewConfig(
+                    name = name,
+                    publishVideo = config.allowVideoOnJoin,
+                    publishAudio = config.allowAudioOnJoin,
+                )
+            )
             videoClient.createPreviewPublisher(context)
                 .also { publisher ->
                     _uiState.update { uiState ->
