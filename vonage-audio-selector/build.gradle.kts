@@ -7,7 +7,7 @@ plugins {
 android {
     namespace = "com.vonage.audioselector"
     compileSdk {
-        version = release(36)
+        version = release(libs.versions.compileSdk.get().toInt())
     }
 
     defaultConfig {
