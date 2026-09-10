@@ -20,6 +20,7 @@
 
 -keep class com.opentok.android.** { *; }
 -keep class com.vonage.webrtc.** { *; }
+-keep class org.jni_zero.** { *; }
 
 # ================================================================================================
 # kotlinx.serialization
