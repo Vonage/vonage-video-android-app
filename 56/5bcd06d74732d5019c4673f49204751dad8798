@@ -1,0 +1,24 @@
+app/proguard-rules.pro
+  s_a7c037ab94effa::t_fded96ce27b839 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "565bcd06d74732d5019c4673f49204751dad8798",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_a7c037ab94effa": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_89494df4-4c8d-49ef-b05b-0be71ed73c16",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
