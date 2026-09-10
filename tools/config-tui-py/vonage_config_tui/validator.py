@@ -19,11 +19,11 @@ from jsonschema import Draft202012Validator
 
 APP_CONFIG_SCHEMA_URL = (
     "https://raw.githubusercontent.com/Vonage/vonage-video-react-app/"
-    "40ff3e4b3ef83b315498d3dfe06f3cff91674cbc/specs/app-config.schema.json"
+    "refs/heads/develop/specs/app-config.schema.json"
 )
 THEME_SCHEMA_URL = (
     "https://raw.githubusercontent.com/Vonage/vonage-video-react-app/"
-    "40ff3e4b3ef83b315498d3dfe06f3cff91674cbc/specs/theme.schema.json"
+    "refs/heads/develop/specs/theme.schema.json"
 )
 _SCHEMA_FETCH_TIMEOUT_SECONDS = 10
 _CACHE_DIR = Path(__file__).resolve().parent / ".cache"

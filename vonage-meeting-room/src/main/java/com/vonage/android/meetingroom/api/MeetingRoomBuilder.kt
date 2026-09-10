@@ -50,6 +50,7 @@ class MeetingRoomBuilder(
     private var theme: MeetingRoomTheme = MeetingRoomTheme.vonage
     private var isDebug: Boolean = false
     private var reportingContent: (@Composable (() -> Unit) -> Unit)? = null
+    private var testSpeakerContent: (@Composable () -> Unit)? = null
     private var permissionContent: (@Composable (List<String>, () -> Unit) -> Unit)? = null
     private var foregroundServiceEnabled: Boolean = true
     private var additionalBottomBarActions: StateFlow<List<MeetingRoomBottomBarAction>>? = null
@@ -156,6 +157,20 @@ class MeetingRoomBuilder(
     }
 
     /**
+     * Provides a composable shown inside the audio output selector, above the device list.
+     *
+     * Intended for a "test speakers" control, which the SDK cannot supply itself because such a
+     * control typically depends on host-app infrastructure (media playback, dependency injection).
+     * When `null` (the default), nothing is shown and the selector lists devices only.
+     *
+     * Ignored when [MeetingRoomConfiguration.allowDeviceSelection] is `false`, since the selector
+     * is then unreachable.
+     */
+    fun testSpeakerContent(content: @Composable () -> Unit): MeetingRoomBuilder = apply {
+        testSpeakerContent = content
+    }
+
+    /**
      * Overrides the permission gate composable shown before the meeting room renders.
      *
      * The SDK invokes this composable proactively, passing:
@@ -243,6 +258,7 @@ class MeetingRoomBuilder(
         theme = theme,
         isDebug = isDebug,
         reportingContent = reportingContent,
+        testSpeakerContent = testSpeakerContent,
         permissionContent = permissionContent ?: { permissions, onGrant ->
             DefaultPermissionContent(permissions = permissions, onGrant = onGrant)
         },

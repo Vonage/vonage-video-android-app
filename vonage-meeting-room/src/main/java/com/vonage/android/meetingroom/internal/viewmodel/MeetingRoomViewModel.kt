@@ -21,6 +21,7 @@ import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
 import com.vonage.android.meetingroom.internal.data.SessionInfo
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
+import com.vonage.android.meetingroom.internal.screen.toCallLayoutType
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler.CallAction
 import com.vonage.android.screensharing.ScreenSharingState
 import kotlinx.collections.immutable.persistentListOf
@@ -54,6 +55,8 @@ internal class MeetingRoomViewModel(
         allowCameraControl = prebuilt.configuration.allowCameraControl,
         allowMicrophoneControl = prebuilt.configuration.allowMicrophoneControl,
         allowShowParticipantList = prebuilt.configuration.allowShowParticipantList,
+        allowDeviceSelection = prebuilt.configuration.allowDeviceSelection,
+        layoutType = prebuilt.configuration.defaultLayoutMode.toCallLayoutType(),
         enabledFeatures = prebuilt.enabledFeatures,
     )
     private val _uiState = MutableStateFlow(initialUiState)

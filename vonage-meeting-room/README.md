@@ -46,11 +46,12 @@ The main entry point. All methods return `this` for fluent chaining.
 | `MeetingRoomBuilder(baseUrl, roomName)` | Required. Sets the backend URL and room name. |
 | `.enabledFeatures(Set<MeetingRoomFeature>)` | Runtime feature filter (see below). Defaults to all features. |
 | `.onAction((MeetingRoomSDKAction) -> Unit)` | Navigation/action callback. |
-| `.configuration(MeetingRoomConfiguration)` | UI controls (camera, mic, participant list). |
+| `.configuration(MeetingRoomConfiguration)` | UI controls (camera, mic, participant list, device selection, PiP, default layout). |
 | `.publisherSettings(PublisherSettings)` | Initial publisher config (username, audio/video flags). |
 | `.theme(MeetingRoomTheme)` | Custom color theme. Defaults to `MeetingRoomTheme.vonage`. |
 | `.isDebug(Boolean)` | Enables verbose HTTP logging. |
 | `.reportingContent(@Composable (() -> Unit) -> Unit)` | Custom report-issue bottom sheet content. |
+| `.testSpeakerContent(@Composable () -> Unit)` | Optional "test speakers" control shown in the audio output selector. |
 | `.build()` | Builds and returns `MeetingRoomPrebuilt`. |
 
 ### `MeetingRoomPrebuilt`
@@ -98,8 +99,21 @@ MeetingRoomConfiguration(
     allowCameraControl       = true,  // show camera toggle
     allowMicrophoneControl   = true,  // show mic toggle
     allowShowParticipantList = true,  // show participant list
+    allowDeviceSelection     = true,  // allow opening the audio output selector
+    allowPictureInPicture    = true,  // enter PiP when leaving the app mid-call
+    defaultLayoutMode        = MeetingRoomLayoutMode.GRID,  // layout on entering the room
 )
 ```
+
+### `MeetingRoomLayoutMode`
+
+```kotlin
+enum class MeetingRoomLayoutMode { GRID, ACTIVE_SPEAKER }
+```
+
+Selects the layout used when entering the room; users can still switch from the bottom bar.
+`MeetingRoomLayoutMode.fromConfigValue("activespeaker")` parses the value used by the shared config
+schema, falling back to `GRID` for unrecognised input.
 
 ### `PublisherSettings`
 

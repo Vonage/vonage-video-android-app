@@ -4,13 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.vonage.android.BuildConfig
-import com.vonage.android.config.AppConfig
+import com.vonage.android.config.Config
 import com.vonage.android.meetingroom.api.MeetingRoomAuthTokenProvider
 import com.vonage.android.meetingroom.api.MeetingRoomBuilder
 import com.vonage.android.meetingroom.api.MeetingRoomConfiguration
 import com.vonage.android.meetingroom.api.MeetingRoomFeature
+import com.vonage.android.meetingroom.api.MeetingRoomLayoutMode
 import com.vonage.android.meetingroom.api.MeetingRoomSDKAction
 import com.vonage.android.meetingroom.api.PublisherSettings
+import com.vonage.android.screen.components.audio.TestSpeaker
 import com.vonage.android.screen.components.permissions.CallPermissionHandler
 import com.vonage.android.screen.reporting.ReportIssueScreen
 import com.vonage.android.settings.CallSettingsHolder
@@ -38,20 +40,26 @@ fun MeetingRoomScreenRoute(
     initialPublisherSettings: PublisherSettings = PublisherSettings(),
     authTokenProvider: MeetingRoomAuthTokenProvider? = null,
 ) {
-    val prebuilt = remember(roomName, initialPublisherSettings) {
+    val config = remember { Config.fromAppConfig() }
+    val prebuilt = remember(roomName, initialPublisherSettings, config) {
         MeetingRoomBuilder(
             baseUrl = BuildConfig.BASE_API_URL,
             roomName = roomName,
         )
-            .enabledFeatures(configuredMeetingRoomFeatures())
+            .enabledFeatures(configuredMeetingRoomFeatures(config))
             .publisherSettings(initialPublisherSettings)
             .callSettingsHolder(callSettingsHolder)
             .authTokenProvider(authTokenProvider)
             .configuration(
                 MeetingRoomConfiguration(
-                    allowCameraControl = AppConfig.VideoSettings.ALLOW_CAMERA_CONTROL,
-                    allowMicrophoneControl = AppConfig.AudioSettings.ALLOW_MICROPHONE_CONTROL,
-                    allowShowParticipantList = AppConfig.MeetingRoomSettings.SHOW_PARTICIPANT_LIST,
+                    allowCameraControl = config.allowCameraControl,
+                    allowMicrophoneControl = config.allowMicrophoneControl,
+                    allowShowParticipantList = config.allowShowParticipantList,
+                    allowDeviceSelection = config.allowMeetingRoomDeviceSelection,
+                    allowPictureInPicture = config.allowPictureInPicture,
+                    defaultLayoutMode = MeetingRoomLayoutMode.fromConfigValue(
+                        config.defaultLayoutMode,
+                    ),
                 )
             )
             .onAction { action ->
@@ -64,7 +72,14 @@ fun MeetingRoomScreenRoute(
             }
             .isDebug(BuildConfig.DEBUG)
             .foregroundServiceEnabled(false)
-            .reportingContent { onDismiss -> ReportIssueScreen(onClose = onDismiss) }
+            .apply {
+                if (config.allowFeedback) {
+                    reportingContent { onDismiss -> ReportIssueScreen(onClose = onDismiss) }
+                }
+                if (config.allowAudioDiagnostics) {
+                    testSpeakerContent { TestSpeaker() }
+                }
+            }
             .permissionContent { requiredPermissions, onGranted ->
                 // Read context inside the @Composable slot lambda so it always reflects the
                 // current Activity after configuration changes, rather than closing over the
@@ -83,15 +98,16 @@ fun MeetingRoomScreenRoute(
 }
 
 /**
- * Maps [AppConfig] toggles to the runtime [MeetingRoomFeature] set. This is layered on top of
+ * Maps [Config] toggles to the runtime [MeetingRoomFeature] set. This is layered on top of
  * the compile-time Gradle flavors — a feature is only active when both are enabled.
  */
-private fun configuredMeetingRoomFeatures(): Set<MeetingRoomFeature> = buildSet {
-    if (AppConfig.MeetingRoomSettings.ALLOW_CHAT) add(MeetingRoomFeature.CHAT)
-    if (AppConfig.MeetingRoomSettings.ALLOW_ARCHIVING) add(MeetingRoomFeature.ARCHIVING)
-    if (AppConfig.MeetingRoomSettings.ALLOW_CAPTIONS) add(MeetingRoomFeature.CAPTIONS)
-    if (AppConfig.MeetingRoomSettings.ALLOW_EMOJIS) add(MeetingRoomFeature.REACTIONS)
-    if (AppConfig.MeetingRoomSettings.ALLOW_SCREEN_SHARE) add(MeetingRoomFeature.SCREEN_SHARE)
-    if (AppConfig.VideoSettings.ALLOW_BACKGROUND_EFFECTS) add(MeetingRoomFeature.BACKGROUND_EFFECTS)
-    if (AppConfig.AudioSettings.ALLOW_ADVANCED_NOISE_SUPPRESSION) add(MeetingRoomFeature.AUDIO_EFFECTS)
+private fun configuredMeetingRoomFeatures(config: Config): Set<MeetingRoomFeature> = buildSet {
+    if (config.allowChat) add(MeetingRoomFeature.CHAT)
+    if (config.allowArchiving) add(MeetingRoomFeature.ARCHIVING)
+    if (config.allowCaptions) add(MeetingRoomFeature.CAPTIONS)
+    if (config.allowEmojis) add(MeetingRoomFeature.REACTIONS)
+    if (config.allowScreenShare) add(MeetingRoomFeature.SCREEN_SHARE)
+    if (config.allowBackgroundEffects) add(MeetingRoomFeature.BACKGROUND_EFFECTS)
+    if (config.allowAdvancedNoiseSuppression) add(MeetingRoomFeature.AUDIO_EFFECTS)
+    if (config.allowMeetingRoomSettings) add(MeetingRoomFeature.SETTINGS)
 }
