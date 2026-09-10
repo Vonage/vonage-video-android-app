@@ -83,7 +83,7 @@ class WaitingRoomViewModelTest {
             userBackgroundRepository = userBackgroundRepository,
         )
 
-        every { getConfig.invoke() } returns Config(
+        every { getConfig.invoke() } returns Config.fromAppConfig().copy(
             allowCameraControl = true,
             allowMicrophoneControl = true,
             allowShowParticipantList = true,

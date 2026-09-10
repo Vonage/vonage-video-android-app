@@ -31,6 +31,7 @@ import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.fx.ui.VideoEffectsScreen
 import com.vonage.android.screen.components.audio.AudioDevicesMenu
+import com.vonage.android.screen.components.audio.TestSpeaker
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.WAITING_ROOM_SCREEN_TAG
 import com.vonage.android.screen.waiting.components.DeviceSelectionPanel
 import com.vonage.android.screen.waiting.components.JoinRoomSection
@@ -91,6 +92,11 @@ fun WaitingRoomScreen(
                     onNoiseSuppressorToggle = { _ ->
                         uiState.publisher?.toggleNoiseSuppression()
                     },
+                    testSpeakerContent = {
+                        if (uiState.allowAudioDiagnostics) {
+                            TestSpeaker()
+                        }
+                    },
                 )
             }
         }
@@ -102,6 +108,7 @@ fun WaitingRoomScreen(
             WaitingRoomTopBar(
                 actions = actions,
                 navigateToSettings = navigateToSettings,
+                allowSettings = uiState.allowSettings,
             )
         },
         firstPane = {
@@ -129,12 +136,14 @@ fun WaitingRoomScreen(
                         )
                     }
                 }
-                DeviceSelectionPanel(
-                    modifier = Modifier
-                        .padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
-                    onMicDeviceSelect = { showAudioDeviceSelector = true },
-                    onCameraDeviceSelect = actions.onCameraSwitch,
-                )
+                if (uiState.allowDeviceSelection) {
+                    DeviceSelectionPanel(
+                        modifier = Modifier
+                            .padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
+                        onMicDeviceSelect = { showAudioDeviceSelector = true },
+                        onCameraDeviceSelect = actions.onCameraSwitch,
+                    )
+                }
             }
         },
         secondPane = {
