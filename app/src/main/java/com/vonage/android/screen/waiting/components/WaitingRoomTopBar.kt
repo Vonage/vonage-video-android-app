@@ -15,6 +15,7 @@ internal fun WaitingRoomTopBar(
     actions: WaitingRoomActions,
     navigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
+    allowSettings: Boolean = true,
 ) {
     TopBanner(
         modifier = modifier,
@@ -27,9 +28,11 @@ internal fun WaitingRoomTopBar(
             )
         },
         actions = {
-            SettingsIcon(
-                navigateToSettings = navigateToSettings,
-            )
+            if (allowSettings) {
+                SettingsIcon(
+                    navigateToSettings = navigateToSettings,
+                )
+            }
         }
     )
 }

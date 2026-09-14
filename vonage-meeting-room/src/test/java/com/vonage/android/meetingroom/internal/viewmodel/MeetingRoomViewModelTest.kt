@@ -16,6 +16,7 @@ import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.kotlin.sdk.VonageError
 import com.vonage.android.meetingroom.MainDispatcherRule
 import com.vonage.android.meetingroom.api.MeetingRoomConfiguration
+import com.vonage.android.meetingroom.api.MeetingRoomLayoutMode
 import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.api.PublisherSettings
@@ -42,6 +43,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -129,6 +131,29 @@ class MeetingRoomViewModelTest {
 
         verify { activityContextHolder.setActivityContext(context) }
         verify { mockCall.connect(any(Context::class)) }
+    }
+
+    @Test
+    fun `given non-default configuration when initialised then flags reach ui state`() = runTest {
+        every { prebuilt.configuration } returns MeetingRoomConfiguration(
+            allowCameraControl = false,
+            allowMicrophoneControl = false,
+            allowShowParticipantList = false,
+            allowDeviceSelection = false,
+            allowPictureInPicture = false,
+            defaultLayoutMode = MeetingRoomLayoutMode.ACTIVE_SPEAKER,
+        )
+
+        val viewModel = MeetingRoomViewModel(container)
+
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse(state.allowCameraControl)
+            assertFalse(state.allowMicrophoneControl)
+            assertFalse(state.allowShowParticipantList)
+            assertFalse(state.allowDeviceSelection)
+            assertEquals(CallLayoutType.SPEAKER_LAYOUT, state.layoutType)
+        }
     }
 
     @Test
