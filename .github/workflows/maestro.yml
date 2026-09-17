@@ -26,21 +26,17 @@ env:
 
 jobs:
   maestro-tests:
-    name: Maestro Tests (${{ matrix.build-type }})
+    name: Maestro Tests (release)
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        build-type: [debug, release]
 
     steps:
-      # Unique per run so concurrent runs (e.g. two open PRs, or debug+release in this
-      # same run) never join the same real video room at the same time. run_id is
-      # unique per workflow run; the PR number is appended only for readability.
+      # Unique per run so concurrent runs (e.g. two open PRs) never join the same
+      # real video room at the same time. run_id is unique per workflow run; the
+      # PR number is appended only for readability.
       - name: Compute unique room name
         id: room
-        run: echo "name=maestro-${{ github.run_id }}-${{ matrix.build-type }}${{ github.event.pull_request.number && format('-pr{0}', github.event.pull_request.number) || '' }}" >> "$GITHUB_OUTPUT"
+        run: echo "name=maestro-${{ github.run_id }}${{ github.event.pull_request.number && format('-pr{0}', github.event.pull_request.number) || '' }}" >> "$GITHUB_OUTPUT"
 
       - name: Free disk space
         run: |
@@ -82,13 +78,7 @@ jobs:
             exit 1
           }
 
-      - name: Build debug APK
-        if: matrix.build-type == 'debug'
-        run: |
-          ./gradlew :app:assembleDebug --info --stacktrace --no-build-cache
-
       - name: Create placeholder google-services.json
-        if: matrix.build-type == 'release'
         run: |
           mkdir -p app/src/release
           cat > app/src/release/google-services.json << 'EOF'
@@ -122,7 +112,6 @@ jobs:
           EOF
 
       - name: Build release APK (minified, signed with fallback debug key)
-        if: matrix.build-type == 'release'
         run: |
           ./gradlew :app:assembleRelease --info --stacktrace --no-build-cache
 
@@ -139,8 +128,8 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         env:
           ROOM_NAME: ${{ steps.room.outputs.name }}
-          APP_ID: ${{ matrix.build-type == 'release' && 'com.vonage.android' || 'com.vonage.android.debug' }}
-          APK_PATH: ${{ matrix.build-type == 'release' && 'app/build/outputs/apk/release/app-release.apk' || 'app/build/outputs/apk/debug/app-debug.apk' }}
+          APP_ID: com.vonage.android
+          APK_PATH: app/build/outputs/apk/release/app-release.apk
         with:
           api-level: 34
           target: default
@@ -200,7 +189,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: maestro-test-results-${{ github.run_number }}-${{ matrix.build-type }}
+          name: maestro-test-results-${{ github.run_number }}
           path: ~/.maestro/tests/
           retention-days: 7
           if-no-files-found: warn
@@ -209,7 +198,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: maestro-report-${{ github.run_number }}-${{ matrix.build-type }}
+          name: maestro-report-${{ github.run_number }}
           path: test-reports/
           retention-days: 7
           if-no-files-found: warn
@@ -273,7 +262,7 @@ jobs:
             - **Latest run**: [#${context.runNumber}](${runUrl})
             - **Commit**: \`${context.sha}\`
 
-            📊 **Artifacts:** see the \`maestro-report-${context.runNumber}-debug\` / \`-release\` artifacts on the run above for screenshots and logs.
+            📊 **Artifacts:** see the \`maestro-report-${context.runNumber}\` artifact on the run above for screenshots and logs.
 
             <details>
             <summary>📜 Run history (last ${history.length})</summary>
