@@ -22,7 +22,6 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 APP_ID="com.vonage.android.debug"
-# Unique per local run so repeated/parallel local runs don't collide in the same video room.
 # $$ (PID) is included since date +%s alone only has one-second resolution.
 ROOM_NAME="${ROOM_NAME:-testroom-local-$(date +%s)-$$}"
 
