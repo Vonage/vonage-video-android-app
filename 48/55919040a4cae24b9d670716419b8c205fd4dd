@@ -1,0 +1,30 @@
+.maestro/flows/join-with-camera-mic-allowed.yaml
+  s_a392b686b69b9b::t_c2056bf00558be 22
+.maestro/flows/goodbye-reenter-room.yaml
+  s_a392b686b69b9b::t_586425d989622e 18
+scripts/run_maestro_tests.sh
+  s_a392b686b69b9b::t_2ae6dd20d313ef 25-26
+.github/workflows/maestro.yml
+  s_a392b686b69b9b::t_6e25b8fc253bd4 29,32-35,38,42-43,45
+  s_a392b686b69b9b::t_f32fc6b1853505 39-41,44
+  s_a392b686b69b9b::t_d14b9ec49971b2 87,91-129,141-142,157-169,172
+  s_a392b686b69b9b::t_d34d16f72b959d 210,219,224-232,236-293,295
+.maestro/README.md
+  s_a392b686b69b9b::t_c8c6a5a74852f0 57-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4855919040a4cae24b9d670716419b8c205fd4dd",
+  "prompts": {},
+  "sessions": {
+    "s_a392b686b69b9b": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_6867505a-eece-4e98-90b1-771914f896e6",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
