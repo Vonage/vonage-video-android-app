@@ -139,6 +139,8 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         env:
           ROOM_NAME: ${{ steps.room.outputs.name }}
+          APP_ID: ${{ matrix.build-type == 'release' && 'com.vonage.android' || 'com.vonage.android.debug' }}
+          APK_PATH: ${{ matrix.build-type == 'release' && 'app/build/outputs/apk/release/app-release.apk' || 'app/build/outputs/apk/debug/app-debug.apk' }}
         with:
           api-level: 34
           target: default
@@ -152,14 +154,6 @@ jobs:
 
             mkdir -p test-reports
             adb logcat -c
-
-            if [ "${{ matrix.build-type }}" = "release" ]; then
-              APP_ID="com.vonage.android"
-              APK_PATH="app/build/outputs/apk/release/app-release.apk"
-            else
-              APP_ID="com.vonage.android.debug"
-              APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
-            fi
 
             adb install -r "$APK_PATH"
             adb shell pm grant "$APP_ID" android.permission.CAMERA 2>/dev/null
