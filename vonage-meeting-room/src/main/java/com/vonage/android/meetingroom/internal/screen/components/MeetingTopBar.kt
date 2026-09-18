@@ -68,7 +68,8 @@ internal fun MeetingTopBar(
                         modifier = Modifier
                             .size(24.dp)
                             .padding(end = 4.dp)
-                            .testTag(TOP_BAR_ARCHIVING_INDICATOR)
+                            .testTag(TOP_BAR_ARCHIVING_INDICATOR),
+                        contentDescription = stringResource(R.string.recording_indicator_content_description),
                     )
                 }
                 Text(

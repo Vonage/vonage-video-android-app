@@ -54,7 +54,11 @@ Flows with the `.yaml.disabled` extension are skipped by Maestro — to re-enabl
 
 ### APP_ID Configuration
 
-All flows use `appId: ${APP_ID}` which is resolved at runtime. The `run_maestro_tests.sh` script sets `APP_ID=com.vonage.android.debug` automatically. In CI, it is passed via `--env APP_ID=com.vonage.android.debug`.
+All flows use `appId: ${APP_ID}` which is resolved at runtime. The `run_maestro_tests.sh` script sets `APP_ID=com.vonage.android.debug` automatically. In CI, it is passed via `--env APP_ID=com.vonage.android.debug` (or `com.vonage.android` for release-build runs).
+
+### ROOM_NAME Configuration
+
+Flows that join a room by name (e.g. `waiting-room-controls-enabled.yaml`, `recording.yaml`) use `${ROOM_NAME}` instead of a hardcoded string. This avoids two concurrent runs (e.g. two open PRs) joining the same real video room at the same time. `run_maestro_tests.sh` generates a unique local value by default; CI passes a value derived from the run ID.
 
 ### Test Tags
 
