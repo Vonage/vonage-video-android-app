@@ -40,6 +40,7 @@ jobs:
         with:
           schema: https://raw.githubusercontent.com/Vonage/vonage-video-react-app/develop/specs/app-config.schema.json
           files: config/app-config.json
+          cache-remote-schema: false
 
   validate-theme:
     name: Validate config/theme.json
@@ -53,3 +54,4 @@ jobs:
         with:
           schema: https://raw.githubusercontent.com/Vonage/vonage-video-react-app/develop/specs/theme.schema.json
           files: config/theme.json
+          cache-remote-schema: false
