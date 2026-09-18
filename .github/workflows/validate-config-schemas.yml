@@ -1,0 +1,55 @@
+name: Validate Config Schemas
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'config/app-config.json'
+      - 'config/theme.json'
+      - '.github/workflows/validate-config-schemas.yml'
+
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - 'config/app-config.json'
+      - 'config/theme.json'
+      - '.github/workflows/validate-config-schemas.yml'
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-app-config:
+    name: Validate config/app-config.json
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate app-config.json against shared schema
+        uses: dsanders11/json-schema-validate-action@v2.0.0
+        with:
+          schema: https://raw.githubusercontent.com/Vonage/vonage-video-react-app/develop/specs/app-config.schema.json
+          files: config/app-config.json
+
+  validate-theme:
+    name: Validate config/theme.json
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate theme.json against shared schema
+        uses: dsanders11/json-schema-validate-action@v2.0.0
+        with:
+          schema: https://raw.githubusercontent.com/Vonage/vonage-video-react-app/develop/specs/theme.schema.json
+          files: config/theme.json
