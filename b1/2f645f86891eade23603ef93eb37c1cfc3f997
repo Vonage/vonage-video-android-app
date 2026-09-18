@@ -1,0 +1,45 @@
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/data/ArchiveRepository.kt
+  s_05300d6b21c339::t_be4765f8bec4ab 21,25-26,33,43,47-48,55,61,64-68,71-72
+  s_05300d6b21c339::t_a7ee6824fd31c6 20,22-23,27-29,32,42,44-45,49-51,54
+  s_05300d6b21c339::t_65a82c7ad5d8d8 6-8
+  s_05300d6b21c339::t_0a337d07c72fde 73
+vonage-android-logger/build.gradle.kts
+  s_05300d6b21c339::t_6532c0ccf2a475 12
+vonage-android-logger/consumer-rules.pro
+  s_05300d6b21c339::t_afd6a25db3d820 1-7,12-13,15,17,19,21,23,25
+  s_05300d6b21c339::t_dbbabb74460d4f 8-11,14,16,18,20,22,24
+vonage-feature-archiving/consumer-rules.pro
+  s_05300d6b21c339::t_a1c8512acdaf85 11-15,17
+  s_05300d6b21c339::t_304129493763b2 1-10,16
+vonage-feature-archiving/build.gradle.kts
+  s_05300d6b21c339::t_e85f412f1a9564 13
+  s_05300d6b21c339::t_5d5309152ca06e 27-30
+  s_05300d6b21c339::t_4be82ce6e8eb83 50
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/EnabledVonageArchiving.kt
+  s_05300d6b21c339::t_0a7991c463e8ee 49-54,70,74,89-91,95,99-100
+  s_05300d6b21c339::t_e7bd44174f979c 6,12
+  s_05300d6b21c339::t_5576cc17742fda 13
+  s_05300d6b21c339::t_c5ff92e7836e5a 47-48
+  s_05300d6b21c339::t_a3f57b4c7de5e0 101-102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b12f645f86891eade23603ef93eb37c1cfc3f997",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_05300d6b21c339": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_e270e298-ad9b-44ae-aa72-0c768ee9c394",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
