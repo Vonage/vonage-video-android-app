@@ -110,7 +110,7 @@ jobs:
 
       - name: Build release APK (minified, signed with fallback debug key)
         run: |
-          ./gradlew :app:assembleRelease --info --stacktrace --no-build-cache
+          ./gradlew :app:assembleRelease --stacktrace
 
       - name: AVD cache
         uses: actions/cache@v4
