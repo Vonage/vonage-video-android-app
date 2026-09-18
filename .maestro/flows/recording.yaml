@@ -72,12 +72,9 @@ appId: ${APP_ID}
 - waitForAnimationToEnd:
     timeout: 5000
 
-# Verify recording indicator is visible (poll — starting archiving is a real
-# backend round-trip and its latency can vary between runs/build types)
-- extendedWaitUntil:
-    visible:
-      id: "archiving-recording-indicator"
-    timeout: 15000
+# Verify recording indicator is visible
+- assertVisible:
+    id: "archiving-recording-indicator"
 
 - takeScreenshot: 02-recording-in-progress
 
