@@ -1,0 +1,19 @@
+.maestro/flows/recording.yaml
+  s_05300d6b21c339::t_0981c5b1d99a34 75-77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "14b29d39ec3e4f6d86a1e5112e0e3bacfca71cc3",
+  "prompts": {},
+  "sessions": {
+    "s_05300d6b21c339": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_e270e298-ad9b-44ae-aa72-0c768ee9c394",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
