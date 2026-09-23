@@ -1,4 +1,4 @@
-"""JSON Schema validation for config/app-config.json and config/theme.json.
+"""JSON Schema validation for app-config.json and theme.json.
 
 Neither schema is committed to the repo: both are unified schemas shared with
 the iOS and React Vonage Video apps, fetched at runtime from their canonical
@@ -30,19 +30,19 @@ _CACHE_DIR = Path(__file__).resolve().parent / ".cache"
 
 
 def _find_config_root() -> Path:
-    """Locate the repo's config/ directory.
+    """Locate the repo root directory containing the config files.
 
     Walk upward from cwd until we find a directory that contains
-    config/app-config.json (the definitive repo marker). Falls back to the
+    app-config.json (the definitive repo marker). Falls back to the
     __file__-relative path so that ``python -m vonage_config_tui`` from the
     repo root still works without an install.
     """
     for parent in [Path.cwd(), *Path.cwd().parents]:
-        candidate = parent / "config" / "app-config.json"
+        candidate = parent / "app-config.json"
         if candidate.exists():
-            return parent / "config"
+            return parent
     # fallback: __file__-relative (works when running from repo without install)
-    return Path(__file__).resolve().parents[3] / "config"
+    return Path(__file__).resolve().parents[3]
 
 
 CONFIG_ROOT: Path = _find_config_root()

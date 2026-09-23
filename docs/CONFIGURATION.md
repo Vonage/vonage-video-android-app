@@ -2,9 +2,9 @@
 
 ## Feature configuration
 
-You can fork the repository and start modifying it for your needs, or configure features via the JSON files in the `config/` folder without touching source code.
+You can fork the repository and start modifying it for your needs, or configure features via the JSON files at the root of the repository without touching source code.
 
-### `config/app-config.json`
+### `app-config.json`
 
 Controls feature flags and application settings:
 
@@ -33,11 +33,11 @@ For a deep dive into the full configuration plugin system (JSON schema, generate
 
 ## Theme customization
 
-The app's visual theme is driven by `config/theme.json`. Edit this file with your desired color scheme values:
+The app's visual theme is driven by `theme.json`. Edit this file with your desired color scheme values:
 
 ```bash
 # Edit the theme
-vim config/theme.json
+vim theme.json
 
 # Regenerate theme resources
 ./gradlew generateVonageConfig
@@ -53,6 +53,6 @@ The backend URL can be set in three ways (evaluated in priority order):
 
 1. `local.properties` key `BASE_API_URL` (recommended for local development)
 2. Environment variable `BASE_API_URL` (recommended for CI/CD)
-3. Direct placeholder replacement in `config/app-config.json`
+3. Direct placeholder replacement in `app-config.json`
 
 See [GETTING_STARTED.md](GETTING_STARTED.md) for full setup instructions.

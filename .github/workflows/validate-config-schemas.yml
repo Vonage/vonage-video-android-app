@@ -9,16 +9,16 @@ on:
       - develop
       - main
     paths:
-      - 'config/app-config.json'
-      - 'config/theme.json'
+      - 'app-config.json'
+      - 'theme.json'
       - '.github/workflows/validate-config-schemas.yml'
 
   pull_request:
     branches:
       - '**'
     paths:
-      - 'config/app-config.json'
-      - 'config/theme.json'
+      - 'app-config.json'
+      - 'theme.json'
       - '.github/workflows/validate-config-schemas.yml'
 
   workflow_dispatch:
@@ -55,10 +55,10 @@ jobs:
       # --strict=false is required because the shared schemas declare a
       # top-level "version" metadata field, which AJV's strict mode
       # (correctly) does not recognize as a JSON Schema keyword. This does
-      # not relax validation of config/app-config.json or config/theme.json
+      # not relax validation of app-config.json or theme.json
       # themselves - it only stops AJV rejecting the schema document itself.
-      - name: Validate config/app-config.json
-        run: npx ajv-cli validate --spec=draft2020 --strict=false -s app-config.schema.json -d config/app-config.json
+      - name: Validate app-config.json
+        run: npx ajv-cli validate --spec=draft2020 --strict=false -s app-config.schema.json -d app-config.json
 
-      - name: Validate config/theme.json
-        run: npx ajv-cli validate --spec=draft2020 --strict=false -s theme.schema.json -d config/theme.json
+      - name: Validate theme.json
+        run: npx ajv-cli validate --spec=draft2020 --strict=false -s theme.schema.json -d theme.json
