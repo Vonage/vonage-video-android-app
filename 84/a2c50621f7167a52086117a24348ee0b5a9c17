@@ -1,0 +1,14 @@
+.github/workflows/release-notification.yml
+  h_5ddc9d372ac6a1 15-50,57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "84a2c50621f7167a52086117a24348ee0b5a9c17",
+  "prompts": {},
+  "humans": {
+    "h_5ddc9d372ac6a1": {
+      "author": "Ivan <210490533+VZaphod@users.noreply.github.com>"
+    }
+  }
+}
