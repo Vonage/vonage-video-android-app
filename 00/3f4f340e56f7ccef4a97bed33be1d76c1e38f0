@@ -1,0 +1,35 @@
+vonage-config-idea-plugin/src/main/kotlin/com/vonage/confighelper/service/VonageConfigHelper.kt
+  s_8a00fc80b441f8::t_ffea959788c3a8 20-21
+vonage-video-ui-compose/build.gradle.kts
+  s_8a00fc80b441f8::t_7a9fb93d94d4cf 35
+vonage-config-idea-plugin/src/main/kotlin/com/vonage/confighelper/VonageConfigurable.kt
+  s_8a00fc80b441f8::t_8ef52205238552 63-64
+.github/workflows/validate-config-schemas.yml
+  s_8a00fc80b441f8::t_e4e10e64e90ff9 12-13,20-21
+.github/instructions/config-build.instructions.md
+  s_8a00fc80b441f8::t_f3de5d0c17e4d4 2
+docs/CONFIG-SYSTEM.md
+  s_8a00fc80b441f8::t_4d311140252511 83
+vonage-config-idea-plugin/src/main/kotlin/com/vonage/confighelper/ui/tab/ThemeTab.kt
+  s_8a00fc80b441f8::t_2aa1628aa9173c 39
+tools/config-tui-py/vonage_config_tui/validator.py
+  s_8a00fc80b441f8::t_0a52f315fc056b 1
+docs/CONFIGURATION.md
+  s_8a00fc80b441f8::t_f2817fec65859f 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "003f4f340e56f7ccef4a97bed33be1d76c1e38f0",
+  "prompts": {},
+  "sessions": {
+    "s_8a00fc80b441f8": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_6a554501-e17b-4d7e-829f-752eae98cb51",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
