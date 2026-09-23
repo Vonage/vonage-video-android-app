@@ -6,7 +6,7 @@ Authentication lives in its own optional feature module, `vonage-feature-okta`, 
 
 ## Enabling / Disabling
 
-The feature is controlled by `config/app-config.json`:
+The feature is controlled by `app-config.json`:
 
 ```json
 {

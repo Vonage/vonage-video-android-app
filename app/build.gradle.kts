@@ -349,5 +349,5 @@ kotlin {
 }
 
 jsonConfig {
-    configFile.set("config/app-config.json")
+    configFile.set("app-config.json")
 }
