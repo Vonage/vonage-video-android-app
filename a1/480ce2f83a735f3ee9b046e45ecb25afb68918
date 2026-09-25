@@ -1,0 +1,19 @@
+.github/workflows/validate-config-schemas.yml
+  s_dc7557059f9a2b::t_85ff55183cd101 30-33,35-36,42-43,45,47-48,50-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a1480ce2f83a735f3ee9b046e45ecb25afb68918",
+  "prompts": {},
+  "sessions": {
+    "s_dc7557059f9a2b": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_1f1d1c93-829c-497c-9ed4-8d261920fe5a",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}

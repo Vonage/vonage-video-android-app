@@ -1,0 +1,22 @@
+.github/workflows/validate-config-schemas.yml
+  s_dc7557059f9a2b::t_10b9291cfc67b7 31-32,38-39,41-49,51-55
+  s_dc7557059f9a2b::t_50a7f1d512969f 1-30,33-37,40,50
+tools/config-tui-py/vonage_config_tui/validator.py
+  s_dc7557059f9a2b::t_e3b781bfb8bac0 22,26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "eb76aeb75bed716dd4cfb257fb8cafc123089b0b",
+  "prompts": {},
+  "sessions": {
+    "s_dc7557059f9a2b": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_1f1d1c93-829c-497c-9ed4-8d261920fe5a",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}

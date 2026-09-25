@@ -1,0 +1,19 @@
+tools/config-tui-py/vonage_config_tui/schema_to_fields.py
+  s_e3157472c8f3a2::t_de86cedd994bb6 141-142,175-176
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "59ef929a2ead70be9dab002a49492eae071a3bdf",
+  "prompts": {},
+  "sessions": {
+    "s_e3157472c8f3a2": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_4c43cf25-5e81-4da1-aaf3-e512fd6ae5e7",
+        "model": "auto"
+      },
+      "human_author": null
+    }
+  }
+}

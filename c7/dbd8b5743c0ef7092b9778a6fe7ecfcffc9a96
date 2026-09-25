@@ -1,0 +1,36 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/bottombar/BottomBar.kt
+  s_7b9c31bfecf272::t_c2346557f624de 43
+  s_7b9c31bfecf272::t_85734f21ea52dc 184-188
+app/src/test/java/com/vonage/android/config/GetConfigTest.kt
+  s_7b9c31bfecf272::t_7c392c5e58cd42 31-44
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  s_7b9c31bfecf272::t_206318b27c293e 292
+  s_7b9c31bfecf272::t_f6b32d9dd9680d 361-362
+app/src/main/java/com/vonage/android/config/Config.kt
+  s_7b9c31bfecf272::t_7f0dd83e1ead6e 11-12,20-21
+app/src/main/java/com/vonage/android/screen/room/MeetingRoomScreenRoute.kt
+  s_7b9c31bfecf272::t_3bb380cc3061ba 10
+  s_7b9c31bfecf272::t_98f99dafc12d45 81-94
+app/src/test/java/com/vonage/android/screen/waiting/WaitingRoomViewModelTest.kt
+  s_7b9c31bfecf272::t_bfa19332cd1975 90-91
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomViewModel.kt
+  s_7b9c31bfecf272::t_1701ddfb72af63 73-79
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/audio/AudioDevicesMenu.kt
+  s_7b9c31bfecf272::t_afc6003c1b46a7 25,34-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c7dbd8b5743c0ef7092b9778a6fe7ecfcffc9a96",
+  "prompts": {},
+  "sessions": {
+    "s_7b9c31bfecf272": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_4d9533e7-43ea-432e-8091-7b24d305b010",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}

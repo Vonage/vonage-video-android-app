@@ -1,0 +1,112 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomBuilder.kt
+  s_b3fc542c790a78::t_cae38384c11364 53
+  s_b3fc542c790a78::t_fd06f449f4381b 160-172
+  s_b3fc542c790a78::t_c7d97fd78818f9 159
+  h_25498f8d57a266 261
+app/src/main/java/com/vonage/android/screen/waiting/components/WaitingRoomTopBar.kt
+  s_b3fc542c790a78::t_81df5cb92324a6 18,31-35
+app/src/test/java/com/vonage/android/screen/waiting/WaitingRoomViewModelTest.kt
+  s_b3fc542c790a78::t_e64f443bcef574 86
+app/src/main/java/com/vonage/android/screen/room/MeetingRoomScreenRoute.kt
+  s_b3fc542c790a78::t_f53fd9372b2882 43-44,49,55-60,62,75-82,101,104-112
+  s_b3fc542c790a78::t_c6fd0f15d889a1 61
+  s_b3fc542c790a78::t_593e3fe3002c29 7,12,15
+docs/CONFIGURATION.md
+  s_b3fc542c790a78::t_5b4db0539b177d 30-63
+docs/AUTHENTICATION.md
+  s_b3fc542c790a78::t_4ea0a5d13285b7 33-38
+vonage-meeting-room/README.md
+  s_b3fc542c790a78::t_22f861b3235777 102-104,108-116
+  s_b3fc542c790a78::t_a78a4b9d33f19a 49,54
+  s_b3fc542c790a78::t_da76871f32c437 117
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomLayoutMode.kt
+  s_b3fc542c790a78::t_cbf781eaaa135c 1-38
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomPrebuilt.kt
+  s_b3fc542c790a78::t_8df00f423da0ea 58-59
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTest.kt
+  s_b3fc542c790a78::t_cb4f0cde7bbb9e 46
+  s_b3fc542c790a78::t_647fdf2c439cf8 137-158
+  s_b3fc542c790a78::t_b228d675899010 19
+  s_b3fc542c790a78::t_93abdc16c34782 136
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomScreen.kt
+  s_b3fc542c790a78::t_f52d7baebd3fec 95-98
+  s_b3fc542c790a78::t_603182d7167316 111
+  s_b3fc542c790a78::t_b208973a3870cf 139-146
+  s_b3fc542c790a78::t_56c314ab854d81 99
+  h_25498f8d57a266 34
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  s_b3fc542c790a78::t_a3d44255183706 104
+  s_b3fc542c790a78::t_5279a0f521e7eb 244-245
+  s_b3fc542c790a78::t_76101bb9e06b4c 365
+  h_25498f8d57a266 344
+build-tools/gradle-config-plugin/src/main/kotlin/com/vonage/gradle/JsonConfigPlugin.kt
+  s_b3fc542c790a78::t_2d625d254ac077 26-36,40-42,49-60
+  s_b3fc542c790a78::t_eaef1d3720528e 61
+  h_25498f8d57a266 6
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/MeetingRoomContent.kt
+  s_b3fc542c790a78::t_d7192ec9eae570 83-85
+  h_25498f8d57a266 164
+app/src/test/java/com/vonage/android/config/GetConfigTest.kt
+  s_b3fc542c790a78::t_cc3d808d635ec6 99-102
+  s_b3fc542c790a78::t_fcfa251c6789a6 45-98,103-104
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomViewModel.kt
+  s_b3fc542c790a78::t_5b2c330139af87 313-318
+  s_b3fc542c790a78::t_aed74a4e0a870f 88-90
+app/src/main/java/com/vonage/android/config/Config.kt
+  s_b3fc542c790a78::t_efa0c5ef876d89 55-60
+  s_b3fc542c790a78::t_91d33a1b87f165 5-10,13,16-30,32-33,36-37,39-54,61-88
+tools/config-tui-py/vonage_config_tui/validator.py
+  h_25498f8d57a266 22,26
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomConfiguration.kt
+  s_b3fc542c790a78::t_abf97cf1ca04a3 6-7,12-16,23-25
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomUiState.kt
+  s_b3fc542c790a78::t_f9d690fc4ed4a7 51-56
+  s_b3fc542c790a78::t_0dee1d122d9ad4 10
+  s_b3fc542c790a78::t_d7c1081af77fea 32-33
+build-tools/gradle-config-plugin/src/main/kotlin/com/vonage/gradle/tasks/GenerateConfigTask.kt
+  s_b3fc542c790a78::t_2694fd94b5cdfc 224-227
+  s_b3fc542c790a78::t_fa9f3b554c3aa3 153-157
+  s_b3fc542c790a78::t_f84ae528ead4c7 66,68,87,102-106,112
+  s_b3fc542c790a78::t_365044fa60b69a 228,232-238,242-243,245-253,257,259-262,264-272
+  s_b3fc542c790a78::t_90e6a70ecb11da 12,15-16,18-20
+  s_b3fc542c790a78::t_e857f2e888b331 290-357
+  s_b3fc542c790a78::t_fc4a0256312a99 27-46,48-49,60-62
+  s_b3fc542c790a78::t_02421c8ff3b22d 76-77
+  s_b3fc542c790a78::t_262b0dfba7e617 254-256
+  s_b3fc542c790a78::t_74ca1caf1b6b44 63
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  s_b3fc542c790a78::t_e19a748c70c5dd 24
+  s_b3fc542c790a78::t_0d7f1d7ac1edf0 58-59
+config/app-config.json
+  s_b3fc542c790a78::t_71373b8556eb30 22
+  h_25498f8d57a266 2,18-19,25-27,36-37,39
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/api/MeetingRoomLayoutModeTest.kt
+  s_b3fc542c790a78::t_ef026f9ecd8b43 1-49
+docs/CONFIG-SYSTEM.md
+  s_b3fc542c790a78::t_39379198909edf 43-45,47-51,54-56,59-63
+  s_b3fc542c790a78::t_954c734f8d8eb6 24
+  s_b3fc542c790a78::t_d24ca4f5468f98 117-143
+  s_b3fc542c790a78::t_9c50d95e00501f 147-149
+  s_b3fc542c790a78::t_fc9dbc1444ed2d 64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0f515874e6f904a727cd903b0fd6872f777f0f46",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_b3fc542c790a78": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_5cc22e4a-6a5d-4f92-bfa3-dbd1815dc935",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}

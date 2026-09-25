@@ -1,0 +1,21 @@
+.github/workflows/maestro.yml
+  s_a392b686b69b9b::t_913d37cc1f7eaf 265
+  s_a392b686b69b9b::t_b32ebda90ce927 29,34-36,39
+  s_a392b686b69b9b::t_3eb6b75991c443 192,201
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b677b370d45477911a1b83375159d7751a174287",
+  "prompts": {},
+  "sessions": {
+    "s_a392b686b69b9b": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_6867505a-eece-4e98-90b1-771914f896e6",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+.maestro/flows/recording.yaml
+  h_25498f8d57a266 103-105
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b8190d17f057ea5c33c513f326785b943a8a486f",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}

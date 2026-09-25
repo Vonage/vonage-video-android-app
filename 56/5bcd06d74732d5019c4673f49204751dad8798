@@ -1,0 +1,34 @@
+app/proguard-rules.pro
+  459f57f41f121a36 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "565bcd06d74732d5019c4673f49204751dad8798",
+  "prompts": {
+    "459f57f41f121a36": {
+      "agent_id": {
+        "tool": "manolocode",
+        "id": "d93abf47-0062-4cd8-8677-482cbb873b76",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-09-10T11:56:29.685Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (manolocode/auto).",
+          "timestamp": "2026-09-10T11:56:29.685Z"
+        }
+      ],
+      "total_additions": 1,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
