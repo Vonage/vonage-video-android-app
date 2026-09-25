@@ -46,6 +46,7 @@ internal fun MeetingTopBar(
     actions: MeetingRoomActions,
     onToggleAudioDeviceSelector: () -> Unit,
     modifier: Modifier = Modifier,
+    allowSettings: Boolean = true,
 ) {
     VonageTopAppBar(
         modifier = modifier,
@@ -120,9 +121,11 @@ internal fun MeetingTopBar(
                 )
             }
 
-            SettingsIcon(
-                navigateToSettings = actions.onSettings,
-            )
+            if (allowSettings) {
+                SettingsIcon(
+                    navigateToSettings = actions.onSettings,
+                )
+            }
         }
     )
 }

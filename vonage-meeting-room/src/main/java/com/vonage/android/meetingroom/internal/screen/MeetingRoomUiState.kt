@@ -31,6 +31,10 @@ internal data class MeetingRoomUiState(
     val allowShowParticipantList: Boolean = true,
     /** Whether the audio output selector can be opened. */
     val allowDeviceSelection: Boolean = true,
+    /** Whether the "Report an issue" control is shown in the bottom bar. */
+    val allowFeedback: Boolean = true,
+    /** Whether the in-call settings entry point is shown in the top bar. */
+    val allowSettings: Boolean = true,
     val backgrounds: ImmutableList<VideoBackgroundItem> = persistentListOf(),
     /**
      * Number of additional user backgrounds the user may still upload before reaching the cap.

@@ -100,6 +100,8 @@ MeetingRoomConfiguration(
     allowMicrophoneControl   = true,  // show mic toggle
     allowShowParticipantList = true,  // show participant list
     allowDeviceSelection     = true,  // allow opening the audio output selector
+    allowFeedback            = true,  // show the "Report an issue" control
+    allowSettings            = true,  // show the in-call settings entry point
     allowPictureInPicture    = true,  // enter PiP when leaving the app mid-call
     defaultLayoutMode        = MeetingRoomLayoutMode.GRID,  // layout on entering the room
 )

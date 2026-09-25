@@ -56,6 +56,8 @@ internal class MeetingRoomViewModel(
         allowMicrophoneControl = prebuilt.configuration.allowMicrophoneControl,
         allowShowParticipantList = prebuilt.configuration.allowShowParticipantList,
         allowDeviceSelection = prebuilt.configuration.allowDeviceSelection,
+        allowFeedback = prebuilt.configuration.allowFeedback,
+        allowSettings = prebuilt.configuration.allowSettings,
         layoutType = prebuilt.configuration.defaultLayoutMode.toCallLayoutType(),
         enabledFeatures = prebuilt.enabledFeatures,
     )

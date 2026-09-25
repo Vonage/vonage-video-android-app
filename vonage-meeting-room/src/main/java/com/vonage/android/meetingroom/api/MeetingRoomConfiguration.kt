@@ -10,6 +10,10 @@ package com.vonage.android.meetingroom.api
  * @param allowMicrophoneControl   Show a mic on/off toggle in the bottom bar. Default `true`.
  * @param allowShowParticipantList Show the participant list button. Default `true`.
  * @param allowDeviceSelection     Allow opening the audio output selector. Default `true`.
+ * @param allowFeedback            Show the "Report an issue" control in the bottom bar. Default
+ *                                 `true`.
+ * @param allowSettings            Show the in-call settings entry point in the top bar. Default
+ *                                 `true`.
  * @param allowPictureInPicture    Enter picture-in-picture when the user leaves the app during a
  *                                 call. Default `true`.
  * @param defaultLayoutMode        Layout used when entering the room. Users can still switch
@@ -21,6 +25,8 @@ data class MeetingRoomConfiguration(
     val allowMicrophoneControl: Boolean = true,
     val allowShowParticipantList: Boolean = true,
     val allowDeviceSelection: Boolean = true,
+    val allowFeedback: Boolean = true,
+    val allowSettings: Boolean = true,
     val allowPictureInPicture: Boolean = true,
     val defaultLayoutMode: MeetingRoomLayoutMode = MeetingRoomLayoutMode.GRID,
 )

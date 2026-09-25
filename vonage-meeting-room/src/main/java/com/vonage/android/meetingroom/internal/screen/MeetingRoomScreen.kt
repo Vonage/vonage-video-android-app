@@ -238,6 +238,7 @@ internal fun MeetingRoomScreen(
                             roomName = uiState.roomName,
                             archivingUiState = uiState.archivingUiState,
                             actions = actions,
+                            allowSettings = uiState.allowSettings,
                             onToggleAudioDeviceSelector = {
                                 showAudioOutputs = !showAudioOutputs
                             },
@@ -293,6 +294,7 @@ internal fun MeetingRoomScreen(
                                     allowCameraControl = uiState.allowCameraControl,
                                     enabledFeatures = uiState.enabledFeatures,
                                 ),
+                                allowFeedback = uiState.allowFeedback,
                                 reportingContent = reportingContent
                                     ?: { onDismiss -> DefaultReportingContent(onDismiss) },
                             )

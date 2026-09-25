@@ -140,6 +140,8 @@ class MeetingRoomViewModelTest {
             allowMicrophoneControl = false,
             allowShowParticipantList = false,
             allowDeviceSelection = false,
+            allowFeedback = false,
+            allowSettings = false,
             allowPictureInPicture = false,
             defaultLayoutMode = MeetingRoomLayoutMode.ACTIVE_SPEAKER,
         )
@@ -152,6 +154,8 @@ class MeetingRoomViewModelTest {
             assertFalse(state.allowMicrophoneControl)
             assertFalse(state.allowShowParticipantList)
             assertFalse(state.allowDeviceSelection)
+            assertFalse(state.allowFeedback)
+            assertFalse(state.allowSettings)
             assertEquals(CallLayoutType.SPEAKER_LAYOUT, state.layoutType)
         }
     }

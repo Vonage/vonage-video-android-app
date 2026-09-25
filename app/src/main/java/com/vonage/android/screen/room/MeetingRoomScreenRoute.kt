@@ -56,6 +56,8 @@ fun MeetingRoomScreenRoute(
                     allowMicrophoneControl = config.allowMicrophoneControl,
                     allowShowParticipantList = config.allowShowParticipantList,
                     allowDeviceSelection = config.allowMeetingRoomDeviceSelection,
+                    allowFeedback = config.allowFeedback,
+                    allowSettings = config.allowMeetingRoomSettings,
                     allowPictureInPicture = config.allowPictureInPicture,
                     defaultLayoutMode = MeetingRoomLayoutMode.fromConfigValue(
                         config.defaultLayoutMode,
@@ -100,6 +102,10 @@ fun MeetingRoomScreenRoute(
 /**
  * Maps [Config] toggles to the runtime [MeetingRoomFeature] set. This is layered on top of
  * the compile-time Gradle flavors — a feature is only active when both are enabled.
+ *
+ * Note: `allowMeetingRoomSettings` does not map to a [MeetingRoomFeature] because nothing reads
+ * that feature to gate the settings UI — it is wired instead via
+ * [MeetingRoomConfiguration.allowSettings], which the meeting-room's top bar actually checks.
  */
 private fun configuredMeetingRoomFeatures(config: Config): Set<MeetingRoomFeature> = buildSet {
     if (config.allowChat) add(MeetingRoomFeature.CHAT)
@@ -109,5 +115,4 @@ private fun configuredMeetingRoomFeatures(config: Config): Set<MeetingRoomFeatur
     if (config.allowScreenShare) add(MeetingRoomFeature.SCREEN_SHARE)
     if (config.allowBackgroundEffects) add(MeetingRoomFeature.BACKGROUND_EFFECTS)
     if (config.allowAdvancedNoiseSuppression) add(MeetingRoomFeature.AUDIO_EFFECTS)
-    if (config.allowMeetingRoomSettings) add(MeetingRoomFeature.SETTINGS)
 }
