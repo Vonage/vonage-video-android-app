@@ -66,6 +66,10 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
 
+      - name: Enable Okta authentication
+        run: |
+          jq '.authSettings.allowAuthentication = true' app-config.json > app-config.tmp && mv app-config.tmp app-config.json
+
       - name: Generate config
         run: |
           ./gradlew generateVonageConfig --info --stacktrace

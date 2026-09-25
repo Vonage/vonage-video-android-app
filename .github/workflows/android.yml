@@ -60,6 +60,10 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Enable Okta authentication
+        run: |
+          jq '.authSettings.allowAuthentication = true' app-config.json > app-config.tmp && mv app-config.tmp app-config.json
+
       - name: Run unit tests and code quality checks
         run: |
           ./gradlew clean koverXmlReportDebug detekt --info
@@ -118,6 +122,10 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+
+      - name: Enable Okta authentication
+        run: |
+          jq '.authSettings.allowAuthentication = true' app-config.json > app-config.tmp && mv app-config.tmp app-config.json
 
       - name: AVD cache
         uses: actions/cache@v4
