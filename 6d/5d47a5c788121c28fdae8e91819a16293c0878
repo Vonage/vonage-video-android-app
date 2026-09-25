@@ -1,0 +1,91 @@
+app-config.json
+  h_25498f8d57a266 1-42
+tools/config-tui-py/vonage_config_tui/validator.py
+  h_25498f8d57a266 1,22,26,33,41,43,45
+  h_25498f8d57a266 36
+.github/copilot-instructions.md
+  h_25498f8d57a266 11
+.github/instructions/config-build.instructions.md
+  h_25498f8d57a266 2,7,12
+.github/prompts/feature-toggle-change.prompt.md
+  h_25498f8d57a266 13
+.github/workflows/maestro.yml
+  h_25498f8d57a266 29,34-37,78-111,113,126-129,144-148,151,203-212,216-273,275
+.github/workflows/release-notification.yml
+  h_25498f8d57a266 15-50,57
+.github/workflows/validate-config-schemas.yml
+  h_25498f8d57a266 1-64
+.maestro/README.md
+  h_25498f8d57a266 57-61
+.maestro/flows/goodbye-reenter-room.yaml
+  h_25498f8d57a266 18
+.maestro/flows/goodbye-view-landing-page.yaml
+  h_25498f8d57a266 20
+.maestro/flows/join-with-camera-mic-allowed.yaml
+  h_25498f8d57a266 22
+.maestro/flows/recording.yaml
+  h_25498f8d57a266 18
+.maestro/flows/waiting-room-controls-disabled.yaml
+  h_25498f8d57a266 20
+.maestro/flows/waiting-room-controls-enabled.yaml
+  h_25498f8d57a266 20
+.vonage/catalog-info.yaml
+  h_25498f8d57a266 9-10
+AGENTS.md
+  h_25498f8d57a266 22,27,54
+app/build.gradle.kts
+  h_25498f8d57a266 352
+build-tools/README.md
+  h_25498f8d57a266 21,32,67,81
+docs/AUTHENTICATION.md
+  h_25498f8d57a266 9
+docs/CONFIG-SYSTEM.md
+  h_25498f8d57a266 13,37,89,92
+docs/CONFIGURATION.md
+  h_25498f8d57a266 5,7,70,74,90
+docs/GETTING_STARTED.md
+  h_25498f8d57a266 34,46
+scripts/run_maestro_tests.sh
+  h_25498f8d57a266 25-26,225,235
+tools/config-tui-py/README.md
+  h_25498f8d57a266 4
+vonage-android-logger/build.gradle.kts
+  h_25498f8d57a266 12
+vonage-android-logger/consumer-rules.pro
+  h_25498f8d57a266 1-17
+vonage-config-idea-plugin/src/main/kotlin/com/vonage/confighelper/VonageConfigurable.kt
+  h_25498f8d57a266 63-64
+vonage-config-idea-plugin/src/main/kotlin/com/vonage/confighelper/service/VonageConfigHelper.kt
+  h_25498f8d57a266 20-21
+vonage-config-idea-plugin/src/main/kotlin/com/vonage/confighelper/ui/tab/ThemeTab.kt
+  h_25498f8d57a266 39
+vonage-feature-archiving/build.gradle.kts
+  h_25498f8d57a266 13,27-30,50
+vonage-feature-archiving/consumer-rules.pro
+  h_25498f8d57a266 1-9
+vonage-feature-archiving/src/disabled/java/com/vonage/android/archiving/ui/RecordingIndicator.kt
+  h_25498f8d57a266 10
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/EnabledVonageArchiving.kt
+  h_25498f8d57a266 6,12-13,47-54,70,74,89-91,95,99-102
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/data/ArchiveRepository.kt
+  h_25498f8d57a266 6-8,20-23,25-29,32-33,42-45,47-51,54-55,61,64-68,71-73
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/ui/RecordingIndicator.kt
+  h_25498f8d57a266 14,21
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/MeetingTopBar.kt
+  h_25498f8d57a266 71-72
+vonage-meeting-room/src/main/res/values/strings.xml
+  h_25498f8d57a266 26
+vonage-video-ui-compose/build.gradle.kts
+  h_25498f8d57a266 35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "6d5d47a5c788121c28fdae8e91819a16293c0878",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
