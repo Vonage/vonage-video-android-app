@@ -24,6 +24,9 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GITHUB_PR_NUM: ${{ github.event.pull_request.number }}
   BASE_API_URL: ${{ secrets.BASE_API_URL }}
+  OKTA_ISSUER_URL: ${{ secrets.OKTA_ISSUER_URL }}
+  OKTA_CLIENT_ID: ${{ secrets.OKTA_CLIENT_ID }}
+  OKTA_SIGN_IN_REDIRECT_URI: ${{ secrets.OKTA_SIGN_IN_REDIRECT_URI }}
 
 jobs:
 
