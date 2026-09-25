@@ -3,10 +3,13 @@ package com.vonage.android.archiving
 import com.vonage.android.archiving.data.ArchiveRepository
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.logger.vonageLogger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+
+private const val TAG = "EnabledVonageArchiving"
 
 /**
  * EnabledVonageArchiving is the active implementation of VonageArchiving for call recording.
@@ -41,8 +44,14 @@ class EnabledVonageArchiving(
             .map {
                 mutex.withLock {
                     when (it) {
-                        is ArchivingState.Started -> currentArchiveId = ArchiveId(it.id)
-                        is ArchivingState.Stopped -> currentArchiveId = null
+                        is ArchivingState.Started -> {
+                            currentArchiveId = ArchiveId(it.id)
+                            vonageLogger.d(TAG, "bind: archiving started, archiveId=${it.id}")
+                        }
+                        is ArchivingState.Stopped -> {
+                            currentArchiveId = null
+                            vonageLogger.d(TAG, "bind: archiving stopped, archiveId=${it.id}")
+                        }
                         else -> {}
                     }
                     it
@@ -58,9 +67,11 @@ class EnabledVonageArchiving(
      */
     override suspend fun startArchive(roomName: String): Result<ArchiveId> =
         archiveRepository.startArchive(roomName)
+            .onFailure { vonageLogger.e(TAG, "startArchive: failed for room=$roomName", it) }
             .map { id ->
                 mutex.withLock {
                     currentArchiveId = id
+                    vonageLogger.d(TAG, "startArchive: succeeded, archiveId=${id.id}")
                     id
                 }
             }
@@ -75,13 +86,20 @@ class EnabledVonageArchiving(
     override suspend fun stopArchive(roomName: String): Result<Boolean> =
         currentArchiveId?.let { archiveId ->
             archiveRepository.stopArchive(roomName, archiveId)
+                .onFailure {
+                    vonageLogger.e(TAG, "stopArchive: failed for room=$roomName, archiveId=${archiveId.id}", it)
+                }
                 .map {
                     mutex.withLock {
                         currentArchiveId = null
+                        vonageLogger.d(TAG, "stopArchive: succeeded, archiveId=${archiveId.id}")
                         it
                     }
                 }
-        } ?: Result.failure(Exception("No current archive id"))
+        } ?: run {
+            vonageLogger.e(TAG, "stopArchive: no current archive id for room=$roomName")
+            Result.failure(Exception("No current archive id"))
+        }
 
     /**
      * Retrieves all past recording archives for the specified room.

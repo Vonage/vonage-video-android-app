@@ -18,7 +18,7 @@ Custom Gradle plugins and build configuration for the Vonage Video Android App.
 
 **Plugin ID**: `com.vonage.json-config`
 
-Generates Kotlin configuration classes from `config/app-config.json`, validated by the config
+Generates Kotlin configuration classes from `app-config.json`, validated by the config
 TUI against a schema fetched from a canonical URL (shared with the iOS and React Vonage Video
 apps; cached locally for offline use — see `tools/config-tui-py/vonage_config_tui/validator.py`).
 
@@ -29,7 +29,7 @@ plugins {
 }
 ```
 
-**Input** (`config/app-config.json`):
+**Input** (`app-config.json`):
 ```json
 {
   "videoSettings": {
@@ -64,7 +64,7 @@ The plugin also generates `gradle/generated-config.properties` for build-time co
 
 **Plugin ID**: `com.vonage.theme-generator`
 
-Generates Jetpack Compose theme code from `config/theme.json`.
+Generates Jetpack Compose theme code from `theme.json`.
 
 **Configuration**:
 ```kotlin
@@ -78,7 +78,7 @@ plugins {
 ./gradlew updateTheme
 ```
 
-**Input** (`config/theme.json`), validated by the config TUI against the unified theme schema
+**Input** (`theme.json`), validated by the config TUI against the unified theme schema
 fetched from `THEME_SCHEMA_URL` in `tools/config-tui-py/vonage_config_tui/validator.py`
 (shared with the iOS and React Vonage Video apps; cached locally for offline use):
 ```json

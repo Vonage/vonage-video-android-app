@@ -10,7 +10,7 @@ A JSON-based configuration system that generates Kotlin constants and Gradle bui
 
 ## Quick Start
 
-### 1. JSON Configuration (`config/app-config.json`)
+### 1. JSON Configuration (`app-config.json`)
 
 ```json
 {
@@ -34,7 +34,7 @@ plugins {
 }
 
 jsonConfig {
-    configFile.set("config/app-config.json")
+    configFile.set("app-config.json")
 }
 ```
 
@@ -77,10 +77,10 @@ app/                          # Main application
 
 ```bash
 # Method 1: Edit JSON directly
-vim config/app-config.json
+vim app-config.json
 
 # Method 2: Use different config file
-./gradlew assembleDebug -Dconfig.file=config/app-config-minimal.json
+./gradlew assembleDebug -Dconfig.file=app-config-minimal.json
 
 # Method 3: Regenerate after changes
 ./gradlew clean generateVonageConfig assembleDebug

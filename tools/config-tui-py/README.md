@@ -1,7 +1,7 @@
 # vonage-config-tui (Python)
 
 Python port of [`tools/config-tui`](../config-tui). A terminal UI for editing
-`config/app-config.json` and `config/theme.json`, validating them against
+`app-config.json` and `theme.json`, validating them against
 unified JSON schemas fetched at runtime from canonical URLs (shared with the
 iOS and React Vonage Video apps, cached locally for offline use), and
 running the associated Gradle tasks.

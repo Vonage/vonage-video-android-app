@@ -23,6 +23,7 @@
     <string name="recording_confirm_button">Start Recording</string>
     <string name="recording_stop_confirm_button">Stop Recording</string>
     <string name="recording_started_notification">Recording started</string>
+    <string name="recording_indicator_content_description">Recording in progress</string>
 
     <!-- Screen Share -->
     <string name="screen_share_start">Share screen</string>

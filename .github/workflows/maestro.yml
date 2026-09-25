@@ -29,11 +29,15 @@ env:
 
 jobs:
   maestro-tests:
-    name: Maestro Tests
+    name: Maestro Tests (release)
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
     steps:
+      - name: Compute unique room name
+        id: room
+        run: echo "name=maestro-${{ github.run_id }}${{ github.event.pull_request.number && format('-pr{0}', github.event.pull_request.number) || '' }}" >> "$GITHUB_OUTPUT"
+
       - name: Free disk space
         run: |
           sudo rm -rf /usr/share/dotnet
@@ -78,9 +82,42 @@ jobs:
             exit 1
           }
 
-      - name: Build debug APK
+      - name: Create placeholder google-services.json
         run: |
-          ./gradlew :app:assembleDebug --info --stacktrace --no-build-cache
+          mkdir -p app/src/release
+          cat > app/src/release/google-services.json << 'EOF'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "maestro-ci-placeholder",
+              "storage_bucket": "maestro-ci-placeholder.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+                  "android_client_info": {
+                    "package_name": "com.vonage.android"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  { "current_key": "placeholder-not-a-real-key" }
+                ],
+                "services": {
+                  "appinvite_service": {
+                    "other_platform_oauth_client": []
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+
+      - name: Build release APK (minified, signed with fallback debug key)
+        run: |
+          ./gradlew :app:assembleRelease --stacktrace
 
       - name: AVD cache
         uses: actions/cache@v4
@@ -93,6 +130,10 @@ jobs:
 
       - name: Run Maestro flows on emulator
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          ROOM_NAME: ${{ steps.room.outputs.name }}
+          APP_ID: com.vonage.android
+          APK_PATH: app/build/outputs/apk/release/app-release.apk
         with:
           api-level: 34
           target: default
@@ -107,14 +148,14 @@ jobs:
             mkdir -p test-reports
             adb logcat -c
 
-            adb install -r app/build/outputs/apk/debug/app-debug.apk
-            adb shell pm grant com.vonage.android.debug android.permission.CAMERA 2>/dev/null
-            adb shell pm grant com.vonage.android.debug android.permission.RECORD_AUDIO 2>/dev/null
-            adb shell pm grant com.vonage.android.debug android.permission.BLUETOOTH_CONNECT 2>/dev/null
-            adb shell pm grant com.vonage.android.debug android.permission.POST_NOTIFICATIONS 2>/dev/null
+            adb install -r "$APK_PATH"
+            adb shell pm grant "$APP_ID" android.permission.CAMERA 2>/dev/null
+            adb shell pm grant "$APP_ID" android.permission.RECORD_AUDIO 2>/dev/null
+            adb shell pm grant "$APP_ID" android.permission.BLUETOOTH_CONNECT 2>/dev/null
+            adb shell pm grant "$APP_ID" android.permission.POST_NOTIFICATIONS 2>/dev/null
 
             maestro --version
-            maestro test --env APP_ID=com.vonage.android.debug .maestro/flows --format junit --output test-reports/maestro-junit.xml || { adb logcat -d -v time > test-reports/logcat.txt; exit 1; }
+            maestro test --env APP_ID="$APP_ID" --env ROOM_NAME="$ROOM_NAME" .maestro/flows --format junit --output test-reports/maestro-junit.xml || { adb logcat -d -v time > test-reports/logcat.txt; exit 1; }
 
       - name: List Maestro test artifacts
         if: always()
@@ -166,26 +207,77 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
 
-      - name: Comment PR with Results
-        if: github.event_name == 'pull_request' && always()
+  comment-pr:
+    name: Update PR Comment
+    needs: maestro-tests
+    if: github.event_name == 'pull_request' && always()
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Update PR Comment with Results
         uses: actions/github-script@v7
         with:
           script: |
-            let comment = '## 🎭 Maestro E2E Test Results\n\n';
-            if ('${{ job.status }}' === 'success') {
-              comment += '✅ **All tests passed!**\n\n';
-            } else {
-              comment += '❌ **Some tests failed**\n\n';
-            }
-            comment += `- **Run**: [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n`;
-            comment += `- **Commit**: \`${{ github.sha }}\`\n\n`;
-            comment += '📊 **Artifacts:**\n';
-            comment += `  - maestro-test-results-${{ github.run_number }}\n`;
-            comment += `  - maestro-report-${{ github.run_number }}\n\n`;
-            comment += '📸 View the complete test results and screenshots in the artifacts section above.';
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
+            const marker = '<!-- maestro-e2e-results -->';
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+
+            const results = ${{ toJson(needs.maestro-tests.result) }};
+
+            const overallStatus = results === 'success' ? '✅ **All tests passed!**' : '❌ **Some tests failed**';
+
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const timestamp = new Date().toISOString();
+
+            const entry = `- ${timestamp} — [Run #${context.runNumber}](${runUrl}) — commit \`${context.sha.substring(0, 7)}\` — ${results === 'success' ? '✅ passed' : '❌ failed'}`;
+
+            // Find the existing bot comment for this check, so we update in place
+            // instead of posting a new one on every run.
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
             });
+            const previous = comments.find(c => c.user?.type === 'Bot' && c.body?.includes(marker));
+
+            // Preserve prior run history (capped) from the existing comment body.
+            const historyMarkerStart = '<!-- history-start -->';
+            const historyMarkerEnd = '<!-- history-end -->';
+            let history = [];
+            if (previous) {
+              const start = previous.body.indexOf(historyMarkerStart);
+              const end = previous.body.indexOf(historyMarkerEnd);
+              if (start !== -1 && end !== -1) {
+                const block = previous.body.substring(start + historyMarkerStart.length, end);
+                history = block.split('\n').map(l => l.trim()).filter(Boolean);
+              }
+            }
+            history.unshift(entry);
+            history = history.slice(0, 10); // keep last 10 runs
+
+            const body = `${marker}
+            ## 🎭 Maestro E2E Test Results
+
+            ${overallStatus}
+
+            - **Latest run**: [#${context.runNumber}](${runUrl})
+            - **Commit**: \`${context.sha}\`
+
+            📊 **Artifacts:** see the \`maestro-report-${context.runNumber}\` artifact on the run above for screenshots and logs.
+
+            <details>
+            <summary>📜 Run history (last ${history.length})</summary>
+
+            ${historyMarkerStart}
+            ${history.join('\n')}
+            ${historyMarkerEnd}
+            </details>`;
+
+            if (previous) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: previous.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }

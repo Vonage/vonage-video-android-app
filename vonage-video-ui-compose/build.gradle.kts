@@ -32,7 +32,7 @@ android {
 }
 
 themeGenerator {
-    themeJsonFile.set(file("../config/theme.json"))
+    themeJsonFile.set(file("../theme.json"))
     outputPackage.set("com.vonage.android.compose.theme")
     themeDirectory.set(file("src/main/java/com/vonage/android/compose/theme"))
 }

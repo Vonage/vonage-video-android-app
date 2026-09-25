@@ -31,7 +31,7 @@ BASE_API_URL=https://your-backend-url.com
 export BASE_API_URL=https://your-backend-url.com
 ```
 
-**Option 3 — Edit `config/app-config.json`** directly, replacing the placeholder with your URL.
+**Option 3 — Edit `app-config.json`** directly, replacing the placeholder with your URL.
 
 > **Emulator tip:** If your backend is running locally, use the special alias `10.0.2.2` instead of `localhost` so the emulator can reach your machine.
 
@@ -43,7 +43,7 @@ After setting the URL, regenerate the build configuration:
 ./gradlew generateVonageConfig
 ```
 
-> This step is required after any change to `config/app-config.json` or `config/theme.json`. The generated file at `gradle/generated-config.properties` must **not** be hand-edited.
+> This step is required after any change to `app-config.json` or `theme.json`. The generated file at `gradle/generated-config.properties` must **not** be hand-edited.
 
 ## Build and install
 

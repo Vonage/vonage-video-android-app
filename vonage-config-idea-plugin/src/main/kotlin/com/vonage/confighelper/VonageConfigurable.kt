@@ -60,8 +60,8 @@ class VonageConfigurable(
 
     override fun apply() {
         val settings = VonageConfigHelper.getInstance(project)
-        settings.state.configFilePath = configFilePathField?.text ?: "config/app-config.json"
-        settings.state.themeFilePath = themeFilePathField?.text ?: "config/theme.json"
+        settings.state.configFilePath = configFilePathField?.text ?: "app-config.json"
+        settings.state.themeFilePath = themeFilePathField?.text ?: "theme.json"
         settings.state.autoRunGradleTasks = autoRunGradleTasksCheckBox?.isSelected ?: true
     }
 

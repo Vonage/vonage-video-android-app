@@ -31,7 +31,7 @@
     "allowDeviceSelection": true,
     "allowEmojis": true,
     "allowScreenShare": true,
-    "defaultLayoutMode": "activespeaker",
+    "defaultLayoutMode": "activeSpeaker",
     "showParticipantList": true
   }
 }

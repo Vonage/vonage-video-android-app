@@ -36,7 +36,7 @@ class ThemeTab(
 
     private fun loadThemeJson() {
         val basePath = project.basePath ?: return
-        val themeFile = File(basePath, "config/theme.json")
+        val themeFile = File(basePath, "theme.json")
 
         val rootNode = json.parseFile(themeFile).toTreeNode()
         themeJsonTree.model = DefaultTreeModel(rootNode)

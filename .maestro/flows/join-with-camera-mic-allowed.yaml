@@ -19,7 +19,7 @@ appId: ${APP_ID}
 
 - eraseText
 
-- inputText: "testroom"
+- inputText: "${ROOM_NAME}"
 
 - hideKeyboard
 
