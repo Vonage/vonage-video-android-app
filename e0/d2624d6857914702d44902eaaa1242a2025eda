@@ -1,0 +1,19 @@
+build-tools/detekt.gradle
+  s_047d28dcd2efb9::t_53ea12c9c1bdf9 9-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e0d2624d6857914702d44902eaaa1242a2025eda",
+  "prompts": {},
+  "sessions": {
+    "s_047d28dcd2efb9": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_c1863d50-0e09-4ac1-a87e-ca7009be4832",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
