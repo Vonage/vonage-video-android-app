@@ -87,7 +87,7 @@ Verify it worked on a device:
 
 ```bash
 adb shell pm get-app-links com.vonage.android.debug
-# meet.vonagenetworks.net: verified
+# backend.example.com: verified
 ```
 
 > **If verification fails, sign-in hangs silently** — the browser simply displays the callback URL and never returns to the app. `pm get-app-links` showing anything other than `verified` (commonly after a fingerprint mismatch or no network at install time) is the first thing to check. `adb shell pm verify-app-links --re-verify <package>` retriggers it.

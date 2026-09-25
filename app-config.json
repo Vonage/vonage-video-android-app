@@ -18,7 +18,7 @@
     "allowMicrophoneControl": true
   },
   "authSettings": {
-    "allowAuthentication": true
+    "allowAuthentication": false
   },
   "waitingRoomSettings": {
     "allowDeviceSelection": true
