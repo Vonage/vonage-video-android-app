@@ -1,0 +1,24 @@
+.github/workflows/maestro.yml
+  s_795e4451cc4d67::t_cb2b98752d54de 69-72
+.github/workflows/publish-play-store.yml
+  s_795e4451cc4d67::t_cb2b98752d54de 71-74
+.github/workflows/android.yml
+  s_795e4451cc4d67::t_cb2b98752d54de 63-66,126-128
+  s_795e4451cc4d67::t_87fb225dff2415 129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "73b2fac9e8e68fef1fac3e2dfcde92b090c7edeb",
+  "prompts": {},
+  "sessions": {
+    "s_795e4451cc4d67": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5552fb3-28f7-456d-a2d2-f34c45e3317d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  }
+}
