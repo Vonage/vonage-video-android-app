@@ -71,6 +71,9 @@ jobs:
       - name: Build release AAB
         env:
           BASE_API_URL: ${{ secrets.BASE_API_URL }}
+          OKTA_ISSUER_URL: ${{ secrets.OKTA_ISSUER_URL }}
+          OKTA_CLIENT_ID: ${{ secrets.OKTA_CLIENT_ID }}
+          OKTA_SIGN_IN_REDIRECT_URI: ${{ secrets.OKTA_SIGN_IN_REDIRECT_URI }}
         run: ./gradlew generateVonageConfig && ./gradlew bundleRelease --stacktrace
 
       - name: Publish to Play Store
