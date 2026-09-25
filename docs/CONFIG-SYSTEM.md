@@ -21,7 +21,7 @@ A JSON-based configuration system that generates Kotlin constants and Gradle bui
   "meetingRoomSettings": {
     "allowChat": true,
     "allowScreenShare": true,
-    "defaultLayoutMode": "active-speaker"
+    "defaultLayoutMode": "grid"
   }
 }
 ```
@@ -40,18 +40,27 @@ jsonConfig {
 
 ### 3. Usage in Code
 
+Runtime config is read through the `Config` snapshot rather than the generated constants
+directly, so `AppConfig` is read in exactly one place (`Config.fromAppConfig()`):
+
 ```kotlin
-// Runtime configuration
-if (AppConfig.MeetingRoomSettings.ALLOW_CHAT) {
-    initializeChatFeature()
+// In a ViewModel — inject GetConfig
+class MyViewModel @Inject constructor(private val getConfig: GetConfig) {
+    fun start() {
+        if (getConfig().allowChat) initializeChatFeature()
+    }
 }
 
-// Build-time optimization
-if (BuildConfig.FEATURE_CHAT_ENABLED) {
-    // Only included if chat is enabled
-    initializeChatModule()
-}
+// In a composable that cannot receive an injected dependency
+val config = remember { Config.fromAppConfig() }
+if (config.allowChat) { /* ... */ }
 ```
+
+`BuildConfig.FEATURE_*_ENABLED` fields are also generated, but they are **informational only** —
+useful for logging and support. The actual compile-time gating is done by the product flavor
+selected via `missingDimensionStrategy`, which swaps in the `enabled` or `disabled` source set. Do
+not branch on `BuildConfig.FEATURE_*` in runtime code: the flavor system has already removed the
+disabled implementation, so the check is redundant.
 
 ## Module Architecture
 
@@ -105,17 +114,39 @@ defaultConfig {
 
 ## Key Configuration Properties
 
-| Setting | AppConfig | BuildConfig | Description |
-|---------|-----------|-------------|-------------|
-| `meetingRoomSettings.allowChat` | `ALLOW_CHAT` | `FEATURE_CHAT_ENABLED` | Chat module & functionality |
-| `videoSettings.defaultResolution` | `DEFAULT_RESOLUTION` | - | Video resolution setting |
-| `meetingRoomSettings.allowScreenShare` | `ALLOW_SCREEN_SHARE` | - | Screen sharing capability |
+`AppConfig` lists the generated constant; `BuildConfig`/flavor shows whether the field also selects
+a product flavor. "Wired" describes how the value reaches behavior.
+
+| Setting | AppConfig | Flavor dimension | Wired |
+|---------|-----------|------------------|-------|
+| `meetingRoomSettings.allowChat` | `ALLOW_CHAT` | `chat` | Flavor + `MeetingRoomFeature.CHAT` |
+| `meetingRoomSettings.allowScreenShare` | `ALLOW_SCREEN_SHARE` | `screensharing` | Flavor + `MeetingRoomFeature.SCREEN_SHARE` |
+| `meetingRoomSettings.allowPictureInPicture` | `ALLOW_PICTURE_IN_PICTURE` | - | `MeetingRoomConfiguration.allowPictureInPicture` |
+| `meetingRoomSettings.defaultLayoutMode` | `DEFAULT_LAYOUT_MODE` | - | `MeetingRoomConfiguration.defaultLayoutMode` |
+| `videoSettings.defaultResolution` | `DEFAULT_RESOLUTION` | - | **Not implemented** — parity only |
+| `waitingRoomSettings.bypassWaitingRoom` | `BYPASS_WAITING_ROOM` | - | **Not implemented** — parity only |
+
+See `docs/CONFIGURATION.md` for the full field-by-field table.
+
+## Adding a new config field
+
+The generator only understands the keys declared in `SETTINGS_GROUPS`, `SCALAR_KEYS` and
+`IGNORED_KEYS` in `GenerateConfigTask`. Adding a field **inside** an existing settings group works
+automatically. Adding a **new top-level key** fails the build with a message naming the key, so a
+new group cannot silently generate nothing:
+
+```
+Unrecognised top-level key(s) in the app config: recordingSettings
+```
+
+Extend `SETTINGS_GROUPS` (for an object), `SCALAR_KEYS` (for a single value), or `IGNORED_KEYS` (for
+a documentation-only block).
 
 ## Best Practices
 
-- **AppConfig**: Runtime settings, user preferences, server-driven features
-- **BuildConfig**: Module inclusion, compile-time optimizations
-- **Product Flavors**: Feature modules with enabled/disabled variants
+- **Config**: Runtime settings read via `GetConfig` / `Config.fromAppConfig()`
+- **BuildConfig `FEATURE_*`**: Informational only — do not branch on these
+- **Product Flavors**: The real compile-time gating for feature modules with enabled/disabled variants
 
 ## Troubleshooting
 

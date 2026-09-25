@@ -71,7 +71,7 @@ internal data class BottomBarState(
 // 4 because mic + camera + menu + end
 const val DEFAULT_ACTIONS_COUNT = 4
 
-@Suppress("LongMethod")
+@Suppress("LongMethod", "LongParameterList")
 @Composable
 internal fun BottomBar(
     roomActions: MeetingRoomActions,
@@ -80,6 +80,7 @@ internal fun BottomBar(
     modifier: Modifier = Modifier,
     actions: ImmutableList<BottomBarActionType> = BottomBarActionType.entries.toImmutableList(),
     additionalActions: ImmutableList<BottomBarAction> = persistentListOf(),
+    allowFeedback: Boolean = true,
     reportingContent: @Composable (() -> Unit) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
@@ -129,8 +130,11 @@ internal fun BottomBar(
 
     // Reporting is always appended last as a CUSTOM action so it participates in the same
     // responsive overflow logic as the built-in buttons and host-injected extra actions.
+    // Omitted entirely when allowFeedback is false, rather than only omitting custom content,
+    // so the button and the default reporting screen never appear.
     val reportingLabel = stringResource(R.string.report_bottombar_button_label)
-    val reportingAction = remember(reportingLabel) {
+    val reportingAction = remember(reportingLabel, allowFeedback) {
+        if (!allowFeedback) return@remember null
         BottomBarAction(
             type = BottomBarActionType.CUSTOM,
             icon = VividIcons.Solid.Warning,
@@ -146,7 +150,7 @@ internal fun BottomBar(
         )
     }
     val allActions = remember(bottomBarActions, additionalActions, reportingAction) {
-        (bottomBarActions + additionalActions + reportingAction).toImmutableList()
+        (bottomBarActions + additionalActions + listOfNotNull(reportingAction)).toImmutableList()
     }
     val visibleActions = allActions.take(actionsVisibleCount)
     val overflowActions = allActions.drop(actionsVisibleCount)

@@ -85,6 +85,9 @@ class WaitingRoomViewModel @AssistedInject constructor(
                             publisher = publisher,
                             allowCameraControl = config.allowCameraControl,
                             allowMicrophoneControl = config.allowMicrophoneControl,
+                            allowDeviceSelection = config.allowWaitingRoomDeviceSelection,
+                            allowSettings = config.allowWaitingRoomSettings,
+                            allowAudioDiagnostics = config.allowAudioDiagnostics,
                             audioDevicesState = audioDevicesHandler.audioDevicesState,
                         )
                     }
@@ -307,6 +310,12 @@ data class WaitingRoomUiState(
     val joinSettings: PublisherSettings = PublisherSettings(),
     val allowMicrophoneControl: Boolean = true,
     val allowCameraControl: Boolean = true,
+    /** Whether the audio/camera device selection panel is shown. */
+    val allowDeviceSelection: Boolean = true,
+    /** Whether the settings entry point is shown in the top bar. */
+    val allowSettings: Boolean = true,
+    /** Whether the "test speakers" control is shown in the audio device selector. */
+    val allowAudioDiagnostics: Boolean = true,
     val audioDevicesState: AudioDevicesState? = null,
     val backgrounds: ImmutableList<VideoBackgroundItem> = persistentListOf(),
     /** Whether the "Add image" tile should be shown in the effects sheet. */

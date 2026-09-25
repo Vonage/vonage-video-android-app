@@ -55,6 +55,8 @@ class MeetingRoomPrebuilt internal constructor(
     internal val theme: MeetingRoomTheme,
     internal val isDebug: Boolean,
     internal val reportingContent: (@Composable (() -> Unit) -> Unit)?,
+    /** Optional "test speakers" control rendered inside the audio output selector. */
+    internal val testSpeakerContent: (@Composable () -> Unit)?,
     internal val permissionContent: @Composable (List<String>, () -> Unit) -> Unit,
     internal val foregroundServiceEnabled: Boolean,
     /** Dynamic list of extra buttons appended after the built-in bottom bar actions. */

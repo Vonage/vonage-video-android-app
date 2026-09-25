@@ -80,7 +80,9 @@ private fun MeetingRoomContentInner(
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val inPipMode = rememberIsInPipMode()
-    val pipModifier = pipEffect()
+    val pipModifier = pipEffect(
+        shouldEnterPipMode = prebuilt.configuration.allowPictureInPicture,
+    )
     val scope = rememberCoroutineScope()
 
     val screenSharePermissionResult = rememberLauncherForActivityResult(
@@ -159,6 +161,7 @@ private fun MeetingRoomContentInner(
             actions = actions,
             uiState = uiState,
             reportingContent = prebuilt.reportingContent,
+            testSpeakerContent = prebuilt.testSpeakerContent,
             additionalBottomBarActions = prebuilt.additionalBottomBarActions,
             customBottomBar = prebuilt.customBottomBar,
         )
