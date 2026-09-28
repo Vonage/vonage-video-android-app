@@ -3,7 +3,7 @@ package com.vonage.android.config
 import javax.inject.Inject
 
 /**
- * Provides the app's view of `config/app-config.json` for Hilt-injected consumers.
+ * Provides the app's view of `app-config.json` for Hilt-injected consumers.
  *
  * Prefer this in ViewModels. Composables that cannot receive an injected dependency should call
  * [Config.fromAppConfig] directly — both go through the same mapping, so the two cannot drift.
@@ -52,11 +52,6 @@ data class Config(
     val allowPictureInPicture: Boolean,
     val allowScreenShare: Boolean,
     val allowShowParticipantList: Boolean,
-    /**
-     * Raw `meetingRoomSettings.defaultLayoutMode` value. Kept as a String so this class stays
-     * free of the meeting-room module's experimental API; parsed by the caller via
-     * `MeetingRoomLayoutMode.fromConfigValue`.
-     */
     val defaultLayoutMode: String,
 ) {
     companion object {

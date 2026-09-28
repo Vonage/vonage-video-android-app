@@ -29,22 +29,13 @@ internal data class MeetingRoomUiState(
     val allowMicrophoneControl: Boolean = true,
     val allowCameraControl: Boolean = true,
     val allowShowParticipantList: Boolean = true,
-    /** Whether the audio output selector can be opened. */
     val allowDeviceSelection: Boolean = true,
-    /** Whether the "Report an issue" control is shown in the bottom bar. */
     val allowFeedback: Boolean = true,
-    /** Whether the in-call settings entry point is shown in the top bar. */
     val allowSettings: Boolean = true,
     val backgrounds: ImmutableList<VideoBackgroundItem> = persistentListOf(),
-    /**
-     * Number of additional user backgrounds the user may still upload before reaching the cap.
-     * Zero means the "Add image" tile should be hidden. Used to select the correct photo picker
-     * (single vs. multi-image) and to cap the number of images the user can pick in one go.
-     */
     val remainingBackgroundSlots: Int = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
     /** Runtime feature set — applied on top of compile-time flavor toggles. */
     val enabledFeatures: Set<MeetingRoomFeature> = MeetingRoomFeature.all,
-    /** Flag indicating recording was started by another participant (triggers overlay notification). */
     val recordingStartedByOthers: Boolean = false,
 )
 

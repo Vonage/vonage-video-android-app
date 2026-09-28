@@ -347,19 +347,12 @@ class AppConfigScreen(Screen):
 
     def _on_save(self, values: dict[str, Any]) -> None:
         schema_data = fields_to_data(values)
-        # Validate only the schema-covered fields: authSettings is a deliberate Android
-        # extension outside the shared schema (additionalProperties: false — see
-        # docs/AUTHENTICATION.md), so validating the merged result would always fail.
         result = validate_app_config_data(schema_data)
         if not result.valid:
             self.status_kind = "error"
             self.status_msg = f"Validation failed: {result.errors[0]}"
             return
 
-        # fields_to_data() only reconstructs keys the schema knows about (schema_to_fields()
-        # only ever produced fields for those). Merge that onto the previously loaded data
-        # instead of replacing it outright, so Android-only extensions absent from the shared
-        # schema survive a save instead of being silently dropped.
         config = _merge(self._data, schema_data)
 
         save_app_config(config)
