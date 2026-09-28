@@ -1,0 +1,18 @@
+tools/config-tui-py/vonage_config_tui/validator.py
+  h_25498f8d57a266 22,26
+docs/AUTHENTICATION.md
+  h_25498f8d57a266 34
+app/src/main/java/com/vonage/android/config/Config.kt
+  h_25498f8d57a266 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "011d1359d9b3965ba90650d48a4116a2216e0125",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
