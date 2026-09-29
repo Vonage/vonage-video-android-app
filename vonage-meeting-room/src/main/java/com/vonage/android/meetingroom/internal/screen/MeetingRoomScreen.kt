@@ -101,6 +101,7 @@ internal fun MeetingRoomScreen(
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
     reportingContent: (@Composable (() -> Unit) -> Unit)? = null,
+    testSpeakerContent: (@Composable () -> Unit)? = null,
     additionalBottomBarActions: StateFlow<List<MeetingRoomBottomBarAction>>? = null,
     customBottomBar: (@Composable (MeetingRoomBottomBarState, MeetingRoomCustomActions) -> Unit)? = null,
 ) {
@@ -237,10 +238,13 @@ internal fun MeetingRoomScreen(
                             roomName = uiState.roomName,
                             archivingUiState = uiState.archivingUiState,
                             actions = actions,
+                            allowSettings = uiState.allowSettings,
+                            allowCameraControl = uiState.allowCameraControl,
                             onToggleAudioDeviceSelector = {
                                 showAudioOutputs = !showAudioOutputs
                             },
-                            audioDevicesState = uiState.audioDevicesState,
+                            audioDevicesState = uiState.audioDevicesState
+                                ?.takeIf { uiState.allowDeviceSelection },
                         )
                     }
                 },
@@ -291,6 +295,7 @@ internal fun MeetingRoomScreen(
                                     allowCameraControl = uiState.allowCameraControl,
                                     enabledFeatures = uiState.enabledFeatures,
                                 ),
+                                allowFeedback = uiState.allowFeedback,
                                 reportingContent = reportingContent
                                     ?: { onDismiss -> DefaultReportingContent(onDismiss) },
                             )
@@ -339,7 +344,7 @@ internal fun MeetingRoomScreen(
                 )
             }
 
-            if (showAudioOutputs) {
+            if (showAudioOutputs && uiState.allowDeviceSelection) {
                 ModalBottomSheet(
                     onDismissRequest = { showAudioOutputs = false },
                     sheetState = audioOutputsSheetState,
@@ -360,6 +365,7 @@ internal fun MeetingRoomScreen(
                                 publisher?.toggleNoiseSuppression()
                             },
                             showNoiseSuppressionToggle = MeetingRoomFeature.AUDIO_EFFECTS in uiState.enabledFeatures,
+                            testSpeakerContent = testSpeakerContent ?: {},
                         )
                     }
                 }

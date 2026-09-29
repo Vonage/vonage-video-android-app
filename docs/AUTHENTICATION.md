@@ -30,6 +30,9 @@ This maps the flag to `BuildConfig.FEATURE_AUTHENTICATION_ENABLED` and the `okta
 
 > **Note:** the Okta SDK requires API 26+. When `allowAuthentication` is `true`, the app's `minSdk` is raised from 24 to 26 (Android 8.0) automatically.
 
+> **Schema note:** `authSettings` is **Android-specific** and is not part of the shared
+> cross-platform config schema that `app-config.json` otherwise follows.
+
 ## Okta configuration
 
 The OIDC client credentials are **never committed to the repository**. They are read at build time from `local.properties` (local development) or environment variables (CI/CD — environment wins when both are set):

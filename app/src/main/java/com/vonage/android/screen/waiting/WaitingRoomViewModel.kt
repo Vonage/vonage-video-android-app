@@ -85,6 +85,9 @@ class WaitingRoomViewModel @AssistedInject constructor(
                             publisher = publisher,
                             allowCameraControl = config.allowCameraControl,
                             allowMicrophoneControl = config.allowMicrophoneControl,
+                            allowDeviceSelection = config.allowWaitingRoomDeviceSelection,
+                            allowSettings = config.allowWaitingRoomSettings,
+                            allowAudioDiagnostics = config.allowAudioDiagnostics,
                             audioDevicesState = audioDevicesHandler.audioDevicesState,
                         )
                     }
@@ -307,8 +310,10 @@ data class WaitingRoomUiState(
     val joinSettings: PublisherSettings = PublisherSettings(),
     val allowMicrophoneControl: Boolean = true,
     val allowCameraControl: Boolean = true,
+    val allowDeviceSelection: Boolean = true,
+    val allowSettings: Boolean = true,
+    val allowAudioDiagnostics: Boolean = true,
     val audioDevicesState: AudioDevicesState? = null,
     val backgrounds: ImmutableList<VideoBackgroundItem> = persistentListOf(),
-    /** Whether the "Add image" tile should be shown in the effects sheet. */
     val remainingBackgroundSlots: Int = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
 )

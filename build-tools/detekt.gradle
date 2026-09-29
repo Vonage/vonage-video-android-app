@@ -6,5 +6,6 @@ detekt {
         exclude("**/.gradle/")
         exclude("**/build/")
         exclude("**/tmp/**")
+        exclude("gradle/generated-config.properties")
     })
 }

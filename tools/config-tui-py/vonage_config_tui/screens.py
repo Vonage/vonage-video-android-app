@@ -53,6 +53,22 @@ def _status_line(msg: str, kind: str) -> Text:
     return Text(f"{icon} {msg}", style=color)
 
 
+def _merge(original: dict[str, Any], updates: dict[str, Any]) -> dict[str, Any]:
+    """Deep-merges ``updates`` onto ``original``, recursing into nested dicts on both sides.
+
+    Keys present in ``original`` but absent from ``updates`` (e.g. top-level sections outside
+    the schema, like Android's ``authSettings``) are kept as-is rather than dropped.
+    """
+    merged = deepcopy(original)
+    for key, value in updates.items():
+        existing = merged.get(key)
+        if isinstance(value, dict) and isinstance(existing, dict):
+            merged[key] = _merge(existing, value)
+        else:
+            merged[key] = value
+    return merged
+
+
 # =========================================================================== #
 # Main menu
 # =========================================================================== #
@@ -330,14 +346,17 @@ class AppConfigScreen(Screen):
     # --- form callbacks ----------------------------------------------------
 
     def _on_save(self, values: dict[str, Any]) -> None:
-        config = fields_to_data(values)
-        result = validate_app_config_data(config)
+        schema_data = fields_to_data(values)
+        result = validate_app_config_data(schema_data)
         if not result.valid:
             self.status_kind = "error"
             self.status_msg = f"Validation failed: {result.errors[0]}"
             return
 
+        config = _merge(self._data, schema_data)
+
         save_app_config(config)
+        self._data = config
         self.status_kind = "info"
         self.status_msg = "Saved app-config.json. Running clean generateVonageConfig..."
         self.running = True
