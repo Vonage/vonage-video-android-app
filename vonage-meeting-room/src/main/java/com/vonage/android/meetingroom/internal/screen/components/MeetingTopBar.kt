@@ -38,6 +38,7 @@ import com.vonage.android.settings.ui.SettingsIcon
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 
+@Suppress("LongParameterList")
 @Composable
 internal fun MeetingTopBar(
     roomName: String,
@@ -47,6 +48,7 @@ internal fun MeetingTopBar(
     onToggleAudioDeviceSelector: () -> Unit,
     modifier: Modifier = Modifier,
     allowSettings: Boolean = true,
+    allowCameraControl: Boolean = true,
 ) {
     VonageTopAppBar(
         modifier = modifier,
@@ -85,12 +87,14 @@ internal fun MeetingTopBar(
             }
         },
         actions = {
-            IconButton(
-                modifier = Modifier
-                    .testTag(TOP_BAR_CAMERA_SWITCH_ACTION),
-                onClick = actions.onCameraSwitch,
-            ) {
-                CameraSwitchIcon()
+            if (allowCameraControl) {
+                IconButton(
+                    modifier = Modifier
+                        .testTag(TOP_BAR_CAMERA_SWITCH_ACTION),
+                    onClick = actions.onCameraSwitch,
+                ) {
+                    CameraSwitchIcon()
+                }
             }
 
             audioDevicesState?.let {

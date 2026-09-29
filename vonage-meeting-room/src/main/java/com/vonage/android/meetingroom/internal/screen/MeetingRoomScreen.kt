@@ -239,6 +239,7 @@ internal fun MeetingRoomScreen(
                             archivingUiState = uiState.archivingUiState,
                             actions = actions,
                             allowSettings = uiState.allowSettings,
+                            allowCameraControl = uiState.allowCameraControl,
                             onToggleAudioDeviceSelector = {
                                 showAudioOutputs = !showAudioOutputs
                             },

@@ -154,6 +154,8 @@ internal fun BottomBar(
     }
     val visibleActions = allActions.take(actionsVisibleCount)
     val overflowActions = allActions.drop(actionsVisibleCount)
+    val hasMoreActions = overflowActions.isNotEmpty() ||
+        MeetingRoomFeature.REACTIONS in state.enabledFeatures
 
     Row(
         modifier = modifier
@@ -167,6 +169,7 @@ internal fun BottomBar(
             roomActions = roomActions,
             allowMicrophoneControl = state.allowMicrophoneControl,
             allowCameraControl = state.allowCameraControl,
+            allowMoreActions = hasMoreActions,
             onShowMore = { showMoreActions = !showMoreActions },
         ) {
             visibleActions.forEach { action ->
