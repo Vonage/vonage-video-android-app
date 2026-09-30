@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.okta.VonageOktaAuth
+import com.vonage.android.okta.ui.AuthenticationRequiredSheet
 import com.vonage.android.okta.ui.SignInButton
 import com.vonage.android.util.pip.pipEffect
 
@@ -39,6 +40,15 @@ internal fun LandingScreenRoute(
             SignInButton(auth = oktaAuth)
         },
     )
+
+    // Shown when the backend rejects the room with 401; only reachable with the okta flavor enabled.
+    if ((uiState as? LandingScreenUiState.Content)?.authRequiredRoomName != null) {
+        AuthenticationRequiredSheet(
+            auth = oktaAuth,
+            onAuthenticated = viewModel::onAuthenticated,
+            onDismiss = viewModel::onAuthenticationDismissed,
+        )
+    }
 }
 
 object LandingScreenTestTags {
