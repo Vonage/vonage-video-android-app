@@ -1,0 +1,30 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  s_85eaa321d41fa1::t_69fcf40e504c0c 242
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/bottombar/BottomBar.kt
+  s_85eaa321d41fa1::t_4f68dd11ee0736 157-158,172
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/bottombar/CallControlBar.kt
+  s_85eaa321d41fa1::t_2728a7dff89cf3 38
+  s_85eaa321d41fa1::t_cb4c3020743546 47
+vonage-meeting-room/src/androidTest/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreenTest.kt
+  s_85eaa321d41fa1::t_4fbd695f5e1894 130-152
+  s_85eaa321d41fa1::t_825309c5e49d0e 31,35
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/MeetingTopBar.kt
+  s_85eaa321d41fa1::t_0a91c253ce7d82 41
+  s_85eaa321d41fa1::t_eca7845d22148e 51,90-97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "af06c5bb3a60102e26951034664fc9564704d006",
+  "prompts": {},
+  "sessions": {
+    "s_85eaa321d41fa1": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_a81a963d-006b-4cde-bab4-429032c8c329",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+app/src/main/java/com/vonage/android/config/Config.kt
+  c8424487d92223a6 6
+docs/AUTHENTICATION.md
+  c8424487d92223a6 34
+tools/config-tui-py/vonage_config_tui/validator.py
+  c8424487d92223a6 22,26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "vonage-override-1.0.0",
+  "base_commit_sha": "011d1359d9b3965ba90650d48a4116a2216e0125",
+  "prompts": {
+    "c8424487d92223a6": {
+      "agent_id": {
+        "tool": "manolocode",
+        "id": "37fa17ff-db05-43a3-848b-ce70bc386a92",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-09-28T09:59:20.256Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (manolocode/auto).",
+          "timestamp": "2026-09-28T09:59:20.256Z"
+        }
+      ],
+      "total_additions": 4,
+      "total_deletions": 63,
+      "accepted_lines": 4,
+      "overriden_lines": 0
+    }
+  }
+}
