@@ -82,6 +82,8 @@ fun SignInButton(
     if (showSignInSheet) {
         SignInSheet(
             auth = auth,
+            subtitle = stringResource(R.string.auth_sign_in_subtitle),
+            onSignedIn = { showSignInSheet = false },
             onDismiss = { showSignInSheet = false },
         )
     }
@@ -96,10 +98,34 @@ fun SignInButton(
     }
 }
 
+/**
+ * Sign-in sheet shown when the backend rejects a request because the user is not
+ * authenticated (e.g. creating or joining a room). [onAuthenticated] is invoked once
+ * the browser sign-in completes so the caller can resume the interrupted action.
+ * The disabled flavor renders nothing and dismisses immediately.
+ */
+@Composable
+fun AuthenticationRequiredSheet(
+    auth: VonageOktaAuth,
+    onAuthenticated: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SignInSheet(
+        auth = auth,
+        subtitle = stringResource(R.string.auth_required_subtitle),
+        onSignedIn = onAuthenticated,
+        onDismiss = onDismiss,
+        modifier = modifier,
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SignInSheet(
     auth: VonageOktaAuth,
+    subtitle: String,
+    onSignedIn: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -125,7 +151,7 @@ private fun SignInSheet(
                 modifier = Modifier.testTag(AuthTestTags.SIGN_IN_TITLE_TAG),
             )
             Text(
-                text = stringResource(R.string.auth_sign_in_subtitle),
+                text = subtitle,
                 style = VonageVideoTheme.typography.bodyBase,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.testTag(AuthTestTags.SIGN_IN_SUBTITLE_TAG),
@@ -148,7 +174,7 @@ private fun SignInSheet(
                             isLoading = true
                             errorMessage = null
                             auth.signIn(context)
-                                .onSuccess { onDismiss() }
+                                .onSuccess { onSignedIn() }
                                 .onFailure { error ->
                                     errorMessage = error.message
                                         ?: context.getString(R.string.auth_sign_in_error)
