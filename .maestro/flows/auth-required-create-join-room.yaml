@@ -1,0 +1,81 @@
+appId: ${APP_ID}
+---
+# E2E Test: Unauthenticated user is asked to sign in before creating or joining a room
+# Description: With authentication enabled (authSettings.allowAuthentication = true) and a
+#   backend that enforces it (GET /session/{room} returns 401 without a valid token),
+#   tapping "Create room" or "Join" opens the sign-in sheet instead of the waiting room.
+# Priority: P1
+
+# clearState wipes the stored Okta credential so the user starts signed out
+- launchApp:
+    clearState: true
+    permissions:
+      camera: allow
+      microphone: allow
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- assertVisible:
+    id: "landing-screen"
+
+# Auth entry point is only rendered when the okta flavor is enabled
+- assertVisible:
+    id: "auth-button"
+
+# --- Create room ---
+- tapOn:
+    id: "landing-screen-create-room-button"
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- assertVisible:
+    id: "auth-sign-in-screen"
+
+- assertVisible:
+    id: "auth-sign-in-provider-okta"
+
+- assertNotVisible:
+    id: "waiting-room-screen"
+
+- takeScreenshot: 01-auth-required-create-room
+
+# Dismissing the sheet keeps the user on the landing screen
+- back
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- assertNotVisible:
+    id: "auth-sign-in-screen"
+
+- assertVisible:
+    id: "landing-screen"
+
+# --- Join room ---
+- tapOn:
+    id: "room-name-input"
+
+- eraseText
+
+- inputText: "${ROOM_NAME}"
+
+- hideKeyboard
+
+- tapOn:
+    id: "join-waiting-room-button"
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- assertVisible:
+    id: "auth-sign-in-screen"
+
+- assertVisible:
+    id: "auth-sign-in-provider-okta"
+
+- assertNotVisible:
+    id: "waiting-room-screen"
+
+- takeScreenshot: 02-auth-required-join-room
