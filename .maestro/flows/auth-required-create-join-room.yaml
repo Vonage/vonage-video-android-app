@@ -8,14 +8,15 @@ appId: ${APP_ID}
 #   flow does not depend on the backend's authentication middleware being active.
 # Priority: P1
 
-# clearState wipes the stored Okta credential so the user starts signed out
+# clearState wipes the stored Okta credential so the user starts signed out. It also
+# revokes the permissions CI granted with `pm grant`, so grant all of them again;
+# otherwise later flows hit the system permission dialog in the waiting room.
 - launchApp:
     clearState: true
     arguments:
       e2eForceAuthRequired: true
     permissions:
-      camera: allow
-      microphone: allow
+      all: allow
 
 - waitForAnimationToEnd:
     timeout: 5000

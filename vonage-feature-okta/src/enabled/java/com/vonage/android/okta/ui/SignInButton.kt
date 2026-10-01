@@ -23,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.components.VonageOutlinedButton
@@ -136,7 +138,9 @@ private fun SignInSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        modifier = modifier.testTag(AuthTestTags.SIGN_IN_SHEET_TAG),
+        modifier = modifier
+            .testTag(AuthTestTags.SIGN_IN_SHEET_TAG)
+            .exposeTestTagsAsResourceIds(),
     ) {
         Column(
             modifier = Modifier
@@ -204,7 +208,9 @@ private fun AccountSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        modifier = modifier.testTag(AuthTestTags.ACCOUNT_MENU_TAG),
+        modifier = modifier
+            .testTag(AuthTestTags.ACCOUNT_MENU_TAG)
+            .exposeTestTagsAsResourceIds(),
     ) {
         Column(
             modifier = Modifier
@@ -240,3 +246,11 @@ private fun AccountSheet(
 }
 
 private val providers = listOf(IdProvider.okta)
+
+/**
+ * A bottom sheet is composed in its own window, so it does not inherit the
+ * `testTagsAsResourceId` set on the activity root; without this, Maestro cannot find
+ * the sheet's test tags.
+ */
+private fun Modifier.exposeTestTagsAsResourceIds(): Modifier =
+    semantics { testTagsAsResourceId = true }
