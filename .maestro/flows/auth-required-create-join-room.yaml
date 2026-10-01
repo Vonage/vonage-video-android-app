@@ -1,14 +1,18 @@
 appId: ${APP_ID}
 ---
 # E2E Test: Unauthenticated user is asked to sign in before creating or joining a room
-# Description: With authentication enabled (authSettings.allowAuthentication = true) and a
-#   backend that enforces it (GET /session/{room} returns 401 without a valid token),
-#   tapping "Create room" or "Join" opens the sign-in sheet instead of the waiting room.
+# Description: With authentication enabled (authSettings.allowAuthentication = true),
+#   tapping "Create room" or "Join" while signed out opens the sign-in sheet instead of the
+#   waiting room. The `e2eForceAuthRequired` launch argument makes the app answer signed-out
+#   GET /session/{room} requests with 401 locally (E2eForceUnauthorizedInterceptor), so the
+#   flow does not depend on the backend's authentication middleware being active.
 # Priority: P1
 
 # clearState wipes the stored Okta credential so the user starts signed out
 - launchApp:
     clearState: true
+    arguments:
+      e2eForceAuthRequired: true
     permissions:
       camera: allow
       microphone: allow
