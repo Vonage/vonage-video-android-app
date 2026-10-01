@@ -1,0 +1,26 @@
+app/src/main/java/com/vonage/android/di/RetrofitModule.kt
+  s_b71c7cb2046950::t_ce6c8014cc971b 6,28,42-43
+app/src/main/java/com/vonage/android/util/E2eTestFlags.kt
+  s_b71c7cb2046950::t_ce6c8014cc971b 1-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "66e4f362fe81b218568fe89f7dc01621210a5f55",
+  "prompts": {},
+  "humans": {
+    "h_4202290f411bdc": {
+      "author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_b71c7cb2046950": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "12846056-dc81-4dbf-9617-6e1afa8ba024",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  }
+}
