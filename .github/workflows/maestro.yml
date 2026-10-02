@@ -69,7 +69,15 @@ jobs:
 
       - name: Generate config
         run: |
+          # E2E builds always enable authentication so the sign-in flows can be tested;
+          # the committed default (false) is left untouched for regular builds.
+          jq '.authSettings.allowAuthentication = true' app-config.json > "$RUNNER_TEMP/app-config.json"
+          cp "$RUNNER_TEMP/app-config.json" app-config.json
           ./gradlew generateVonageConfig --info --stacktrace
+          grep -q '^vonage\.auth\.allow_authentication=true' gradle/generated-config.properties || {
+            echo "Generated config does not enable authentication."
+            exit 1
+          }
           grep -Eq '^vonage\.baseApiUrl=https?://' gradle/generated-config.properties || {
             echo "Generated config does not contain a valid http(s) vonage.baseApiUrl."
             exit 1

@@ -3,6 +3,7 @@ package com.vonage.android.di
 import com.vonage.android.BuildConfig
 import com.vonage.android.data.network.APIService
 import com.vonage.android.data.network.interceptor.AuthorizationInterceptor
+import com.vonage.android.data.network.interceptor.E2eForceUnauthorizedInterceptor
 import com.vonage.android.data.network.interceptor.VeraHeaderRequestDecorator
 import dagger.Module
 import dagger.Provides
@@ -24,6 +25,7 @@ object RetrofitModule {
     @Singleton
     fun provideHttpClient(
         authorizationInterceptor: AuthorizationInterceptor,
+        e2eForceUnauthorizedInterceptor: E2eForceUnauthorizedInterceptor,
     ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(
             HttpLoggingInterceptor()
@@ -37,6 +39,8 @@ object RetrofitModule {
         )
         .addInterceptor(VeraHeaderRequestDecorator())
         .addInterceptor(authorizationInterceptor)
+        // Must stay after authorizationInterceptor; no-op unless an E2E flow enables it.
+        .addInterceptor(e2eForceUnauthorizedInterceptor)
         .build()
 
     @Provides
