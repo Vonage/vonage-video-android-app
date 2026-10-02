@@ -1,16 +1,17 @@
 appId: ${APP_ID}
 ---
 # E2E Test: Unauthenticated user is asked to sign in before creating or joining a room
-# Description: With authentication enabled (authSettings.allowAuthentication = true),
-#   tapping "Create room" or "Join" while signed out opens the sign-in sheet instead of the
-#   waiting room. The `e2eForceAuthRequired` launch argument makes the app answer signed-out
+# Description: Tapping "Create room" or "Join" while signed out opens the sign-in sheet
+#   instead of the waiting room.
+#   The `e2eForceAuthRequired` launch argument makes the app answer signed-out
 #   GET /session/{room} requests with 401 locally (E2eForceUnauthorizedInterceptor), so the
 #   flow does not depend on the backend's authentication middleware being active.
+# Requires: a build with authSettings.allowAuthentication = true (okta flavor enabled).
+#   The Maestro CI workflow always builds with it enabled.
 # Priority: P1
 
 # clearState wipes the stored Okta credential so the user starts signed out. It also
-# revokes the permissions CI granted with `pm grant`, so grant all of them again;
-# otherwise later flows hit the system permission dialog in the waiting room.
+# revokes the permissions CI granted with `pm grant`, so grant all of them again.
 - launchApp:
     clearState: true
     arguments:
@@ -24,7 +25,7 @@ appId: ${APP_ID}
 - assertVisible:
     id: "landing-screen"
 
-# Auth entry point is only rendered when the okta flavor is enabled
+# Fails fast if the build does not have authentication enabled
 - assertVisible:
     id: "auth-button"
 
