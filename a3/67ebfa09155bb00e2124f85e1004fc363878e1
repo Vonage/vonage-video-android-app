@@ -1,0 +1,31 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/data/MeetingRoomNetworkFactory.kt
+  s_27228da0d4cb57::t_a109f2af9073b3 21-24
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  s_27228da0d4cb57::t_39ee214b2f49ce 172-173
+  s_27228da0d4cb57::t_549c3236c8db23 174
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelSessionKeyTest.kt
+  s_27228da0d4cb57::t_3d353089de842d 1-140
+app/src/main/java/com/vonage/android/di/RetrofitModule.kt
+  s_27228da0d4cb57::t_324fd6aa2144b7 7
+  s_27228da0d4cb57::t_4a430752e53d0c 30-33
+vonage-video-shared/src/test/java/com/vonage/android/shared/network/RedactSecretsTest.kt
+  s_27228da0d4cb57::t_f9136e02406b2d 1-24
+vonage-video-shared/src/main/java/com/vonage/android/shared/network/redactSecrets.kt
+  s_27228da0d4cb57::t_c7a26b8d92350d 1-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a367ebfa09155bb00e2124f85e1004fc363878e1",
+  "prompts": {},
+  "sessions": {
+    "s_27228da0d4cb57": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_ec58b881-3c3f-4d0b-986b-8dea032e9695",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
