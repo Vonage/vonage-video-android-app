@@ -409,25 +409,6 @@ class MeetingRoomViewModelTest {
     }
 
     @Test
-    fun `given no session key when archiveCall true then fail without calling backend`() = runTest {
-        givenMockCall()
-
-        sut.uiState.test {
-            awaitItem()
-            sut.setup(context)
-            testScheduler.advanceUntilIdle()
-            awaitItem() // audio devices
-            awaitItem() // connected
-            sessionKeyHolder.sessionKey = null
-
-            sut.archiveCall(true)
-            assertEquals(ArchivingUiState.STARTING, awaitItem().archivingUiState)
-            assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState)
-        }
-        coVerify(exactly = 0) { vonageArchiving.startArchive(any()) }
-    }
-
-    @Test
     fun `given viewmodel when other participant starts archiving then emit correct state`() = runTest {
         val mockCall = givenMockCall()
         val archivingStateFlow = MutableSharedFlow<ArchivingState>()

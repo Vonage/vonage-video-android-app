@@ -169,6 +169,9 @@ internal class MeetingRoomViewModel(
         roomName: String,
     ) {
         viewModelScope.launch {
+            // The user may have left while the session was being fetched: never connect or
+            // publish this session's key, it could overwrite the key of a newer meeting room.
+            if (callEnded.get()) return@launch
             call = container.videoClient.initializeSession(
                 apiKey = sessionInfo.applicationId,
                 sessionId = sessionInfo.sessionId,

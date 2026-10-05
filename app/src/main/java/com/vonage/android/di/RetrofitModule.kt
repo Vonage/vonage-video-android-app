@@ -4,6 +4,7 @@ import com.vonage.android.BuildConfig
 import com.vonage.android.data.network.APIService
 import com.vonage.android.data.network.interceptor.AuthorizationInterceptor
 import com.vonage.android.data.network.interceptor.VeraHeaderRequestDecorator
+import com.vonage.android.shared.network.redactSecrets
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,7 +27,10 @@ object RetrofitModule {
         authorizationInterceptor: AuthorizationInterceptor,
     ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(
-            HttpLoggingInterceptor()
+            // Bodies carry the session key and client token: mask them before logging.
+            HttpLoggingInterceptor { message ->
+                HttpLoggingInterceptor.Logger.DEFAULT.log(message.redactSecrets())
+            }
                 .apply {
                     level = if (BuildConfig.DEBUG) {
                         HttpLoggingInterceptor.Level.BODY
