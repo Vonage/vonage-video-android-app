@@ -5,6 +5,8 @@ import com.vonage.android.data.network.APIService
 import com.vonage.android.data.network.interceptor.AuthorizationInterceptor
 import com.vonage.android.data.network.interceptor.E2eForceUnauthorizedInterceptor
 import com.vonage.android.data.network.interceptor.VeraHeaderRequestDecorator
+import com.vonage.android.shared.session.SessionApiService
+import com.vonage.android.shared.session.SessionRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -64,5 +66,15 @@ object RetrofitModule {
     @Singleton
     fun provideApiService(retrofit: Retrofit): APIService = retrofit
         .create(APIService::class.java)
+
+    /**
+     * Shared session data layer (also used by `vonage-meeting-room` with its own client).
+     * Built on the app's Retrofit so the Authorization and E2E interceptors apply.
+     */
+    @Provides
+    @Singleton
+    fun provideSessionRepository(retrofit: Retrofit): SessionRepository = SessionRepository(
+        apiService = retrofit.create(SessionApiService::class.java),
+    )
 
 }

@@ -1,32 +1,28 @@
 package com.vonage.android.data
 
-import com.vonage.android.data.network.APIService
 import com.vonage.android.okta.VonageOktaAuth
-import java.io.IOException
-import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
+import com.vonage.android.shared.session.SessionRepository
+import com.vonage.android.shared.session.SessionUnauthorizedException
 import javax.inject.Inject
 
 /**
  * Decides whether the user must sign in before creating or joining a room.
  *
- * Authentication is only requested when the optional Okta feature is compiled in **and**
- * the backend actually rejects the session request with `401 Unauthorized`. Backends
- * without the authentication middleware keep working without forcing a sign-in.
+ * Only probes the backend when authentication is enabled in the build config
+ * (`authSettings.allowAuthentication`); a `401` from the session endpoint is the sole
+ * trigger for asking the user to sign in. Backends without the authentication middleware
+ * keep working without forcing a sign-in.
  */
 class RoomAccessRepository @Inject constructor(
-    private val apiService: APIService,
+    private val sessionRepository: SessionRepository,
     private val oktaAuth: VonageOktaAuth,
 ) {
 
     suspend fun requiresAuthentication(roomName: String): Boolean {
         if (!oktaAuth.isCapable) return false
-        return try {
-            // The Authorization header (if any) is attached by AuthorizationInterceptor,
-            // so an expired, non-refreshable session is also reported as unauthorized.
-            apiService.getSession(roomName).code() == HTTP_UNAUTHORIZED
-        } catch (_: IOException) {
-            // Connectivity problems are surfaced later by the meeting room itself.
-            false
-        }
+        // The Authorization header (if any) is attached by AuthorizationInterceptor, so an
+        // expired, non-refreshable session is also reported as unauthorized. Any other failure
+        // (network, server error) is surfaced later by the meeting room itself.
+        return sessionRepository.getSession(roomName).exceptionOrNull() is SessionUnauthorizedException
     }
 }

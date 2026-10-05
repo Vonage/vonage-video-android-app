@@ -10,7 +10,7 @@
 | `waiting-room-controls-enabled.yaml` | Verify mic/camera enabled by default and persist in meeting |
 | `waiting-room-controls-disabled.yaml` | Toggle mic/camera off in waiting room, verify disabled in meeting |
 | `github-repo-link.yaml` | Verify GitHub repo button is visible on landing screen |
-| `auth-required-create-join-room.yaml` | Signed-out user taps Create / Join → sign-in sheet is shown instead of the waiting room |
+| `auth-required-create-join-room.yaml` | Signed-out user taps Create / Join while the backend answers 401 (simulated) → sign-in sheet instead of the waiting room. Needs `authSettings.allowAuthentication: true` (always on in the Maestro CI build) |
 
 ## Disabled
 
