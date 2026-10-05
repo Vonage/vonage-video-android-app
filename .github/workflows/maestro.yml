@@ -118,7 +118,9 @@ jobs:
 
       - name: Build release APK (minified, signed with fallback debug key)
         run: |
-          ./gradlew :app:assembleRelease --stacktrace
+          # -Pvonage.e2eHooks=true enables the Maestro launch-argument hooks (fake 401, fake
+          # Okta sign-in) in this release build only; store release builds ignore them.
+          ./gradlew :app:assembleRelease -Pvonage.e2eHooks=true --stacktrace
 
       - name: AVD cache
         uses: actions/cache@v4

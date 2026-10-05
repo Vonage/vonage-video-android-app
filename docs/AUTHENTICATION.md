@@ -177,6 +177,8 @@ The Maestro flow `.maestro/flows/auth-required-create-join-room.yaml` covers the
 
 The Maestro CI workflow always builds with `allowAuthentication: true` (it overrides the committed default before generating the config), so this flow runs on every E2E run. The other flows are unaffected: the backend does not enforce authentication for them, and they are launched without the argument. Locally, enable the flag before running this flow.
 
-> The switch ships in release builds too (CI runs the release APK). It is off by default, only affects signed-out session requests, and can at most force the sign-in prompt — it never bypasses authentication.
+`.maestro/flows/auth-login-logout.yaml` covers sign-in and sign-out from the top-bar button. It passes `e2eFakeSignIn`, which swaps the Okta browser step for `FakeBrowserSignInProvider` (instant success as "E2E Test User", token kept in memory), so they need no Okta tenant, credentials or App Link verification. The Okta hosted page and the redirect back to the app are therefore not covered by E2E tests.
+
+> These launch-argument hooks are only honoured when `BuildConfig.E2E_HOOKS_ENABLED` is set: always in debug builds, and in release only when built with `-Pvonage.e2eHooks=true` (the Maestro CI build). Store release builds ignore them.
 
 Compose test tags on the auth UI (`auth-button`, `auth-sign-in-screen`, `auth-sign-in-provider-okta`, `auth-account-menu`, `auth-sign-out-button`, …) are aligned with the iOS accessibility identifiers so Maestro E2E flows can be shared across platforms.
