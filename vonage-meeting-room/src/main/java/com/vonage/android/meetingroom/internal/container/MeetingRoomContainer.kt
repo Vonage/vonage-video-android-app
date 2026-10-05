@@ -14,6 +14,7 @@ import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.sdk.VonageSdkFactory
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
+import com.vonage.android.meetingroom.api.SessionKeyHolder
 import com.vonage.android.meetingroom.internal.data.MeetingRoomApiService
 import com.vonage.android.meetingroom.internal.data.MeetingRoomNetworkFactory
 import com.vonage.android.meetingroom.internal.data.MeetingRoomSessionRepository
@@ -57,6 +58,10 @@ internal class MeetingRoomContainer(
 
     val sessionRepository: MeetingRoomSessionRepository by lazy {
         MeetingRoomSessionRepository(apiService)
+    }
+
+    val sessionKeyHolder: SessionKeyHolder by lazy {
+        prebuilt.sessionKeyHolder ?: SessionKeyHolder()
     }
 
     private val chatSignalPlugin: ChatSignalPlugin by lazy {

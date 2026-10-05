@@ -1,8 +1,13 @@
 package com.vonage.android.meetingroom.internal.data
 
+import com.vonage.android.shared.network.SessionKeyRequest
+import com.vonage.android.shared.network.TrpcResponse
+import com.vonage.android.shared.network.TrpcResult
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody
 import org.junit.jupiter.api.Test
 import retrofit2.Response
@@ -15,84 +20,124 @@ class MeetingRoomSessionRepositoryTest {
     private val sut = MeetingRoomSessionRepository(apiService)
 
     @Test
-    fun `given api success returns mapped SessionInfo`() = runTest {
-        coEvery { apiService.getSession(any()) } returns Response.success(
-            GetSessionResponse(
-                apiKey = "apiKey",
-                sessionId = "sessionId",
-                token = "token",
-                captionsId = null,
-            )
-        )
+    fun `given both calls succeed returns mapped SessionInfo`() = runTest {
+        givenCreateSessionSucceeds()
+        givenJoinSessionSucceeds()
 
-        val result = sut.getSession("any-room-name")
+        val result = sut.getSession(ROOM_NAME)
 
         assertEquals(
             Result.success(
                 SessionInfo(
-                    apiKey = "apiKey",
+                    applicationId = "applicationId",
                     sessionId = "sessionId",
                     token = "token",
-                    captionsId = null,
+                    sessionKey = SESSION_KEY,
                 )
             ),
             result,
         )
+        coVerify { apiService.createSession(CreateSessionRequest(ROOM_NAME)) }
+        coVerify { apiService.joinSession(SessionKeyRequest(SESSION_KEY)) }
     }
 
     @Test
-    fun `given api success with captionsId returns mapped SessionInfo with captionsId`() = runTest {
-        coEvery { apiService.getSession(any()) } returns Response.success(
-            GetSessionResponse(
-                apiKey = "apiKey",
-                sessionId = "sessionId",
-                token = "token",
-                captionsId = "captionsId",
-            )
-        )
+    fun `given createSession error response returns failure without joining`() = runTest {
+        coEvery { apiService.createSession(any()) } returns Response.error(400, ResponseBody.EMPTY)
 
-        val result = sut.getSession("any-room-name")
-
-        assertEquals(
-            Result.success(
-                SessionInfo(
-                    apiKey = "apiKey",
-                    sessionId = "sessionId",
-                    token = "token",
-                    captionsId = "captionsId",
-                )
-            ),
-            result,
-        )
-    }
-
-    @Test
-    fun `given api success with null body returns failure`() = runTest {
-        coEvery { apiService.getSession(any()) } returns Response.success(null)
-
-        val result = sut.getSession("any-room-name")
+        val result = sut.getSession(ROOM_NAME)
 
         assertTrue(result.isFailure)
-        assertEquals("Empty response", result.exceptionOrNull()?.message)
+        assertEquals("Failed creating session", result.exceptionOrNull()?.message)
+        coVerify(exactly = 0) { apiService.joinSession(any()) }
     }
 
     @Test
-    fun `given api error response returns failure`() = runTest {
-        coEvery { apiService.getSession(any()) } returns Response.error(500, ResponseBody.EMPTY)
+    fun `given createSession null body returns failure`() = runTest {
+        coEvery { apiService.createSession(any()) } returns Response.success(null)
 
-        val result = sut.getSession("any-room-name")
+        val result = sut.getSession(ROOM_NAME)
 
         assertTrue(result.isFailure)
-        assertEquals("Failed getting session", result.exceptionOrNull()?.message)
+        assertEquals("Failed creating session", result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun `given joinSession error response returns failure`() = runTest {
+        givenCreateSessionSucceeds()
+        coEvery { apiService.joinSession(any()) } returns Response.error(500, ResponseBody.EMPTY)
+
+        val result = sut.getSession(ROOM_NAME)
+
+        assertTrue(result.isFailure)
+        assertEquals("Failed joining session", result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun `given joinSession null body returns failure`() = runTest {
+        givenCreateSessionSucceeds()
+        coEvery { apiService.joinSession(any()) } returns Response.success(null)
+
+        val result = sut.getSession(ROOM_NAME)
+
+        assertTrue(result.isFailure)
+        assertEquals("Failed joining session", result.exceptionOrNull()?.message)
     }
 
     @Test
     fun `given api throws exception returns failure`() = runTest {
-        coEvery { apiService.getSession(any()) } throws Exception("Network error")
+        coEvery { apiService.createSession(any()) } throws Exception("Network error")
 
-        val result = sut.getSession("any-room-name")
+        val result = sut.getSession(ROOM_NAME)
 
         assertTrue(result.isFailure)
         assertEquals("Network error", result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun `decodes backend payloads ignoring extra fields`() {
+        val json = Json { ignoreUnknownKeys = true }
+        val create = json.decodeFromString<TrpcResponse<CreateSessionResponse>>(
+            """{"result":{"data":{"sessionId":"s","sessionKey":"k","applicationId":"a",""" +
+                """"roomName":"room","p2p":false,"partnerId":"a"}}}"""
+        )
+        val join = json.decodeFromString<TrpcResponse<JoinSessionResponse>>(
+            """{"result":{"data":{"token":"t","applicationId":"a","sessionId":"s","sessionKey":"k"}}}"""
+        )
+
+        assertEquals(CreateSessionResponse(sessionId = "s", sessionKey = "k", applicationId = "a"), create.result.data)
+        assertEquals("t", join.result.data.token)
+    }
+
+    @Test
+    fun `session info toString does not leak secrets`() {
+        val info = SessionInfo(applicationId = "a", sessionId = "s", token = "secret-token", sessionKey = "secret-key")
+
+        assertTrue("secret" !in info.toString())
+    }
+
+    private fun givenCreateSessionSucceeds() {
+        coEvery { apiService.createSession(CreateSessionRequest(ROOM_NAME)) } returns Response.success(
+            TrpcResponse(
+                TrpcResult(
+                    CreateSessionResponse(
+                        sessionId = "sessionId",
+                        sessionKey = SESSION_KEY,
+                        applicationId = "applicationId",
+                    )
+                )
+            )
+        )
+    }
+
+    private fun givenJoinSessionSucceeds() {
+        coEvery { apiService.joinSession(SessionKeyRequest(SESSION_KEY)) } returns Response.success(
+            TrpcResponse(TrpcResult(JoinSessionResponse(token = "token")))
+        )
+    }
+
+    private companion object {
+        const val ROOM_NAME = "any-room-name"
+        const val SESSION_KEY = "session-key"
     }
 }

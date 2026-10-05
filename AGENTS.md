@@ -36,7 +36,8 @@
 
 ## Architecture Notes
 
-- Session bootstrap path: `APIService.getSession()` → `SessionRepository` → `MeetingRoomViewModel.connect(...)` → `VonageVideoClient.initializeSession(...)`.
+- Session bootstrap path: `MeetingRoomApiService.createSession()` + `joinSession()` (v2 tRPC, `{result:{data}}` envelope `TrpcResponse` in `vonage-video-shared`) → `MeetingRoomSessionRepository` → `MeetingRoomViewModel.connect(...)` → `VonageVideoClient.initializeSession(...)`.
+- The v2 `sessionKey` JWT scopes archiving and captions calls. The SDK writes it to `SessionKeyHolder` (shared with the app via `MeetingRoomBuilder.sessionKeyHolder(...)` and Hilt) so the goodbye screen can list recordings. Treat it as a secret: never log it or put it in nav args.
 - `BASE_API_URL` propagates to three locations: Retrofit base URL (`RetrofitModule.kt`), deep links (`AppNavHost.kt`), and sharing links (`util/navigateToShare.kt`).
 - Hilt DI is used in `app/`. `vonage-meeting-room` uses a **manual** `MeetingRoomContainer` — do not introduce Hilt into that module.
 - Feature signal plugins (chat, reactions) are injected into `VonageVideoClient` via `SdkModule.provideVonageVideoClient(...)` in `app/`.

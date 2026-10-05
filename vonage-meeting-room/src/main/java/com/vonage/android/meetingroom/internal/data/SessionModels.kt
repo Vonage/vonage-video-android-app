@@ -4,20 +4,33 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class GetSessionResponse(
-    @SerialName("apiKey")
-    val apiKey: String,
+internal data class CreateSessionRequest(
+    @SerialName("roomName")
+    val roomName: String,
+)
+
+@Serializable
+internal data class CreateSessionResponse(
     @SerialName("sessionId")
     val sessionId: String,
+    @SerialName("sessionKey")
+    val sessionKey: String,
+    @SerialName("applicationId")
+    val applicationId: String,
+)
+
+@Serializable
+internal data class JoinSessionResponse(
     @SerialName("token")
     val token: String,
-    @SerialName("captionsId")
-    val captionsId: String? = null,
 )
 
 internal data class SessionInfo(
-    val apiKey: String,
+    val applicationId: String,
     val sessionId: String,
     val token: String,
-    val captionsId: String?,
-)
+    val sessionKey: String,
+) {
+    // Keep the session key and token out of logs.
+    override fun toString(): String = "SessionInfo(applicationId=$applicationId, sessionId=$sessionId)"
+}

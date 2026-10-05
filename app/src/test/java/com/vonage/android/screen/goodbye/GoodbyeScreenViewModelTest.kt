@@ -6,10 +6,12 @@ import com.vonage.android.archiving.Archive
 import com.vonage.android.archiving.ArchiveId
 import com.vonage.android.archiving.ArchiveStatus
 import com.vonage.android.archiving.VonageArchiving
+import com.vonage.android.meetingroom.api.SessionKeyHolder
 import com.vonage.android.util.DownloadManager
 import com.vonage.android.util.coroutines.CoroutinePoller
 import com.vonage.android.util.coroutines.CoroutinePollerFactory
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -27,10 +29,12 @@ class GoodbyeScreenViewModelTest {
 
     private val vonageArchiving: VonageArchiving = mockk()
     private val downloadManager: DownloadManager = mockk()
+    private val sessionKeyHolder = SessionKeyHolder().apply { sessionKey = ANY_SESSION_KEY }
 
     private fun sut() = GoodbyeScreenViewModel(
         roomName = ANY_ROOM_NAME,
         vonageArchiving = vonageArchiving,
+        sessionKeyProvider = sessionKeyHolder,
         downloadManager = downloadManager,
         pollerFactory = CoroutinePollerFactory { fetchData ->
             mockk<CoroutinePoller<Unit>>(relaxed = true).also { poller ->
@@ -46,7 +50,7 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel when initial state then returns archive list`() = runTest {
-        coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(archiveListAfterPolling)
+        coEvery { vonageArchiving.getRecordings(ANY_SESSION_KEY) } returns Result.success(archiveListAfterPolling)
         val sut = sut()
 
         sut.uiState.test {
@@ -61,7 +65,7 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel when archives loaded then updates state to content`() = runTest {
-        coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(archiveListAfterPolling)
+        coEvery { vonageArchiving.getRecordings(ANY_SESSION_KEY) } returns Result.success(archiveListAfterPolling)
 
         val sut = sut()
         sut.uiState.test {
@@ -76,7 +80,7 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel when archives update then emits new state`() = runTest {
-        coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns
+        coEvery { vonageArchiving.getRecordings(ANY_SESSION_KEY) } returns
                 Result.success(archiveList) andThen Result.success(archiveListAfterPolling)
 
         val sut = sut()
@@ -92,7 +96,7 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel when download available archive then delegate to download manager`() = runTest {
-        coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(archiveListAfterPolling)
+        coEvery { vonageArchiving.getRecordings(ANY_SESSION_KEY) } returns Result.success(archiveListAfterPolling)
         every { downloadManager.downloadByUrl(any()) } returns Unit
 
         val sut = sut()
@@ -111,7 +115,7 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel when download pending archive then ignore`() = runTest {
-        coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(archiveList)
+        coEvery { vonageArchiving.getRecordings(ANY_SESSION_KEY) } returns Result.success(archiveList)
         every { downloadManager.downloadByUrl(any()) } returns Unit
 
         val sut = sut()
@@ -130,7 +134,7 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel when repository fails then continues polling silently`() = runTest {
-        coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.failure(Exception("Network error"))
+        coEvery { vonageArchiving.getRecordings(ANY_SESSION_KEY) } returns Result.failure(Exception("Network error"))
 
         val sut = sut()
         sut.uiState.test {
@@ -142,7 +146,7 @@ class GoodbyeScreenViewModelTest {
     fun `given viewmodel with mixed archive states then loads correctly`() = runTest {
         val mixedArchiveList = listOf(availableArchive, pendingArchive, pendingArchive)
 
-        coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(mixedArchiveList)
+        coEvery { vonageArchiving.getRecordings(ANY_SESSION_KEY) } returns Result.success(mixedArchiveList)
 
         val sut = sut()
         sut.uiState.test {
@@ -153,6 +157,19 @@ class GoodbyeScreenViewModelTest {
                 ), awaitItem()
             )
         }
+    }
+
+    @Test
+    fun `given no session key when initialized then does not search archives`() = runTest {
+        sessionKeyHolder.sessionKey = null
+
+        val sut = sut()
+
+        sut.uiState.test {
+            assertEquals(GoodbyeScreenUiState.Idle, awaitItem())
+            expectNoEvents()
+        }
+        coVerify(exactly = 0) { vonageArchiving.getRecordings(any()) }
     }
 
     private val availableArchive = Archive(
@@ -184,5 +201,6 @@ class GoodbyeScreenViewModelTest {
 
     private companion object {
         const val ANY_ROOM_NAME = "room-name"
+        const val ANY_SESSION_KEY = "session-key"
     }
 }
