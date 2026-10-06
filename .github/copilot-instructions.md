@@ -1,6 +1,6 @@
 # Copilot Instructions
 
-Use this file as the default guidance for this repository. For deeper context, see `AGENTS.md`.
+Use this file as the default guidance for this repository. For deeper context, see `AGENTS.md` and the task-specific skills in `.claude/skills/` (setup, configure, feature-flag, new-feature-module, run-tests, record-snapshots — index in `.claude/skills/README.md`).
 
 ## Architecture First
 - `app/` is the composition root (navigation, DI, networking, orchestration). Start from `app/src/main/java/com/vonage/android/navigation/AppNavHost.kt` and `app/src/main/java/com/vonage/android/di/`.

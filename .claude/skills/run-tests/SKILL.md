@@ -38,18 +38,18 @@ A change to a `vonage-video-core` interface also needs the consumers: `vonage-me
 ./gradlew :vonage-video-ui-compose:verifyRoborazziDebug --tests '*VonageButtonScreenshotTest'
 ```
 
-Unit tests mostly use JUnit 5 (`org.junit.jupiter.api.Test`, backtick names or `given_<precondition>_THEN_<outcome>`); instrumented and Roborazzi tests use JUnit 4. Mixing the annotations is the usual cause of "no tests found".
+Most unit tests use JUnit 5 (`org.junit.jupiter.api.Test`, backtick names or `given_<precondition>_THEN_<outcome>`), including `MeetingRoomViewModelTest` and the feature modules' `testEnabled` tests. Instrumented and Roborazzi tests use JUnit 4, and a minority of older unit tests do too. Check the imports of the file instead of assuming. Mixing the annotations is the usual cause of "no tests found".
 
 ## CI-equivalent gate (what a PR must pass)
 
 ```bash
-./gradlew clean koverXmlReportDebug detekt                          # unit tests of every kover-included module + coverage XML + static analysis
+./gradlew clean koverXmlReportDebug detekt                          # unit tests of NON-flavored modules + coverage XML + static analysis
 ./gradlew :vonage-video-ui-compose:verifyRoborazziDebug             # snapshot goldens (CI checks out with lfs: true)
 ./gradlew vonage-android-logger:androidApiCheck vonage-audio-selector:androidApiCheck   # binary API dumps
 ./gradlew :app:pixelDebugAndroidTest --no-build-cache               # UI tests job (needs KVM/HAXM locally; slow)
 ```
 
-`koverXmlReportDebug` runs the debug unit-test tasks of every module except `vonage-video-ui-compose`, `vonage-video-sdk` and `vonage-config-idea-plugin` (excluded in root `build.gradle.kts`), so the snapshot module and the IDE plugin must be run separately as above. The pre-push hook (`./gradlew installGitHooks`) runs `detekt` and `git lfs pre-push` — a detekt finding blocks the push locally before CI sees it.
+`koverXmlReportDebug` only runs `testDebugUnitTest` in the **non-flavored** modules (`app`, `vonage-video-core`, `vonage-video-shared`, `vonage-android-logger`, `vonage-audio-selector`, the sample app). It does **not** execute the unit tests of `vonage-meeting-room` or any `vonage-feature-*` module, because their variants are flavored (`enabledDebug`, `archivingEnabled…Debug`) and have no plain `debug` unit-test task (verified with `./gradlew koverXmlReportDebug --dry-run`). CI only compiles those modules and runs detekt on them, so run their single-variant tasks from the routing table yourself before pushing. `vonage-video-ui-compose`, `vonage-video-sdk` and `vonage-config-idea-plugin` are excluded from kover entirely and must also be run separately. The pre-push hook (`./gradlew installGitHooks`) runs `detekt` and `git lfs pre-push` — a detekt finding blocks the push locally before CI sees it.
 
 `androidApiCheck`/`androidApiDump` are the task names here; the stock `apiCheck`/`apiDump` from the binary-compatibility-validator plugin are not registered under AGP 9 (see the workaround comment in those modules' `build.gradle.kts`). After an intentional public-API change: `./gradlew <module>:androidApiDump` and commit the `.api` file.
 

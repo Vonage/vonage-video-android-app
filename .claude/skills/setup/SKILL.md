@@ -59,7 +59,9 @@ BASE_API_URL=https://your-backend.example.com
 
 Editing the placeholder in `app-config.json` by hand is **not** sufficient on its own — the generator still demands the key — so don't recommend that route even though `docs/GETTING_STARTED.md` lists it as option 3. Keep `app-config.json` on the placeholder so the file stays interchangeable with iOS/React.
 
-Emulator against a backend on this machine: use `http://10.0.2.2:<port>`, not `localhost`. The App Link host is derived from the URL too (`manifestPlaceholders["hostName"]`), so a bare IP is fine for local work but deep links won't verify.
+Emulator against a backend on this machine: use `http://10.0.2.2:<port>`, not `localhost`. On a physical phone over USB, run `adb reverse tcp:<port> tcp:<port>` and use `http://localhost:<port>`. Leave off the trailing slash: the same string builds the Retrofit base URL, the deep link (`"$BASE_API_URL/room"`) and share links, which would get a double slash. The App Link host is derived from the URL too (`manifestPlaceholders["hostName"]`), so a bare IP is fine for local work but deep links won't verify.
+
+**Plain `http://` backends need a cleartext exception.** Both `app/src/main/AndroidManifest.xml` and `app/src/debug/AndroidManifest.xml` set `android:usesCleartextTraffic="false"`. The build succeeds, then every API call fails at runtime with `CLEARTEXT communication to 10.0.2.2 not permitted by network security policy` in logcat, and the app looks like it cannot create a room. Either serve the backend over HTTPS (a tunnel works), or add a **debug-only** `app/src/debug/res/xml/network_security_config.xml` with a `<domain-config cleartextTrafficPermitted="true">` for `10.0.2.2` / `localhost` and reference it with `android:networkSecurityConfig="@xml/network_security_config"` in the debug manifest. Never relax it in `src/main`.
 
 ## Step 4: Generate, hook, build
 
@@ -102,6 +104,7 @@ It validates against the shared cross-platform JSON schemas (fetched from the Re
 
 ## Common failures
 
+- **App builds but cannot create or join a room against a local backend** — cleartext HTTP is blocked; see Step 3. Check logcat for `CLEARTEXT communication … not permitted`.
 - **`BASE_API_URL is not configured!`** — Step 3. Note that `:vonage-video-core:testDebugUnitTest` and other non-app modules still work without it (only `:app` depends on `generateVonageConfig`); `:app:*` tasks do not.
 - **`Unrecognised top-level key(s) in the app config`** — someone added a new top-level group to `app-config.json`; the generator's key lists must be extended (`/feature-flag`, or `#vera-feature-flags` in kiro).
 - **Pre-push rejected: "git-lfs was not found"** or detekt findings — install git-lfs, run `./gradlew detekt` and fix; don't `--no-verify` past it, CI runs the same check.
