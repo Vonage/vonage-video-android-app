@@ -45,6 +45,12 @@
 - Debug builds append `.debug` to `applicationId` and `-DEBUG` to `versionName`, allowing debug and release to co-exist on device.
 - Firebase/Crashlytics plugins are **only applied for release builds** (guarded by `isReleaseBuild` check in `app/build.gradle.kts`).
 
+## AI Assistant Skills
+
+- Task-specific guides live in `.claude/skills/<name>/SKILL.md` (index: `.claude/skills/README.md`), mirrored for kiro as symlinks in `.kiro/steering/`. Use them for setup (`/setup`), configuration (`/configure`), new config keys (`/feature-flag`), new modules (`/new-feature-module`), test routing (`/run-tests`) and snapshots (`/record-snapshots`).
+- They are verified against the build, not the docs; where they disagree with a doc, trust the skill and fix the doc (`.claude/skills/EVALUATIONS.md` lists known drift).
+- Theme regeneration is `./gradlew updateTheme`, **not** `generateVonageConfig`; feature-module tests are `:<module>:testEnabledDebugUnitTest`; the binary-API tasks are `androidApiCheck` / `androidApiDump`.
+
 ## Developer Workflows
 
 ```bash
