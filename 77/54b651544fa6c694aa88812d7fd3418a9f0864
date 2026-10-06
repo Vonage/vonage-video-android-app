@@ -1,0 +1,24 @@
+app/src/debug/kotlin/com/vonage/android/DebugMainApplication.kt
+  s_27228da0d4cb57::t_5e9f829bc4cb10 4,6-7,28-40,47,49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7754b651544fa6c694aa88812d7fd3418a9f0864",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_27228da0d4cb57": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_ec58b881-3c3f-4d0b-986b-8dea032e9695",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
