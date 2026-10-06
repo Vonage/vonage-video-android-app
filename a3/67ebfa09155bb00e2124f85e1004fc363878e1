@@ -1,31 +1,44 @@
-vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/data/MeetingRoomNetworkFactory.kt
-  s_27228da0d4cb57::t_a109f2af9073b3 21-24
-vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
-  s_27228da0d4cb57::t_39ee214b2f49ce 172-173
-  s_27228da0d4cb57::t_549c3236c8db23 174
-vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelSessionKeyTest.kt
-  s_27228da0d4cb57::t_3d353089de842d 1-140
 app/src/main/java/com/vonage/android/di/RetrofitModule.kt
-  s_27228da0d4cb57::t_324fd6aa2144b7 7
-  s_27228da0d4cb57::t_4a430752e53d0c 30-33
-vonage-video-shared/src/test/java/com/vonage/android/shared/network/RedactSecretsTest.kt
-  s_27228da0d4cb57::t_f9136e02406b2d 1-24
+  5016e039230f81f5 7,30-33
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/data/MeetingRoomNetworkFactory.kt
+  5016e039230f81f5 4,21-24
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  5016e039230f81f5 172-174
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelSessionKeyTest.kt
+  5016e039230f81f5 1-140
 vonage-video-shared/src/main/java/com/vonage/android/shared/network/redactSecrets.kt
-  s_27228da0d4cb57::t_c7a26b8d92350d 1-10
+  5016e039230f81f5 1-10
+vonage-video-shared/src/test/java/com/vonage/android/shared/network/RedactSecretsTest.kt
+  5016e039230f81f5 1-24
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.7.5",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "a367ebfa09155bb00e2124f85e1004fc363878e1",
-  "prompts": {},
-  "sessions": {
-    "s_27228da0d4cb57": {
+  "prompts": {
+    "5016e039230f81f5": {
       "agent_id": {
-        "tool": "kiro",
-        "id": "sess_ec58b881-3c3f-4d0b-986b-8dea032e9695",
+        "tool": "manolocode",
+        "id": "6a93688c-b49f-4ada-8d9d-c093494bfea2",
         "model": "auto"
       },
-      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-10-06T14:20:36.675Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (manolocode/auto).",
+          "timestamp": "2026-10-06T14:20:36.675Z"
+        }
+      ],
+      "total_additions": 187,
+      "total_deletions": 21,
+      "accepted_lines": 187,
+      "overriden_lines": 0
     }
   }
 }
