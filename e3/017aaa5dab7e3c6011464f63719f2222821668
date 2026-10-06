@@ -1,0 +1,43 @@
+.maestro/TESTS.md
+  s_b71c7cb2046950::t_ce9ba8dcabaa1a 14,24-32
+.maestro/flows/auth-login-logout.yaml
+  s_b71c7cb2046950::t_ce9ba8dcabaa1a 1-110
+vonage-feature-okta/src/enabled/java/com/vonage/android/okta/data/FakeBrowserSignInProvider.kt
+  s_b71c7cb2046950::t_86f3926ed8c5ed 1-56
+vonage-feature-okta/src/disabled/java/com/vonage/android/okta/di/OktaModule.kt
+  s_b71c7cb2046950::t_86f3926ed8c5ed 13
+app/src/main/java/com/vonage/android/di/AuthModule.kt
+  s_b71c7cb2046950::t_a3018b924358bd 8,31,40
+docs/AUTHENTICATION.md
+  s_b71c7cb2046950::t_842bb71e74b646 181-182
+  s_b71c7cb2046950::t_f78712d158285d 180
+app/src/main/java/com/vonage/android/util/E2eTestFlags.kt
+  s_b71c7cb2046950::t_a3018b924358bd 4,12-14,17-22,32-39,41-42,53
+app/build.gradle.kts
+  s_b71c7cb2046950::t_a3018b924358bd 206-209,212,221
+.github/workflows/maestro.yml
+  s_b71c7cb2046950::t_ce9ba8dcabaa1a 121-123
+vonage-feature-okta/src/enabled/java/com/vonage/android/okta/di/OktaModule.kt
+  s_b71c7cb2046950::t_86f3926ed8c5ed 7,9,13-21,23-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e3017aaa5dab7e3c6011464f63719f2222821668",
+  "prompts": {},
+  "humans": {
+    "h_4202290f411bdc": {
+      "author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_b71c7cb2046950": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "12846056-dc81-4dbf-9617-6e1afa8ba024",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "aos-svg <artur.osinski@vonage.com>"
+    }
+  }
+}
