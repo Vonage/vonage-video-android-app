@@ -1,0 +1,19 @@
+app/build.gradle.kts
+  s_bd669482d8ce7c::t_4edb7e6fee343f 238
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8a77476cece2fdc3aeda70c5cca0ff2057f3d104",
+  "prompts": {},
+  "sessions": {
+    "s_bd669482d8ce7c": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_91a828e5-0757-435f-9318-56b53c26f8ff",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
