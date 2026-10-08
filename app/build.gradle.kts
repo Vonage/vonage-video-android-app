@@ -235,7 +235,7 @@ android {
 
 play {
     serviceAccountCredentials.set(rootProject.file(".sign/service_account.json"))
-    track.set("alpha")
+    track.set("production")
     releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.COMPLETED)
     artifactDir.set(file("build/outputs/bundle/release"))
     defaultToAppBundles.set(true)
