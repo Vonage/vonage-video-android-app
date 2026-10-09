@@ -7,9 +7,9 @@ import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 class CurrentDeviceTest {
 
@@ -31,29 +31,20 @@ class CurrentDeviceTest {
     fun `given no user selected device when getCurrentActiveDevice returns first available device`() =
         runTest {
             every { getDevices.invoke() } returns listOf(wiredHeadset, speaker)
-            assertEquals(
-                wiredHeadset,
-                sut.getCurrentActiveDevice(),
-            )
+            assertEquals(wiredHeadset, sut.getCurrentActiveDevice())
         }
 
     @Test
     fun `given no user selected device when getCurrentActiveDevice returns null when no available devices`() =
         runTest {
             every { getDevices.invoke() } returns listOf()
-            assertEquals(
-                null,
-                sut.getCurrentActiveDevice(),
-            )
+            assertEquals(null, sut.getCurrentActiveDevice())
         }
 
     @Test
     fun `given user selected returns user selected`() = runTest {
         sut.userSelectDevice(speaker)
-        assertEquals(
-            speaker,
-            sut.getCurrentActiveDevice(),
-        )
+        assertEquals(speaker, sut.getCurrentActiveDevice())
     }
 
     @Test
@@ -61,10 +52,7 @@ class CurrentDeviceTest {
         every { getDevices.invoke() } returns listOf(wiredHeadset, speaker)
         sut.getCurrentActiveDevice()
         sut.userSelectDevice(speaker)
-        assertEquals(
-            speaker,
-            sut.getCurrentActiveDevice(),
-        )
+        assertEquals(speaker, sut.getCurrentActiveDevice())
     }
 
     @Test
@@ -73,10 +61,7 @@ class CurrentDeviceTest {
         sut.getCurrentActiveDevice()
         sut.userSelectDevice(speaker)
         sut.reset()
-        assertEquals(
-            wiredHeadset,
-            sut.getCurrentActiveDevice(),
-        )
+        assertEquals(wiredHeadset, sut.getCurrentActiveDevice())
     }
 
     @Test

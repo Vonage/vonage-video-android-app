@@ -9,9 +9,9 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 
@@ -23,14 +23,14 @@ class AudioDevicesHandlerTest {
     private val availableDevicesFlow = MutableStateFlow(persistentListOf<AudioDevice>())
     private val activeDeviceFlow = MutableStateFlow<AudioDevice?>(null)
 
-    @Before
+    @BeforeEach
     fun setUp() {
         every { mockAudioDeviceSelector.availableDevices } returns availableDevicesFlow
         every { mockAudioDeviceSelector.activeDevice } returns activeDeviceFlow
         handler = AudioDevicesHandler(mockAudioDeviceSelector)
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         clearAllMocks()
     }

@@ -1,5 +1,6 @@
 package com.vonage.android.meetingroom.internal.factory
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,13 +12,13 @@ import androidx.compose.ui.res.stringResource
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.meetingroom.R
 
-@Suppress("UnusedParameter")
 @Composable
 internal fun ReportingContent(onDismiss: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(VonageVideoTheme.dimens.paddingLarge),
+            .padding(VonageVideoTheme.dimens.paddingLarge)
+            .clickable(onClick = onDismiss),
         contentAlignment = Alignment.Center,
     ) {
         Text(text = stringResource(R.string.report_bottombar_button_label))

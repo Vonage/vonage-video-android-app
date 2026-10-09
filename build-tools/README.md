@@ -18,7 +18,9 @@ Custom Gradle plugins and build configuration for the Vonage Video Android App.
 
 **Plugin ID**: `com.vonage.json-config`
 
-Generates Kotlin configuration classes from `config/app-config.json`.
+Generates Kotlin configuration classes from `app-config.json`, validated by the config
+TUI against a schema fetched from a canonical URL (shared with the iOS and React Vonage Video
+apps; cached locally for offline use — see `tools/config-tui-py/vonage_config_tui/validator.py`).
 
 **Configuration**:
 ```kotlin
@@ -27,7 +29,7 @@ plugins {
 }
 ```
 
-**Input** (`config/app-config.json`):
+**Input** (`app-config.json`):
 ```json
 {
   "videoSettings": {
@@ -62,7 +64,7 @@ The plugin also generates `gradle/generated-config.properties` for build-time co
 
 **Plugin ID**: `com.vonage.theme-generator`
 
-Generates Jetpack Compose theme code from `config/theme.json`.
+Generates Jetpack Compose theme code from `theme.json`.
 
 **Configuration**:
 ```kotlin
@@ -76,22 +78,26 @@ plugins {
 ./gradlew updateTheme
 ```
 
-**Input** (`config/theme.json`):
+**Input** (`theme.json`), validated by the config TUI against the unified theme schema
+fetched from `THEME_SCHEMA_URL` in `tools/config-tui-py/vonage_config_tui/validator.py`
+(shared with the iOS and React Vonage Video apps; cached locally for offline use):
 ```json
 {
-  "themes": {
-    "vonage": {
-      "colors": {
-        "light": { "primary": "#0000FF", "background": "#FFFFFF" },
-        "dark": { "primary": "#4444FF", "background": "#121212" }
-      },
-      "borderRadius": { "small": 8, "medium": 12, "large": 16 },
-      "typography": {
-        "mobile": {
-          "headline": { "font-size": "32px", "font-weight": 700 }
-        }
-      }
-    }
+  "metadata": {
+    "name": "vonage",
+    "version": "1.0.0",
+    "created": "2026-09-04",
+    "description": "Default Vonage Video app theme."
+  },
+  "colors": {
+    "light": { "primary": "#0000FF", "background": "#FFFFFF", "...": "..." },
+    "dark": { "primary": "#4444FF", "background": "#121212", "...": "..." }
+  },
+  "borderRadius": { "small": 8, "medium": 12, "large": 16 },
+  "typography": {
+    "font-family": "Inter",
+    "desktop": { "headline": { "font-size": "66px", "line-height": "88px", "font-weight": 500 } },
+    "mobile": { "headline": { "font-size": "32px", "line-height": "40px", "font-weight": 500 } }
   }
 }
 ```

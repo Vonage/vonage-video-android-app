@@ -11,13 +11,14 @@ import com.vonage.android.compose.vivid.icons.solid.Rec
 @Composable
 fun RecordingIndicator(
     modifier: Modifier = Modifier,
+    contentDescription: String? = null,
 ) {
     Pulsating {
         Icon(
             modifier = modifier,
             imageVector = VividIcons.Solid.Rec,
             tint = Color.Red,
-            contentDescription = null,
+            contentDescription = contentDescription,
         )
     }
 }

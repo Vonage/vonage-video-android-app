@@ -1,8 +1,22 @@
 package com.vonage.android.core
 
+import com.vonage.android.shared.ViewEvent
+import com.vonage.android.shared.ViewState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+
+/**
+ * Base class for the dependency bundle provided to every [ViewAction] dispatched by a [BaseViewModel].
+ *
+ * Subclass this to expose the repositories, holders, or use-cases a particular screen needs.
+ * The [coroutineScope] is typically backed by [androidx.lifecycle.viewModelScope].
+ */
+abstract class ActionDependencies {
+    /** Coroutine scope used by actions that need to launch long-running or concurrent work. */
+    abstract val coroutineScope: CoroutineScope
+}
 
 /**
  * A discrete, self-contained unit of business logic that can be [dispatched][BaseViewModel.dispatch]

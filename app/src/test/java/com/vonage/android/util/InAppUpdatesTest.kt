@@ -23,9 +23,9 @@ import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class InAppUpdatesTest {
 
@@ -35,7 +35,7 @@ class InAppUpdatesTest {
     private val mockToast: Toast = mockk(relaxed = true)
     private lateinit var capturedCallback: ActivityResultCallback<ActivityResult>
 
-    @Before
+    @BeforeEach
     fun setUp() {
         mockkStatic(AppUpdateManagerFactory::class)
         mockkStatic(AppUpdateManager::requestUpdateFlow)
@@ -56,7 +56,7 @@ class InAppUpdatesTest {
         }
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         clearAllMocks()
         unmockkAll()

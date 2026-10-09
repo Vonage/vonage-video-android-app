@@ -50,10 +50,12 @@ class MeetingRoomBuilder(
     private var theme: MeetingRoomTheme = MeetingRoomTheme.vonage
     private var isDebug: Boolean = false
     private var reportingContent: (@Composable (() -> Unit) -> Unit)? = null
+    private var testSpeakerContent: (@Composable () -> Unit)? = null
     private var permissionContent: (@Composable (List<String>, () -> Unit) -> Unit)? = null
     private var foregroundServiceEnabled: Boolean = true
     private var additionalBottomBarActions: StateFlow<List<MeetingRoomBottomBarAction>>? = null
     private var customBottomBar: (@Composable (MeetingRoomBottomBarState, MeetingRoomCustomActions) -> Unit)? = null
+    private var authTokenProvider: MeetingRoomAuthTokenProvider? = null
 
     /**
      * Defines which optional features are active at runtime.
@@ -155,6 +157,20 @@ class MeetingRoomBuilder(
     }
 
     /**
+     * Provides a composable shown inside the audio output selector, above the device list.
+     *
+     * Intended for a "test speakers" control, which the SDK cannot supply itself because such a
+     * control typically depends on host-app infrastructure (media playback, dependency injection).
+     * When `null` (the default), nothing is shown and the selector lists devices only.
+     *
+     * Ignored when [MeetingRoomConfiguration.allowDeviceSelection] is `false`, since the selector
+     * is then unreachable.
+     */
+    fun testSpeakerContent(content: @Composable () -> Unit): MeetingRoomBuilder = apply {
+        testSpeakerContent = content
+    }
+
+    /**
      * Overrides the permission gate composable shown before the meeting room renders.
      *
      * The SDK invokes this composable proactively, passing:
@@ -214,6 +230,18 @@ class MeetingRoomBuilder(
     }
 
     /**
+     * Supplies an access token attached as an `Authorization: Bearer` header to every
+     * backend request made by the SDK (session fetch, archiving, captions).
+     *
+     * The provider is invoked by OkHttp on a background thread and may block. Returning
+     * null sends the request without the header, so backends without authentication
+     * keep working. Defaults to null (no header — same behavior as before).
+     */
+    fun authTokenProvider(provider: MeetingRoomAuthTokenProvider?): MeetingRoomBuilder = apply {
+        authTokenProvider = provider
+    }
+
+    /**
      * Constructs the [MeetingRoomPrebuilt] with the current configuration.
      *
      * Call [MeetingRoomPrebuilt.launch] or embed [MeetingRoomPrebuilt.content] to display the
@@ -230,11 +258,13 @@ class MeetingRoomBuilder(
         theme = theme,
         isDebug = isDebug,
         reportingContent = reportingContent,
+        testSpeakerContent = testSpeakerContent,
         permissionContent = permissionContent ?: { permissions, onGrant ->
             DefaultPermissionContent(permissions = permissions, onGrant = onGrant)
         },
         foregroundServiceEnabled = foregroundServiceEnabled,
         additionalBottomBarActions = additionalBottomBarActions,
         customBottomBar = customBottomBar,
+        authTokenProvider = authTokenProvider,
     )
 }

@@ -17,8 +17,8 @@ class VonageConfigHelper : PersistentStateComponent<VonageConfigHelper.State> {
     private var state = State()
 
     data class State(
-        var configFilePath: String = "config/app-config.json",
-        var themeFilePath: String = "config/theme.json",
+        var configFilePath: String = "app-config.json",
+        var themeFilePath: String = "theme.json",
         var autoRunGradleTasks: Boolean = true
     )
 

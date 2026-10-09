@@ -37,10 +37,10 @@ import com.vonage.android.compose.preview.buildParticipants
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.Warning
-import com.vonage.android.kotlin.ext.toggle
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.meetingroom.R
+import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
 import com.vonage.android.meetingroom.internal.util.noOpCall
@@ -65,12 +65,13 @@ internal data class BottomBarState(
     val allowShowParticipantList: Boolean,
     val allowMicrophoneControl: Boolean,
     val allowCameraControl: Boolean,
+    val enabledFeatures: Set<MeetingRoomFeature> = MeetingRoomFeature.all,
 )
 
 // 4 because mic + camera + menu + end
 const val DEFAULT_ACTIONS_COUNT = 4
 
-@Suppress("LongMethod")
+@Suppress("LongMethod", "LongParameterList")
 @Composable
 internal fun BottomBar(
     roomActions: MeetingRoomActions,
@@ -79,6 +80,7 @@ internal fun BottomBar(
     modifier: Modifier = Modifier,
     actions: ImmutableList<BottomBarActionType> = BottomBarActionType.entries.toImmutableList(),
     additionalActions: ImmutableList<BottomBarAction> = persistentListOf(),
+    allowFeedback: Boolean = true,
     reportingContent: @Composable (() -> Unit) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
@@ -112,7 +114,7 @@ internal fun BottomBar(
         call = call,
         onShowParticipants = {
             scope.launch {
-                showParticipants = showParticipants.toggle()
+                showParticipants = !showParticipants
                 moreActionsSheetState.hide()
                 showMoreActions = false
             }
@@ -128,8 +130,11 @@ internal fun BottomBar(
 
     // Reporting is always appended last as a CUSTOM action so it participates in the same
     // responsive overflow logic as the built-in buttons and host-injected extra actions.
+    // Omitted entirely when allowFeedback is false, rather than only omitting custom content,
+    // so the button and the default reporting screen never appear.
     val reportingLabel = stringResource(R.string.report_bottombar_button_label)
-    val reportingAction = remember(reportingLabel) {
+    val reportingAction = remember(reportingLabel, allowFeedback) {
+        if (!allowFeedback) return@remember null
         BottomBarAction(
             type = BottomBarActionType.CUSTOM,
             icon = VividIcons.Solid.Warning,
@@ -137,7 +142,7 @@ internal fun BottomBar(
             isSelected = false,
             onClick = {
                 scope.launch {
-                    showReporting = showReporting.toggle()
+                    showReporting = !showReporting
                     moreActionsSheetState.hide()
                     showMoreActions = false
                 }
@@ -145,10 +150,12 @@ internal fun BottomBar(
         )
     }
     val allActions = remember(bottomBarActions, additionalActions, reportingAction) {
-        (bottomBarActions + additionalActions + reportingAction).toImmutableList()
+        (bottomBarActions + additionalActions + listOfNotNull(reportingAction)).toImmutableList()
     }
     val visibleActions = allActions.take(actionsVisibleCount)
     val overflowActions = allActions.drop(actionsVisibleCount)
+    val hasMoreActions = overflowActions.isNotEmpty() ||
+        MeetingRoomFeature.REACTIONS in state.enabledFeatures
 
     Row(
         modifier = modifier
@@ -162,7 +169,8 @@ internal fun BottomBar(
             roomActions = roomActions,
             allowMicrophoneControl = state.allowMicrophoneControl,
             allowCameraControl = state.allowCameraControl,
-            onShowMore = { showMoreActions = showMoreActions.toggle() },
+            allowMoreActions = hasMoreActions,
+            onShowMore = { showMoreActions = !showMoreActions },
         ) {
             visibleActions.forEach { action ->
                 ControlButton(
@@ -180,9 +188,11 @@ internal fun BottomBar(
             onDismissRequest = { showMoreActions = false },
             sheetState = moreActionsSheetState,
         ) {
-            EmojiSelector(
-                onEmojiClick = { emoji -> roomActions.onEmojiSent(emoji) },
-            )
+            if (MeetingRoomFeature.REACTIONS in state.enabledFeatures) {
+                EmojiSelector(
+                    onEmojiClick = { emoji -> roomActions.onEmojiSent(emoji) },
+                )
+            }
             MoreActionsGrid(
                 actions = overflowActions.toImmutableList(),
             )

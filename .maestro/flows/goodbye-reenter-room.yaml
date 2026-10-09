@@ -15,7 +15,7 @@ appId: ${APP_ID}
 - tapOn:
     id: "room-name-input"
 
-- inputText: "testroom"
+- inputText: "${ROOM_NAME}"
 
 - hideKeyboard
 

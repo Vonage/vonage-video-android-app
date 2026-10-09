@@ -6,10 +6,11 @@ plugins {
 
 android {
     namespace = "com.vonage.android.archiving"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 24
+        minSdk = libs.versions.minSdk.get().toInt()
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     compileOptions {
@@ -20,6 +21,13 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+            all { it.useJUnitPlatform() }
+        }
     }
 
     flavorDimensions += "archiving"
@@ -39,6 +47,7 @@ dependencies {
     implementation(project(":vonage-video-ui-compose"))
     implementation(project(":vonage-video-core"))
     implementation(project(":vonage-video-shared"))
+    implementation(project(":vonage-android-logger"))
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.core.ktx)
@@ -47,12 +56,16 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.tooling.preview)
 
-    enabledImplementation(libs.retrofit)
+    // retrofit is shared so the disabled flavor exposes the same provider signature
+    // (provideVonageArchiving(retrofit)) as enabled; the disabled stub ignores the arg.
+    implementation(libs.retrofit)
     enabledImplementation(libs.okhttp)
 
-    testImplementation(libs.junit.junit)
+    testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(kotlin("test"))
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }

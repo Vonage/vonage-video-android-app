@@ -6,4 +6,4 @@ import retrofit2.Retrofit
 
 @Suppress("UNUSED_PARAMETER")
 internal fun createVonageArchiving(retrofit: Retrofit): VonageArchiving =
-    ArchivingModule.provideVonageArchiving()
+    ArchivingModule.provideVonageArchiving(retrofit)

@@ -1,7 +1,7 @@
 package com.vonage.android.settings
 
 import kotlinx.coroutines.test.runTest
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class NoOpCallSettingsStorageTest {

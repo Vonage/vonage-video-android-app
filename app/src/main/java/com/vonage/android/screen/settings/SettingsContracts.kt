@@ -1,7 +1,7 @@
 package com.vonage.android.screen.settings
 
 import com.vonage.android.core.ActionDependencies
-import com.vonage.android.core.ViewEvent
+import com.vonage.android.shared.ViewEvent
 import com.vonage.android.settings.CallSettingsHolder
 import kotlinx.coroutines.CoroutineScope
 

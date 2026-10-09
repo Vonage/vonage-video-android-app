@@ -6,10 +6,10 @@ plugins {
 
 android {
     namespace = "com.vonage.android.audiofx"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 24
+        minSdk = libs.versions.minSdk.get().toInt()
     }
 
     compileOptions {
@@ -20,6 +20,10 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    testOptions {
+        unitTests.all { it.useJUnitPlatform() }
     }
 
     flavorDimensions += "audiofx"
@@ -46,12 +50,14 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.opentok.android.sdk)
-    enabledImplementation(libs.opentok.android.video.transformers)
+    implementation(libs.vonage.android.sdk)
+    enabledImplementation(libs.vonage.android.video.transformers)
 
-    testImplementation(libs.junit.junit)
+    testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(kotlin("test"))
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }

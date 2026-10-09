@@ -26,6 +26,7 @@ internal fun LandingScreenContent(
     isRoomNameWrong: Boolean,
     actions: LandingScreenActions,
     modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
 ) {
     Column(
         modifier = modifier,
@@ -42,6 +43,7 @@ internal fun LandingScreenContent(
                 .fillMaxWidth()
                 .testTag(CREATE_ROOM_BUTTON_TAG),
             onClick = actions.onCreateRoomClick,
+            enabled = isEnabled,
             leadingIcon = { PlusIcon() },
         )
         OrSeparator()
@@ -52,6 +54,7 @@ internal fun LandingScreenContent(
         LandingRoomInput(
             roomName = roomName,
             isRoomNameWrong = isRoomNameWrong,
+            isEnabled = isEnabled,
             actions = actions,
         )
     }

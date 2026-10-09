@@ -6,9 +6,7 @@ import com.vonage.android.MainDispatcherRule
 import com.vonage.android.config.Config
 import com.vonage.android.config.GetConfig
 import com.vonage.android.data.UserRepository
-import com.vonage.android.fx.data.AddBackgroundUseCase
 import com.vonage.android.fx.data.BackgroundsResult
-import com.vonage.android.fx.data.DeleteBackgroundUseCase
 import com.vonage.android.fx.data.GetBackgroundsUseCase
 import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.kotlin.VonageVideoClient
@@ -31,16 +29,16 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class WaitingRoomViewModelTest {
 
-    @get:Rule
+    @RegisterExtension
     val mainDispatcherRule = MainDispatcherRule()
 
     private val context: Context = mockk(relaxed = true)
@@ -68,12 +66,11 @@ class WaitingRoomViewModelTest {
             remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
         )
     }
-    private val addBackgroundUseCase: AddBackgroundUseCase = mockk(relaxed = true)
-    private val deleteBackgroundUseCase: DeleteBackgroundUseCase = mockk(relaxed = true)
+    private val userBackgroundRepository: UserBackgroundRepository = mockk(relaxed = true)
 
     private lateinit var sut: WaitingRoomViewModel
 
-    @Before
+    @BeforeEach
     fun setUp() {
         sut = WaitingRoomViewModel(
             roomName = ANY_ROOM_NAME,
@@ -83,14 +80,15 @@ class WaitingRoomViewModelTest {
             audioDevicesHandler = audioDevicesHandler,
             callSettingsHolder = callSettingsHolder,
             getBackgroundsUseCase = getBackgroundsUseCase,
-            addBackgroundUseCase = addBackgroundUseCase,
-            deleteBackgroundUseCase = deleteBackgroundUseCase,
+            userBackgroundRepository = userBackgroundRepository,
         )
 
-        every { getConfig.invoke() } returns Config(
+        every { getConfig.invoke() } returns Config.fromAppConfig().copy(
             allowCameraControl = true,
             allowMicrophoneControl = true,
             allowShowParticipantList = true,
+            allowVideoOnJoin = true,
+            allowAudioOnJoin = true,
         )
         every { videoClient.configurePublisher(any()) } returns Unit
     }
@@ -187,11 +185,11 @@ class WaitingRoomViewModelTest {
         every { videoClient.destroyPublisher() } returns Unit
 
         sut.uiState.test {
-            awaitItem()                // initial state
+            awaitItem()
             sut.init(context)
-            awaitItem()                // post-init: publisher now set in uiState
+            awaitItem()
             sut.joinRoom("save user name")
-            val state = awaitItem()    // post-join: isSuccess = true
+            val state = awaitItem()
             assertTrue(state.isSuccess)
             assertEquals("save user name", state.joinSettings.username)
         }
@@ -207,10 +205,10 @@ class WaitingRoomViewModelTest {
         every { videoClient.destroyPublisher() } returns Unit
 
         sut.uiState.test {
-            awaitItem()                // initial state
+            awaitItem()
             sut.init(context)
-            awaitItem()                // post-init: publisher now set in uiState
-            sut.joinRoom("   ")        // whitespace-only — trimmed to empty, must be rejected
+            awaitItem()
+            sut.joinRoom("   ")
             val state = awaitItem()
             assertFalse(state.isSuccess)
             assertFalse(state.isUserNameValid)
@@ -228,17 +226,17 @@ class WaitingRoomViewModelTest {
         every { videoClient.destroyPublisher() } returns Unit
 
         sut.uiState.test {
-            awaitItem() // initial state
+            awaitItem()
             sut.init(context)
-            awaitItem() // post-init: publisher is now set in _uiState
+            awaitItem()
             sut.joinRoom("Alice")
-            val state = awaitItem() // post-join state
+            val state = awaitItem()
             assertTrue(state.isSuccess)
             assertEquals(
                 PublisherSettings(
                     username = "Alice",
-                    publishAudio = false,      // isMicEnabled = false per buildMockPublisher()
-                    publishVideo = true,       // isCameraEnabled = true per buildMockPublisher()
+                    publishAudio = false,
+                    publishVideo = true,
                     initialVideoEffect = VideoEffect.None,
                 ),
                 state.joinSettings,
@@ -254,8 +252,8 @@ class WaitingRoomViewModelTest {
         sut.init(context)
 
         sut.uiState.test {
-            awaitItem() // initial state
-            awaitItem() // after init
+            awaitItem()
+            awaitItem()
 
             sut.onCameraSwitch()
             cancelAndIgnoreRemainingEvents()
@@ -271,8 +269,8 @@ class WaitingRoomViewModelTest {
 
         sut.init(context)
         sut.uiState.test {
-            awaitItem() // initial state
-            awaitItem() // after init
+            awaitItem()
+            awaitItem()
 
             sut.applyVideoEffect(VideoEffect.BlurLow)
             cancelAndIgnoreRemainingEvents()
@@ -293,41 +291,33 @@ class WaitingRoomViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `observeBuildTimeSettings should NOT recreate publisher when a call is active`() = runTest {
-        // Arrange: a publisher exists and a call is active
         val publisher = givenPreviewPublisher()
         coEvery { userRepository.getUserName() } returns "user"
         every { videoClient.destroyPublisher() } returns Unit
 
         sut.init(context)
         advanceUntilIdle()
-        // Simulate call becoming active (MeetingRoomViewModel calls callSettingsHolder.bind())
         callSettingsHolderCallFlow.value = mockk()
 
-        // Act: change a build-time setting (e.g. resolution) — the trigger that used to freeze video
         callSettingsHolderResolutionFlow.value = CaptureResolution.HIGH
         advanceUntilIdle()
 
-        // Assert: destroyPublisher must NOT have been called — the live session publisher is intact
         verify(exactly = 0) { videoClient.destroyPublisher() }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `observeBuildTimeSettings should recreate publisher when no call is active`() = runTest {
-        // Arrange: a publisher exists, no active call
         val publisher = givenPreviewPublisher()
         coEvery { userRepository.getUserName() } returns "user"
         every { videoClient.destroyPublisher() } returns Unit
 
         sut.init(context)
         advanceUntilIdle()
-        // callSettingsHolderCallFlow stays null — no active call
 
-        // Act: change resolution
         callSettingsHolderResolutionFlow.value = CaptureResolution.HIGH
         advanceUntilIdle()
 
-        // Assert: preview publisher is recreated (this is the correct waiting-room behaviour)
         verify(atLeast = 1) { videoClient.destroyPublisher() }
     }
 

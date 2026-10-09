@@ -8,6 +8,7 @@ abstract class JsonConfigExtension {
     abstract val className: Property<String>
 
     init {
+        configFile.convention("app-config.json")
         outputPackage.convention("com.vonage.android.config")
         className.convention("AppConfig")
     }

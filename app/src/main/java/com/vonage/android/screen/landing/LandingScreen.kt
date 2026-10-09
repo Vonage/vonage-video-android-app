@@ -3,6 +3,7 @@ package com.vonage.android.screen.landing
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,6 +37,7 @@ fun LandingScreen(
     actions: LandingScreenActions,
     modifier: Modifier = Modifier,
     navigateToRoom: (LandingScreenRouteParams) -> Unit = {},
+    topBarActions: @Composable RowScope.() -> Unit = {},
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -54,7 +56,7 @@ fun LandingScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .testTag(LANDING_SCREEN_TAG),
-                    topBar = { TopBanner() },
+                    topBar = { TopBanner(actions = topBarActions) },
                     firstPane = {
                         LandingScreenHeader(
                             modifier = Modifier
@@ -70,6 +72,7 @@ fun LandingScreen(
                                 .widthIn(0.dp, MAX_PANE_WIDTH.dp),
                             roomName = uiState.roomName,
                             isRoomNameWrong = uiState.isRoomNameWrong,
+                            isEnabled = !uiState.isCheckingAccess,
                             actions = actions,
                         )
                     }

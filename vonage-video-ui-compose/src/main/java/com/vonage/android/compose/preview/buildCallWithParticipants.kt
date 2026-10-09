@@ -12,9 +12,6 @@ import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
-import com.vonage.android.kotlin.model.SignalState
-import com.vonage.android.kotlin.model.SignalStateContent
-import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoEffect
 import kotlinx.collections.immutable.ImmutableList
@@ -62,26 +59,15 @@ fun buildCallWithParticipants(
     override fun setVideoBitrate(config: VideoBitrateConfig) { /* empty on purpose */ }
     override fun setDegradationPreference(preference: DegradationPreference) { /* empty on purpose */ }
 
-    // Chat related methods
-    override val signalStateFlow: StateFlow<SignalState> = MutableStateFlow(
-        SignalState(
-            signals = mapOf(
-                SignalType.CHAT.signal to ChatState(
-                    unreadCount = unreadCount,
-                    messages = buildChatMessages(messagesCount).toImmutableList(),
-                ),
-            )
-        )
-    )
     override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = MutableStateFlow(persistentListOf())
     override val archivingStateFlow: StateFlow<ArchivingState> = MutableStateFlow(ArchivingState.Idle)
 
-    override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> {
-        val signalState = signalStateFlow.value.signals[signalType.signal]
-        return MutableStateFlow(signalState)
-    }
-
-    override val chatSignalState: StateFlow<ChatState?> = MutableStateFlow(null)
+    override val chatSignalState: StateFlow<ChatState?> = MutableStateFlow(
+        ChatState(
+            unreadCount = unreadCount,
+            messages = buildChatMessages(messagesCount).toImmutableList(),
+        )
+    )
 
     override val emojiSignalState: StateFlow<EmojiState?> = MutableStateFlow(null)
 

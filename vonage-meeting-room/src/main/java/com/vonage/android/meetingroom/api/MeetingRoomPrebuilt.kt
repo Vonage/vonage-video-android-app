@@ -55,12 +55,16 @@ class MeetingRoomPrebuilt internal constructor(
     internal val theme: MeetingRoomTheme,
     internal val isDebug: Boolean,
     internal val reportingContent: (@Composable (() -> Unit) -> Unit)?,
+    /** Optional "test speakers" control rendered inside the audio output selector. */
+    internal val testSpeakerContent: (@Composable () -> Unit)?,
     internal val permissionContent: @Composable (List<String>, () -> Unit) -> Unit,
     internal val foregroundServiceEnabled: Boolean,
     /** Dynamic list of extra buttons appended after the built-in bottom bar actions. */
     internal val additionalBottomBarActions: StateFlow<List<MeetingRoomBottomBarAction>>? = null,
     /** Full replacement for the bottom bar. When set, [additionalBottomBarActions] is ignored. */
     internal val customBottomBar: (@Composable (MeetingRoomBottomBarState, MeetingRoomCustomActions) -> Unit)? = null,
+    /** Optional supplier of a bearer token attached to the SDK's backend requests. */
+    internal val authTokenProvider: MeetingRoomAuthTokenProvider? = null,
 ) {
     private val _callState = MutableStateFlow(MeetingRoomCallState(roomName = roomName))
 

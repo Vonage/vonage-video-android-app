@@ -86,6 +86,7 @@ This application provides features for common conferencing use cases, such as:
 | [Getting Started](docs/GETTING_STARTED.md) | Clone, configure the backend URL, build, and run the app |
 | [Configuration](docs/CONFIGURATION.md) | Feature flags, theme customization, and base URL setup |
 | [Config System](docs/CONFIG-SYSTEM.md) | Deep-dive into the JSON-driven config plugin system |
+| [Authentication](docs/AUTHENTICATION.md) | Optional Okta sign-in, token injection, and identity provider setup |
 | [Localization](docs/LOCALIZATION.md) | Multi-language support and how to add a new language |
 | [Testing](docs/TESTING.md) | Unit tests, instrumented tests, snapshot tests, and Maestro E2E |
 | [Code Style](docs/CODE_STYLE.md) | Detekt, Spotless, and code conventions |

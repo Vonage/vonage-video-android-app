@@ -22,6 +22,8 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 APP_ID="com.vonage.android.debug"
+# $$ (PID) is included since date +%s alone only has one-second resolution.
+ROOM_NAME="${ROOM_NAME:-testroom-local-$(date +%s)-$$}"
 
 # ========== INSTALL MAESTRO & DEPENDENCIES ==========
 echo -e "${BLUE}🚀 Setting up Maestro and dependencies...${NC}"
@@ -220,7 +222,7 @@ if [ -n "$SINGLE_FLOW" ]; then
         exit 1
     fi
     echo -e "${BLUE}Running flow: $SINGLE_FLOW${NC}"
-    "$MAESTRO_PATH" test --env APP_ID="$APP_ID" "$FLOW_FILE"
+    "$MAESTRO_PATH" test --env APP_ID="$APP_ID" --env ROOM_NAME="$ROOM_NAME" "$FLOW_FILE"
 else
     # Run all flows
     FLOW_COUNT=$(find .maestro/flows -name "*.yaml" | wc -l)
@@ -230,7 +232,7 @@ else
         exit 0
     fi
     echo -e "${BLUE}Found $FLOW_COUNT test(s)${NC}"
-    "$MAESTRO_PATH" test --env APP_ID="$APP_ID" .maestro/flows/
+    "$MAESTRO_PATH" test --env APP_ID="$APP_ID" --env ROOM_NAME="$ROOM_NAME" .maestro/flows/
 fi
 
 if [ $? -eq 0 ]; then

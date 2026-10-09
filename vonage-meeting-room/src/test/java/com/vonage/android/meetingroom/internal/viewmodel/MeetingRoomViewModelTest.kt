@@ -16,12 +16,11 @@ import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.kotlin.sdk.VonageError
 import com.vonage.android.meetingroom.MainDispatcherRule
 import com.vonage.android.meetingroom.api.MeetingRoomConfiguration
+import com.vonage.android.meetingroom.api.MeetingRoomLayoutMode
 import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
-import com.vonage.android.meetingroom.internal.data.MeetingRoomSessionRepository
-import com.vonage.android.meetingroom.internal.data.SessionInfo
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
 import com.vonage.android.meetingroom.internal.screen.audio.MeetingRoomAudioDevicesHandler
@@ -31,6 +30,8 @@ import com.vonage.android.meetingroom.internal.util.ActivityContextHolder
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.settings.CallSettingsHolder
+import com.vonage.android.shared.session.SessionInfo
+import com.vonage.android.shared.session.SessionRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -41,15 +42,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.Test
 import android.net.Uri
-import com.vonage.android.fx.data.AddBackgroundUseCase
 import com.vonage.android.fx.data.BackgroundsResult
-import com.vonage.android.fx.data.DeleteBackgroundUseCase
 import com.vonage.android.fx.data.GetBackgroundsUseCase
 import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.fx.ui.VideoBackgroundItem
@@ -58,13 +58,13 @@ import kotlin.Result.Companion.success
 
 class MeetingRoomViewModelTest {
 
-    @get:Rule
+    @RegisterExtension
     val mainDispatcherRule = MainDispatcherRule()
 
     private val context: Context = mockk(relaxed = true)
     private val container: MeetingRoomContainer = mockk(relaxed = true)
     private val prebuilt: MeetingRoomPrebuilt = mockk(relaxed = true)
-    private val sessionRepository: MeetingRoomSessionRepository = mockk()
+    private val sessionRepository: SessionRepository = mockk()
     private val vonageArchiving: VonageArchiving = mockk(relaxed = true)
     private val vonageCaptions: VonageCaptions = mockk(relaxed = true)
     private val vonageScreenSharing: VonageScreenSharing = mockk(relaxed = true)
@@ -85,12 +85,11 @@ class MeetingRoomViewModelTest {
             remainingBackgroundSlots = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
         )
     }
-    private val addBackgroundUseCase: AddBackgroundUseCase = mockk(relaxed = true)
-    private val deleteBackgroundUseCase: DeleteBackgroundUseCase = mockk(relaxed = true)
+    private val userBackgroundRepository: UserBackgroundRepository = mockk(relaxed = true)
 
     private lateinit var sut: MeetingRoomViewModel
 
-    @Before
+    @BeforeEach
     fun setUp() {
         every { container.prebuilt } returns prebuilt
         every { container.sessionRepository } returns sessionRepository
@@ -103,8 +102,7 @@ class MeetingRoomViewModelTest {
         every { container.audioDevicesHandler } returns audioDevicesHandler
         every { container.callSettingsHolder } returns callSettingsHolder
         every { container.getBackgroundsUseCase } returns getBackgroundsUseCase
-        every { container.addBackgroundUseCase } returns addBackgroundUseCase
-        every { container.deleteBackgroundUseCase } returns deleteBackgroundUseCase
+        every { container.userBackgroundRepository } returns userBackgroundRepository
 
         every { prebuilt.roomName } returns ANY_ROOM_NAME
         every { prebuilt.configuration } returns MeetingRoomConfiguration()
@@ -133,6 +131,33 @@ class MeetingRoomViewModelTest {
 
         verify { activityContextHolder.setActivityContext(context) }
         verify { mockCall.connect(any(Context::class)) }
+    }
+
+    @Test
+    fun `given non-default configuration when initialised then flags reach ui state`() = runTest {
+        every { prebuilt.configuration } returns MeetingRoomConfiguration(
+            allowCameraControl = false,
+            allowMicrophoneControl = false,
+            allowShowParticipantList = false,
+            allowDeviceSelection = false,
+            allowFeedback = false,
+            allowSettings = false,
+            allowPictureInPicture = false,
+            defaultLayoutMode = MeetingRoomLayoutMode.ACTIVE_SPEAKER,
+        )
+
+        val viewModel = MeetingRoomViewModel(container)
+
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse(state.allowCameraControl)
+            assertFalse(state.allowMicrophoneControl)
+            assertFalse(state.allowShowParticipantList)
+            assertFalse(state.allowDeviceSelection)
+            assertFalse(state.allowFeedback)
+            assertFalse(state.allowSettings)
+            assertEquals(CallLayoutType.SPEAKER_LAYOUT, state.layoutType)
+        }
     }
 
     @Test
@@ -747,7 +772,7 @@ class MeetingRoomViewModelTest {
     }
 
     @Test
-    fun `given addBackground is called then delegates to addBackgroundUseCase and refreshes backgrounds in state`() = runTest {
+    fun `given addBackground is called then delegates to saveBackground and refreshes backgrounds in state`() = runTest {
         // Given
         val uri = mockk<Uri>()
         val updatedBackgrounds = persistentListOf(VideoBackgroundItem(id = "user-bg", isUserUploaded = true))
@@ -763,13 +788,13 @@ class MeetingRoomViewModelTest {
         testScheduler.advanceUntilIdle()
 
         // Then
-        coVerify(exactly = 1) { addBackgroundUseCase(uri, any()) }
+        coVerify(exactly = 1) { userBackgroundRepository.saveBackground(uri, any()) }
         assertEquals(updatedBackgrounds, sut.uiState.value.backgrounds)
         assertEquals(0, sut.uiState.value.remainingBackgroundSlots)
     }
 
     @Test
-    fun `given deleteBackground is called then delegates to deleteBackgroundUseCase and refreshes backgrounds`() = runTest {
+    fun `given deleteBackground is called then delegates to deleteBackground and refreshes backgrounds`() = runTest {
         // Given
         val item = VideoBackgroundItem(id = "user-bg", isUserUploaded = true)
         val updatedBackgrounds = persistentListOf(VideoBackgroundItem(id = "bg-1"))
@@ -785,7 +810,7 @@ class MeetingRoomViewModelTest {
         testScheduler.advanceUntilIdle()
 
         // Then
-        coVerify(exactly = 1) { deleteBackgroundUseCase("user-bg") }
+        coVerify(exactly = 1) { userBackgroundRepository.deleteBackground("user-bg") }
         assertEquals(updatedBackgrounds, sut.uiState.value.backgrounds)
     }
 

@@ -22,18 +22,17 @@ import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
-import com.vonage.android.kotlin.model.SignalState
-import com.vonage.android.kotlin.model.SignalStateContent
-import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
+import com.vonage.android.meetingroom.internal.screen.components.TopBarTestTags.TOP_BAR_CAMERA_SWITCH_ACTION
 import com.vonage.android.meetingroom.internal.screen.components.TopBarTestTags.TOP_BAR_TITLE
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_CAMERA_BUTTON
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_MIC_BUTTON
+import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_MORE_BUTTON
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
@@ -128,6 +127,29 @@ class MeetingRoomScreenTest {
         compose.onNodeWithTag(MEETING_ROOM_CONTENT).assertIsDisplayed()
         compose.onNodeWithTag("$BOTTOM_BAR_CAMERA_BUTTON-enabled", useUnmergedTree = true).assertDoesNotExist()
         compose.onNodeWithTag("$BOTTOM_BAR_MIC_BUTTON-enabled", useUnmergedTree = true).assertIsDisplayed()
+        compose.onNodeWithTag(TOP_BAR_CAMERA_SWITCH_ACTION, useUnmergedTree = true).assertDoesNotExist()
+    }
+
+    @Test
+    fun given_all_optional_features_disabled_THEN_more_options_button_not_displayed() {
+        compose.setContent {
+            VonageVideoTheme {
+                MeetingRoomScreen(
+                    uiState = MeetingRoomUiState(
+                        roomName = "sample-name",
+                        call = buildCallWithParticipants(
+                            participantCount = 5,
+                            unreadCount = 8,
+                        ),
+                        enabledFeatures = emptySet(),
+                    ),
+                    actions = MeetingRoomActions(),
+                )
+            }
+        }
+
+        compose.onNodeWithTag(MEETING_ROOM_BOTTOM_BAR).assertIsDisplayed()
+        compose.onNodeWithTag(BOTTOM_BAR_MORE_BUTTON, useUnmergedTree = true).assertDoesNotExist()
     }
 
     @Test
@@ -166,10 +188,8 @@ class MeetingRoomScreenTest {
             override val pinnedParticipantIds: StateFlow<Set<String>> = MutableStateFlow(emptySet())
             override fun togglePinParticipant(participantId: String) {}
             override fun forceMuteParticipant(participantId: String) {}
-            override val signalStateFlow: StateFlow<SignalState?> = MutableStateFlow(null)
             override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = MutableStateFlow(persistentListOf())
             override val archivingStateFlow: StateFlow<ArchivingState> = MutableStateFlow(ArchivingState.Idle)
-            override fun signalState(signalType: SignalType): StateFlow<SignalStateContent?> = MutableStateFlow(null)
             override val chatSignalState: StateFlow<ChatState?> = MutableStateFlow(null)
             override val emojiSignalState: StateFlow<EmojiState?> = MutableStateFlow(null)
             override fun connect(context: Context): Flow<SessionEvent> = flowOf()

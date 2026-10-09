@@ -12,7 +12,7 @@ import retrofit2.Response
 import kotlin.Result.Companion.success
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class ReportingRepositoryTest {
 

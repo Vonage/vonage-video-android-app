@@ -7,5 +7,6 @@ import androidx.compose.ui.Modifier
 @Composable
 fun RecordingIndicator(
     modifier: Modifier = Modifier,
+    contentDescription: String? = null,
 ) {
 }

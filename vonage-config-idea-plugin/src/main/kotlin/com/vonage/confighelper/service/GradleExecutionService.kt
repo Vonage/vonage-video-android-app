@@ -2,8 +2,9 @@ package com.vonage.confighelper.service
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.OSProcessHandler
-import com.intellij.execution.process.ProcessAdapter
 import com.intellij.execution.process.ProcessEvent
+import com.intellij.execution.process.ProcessListener
+import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
 import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.project.Project
@@ -46,7 +47,7 @@ class GradleExecutionService(
                 .withWorkDirectory(basePath)
 
             val processHandler = OSProcessHandler(commandLine)
-            processHandler.addProcessListener(object : ProcessAdapter() {
+            processHandler.addProcessListener(object : ProcessListener {
                 override fun processTerminated(event: ProcessEvent) {
                     if (event.exitCode == 0) {
                         callback.onSuccess()
@@ -83,11 +84,10 @@ class GradleExecutionService(
 
     private fun refreshGradleProject(basePath: String) {
         ExternalSystemUtil.refreshProject(
-            project,
-            GradleConstants.SYSTEM_ID,
             basePath,
-            false,
-            ProgressExecutionMode.IN_BACKGROUND_ASYNC
+            ImportSpecBuilder(project, GradleConstants.SYSTEM_ID)
+                .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
+                .build(),
         )
     }
 }

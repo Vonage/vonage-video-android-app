@@ -24,8 +24,8 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Before
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 
 /**
  * Shared infrastructure for [Call] unit tests.
@@ -62,7 +62,7 @@ abstract class CallTestBase {
     var capturedSignalListener: VonageSignalListener? = null
     var capturedArchiveListener: VonageArchiveListener? = null
 
-    @Before
+    @BeforeEach
     fun setup() {
         Dispatchers.setMain(testDispatcher)
 
@@ -96,7 +96,7 @@ abstract class CallTestBase {
         }
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
     }

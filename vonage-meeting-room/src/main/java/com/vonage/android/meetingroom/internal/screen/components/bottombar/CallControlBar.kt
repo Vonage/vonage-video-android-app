@@ -35,6 +35,7 @@ import com.vonage.android.meetingroom.internal.screen.components.bottombar.Botto
 import com.vonage.android.shared.buildTestTag
 import kotlinx.coroutines.flow.MutableStateFlow
 
+@Suppress("LongParameterList")
 @Composable
 internal fun CallControlBar(
     publisher: Participant?,
@@ -43,6 +44,7 @@ internal fun CallControlBar(
     allowMicrophoneControl: Boolean,
     allowCameraControl: Boolean,
     modifier: Modifier = Modifier,
+    allowMoreActions: Boolean = true,
     content: @Composable RowScope.() -> Unit,
 ) {
     val isMicEnabled by remember(publisher) {
@@ -75,9 +77,11 @@ internal fun CallControlBar(
 
         content()
 
-        MenuButton(
-            onShowMore = onShowMore
-        )
+        if (allowMoreActions) {
+            MenuButton(
+                onShowMore = onShowMore
+            )
+        }
 
         EndCallButton(
             roomActions = roomActions

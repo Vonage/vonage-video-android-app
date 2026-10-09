@@ -4,31 +4,25 @@ import app.cash.turbine.test
 import com.vonage.android.kotlin.model.ChatState
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.signal.RawSignal
-import com.vonage.android.shared.DateProvider
-import com.vonage.android.shared.ForegroundChecker
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import junit.framework.TestCase.assertEquals
+import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 import java.util.Date
 
 class EnabledChatSignalPluginTest {
 
     private val date = mockk<Date>()
+    private var appInBackground = false
 
     private val chatNotifications: ChatNotifications = mockk(relaxed = true)
-    private val foregroundChecker: ForegroundChecker = mockk()
-    private val dateProvider: DateProvider = mockk {
-        every { current() } returns date
-    }
     private val sut: EnabledChatSignalPlugin = EnabledChatSignalPlugin(
         chatNotifications = chatNotifications,
-        foregroundChecker = foregroundChecker,
-        dateProvider = dateProvider,
+        currentDate = { date },
+        inBackground = { appInBackground },
     )
 
     @Test
@@ -139,10 +133,10 @@ class EnabledChatSignalPluginTest {
     }
 
     private fun givenAppInForeground() {
-        every { foregroundChecker.isInBackground() } returns false
+        appInBackground = false
     }
 
     private fun givenAppInBackground() {
-        every { foregroundChecker.isInBackground() } returns true
+        appInBackground = true
     }
 }

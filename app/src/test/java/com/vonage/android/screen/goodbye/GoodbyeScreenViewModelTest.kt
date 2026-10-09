@@ -8,7 +8,7 @@ import com.vonage.android.archiving.ArchiveStatus
 import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.util.DownloadManager
 import com.vonage.android.util.coroutines.CoroutinePoller
-import com.vonage.android.util.coroutines.CoroutinePollerProvider
+import com.vonage.android.util.coroutines.CoroutinePollerFactory
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -16,44 +16,36 @@ import io.mockk.verify
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class GoodbyeScreenViewModelTest {
 
-    @get:Rule
+    @RegisterExtension
     val mainDispatcherRule = MainDispatcherRule()
 
     private val vonageArchiving: VonageArchiving = mockk()
     private val downloadManager: DownloadManager = mockk()
-    private val coroutinePollerProvider: CoroutinePollerProvider<Unit> = mockk()
 
     private fun sut() = GoodbyeScreenViewModel(
         roomName = ANY_ROOM_NAME,
         vonageArchiving = vonageArchiving,
         downloadManager = downloadManager,
-        coroutinePollerProvider = coroutinePollerProvider,
-        dispatcher = mainDispatcherRule.testDispatcher,
-    )
-
-    private fun setupPollerMock() {
-        every { coroutinePollerProvider.get(any(), any()) } answers {
-            val fetchData = secondArg<suspend () -> Unit>()
+        pollerFactory = CoroutinePollerFactory { fetchData ->
             mockk<CoroutinePoller<Unit>>(relaxed = true).also { poller ->
                 every { poller.poll(any()) } answers {
                     flow {
-                        fetchData() // Execute the fetchData callback
+                        fetchData()
                         emit(Unit)
                     }
                 }
             }
-        }
-    }
+        },
+    )
 
     @Test
     fun `given viewmodel when initial state then returns archive list`() = runTest {
-        setupPollerMock()
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(archiveListAfterPolling)
         val sut = sut()
 
@@ -69,7 +61,6 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel when archives loaded then updates state to content`() = runTest {
-        setupPollerMock()
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(archiveListAfterPolling)
 
         val sut = sut()
@@ -85,7 +76,6 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel when archives update then emits new state`() = runTest {
-        setupPollerMock()
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns
                 Result.success(archiveList) andThen Result.success(archiveListAfterPolling)
 
@@ -97,14 +87,11 @@ class GoodbyeScreenViewModelTest {
                     archives = archiveList.toImmutableList(),
                 ), awaitItem()
             )
-            // Let the test complete without checking for more emissions
-            // to avoid timing issues with the polling mechanism
         }
     }
 
     @Test
     fun `given viewmodel when download available archive then delegate to download manager`() = runTest {
-        setupPollerMock()
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(archiveListAfterPolling)
         every { downloadManager.downloadByUrl(any()) } returns Unit
 
@@ -124,7 +111,6 @@ class GoodbyeScreenViewModelTest {
 
     @Test
     fun `given viewmodel when download pending archive then ignore`() = runTest {
-        setupPollerMock()
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(archiveList)
         every { downloadManager.downloadByUrl(any()) } returns Unit
 
@@ -137,27 +123,23 @@ class GoodbyeScreenViewModelTest {
                 ), awaitItem()
             )
 
-            sut.downloadArchive(archiveList[1]) // This is the pending archive
+            sut.downloadArchive(archiveList[1])
             verify(exactly = 0) { downloadManager.downloadByUrl("https://cdn.recording.io/potatoe-pending") }
         }
     }
 
     @Test
     fun `given viewmodel when repository fails then continues polling silently`() = runTest {
-        setupPollerMock()
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.failure(Exception("Network error"))
 
         val sut = sut()
         sut.uiState.test {
             assertEquals(GoodbyeScreenUiState.Idle, awaitItem())
-            // Since the call fails, onSuccess is not called and state remains Idle
-            // The test completes successfully showing that failures don't crash the app
         }
     }
 
     @Test
     fun `given viewmodel with mixed archive states then loads correctly`() = runTest {
-        setupPollerMock()
         val mixedArchiveList = listOf(availableArchive, pendingArchive, pendingArchive)
 
         coEvery { vonageArchiving.getRecordings(ANY_ROOM_NAME) } returns Result.success(mixedArchiveList)

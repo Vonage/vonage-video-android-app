@@ -29,21 +29,7 @@ object Linkify {
 
     // from https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/text/util/Linkify.java;l=737;drc=4f9480b13d3cab52255608ac5913922ca4269ac5
     private fun List<LinkSpec>.pruneOverlaps(): List<LinkSpec> {
-        val sortedList = sortedWith { a, b ->
-            if (a.start < b.start) {
-                return@sortedWith -1
-            }
-            if (a.start > b.start) {
-                return@sortedWith 1
-            }
-            if (a.end < b.end) {
-                return@sortedWith 1
-            }
-            if (a.end > b.end) {
-                return@sortedWith -1
-            }
-            return@sortedWith 0
-        }.toMutableList()
+        val sortedList = sortedWith(compareBy<LinkSpec>({ it.start }, { -it.end })).toMutableList()
 
         var len: Int = sortedList.size
         var i = 0

@@ -6,14 +6,11 @@ plugins {
 
 android {
     namespace = "com.vonage.android.meetingroom"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 24
+        minSdk = libs.versions.minSdk.get().toInt()
         consumerProguardFiles("consumer-rules.pro")
-        // These feature modules are always included in their enabled variant from meeting-room's
-        // perspective; the app layer controls which variant is used via its own
-        // missingDimensionStrategy for direct feature-module dependencies.
         missingDimensionStrategy("chat", "enabled")
         missingDimensionStrategy("reactions", "enabled")
         missingDimensionStrategy("videofx", "enabled")
@@ -29,6 +26,10 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    testOptions {
+        unitTests.all { it.useJUnitPlatform() }
     }
 
     // Only dimensions with actual source-set differences in this module need explicit flavors.
@@ -92,18 +93,20 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.opentok.android.sdk)
+    implementation(libs.vonage.android.sdk)
     implementation(libs.androidx.material.icons.extended)
 
-    testImplementation(libs.junit.junit)
+    testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(kotlin("test"))
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
     debugImplementation(libs.androidx.ui.test.manifest)
 }

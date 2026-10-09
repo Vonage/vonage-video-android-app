@@ -26,18 +26,26 @@ if (configFile.exists()) {
     configFile.inputStream().use { configProps.load(it) }
 }
 
+// Okta OIDC credentials — only needed when authSettings.allowAuthentication is true.
+// Loaded from local.properties, overridable via environment variables (CI/CD).
+val localProps = Properties()
+val localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    localPropsFile.inputStream().use { localProps.load(it) }
+}
+
 android {
     namespace = "com.vonage.android"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         applicationId = "com.vonage.android"
-        minSdk = 24
-        targetSdk = 36
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
         // NOTE: The following versionCode and versionName are placeholders.
         // Actual values are set dynamically by the GitHub Actions workflow during CI/CD.
-        versionCode = 130
-        versionName = "1.3.0"
+        versionCode = 140
+        versionName = "1.4.0"
 
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
@@ -48,7 +56,8 @@ android {
         // Set up base API URL
         val baseApiUrl = configProps.getProperty("vonage.baseApiUrl", "")
         buildConfigField("String", "BASE_API_URL", "\"$baseApiUrl\"")
-        manifestPlaceholders["hostName"] = baseApiUrl
+        // App Link filters match on the bare authority, so strip the scheme and any path.
+        manifestPlaceholders["hostName"] = baseApiUrl.substringAfter("://").substringBefore("/")
 
         // Chat feature
         val chatProperty = configProps.getProperty("vonage.meetingRoom.allow_chat", "true")
@@ -93,6 +102,46 @@ android {
         val settingsProperty = configProps.getProperty("vonage.meetingRoom.allow_settings", "true")
         buildConfigField("boolean", "FEATURE_SETTINGS_ENABLED", "$settingsProperty")
         missingDimensionStrategy("settings", settingsProperty.toEnabledString())
+
+        // Authentication (Okta) feature — disabled by default
+        val authProperty = configProps.getProperty("vonage.auth.allow_authentication", "false")
+        buildConfigField("boolean", "FEATURE_AUTHENTICATION_ENABLED", "$authProperty")
+        missingDimensionStrategy("okta", authProperty.toEnabledString())
+        if (authProperty.toBoolean()) {
+            // okta-mobile-kotlin requires API 26+; only raised when authentication is enabled
+            minSdk = 26
+        }
+
+        // Okta OIDC configuration (see docs/AUTHENTICATION.md); empty when not configured
+        val oktaSignInRedirectUri = oktaSecret("OKTA_SIGN_IN_REDIRECT_URI")
+        buildConfigField("String", "OKTA_ISSUER_URL", "\"${oktaSecret("OKTA_ISSUER_URL")}\"")
+        buildConfigField("String", "OKTA_CLIENT_ID", "\"${oktaSecret("OKTA_CLIENT_ID")}\"")
+        buildConfigField("String", "OKTA_SIGN_IN_REDIRECT_URI", "\"$oktaSignInRedirectUri\"")
+        buildConfigField("String", "OKTA_SCOPE", "\"${oktaSecret("OKTA_SCOPE")}\"")
+
+        // The OIDC callback arrives as a verified App Link, the same way iOS receives it
+        // through its `applinks:` entitlement. The Okta SDK's own redirect intent-filter can
+        // only express a scheme, so it is pinned to an inert one and the real https filter is
+        // declared in vonage-feature-okta/src/enabled/AndroidManifest.xml from the host and
+        // path below. A custom-scheme redirect URI still works: the SDK filter then handles it
+        // and the https filter is pointed at an unroutable host.
+        val isHttpsRedirect = oktaSignInRedirectUri.startsWith("https://", ignoreCase = true)
+        manifestPlaceholders["webAuthenticationRedirectScheme"] = if (isHttpsRedirect) {
+            "com.vonage.android.okta.unused"
+        } else {
+            oktaSignInRedirectUri.substringBefore(":", "").ifBlank { "com.vonage.android" }
+        }
+        val redirectAuthority = oktaSignInRedirectUri.substringAfter("://", "")
+        manifestPlaceholders["oktaRedirectHost"] = if (isHttpsRedirect) {
+            redirectAuthority.substringBefore("/")
+        } else {
+            "okta-redirect.invalid"
+        }
+        manifestPlaceholders["oktaRedirectPath"] = if (isHttpsRedirect) {
+            "/" + redirectAuthority.substringAfter("/", "")
+        } else {
+            "/okta-callback"
+        }
     }
 
     compileOptions {
@@ -107,6 +156,7 @@ android {
         unitTests {
             isIncludeAndroidResources = true
             isReturnDefaultValues = true
+            all { it.useJUnitPlatform() }
         }
         animationsDisabled = true
         managedDevices {
@@ -153,8 +203,13 @@ android {
         }
     }
 
+    // Maestro E2E launch-argument hooks (see util/E2eTestFlags.kt): always on in debug; in release
+    // only when the Maestro CI build passes -Pvonage.e2eHooks=true, so store builds ignore them.
+    val e2eHooksInRelease = providers.gradleProperty("vonage.e2eHooks").orNull.toBoolean()
+
     buildTypes {
         debug {
+            buildConfigField("boolean", "E2E_HOOKS_ENABLED", "true")
             versionNameSuffix = "-DEBUG"
             applicationIdSuffix = ".debug"
             isDebuggable = true
@@ -163,6 +218,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
+            buildConfigField("boolean", "E2E_HOOKS_ENABLED", "$e2eHooksInRelease")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -203,6 +259,7 @@ dependencies {
     implementation(project(":vonage-feature-video-effects"))
     implementation(project(":vonage-feature-audio-effects"))
     implementation(project(":vonage-feature-captions"))
+    implementation(project(":vonage-feature-okta"))
     implementation(project(":vonage-feature-settings"))
     implementation(project(":vonage-audio-selector"))
     implementation(project(":vonage-android-logger"))
@@ -241,16 +298,17 @@ dependencies {
     releaseImplementation(libs.firebase.analytics)
 
     // Vonage Video Android SDK, needed to customize Audio Device
-    implementation(libs.opentok.android.sdk)
+    implementation(libs.vonage.android.sdk)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
-    testImplementation(libs.junit.junit)
     testImplementation(libs.junit.jupiter.params)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.core.testing)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.test.rules)
@@ -268,6 +326,12 @@ dependencies {
 }
 
 fun String.toEnabledString(): String = if (toBoolean()) "enabled" else "disabled"
+
+/**
+ * Resolves an Okta secret from the environment (CI/CD) or local.properties (local dev).
+ * Returns an empty string when unset so unauthenticated builds keep working.
+ */
+fun oktaSecret(name: String): String = System.getenv(name) ?: localProps.getProperty(name, "")
 
 /**
  * Returns the prefixed flavor name used by the vonage-meeting-room module,
@@ -291,5 +355,5 @@ kotlin {
 }
 
 jsonConfig {
-    configFile.set("config/app-config.json")
+    configFile.set("app-config.json")
 }

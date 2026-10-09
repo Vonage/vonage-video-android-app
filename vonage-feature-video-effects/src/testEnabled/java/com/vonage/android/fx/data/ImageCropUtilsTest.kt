@@ -1,8 +1,8 @@
 package com.vonage.android.fx.data
 
 import com.vonage.android.kotlin.model.CaptureResolution
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 class ImageCropUtilsTest {
 

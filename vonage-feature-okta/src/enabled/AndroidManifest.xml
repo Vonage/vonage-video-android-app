@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <!--
+            Receives the OIDC callback as a verified App Link, mirroring the iOS app's
+            `applinks:` entitlement so both platforms share one redirect URI.
+
+            The SDK's own declaration of this activity carries a scheme-only intent-filter
+            (`android:scheme="${webAuthenticationRedirectScheme}"`), which cannot express a
+            host or path. The filter below is merged alongside it; host and path come from
+            OKTA_SIGN_IN_REDIRECT_URI via manifestPlaceholders in app/build.gradle.kts.
+
+            Requires an assetlinks.json on the redirect host listing this app's package and
+            signing-certificate fingerprints, or verification fails and sign-in never returns.
+            See docs/AUTHENTICATION.md.
+        -->
+        <activity
+            android:name="com.okta.webauthenticationui.RedirectActivity"
+            android:exported="true">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="${oktaRedirectHost}"
+                    android:path="${oktaRedirectPath}" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

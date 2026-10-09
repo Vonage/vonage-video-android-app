@@ -18,9 +18,10 @@ import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.MeetingRoomCallState
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
-import com.vonage.android.meetingroom.internal.data.SessionInfo
+import com.vonage.android.shared.session.SessionInfo
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
+import com.vonage.android.meetingroom.internal.screen.toCallLayoutType
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler.CallAction
 import com.vonage.android.screensharing.ScreenSharingState
 import kotlinx.collections.immutable.persistentListOf
@@ -54,6 +55,10 @@ internal class MeetingRoomViewModel(
         allowCameraControl = prebuilt.configuration.allowCameraControl,
         allowMicrophoneControl = prebuilt.configuration.allowMicrophoneControl,
         allowShowParticipantList = prebuilt.configuration.allowShowParticipantList,
+        allowDeviceSelection = prebuilt.configuration.allowDeviceSelection,
+        allowFeedback = prebuilt.configuration.allowFeedback,
+        allowSettings = prebuilt.configuration.allowSettings,
+        layoutType = prebuilt.configuration.defaultLayoutMode.toCallLayoutType(),
         enabledFeatures = prebuilt.enabledFeatures,
     )
     private val _uiState = MutableStateFlow(initialUiState)
@@ -224,7 +229,7 @@ internal class MeetingRoomViewModel(
     fun addBackground(uris: List<Uri>) {
         viewModelScope.launch {
             val resolution = container.callSettingsHolder.captureResolution.value
-            uris.forEach { uri -> container.addBackgroundUseCase(uri, resolution) }
+            uris.forEach { uri -> container.userBackgroundRepository.saveBackground(uri, resolution) }
             refreshBackgrounds()
         }
     }
@@ -235,7 +240,7 @@ internal class MeetingRoomViewModel(
      */
     fun deleteBackground(item: VideoBackgroundItem) {
         viewModelScope.launch {
-            container.deleteBackgroundUseCase(item.id)
+            container.userBackgroundRepository.deleteBackground(item.id)
             val currentEffect = call?.publisher?.value?.videoEffect?.value
             if (currentEffect is VideoEffect.BackgroundImage && currentEffect.id == item.id) {
                 applyVideoEffect(VideoEffect.None)

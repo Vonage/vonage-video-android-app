@@ -20,9 +20,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class VeraBluetoothManagerTest {
@@ -37,7 +37,7 @@ class VeraBluetoothManagerTest {
 
     private lateinit var sut: VeraBluetoothManager
 
-    @Before
+    @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         every { bluetoothManager.adapter } returns bluetoothAdapter
@@ -174,7 +174,6 @@ class VeraBluetoothManagerTest {
         sut.onStart()
         sut.onStart()
 
-        // Should register twice (bluetooth and wired), not four times
         verify(exactly = 2) { context.registerReceiver(any(), any()) }
     }
 
@@ -204,13 +203,11 @@ class VeraBluetoothManagerTest {
 
         sut = createBluetoothManager()
 
-        // Simulate service connection to set the bluetoothProfile
         serviceListenerSlot.captured.onServiceConnected(BluetoothProfile.HEADSET, bluetoothProfile)
 
         sut.onStart()
         sut.onStop()
 
-        // Verify that closeProfileProxy was called with the profile
         verify { bluetoothAdapter.closeProfileProxy(BluetoothProfile.HEADSET, bluetoothProfile) }
     }
 

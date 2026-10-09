@@ -2,25 +2,25 @@ package com.vonage.logger.interceptor
 
 import com.vonage.logger.LogEvent
 import com.vonage.logger.LogLevel
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.io.File
 
 class FileLogInterceptorTest {
 
     private lateinit var logFile: File
 
-    @Before
+    @BeforeEach
     fun setUp() {
         logFile = File.createTempFile("vonage-logger-test", ".log")
         logFile.writeText("")
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         logFile.delete()
     }

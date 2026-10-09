@@ -7,9 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.config.GetConfig
 import com.vonage.android.data.UserRepository
-import com.vonage.android.fx.data.AddBackgroundUseCase
 import com.vonage.android.fx.data.BackgroundsResult
-import com.vonage.android.fx.data.DeleteBackgroundUseCase
 import com.vonage.android.fx.data.GetBackgroundsUseCase
 import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.fx.ui.VideoBackgroundItem
@@ -52,8 +50,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     private val audioDevicesHandler: AudioDevicesHandler,
     private val callSettingsHolder: CallSettingsHolder,
     private val getBackgroundsUseCase: GetBackgroundsUseCase,
-    private val addBackgroundUseCase: AddBackgroundUseCase,
-    private val deleteBackgroundUseCase: DeleteBackgroundUseCase,
+    private val userBackgroundRepository: UserBackgroundRepository,
 ) : ViewModel() {
 
     private var publisherSetupJob: Job? = null
@@ -73,7 +70,13 @@ class WaitingRoomViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val config = getConfig()
             val name = userRepository.getUserName()
-            videoClient.configurePublisher(buildPreviewConfig(name))
+            videoClient.configurePublisher(
+                buildPreviewConfig(
+                    name = name,
+                    publishVideo = config.allowVideoOnJoin,
+                    publishAudio = config.allowAudioOnJoin,
+                )
+            )
             videoClient.createPreviewPublisher(context)
                 .also { publisher ->
                     _uiState.update { uiState ->
@@ -82,6 +85,9 @@ class WaitingRoomViewModel @AssistedInject constructor(
                             publisher = publisher,
                             allowCameraControl = config.allowCameraControl,
                             allowMicrophoneControl = config.allowMicrophoneControl,
+                            allowDeviceSelection = config.allowWaitingRoomDeviceSelection,
+                            allowSettings = config.allowWaitingRoomSettings,
+                            allowAudioDiagnostics = config.allowAudioDiagnostics,
                             audioDevicesState = audioDevicesHandler.audioDevicesState,
                         )
                     }
@@ -125,7 +131,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
     fun addBackground(uris: List<Uri>) {
         viewModelScope.launch(Dispatchers.IO) {
             val resolution = callSettingsHolder.captureResolution.value
-            uris.forEach { uri -> addBackgroundUseCase(uri, resolution) }
+            uris.forEach { uri -> userBackgroundRepository.saveBackground(uri, resolution) }
             refreshBackgrounds()
         }
     }
@@ -136,7 +142,7 @@ class WaitingRoomViewModel @AssistedInject constructor(
      */
     fun deleteBackground(item: VideoBackgroundItem) {
         viewModelScope.launch(Dispatchers.IO) {
-            deleteBackgroundUseCase(item.id)
+            userBackgroundRepository.deleteBackground(item.id)
             val currentEffect = _uiState.value.publisher?.videoEffect?.value
             if (currentEffect is VideoEffect.BackgroundImage && currentEffect.id == item.id) {
                 withContext(Dispatchers.Main) { applyVideoEffect(VideoEffect.None) }
@@ -304,8 +310,10 @@ data class WaitingRoomUiState(
     val joinSettings: PublisherSettings = PublisherSettings(),
     val allowMicrophoneControl: Boolean = true,
     val allowCameraControl: Boolean = true,
+    val allowDeviceSelection: Boolean = true,
+    val allowSettings: Boolean = true,
+    val allowAudioDiagnostics: Boolean = true,
     val audioDevicesState: AudioDevicesState? = null,
     val backgrounds: ImmutableList<VideoBackgroundItem> = persistentListOf(),
-    /** Whether the "Add image" tile should be shown in the effects sheet. */
     val remainingBackgroundSlots: Int = UserBackgroundRepository.MAX_USER_BACKGROUNDS,
 )

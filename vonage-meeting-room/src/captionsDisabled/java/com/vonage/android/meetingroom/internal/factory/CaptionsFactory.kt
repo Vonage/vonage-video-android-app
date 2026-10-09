@@ -6,4 +6,4 @@ import retrofit2.Retrofit
 
 @Suppress("UNUSED_PARAMETER")
 internal fun createVonageCaptions(retrofit: Retrofit): VonageCaptions =
-    CaptionsModule.provideVonageCaptions()
+    CaptionsModule.provideVonageCaptions(retrofit)

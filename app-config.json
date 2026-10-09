@@ -1,0 +1,42 @@
+{
+  "metadata": {
+    "name": "vonage",
+    "version": "1.0.0",
+    "created": "2026-09-04",
+    "description": "Default Vonage Video app configuration."
+  },
+  "baseApiUrl": "${BASE_API_URL}",
+  "videoSettings": {
+    "allowBackgroundEffects": true,
+    "allowCameraControl": true,
+    "allowVideoOnJoin": true,
+    "defaultResolution": "640x480"
+  },
+  "audioSettings": {
+    "allowAdvancedNoiseSuppression": true,
+    "allowAudioOnJoin": true,
+    "allowMicrophoneControl": true,
+    "allowAudioDiagnostics": true
+  },
+  "authSettings": {
+    "allowAuthentication": false
+  },
+  "waitingRoomSettings": {
+    "allowDeviceSelection": true,
+    "allowSettings": true,
+    "bypassWaitingRoom": true
+  },
+  "meetingRoomSettings": {
+    "allowSettings": true,
+    "allowArchiving": true,
+    "allowCaptions": true,
+    "allowChat": true,
+    "allowDeviceSelection": true,
+    "allowEmojis": true,
+    "allowFeedback": true,
+    "allowPictureInPicture": true,
+    "allowScreenShare": true,
+    "defaultLayoutMode": "activeSpeaker",
+    "showParticipantList": true
+  }
+}

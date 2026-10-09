@@ -60,10 +60,6 @@ class VonageLogger private constructor(
     }
 }
 
-object DefaultVonageLogger {
-    val log = VonageLogger.Builder()
-        .addInterceptor(AndroidLogInterceptor())
-        .build()
-}
-
-val vonageLogger = DefaultVonageLogger.log
+val vonageLogger: VonageLogger = VonageLogger.Builder()
+    .addInterceptor(AndroidLogInterceptor())
+    .build()

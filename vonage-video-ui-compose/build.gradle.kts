@@ -8,10 +8,10 @@ plugins {
 
 android {
     namespace = "com.vonage.android.compose"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 24
+        minSdk = libs.versions.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -26,12 +26,13 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+            all { it.useJUnitPlatform() }
         }
     }
 }
 
 themeGenerator {
-    themeJsonFile.set(file("../config/theme.json"))
+    themeJsonFile.set(file("../theme.json"))
     outputPackage.set("com.vonage.android.compose.theme")
     themeDirectory.set(file("src/main/java/com/vonage/android/compose/theme"))
 }
@@ -58,15 +59,17 @@ dependencies {
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
 
     testImplementation(libs.junit.junit)
-    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter.params)
     testImplementation(libs.androidx.ui.test.junit4)
     testImplementation(libs.roborazzi)
     testImplementation(libs.roborazzi.compose)
     testImplementation(libs.robolectric)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.vintage.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
