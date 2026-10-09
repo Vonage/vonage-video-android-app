@@ -23,6 +23,9 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GITHUB_PR_NUM: ${{ github.event.pull_request.number }}
   BASE_API_URL: ${{ secrets.BASE_API_URL }}
+  OKTA_ISSUER_URL: ${{ secrets.OKTA_ISSUER_URL }}
+  OKTA_CLIENT_ID: ${{ secrets.OKTA_CLIENT_ID }}
+  OKTA_SIGN_IN_REDIRECT_URI: ${{ secrets.OKTA_SIGN_IN_REDIRECT_URI }}
 
 jobs:
   maestro-tests:
@@ -66,6 +69,10 @@ jobs:
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Enable Okta authentication
+        run: |
+          jq '.authSettings.allowAuthentication = true' app-config.json > app-config.tmp && mv app-config.tmp app-config.json
 
       - name: Generate config
         run: |
