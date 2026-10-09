@@ -44,7 +44,12 @@ class RoomAccessRepositoryTest {
         runTest {
             every { oktaAuth.isCapable } returns true
             coEvery { sessionRepository.getSession("room") } returns Result.success(
-                SessionInfo(apiKey = "apiKey", sessionId = "sessionId", token = "token", captionsId = null)
+                SessionInfo(
+                    applicationId = "applicationId",
+                    sessionId = "sessionId",
+                    token = "token",
+                    sessionKey = "sessionKey",
+                )
             )
 
             assertFalse(sut.requiresAuthentication("room"))

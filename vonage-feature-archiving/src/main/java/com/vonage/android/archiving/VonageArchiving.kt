@@ -20,30 +20,30 @@ interface VonageArchiving {
     fun bind(call: CallFacade): Flow<ArchivingState>
 
     /**
-     * Starts archiving/recording for the specified room.
+     * Starts archiving/recording for the session identified by [sessionKey].
      * Initiates a new recording session and returns the archive ID for tracking.
      *
-     * @param roomName The name of the room to start archiving
+     * @param sessionKey The session key JWT returned by the backend when the session was created
      * @return Result containing the archive ID on success, or an error on failure
      */
-    suspend fun startArchive(roomName: String): Result<ArchiveId>
+    suspend fun startArchive(sessionKey: String): Result<ArchiveId>
 
     /**
-     * Stops the current active archive/recording session for the room.
+     * Stops the current active archive/recording for the session identified by [sessionKey].
      * Ends the recording and finalizes the archive for later retrieval.
      *
-     * @param roomName The name of the room to stop archiving
+     * @param sessionKey The session key JWT returned by the backend when the session was created
      * @return Result indicating success (true) or failure with error details
      */
-    suspend fun stopArchive(roomName: String): Result<Boolean>
+    suspend fun stopArchive(sessionKey: String): Result<Boolean>
 
     /**
-     * Retrieves all recorded archives for the specified room.
+     * Retrieves all recorded archives for the session identified by [sessionKey].
      * Returns a list of previously recorded sessions with their metadata.
      *
-     * @param roomName The name of the room to retrieve recordings for
+     * @param sessionKey The session key JWT returned by the backend when the session was created
      * @return Result containing a list of archives on success, or an error on failure
      */
-    suspend fun getRecordings(roomName: String): Result<List<Archive>>
+    suspend fun getRecordings(sessionKey: String): Result<List<Archive>>
 
 }

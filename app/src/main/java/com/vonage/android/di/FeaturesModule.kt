@@ -8,6 +8,8 @@ import com.vonage.android.captions.di.CaptionsModule
 import com.vonage.android.chat.ChatFeature
 import com.vonage.android.chat.ChatModule
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
+import com.vonage.android.meetingroom.api.SessionKeyHolder
+import com.vonage.android.meetingroom.api.SessionKeyProvider
 import com.vonage.android.reactions.ReactionSignalPlugin
 import com.vonage.android.reactions.di.ReactionsModule
 import com.vonage.android.screensharing.VonageScreenSharing
@@ -27,6 +29,12 @@ import dagger.hilt.EntryPoint
 @InstallIn(SingletonComponent::class)
 interface CallSettingsHolderEntryPoint {
     fun callSettingsHolder(): CallSettingsHolder
+}
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface SessionKeyHolderEntryPoint {
+    fun sessionKeyHolder(): SessionKeyHolder
 }
 
 @Module
@@ -68,5 +76,13 @@ object FeaturesModule {
     @Provides
     fun provideCallSettingsHolder(storage: DataStoreCallSettingsStorage): CallSettingsHolder =
         CallSettingsHolder(storage = storage)
+
+    /** Shared with the meeting room so the goodbye screen can list the session recordings. */
+    @Singleton
+    @Provides
+    fun provideSessionKeyHolder(): SessionKeyHolder = SessionKeyHolder()
+
+    @Provides
+    fun provideSessionKeyProvider(holder: SessionKeyHolder): SessionKeyProvider = holder
 
 }

@@ -5,6 +5,7 @@ import com.vonage.android.data.network.APIService
 import com.vonage.android.data.network.interceptor.AuthorizationInterceptor
 import com.vonage.android.data.network.interceptor.E2eForceUnauthorizedInterceptor
 import com.vonage.android.data.network.interceptor.VeraHeaderRequestDecorator
+import com.vonage.android.shared.network.redactSecrets
 import com.vonage.android.shared.session.SessionApiService
 import com.vonage.android.shared.session.SessionRepository
 import dagger.Module
@@ -30,7 +31,10 @@ object RetrofitModule {
         e2eForceUnauthorizedInterceptor: E2eForceUnauthorizedInterceptor,
     ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(
-            HttpLoggingInterceptor()
+            // Bodies carry the session key and client token: mask them before logging.
+            HttpLoggingInterceptor { message ->
+                HttpLoggingInterceptor.Logger.DEFAULT.log(message.redactSecrets())
+            }
                 .apply {
                     level = if (BuildConfig.DEBUG) {
                         HttpLoggingInterceptor.Level.BODY

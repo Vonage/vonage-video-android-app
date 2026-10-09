@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.vonage.android.archiving.Archive
 import com.vonage.android.archiving.ArchiveStatus
 import com.vonage.android.archiving.VonageArchiving
+import com.vonage.android.meetingroom.api.SessionKeyProvider
 import com.vonage.android.util.DownloadManager
 import com.vonage.android.util.coroutines.CoroutinePollerFactory
 import dagger.assisted.Assisted
@@ -26,6 +27,7 @@ import kotlinx.coroutines.launch
 class GoodbyeScreenViewModel @AssistedInject constructor(
     @Assisted val roomName: String,
     private val vonageArchiving: VonageArchiving,
+    private val sessionKeyProvider: SessionKeyProvider,
     private val downloadManager: DownloadManager,
     private val pollerFactory: CoroutinePollerFactory,
 ) : ViewModel() {
@@ -38,9 +40,15 @@ class GoodbyeScreenViewModel @AssistedInject constructor(
     )
 
     init {
+        // No key means no session was created (e.g. failed join or process death): show nothing,
+        // and never call searchArchives without a key (the backend would search the whole app).
+        sessionKeyProvider.sessionKey?.let(::pollRecordings)
+    }
+
+    private fun pollRecordings(sessionKey: String) {
         viewModelScope.launch {
             pollerFactory.create {
-                vonageArchiving.getRecordings(roomName)
+                vonageArchiving.getRecordings(sessionKey)
                     .onSuccess { archives ->
                         archives
                             .count { archive -> archive.status == ArchiveStatus.PENDING }

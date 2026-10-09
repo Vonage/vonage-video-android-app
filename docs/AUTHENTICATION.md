@@ -153,7 +153,7 @@ Rather than forcing every user to sign in up front (which would break backends w
 
 1. On **Create room** / **Join**, `LandingScreenViewModel` asks `RoomAccessRepository.requiresAuthentication(room)`.
 2. When the okta flavor is disabled this returns `false` immediately — no extra request is made and the flow is unchanged.
-3. Otherwise it calls `GET session/{room}` through the shared `SessionRepository` (`vonage-video-shared`, the same one the meeting room uses), on the app's Retrofit so the token, if any, is attached by `AuthorizationInterceptor`. Only a `401 Unauthorized` counts as "sign-in required"; success, other errors and network failures proceed to the waiting room as before.
+3. Otherwise it calls `POST v2/createSession` + `POST v2/joinSession` through the shared `SessionRepository` (`vonage-video-shared`, the same one the meeting room uses), on the app's Retrofit so the token, if any, is attached by `AuthorizationInterceptor`. Only a `401 Unauthorized` (from either call) counts as "sign-in required"; success, other errors and network failures proceed to the waiting room as before.
 4. On `401` the landing screen shows `AuthenticationRequiredSheet` (same sheet and test tags as the top-bar sign-in). A successful browser sign-in continues to the waiting room for the room the user picked; dismissing the sheet keeps them on the landing screen.
 
 ### Session persistence & security
@@ -176,7 +176,7 @@ The contract in `src/main` is provider-agnostic (`VonageOktaAuth`, `AuthState`, 
 ./gradlew :app:testDebugUnitTest --tests "com.vonage.android.data.network.interceptor.*"
 ```
 
-The Maestro flow `.maestro/flows/auth-required-create-join-room.yaml` covers the signed-out Create / Join case and runs with the rest of the suite. It launches the app with the `e2eForceAuthRequired` argument, which makes `E2eForceUnauthorizedInterceptor` answer signed-out `GET session/{room}` requests with a local `401` — so the flow passes whether or not the backend middleware is active, and the other flows (launched without the argument) keep hitting the real backend.
+The Maestro flow `.maestro/flows/auth-required-create-join-room.yaml` covers the signed-out Create / Join case and runs with the rest of the suite. It launches the app with the `e2eForceAuthRequired` argument, which makes `E2eForceUnauthorizedInterceptor` answer signed-out `POST v2/createSession` requests with a local `401` — so the flow passes whether or not the backend middleware is active, and the other flows (launched without the argument) keep hitting the real backend.
 
 The Maestro CI workflow always builds with `allowAuthentication: true` (it overrides the committed default before generating the config), so this flow runs on every E2E run. The other flows are unaffected: the backend does not enforce authentication for them, and they are launched without the argument. Locally, enable the flag before running this flow.
 

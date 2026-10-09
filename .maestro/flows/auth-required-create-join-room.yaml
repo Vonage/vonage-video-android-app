@@ -4,7 +4,7 @@ appId: ${APP_ID}
 # Description: Tapping "Create room" or "Join" while signed out opens the sign-in sheet
 #   instead of the waiting room.
 #   The `e2eForceAuthRequired` launch argument makes the app answer signed-out
-#   GET /session/{room} requests with 401 locally (E2eForceUnauthorizedInterceptor), so the
+#   POST /v2/createSession requests with 401 locally (E2eForceUnauthorizedInterceptor), so the
 #   flow does not depend on the backend's authentication middleware being active.
 # Requires: a build with authSettings.allowAuthentication = true (okta flavor enabled).
 #   The Maestro CI workflow always builds with it enabled.
