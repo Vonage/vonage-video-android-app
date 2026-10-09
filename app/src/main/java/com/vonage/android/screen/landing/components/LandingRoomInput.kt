@@ -30,6 +30,7 @@ internal fun LandingRoomInput(
     isRoomNameWrong: Boolean,
     actions: LandingScreenActions,
     modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -65,6 +66,7 @@ internal fun LandingRoomInput(
                 .height(VonageVideoTheme.dimens.buttonHeight)
                 .testTag(JOIN_BUTTON_TAG),
             onClick = { actions.onJoinRoomClick(roomName) },
+            enabled = isEnabled,
             text = stringResource(R.string.landing_join),
         )
     }

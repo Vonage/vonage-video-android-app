@@ -9,6 +9,7 @@ android {
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     compileOptions {
@@ -23,9 +24,16 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+
+    // Session data layer: callers create SessionApiService from their own Retrofit instance,
+    // and retrofit2.Response is part of its signature, so Retrofit is exposed as `api`.
+    api(libs.retrofit)
     implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(kotlin("test"))
     testImplementation(libs.junit.jupiter.params)
     testRuntimeOnly(libs.junit.platform.launcher)
     testRuntimeOnly(libs.junit.jupiter.engine)

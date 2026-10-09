@@ -72,7 +72,7 @@ class VonageVideoClient(
      *
      * Typical call chain (orchestrated by `MeetingRoomViewModel`):
      * ```
-     * MeetingRoomSessionRepository.getSession() → VonageVideoClient.initializeSession() → CallFacade.connect()
+     * SessionRepository.getSession() → VonageVideoClient.initializeSession() → CallFacade.connect()
      * ```
      *
      * @param apiKey   Vonage application ID (`applicationId`) obtained from the backend `createSession` endpoint.

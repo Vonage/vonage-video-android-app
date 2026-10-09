@@ -147,6 +147,15 @@ The landing screen's top bar renders `SignInButton` from the feature module:
 
 The disabled flavor's `SignInButton` has an identical signature and renders nothing, so no feature-flag branching exists in `app/` UI code. All other screens are untouched.
 
+### Sign-in required before creating or joining a room
+
+Rather than forcing every user to sign in up front (which would break backends without the authentication middleware), the app lets the backend decide:
+
+1. On **Create room** / **Join**, `LandingScreenViewModel` asks `RoomAccessRepository.requiresAuthentication(room)`.
+2. When the okta flavor is disabled this returns `false` immediately — no extra request is made and the flow is unchanged.
+3. Otherwise it calls `POST v2/createSession` + `POST v2/joinSession` through the shared `SessionRepository` (`vonage-video-shared`, the same one the meeting room uses), on the app's Retrofit so the token, if any, is attached by `AuthorizationInterceptor`. Only a `401 Unauthorized` (from either call) counts as "sign-in required"; success, other errors and network failures proceed to the waiting room as before.
+4. On `401` the landing screen shows `AuthenticationRequiredSheet` (same sheet and test tags as the top-bar sign-in). A successful browser sign-in continues to the waiting room for the room the user picked; dismissing the sheet keeps them on the landing screen.
+
 ### Session persistence & security
 
 - Tokens are stored by the Okta SDK in an **encrypted Room database** on device; the session is restored on app start (`restoreSession()`), so users stay signed in across restarts.
@@ -166,5 +175,13 @@ The contract in `src/main` is provider-agnostic (`VonageOktaAuth`, `AuthState`, 
 # App-level interceptor tests
 ./gradlew :app:testDebugUnitTest --tests "com.vonage.android.data.network.interceptor.*"
 ```
+
+The Maestro flow `.maestro/flows/auth-required-create-join-room.yaml` covers the signed-out Create / Join case and runs with the rest of the suite. It launches the app with the `e2eForceAuthRequired` argument, which makes `E2eForceUnauthorizedInterceptor` answer signed-out `POST v2/createSession` requests with a local `401` — so the flow passes whether or not the backend middleware is active, and the other flows (launched without the argument) keep hitting the real backend.
+
+The Maestro CI workflow always builds with `allowAuthentication: true` (it overrides the committed default before generating the config), so this flow runs on every E2E run. The other flows are unaffected: the backend does not enforce authentication for them, and they are launched without the argument. Locally, enable the flag before running this flow.
+
+`.maestro/flows/auth-login-logout.yaml` covers sign-in and sign-out from the top-bar button. It passes `e2eFakeSignIn`, which swaps the Okta browser step for `FakeBrowserSignInProvider` (instant success as "E2E Test User", token kept in memory), so they need no Okta tenant, credentials or App Link verification. The Okta hosted page and the redirect back to the app are therefore not covered by E2E tests.
+
+> These launch-argument hooks are only honoured when `BuildConfig.E2E_HOOKS_ENABLED` is set: always in debug builds, and in release only when built with `-Pvonage.e2eHooks=true` (the Maestro CI build). Store release builds ignore them.
 
 Compose test tags on the auth UI (`auth-button`, `auth-sign-in-screen`, `auth-sign-in-provider-okta`, `auth-account-menu`, `auth-sign-out-button`, …) are aligned with the iOS accessibility identifiers so Maestro E2E flows can be shared across platforms.

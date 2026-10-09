@@ -203,8 +203,13 @@ android {
         }
     }
 
+    // Maestro E2E launch-argument hooks (see util/E2eTestFlags.kt): always on in debug; in release
+    // only when the Maestro CI build passes -Pvonage.e2eHooks=true, so store builds ignore them.
+    val e2eHooksInRelease = providers.gradleProperty("vonage.e2eHooks").orNull.toBoolean()
+
     buildTypes {
         debug {
+            buildConfigField("boolean", "E2E_HOOKS_ENABLED", "true")
             versionNameSuffix = "-DEBUG"
             applicationIdSuffix = ".debug"
             isDebuggable = true
@@ -213,6 +218,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
+            buildConfigField("boolean", "E2E_HOOKS_ENABLED", "$e2eHooksInRelease")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

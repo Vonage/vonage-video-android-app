@@ -22,8 +22,6 @@ import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.meetingroom.api.SessionKeyHolder
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
-import com.vonage.android.meetingroom.internal.data.MeetingRoomSessionRepository
-import com.vonage.android.meetingroom.internal.data.SessionInfo
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
 import com.vonage.android.meetingroom.internal.screen.audio.MeetingRoomAudioDevicesHandler
@@ -33,6 +31,8 @@ import com.vonage.android.meetingroom.internal.util.ActivityContextHolder
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.settings.CallSettingsHolder
+import com.vonage.android.shared.session.SessionInfo
+import com.vonage.android.shared.session.SessionRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -65,7 +65,7 @@ class MeetingRoomViewModelTest {
     private val context: Context = mockk(relaxed = true)
     private val container: MeetingRoomContainer = mockk(relaxed = true)
     private val prebuilt: MeetingRoomPrebuilt = mockk(relaxed = true)
-    private val sessionRepository: MeetingRoomSessionRepository = mockk()
+    private val sessionRepository: SessionRepository = mockk()
     private val vonageArchiving: VonageArchiving = mockk(relaxed = true)
     private val vonageCaptions: VonageCaptions = mockk(relaxed = true)
     private val vonageScreenSharing: VonageScreenSharing = mockk(relaxed = true)

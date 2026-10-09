@@ -1,4 +1,4 @@
-package com.vonage.android.meetingroom.internal.data
+package com.vonage.android.shared.session
 
 import com.vonage.android.shared.network.SessionKeyRequest
 import com.vonage.android.shared.network.TrpcResponse
@@ -8,16 +8,17 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
-import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.jupiter.api.Test
 import retrofit2.Response
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
-class MeetingRoomSessionRepositoryTest {
+class SessionRepositoryTest {
 
-    private val apiService: MeetingRoomApiService = mockk()
-    private val sut = MeetingRoomSessionRepository(apiService)
+    private val apiService: SessionApiService = mockk()
+    private val sut = SessionRepository(apiService)
 
     @Test
     fun `given both calls succeed returns mapped SessionInfo`() = runTest {
@@ -43,7 +44,7 @@ class MeetingRoomSessionRepositoryTest {
 
     @Test
     fun `given createSession error response returns failure without joining`() = runTest {
-        coEvery { apiService.createSession(any()) } returns Response.error(400, ResponseBody.EMPTY)
+        coEvery { apiService.createSession(any()) } returns Response.error(400, "".toResponseBody())
 
         val result = sut.getSession(ROOM_NAME)
 
@@ -63,9 +64,20 @@ class MeetingRoomSessionRepositoryTest {
     }
 
     @Test
+    fun `given createSession unauthorized response returns SessionUnauthorizedException without joining`() =
+        runTest {
+            coEvery { apiService.createSession(any()) } returns Response.error(401, "".toResponseBody())
+
+            val result = sut.getSession(ROOM_NAME)
+
+            assertIs<SessionUnauthorizedException>(result.exceptionOrNull())
+            coVerify(exactly = 0) { apiService.joinSession(any()) }
+        }
+
+    @Test
     fun `given joinSession error response returns failure`() = runTest {
         givenCreateSessionSucceeds()
-        coEvery { apiService.joinSession(any()) } returns Response.error(500, ResponseBody.EMPTY)
+        coEvery { apiService.joinSession(any()) } returns Response.error(500, "".toResponseBody())
 
         val result = sut.getSession(ROOM_NAME)
 
@@ -82,6 +94,16 @@ class MeetingRoomSessionRepositoryTest {
 
         assertTrue(result.isFailure)
         assertEquals("Failed joining session", result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun `given joinSession unauthorized response returns SessionUnauthorizedException`() = runTest {
+        givenCreateSessionSucceeds()
+        coEvery { apiService.joinSession(any()) } returns Response.error(401, "".toResponseBody())
+
+        val result = sut.getSession(ROOM_NAME)
+
+        assertIs<SessionUnauthorizedException>(result.exceptionOrNull())
     }
 
     @Test

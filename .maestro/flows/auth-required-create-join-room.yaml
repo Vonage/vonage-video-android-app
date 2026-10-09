@@ -1,0 +1,87 @@
+appId: ${APP_ID}
+---
+# E2E Test: Unauthenticated user is asked to sign in before creating or joining a room
+# Description: Tapping "Create room" or "Join" while signed out opens the sign-in sheet
+#   instead of the waiting room.
+#   The `e2eForceAuthRequired` launch argument makes the app answer signed-out
+#   POST /v2/createSession requests with 401 locally (E2eForceUnauthorizedInterceptor), so the
+#   flow does not depend on the backend's authentication middleware being active.
+# Requires: a build with authSettings.allowAuthentication = true (okta flavor enabled).
+#   The Maestro CI workflow always builds with it enabled.
+# Priority: P1
+
+# clearState wipes the stored Okta credential so the user starts signed out. It also
+# revokes the permissions CI granted with `pm grant`, so grant all of them again.
+- launchApp:
+    clearState: true
+    arguments:
+      e2eForceAuthRequired: true
+    permissions:
+      all: allow
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- assertVisible:
+    id: "landing-screen"
+
+# Fails fast if the build does not have authentication enabled
+- assertVisible:
+    id: "auth-button"
+
+# --- Create room ---
+- tapOn:
+    id: "landing-screen-create-room-button"
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- assertVisible:
+    id: "auth-sign-in-screen"
+
+- assertVisible:
+    id: "auth-sign-in-provider-okta"
+
+- assertNotVisible:
+    id: "waiting-room-screen"
+
+- takeScreenshot: 01-auth-required-create-room
+
+# Dismissing the sheet keeps the user on the landing screen
+- back
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- assertNotVisible:
+    id: "auth-sign-in-screen"
+
+- assertVisible:
+    id: "landing-screen"
+
+# --- Join room ---
+- tapOn:
+    id: "room-name-input"
+
+- eraseText
+
+- inputText: "${ROOM_NAME}"
+
+- hideKeyboard
+
+- tapOn:
+    id: "join-waiting-room-button"
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- assertVisible:
+    id: "auth-sign-in-screen"
+
+- assertVisible:
+    id: "auth-sign-in-provider-okta"
+
+- assertNotVisible:
+    id: "waiting-room-screen"
+
+- takeScreenshot: 02-auth-required-join-room

@@ -72,6 +72,7 @@ fun LandingScreen(
                                 .widthIn(0.dp, MAX_PANE_WIDTH.dp),
                             roomName = uiState.roomName,
                             isRoomNameWrong = uiState.isRoomNameWrong,
+                            isEnabled = !uiState.isCheckingAccess,
                             actions = actions,
                         )
                     }
