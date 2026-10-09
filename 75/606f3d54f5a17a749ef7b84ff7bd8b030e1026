@@ -1,0 +1,56 @@
+vonage-video-core/src/main/java/com/vonage/android/kotlin/VonageVideoClient.kt
+  s_7b46128b906065::t_cbca364d6737c6 75
+app/src/test/java/com/vonage/android/data/RoomAccessRepositoryTest.kt
+  s_7b46128b906065::t_73b9bc9a1a514a 47-52
+  s_7b46128b906065::t_820c50a4cef8f4 44-46
+  s_7b46128b906065::t_cb8ffd31b35ad2 53-55
+docs/AUTHENTICATION.md
+  s_7b46128b906065::t_9fa8382b8b7230 156
+  s_7b46128b906065::t_b3d3dad4edd50d 153-155
+  s_7b46128b906065::t_d110cf66ac79f7 157-158
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelSessionKeyTest.kt
+  s_7b46128b906065::t_ad3a164496d2c5 23-24
+.github/copilot-instructions.md
+  s_7b46128b906065::t_c6391260ed7a11 21
+vonage-video-shared/src/main/java/com/vonage/android/shared/session/SessionApiService.kt
+  s_7b46128b906065::t_cda6a361b96ef9 3-23
+.maestro/flows/auth-required-create-join-room.yaml
+  s_7b46128b906065::t_3a3143579e5151 7
+  s_7b46128b906065::t_8fbee493d47f18 4-6
+  s_7b46128b906065::t_ba49e945888aa4 8-10
+AGENTS.md
+  s_7b46128b906065::t_4277d8350d5420 39
+vonage-video-shared/src/main/java/com/vonage/android/shared/session/SessionRepository.kt
+  s_7b46128b906065::t_6eec0ddf76d834 3-42
+vonage-video-shared/src/test/java/com/vonage/android/shared/session/SessionRepositoryTest.kt
+  s_7b46128b906065::t_03e16efaee658c 23,25,28,45,47-104,109,113,119,134
+  s_7b46128b906065::t_5e12ad84f5745a 105-108
+.maestro/TESTS.md
+  s_7b46128b906065::t_385d9f1088b5da 31
+  s_7b46128b906065::t_26e8e905f8619d 28-30
+  s_7b46128b906065::t_690577cbc1084f 32
+app/src/main/java/com/vonage/android/util/E2eTestFlags.kt
+  s_7b46128b906065::t_f724230b425ca6 26
+  s_7b46128b906065::t_283ae32c7caa28 23-25
+  s_7b46128b906065::t_f9ff7edcd99843 27-29
+app/src/main/java/com/vonage/android/data/network/interceptor/E2eForceUnauthorizedInterceptor.kt
+  s_7b46128b906065::t_cf9fd0b022db6a 25-41
+  s_7b46128b906065::t_6561c886df36d3 22-24
+  s_7b46128b906065::t_f7bc03fcee81eb 42-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "75606f3d54f5a17a749ef7b84ff7bd8b030e1026",
+  "prompts": {},
+  "sessions": {
+    "s_7b46128b906065": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_42b0fd03-295e-41c4-b66c-988687954b28",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
