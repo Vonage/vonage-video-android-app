@@ -1,10 +1,10 @@
-package com.vonage.android.meetingroom.internal.data
+package com.vonage.android.shared.session
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class GetSessionResponse(
+data class GetSessionResponse(
     @SerialName("apiKey")
     val apiKey: String,
     @SerialName("sessionId")
@@ -15,9 +15,12 @@ internal data class GetSessionResponse(
     val captionsId: String? = null,
 )
 
-internal data class SessionInfo(
+data class SessionInfo(
     val apiKey: String,
     val sessionId: String,
     val token: String,
     val captionsId: String?,
 )
+
+/** The backend rejected the session request with `401 Unauthorized`: the user must sign in. */
+class SessionUnauthorizedException : Exception("Authentication required to get the session")

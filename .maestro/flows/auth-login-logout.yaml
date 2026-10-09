@@ -1,0 +1,110 @@
+appId: ${APP_ID}
+---
+# E2E Test: Okta sign-in and sign-out from the landing screen
+# Description: Signed-out user opens the sign-in sheet from the top-bar button, signs in,
+#   sees their name in the account sheet, signs out, and is offered the sign-in sheet again.
+#   The `e2eFakeSignIn` launch argument makes "Sign in with Okta" succeed instantly with the
+#   fake user "E2E Test User" (FakeBrowserSignInProvider) instead of opening the Okta browser
+#   flow, so no real Okta tenant, credentials or App Link verification are needed. The Okta
+#   hosted page and redirect are therefore NOT covered by this flow.
+# Requires: a build with authSettings.allowAuthentication = true and E2E hooks enabled
+#   (debug builds, or the Maestro CI release build with -Pvonage.e2eHooks=true).
+# Priority: P1
+
+# clearState wipes any stored credential so the user starts signed out. It also revokes the
+# permissions CI granted with `pm grant`, so grant all of them again.
+- launchApp:
+    clearState: true
+    arguments:
+      e2eFakeSignIn: true
+    permissions:
+      all: allow
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- assertVisible:
+    id: "landing-screen"
+
+- assertVisible:
+    id: "auth-button"
+
+# --- Sign in ---
+- tapOn:
+    id: "auth-button"
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- assertVisible:
+    id: "auth-sign-in-screen"
+
+- assertVisible:
+    id: "auth-sign-in-title"
+
+- assertVisible:
+    id: "auth-sign-in-provider-okta"
+
+- takeScreenshot: 01-sign-in-sheet
+
+- tapOn:
+    id: "auth-sign-in-provider-okta"
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# The sheet closes on successful sign-in
+- assertNotVisible:
+    id: "auth-sign-in-screen"
+
+- assertVisible:
+    id: "landing-screen"
+
+# --- Signed in: the account sheet shows the user ---
+- tapOn:
+    id: "auth-button"
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- assertVisible:
+    id: "auth-account-menu"
+
+- assertVisible:
+    id: "auth-account-name"
+    text: "E2E Test User"
+
+- assertVisible:
+    id: "auth-sign-out-button"
+
+- takeScreenshot: 02-account-sheet-signed-in
+
+# --- Sign out ---
+- tapOn:
+    id: "auth-sign-out-button"
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- assertNotVisible:
+    id: "auth-account-menu"
+
+- assertVisible:
+    id: "landing-screen"
+
+# --- Signed out again: the top-bar button offers sign-in, not the account sheet ---
+- tapOn:
+    id: "auth-button"
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+- assertVisible:
+    id: "auth-sign-in-screen"
+
+- assertNotVisible:
+    id: "auth-account-menu"
+
+- takeScreenshot: 03-signed-out
+
+- back

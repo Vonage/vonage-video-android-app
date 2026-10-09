@@ -5,6 +5,7 @@ import com.vonage.android.BuildConfig
 import com.vonage.android.okta.OktaConfig
 import com.vonage.android.okta.VonageOktaAuth
 import com.vonage.android.okta.di.OktaModule
+import com.vonage.android.util.E2eTestFlags
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.EntryPoint
@@ -27,6 +28,7 @@ object AuthModule {
     @Provides
     fun provideVonageOktaAuth(
         @ApplicationContext context: Context,
+        e2eTestFlags: E2eTestFlags,
     ): VonageOktaAuth = OktaModule.provideVonageOktaAuth(
         context = context,
         config = OktaConfig(
@@ -35,5 +37,6 @@ object AuthModule {
             signInRedirectUri = BuildConfig.OKTA_SIGN_IN_REDIRECT_URI,
             scope = BuildConfig.OKTA_SCOPE.ifBlank { OktaConfig.DEFAULT_SCOPE },
         ),
+        isFakeSignInEnabled = { e2eTestFlags.fakeSignIn },
     )
 }

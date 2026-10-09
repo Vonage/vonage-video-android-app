@@ -1,18 +1,19 @@
-package com.vonage.android.meetingroom.internal.data
+package com.vonage.android.shared.session
 
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.jupiter.api.Test
 import retrofit2.Response
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
-class MeetingRoomSessionRepositoryTest {
+class SessionRepositoryTest {
 
-    private val apiService: MeetingRoomApiService = mockk()
-    private val sut = MeetingRoomSessionRepository(apiService)
+    private val apiService: SessionApiService = mockk()
+    private val sut = SessionRepository(apiService)
 
     @Test
     fun `given api success returns mapped SessionInfo`() = runTest {
@@ -78,12 +79,21 @@ class MeetingRoomSessionRepositoryTest {
 
     @Test
     fun `given api error response returns failure`() = runTest {
-        coEvery { apiService.getSession(any()) } returns Response.error(500, ResponseBody.EMPTY)
+        coEvery { apiService.getSession(any()) } returns Response.error(500, "".toResponseBody())
 
         val result = sut.getSession("any-room-name")
 
         assertTrue(result.isFailure)
         assertEquals("Failed getting session", result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun `given api unauthorized response returns SessionUnauthorizedException`() = runTest {
+        coEvery { apiService.getSession(any()) } returns Response.error(401, "".toResponseBody())
+
+        val result = sut.getSession("any-room-name")
+
+        assertIs<SessionUnauthorizedException>(result.exceptionOrNull())
     }
 
     @Test
