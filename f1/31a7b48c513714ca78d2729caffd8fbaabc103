@@ -1,0 +1,20 @@
+.github/workflows/android.yml
+  h_5ddc9d372ac6a1 27-29,63-66,126-129
+.github/workflows/maestro.yml
+  h_5ddc9d372ac6a1 26-28,73-76
+.github/workflows/publish-play-store.yml
+  h_5ddc9d372ac6a1 71-74,78-80
+docs/AUTHENTICATION.md
+  h_5ddc9d372ac6a1 93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "f131a7b48c513714ca78d2729caffd8fbaabc103",
+  "prompts": {},
+  "humans": {
+    "h_5ddc9d372ac6a1": {
+      "author": "Ivan <210490533+VZaphod@users.noreply.github.com>"
+    }
+  }
+}
