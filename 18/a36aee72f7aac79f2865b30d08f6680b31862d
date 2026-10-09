@@ -1,0 +1,31 @@
+.github/ISSUE_TEMPLATE/1-bug-report.yml
+  s_3cb252efaac298::t_12c4a77f33df06 45
+.github/workflows/check-release.yml
+  s_3cb252efaac298::t_580edd15059141 7
+app/build.gradle.kts
+  s_3cb252efaac298::t_444689f899366c 47-48
+.github/workflows/publish-play-store.yml
+  s_3cb252efaac298::t_8747fce44ae472 67
+  s_3cb252efaac298::t_2bcb296ec97fb1 66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "18a36aee72f7aac79f2865b30d08f6680b31862d",
+  "prompts": {},
+  "humans": {
+    "h_5ddc9d372ac6a1": {
+      "author": "Ivan <210490533+VZaphod@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_3cb252efaac298": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_4b3be9fd-31af-474a-bd06-21ad18c61311",
+        "model": "auto"
+      },
+      "human_author": "Ivan <210490533+VZaphod@users.noreply.github.com>"
+    }
+  }
+}
