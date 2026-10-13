@@ -23,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.components.VonageOutlinedButton
@@ -82,6 +84,8 @@ fun SignInButton(
     if (showSignInSheet) {
         SignInSheet(
             auth = auth,
+            subtitle = stringResource(R.string.auth_sign_in_subtitle),
+            onSignedIn = { showSignInSheet = false },
             onDismiss = { showSignInSheet = false },
         )
     }
@@ -96,10 +100,34 @@ fun SignInButton(
     }
 }
 
+/**
+ * Sign-in sheet shown when the backend rejects a request because the user is not
+ * authenticated (e.g. creating or joining a room). [onAuthenticated] is invoked once
+ * the browser sign-in completes so the caller can resume the interrupted action.
+ * The disabled flavor renders nothing and dismisses immediately.
+ */
+@Composable
+fun AuthenticationRequiredSheet(
+    auth: VonageOktaAuth,
+    onAuthenticated: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SignInSheet(
+        auth = auth,
+        subtitle = stringResource(R.string.auth_required_subtitle),
+        onSignedIn = onAuthenticated,
+        onDismiss = onDismiss,
+        modifier = modifier,
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SignInSheet(
     auth: VonageOktaAuth,
+    subtitle: String,
+    onSignedIn: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -110,7 +138,9 @@ private fun SignInSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        modifier = modifier.testTag(AuthTestTags.SIGN_IN_SHEET_TAG),
+        modifier = modifier
+            .testTag(AuthTestTags.SIGN_IN_SHEET_TAG)
+            .exposeTestTagsAsResourceIds(),
     ) {
         Column(
             modifier = Modifier
@@ -125,7 +155,7 @@ private fun SignInSheet(
                 modifier = Modifier.testTag(AuthTestTags.SIGN_IN_TITLE_TAG),
             )
             Text(
-                text = stringResource(R.string.auth_sign_in_subtitle),
+                text = subtitle,
                 style = VonageVideoTheme.typography.bodyBase,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.testTag(AuthTestTags.SIGN_IN_SUBTITLE_TAG),
@@ -148,7 +178,7 @@ private fun SignInSheet(
                             isLoading = true
                             errorMessage = null
                             auth.signIn(context)
-                                .onSuccess { onDismiss() }
+                                .onSuccess { onSignedIn() }
                                 .onFailure { error ->
                                     errorMessage = error.message
                                         ?: context.getString(R.string.auth_sign_in_error)
@@ -178,7 +208,9 @@ private fun AccountSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        modifier = modifier.testTag(AuthTestTags.ACCOUNT_MENU_TAG),
+        modifier = modifier
+            .testTag(AuthTestTags.ACCOUNT_MENU_TAG)
+            .exposeTestTagsAsResourceIds(),
     ) {
         Column(
             modifier = Modifier
@@ -214,3 +246,11 @@ private fun AccountSheet(
 }
 
 private val providers = listOf(IdProvider.okta)
+
+/**
+ * A bottom sheet is composed in its own window, so it does not inherit the
+ * `testTagsAsResourceId` set on the activity root; without this, Maestro cannot find
+ * the sheet's test tags.
+ */
+private fun Modifier.exposeTestTagsAsResourceIds(): Modifier =
+    semantics { testTagsAsResourceId = true }

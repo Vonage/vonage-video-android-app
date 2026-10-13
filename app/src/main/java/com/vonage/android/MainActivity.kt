@@ -24,6 +24,7 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.di.CallSettingsHolderEntryPoint
 import com.vonage.android.di.VonageOktaAuthEntryPoint
 import com.vonage.android.navigation.AppNavHost
+import com.vonage.android.util.E2eTestFlags
 import com.vonage.android.util.InAppUpdates
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
@@ -31,14 +32,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var e2eTestFlags: E2eTestFlags
 
     private val flow = MutableSharedFlow<Intent>(extraBufferCapacity = 1)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        e2eTestFlags.updateFrom(intent)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         enableEdgeToEdge()
 

@@ -44,8 +44,8 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
         // NOTE: The following versionCode and versionName are placeholders.
         // Actual values are set dynamically by the GitHub Actions workflow during CI/CD.
-        versionCode = 130
-        versionName = "1.3.0"
+        versionCode = 140
+        versionName = "1.4.0"
 
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
@@ -203,8 +203,13 @@ android {
         }
     }
 
+    // Maestro E2E launch-argument hooks (see util/E2eTestFlags.kt): always on in debug; in release
+    // only when the Maestro CI build passes -Pvonage.e2eHooks=true, so store builds ignore them.
+    val e2eHooksInRelease = providers.gradleProperty("vonage.e2eHooks").orNull.toBoolean()
+
     buildTypes {
         debug {
+            buildConfigField("boolean", "E2E_HOOKS_ENABLED", "true")
             versionNameSuffix = "-DEBUG"
             applicationIdSuffix = ".debug"
             isDebuggable = true
@@ -213,6 +218,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
+            buildConfigField("boolean", "E2E_HOOKS_ENABLED", "$e2eHooksInRelease")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

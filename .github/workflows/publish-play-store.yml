@@ -63,14 +63,21 @@ jobs:
 
       - name: Set version from GitHub run number
         run: |
-          VERSION_CODE=$((1000300 + $GITHUB_RUN_NUMBER))
-          VERSION_NAME="1.3.0-build${GITHUB_RUN_NUMBER}"
+          VERSION_CODE=$((1000400 + $GITHUB_RUN_NUMBER))
+          VERSION_NAME="1.4.0-build${GITHUB_RUN_NUMBER}"
           sed -i "s/versionCode = [0-9]\+/versionCode = $VERSION_CODE/" app/build.gradle.kts
           sed -i "s/versionName = \".*\"/versionName = \"$VERSION_NAME\"/" app/build.gradle.kts
+
+      - name: Enable Okta authentication
+        run: |
+          jq '.authSettings.allowAuthentication = true' app-config.json > app-config.tmp && mv app-config.tmp app-config.json
 
       - name: Build release AAB
         env:
           BASE_API_URL: ${{ secrets.BASE_API_URL }}
+          OKTA_ISSUER_URL: ${{ secrets.OKTA_ISSUER_URL }}
+          OKTA_CLIENT_ID: ${{ secrets.OKTA_CLIENT_ID }}
+          OKTA_SIGN_IN_REDIRECT_URI: ${{ secrets.OKTA_SIGN_IN_REDIRECT_URI }}
         run: ./gradlew generateVonageConfig && ./gradlew bundleRelease --stacktrace
 
       - name: Publish to Play Store

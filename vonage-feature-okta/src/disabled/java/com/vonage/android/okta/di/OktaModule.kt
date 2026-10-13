@@ -10,5 +10,6 @@ object OktaModule {
     fun provideVonageOktaAuth(
         @Suppress("UNUSED_PARAMETER") context: Context,
         @Suppress("UNUSED_PARAMETER") config: OktaConfig,
+        @Suppress("UNUSED_PARAMETER") isFakeSignInEnabled: () -> Boolean = { false },
     ): VonageOktaAuth = DisabledVonageOktaAuth()
 }
