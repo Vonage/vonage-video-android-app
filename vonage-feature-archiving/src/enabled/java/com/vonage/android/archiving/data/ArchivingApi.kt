@@ -1,22 +1,20 @@
 package com.vonage.android.archiving.data
 
+import com.vonage.android.shared.network.SessionKeyRequest
+import com.vonage.android.shared.network.TrpcResponse
 import retrofit2.Response
-import retrofit2.http.GET
+import retrofit2.http.Body
 import retrofit2.http.POST
-import retrofit2.http.Path
 
 interface ArchivingApi {
 
-    @POST("session/{room}/startArchive")
-    suspend fun startArchiving(@Path("room") room: String): Response<StartArchivingResponse>
+    @POST("v2/startArchive")
+    suspend fun startArchiving(@Body body: SessionKeyRequest): Response<TrpcResponse<ArchiveOperationResponse>>
 
-    @POST("session/{room}/{archiveId}/stopArchive")
-    suspend fun stopArchiving(
-        @Path("room") room: String,
-        @Path("archiveId") archiveId: String,
-    ): Response<StopArchivingResponse>
+    @POST("v2/stopArchive")
+    suspend fun stopArchiving(@Body body: StopArchiveRequest): Response<TrpcResponse<ArchiveOperationResponse>>
 
-    @GET("session/{room}/archives")
-    suspend fun getArchives(@Path("room") room: String): Response<GetArchivesResponse>
+    @POST("v2/searchArchives")
+    suspend fun searchArchives(@Body body: SessionKeyRequest): Response<TrpcResponse<SearchArchivesResponse>>
 
 }

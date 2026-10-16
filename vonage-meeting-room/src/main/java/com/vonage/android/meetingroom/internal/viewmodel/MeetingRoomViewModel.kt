@@ -120,6 +120,8 @@ internal class MeetingRoomViewModel(
                 )
             }
 
+            // Never keep the key of a previous room: it is written again once the session is created.
+            container.sessionKeyHolder.sessionKey = null
             container.sessionRepository.getSession(roomName)
                 .onSuccess { sessionInfo ->
                     connect(roomName = roomName, sessionInfo = sessionInfo)
@@ -167,21 +169,25 @@ internal class MeetingRoomViewModel(
         roomName: String,
     ) {
         viewModelScope.launch {
+            // The user may have left while the session was being fetched: never connect or
+            // publish this session's key, it could overwrite the key of a newer meeting room.
+            if (callEnded.get()) return@launch
             call = container.videoClient.initializeSession(
-                apiKey = sessionInfo.apiKey,
+                apiKey = sessionInfo.applicationId,
                 sessionId = sessionInfo.sessionId,
                 token = sessionInfo.token,
             )
             listenRemoteArchiving()
             call?.let { activeCall ->
-                container.vonageCaptions.init(activeCall, roomName, sessionInfo.captionsId)
+                container.sessionKeyHolder.sessionKey = sessionInfo.sessionKey
+                container.vonageCaptions.init(activeCall, sessionInfo.sessionKey)
                 container.callSettingsHolder.bind(activeCall)
                 _uiState.update { state ->
                     state.copy(
                         roomName = roomName,
                         call = activeCall,
                         archivingUiState = ArchivingUiState.IDLE,
-                        captionsUiState = if (sessionInfo.captionsId != null) CaptionsUiState.ENABLED else CaptionsUiState.IDLE,
+                        captionsUiState = CaptionsUiState.IDLE,
                         isLoading = false,
                         isError = false,
                     )
@@ -295,15 +301,16 @@ internal class MeetingRoomViewModel(
             _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.STOPPING) }
         }
         viewModelScope.launch {
+            val sessionKey = container.sessionKeyHolder.sessionKey
             if (enable) {
-                container.vonageArchiving.startArchive(roomName)
+                archiveResult(sessionKey) { container.vonageArchiving.startArchive(it) }
                     .onSuccess { _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.RECORDING) } }
                     .onFailure {
                         localUserStartedRecording = false
                         _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.IDLE) }
                     }
             } else {
-                container.vonageArchiving.stopArchive(roomName)
+                archiveResult(sessionKey) { container.vonageArchiving.stopArchive(it) }
                     .onSuccess {
                         localUserStartedRecording = false
                         _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.IDLE) }
@@ -312,6 +319,13 @@ internal class MeetingRoomViewModel(
             }
         }
     }
+
+    /** The session key is always set once connected; a missing key fails the action instead of calling the backend. */
+    private suspend fun <T> archiveResult(
+        sessionKey: String?,
+        action: suspend (String) -> Result<T>,
+    ): Result<T> =
+        sessionKey?.let { action(it) } ?: Result.failure(IllegalStateException("Session key not available"))
 
     private fun listenRemoteArchiving() {
         viewModelScope.launch {

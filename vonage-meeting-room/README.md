@@ -52,6 +52,7 @@ The main entry point. All methods return `this` for fluent chaining.
 | `.isDebug(Boolean)` | Enables verbose HTTP logging. |
 | `.reportingContent(@Composable (() -> Unit) -> Unit)` | Custom report-issue bottom sheet content. |
 | `.testSpeakerContent(@Composable () -> Unit)` | Optional "test speakers" control shown in the audio output selector. |
+| `.sessionKeyHolder(SessionKeyHolder?)` | Shared holder the SDK fills with the backend session key JWT, e.g. to list recordings after the call. |
 | `.build()` | Builds and returns `MeetingRoomPrebuilt`. |
 
 ### `MeetingRoomPrebuilt`

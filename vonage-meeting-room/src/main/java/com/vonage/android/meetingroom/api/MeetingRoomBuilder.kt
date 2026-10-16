@@ -56,6 +56,7 @@ class MeetingRoomBuilder(
     private var additionalBottomBarActions: StateFlow<List<MeetingRoomBottomBarAction>>? = null
     private var customBottomBar: (@Composable (MeetingRoomBottomBarState, MeetingRoomCustomActions) -> Unit)? = null
     private var authTokenProvider: MeetingRoomAuthTokenProvider? = null
+    private var sessionKeyHolder: SessionKeyHolder? = null
 
     /**
      * Defines which optional features are active at runtime.
@@ -242,6 +243,17 @@ class MeetingRoomBuilder(
     }
 
     /**
+     * Provides a shared [SessionKeyHolder] the SDK fills with the session key JWT once the
+     * session is created.
+     *
+     * Use this when the host app needs the key after the call, e.g. to list the session
+     * recordings on a goodbye screen. Without this, the SDK uses its own internal instance.
+     */
+    fun sessionKeyHolder(holder: SessionKeyHolder?): MeetingRoomBuilder = apply {
+        sessionKeyHolder = holder
+    }
+
+    /**
      * Constructs the [MeetingRoomPrebuilt] with the current configuration.
      *
      * Call [MeetingRoomPrebuilt.launch] or embed [MeetingRoomPrebuilt.content] to display the
@@ -266,5 +278,6 @@ class MeetingRoomBuilder(
         additionalBottomBarActions = additionalBottomBarActions,
         customBottomBar = customBottomBar,
         authTokenProvider = authTokenProvider,
+        sessionKeyHolder = sessionKeyHolder,
     )
 }

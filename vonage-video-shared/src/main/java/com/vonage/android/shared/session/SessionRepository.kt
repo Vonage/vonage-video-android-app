@@ -1,5 +1,6 @@
 package com.vonage.android.shared.session
 
+import com.vonage.android.shared.network.SessionKeyRequest
 import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
 
 class SessionRepository(
@@ -7,27 +8,37 @@ class SessionRepository(
 ) {
 
     /**
-     * Fetches the session credentials for [roomName]. A `401` response fails with
-     * [SessionUnauthorizedException] so callers can ask the user to sign in.
+     * Resolves the credentials for [roomName] with the v2 two-step flow:
+     * `createSession` (reuses the room's live session) followed by `joinSession` (issues the token).
+     *
+     * A `401` response from either call fails with [SessionUnauthorizedException] so callers
+     * can ask the user to sign in.
      */
     suspend fun getSession(roomName: String): Result<SessionInfo> =
         runCatching {
-            val response = apiService.getSession(roomName)
-            return when {
-                response.isSuccessful -> response.body()?.let {
-                    Result.success(
-                        SessionInfo(
-                            apiKey = it.apiKey,
-                            sessionId = it.sessionId,
-                            token = it.token,
-                            captionsId = it.captionsId,
-                        )
-                    )
-                } ?: Result.failure(Exception("Empty response"))
-
-                response.code() == HTTP_UNAUTHORIZED -> Result.failure(SessionUnauthorizedException())
-
-                else -> Result.failure(Exception("Failed getting session"))
+            val createResponse = apiService.createSession(CreateSessionRequest(roomName))
+            if (createResponse.code() == HTTP_UNAUTHORIZED) {
+                return Result.failure(SessionUnauthorizedException())
             }
+            val session = createResponse.body()?.result?.data
+            if (!createResponse.isSuccessful || session == null) {
+                return Result.failure(Exception("Failed creating session"))
+            }
+
+            val joinResponse = apiService.joinSession(SessionKeyRequest(session.sessionKey))
+            if (joinResponse.code() == HTTP_UNAUTHORIZED) {
+                return Result.failure(SessionUnauthorizedException())
+            }
+            val join = joinResponse.body()?.result?.data
+            if (!joinResponse.isSuccessful || join == null) {
+                return Result.failure(Exception("Failed joining session"))
+            }
+
+            SessionInfo(
+                applicationId = session.applicationId,
+                sessionId = session.sessionId,
+                token = join.token,
+                sessionKey = session.sessionKey,
+            )
         }
 }

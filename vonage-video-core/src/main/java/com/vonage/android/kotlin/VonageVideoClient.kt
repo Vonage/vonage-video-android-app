@@ -70,13 +70,13 @@ class VonageVideoClient(
      * **Note:** This method does NOT connect to the session. Call [CallFacade.connect] on the
      * returned facade to actually establish the WebRTC connection and start publishing.
      *
-     * Typical call chain (orchestrated by `MeetingRoomScreenViewModel`):
+     * Typical call chain (orchestrated by `MeetingRoomViewModel`):
      * ```
      * SessionRepository.getSession() → VonageVideoClient.initializeSession() → CallFacade.connect()
      * ```
      *
-     * @param apiKey   Vonage project API key obtained from the backend session endpoint.
-     * @param sessionId Vonage session ID obtained from the backend session endpoint.
+     * @param apiKey   Vonage application ID (`applicationId`) obtained from the backend `createSession` endpoint.
+     * @param sessionId Vonage session ID obtained from the backend `createSession` endpoint.
      * @param token    Short-lived token authorising this participant to join the session.
      * @return A [CallFacade] combining session, publisher, chat, emoji, and screen-share facades.
      */
