@@ -54,10 +54,12 @@ google-services.json
 
 # Kiro
 .kiro/specs/
-.kiro/steering/
 .kiro/settings/
 .kiro/settings.json
 .kiro/skills/
 
 # OpenCode plans
 .opencode/plans/
+
+# Claude Code agent worktrees (skills live in .claude/skills and are versioned)
+.claude/worktrees/
