@@ -34,7 +34,10 @@ enum class MeetingRoomFeature {
     BACKGROUND_EFFECTS,
 
     /** Advanced noise suppression. */
-    AUDIO_EFFECTS;
+    AUDIO_EFFECTS,
+
+    /** Audio-first call mode suggested while the user is moving. */
+    ON_THE_GO;
 
     companion object {
         /** Convenience set containing every feature — used as the default. */

@@ -11,6 +11,7 @@ fun SettingsScreen(
     uiState: SettingsUiState,
     actions: SettingsScreenActions,
     modifier: Modifier = Modifier,
+    extraContent: (@Composable () -> Unit)? = null,
 ) {
 
 }

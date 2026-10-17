@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="on_the_go_participant_count">%1$d Teilnehmer</string>
+    <string name="on_the_go_exit">Beenden</string>
+    <string name="on_the_go_exit_description">On-the-Go-Modus beenden</string>
+    <string name="on_the_go_speaker_speaking">%1$s spricht</string>
+    <string name="on_the_go_no_one_speaking">Niemand spricht</string>
+    <string name="on_the_go_microphone_off">MIKROFON AUS</string>
+    <string name="on_the_go_microphone_on">MIKROFON EIN</string>
+    <string name="on_the_go_tap_to_mute">Tippen zum Stummschalten</string>
+    <string name="on_the_go_tap_to_unmute">Tippen zum Aufheben der Stummschaltung</string>
+    <string name="on_the_go_mic_off_announcement">Mikrofon ist stummgeschaltet</string>
+    <string name="on_the_go_mic_on_announcement">Mikrofon ist eingeschaltet</string>
+    <string name="on_the_go_mic_off_description">Mikrofon aus. Zum Aufheben der Stummschaltung doppeltippen.</string>
+    <string name="on_the_go_mic_on_description">Mikrofon ein. Zum Stummschalten doppeltippen.</string>
+    <string name="on_the_go_view_shared_content">Geteilte Inhalte anzeigen</string>
+    <string name="on_the_go_live">LIVE</string>
+    <string name="on_the_go_leave">Verlassen</string>
+    <string name="on_the_go_leave_call">Anruf verlassen</string>
+    <string name="on_the_go_done">Fertig</string>
+    <string name="on_the_go_suggestion_title">Sie sind anscheinend unterwegs.</string>
+    <string name="on_the_go_suggestion_body">Zum On-the-Go-Modus wechseln? Kamera und eingehendes Video werden ausgeschaltet.</string>
+    <string name="on_the_go_switch">Wechseln</string>
+    <string name="on_the_go_not_now">Nicht jetzt</string>
+    <string name="on_the_go_suggest_when_moving">On-the-Go-Modus bei Bewegung vorschlagen</string>
+    <string name="on_the_go_settings_footer">Wenn Sie während eines Anrufs zu Fuß, mit dem Fahrrad oder mit dem Auto unterwegs sind, bieten wir einen einfacheren, auf Audio ausgerichteten Bildschirm an. Sie können jederzeit manuell über das Mehr-Menü wechseln.</string>
+</resources>

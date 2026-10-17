@@ -64,4 +64,32 @@
     <!-- Test speakers -->
     <string name="test_speakers_start">Start test speakers</string>
     <string name="test_speakers_stop">Stop testing</string>
+
+    <!-- On-the-Go -->
+    <string name="on_the_go_title" translatable="false">On-the-Go</string>
+    <string name="on_the_go_menu" translatable="false">On-the-Go</string>
+    <string name="on_the_go_participant_count">%1$d participants</string>
+    <string name="on_the_go_exit">Exit</string>
+    <string name="on_the_go_exit_description">Exit On-the-Go mode</string>
+    <string name="on_the_go_speaker_speaking">%1$s is speaking</string>
+    <string name="on_the_go_no_one_speaking">No one is speaking</string>
+    <string name="on_the_go_microphone_off">MICROPHONE OFF</string>
+    <string name="on_the_go_microphone_on">MICROPHONE ON</string>
+    <string name="on_the_go_tap_to_mute">Tap to mute</string>
+    <string name="on_the_go_tap_to_unmute">Tap to unmute</string>
+    <string name="on_the_go_mic_off_announcement">Microphone is off</string>
+    <string name="on_the_go_mic_on_announcement">Microphone is on</string>
+    <string name="on_the_go_mic_off_description">Microphone, off. Double-tap to unmute.</string>
+    <string name="on_the_go_mic_on_description">Microphone, on. Double-tap to mute.</string>
+    <string name="on_the_go_view_shared_content">View shared content</string>
+    <string name="on_the_go_live">LIVE</string>
+    <string name="on_the_go_leave">Leave</string>
+    <string name="on_the_go_leave_call">Leave call</string>
+    <string name="on_the_go_done">Done</string>
+    <string name="on_the_go_suggestion_title">Looks like you\'re on the move.</string>
+    <string name="on_the_go_suggestion_body">Switch to On-the-Go mode? Camera and incoming video turn off.</string>
+    <string name="on_the_go_switch">Switch</string>
+    <string name="on_the_go_not_now">Not now</string>
+    <string name="on_the_go_suggest_when_moving">Suggest On-the-Go mode when moving</string>
+    <string name="on_the_go_settings_footer">When you\'re walking, cycling or driving during a call, we\'ll offer a simpler audio-first screen. You can always switch manually from the more menu.</string>
 </resources>

@@ -82,7 +82,8 @@ sealed class MeetingRoomSDKAction {
 ```kotlin
 enum class MeetingRoomFeature {
     CHAT, ARCHIVING, CAPTIONS, REACTIONS,
-    SETTINGS, SCREEN_SHARE, BACKGROUND_EFFECTS, AUDIO_EFFECTS;
+    SETTINGS, SCREEN_SHARE, BACKGROUND_EFFECTS, AUDIO_EFFECTS,
+    ON_THE_GO;
 
     companion object {
         val all: Set<MeetingRoomFeature> = entries.toSet()

@@ -112,6 +112,7 @@ private fun configuredMeetingRoomFeatures(config: Config): Set<MeetingRoomFeatur
     if (config.allowArchiving) add(MeetingRoomFeature.ARCHIVING)
     if (config.allowCaptions) add(MeetingRoomFeature.CAPTIONS)
     if (config.allowEmojis) add(MeetingRoomFeature.REACTIONS)
+    if (config.allowOnTheGo) add(MeetingRoomFeature.ON_THE_GO)
     if (config.allowScreenShare) add(MeetingRoomFeature.SCREEN_SHARE)
     if (config.allowBackgroundEffects) add(MeetingRoomFeature.BACKGROUND_EFFECTS)
     if (config.allowAdvancedNoiseSuppression) add(MeetingRoomFeature.AUDIO_EFFECTS)

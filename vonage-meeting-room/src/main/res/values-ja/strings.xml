@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="on_the_go_participant_count">参加者 %1$d人</string>
+    <string name="on_the_go_exit">終了</string>
+    <string name="on_the_go_exit_description">On-the-Goモードを終了</string>
+    <string name="on_the_go_speaker_speaking">%1$sさんが話しています</string>
+    <string name="on_the_go_no_one_speaking">誰も話していません</string>
+    <string name="on_the_go_microphone_off">マイクオフ</string>
+    <string name="on_the_go_microphone_on">マイクオン</string>
+    <string name="on_the_go_tap_to_mute">タップしてミュート</string>
+    <string name="on_the_go_tap_to_unmute">タップしてミュートを解除</string>
+    <string name="on_the_go_mic_off_announcement">マイクはミュート中です</string>
+    <string name="on_the_go_mic_on_announcement">マイクはオンです</string>
+    <string name="on_the_go_mic_off_description">マイクはオフです。ダブルタップでミュートを解除します。</string>
+    <string name="on_the_go_mic_on_description">マイクはオンです。ダブルタップでミュートします。</string>
+    <string name="on_the_go_view_shared_content">共有コンテンツを表示</string>
+    <string name="on_the_go_live">ライブ</string>
+    <string name="on_the_go_leave">退出</string>
+    <string name="on_the_go_leave_call">通話から退出</string>
+    <string name="on_the_go_done">完了</string>
+    <string name="on_the_go_suggestion_title">移動中のようです。</string>
+    <string name="on_the_go_suggestion_body">On-the-Goモードに切り替えますか？カメラと受信映像がオフになります。</string>
+    <string name="on_the_go_switch">切り替える</string>
+    <string name="on_the_go_not_now">後で</string>
+    <string name="on_the_go_suggest_when_moving">移動中にOn-the-Goモードを提案</string>
+    <string name="on_the_go_settings_footer">通話中に歩行、自転車、運転をしているときは、音声中心のシンプルな画面をご案内します。その他メニューからいつでも手動で切り替えられます。</string>
+</resources>

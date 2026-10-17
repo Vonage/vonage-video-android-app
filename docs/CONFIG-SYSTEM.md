@@ -122,6 +122,7 @@ a product flavor. "Wired" describes how the value reaches behavior.
 | `meetingRoomSettings.allowChat` | `ALLOW_CHAT` | `chat` | Flavor + `MeetingRoomFeature.CHAT` |
 | `meetingRoomSettings.allowScreenShare` | `ALLOW_SCREEN_SHARE` | `screensharing` | Flavor + `MeetingRoomFeature.SCREEN_SHARE` |
 | `meetingRoomSettings.allowPictureInPicture` | `ALLOW_PICTURE_IN_PICTURE` | - | `MeetingRoomConfiguration.allowPictureInPicture` |
+| `meetingRoomSettings.allowOnTheGo` | `ALLOW_ON_THE_GO` | - | `MeetingRoomFeature.ON_THE_GO` |
 | `meetingRoomSettings.defaultLayoutMode` | `DEFAULT_LAYOUT_MODE` | - | `MeetingRoomConfiguration.defaultLayoutMode` |
 | `videoSettings.defaultResolution` | `DEFAULT_RESOLUTION` | - | **Not implemented** — parity only |
 | `waitingRoomSettings.bypassWaitingRoom` | `BYPASS_WAITING_ROOM` | - | **Not implemented** — parity only |

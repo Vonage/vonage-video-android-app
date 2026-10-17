@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DirectionsWalk
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -28,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
@@ -43,12 +46,22 @@ import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.fx.ui.VideoEffectsScreen
 import com.vonage.android.kotlin.model.CallFacade
+import com.vonage.android.kotlin.model.Participant
+import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.R
 import com.vonage.android.meetingroom.api.MeetingRoomBottomBarAction
 import com.vonage.android.meetingroom.api.MeetingRoomBottomBarState
 import com.vonage.android.meetingroom.api.MeetingRoomCustomActions
 import com.vonage.android.meetingroom.api.MeetingRoomFeature
+import com.vonage.android.meetingroom.internal.onthego.BindOnTheGoCall
+import com.vonage.android.meetingroom.internal.onthego.OnTheGoCallActions
+import com.vonage.android.meetingroom.internal.onthego.OnTheGoScreen
+import com.vonage.android.meetingroom.internal.onthego.OnTheGoScreenActions
+import com.vonage.android.meetingroom.internal.onthego.OnTheGoState
+import com.vonage.android.meetingroom.internal.onthego.OnTheGoSuggestionBanner
+import com.vonage.android.meetingroom.internal.onthego.OnTheGoVideoSubscription
+import com.vonage.android.meetingroom.internal.onthego.rememberOnTheGoController
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_BOTTOM_BAR
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_SCREEN_TAG
@@ -146,7 +159,6 @@ internal fun MeetingRoomScreen(
         (uiState.isError.not() && uiState.isLoading.not() && uiState.isEndCall.not() && call != null) -> {
             val participants by call.participantsStateFlow.collectAsStateWithLifecycle()
             val publisher by call.publisher.collectAsStateWithLifecycle()
-            val captionLines by call.captionsStateFlow.collectAsStateWithLifecycle()
 
             // Collect additional custom buttons (dynamic — isSelected/badgeCount can change).
             val extraActions by (additionalBottomBarActions ?: MutableStateFlow(emptyList()))
@@ -163,6 +175,41 @@ internal fun MeetingRoomScreen(
                     )
                 }.toImmutableList()
             }
+            val onTheGoEnabled = MeetingRoomFeature.ON_THE_GO in uiState.enabledFeatures
+            val onTheGoController = rememberOnTheGoController(
+                enabled = onTheGoEnabled,
+                actions = OnTheGoCallActions(
+                    toggleMic = actions.onToggleMic,
+                    toggleCamera = actions.onToggleCamera,
+                    endCall = actions.onEndCall,
+                ),
+            )
+            BindOnTheGoCall(controller = onTheGoController, call = call)
+            val onTheGoSnapshot by onTheGoController.snapshot.collectAsStateWithLifecycle()
+            val onTheGoState by onTheGoController.state.collectAsStateWithLifecycle()
+            val sharePresented by onTheGoController.isSharedContentPresented.collectAsStateWithLifecycle()
+            OnTheGoVideoSubscription(
+                call = call,
+                active = onTheGoState == OnTheGoState.ACTIVE,
+                visibleShareId = if (sharePresented) onTheGoSnapshot.screenShare?.id else null,
+            )
+            val onTheGoLabel = stringResource(R.string.on_the_go_menu)
+            val onTheGoMenuAction = remember(onTheGoLabel, onTheGoController) {
+                BottomBarAction(
+                    type = BottomBarActionType.CUSTOM,
+                    icon = Icons.Filled.DirectionsWalk,
+                    label = onTheGoLabel,
+                    onClick = onTheGoController::enterManually,
+                )
+            }
+            val bottomBarExtraActions = remember(mappedExtraActions, onTheGoMenuAction, onTheGoEnabled) {
+                if (onTheGoEnabled) {
+                    (listOf(onTheGoMenuAction) + mappedExtraActions).toImmutableList()
+                } else {
+                    mappedExtraActions
+                }
+            }
+            val onTheGoActive = onTheGoState == OnTheGoState.ACTIVE
 
             // Collect publisher mic/camera state for the custom bottom bar state.
             val isMicEnabled by (publisher?.isMicEnabled ?: MutableStateFlow(false))
@@ -223,7 +270,7 @@ internal fun MeetingRoomScreen(
                     .systemBarsPadding(),
                 topBar = {
                     AnimatedVisibility(
-                        visible = showBars,
+                        visible = showBars && !onTheGoActive,
                         enter = slideInVertically(
                             animationSpec = tween(durationMillis = BAR_TOGGLE_DURATION_MS),
                             initialOffsetY = { -it },
@@ -250,7 +297,7 @@ internal fun MeetingRoomScreen(
                 },
                 bottomBar = {
                     AnimatedVisibility(
-                        visible = showBars,
+                        visible = showBars && !onTheGoActive,
                         enter = slideInVertically(
                             animationSpec = tween(durationMillis = BAR_TOGGLE_DURATION_MS),
                             initialOffsetY = { it },
@@ -280,7 +327,7 @@ internal fun MeetingRoomScreen(
                                 actions = remember(uiState.enabledFeatures) {
                                     enabledBottomBarActions(uiState.enabledFeatures)
                                 },
-                                additionalActions = mappedExtraActions,
+                                additionalActions = bottomBarExtraActions,
                                 state = BottomBarState(
                                     onShowChat = { scope.launch { navigator.toggleChat() } },
                                     isChatShow = isChatShow,
@@ -311,26 +358,42 @@ internal fun MeetingRoomScreen(
                     directive = navigator.scaffoldDirective,
                     value = navigator.scaffoldValue,
                     mainPane = {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .pointerInput(Unit) {
-                                    detectTapGestures(onTap = { showBars = !showBars })
-                                },
-                        ) {
-                            EmojiReactionOverlay(call = call)
-                            CaptionsOverlay(captionLines = captionLines)
-                            SpeakingWhileMutedOverlay(publisher = publisher)
-                            RecordingStartedOverlay(isRecordingStartedByOthers = uiState.recordingStartedByOthers)
-                            // MeetingRoomContent is always visible — the effects sheet is a
-                            // ModalBottomSheet that overlays it without disturbing the publisher.
-                            MeetingRoomContent(
-                                modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
-                                call = call,
-                                actions = effectsActions,
-                                participants = participants,
-                                layoutType = uiState.layoutType,
-                            )
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            if (onTheGoActive) {
+                                OnTheGoScreen(
+                                    snapshot = onTheGoSnapshot,
+                                    sharedParticipant = participants.firstOrNull { participant ->
+                                        participant.id == onTheGoSnapshot.screenShare?.id
+                                    },
+                                    sharedContentPresented = sharePresented,
+                                    actions = OnTheGoScreenActions(
+                                        onToggleMic = onTheGoController::toggleMic,
+                                        onExit = onTheGoController::exit,
+                                        onLeaveCall = onTheGoController::leaveCall,
+                                        onOpenAudioRoute = { showAudioOutputs = true },
+                                        onPresentSharedContent = onTheGoController::presentSharedContent,
+                                        onDismissSharedContent = onTheGoController::dismissSharedContent,
+                                    ),
+                                )
+                            } else {
+                                MeetingCallContent(
+                                    call = call,
+                                    publisher = publisher,
+                                    recordingStartedByOthers = uiState.recordingStartedByOthers,
+                                    participants = participants,
+                                    effectsActions = effectsActions,
+                                    layoutType = uiState.layoutType,
+                                    onToggleBars = { showBars = !showBars },
+                                )
+                                if (onTheGoState == OnTheGoState.SUGGESTED) {
+                                    OnTheGoSuggestionBanner(
+                                        timeoutMs = onTheGoController.configuration.suggestionTimeoutMs,
+                                        onSwitch = onTheGoController::acceptSuggestion,
+                                        onNotNow = onTheGoController::declineSuggestion,
+                                        modifier = Modifier.align(Alignment.TopCenter),
+                                    )
+                                }
+                            }
                         }
                     },
                     supportingPane = { },
@@ -441,6 +504,38 @@ internal fun MeetingRoomScreen(
             onCancel = {
                 showRecordingConfirmDialog = false
             }
+        )
+    }
+}
+
+@Composable
+private fun MeetingCallContent(
+    call: CallFacade,
+    publisher: PublisherState?,
+    recordingStartedByOthers: Boolean,
+    participants: ImmutableList<Participant>,
+    effectsActions: MeetingRoomActions,
+    layoutType: CallLayoutType,
+    onToggleBars: () -> Unit,
+) {
+    val captionLines by call.captionsStateFlow.collectAsStateWithLifecycle()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = { onToggleBars() })
+            },
+    ) {
+        EmojiReactionOverlay(call = call)
+        CaptionsOverlay(captionLines = captionLines)
+        SpeakingWhileMutedOverlay(publisher = publisher)
+        RecordingStartedOverlay(isRecordingStartedByOthers = recordingStartedByOthers)
+        MeetingRoomContent(
+            modifier = Modifier.testTag(MEETING_ROOM_CONTENT),
+            call = call,
+            actions = effectsActions,
+            participants = participants,
+            layoutType = layoutType,
         )
     }
 }
