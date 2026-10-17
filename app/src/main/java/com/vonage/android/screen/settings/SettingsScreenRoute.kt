@@ -2,9 +2,12 @@ package com.vonage.android.screen.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.BuildConfig
+import com.vonage.android.config.Config
+import com.vonage.android.meetingroom.api.OnTheGoSettingsSection
 import com.vonage.android.settings.SettingsScreenActions
 import com.vonage.android.settings.ui.SettingsScreen
 
@@ -19,6 +22,7 @@ fun SettingsScreenRoute(
     onDismiss: () -> Unit = {},
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val showOnTheGo = remember { Config.fromAppConfig().allowOnTheGo }
 
     SettingsScreen(
         uiState = uiState,
@@ -35,5 +39,10 @@ fun SettingsScreenRoute(
             onAudioBitrateChange = viewModel::updateAudioBitrate,
             onDismiss = onDismiss,
         ),
+        extraContent = if (showOnTheGo) {
+            { OnTheGoSettingsSection() }
+        } else {
+            null
+        },
     )
 }

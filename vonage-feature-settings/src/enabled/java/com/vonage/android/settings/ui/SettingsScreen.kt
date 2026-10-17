@@ -59,6 +59,7 @@ fun SettingsScreen(
     uiState: SettingsUiState,
     actions: SettingsScreenActions,
     modifier: Modifier = Modifier,
+    extraContent: (@Composable () -> Unit)? = null,
 ) {
     val isWideLayout = currentWindowAdaptiveInfo()
         .windowSizeClass
@@ -77,12 +78,14 @@ fun SettingsScreen(
                 modifier = contentModifier,
                 uiState = uiState,
                 actions = actions,
+                extraContent = extraContent,
             )
         } else {
             SettingsListLayout(
                 modifier = contentModifier,
                 uiState = uiState,
                 actions = actions,
+                extraContent = extraContent,
             )
         }
     }
@@ -95,6 +98,7 @@ private fun SettingsListLayout(
     uiState: SettingsUiState,
     actions: SettingsScreenActions,
     modifier: Modifier = Modifier,
+    extraContent: (@Composable () -> Unit)? = null,
 ) {
     LazyColumn(
         modifier = modifier
@@ -107,6 +111,9 @@ private fun SettingsListLayout(
                 icon = section.icon,
             ) }
             settingItems(section, uiState, actions)
+        }
+        if (extraContent != null) {
+            item { extraContent() }
         }
         footer(uiState)
     }
@@ -121,6 +128,7 @@ private fun SettingsTabLayout(
     uiState: SettingsUiState,
     actions: SettingsScreenActions,
     modifier: Modifier = Modifier,
+    extraContent: (@Composable () -> Unit)? = null,
 ) {
     var selectedSection by rememberSaveable { mutableStateOf(SettingsSection.VIDEO) }
 
@@ -141,6 +149,9 @@ private fun SettingsTabLayout(
         ) {
             item { SectionHeader(text = stringResource(selectedSection.titleRes),) }
             settingItems(selectedSection, uiState, actions)
+            if (extraContent != null) {
+                item { extraContent() }
+            }
             footer(uiState)
         }
     }

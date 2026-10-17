@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="on_the_go_participant_count">%1$d partecipanti</string>
+    <string name="on_the_go_exit">Esci</string>
+    <string name="on_the_go_exit_description">Esci dalla modalità On-the-Go</string>
+    <string name="on_the_go_speaker_speaking">%1$s sta parlando</string>
+    <string name="on_the_go_no_one_speaking">Nessuno sta parlando</string>
+    <string name="on_the_go_microphone_off">MICROFONO DISATTIVATO</string>
+    <string name="on_the_go_microphone_on">MICROFONO ATTIVO</string>
+    <string name="on_the_go_tap_to_mute">Tocca per disattivare l\'audio</string>
+    <string name="on_the_go_tap_to_unmute">Tocca per riattivare l\'audio</string>
+    <string name="on_the_go_mic_off_announcement">Microfono disattivato</string>
+    <string name="on_the_go_mic_on_announcement">Microfono attivo</string>
+    <string name="on_the_go_mic_off_description">Microfono disattivato. Tocca due volte per riattivare l\'audio.</string>
+    <string name="on_the_go_mic_on_description">Microfono attivo. Tocca due volte per disattivare l\'audio.</string>
+    <string name="on_the_go_view_shared_content">Visualizza il contenuto condiviso</string>
+    <string name="on_the_go_live">LIVE</string>
+    <string name="on_the_go_leave">Abbandona</string>
+    <string name="on_the_go_leave_call">Abbandona la chiamata</string>
+    <string name="on_the_go_done">Fine</string>
+    <string name="on_the_go_suggestion_title">Sembra che tu sia in movimento.</string>
+    <string name="on_the_go_suggestion_body">Passare alla modalità On-the-Go? La videocamera e il video in ingresso si disattivano.</string>
+    <string name="on_the_go_switch">Passa</string>
+    <string name="on_the_go_not_now">Non ora</string>
+    <string name="on_the_go_suggest_when_moving">Suggerisci la modalità On-the-Go quando sei in movimento</string>
+    <string name="on_the_go_settings_footer">Quando cammini, vai in bicicletta o guidi durante una chiamata, ti offriremo una schermata più semplice incentrata sull\'audio. Puoi sempre passare manualmente dal menu Altro.</string>
+</resources>

@@ -91,6 +91,7 @@ class GetConfigTest {
         )
         assertEquals(AppConfig.MeetingRoomSettings.ALLOW_EMOJIS, config.allowEmojis)
         assertEquals(AppConfig.MeetingRoomSettings.ALLOW_FEEDBACK, config.allowFeedback)
+        assertEquals(AppConfig.MeetingRoomSettings.ALLOW_ON_THE_GO, config.allowOnTheGo)
         assertEquals(
             AppConfig.MeetingRoomSettings.ALLOW_PICTURE_IN_PICTURE,
             config.allowPictureInPicture,

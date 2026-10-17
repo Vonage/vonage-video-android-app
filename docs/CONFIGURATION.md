@@ -55,6 +55,7 @@ and setting them has no effect on Android.
 | `meetingRoomSettings.allowDeviceSelection` | Audio output selector in the call |
 | `meetingRoomSettings.allowEmojis` | Emoji reactions |
 | `meetingRoomSettings.allowFeedback` | "Report an issue" control |
+| `meetingRoomSettings.allowOnTheGo` | Audio-first On-the-Go call mode, suggested from device motion |
 | `meetingRoomSettings.allowPictureInPicture` | Enter picture-in-picture when leaving the app mid-call |
 | `meetingRoomSettings.allowScreenShare` | Screen sharing |
 | `meetingRoomSettings.defaultLayoutMode` | Layout on entering the room: `grid` or `activespeaker` |

@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.vonage.android.compose.components.bottombar.ActionCell
@@ -27,10 +27,11 @@ internal fun MoreActionsGrid(
         horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.paddingSmall),
         verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.paddingSmall),
     ) {
-        items(
+        itemsIndexed(
             items = actions,
-            key = { action -> action.type },
-        ) { action ->
+            // CUSTOM is shared by reporting and every host action, including On-the-Go.
+            key = { index, action -> "${action.type.name}:$index:${action.label}" },
+        ) { _, action ->
             ActionCell(
                 icon = action.icon,
                 label = action.label,

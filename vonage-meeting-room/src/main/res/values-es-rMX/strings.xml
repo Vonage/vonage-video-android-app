@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="on_the_go_participant_count">%1$d participantes</string>
+    <string name="on_the_go_exit">Salir</string>
+    <string name="on_the_go_exit_description">Salir del modo On-the-Go</string>
+    <string name="on_the_go_speaker_speaking">%1$s está hablando</string>
+    <string name="on_the_go_no_one_speaking">Nadie está hablando</string>
+    <string name="on_the_go_microphone_off">MICRÓFONO DESACTIVADO</string>
+    <string name="on_the_go_microphone_on">MICRÓFONO ACTIVADO</string>
+    <string name="on_the_go_tap_to_mute">Toca para silenciar</string>
+    <string name="on_the_go_tap_to_unmute">Toca para activar el audio</string>
+    <string name="on_the_go_mic_off_announcement">Micrófono silenciado</string>
+    <string name="on_the_go_mic_on_announcement">Micrófono activado</string>
+    <string name="on_the_go_mic_off_description">Micrófono silenciado. Toca dos veces para activar el audio.</string>
+    <string name="on_the_go_mic_on_description">Micrófono activado. Toca dos veces para silenciar.</string>
+    <string name="on_the_go_view_shared_content">Ver contenido compartido</string>
+    <string name="on_the_go_live">EN VIVO</string>
+    <string name="on_the_go_leave">Salir</string>
+    <string name="on_the_go_leave_call">Salir de la llamada</string>
+    <string name="on_the_go_done">Listo</string>
+    <string name="on_the_go_suggestion_title">Parece que estás en movimiento.</string>
+    <string name="on_the_go_suggestion_body">¿Cambiar al modo On-the-Go? La cámara y el video entrante se desactivan.</string>
+    <string name="on_the_go_switch">Cambiar</string>
+    <string name="on_the_go_not_now">Ahora no</string>
+    <string name="on_the_go_suggest_when_moving">Sugerir el modo On-the-Go al moverte</string>
+    <string name="on_the_go_settings_footer">Cuando camines, vayas en bicicleta o conduzcas durante una llamada, te ofreceremos una pantalla más sencilla centrada en el audio. Siempre puedes cambiar manualmente desde el menú Más.</string>
+</resources>
