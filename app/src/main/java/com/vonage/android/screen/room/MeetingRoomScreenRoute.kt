@@ -5,6 +5,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.vonage.android.BuildConfig
 import com.vonage.android.config.Config
+import com.vonage.android.di.SessionKeyHolderEntryPoint
+import dagger.hilt.android.EntryPointAccessors
 import com.vonage.android.meetingroom.api.MeetingRoomAuthTokenProvider
 import com.vonage.android.meetingroom.api.MeetingRoomBuilder
 import com.vonage.android.meetingroom.api.MeetingRoomConfiguration
@@ -41,6 +43,10 @@ fun MeetingRoomScreenRoute(
     authTokenProvider: MeetingRoomAuthTokenProvider? = null,
 ) {
     val config = remember { Config.fromAppConfig() }
+    val appContext = LocalContext.current.applicationContext
+    val sessionKeyHolder = remember(appContext) {
+        EntryPointAccessors.fromApplication(appContext, SessionKeyHolderEntryPoint::class.java).sessionKeyHolder()
+    }
     val prebuilt = remember(roomName, initialPublisherSettings, config) {
         MeetingRoomBuilder(
             baseUrl = BuildConfig.BASE_API_URL,
@@ -49,6 +55,7 @@ fun MeetingRoomScreenRoute(
             .enabledFeatures(configuredMeetingRoomFeatures(config))
             .publisherSettings(initialPublisherSettings)
             .callSettingsHolder(callSettingsHolder)
+            .sessionKeyHolder(sessionKeyHolder)
             .authTokenProvider(authTokenProvider)
             .configuration(
                 MeetingRoomConfiguration(

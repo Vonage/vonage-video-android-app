@@ -22,7 +22,7 @@ class E2eForceUnauthorizedInterceptor @Inject constructor(
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
-        val isSignedOutSessionRequest = request.url.encodedPath.contains(SESSION_PATH) &&
+        val isSignedOutSessionRequest = request.url.encodedPath.endsWith(CREATE_SESSION_PATH) &&
             request.header("Authorization") == null
         if (!e2eTestFlags.forceAuthRequired || !isSignedOutSessionRequest) {
             return chain.proceed(request)
@@ -37,6 +37,7 @@ class E2eForceUnauthorizedInterceptor @Inject constructor(
     }
 
     private companion object {
-        const val SESSION_PATH = "/session/"
+        // First call of the v2 session bootstrap; a 401 here stops it before joinSession.
+        const val CREATE_SESSION_PATH = "/v2/createSession"
     }
 }

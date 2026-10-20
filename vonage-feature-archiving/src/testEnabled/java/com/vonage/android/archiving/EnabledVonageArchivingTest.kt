@@ -5,6 +5,7 @@ import com.vonage.android.archiving.data.ArchiveRepository
 import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,9 +78,9 @@ class EnabledVonageArchivingTest {
     @Test
     fun `startArchive should return success with archive id`() = runTest {
         val expectedArchiveId = ArchiveId("new-archive-id")
-        coEvery { archiveRepository.startArchive("test-room") } returns Result.success(expectedArchiveId)
+        coEvery { archiveRepository.startArchive("test-session-key") } returns Result.success(expectedArchiveId)
 
-        val result = sut.startArchive("test-room")
+        val result = sut.startArchive("test-session-key")
 
         assertTrue(result.isSuccess)
         assertEquals(expectedArchiveId, result.getOrNull())
@@ -88,9 +89,9 @@ class EnabledVonageArchivingTest {
     @Test
     fun `startArchive should return failure when repository fails`() = runTest {
         val exception = Exception("Failed to start archive")
-        coEvery { archiveRepository.startArchive("test-room") } returns Result.failure(exception)
+        coEvery { archiveRepository.startArchive("test-session-key") } returns Result.failure(exception)
 
-        val result = sut.startArchive("test-room")
+        val result = sut.startArchive("test-session-key")
 
         assertTrue(result.isFailure)
         assertEquals(exception, result.exceptionOrNull())
@@ -100,23 +101,42 @@ class EnabledVonageArchivingTest {
     fun `stopArchive should return success when archive is active`() = runTest {
         val archiveId = ArchiveId("active-archive-id")
 
-        coEvery { archiveRepository.startArchive("test-room") } returns Result.success(archiveId)
-        sut.startArchive("test-room")
+        coEvery { archiveRepository.startArchive("test-session-key") } returns Result.success(archiveId)
+        sut.startArchive("test-session-key")
 
-        coEvery { archiveRepository.stopArchive("test-room", archiveId) } returns Result.success(true)
+        coEvery { archiveRepository.stopArchive("test-session-key", archiveId) } returns Result.success(true)
         
-        val result = sut.stopArchive("test-room")
+        val result = sut.stopArchive("test-session-key")
 
         assertTrue(result.isSuccess)
         assertEquals(true, result.getOrNull())
     }
 
     @Test
-    fun `stopArchive should return failure when no archive is active`() = runTest {
-        val result = sut.stopArchive("test-room")
+    fun `stopArchive without tracked archive id lets backend resolve it`() = runTest {
+        coEvery { archiveRepository.stopArchive("test-session-key", null) } returns Result.success(true)
 
-        assertTrue(result.isFailure)
-        assertEquals("No current archive id", result.exceptionOrNull()?.message)
+        val result = sut.stopArchive("test-session-key")
+
+        assertTrue(result.isSuccess)
+        coVerify { archiveRepository.stopArchive("test-session-key", null) }
+    }
+
+    @Test
+    fun `stopArchive sends archive id tracked from bind`() = runTest {
+        coEvery { archiveRepository.stopArchive("test-session-key", ArchiveId("remote-id")) } returns
+            Result.success(true)
+
+        sut.bind(callFacade).test {
+            awaitItem()
+            callArchivingStateFlow.value = ArchivingState.Started("remote-id")
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        val result = sut.stopArchive("test-session-key")
+
+        assertTrue(result.isSuccess)
+        coVerify { archiveRepository.stopArchive("test-session-key", ArchiveId("remote-id")) }
     }
 
     @Test
@@ -124,12 +144,12 @@ class EnabledVonageArchivingTest {
         val archiveId = ArchiveId("active-archive-id")
         val exception = Exception("Failed to stop archive")
         
-        coEvery { archiveRepository.startArchive("test-room") } returns Result.success(archiveId)
-        sut.startArchive("test-room")
+        coEvery { archiveRepository.startArchive("test-session-key") } returns Result.success(archiveId)
+        sut.startArchive("test-session-key")
         
-        coEvery { archiveRepository.stopArchive("test-room", archiveId) } returns Result.failure(exception)
+        coEvery { archiveRepository.stopArchive("test-session-key", archiveId) } returns Result.failure(exception)
         
-        val result = sut.stopArchive("test-room")
+        val result = sut.stopArchive("test-session-key")
 
         assertTrue(result.isFailure)
         assertEquals(exception, result.exceptionOrNull())
@@ -158,9 +178,9 @@ class EnabledVonageArchivingTest {
             )
         )
         
-        coEvery { archiveRepository.getRecordings("test-room") } returns Result.success(archives)
+        coEvery { archiveRepository.getRecordings("test-session-key") } returns Result.success(archives)
 
-        val result = sut.getRecordings("test-room")
+        val result = sut.getRecordings("test-session-key")
 
         assertTrue(result.isSuccess)
         assertEquals(archives, result.getOrNull())
@@ -169,9 +189,9 @@ class EnabledVonageArchivingTest {
 
     @Test
     fun `getRecordings should return empty list when no recordings exist`() = runTest {
-        coEvery { archiveRepository.getRecordings("test-room") } returns Result.success(emptyList())
+        coEvery { archiveRepository.getRecordings("test-session-key") } returns Result.success(emptyList())
 
-        val result = sut.getRecordings("test-room")
+        val result = sut.getRecordings("test-session-key")
 
         assertTrue(result.isSuccess)
         assertEquals(emptyList<Archive>(), result.getOrNull())
@@ -180,9 +200,9 @@ class EnabledVonageArchivingTest {
     @Test
     fun `getRecordings should return failure when repository fails`() = runTest {
         val exception = Exception("Failed to fetch recordings")
-        coEvery { archiveRepository.getRecordings("test-room") } returns Result.failure(exception)
+        coEvery { archiveRepository.getRecordings("test-session-key") } returns Result.failure(exception)
 
-        val result = sut.getRecordings("test-room")
+        val result = sut.getRecordings("test-session-key")
 
         assertTrue(result.isFailure)
         assertEquals(exception, result.exceptionOrNull())
@@ -193,13 +213,13 @@ class EnabledVonageArchivingTest {
         val archiveId1 = ArchiveId("archive-1")
         val archiveId2 = ArchiveId("archive-2")
         
-        coEvery { archiveRepository.startArchive("room-1") } returns Result.success(archiveId1)
-        coEvery { archiveRepository.startArchive("room-2") } returns Result.success(archiveId2)
+        coEvery { archiveRepository.startArchive("session-key-1") } returns Result.success(archiveId1)
+        coEvery { archiveRepository.startArchive("session-key-2") } returns Result.success(archiveId2)
         
-        val result1 = sut.startArchive("room-1")
+        val result1 = sut.startArchive("session-key-1")
         assertEquals(archiveId1, result1.getOrNull())
         
-        val result2 = sut.startArchive("room-2")
+        val result2 = sut.startArchive("session-key-2")
         assertEquals(archiveId2, result2.getOrNull())
     }
 
@@ -208,14 +228,14 @@ class EnabledVonageArchivingTest {
         val archiveIdFromBind = "bind-archive-id"
         val archiveIdFromStart = ArchiveId("start-archive-id")
         
-        coEvery { archiveRepository.startArchive("test-room") } returns Result.success(archiveIdFromStart)
+        coEvery { archiveRepository.startArchive("test-session-key") } returns Result.success(archiveIdFromStart)
         
         sut.bind(callFacade).test {
             awaitItem()
             callArchivingStateFlow.value = ArchivingState.Started(archiveIdFromBind)
             assertEquals(ArchivingState.Started(archiveIdFromBind), awaitItem())
             
-            val result = sut.startArchive("test-room")
+            val result = sut.startArchive("test-session-key")
             assertEquals(archiveIdFromStart, result.getOrNull())
             
             cancelAndIgnoreRemainingEvents()

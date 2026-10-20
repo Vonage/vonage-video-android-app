@@ -9,8 +9,7 @@ class DisabledVonageCaptions : VonageCaptions {
 
     override fun init(
         callFacade: CallFacade,
-        roomName: String,
-        captionsId: String?
+        sessionKey: String,
     ) {
 
     }

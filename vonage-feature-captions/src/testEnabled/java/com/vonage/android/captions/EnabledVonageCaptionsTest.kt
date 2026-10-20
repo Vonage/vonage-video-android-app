@@ -28,59 +28,67 @@ class EnabledVonageCaptionsTest {
 
     @Test
     fun `when enable success then enableCaptions`() = runTest {
-        val roomName = "test-room"
-        val captionsId = "captions-456"
-        val expectedResult = success(captionsId)
+        coEvery { captionsRepository.enableCaptions(SESSION_KEY) } returns success("captions-456")
 
-        coEvery { captionsRepository.enableCaptions(roomName) } returns expectedResult
-
-        sut.init(callFacade, roomName, null)
+        sut.init(callFacade, SESSION_KEY)
         val result = sut.enable()
 
         assertTrue(result.isSuccess)
         assertEquals(Unit, result.getOrNull())
-        coVerify { captionsRepository.enableCaptions(roomName) }
+        coVerify { captionsRepository.enableCaptions(SESSION_KEY) }
+        verify { callFacade.enableCaptions() }
+    }
+
+    @Test
+    fun `when enable succeeds with null captionsId then still enableCaptions`() = runTest {
+        coEvery { captionsRepository.enableCaptions(SESSION_KEY) } returns success(null)
+
+        sut.init(callFacade, SESSION_KEY)
+        val result = sut.enable()
+
+        assertTrue(result.isSuccess)
         verify { callFacade.enableCaptions() }
     }
 
     @Test
     fun `when enable fails then returns failure`() = runTest {
-        val roomName = "test-room"
-        val exception = Exception("Network error")
-        val expectedResult = failure<String>(exception)
+        coEvery { captionsRepository.enableCaptions(SESSION_KEY) } returns failure(Exception("Network error"))
 
-        coEvery { captionsRepository.enableCaptions(roomName) } returns expectedResult
-
-        sut.init(callFacade, roomName, null)
+        sut.init(callFacade, SESSION_KEY)
         val result = sut.enable()
 
         assertTrue(result.isFailure)
         assertEquals("Network error", result.exceptionOrNull()?.message)
-        coVerify { captionsRepository.enableCaptions(roomName) }
         verify(exactly = 0) { callFacade.enableCaptions() }
     }
 
     @Test
-    fun `when disable success then disableCaptions and clears id`() = runTest {
-        val roomName = "test-room"
-        val captionsId = "captions-789"
+    fun `when disable after enable then disableCaptions`() = runTest {
+        coEvery { captionsRepository.enableCaptions(SESSION_KEY) } returns success("captions-789")
 
-        coEvery { captionsRepository.enableCaptions(roomName) } returns success(captionsId)
-
-        sut.init(callFacade, roomName, captionsId)
+        sut.init(callFacade, SESSION_KEY)
         sut.enable()
         val result = sut.disable()
 
         assertTrue(result.isSuccess)
-        assertEquals(Unit, result.getOrNull())
         verify { callFacade.disableCaptions() }
     }
 
     @Test
-    fun `when disable with no captionsId then returns failure`() = runTest {
-        val roomName = "test-room"
+    fun `when disable after enable with null captionsId then disableCaptions`() = runTest {
+        coEvery { captionsRepository.enableCaptions(SESSION_KEY) } returns success(null)
 
-        sut.init(callFacade, roomName, null)
+        sut.init(callFacade, SESSION_KEY)
+        sut.enable()
+        val result = sut.disable()
+
+        assertTrue(result.isSuccess)
+        verify { callFacade.disableCaptions() }
+    }
+
+    @Test
+    fun `when disable without enable then returns failure`() = runTest {
+        sut.init(callFacade, SESSION_KEY)
         val result = sut.disable()
 
         assertTrue(result.isFailure)
@@ -88,78 +96,52 @@ class EnabledVonageCaptionsTest {
     }
 
     @Test
-    fun `when enable multiple times then updates current captionsId`() = runTest {
-        val roomName = "test-room"
-        val firstCaptionsId = "captions-111"
-        val secondCaptionsId = "captions-222"
+    fun `when disable twice then second call fails`() = runTest {
+        coEvery { captionsRepository.enableCaptions(SESSION_KEY) } returns success(null)
 
-        coEvery { captionsRepository.enableCaptions(roomName) } returnsMany listOf(
-            success(firstCaptionsId),
-            success(secondCaptionsId)
-        )
-
-        sut.init(callFacade, roomName, null)
-
-        val firstResult = sut.enable()
-        assertTrue(firstResult.isSuccess)
-
-        // Second enable should work with new ID
-        val secondResult = sut.enable()
-        assertTrue(secondResult.isSuccess)
-
-        coVerify(exactly = 2) { captionsRepository.enableCaptions(roomName) }
-    }
-
-    @Test
-    fun `when disable with existing captionsId then delegate to call`() = runTest {
-        val roomName = "test-room"
-        val captionsId = "existing-captions-id"
-
-        sut.init(callFacade, roomName, captionsId)
+        sut.init(callFacade, SESSION_KEY)
+        sut.enable()
+        sut.disable()
         val result = sut.disable()
 
-        assertTrue(result.isSuccess)
-        verify { callFacade.disableCaptions() }
+        assertTrue(result.isFailure)
+        verify(exactly = 1) { callFacade.disableCaptions() }
     }
 
     @Test
-    fun `when enable then delegate to call`() = runTest {
-        val roomName = "test-room"
-        val captionsId = "captions-555"
+    fun `when enable multiple times then calls repository each time`() = runTest {
+        coEvery { captionsRepository.enableCaptions(SESSION_KEY) } returnsMany listOf(
+            success("captions-111"),
+            success(null),
+        )
 
-        coEvery { captionsRepository.enableCaptions(roomName) } returns success(captionsId)
+        sut.init(callFacade, SESSION_KEY)
 
-        sut.init(callFacade, roomName, null)
+        assertTrue(sut.enable().isSuccess)
+        assertTrue(sut.enable().isSuccess)
+
+        coVerify(exactly = 2) { captionsRepository.enableCaptions(SESSION_KEY) }
+    }
+
+    @Test
+    fun `when init then captions are not enabled on the call`() = runTest {
+        sut.init(callFacade, SESSION_KEY)
+
+        verify(exactly = 0) { callFacade.enableCaptions() }
+    }
+
+    @Test
+    fun `when re-init after enable then state is reset`() = runTest {
+        coEvery { captionsRepository.enableCaptions(SESSION_KEY) } returns success(null)
+
+        sut.init(callFacade, SESSION_KEY)
         sut.enable()
+        sut.init(callFacade, "another-session-key")
 
-        verify { callFacade.enableCaptions() }
+        assertTrue(sut.disable().isFailure)
     }
 
-    @Test
-    fun `when init with existing captionsId then enableCaptions is called`() = runTest {
-        val roomName = "test-room"
-        val existingCaptionsId = "pre-existing-captions-id"
-
-        sut.init(callFacade, roomName, existingCaptionsId)
-
-        verify { callFacade.enableCaptions() }
-    }
-
-    @Test
-    fun `when init with null captionsId then enableCaptions is not called`() = runTest {
-        val roomName = "test-room"
-
-        sut.init(callFacade, roomName, null)
-
-        verify(exactly = 0) { callFacade.enableCaptions() }
-    }
-
-    @Test
-    fun `when init with blank captionsId then enableCaptions is not called`() = runTest {
-        val roomName = "test-room"
-
-        sut.init(callFacade, roomName, "")
-
-        verify(exactly = 0) { callFacade.enableCaptions() }
+    private companion object {
+        const val SESSION_KEY = "test-session-key"
     }
 }

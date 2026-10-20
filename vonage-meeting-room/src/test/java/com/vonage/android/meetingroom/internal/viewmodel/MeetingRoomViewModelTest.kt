@@ -20,6 +20,7 @@ import com.vonage.android.meetingroom.api.MeetingRoomLayoutMode
 import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.api.PublisherSettings
+import com.vonage.android.meetingroom.api.SessionKeyHolder
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
@@ -86,6 +87,7 @@ class MeetingRoomViewModelTest {
         )
     }
     private val userBackgroundRepository: UserBackgroundRepository = mockk(relaxed = true)
+    private val sessionKeyHolder = SessionKeyHolder()
 
     private lateinit var sut: MeetingRoomViewModel
 
@@ -103,6 +105,7 @@ class MeetingRoomViewModelTest {
         every { container.callSettingsHolder } returns callSettingsHolder
         every { container.getBackgroundsUseCase } returns getBackgroundsUseCase
         every { container.userBackgroundRepository } returns userBackgroundRepository
+        every { container.sessionKeyHolder } returns sessionKeyHolder
 
         every { prebuilt.roomName } returns ANY_ROOM_NAME
         every { prebuilt.configuration } returns MeetingRoomConfiguration()
@@ -131,6 +134,8 @@ class MeetingRoomViewModelTest {
 
         verify { activityContextHolder.setActivityContext(context) }
         verify { mockCall.connect(any(Context::class)) }
+        verify { videoClient.initializeSession("application-id", "session-id", "token") }
+        assertEquals(ANY_SESSION_KEY, sessionKeyHolder.sessionKey)
     }
 
     @Test
@@ -162,6 +167,7 @@ class MeetingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when initialize fails then returns error state`() = runTest {
+        sessionKeyHolder.sessionKey = "stale-key"
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns Result.failure(Exception("Empty response"))
 
         sut.setup(context)
@@ -172,6 +178,7 @@ class MeetingRoomViewModelTest {
         assertEquals(false, errorState.isLoading)
         assertEquals(true, errorState.isError)
         assertEquals(audioDevicesStateMock, errorState.audioDevicesState)
+        assertEquals(null, sessionKeyHolder.sessionKey) // never keeps a previous room's key
     }
 
     @Test
@@ -356,7 +363,7 @@ class MeetingRoomViewModelTest {
     @Test
     fun `given viewmodel when archiveCall true then emit correct state`() = runTest {
         givenMockCall()
-        coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(
+        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY) } returns success(
             com.vonage.android.archiving.ArchiveId("archiveId"),
         )
 
@@ -370,17 +377,17 @@ class MeetingRoomViewModelTest {
             sut.archiveCall(true)
             assertEquals(ArchivingUiState.STARTING, awaitItem().archivingUiState)
             assertEquals(ArchivingUiState.RECORDING, awaitItem().archivingUiState)
-            coVerify { vonageArchiving.startArchive(ANY_ROOM_NAME) }
+            coVerify { vonageArchiving.startArchive(ANY_SESSION_KEY) }
         }
     }
 
     @Test
     fun `given viewmodel when archiveCall false then emit correct state`() = runTest {
         givenMockCall()
-        coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(
+        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY) } returns success(
             com.vonage.android.archiving.ArchiveId("archiveId"),
         )
-        coEvery { vonageArchiving.stopArchive(ANY_ROOM_NAME) } returns success(true)
+        coEvery { vonageArchiving.stopArchive(ANY_SESSION_KEY) } returns success(true)
 
         sut.uiState.test {
             awaitItem()
@@ -392,12 +399,12 @@ class MeetingRoomViewModelTest {
             sut.archiveCall(true)
             assertEquals(ArchivingUiState.STARTING, awaitItem().archivingUiState)
             assertEquals(ArchivingUiState.RECORDING, awaitItem().archivingUiState)
-            coVerify { vonageArchiving.startArchive(ANY_ROOM_NAME) }
+            coVerify { vonageArchiving.startArchive(ANY_SESSION_KEY) }
 
             sut.archiveCall(false)
             assertEquals(ArchivingUiState.STOPPING, awaitItem().archivingUiState)
             assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState)
-            coVerify { vonageArchiving.stopArchive(ANY_ROOM_NAME) }
+            coVerify { vonageArchiving.stopArchive(ANY_SESSION_KEY) }
         }
     }
 
@@ -445,7 +452,7 @@ class MeetingRoomViewModelTest {
         val mockCall = givenMockCall()
         val archivingStateFlow = MutableSharedFlow<ArchivingState>()
         every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
-        coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(
+        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY) } returns success(
             com.vonage.android.archiving.ArchiveId("archiveId"),
         )
 
@@ -582,18 +589,17 @@ class MeetingRoomViewModelTest {
     // region Captions
 
     @Test
-    fun `given viewmodel when init with captionsId then emit correct state`() = runTest {
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse(captionsId = "captionsId")
-        val mockCall: CallFacade = buildMockCall()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+    fun `given viewmodel when connected then captions start idle and bind with session key`() = runTest {
+        val mockCall = givenMockCall()
 
         sut.uiState.test {
             awaitItem()
             sut.setup(context)
             testScheduler.advanceUntilIdle()
             awaitItem() // audio devices
-            assertEquals(CaptionsUiState.ENABLED, awaitItem().captionsUiState)
+            assertEquals(CaptionsUiState.IDLE, awaitItem().captionsUiState)
         }
+        verify { vonageCaptions.init(mockCall, ANY_SESSION_KEY) }
     }
 
     @Test
@@ -922,17 +928,18 @@ class MeetingRoomViewModelTest {
     }
 
     private fun buildSuccessSessionResponse(
-        apiKey: String = "api-key",
+        applicationId: String = "application-id",
         sessionId: String = "session-id",
         token: String = "token",
-        captionsId: String? = null,
+        sessionKey: String = ANY_SESSION_KEY,
     ) = success(
-        SessionInfo(apiKey = apiKey, sessionId = sessionId, token = token, captionsId = captionsId),
+        SessionInfo(applicationId = applicationId, sessionId = sessionId, token = token, sessionKey = sessionKey),
     )
 
     // endregion
 
     private companion object {
         const val ANY_ROOM_NAME = "room-name"
+        const val ANY_SESSION_KEY = "session-key"
     }
 }

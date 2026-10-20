@@ -23,7 +23,7 @@ class E2eTestFlags internal constructor(
 
     /**
      * When true, the backend is simulated as enforcing authentication: signed-out
-     * `session/{room}` requests are answered with `401` without reaching the network.
+     * `v2/createSession` requests are answered with `401` without reaching the network.
      */
     @Volatile
     var forceAuthRequired: Boolean = false

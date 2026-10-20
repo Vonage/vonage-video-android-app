@@ -65,6 +65,8 @@ class MeetingRoomPrebuilt internal constructor(
     internal val customBottomBar: (@Composable (MeetingRoomBottomBarState, MeetingRoomCustomActions) -> Unit)? = null,
     /** Optional supplier of a bearer token attached to the SDK's backend requests. */
     internal val authTokenProvider: MeetingRoomAuthTokenProvider? = null,
+    /** Optional host-shared holder for the session key JWT. */
+    internal val sessionKeyHolder: SessionKeyHolder? = null,
 ) {
     private val _callState = MutableStateFlow(MeetingRoomCallState(roomName = roomName))
 
