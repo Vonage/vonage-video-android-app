@@ -30,5 +30,10 @@ class GlobalDataStorage @Inject constructor(
         val SETTINGS_VIDEO_BITRATE_PRESET = stringPreferencesKey("settings_video_bitrate_preset")
         val SETTINGS_VIDEO_BITRATE_MAX = intPreferencesKey("settings_video_bitrate_max")
         val SETTINGS_DEGRADATION_PREFERENCE = stringPreferencesKey("settings_degradation_preference")
+        val SETTINGS_PUBLISH_AUDIO = booleanPreferencesKey("settings_publish_audio")
+        val SETTINGS_PUBLISH_VIDEO = booleanPreferencesKey("settings_publish_video")
+        val SETTINGS_VIDEO_EFFECT = stringPreferencesKey("settings_video_effect")
+        val SETTINGS_BACKGROUND_ID = stringPreferencesKey("settings_background_id")
+        val SETTINGS_BACKGROUND_PATH = stringPreferencesKey("settings_background_path")
     }
 }
