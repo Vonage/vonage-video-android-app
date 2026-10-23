@@ -27,6 +27,7 @@ internal fun PublisherStats(
     publisher?.let { pub ->
         val videoStats by pub.videoStats.collectAsStateWithLifecycle()
         val audioStats by pub.audioStats.collectAsStateWithLifecycle()
+        val networkCondition by pub.networkCondition.collectAsStateWithLifecycle()
         Column(
             modifier = modifier,
         ) {
@@ -38,6 +39,7 @@ internal fun PublisherStats(
                     value = it.estimatedBandwidthInBps.formatBitrate(),
                 )
             }
+            networkCondition?.let { NetworkConditionStats(it) }
             videoStats?.let { PublisherVideoStats(it) }
             audioStats?.let { PublisherAudioStats(it) }
         }

@@ -36,6 +36,7 @@ interface VonagePublisher {
     fun setAudioLevelListener(listener: VonageAudioLevelListener?)
     fun setVideoStatsListener(listener: VonagePublisherVideoStatsListener?)
     fun setAudioStatsListener(listener: VonagePublisherAudioStatsListener?)
+    fun setNetworkConditionListener(listener: VonageNetworkConditionListener?)
 }
 
 // region Publisher listener interfaces
