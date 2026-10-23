@@ -1,10 +1,16 @@
 package com.vonage.android.kotlin.model
 
 import com.vonage.android.kotlin.sdk.VonageBlurLevel
+import com.vonage.android.kotlin.sdk.VonageNetworkCondition
+import com.vonage.android.kotlin.sdk.VonageNetworkConditionListener
 import com.vonage.android.kotlin.sdk.VonagePublisher
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -41,6 +47,21 @@ class PublisherStateTest {
             vonagePublisher = mockPublisher,
         )
     }
+
+    // region Network condition
+
+    @Test
+    fun `setup exposes the network condition reported by the SDK`() = runTest(UnconfinedTestDispatcher()) {
+        var listener: VonageNetworkConditionListener? = null
+        every { mockPublisher.setNetworkConditionListener(any()) } answers { listener = firstArg() }
+        backgroundScope.launch { publisherState.setup() }
+
+        listener!!.onNetworkCondition(VonageNetworkCondition(score = 4, reason = "none"))
+
+        assertEquals(NetworkCondition(score = 4, reason = "none"), publisherState.networkCondition.value)
+    }
+
+    // endregion
 
     // region changeVisibility round-trip
 
