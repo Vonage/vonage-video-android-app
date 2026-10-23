@@ -1,0 +1,54 @@
+app/src/main/java/com/vonage/android/data/storage/GlobalDataStorage.kt
+  s_9fba2fa6ffd127::t_2709987d3a3738 33-37
+app/src/main/java/com/vonage/android/data/storage/DataStoreCallSettingsStorage.kt
+  s_9fba2fa6ffd127::t_f6203cefd9023a 60-64
+  s_9fba2fa6ffd127::t_c635e14da94f90 89-92,104-114,116-129
+  s_9fba2fa6ffd127::t_651c5222f36bf1 93-103
+  s_9fba2fa6ffd127::t_6ec32032982c58 3-4,7-8,15-16,21,28,31
+vonage-feature-settings/src/main/java/com/vonage/android/settings/CallSettingsHolder.kt
+  s_9fba2fa6ffd127::t_c9739c74ecb70c 63-78,81-82
+  s_9fba2fa6ffd127::t_7f4afd3e98d4c2 83
+vonage-feature-settings/src/main/java/com/vonage/android/settings/CallSettingsStorage.kt
+  s_9fba2fa6ffd127::t_6bc5846b40547f 9-19,35
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTest.kt
+  s_9fba2fa6ffd127::t_9b15bdc675b52c 285-303
+  s_9fba2fa6ffd127::t_7d5ae301da155e 304-305
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomViewModel.kt
+  s_9fba2fa6ffd127::t_529521aa9bf970 308-311
+  s_9fba2fa6ffd127::t_39d2a0e5eb0fa7 75-76,80-85,178
+  s_9fba2fa6ffd127::t_d0d74d84823156 175-177
+  s_9fba2fa6ffd127::t_0c5cf51e60b5e5 179-180
+app/src/test/java/com/vonage/android/data/storage/DataStoreCallSettingsStorageTest.kt
+  s_9fba2fa6ffd127::t_de640177c07e0e 101-128
+  s_9fba2fa6ffd127::t_b459c92bf84669 5-6,13-14,19,25,27
+app/src/test/java/com/vonage/android/screen/waiting/WaitingRoomViewModelTest.kt
+  s_9fba2fa6ffd127::t_44eaa80578ac6b 288
+  s_9fba2fa6ffd127::t_dac6685a71ea84 39
+  s_9fba2fa6ffd127::t_a8c9c7c4f90d3e 53,56
+  s_9fba2fa6ffd127::t_4dcae269e25e44 286-287,289-347
+  s_9fba2fa6ffd127::t_0bfcf8ba428860 348
+vonage-feature-settings/src/testEnabled/java/com/vonage/android/settings/CallSettingsHolderTest.kt
+  s_9fba2fa6ffd127::t_167543cc40bef1 193,196-197,201-218,220,222
+  s_9fba2fa6ffd127::t_e6058ea8313e5b 194-195,198-200,219,221,223-226
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "99def49c2b7bd3b9fce0f925dd082c48d11facb5",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_9fba2fa6ffd127": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_40ad509f-2701-48c9-9a52-4200ac1adc93",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
