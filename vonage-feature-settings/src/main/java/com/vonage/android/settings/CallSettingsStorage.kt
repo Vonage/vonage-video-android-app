@@ -6,6 +6,17 @@ import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.kotlin.model.VideoCodec
+import com.vonage.android.kotlin.model.VideoEffect
+
+/**
+ * Publisher state last chosen by the user, restored on the next join.
+ * A null mic/camera value means the user never chose one, so the app config default applies.
+ */
+data class PublisherPreferences(
+    val publishAudio: Boolean? = null,
+    val publishVideo: Boolean? = null,
+    val videoEffect: VideoEffect = VideoEffect.None,
+)
 
 data class PersistedCallSettings(
     val captureFrameRate: CaptureFrameRate = CaptureFrameRate.FPS_15,
@@ -21,6 +32,7 @@ data class PersistedCallSettings(
         maxBitrate = VideoBitratePreset.DEFAULT.defaultMaxBitrate,
     ),
     val degradationPreference: DegradationPreference = DegradationPreference.NOT_SET,
+    val publisherPreferences: PublisherPreferences = PublisherPreferences(),
 )
 
 interface CallSettingsStorage {

@@ -19,6 +19,7 @@ import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
 import com.vonage.android.settings.CallSettingsHolder
+import com.vonage.android.settings.PublisherPreferences
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -35,6 +36,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import java.io.File
 
 class WaitingRoomViewModelTest {
 
@@ -48,8 +50,10 @@ class WaitingRoomViewModelTest {
     private val audioDevicesHandler: AudioDevicesHandler = mockk(relaxed = true)
     private val callSettingsHolderCallFlow = MutableStateFlow<com.vonage.android.kotlin.model.CallFacade?>(null)
     private val callSettingsHolderResolutionFlow = MutableStateFlow<CaptureResolution?>(null)
+    private val callSettingsHolderPreferencesFlow = MutableStateFlow(PublisherPreferences())
     private val callSettingsHolder: CallSettingsHolder = mockk(relaxed = true) {
         every { call } returns callSettingsHolderCallFlow
+        every { publisherPreferences } returns callSettingsHolderPreferencesFlow
         every { senderStatsEnabled } returns MutableStateFlow(true)
         every { captureFrameRate } returns MutableStateFlow(CaptureFrameRate.FPS_15)
         every { captureResolution } returns callSettingsHolderResolutionFlow
@@ -277,6 +281,69 @@ class WaitingRoomViewModelTest {
         }
 
         verify(exactly = 1) { publisher.applyVideoEffect(VideoEffect.BlurLow) }
+    }
+
+    @Test
+    fun `given stored publisher preferences when initialize then preview publisher starts with them`() = runTest {
+        val image = File.createTempFile("background", ".jpg").apply { deleteOnExit() }
+        val effect = VideoEffect.BackgroundImage(id = "bg-1", imagePath = image.absolutePath)
+        callSettingsHolderPreferencesFlow.value =
+            PublisherPreferences(publishAudio = true, publishVideo = false, videoEffect = effect)
+        givenPreviewPublisher()
+        coEvery { userRepository.getUserName() } returns ""
+
+        sut.init(context)
+        sut.uiState.test {
+            awaitItem()
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify {
+            videoClient.configurePublisher(
+                match { it.initialVideoEffect == effect && it.publishAudio && !it.publishVideo },
+            )
+        }
+    }
+
+    @Test
+    fun `given stored background whose file is gone when initialize then preview starts without effect`() = runTest {
+        callSettingsHolderPreferencesFlow.value = PublisherPreferences(
+            videoEffect = VideoEffect.BackgroundImage(id = "bg-1", imagePath = "/does/not/exist.jpg"),
+        )
+        givenPreviewPublisher()
+        coEvery { userRepository.getUserName() } returns ""
+
+        sut.init(context)
+        sut.uiState.test {
+            awaitItem()
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify { videoClient.configurePublisher(match { it.initialVideoEffect == VideoEffect.None }) }
+    }
+
+    @Test
+    fun `given initialized viewmodel when join room then publisher preferences are saved`() = runTest {
+        coEvery { userRepository.getUserName() } returns "initial"
+        coEvery { userRepository.saveUserName(any()) } returns Unit
+        givenPreviewPublisher()
+        every { videoClient.destroyPublisher() } returns Unit
+
+        sut.uiState.test {
+            awaitItem()
+            sut.init(context)
+            awaitItem()
+            sut.joinRoom("Alice")
+            awaitItem()
+        }
+
+        verify {
+            callSettingsHolder.updatePublisherPreferences(
+                PublisherPreferences(publishAudio = false, publishVideo = true, videoEffect = VideoEffect.None),
+            )
+        }
     }
 
     @Test
