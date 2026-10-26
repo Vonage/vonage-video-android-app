@@ -95,6 +95,10 @@ class GetConfigTest {
             AppConfig.MeetingRoomSettings.ALLOW_PICTURE_IN_PICTURE,
             config.allowPictureInPicture,
         )
+        assertEquals(
+            AppConfig.MeetingRoomSettings.ALLOW_POST_CALL_TRANSCRIPTION,
+            config.allowPostCallTranscription,
+        )
         assertEquals(AppConfig.MeetingRoomSettings.ALLOW_SCREEN_SHARE, config.allowScreenShare)
         assertEquals(
             AppConfig.MeetingRoomSettings.DEFAULT_LAYOUT_MODE,
