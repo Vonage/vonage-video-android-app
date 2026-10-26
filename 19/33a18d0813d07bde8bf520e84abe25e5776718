@@ -1,0 +1,44 @@
+docs/CONFIGURATION.md
+  s_efe10694d14b1e::t_5fc4482f83e346 59
+app-config.json
+  s_efe10694d14b1e::t_584cf0506dbc05 38
+app/src/main/java/com/vonage/android/di/FeaturesModule.kt
+  s_efe10694d14b1e::t_09d60f97586281 56-61
+docs/CONFIG-SYSTEM.md
+  s_efe10694d14b1e::t_29fba42c40357b 124
+vonage-feature-post-call-transcription/src/testEnabled/java/com/vonage/android/postcalltranscription/EnabledVonagePostCallTranscriptionTest.kt
+  s_efe10694d14b1e::t_8a78eb87d5581c 1-22
+.claude/skills/configure/SKILL.md
+  s_efe10694d14b1e::t_50e752fc241833 47
+AGENTS.md
+  s_efe10694d14b1e::t_6202c9e9e1927a 15
+app/src/test/java/com/vonage/android/config/GetConfigTest.kt
+  s_efe10694d14b1e::t_06920541a4f985 98-101
+settings.gradle.kts
+  s_efe10694d14b1e::t_407f51644aff1c 39
+app/build.gradle.kts
+  s_efe10694d14b1e::t_fa1598c5b02608 91-96
+app/src/main/java/com/vonage/android/config/Config.kt
+  s_efe10694d14b1e::t_57197361f3d4c8 53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1933a18d0813d07bde8bf520e84abe25e5776718",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_efe10694d14b1e": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_dbd2ccd3-bbe3-40ad-8a5a-523e56f4eb2f",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
