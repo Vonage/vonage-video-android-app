@@ -1,0 +1,36 @@
+vonage-feature-archiving/src/disabled/java/com/vonage/android/archiving/ui/recordingAction.kt
+  h_25498f8d57a266 16-25
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/ui/recordingAction.kt
+  h_25498f8d57a266 5,11,20-58,60-61,65,67,79-80
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomBottomBarState.kt
+  h_25498f8d57a266 15,24
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomCustomActions.kt
+  h_25498f8d57a266 16-17,27
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/MeetingRoomContent.kt
+  h_25498f8d57a266 125-126
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomActions.kt
+  h_25498f8d57a266 24-26
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  h_25498f8d57a266 42,57,59,68,90,118-119,187,212-213,216,221-228,252,285,305,339-342,464-501,504-507,538
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/ArchiveNotificationOverlay.kt
+  h_25498f8d57a266 3,9,11,23,27,29,35-38,40,42,45,50,52,56,60-61,64-66,68-70,72-91,95-96
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/MeetingTopBar.kt
+  h_25498f8d57a266 23,38,54,63-65,69-74,134-154,162,172
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/bottombar/BottomBar.kt
+  h_25498f8d57a266 30,70,282-289
+vonage-meeting-room/src/main/res/values/strings.xml
+  h_25498f8d57a266 28-37
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/bottombar/BottomBarAction.kt
+  h_25498f8d57a266 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a92c06b9c38ed7b9ea02c6c8718f8733a92acdf3",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
