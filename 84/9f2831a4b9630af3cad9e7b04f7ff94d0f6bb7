@@ -1,0 +1,27 @@
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/EnabledVonageArchiving.kt
+  s_8f4e2b70c24947::t_57cd3870e129ef 27-31,34-35,40-41,43-48,50-51,53,74,93,102
+vonage-feature-archiving/src/testEnabled/java/com/vonage/android/archiving/EnabledVonageArchivingTest.kt
+  s_8f4e2b70c24947::t_6b96ce54276dbc 134,137-138,140-142,146,309,336-353
+  s_8f4e2b70c24947::t_bf9018d463ddca 131-133
+  s_8f4e2b70c24947::t_8efadf45c9d599 135-136
+  s_8f4e2b70c24947::t_38f080502e9768 139
+  s_8f4e2b70c24947::t_330c27f698e6ae 143-145
+  s_8f4e2b70c24947::t_539714f3e29b18 147
+  s_8f4e2b70c24947::t_816cad458f7c62 335
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "849f2831a4b9630af3cad9e7b04f7ff94d0f6bb7",
+  "prompts": {},
+  "sessions": {
+    "s_8f4e2b70c24947": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_17e5783d-0bec-4619-99bb-b4bb33985fa0",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
