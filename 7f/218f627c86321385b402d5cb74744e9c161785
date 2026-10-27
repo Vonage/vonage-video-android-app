@@ -1,0 +1,25 @@
+vonage-feature-archiving/src/testEnabled/java/com/vonage/android/archiving/EnabledVonageArchivingTest.kt
+  s_8f4e2b70c24947::t_0ff719c494eba3 131-147
+  s_8f4e2b70c24947::t_84a8e506734bf8 130
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7f218f627c86321385b402d5cb74744e9c161785",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_8f4e2b70c24947": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_17e5783d-0bec-4619-99bb-b4bb33985fa0",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
