@@ -1,0 +1,26 @@
+.claude/skills/configure/SKILL.md
+  h_25498f8d57a266 47
+AGENTS.md
+  h_25498f8d57a266 15
+app-config.json
+  h_25498f8d57a266 38
+app/build.gradle.kts
+  h_25498f8d57a266 72-74,76-79,81-85
+app/src/main/java/com/vonage/android/screen/room/MeetingRoomScreenRoute.kt
+  h_25498f8d57a266 120
+docs/CONFIG-SYSTEM.md
+  h_25498f8d57a266 124
+docs/CONFIGURATION.md
+  h_25498f8d57a266 59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "29813c9b30c2ed168f11585a0ee60148d909a0e1",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
