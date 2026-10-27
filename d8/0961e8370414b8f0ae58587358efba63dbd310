@@ -1,0 +1,179 @@
+vonage-meeting-room/src/main/res/values/strings.xml
+  s_8f4e2b70c24947::t_aed4f0d15cb95e 36
+  s_8f4e2b70c24947::t_5c23d673696eb6 28-35,37
+vonage-feature-archiving/src/testEnabled/java/com/vonage/android/archiving/data/ArchiveRepositoryTest.kt
+  s_8f4e2b70c24947::t_f4520c178a8e09 124,131-133,135-144,161-163
+  s_8f4e2b70c24947::t_03912a9b252daa 125-130,134,145-160
+  s_8f4e2b70c24947::t_d2dfa81af24d06 123,183-265,268-269
+vonage-feature-archiving/src/testEnabled/java/com/vonage/android/archiving/EnabledVonageArchivingTest.kt
+  s_8f4e2b70c24947::t_e283be7a90bc68 244-258,270-342
+  s_8f4e2b70c24947::t_3553f2d98818b7 259-269
+vonage-feature-archiving/src/main/java/com/vonage/android/archiving/Archive.kt
+  s_8f4e2b70c24947::t_acf6854c96bf71 22-37
+  s_8f4e2b70c24947::t_448fb06abb645b 11,13,16
+vonage-feature-archiving/src/disabled/java/com/vonage/android/archiving/ui/recordingAction.kt
+  s_8f4e2b70c24947::t_da0e8bba3d8325 16-25
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/NotificationToastScreenshotTest.kt
+  s_8f4e2b70c24947::t_3f6deb853ddcfd 1-50
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomActions.kt
+  s_8f4e2b70c24947::t_9c89c03a0b008c 24
+  s_8f4e2b70c24947::t_869ce0a368cfd1 25-26
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomCustomActions.kt
+  s_8f4e2b70c24947::t_be64b9fec47fbd 16-17,27
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/bottombar/BottomBarAction.kt
+  s_8f4e2b70c24947::t_7a6990211eebb1 21
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/TranscriptionIndicator.kt
+  s_8f4e2b70c24947::t_8d26113b1dd615 1-32
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTranscriptionTest.kt
+  s_8f4e2b70c24947::t_72457cde1e409a 63,66,72,96,99,101,103,105-110,119-120,122-142,144,146,149-154,157,165-166,168,170,174-179,184-185,187,217,219,243,245,251-256,268-269,271,277-282,285,293-294,309,312,317
+  s_8f4e2b70c24947::t_33552f4b80ad42 60-62
+  s_8f4e2b70c24947::t_da686d0f6097e3 64-65
+  s_8f4e2b70c24947::t_cc003cd5fc5f81 67-71
+  s_8f4e2b70c24947::t_579e6d676dd895 73-75,93-95
+  s_8f4e2b70c24947::t_8d588cf3b04553 97-98
+  s_8f4e2b70c24947::t_c4976854f9c1d5 100
+  s_8f4e2b70c24947::t_a30800f6927e57 102
+  s_8f4e2b70c24947::t_9f6de2d8b33c5b 104
+  s_8f4e2b70c24947::t_524e2023e8428d 111-113,116-118
+  s_8f4e2b70c24947::t_95be5027a02e58 121
+  s_8f4e2b70c24947::t_0adb3c16eee8a9 143
+  s_8f4e2b70c24947::t_8e2968ade801fa 145
+  s_8f4e2b70c24947::t_a922834a75f3c1 147-148
+  s_8f4e2b70c24947::t_9799b4826074fc 155-156
+  s_8f4e2b70c24947::t_9850691f96bf07 158-160,162-164
+  s_8f4e2b70c24947::t_85db87e8e53627 167
+  s_8f4e2b70c24947::t_e11e5e249bef44 169
+  s_8f4e2b70c24947::t_c7ecc30fef5fbc 171-173
+  s_8f4e2b70c24947::t_d5733def9af39b 180-183
+  s_8f4e2b70c24947::t_4baf3299850a47 186
+  s_8f4e2b70c24947::t_a0ebef81fda0de 188-190,214-216
+  s_8f4e2b70c24947::t_ebdf68abbfb696 218
+  s_8f4e2b70c24947::t_8bf547d8168474 220-222,240-242
+  s_8f4e2b70c24947::t_d89ca870151842 244
+  s_8f4e2b70c24947::t_e76cc0eb4d1fb1 246-250
+  s_8f4e2b70c24947::t_720c68bad28f07 257-259,265-267
+  s_8f4e2b70c24947::t_181a160f54ba79 270
+  s_8f4e2b70c24947::t_a26ae85b7f4dc3 272-276
+  s_8f4e2b70c24947::t_e95c8d0267f4f3 283-284
+  s_8f4e2b70c24947::t_203047e1681eee 286-288,290-292
+  s_8f4e2b70c24947::t_c1253d7ad794da 295-297,306-308
+  s_8f4e2b70c24947::t_dd9b2b2d5f4c65 310-311
+  s_8f4e2b70c24947::t_f28b36361a59c5 313-316
+  s_8f4e2b70c24947::t_3fa5fd0a7e1c11 318
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  s_8f4e2b70c24947::t_d1d9f9103f862b 68
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/TranscriptionIndicatorScreenshotTest.kt
+  s_8f4e2b70c24947::t_5980f5c0bf8a72 1-37
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/ui/ArchiveIcon.kt
+  s_8f4e2b70c24947::t_c90e74122ae5ca 7,11,16,21-24
+app/src/main/java/com/vonage/android/screen/room/MeetingRoomScreenRoute.kt
+  s_8f4e2b70c24947::t_9274c82dbb5e18 120
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/ui/ArchivesList.kt
+  s_8f4e2b70c24947::t_c24dde5eaa5810 106
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/vivid/icons/solid/VoicemailTranscript.kt
+  s_8f4e2b70c24947::t_528f808e0b0fd8 1-115
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomBottomBarState.kt
+  s_8f4e2b70c24947::t_574cc3060d4c5b 15,24
+docs/CONFIGURATION.md
+  s_8f4e2b70c24947::t_72def41bba32b2 59
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/VonageCheckbox.kt
+  s_8f4e2b70c24947::t_d72960b617c02a 1-60
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/CallFacade.kt
+  s_8f4e2b70c24947::t_e69cb4c7a4b262 151-154,157-160
+  s_8f4e2b70c24947::t_e77f4e40ab10cd 77-82
+vonage-feature-archiving/src/main/java/com/vonage/android/archiving/VonageArchiving.kt
+  s_8f4e2b70c24947::t_869c3870e5ac3a 28,31-35
+  s_8f4e2b70c24947::t_34e00f10e46655 23-24,27,38-39,42,45
+app/build.gradle.kts
+  s_8f4e2b70c24947::t_1e6d76710b4e70 72-74,76-79,81-85
+vonage-feature-archiving/src/disabled/java/com/vonage/android/archiving/DisabledVonageArchiving.kt
+  s_8f4e2b70c24947::t_97f6f7e1a1e700 13
+  s_8f4e2b70c24947::t_62faec1cd01d0e 16
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/data/ArchiveRepository.kt
+  s_8f4e2b70c24947::t_73b33b7c462696 41-49,51-60
+  s_8f4e2b70c24947::t_50bdeaf9ecb30f 102-123,126-131,135,137,142
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/ArchiveNotificationOverlay.kt
+  s_8f4e2b70c24947::t_bac78db0def358 11-64,68-71,91
+  s_8f4e2b70c24947::t_0d241d10ed10f0 65-66,73-90,94-96
+  s_8f4e2b70c24947::t_58ffd2af8da4ab 8-10
+  s_8f4e2b70c24947::t_b86fcc2cbc0c2e 67
+  s_8f4e2b70c24947::t_852e13c0afa4f0 72
+  s_8f4e2b70c24947::t_1417ce71ce7e75 92-93
+app/src/test/java/com/vonage/android/screen/goodbye/GoodbyeScreenViewModelTest.kt
+  s_8f4e2b70c24947::t_2a19efe435652e 164-183
+  s_8f4e2b70c24947::t_9cbfe4e44eb643 163
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/EnabledVonageArchiving.kt
+  s_8f4e2b70c24947::t_f23760641dbf54 16-18,26,28-29,31,35-37,50-52,55-56,65-66,69,79,82-83,89-94,97,100-105,107,110-111
+  s_8f4e2b70c24947::t_705acd1e738875 70,73-78
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/BasicAlertDialog.kt
+  s_8f4e2b70c24947::t_215bbfc5596ea8 3-4,14-16,24,28-35,68-79
+  s_8f4e2b70c24947::t_60af1ca51b711f 80-82
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/BasicAlertDialogScreenshotTest.kt
+  s_8f4e2b70c24947::t_8a2e42448d8869 39-51
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/data/ArchivingApi.kt
+  s_8f4e2b70c24947::t_b966bad49d2293 12
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  s_8f4e2b70c24947::t_846b767b3f4d8e 305-308,310-312,355,358
+  s_8f4e2b70c24947::t_4bac1d9240d6e2 408
+  s_8f4e2b70c24947::t_288bff75b5ce10 336,340,385-388,390-398,402-405,410-416,420
+  s_8f4e2b70c24947::t_f4c6448fb217b6 389
+  s_8f4e2b70c24947::t_36cc48f7de7238 25
+  s_8f4e2b70c24947::t_8a428916606e93 196
+  s_8f4e2b70c24947::t_da20d324d1872b 309
+  s_8f4e2b70c24947::t_7829252982bda0 303-304
+  s_8f4e2b70c24947::t_cc6e3af8ad796b 334-335
+  s_8f4e2b70c24947::t_7f75084a9f045b 337-339
+  s_8f4e2b70c24947::t_3322109f139182 341-343
+  s_8f4e2b70c24947::t_feae2ec0478c80 356-357
+  s_8f4e2b70c24947::t_7021480fe2fcf2 382-384
+  s_8f4e2b70c24947::t_7e7be73ba9e1d6 399-401
+  s_8f4e2b70c24947::t_eba4b88cca63a4 406-407
+  s_8f4e2b70c24947::t_01c0885662d6f5 409
+  s_8f4e2b70c24947::t_0853dda5ec2ab7 417-419
+  s_8f4e2b70c24947::t_289ed21ce6acb7 421
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/VonageCheckboxScreenshotTest.kt
+  s_8f4e2b70c24947::t_9e80246e254211 1-50
+vonage-video-core/src/test/java/com/vonage/android/kotlin/CallTest.kt
+  s_8f4e2b70c24947::t_71256d3097bac3 363,366-371,376,379-388,390-399,404,406-417
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/NotificationToast.kt
+  s_8f4e2b70c24947::t_c1556f4d7c0814 1-73
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/MeetingRoomContent.kt
+  s_8f4e2b70c24947::t_54232e0d004e36 125
+  s_8f4e2b70c24947::t_b19f9bdd97c2f4 126
+vonage-video-core/src/main/java/com/vonage/android/kotlin/Call.kt
+  s_8f4e2b70c24947::t_be1df49d81488e 49
+  s_8f4e2b70c24947::t_491fe73f335dce 209-213,289-290,294
+  s_8f4e2b70c24947::t_f16871d689349e 824
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomFeature.kt
+  s_8f4e2b70c24947::t_449ece41ce28e7 21-26
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomUiState.kt
+  s_8f4e2b70c24947::t_2c35b2bbacfa6c 20-21
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/data/ArchivingResponses.kt
+  s_8f4e2b70c24947::t_3ff4ebd5f8d6cc 10-12,20-34
+  s_8f4e2b70c24947::t_bdfd8d598bdbbf 89-103
+  s_8f4e2b70c24947::t_f8a87d3a9eb18a 7-9,13-19,35-36
+  s_8f4e2b70c24947::t_1020f9424be159 6
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/ui/recordingAction.kt
+  s_8f4e2b70c24947::t_8eed022724c97f 5,11,20-58,60-61,65,67,79-80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d80961e8370414b8f0ae58587358efba63dbd310",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_8f4e2b70c24947": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_17e5783d-0bec-4619-99bb-b4bb33985fa0",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
