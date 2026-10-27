@@ -1,0 +1,18 @@
+vonage-video-core/src/main/java/com/vonage/android/kotlin/Call.kt
+  h_25498f8d57a266 49,209-213,289-290,294,824
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/CallFacade.kt
+  h_25498f8d57a266 77-82,151-154,157-160
+vonage-video-core/src/test/java/com/vonage/android/kotlin/CallTest.kt
+  h_25498f8d57a266 363,366-371,376,379-388,390-399,404,406-417
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "110d19895ecd6cf6cb03a8fc9b4eeb4b6ed97d25",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
