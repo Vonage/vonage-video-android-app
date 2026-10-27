@@ -1,0 +1,30 @@
+vonage-feature-archiving/src/disabled/java/com/vonage/android/archiving/DisabledVonageArchiving.kt
+  h_25498f8d57a266 13,16
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/EnabledVonageArchiving.kt
+  h_25498f8d57a266 16-18,26,28-29,31,35-37,50-52,55-56,65-66,69-70,73-79,82-83,89-94,97,100-105,107,110-111
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/data/ArchiveRepository.kt
+  h_25498f8d57a266 40-48,50-59
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/data/ArchivingApi.kt
+  h_25498f8d57a266 12
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/data/ArchivingResponses.kt
+  h_25498f8d57a266 6-36
+vonage-feature-archiving/src/main/java/com/vonage/android/archiving/Archive.kt
+  h_25498f8d57a266 19-34
+vonage-feature-archiving/src/main/java/com/vonage/android/archiving/VonageArchiving.kt
+  h_25498f8d57a266 23-24,27-28,31-35,38-39,42,45
+vonage-feature-archiving/src/testEnabled/java/com/vonage/android/archiving/EnabledVonageArchivingTest.kt
+  h_25498f8d57a266 244-342
+vonage-feature-archiving/src/testEnabled/java/com/vonage/android/archiving/data/ArchiveRepositoryTest.kt
+  h_25498f8d57a266 60,69,76,85,122-162,185
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3ed4157368a4fb9d5ee037044ff28b951f4db619",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
