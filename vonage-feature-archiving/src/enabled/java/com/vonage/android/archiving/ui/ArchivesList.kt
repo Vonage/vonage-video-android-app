@@ -103,7 +103,7 @@ private fun ArchiveRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceDefault),
     ) {
-        ArchiveIcon()
+        ArchiveIcon(type = archive.type)
         Column(
             modifier = Modifier
                 .weight(1f),
