@@ -1,0 +1,18 @@
+.claude/skills/configure/SKILL.md
+  h_25498f8d57a266 47
+AGENTS.md
+  h_25498f8d57a266 15
+docs/CONFIGURATION.md
+  h_25498f8d57a266 59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "46be7358d5dbc1ac1da37e21be1d95f01ce99d25",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
