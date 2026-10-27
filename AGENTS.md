@@ -12,7 +12,7 @@
 | `vonage-video-ui-compose/` | Reusable Compose components + JSON-driven theme generator |
 | `vonage-feature-*/` | Optional capabilities with `enabled`/`disabled` flavor variants |
 | `vonage-feature-okta/` | Optional Okta OIDC authentication (off by default via `authSettings.allowAuthentication`). Contract in `src/main`, Okta SDK only in `src/enabled`. See `docs/AUTHENTICATION.md`. |
-| `vonage-feature-post-call-transcription/` | Optional post-call transcriptions (off by default via `meetingRoomSettings.allowPostCallTranscription`). App-level only (Hilt `FeaturesModule`); not a `vonage-meeting-room` dependency. Scaffold: enabled flavor returns no transcriptions until the backend endpoint exists. |
+| `vonage-feature-post-call-transcription/` | Optional post-call transcriptions (off by default via `meetingRoomSettings.allowPostCallTranscription`). The module itself is app-level only (Hilt `FeaturesModule`, goodbye screen) and not a `vonage-meeting-room` dependency; scaffold: enabled flavor returns no transcriptions until the backend endpoint exists. The in-call Start/Stop transcription button is `MeetingRoomFeature.POST_CALL_TRANSCRIPTION`, built on `vonage-feature-archiving` (`ArchiveType.TRANSCRIPTION`), so the flag also compiles the archiving flavor in. |
 | `vonage-video-shared/` | Shared utilities |
 | `vonage-android-logger/` | Logging pipeline with interceptor model |
 | `vonage-audio-selector/` | Audio output selector (Bluetooth, wired, earpiece, speaker) |

@@ -44,7 +44,7 @@ Two gates, both must be open: a feature is active only when its **compile-time f
 | `audioSettings.allowAdvancedNoiseSuppression` | `audiofx` | `MeetingRoomFeature.AUDIO_EFFECTS` |
 | `meetingRoomSettings.allowSettings` | `settings` | `MeetingRoomConfiguration.allowSettings` (no `MeetingRoomFeature` case) |
 | `authSettings.allowAuthentication` | `okta` — also raises `minSdk` to 26 | n/a (landing-screen sign-in; Android-only key, not in the shared schema) |
-| `meetingRoomSettings.allowPostCallTranscription` | `postcalltranscription` | n/a (app-level, goodbye screen; default `false`) |
+| `meetingRoomSettings.allowPostCallTranscription` | `postcalltranscription`; also forces `archiving`/`archivingEnabled` on | `MeetingRoomFeature.POST_CALL_TRANSCRIPTION` (Start/Stop transcription button; default `false`) |
 
 Everything else (`allowCameraControl`, `allowMicrophoneControl`, `allowAudioOnJoin`, `allowVideoOnJoin`, `allowDeviceSelection`, `allowFeedback`, `allowPictureInPicture`, `showParticipantList`, `defaultLayoutMode` = `grid` | `activeSpeaker`, …) is runtime-only via `Config`/`MeetingRoomConfiguration`. Two keys exist purely for cross-platform parity and do nothing on Android: `videoSettings.defaultResolution` and `waitingRoomSettings.bypassWaitingRoom`. `metadata` generates nothing. The full table is in `docs/CONFIGURATION.md`.
 

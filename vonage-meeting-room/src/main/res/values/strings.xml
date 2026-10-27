@@ -25,6 +25,16 @@
     <string name="recording_started_notification">Recording started</string>
     <string name="recording_indicator_content_description">Recording in progress</string>
 
+    <!-- Post-call transcription -->
+    <string name="transcription_start_transcription">Start Transcription</string>
+    <string name="transcription_stop_transcription">Stop Transcription</string>
+    <string name="transcription_confirm_dialog_message">Start transcribing this meeting? A transcript will be available after the call ends.</string>
+    <string name="transcription_stop_confirm_dialog_message">Stop transcribing this meeting? The transcript captured so far will still be available after the call ends.</string>
+    <string name="transcription_started_notification">Transcription started</string>
+    <string name="transcription_stopped_notification">Transcription stopped</string>
+    <string name="transcription_indicator_content_description">Transcription in progress</string>
+    <string name="transcription_include_summary">Include AI summary</string>
+
     <!-- Screen Share -->
     <string name="screen_share_start">Share screen</string>
     <string name="screen_share_stop">Stop sharing screen</string>

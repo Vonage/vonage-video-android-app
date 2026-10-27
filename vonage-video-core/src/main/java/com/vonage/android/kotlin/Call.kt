@@ -46,6 +46,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -205,8 +206,11 @@ class Call internal constructor(
     /** Flag for deferred self-captions subscription when publisher stream not yet available */
     private var pendingSelfCaptionsSubscription: Boolean = false
 
-    private val _archivingStateFlow = MutableStateFlow<ArchivingState>(ArchivingState.Idle)
-    override val archivingStateFlow: StateFlow<ArchivingState> = _archivingStateFlow
+    private val _archivingStateFlow = MutableSharedFlow<ArchivingState>(extraBufferCapacity = ARCHIVING_EVENTS_BUFFER)
+    override val archivingStateFlow: Flow<ArchivingState> = _archivingStateFlow
+
+    /** Archive name by id: the SDK only reports the name when the archive starts. */
+    private val archiveNames = ConcurrentHashMap<String, String>()
 
     override val chatSignalState: StateFlow<ChatState?> =
         signalPlugins
@@ -282,11 +286,12 @@ class Call internal constructor(
         }
         session.setArchiveListener(object : VonageArchiveListener {
             override fun onArchiveStarted(id: String, name: String?) {
-                _archivingStateFlow.update { ArchivingState.Started(id) }
+                name?.let { archiveNames[id] = it }
+                _archivingStateFlow.tryEmit(ArchivingState.Started(id, name))
             }
 
             override fun onArchiveStopped(id: String) {
-                _archivingStateFlow.update { ArchivingState.Stopped(id) }
+                _archivingStateFlow.tryEmit(ArchivingState.Stopped(id, archiveNames.remove(id)))
             }
         })
         session.connect(token)
@@ -816,5 +821,6 @@ class Call internal constructor(
         private const val ACTIVE_SPEAKER_DEBOUNCE_MILLIS = 250L
         private const val VISIBILITY_MONITOR_ENABLED = false
         private const val DEGRADATION_PREF_RESTART_DELAY_MS = 200L
+        private const val ARCHIVING_EVENTS_BUFFER = 16
     }
 }

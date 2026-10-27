@@ -21,6 +21,9 @@ internal data class MeetingRoomActions(
     val onMessageSent: (String) -> Unit = {},
     val onListenUnread: (Boolean) -> Unit = {},
     val onToggleRecording: (Boolean) -> Unit = {},
+    val onToggleTranscription: (Boolean) -> Unit = {},
+    /** Confirmed start of a transcription, with the user's AI summary choice. */
+    val onStartTranscription: (withSummary: Boolean) -> Unit = {},
     val onToggleCaptions: (Boolean) -> Unit = {},
     val onToggleScreenSharing: (Boolean) -> Unit = {},
     val onChangeLayout: (CallLayoutType) -> Unit = {},

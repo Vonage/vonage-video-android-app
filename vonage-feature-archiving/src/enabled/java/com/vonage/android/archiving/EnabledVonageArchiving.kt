@@ -13,9 +13,9 @@ private const val TAG = "EnabledVonageArchiving"
 
 /**
  * EnabledVonageArchiving is the active implementation of VonageArchiving for call recording.
- * This class provides full archiving functionality including starting/stopping recordings,
- * monitoring state changes, and retrieving past recordings.
- * 
+ * This class provides full archiving functionality including starting/stopping recordings and
+ * transcriptions, monitoring state changes, and retrieving past recordings.
+ *
  * Used when the archiving feature is enabled in the build configuration.
  */
 class EnabledVonageArchiving(
@@ -23,16 +23,18 @@ class EnabledVonageArchiving(
 ) : VonageArchiving {
 
     val mutex = Mutex()
+
     /**
-     * Tracks the current active archive session ID.
-     * Set when archiving starts, cleared when it stops.
+     * Active archive ID per [ArchiveType]: a recording and a transcription run concurrently, so
+     * stopping one must neither send nor forget the other's ID.
      */
-    private var currentArchiveId: ArchiveId? = null
+    private val activeArchiveIds = mutableMapOf<ArchiveType, ArchiveId>()
 
     /**
      * Binds to a call's archiving state flow to monitor real-time state changes.
-     * Automatically updates the current archive ID when archiving starts or stops.
-     * 
+     * Tracks the active archive ID of each type from the started/stopped events, so archives
+     * started by other participants can be stopped by ID too.
+     *
      * This should be collected in a coroutine to continuously receive state updates
      * throughout the call lifecycle.
      *
@@ -45,12 +47,13 @@ class EnabledVonageArchiving(
                 mutex.withLock {
                     when (it) {
                         is ArchivingState.Started -> {
-                            currentArchiveId = ArchiveId(it.id)
-                            vonageLogger.d(TAG, "bind: archiving started, archiveId=${it.id}")
+                            val type = ArchiveType.fromArchiveName(it.name)
+                            activeArchiveIds[type] = ArchiveId(it.id)
+                            vonageLogger.d(TAG, "bind: $type started, archiveId=${it.id}")
                         }
                         is ArchivingState.Stopped -> {
-                            currentArchiveId = null
-                            vonageLogger.d(TAG, "bind: archiving stopped, archiveId=${it.id}")
+                            activeArchiveIds.entries.removeAll { entry -> entry.value.id == it.id }
+                            vonageLogger.d(TAG, "bind: archive stopped, archiveId=${it.id}")
                         }
                         else -> {}
                     }
@@ -59,39 +62,53 @@ class EnabledVonageArchiving(
             }
 
     /**
-     * Starts a new archiving/recording session for the session identified by [sessionKey].
-     * Stores the returned archive ID for tracking and later stopping the recording.
+     * Starts a new archive of [type] for the session identified by [sessionKey].
+     * Stores the returned archive ID for tracking and later stopping it.
      *
      * @param sessionKey The session key JWT returned by the backend when the session was created
+     * @param type Recording or transcription archive
+     * @param withSummary Transcription only: also generate an AI summary of the transcript
      * @return Result containing the ArchiveId on success, or an error on failure
      */
-    override suspend fun startArchive(sessionKey: String): Result<ArchiveId> =
-        archiveRepository.startArchive(sessionKey)
-            .onFailure { vonageLogger.e(TAG, "startArchive: failed", it) }
+    override suspend fun startArchive(sessionKey: String, type: ArchiveType, withSummary: Boolean): Result<ArchiveId> =
+        archiveRepository.startArchive(
+            sessionKey = sessionKey,
+            withTranscription = type == ArchiveType.TRANSCRIPTION,
+            withSummary = withSummary,
+        )
+            .onFailure { vonageLogger.e(TAG, "startArchive: $type failed", it) }
             .map { id ->
                 mutex.withLock {
-                    currentArchiveId = id
-                    vonageLogger.d(TAG, "startArchive: succeeded, archiveId=${id.id}")
+                    activeArchiveIds[type] = id
+                    vonageLogger.d(TAG, "startArchive: $type succeeded, archiveId=${id.id}")
                     id
                 }
             }
 
     /**
-     * Stops the currently active archive/recording for the session identified by [sessionKey].
-     * Sends the tracked archive ID when known; otherwise the backend stops the archive it has
-     * stored for the session (e.g. one started by another participant before this client bound).
+     * Stops the active archive of [type] for the session identified by [sessionKey].
+     *
+     * A recording sends the tracked archive ID when known; otherwise the backend stops the archive
+     * it has stored for the session (e.g. one started by another participant before this client
+     * bound). A transcription always sends its explicit ID: without one the backend fallback could
+     * stop the recording instead, so the call fails without reaching the backend.
      *
      * @param sessionKey The session key JWT returned by the backend when the session was created
+     * @param type Recording or transcription archive
      * @return Result with true on success, or an error on failure
      */
-    override suspend fun stopArchive(sessionKey: String): Result<Boolean> {
-        val archiveId = mutex.withLock { currentArchiveId }
+    override suspend fun stopArchive(sessionKey: String, type: ArchiveType): Result<Boolean> {
+        val archiveId = mutex.withLock { activeArchiveIds[type] }
+        if (archiveId == null && type == ArchiveType.TRANSCRIPTION) {
+            vonageLogger.e(TAG, "stopArchive: no active transcription archive")
+            return Result.failure(IllegalStateException("No active transcription archive"))
+        }
         return archiveRepository.stopArchive(sessionKey, archiveId)
-            .onFailure { vonageLogger.e(TAG, "stopArchive: failed, archiveId=${archiveId?.id}", it) }
+            .onFailure { vonageLogger.e(TAG, "stopArchive: $type failed, archiveId=${archiveId?.id}", it) }
             .map {
                 mutex.withLock {
-                    currentArchiveId = null
-                    vonageLogger.d(TAG, "stopArchive: succeeded, archiveId=${archiveId?.id}")
+                    activeArchiveIds.remove(type)
+                    vonageLogger.d(TAG, "stopArchive: $type succeeded, archiveId=${archiveId?.id}")
                     it
                 }
             }

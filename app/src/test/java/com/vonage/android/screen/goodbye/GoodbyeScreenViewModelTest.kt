@@ -5,6 +5,7 @@ import com.vonage.android.MainDispatcherRule
 import com.vonage.android.archiving.Archive
 import com.vonage.android.archiving.ArchiveId
 import com.vonage.android.archiving.ArchiveStatus
+import com.vonage.android.archiving.ArchiveType
 import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.meetingroom.api.SessionKeyHolder
 import com.vonage.android.util.DownloadManager
@@ -156,6 +157,27 @@ class GoodbyeScreenViewModelTest {
                     archives = mixedArchiveList.toImmutableList(),
                 ), awaitItem()
             )
+        }
+    }
+
+    @Test
+    fun `given available transcription when download then delegates the transcript url`() = runTest {
+        val transcription = availableArchive.copy(
+            id = ArchiveId("transcription-id"),
+            name = "transcription",
+            url = "https://cdn.recording.io/transcription.zip",
+            type = ArchiveType.TRANSCRIPTION,
+        )
+        coEvery { vonageArchiving.getRecordings(ANY_SESSION_KEY) } returns Result.success(listOf(transcription))
+        every { downloadManager.downloadByUrl(any()) } returns Unit
+
+        val sut = sut()
+        sut.uiState.test {
+            assertEquals(GoodbyeScreenUiState.Idle, awaitItem())
+            awaitItem()
+
+            sut.downloadArchive(transcription)
+            verify { downloadManager.downloadByUrl("https://cdn.recording.io/transcription.zip") }
         }
     }
 
