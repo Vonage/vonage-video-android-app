@@ -13,6 +13,8 @@ package com.vonage.android.meetingroom.api
  * @param onToggleRecording     Start (`true`) or stop (`false`) session recording.
  * @param onToggleCaptions      Enable (`true`) or disable (`false`) live captions.
  * @param onToggleScreenSharing Start (`true`) or stop (`false`) screen sharing.
+ * @param onToggleTranscription Start (`true`) or stop (`false`) a post-call transcription. Like
+ *                              [onToggleRecording], it asks the user to confirm first.
  */
 @ExperimentalMeetingRoomApi
 class MeetingRoomCustomActions(
@@ -22,4 +24,5 @@ class MeetingRoomCustomActions(
     val onToggleRecording: (Boolean) -> Unit,
     val onToggleCaptions: (Boolean) -> Unit,
     val onToggleScreenSharing: (Boolean) -> Unit,
+    val onToggleTranscription: (Boolean) -> Unit = {},
 )
