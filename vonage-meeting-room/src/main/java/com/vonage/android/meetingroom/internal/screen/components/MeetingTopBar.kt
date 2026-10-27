@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.ui.RecordingIndicator
+import com.vonage.android.compose.components.TranscriptionIndicator
 import com.vonage.android.compose.components.VonageTopAppBar
 import com.vonage.android.compose.icons.AudioSelectorIcon
 import com.vonage.android.compose.icons.CameraSwitchIcon
@@ -34,6 +35,7 @@ import com.vonage.android.meetingroom.internal.screen.components.TopBarTestTags.
 import com.vonage.android.meetingroom.internal.screen.components.TopBarTestTags.TOP_BAR_CAMERA_SWITCH_ACTION
 import com.vonage.android.meetingroom.internal.screen.components.TopBarTestTags.TOP_BAR_SHARE_ACTION
 import com.vonage.android.meetingroom.internal.screen.components.TopBarTestTags.TOP_BAR_TITLE
+import com.vonage.android.meetingroom.internal.screen.components.TopBarTestTags.TOP_BAR_TRANSCRIPTION_INDICATOR
 import com.vonage.android.settings.ui.SettingsIcon
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,6 +51,7 @@ internal fun MeetingTopBar(
     modifier: Modifier = Modifier,
     allowSettings: Boolean = true,
     allowCameraControl: Boolean = true,
+    transcriptionUiState: ArchivingUiState = ArchivingUiState.IDLE,
 ) {
     VonageTopAppBar(
         modifier = modifier,
@@ -57,22 +60,16 @@ internal fun MeetingTopBar(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                when (archivingUiState) {
-                    ArchivingUiState.IDLE -> null
-                    ArchivingUiState.STARTING,
-                    ArchivingUiState.STOPPING -> CircularProgressIndicator(
-                        color = Color.Red,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .padding(end = 4.dp)
-                    )
-
-                    ArchivingUiState.RECORDING -> RecordingIndicator(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .padding(end = 4.dp)
-                            .testTag(TOP_BAR_ARCHIVING_INDICATOR),
+                ArchiveStateIndicator(archivingUiState) { indicatorModifier ->
+                    RecordingIndicator(
+                        modifier = indicatorModifier.testTag(TOP_BAR_ARCHIVING_INDICATOR),
                         contentDescription = stringResource(R.string.recording_indicator_content_description),
+                    )
+                }
+                ArchiveStateIndicator(transcriptionUiState) { indicatorModifier ->
+                    TranscriptionIndicator(
+                        modifier = indicatorModifier.testTag(TOP_BAR_TRANSCRIPTION_INDICATOR),
+                        contentDescription = stringResource(R.string.transcription_indicator_content_description),
                     )
                 }
                 Text(
@@ -134,6 +131,27 @@ internal fun MeetingTopBar(
     )
 }
 
+/** Progress while the archive starts/stops, [activeIndicator] while it runs, nothing when idle. */
+@Composable
+private fun ArchiveStateIndicator(
+    archiveUiState: ArchivingUiState,
+    activeIndicator: @Composable (Modifier) -> Unit,
+) {
+    val indicatorModifier = Modifier
+        .size(24.dp)
+        .padding(end = 4.dp)
+    when (archiveUiState) {
+        ArchivingUiState.IDLE -> Unit
+        ArchivingUiState.STARTING,
+        ArchivingUiState.STOPPING -> CircularProgressIndicator(
+            color = Color.Red,
+            modifier = indicatorModifier,
+        )
+
+        ArchivingUiState.RECORDING -> activeIndicator(indicatorModifier)
+    }
+}
+
 object TopBarTestTags {
     const val TOP_BAR_TITLE = "top-bar-title"
     const val TOP_BAR_SHARE_ACTION = "top-bar-share-action"
@@ -141,6 +159,7 @@ object TopBarTestTags {
     const val TOP_BAR_AUDIO_SELECTOR_ACTION = "top-bar-audio-selector-action"
     const val TOP_BAR_SETTINGS_ACTION = "top-bar-settings-action"
     const val TOP_BAR_ARCHIVING_INDICATOR = "archiving-recording-indicator"
+    const val TOP_BAR_TRANSCRIPTION_INDICATOR = "archiving-transcription-indicator"
 }
 
 @PreviewLightDark
@@ -150,6 +169,7 @@ internal fun MeetingTopBarPreview() {
         MeetingTopBar(
             roomName = "sample-name",
             archivingUiState = ArchivingUiState.RECORDING,
+            transcriptionUiState = ArchivingUiState.RECORDING,
             audioDevicesState = AudioDevicesState(
                 availableDevices = MutableStateFlow(persistentListOf()),
                 activeDevice = MutableStateFlow(null),
