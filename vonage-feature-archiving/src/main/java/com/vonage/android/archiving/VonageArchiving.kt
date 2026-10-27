@@ -1,6 +1,5 @@
 package com.vonage.android.archiving
 
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import kotlinx.coroutines.flow.Flow
 
@@ -11,13 +10,13 @@ import kotlinx.coroutines.flow.Flow
 interface VonageArchiving {
 
     /**
-     * Binds to a call's archiving state flow to monitor real-time changes.
-     * Listen to this flow to react to archiving state transitions (Started, Stopped, Idle).
+     * Binds to the archives running in a call. Emits the current ones first, then every change;
+     * several can run at once, at most one per [ArchiveType].
      *
-     * @param call The call facade to bind to for archiving state updates
-     * @return Flow emitting archiving state changes throughout the call lifecycle
+     * @param call The call facade to bind to
+     * @return Flow of the running archives by type
      */
-    fun bind(call: CallFacade): Flow<ArchivingState>
+    fun bind(call: CallFacade): Flow<Map<ArchiveType, ArchiveId>>
 
     /**
      * Starts an archive of [type] for the session identified by [sessionKey]. A transcription
