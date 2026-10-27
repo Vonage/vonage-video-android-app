@@ -1,0 +1,26 @@
+app/src/test/java/com/vonage/android/screen/goodbye/GoodbyeScreenViewModelTest.kt
+  h_25498f8d57a266 8,163-183
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/data/ArchiveRepository.kt
+  h_25498f8d57a266 6,102-123,126-131,135,137,142
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/data/ArchivingResponses.kt
+  h_25498f8d57a266 89-103
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/ui/ArchiveIcon.kt
+  h_25498f8d57a266 7,11,16,21-24
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/ui/ArchivesList.kt
+  h_25498f8d57a266 106
+vonage-feature-archiving/src/main/java/com/vonage/android/archiving/Archive.kt
+  h_25498f8d57a266 11,13,16
+vonage-feature-archiving/src/testEnabled/java/com/vonage/android/archiving/data/ArchiveRepositoryTest.kt
+  h_25498f8d57a266 6,183-265,268-269
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c6c03a22ebb6c20d12c63eea7a963ba8dbb3ed57",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
