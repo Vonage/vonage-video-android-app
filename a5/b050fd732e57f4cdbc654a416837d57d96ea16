@@ -1,0 +1,21 @@
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTranscriptionTest.kt
+  s_8f4e2b70c24947::t_9240c8d7cf5b34 245-265,338
+  s_8f4e2b70c24947::t_9b9bf697929901 244
+  s_8f4e2b70c24947::t_e5946bfd9b78f0 339
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a5b050fd732e57f4cdbc654a416837d57d96ea16",
+  "prompts": {},
+  "sessions": {
+    "s_8f4e2b70c24947": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_17e5783d-0bec-4619-99bb-b4bb33985fa0",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
