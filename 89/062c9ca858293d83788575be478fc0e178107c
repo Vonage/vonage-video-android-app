@@ -1,0 +1,32 @@
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/BasicAlertDialog.kt
+  h_25498f8d57a266 3-4,14-16,24,28-35,68-82
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/VonageCheckbox.kt
+  h_25498f8d57a266 1-60
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/BasicAlertDialogScreenshotTest.kt
+  h_25498f8d57a266 39-51
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/components/VonageCheckboxScreenshotTest.kt
+  h_25498f8d57a266 1-50
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.BasicAlertDialogScreenshotTest.basicAlertDialogWithContent_dark.png
+  h_25498f8d57a266 1-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.BasicAlertDialogScreenshotTest.basicAlertDialogWithContent_light.png
+  h_25498f8d57a266 1-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.VonageCheckboxScreenshotTest.vonageCheckboxChecked_dark.png
+  h_25498f8d57a266 1-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.VonageCheckboxScreenshotTest.vonageCheckboxChecked_light.png
+  h_25498f8d57a266 1-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.VonageCheckboxScreenshotTest.vonageCheckboxUnchecked_dark.png
+  h_25498f8d57a266 1-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.VonageCheckboxScreenshotTest.vonageCheckboxUnchecked_light.png
+  h_25498f8d57a266 1-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "89062c9ca858293d83788575be478fc0e178107c",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
