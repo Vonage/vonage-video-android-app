@@ -1,0 +1,20 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomFeature.kt
+  h_25498f8d57a266 21-26
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomUiState.kt
+  h_25498f8d57a266 20-21,42-43,46-50
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  h_25498f8d57a266 8,25,30,76-79,196,303-312,314-315,317,322-323,325-326,329,331-332,334-343,355-358,366-372,380-421,475-477
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTranscriptionTest.kt
+  h_25498f8d57a266 1-318
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "eb33c04b2fda753eb9fed72e2d751cb1d05cf0bc",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
