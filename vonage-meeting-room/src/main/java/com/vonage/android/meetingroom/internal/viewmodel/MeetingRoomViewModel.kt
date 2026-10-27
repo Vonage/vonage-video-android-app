@@ -5,12 +5,13 @@ import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vonage.android.archiving.ArchiveId
+import com.vonage.android.archiving.ArchiveType
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.captions.CaptionsUiState
 import com.vonage.android.fx.data.BackgroundsResult
 import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.fx.ui.VideoBackgroundItem
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.SessionEvent
@@ -327,39 +328,44 @@ internal class MeetingRoomViewModel(
     ): Result<T> =
         sessionKey?.let { action(it) } ?: Result.failure(IllegalStateException("Session key not available"))
 
+    /** Running archives are state: a recording that appears or disappears is a start or stop. */
     private fun listenRemoteArchiving() {
         viewModelScope.launch {
             call?.let {
+                var previousRecording: ArchiveId? = null
                 container.vonageArchiving.bind(it)
-                    .onEach { archivingState ->
-                        when (archivingState) {
-                            is ArchivingState.Idle -> {}
-                            is ArchivingState.Started -> {
-                                val startedByOthers = !localUserStartedRecording
-                                _uiState.update { state ->
-                                    state.copy(
-                                        archivingUiState = ArchivingUiState.RECORDING,
-                                        recordingStartedByOthers = startedByOthers
-                                    )
-                                }
-                                // Reset the overlay flag after the overlay duration
-                                if (startedByOthers) {
-                                    launch {
-                                        delay(RECORDING_OVERLAY_DELAY_MS)
-                                        _uiState.update { state -> state.copy(recordingStartedByOthers = false) }
-                                    }
-                                }
-                                // Reset the local flag for next recording
-                                localUserStartedRecording = false
-                            }
-                            is ArchivingState.Stopped -> _uiState.update { state ->
+                    .onEach { archives ->
+                        val recording = archives[ArchiveType.RECORDING]
+                        when {
+                            recording != null && recording != previousRecording -> onRecordingStarted()
+                            recording == null && previousRecording != null -> _uiState.update { state ->
                                 state.copy(archivingUiState = ArchivingUiState.IDLE)
                             }
                         }
+                        previousRecording = recording
                     }
                     .collect()
             }
         }
+    }
+
+    private fun onRecordingStarted() {
+        val startedByOthers = !localUserStartedRecording
+        _uiState.update { state ->
+            state.copy(
+                archivingUiState = ArchivingUiState.RECORDING,
+                recordingStartedByOthers = startedByOthers
+            )
+        }
+        // Reset the overlay flag after the overlay duration
+        if (startedByOthers) {
+            viewModelScope.launch {
+                delay(RECORDING_OVERLAY_DELAY_MS)
+                _uiState.update { state -> state.copy(recordingStartedByOthers = false) }
+            }
+        }
+        // Reset the local flag for next recording
+        localUserStartedRecording = false
     }
     //endregion
 
