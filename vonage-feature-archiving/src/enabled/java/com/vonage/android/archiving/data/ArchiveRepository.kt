@@ -37,9 +37,26 @@ class ArchiveRepository(
             vonageLogger.e(TAG, "getRecordings: exception", it)
         }
 
-    suspend fun startArchive(sessionKey: String): Result<ArchiveId> =
+    /**
+     * Starts an archive. A transcription ([withTranscription]) always sends [withSummary]
+     * explicitly, so the backend's own summary default never applies.
+     */
+    suspend fun startArchive(
+        sessionKey: String,
+        withTranscription: Boolean = false,
+        withSummary: Boolean = false,
+    ): Result<ArchiveId> =
         runCatching {
-            val response = archivingApi.startArchiving(SessionKeyRequest(sessionKey))
+            val request = StartArchiveRequest(
+                sessionKey = sessionKey,
+                withTranscription = withTranscription,
+                archiveOptions = if (withTranscription) {
+                    StartArchiveOptions(TranscriptionProperties(hasSummary = withSummary))
+                } else {
+                    null
+                },
+            )
+            val response = archivingApi.startArchiving(request)
             return if (response.isSuccessful) {
                 response.body()?.let {
                     Result.success(ArchiveId(it.result.data.id))

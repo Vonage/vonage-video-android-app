@@ -57,7 +57,7 @@ class ArchiveRepositoryTest {
 
     @Test
     fun `given repository when startArchiving api success returns success`() = runTest {
-        coEvery { apiService.startArchiving(SESSION_KEY_REQUEST) } returns Response.success(
+        coEvery { apiService.startArchiving(START_ARCHIVE_REQUEST) } returns Response.success(
             TrpcResponse(TrpcResult(ArchiveOperationResponse(id = "archive-id", status = "started")))
         )
         val response = sut.startArchive(SESSION_KEY)
@@ -66,14 +66,14 @@ class ArchiveRepositoryTest {
 
     @Test
     fun `given repository when startArchiving api success with empty returns success`() = runTest {
-        coEvery { apiService.startArchiving(SESSION_KEY_REQUEST) } returns Response.success(null)
+        coEvery { apiService.startArchiving(START_ARCHIVE_REQUEST) } returns Response.success(null)
         val response = sut.startArchive(SESSION_KEY)
         assertTrue(response.isFailure)
     }
 
     @Test
     fun `given repository when startArchiving api fails returns error`() = runTest {
-        coEvery { apiService.startArchiving(SESSION_KEY_REQUEST) } returns Response.error(
+        coEvery { apiService.startArchiving(START_ARCHIVE_REQUEST) } returns Response.error(
             500, ResponseBody.EMPTY
         )
         val response = sut.startArchive(SESSION_KEY)
@@ -82,7 +82,7 @@ class ArchiveRepositoryTest {
 
     @Test
     fun `given repository when startArchiving api fails with exception returns error`() = runTest {
-        coEvery { apiService.startArchiving(SESSION_KEY_REQUEST) } throws Exception("Network error")
+        coEvery { apiService.startArchiving(START_ARCHIVE_REQUEST) } throws Exception("Network error")
         val response = sut.startArchive(SESSION_KEY)
         assertTrue(response.isFailure)
     }
@@ -120,6 +120,47 @@ class ArchiveRepositoryTest {
     }
 
     @Test
+    fun `given repository when startArchiving with transcription sends transcription request`() = runTest {
+        val request = StartArchiveRequest(
+            sessionKey = SESSION_KEY,
+            withTranscription = true,
+            archiveOptions = StartArchiveOptions(TranscriptionProperties(hasSummary = true)),
+        )
+        coEvery { apiService.startArchiving(request) } returns
+            Response.success(
+                TrpcResponse(TrpcResult(ArchiveOperationResponse(id = "transcription-id", status = "started")))
+            )
+        val response = sut.startArchive(SESSION_KEY, withTranscription = true, withSummary = true)
+        assertEquals(Result.success(ArchiveId("transcription-id")), response)
+    }
+
+    @Test
+    fun `start archive request only encodes withTranscription when requested`() {
+        val json = Json { ignoreUnknownKeys = true }
+        assertEquals("""{"sessionKey":"key"}""", json.encodeToString(StartArchiveRequest("key")))
+        assertEquals(
+            """{"sessionKey":"key","withTranscription":true}""",
+            json.encodeToString(StartArchiveRequest("key", withTranscription = true)),
+        )
+    }
+
+    @Test
+    fun `start archive request encodes the summary choice as transcription properties`() {
+        val json = Json { ignoreUnknownKeys = true }
+        assertEquals(
+            """{"sessionKey":"key","withTranscription":true,""" +
+                """"archiveOptions":{"transcriptionProperties":{"hasSummary":false}}}""",
+            json.encodeToString(
+                StartArchiveRequest(
+                    sessionKey = "key",
+                    withTranscription = true,
+                    archiveOptions = StartArchiveOptions(TranscriptionProperties(hasSummary = false)),
+                ),
+            ),
+        )
+    }
+
+    @Test
     fun `stop archive request omits null archive id from json`() {
         val json = Json { ignoreUnknownKeys = true }
         assertEquals("""{"sessionKey":"key"}""", json.encodeToString(StopArchiveRequest("key")))
@@ -141,6 +182,7 @@ class ArchiveRepositoryTest {
     private companion object {
         const val SESSION_KEY = "any-session-key"
         val SESSION_KEY_REQUEST = SessionKeyRequest(SESSION_KEY)
+        val START_ARCHIVE_REQUEST = StartArchiveRequest(SESSION_KEY)
     }
 
     private val serverArchives = listOf(

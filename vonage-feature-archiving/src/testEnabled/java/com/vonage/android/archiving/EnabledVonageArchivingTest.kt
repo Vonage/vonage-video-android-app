@@ -241,4 +241,103 @@ class EnabledVonageArchivingTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    // region Transcription
+
+    @Test
+    fun `startArchive transcription requests archive with transcription`() = runTest {
+        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = true) } returns
+            Result.success(ArchiveId("transcription-id"))
+
+        val result = sut.startArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION)
+
+        assertEquals(ArchiveId("transcription-id"), result.getOrNull())
+        coVerify { archiveRepository.startArchive(SESSION_KEY, withTranscription = true) }
+    }
+
+    @Test
+    fun `startArchive transcription forwards the summary choice`() = runTest {
+        coEvery {
+            archiveRepository.startArchive(SESSION_KEY, withTranscription = true, withSummary = true)
+        } returns Result.success(ArchiveId("transcription-id"))
+
+        sut.startArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION, withSummary = true)
+
+        coVerify { archiveRepository.startArchive(SESSION_KEY, withTranscription = true, withSummary = true) }
+    }
+
+    @Test
+    fun `stopArchive of each type sends its own archive id while both run`() = runTest {
+        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = false) } returns
+            Result.success(ArchiveId("recording-id"))
+        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = true) } returns
+            Result.success(ArchiveId("transcription-id"))
+        coEvery { archiveRepository.stopArchive(SESSION_KEY, any()) } returns Result.success(true)
+
+        sut.startArchive(SESSION_KEY, ArchiveType.RECORDING)
+        sut.startArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION)
+
+        assertTrue(sut.stopArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION).isSuccess)
+        coVerify { archiveRepository.stopArchive(SESSION_KEY, ArchiveId("transcription-id")) }
+
+        assertTrue(sut.stopArchive(SESSION_KEY, ArchiveType.RECORDING).isSuccess)
+        coVerify { archiveRepository.stopArchive(SESSION_KEY, ArchiveId("recording-id")) }
+    }
+
+    @Test
+    fun `stopArchive transcription without tracked archive id fails without calling backend`() = runTest {
+        val result = sut.stopArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION)
+
+        assertTrue(result.isFailure)
+        coVerify(exactly = 0) { archiveRepository.stopArchive(any(), any()) }
+    }
+
+    @Test
+    fun `bind tracks archive ids by name and a stopped transcription keeps the recording id`() = runTest {
+        coEvery { archiveRepository.stopArchive(SESSION_KEY, any()) } returns Result.success(true)
+
+        sut.bind(callFacade).test {
+            awaitItem()
+            callArchivingStateFlow.value = ArchivingState.Started("recording-id", "recording")
+            awaitItem()
+            callArchivingStateFlow.value = ArchivingState.Started("transcription-id", "transcription")
+            awaitItem()
+            callArchivingStateFlow.value = ArchivingState.Stopped("transcription-id", "transcription")
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertTrue(sut.stopArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION).isFailure)
+        assertTrue(sut.stopArchive(SESSION_KEY, ArchiveType.RECORDING).isSuccess)
+        coVerify { archiveRepository.stopArchive(SESSION_KEY, ArchiveId("recording-id")) }
+    }
+
+    @Test
+    fun `stopArchive transcription sends archive id tracked from bind`() = runTest {
+        coEvery { archiveRepository.stopArchive(SESSION_KEY, ArchiveId("remote-transcription-id")) } returns
+            Result.success(true)
+
+        sut.bind(callFacade).test {
+            awaitItem()
+            callArchivingStateFlow.value = ArchivingState.Started("remote-transcription-id", "transcription")
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertTrue(sut.stopArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION).isSuccess)
+        coVerify { archiveRepository.stopArchive(SESSION_KEY, ArchiveId("remote-transcription-id")) }
+    }
+
+    @Test
+    fun `archive type is resolved from the archive name`() {
+        assertEquals(ArchiveType.TRANSCRIPTION, ArchiveType.fromArchiveName("transcription"))
+        assertEquals(ArchiveType.RECORDING, ArchiveType.fromArchiveName("recording"))
+        assertEquals(ArchiveType.RECORDING, ArchiveType.fromArchiveName(null))
+    }
+
+    // endregion
+
+    private companion object {
+        const val SESSION_KEY = "test-session-key"
+    }
 }
