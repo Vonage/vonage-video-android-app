@@ -10,7 +10,6 @@ import com.vonage.android.fx.data.BackgroundsResult
 import com.vonage.android.fx.data.GetBackgroundsUseCase
 import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.kotlin.VonageVideoClient
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.meetingroom.MainDispatcherRule
@@ -188,8 +187,8 @@ class MeetingRoomViewModelTranscriptionTest {
     fun `given recording and transcription running when transcription stops then recording keeps running`() =
         runTest {
             val mockCall = givenMockCall()
-            val archivingStateFlow = MutableSharedFlow<ArchivingState>()
-            every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+            val runningArchives = MutableSharedFlow<Map<ArchiveType, ArchiveId>>()
+            every { vonageArchiving.bind(mockCall) } returns runningArchives
 
             sut.uiState.test {
                 awaitItem()
@@ -198,15 +197,15 @@ class MeetingRoomViewModelTranscriptionTest {
                 awaitItem() // audio devices
                 awaitItem() // connected
 
-                archivingStateFlow.emit(ArchivingState.Started("recording-id", "recording"))
-                archivingStateFlow.emit(ArchivingState.Started("transcription-id", "transcription"))
+                runningArchives.emit(mapOf(RUNNING_RECORDING))
+                runningArchives.emit(mapOf(RUNNING_RECORDING, RUNNING_TRANSCRIPTION))
                 testScheduler.runCurrent()
                 with(sut.uiState.value) {
                     assertEquals(ArchivingUiState.RECORDING, archivingUiState)
                     assertEquals(ArchivingUiState.RECORDING, transcriptionUiState)
                 }
 
-                archivingStateFlow.emit(ArchivingState.Stopped("transcription-id", "transcription"))
+                runningArchives.emit(mapOf(RUNNING_RECORDING))
                 testScheduler.runCurrent()
                 with(sut.uiState.value) {
                     assertEquals(ArchivingUiState.RECORDING, archivingUiState)
@@ -220,8 +219,8 @@ class MeetingRoomViewModelTranscriptionTest {
     fun `given recording and transcription running when recording stops then transcription keeps running`() =
         runTest {
             val mockCall = givenMockCall()
-            val archivingStateFlow = MutableSharedFlow<ArchivingState>()
-            every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+            val runningArchives = MutableSharedFlow<Map<ArchiveType, ArchiveId>>()
+            every { vonageArchiving.bind(mockCall) } returns runningArchives
 
             sut.uiState.test {
                 awaitItem()
@@ -230,9 +229,9 @@ class MeetingRoomViewModelTranscriptionTest {
                 awaitItem() // audio devices
                 awaitItem() // connected
 
-                archivingStateFlow.emit(ArchivingState.Started("recording-id", "recording"))
-                archivingStateFlow.emit(ArchivingState.Started("transcription-id", "transcription"))
-                archivingStateFlow.emit(ArchivingState.Stopped("recording-id", "recording"))
+                runningArchives.emit(mapOf(RUNNING_RECORDING))
+                runningArchives.emit(mapOf(RUNNING_RECORDING, RUNNING_TRANSCRIPTION))
+                runningArchives.emit(mapOf(RUNNING_TRANSCRIPTION))
                 testScheduler.runCurrent()
                 with(sut.uiState.value) {
                     assertEquals(ArchivingUiState.IDLE, archivingUiState)
@@ -243,10 +242,32 @@ class MeetingRoomViewModelTranscriptionTest {
         }
 
     @Test
+    fun `given both archives already running when joining then both are shown`() = runTest {
+        val mockCall = givenMockCall()
+        every { vonageArchiving.bind(mockCall) } returns MutableStateFlow(
+            mapOf(
+                ArchiveType.RECORDING to ArchiveId("recording-id"),
+                ArchiveType.TRANSCRIPTION to ArchiveId("transcription-id"),
+            ),
+        )
+
+        sut.uiState.test {
+            awaitItem()
+            sut.setup(context)
+            testScheduler.runCurrent()
+            with(sut.uiState.value) {
+                assertEquals(ArchivingUiState.RECORDING, archivingUiState)
+                assertEquals(ArchivingUiState.RECORDING, transcriptionUiState)
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `given remote transcription starts then shows started notification without recording overlay`() = runTest {
         val mockCall = givenMockCall()
-        val archivingStateFlow = MutableSharedFlow<ArchivingState>()
-        every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+        val runningArchives = MutableSharedFlow<Map<ArchiveType, ArchiveId>>()
+        every { vonageArchiving.bind(mockCall) } returns runningArchives
 
         sut.uiState.test {
             awaitItem()
@@ -255,7 +276,7 @@ class MeetingRoomViewModelTranscriptionTest {
             awaitItem() // audio devices
             awaitItem() // connected
 
-            archivingStateFlow.emit(ArchivingState.Started("transcription-id", "transcription"))
+            runningArchives.emit(mapOf(RUNNING_TRANSCRIPTION))
             val started = awaitItem()
             assertEquals(ArchivingUiState.RECORDING, started.transcriptionUiState)
             assertEquals(TranscriptionNotification.STARTED, started.transcriptionNotification)
@@ -271,8 +292,8 @@ class MeetingRoomViewModelTranscriptionTest {
     @Test
     fun `given transcription stops then shows stopped notification`() = runTest {
         val mockCall = givenMockCall()
-        val archivingStateFlow = MutableSharedFlow<ArchivingState>()
-        every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+        val runningArchives = MutableSharedFlow<Map<ArchiveType, ArchiveId>>()
+        every { vonageArchiving.bind(mockCall) } returns runningArchives
 
         sut.uiState.test {
             awaitItem()
@@ -281,9 +302,9 @@ class MeetingRoomViewModelTranscriptionTest {
             awaitItem() // audio devices
             awaitItem() // connected
 
-            archivingStateFlow.emit(ArchivingState.Started("transcription-id", "transcription"))
+            runningArchives.emit(mapOf(RUNNING_TRANSCRIPTION))
             awaitItem()
-            archivingStateFlow.emit(ArchivingState.Stopped("transcription-id", "transcription"))
+            runningArchives.emit(emptyMap())
             val stopped = awaitItem()
             assertEquals(ArchivingUiState.IDLE, stopped.transcriptionUiState)
             assertEquals(TranscriptionNotification.STOPPED, stopped.transcriptionNotification)
@@ -314,5 +335,7 @@ class MeetingRoomViewModelTranscriptionTest {
     private companion object {
         const val ANY_ROOM_NAME = "room-name"
         const val ANY_SESSION_KEY = "session-key"
+        val RUNNING_RECORDING = ArchiveType.RECORDING to ArchiveId("recording-id")
+        val RUNNING_TRANSCRIPTION = ArchiveType.TRANSCRIPTION to ArchiveId("transcription-id")
     }
 }

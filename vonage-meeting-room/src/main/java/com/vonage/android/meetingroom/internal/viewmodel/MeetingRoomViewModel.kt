@@ -5,13 +5,13 @@ import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vonage.android.archiving.ArchiveId
 import com.vonage.android.archiving.ArchiveType
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.captions.CaptionsUiState
 import com.vonage.android.fx.data.BackgroundsResult
 import com.vonage.android.fx.data.UserBackgroundRepository
 import com.vonage.android.fx.ui.VideoBackgroundItem
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.SessionEvent
@@ -353,25 +353,24 @@ internal class MeetingRoomViewModel(
         sessionKey?.let { action(it) } ?: Result.failure(IllegalStateException("Session key not available"))
 
     /**
-     * Recording and transcription are separate archives that can run concurrently: each event is
-     * routed by its archive name, so stopping one never resets the other.
+     * Running archives are state: an archive type that appears (or changes id) has started and one
+     * that disappears has stopped. Recording and transcription are tracked independently, so
+     * stopping one never resets the other.
      */
     private fun listenRemoteArchiving() {
         viewModelScope.launch {
             call?.let {
+                var previous = emptyMap<ArchiveType, ArchiveId>()
                 container.vonageArchiving.bind(it)
-                    .onEach { archivingState ->
-                        when (archivingState) {
-                            is ArchivingState.Idle -> {}
-                            is ArchivingState.Started -> onArchiveStarted(ArchiveType.fromArchiveName(archivingState.name))
-                            is ArchivingState.Stopped -> when (ArchiveType.fromArchiveName(archivingState.name)) {
-                                ArchiveType.RECORDING -> updateArchiveUiState(ArchiveType.RECORDING, ArchivingUiState.IDLE)
-                                ArchiveType.TRANSCRIPTION -> updateTranscription(
-                                    notification = TranscriptionNotification.STOPPED,
-                                    transcriptionUiState = ArchivingUiState.IDLE,
-                                )
+                    .onEach { archives ->
+                        ArchiveType.entries.forEach { type ->
+                            val current = archives[type]
+                            when {
+                                current != null && current != previous[type] -> onArchiveStarted(type)
+                                current == null && previous[type] != null -> onArchiveStopped(type)
                             }
                         }
+                        previous = archives
                     }
                     .collect()
             }
@@ -401,6 +400,16 @@ internal class MeetingRoomViewModel(
             ArchiveType.TRANSCRIPTION -> updateTranscription(
                 notification = TranscriptionNotification.STARTED,
                 transcriptionUiState = ArchivingUiState.RECORDING,
+            )
+        }
+    }
+
+    private fun onArchiveStopped(type: ArchiveType) {
+        when (type) {
+            ArchiveType.RECORDING -> updateArchiveUiState(ArchiveType.RECORDING, ArchivingUiState.IDLE)
+            ArchiveType.TRANSCRIPTION -> updateTranscription(
+                notification = TranscriptionNotification.STOPPED,
+                transcriptionUiState = ArchivingUiState.IDLE,
             )
         }
     }
