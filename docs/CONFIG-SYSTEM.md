@@ -121,6 +121,7 @@ a product flavor. "Wired" describes how the value reaches behavior.
 |---------|-----------|------------------|-------|
 | `meetingRoomSettings.allowChat` | `ALLOW_CHAT` | `chat` | Flavor + `MeetingRoomFeature.CHAT` |
 | `meetingRoomSettings.allowScreenShare` | `ALLOW_SCREEN_SHARE` | `screensharing` | Flavor + `MeetingRoomFeature.SCREEN_SHARE` |
+| `meetingRoomSettings.allowPostCallTranscription` | `ALLOW_POST_CALL_TRANSCRIPTION` | `postcalltranscription` | Flavor only (app-level, Hilt `FeaturesModule`; no `MeetingRoomFeature` case) |
 | `meetingRoomSettings.allowPictureInPicture` | `ALLOW_PICTURE_IN_PICTURE` | - | `MeetingRoomConfiguration.allowPictureInPicture` |
 | `meetingRoomSettings.defaultLayoutMode` | `DEFAULT_LAYOUT_MODE` | - | `MeetingRoomConfiguration.defaultLayoutMode` |
 | `videoSettings.defaultResolution` | `DEFAULT_RESOLUTION` | - | **Not implemented** — parity only |

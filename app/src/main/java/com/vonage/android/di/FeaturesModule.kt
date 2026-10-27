@@ -10,6 +10,8 @@ import com.vonage.android.chat.ChatModule
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.meetingroom.api.SessionKeyHolder
 import com.vonage.android.meetingroom.api.SessionKeyProvider
+import com.vonage.android.postcalltranscription.VonagePostCallTranscription
+import com.vonage.android.postcalltranscription.di.PostCallTranscriptionModule
 import com.vonage.android.reactions.ReactionSignalPlugin
 import com.vonage.android.reactions.di.ReactionsModule
 import com.vonage.android.screensharing.VonageScreenSharing
@@ -50,6 +52,12 @@ object FeaturesModule {
     @Provides
     fun provideVonageCaptions(retrofit: Retrofit): VonageCaptions =
         CaptionsModule.provideVonageCaptions(retrofit)
+
+    /** Consumed by the goodbye screen: transcriptions are generated from archives after the call. */
+    @Singleton
+    @Provides
+    fun provideVonagePostCallTranscription(): VonagePostCallTranscription =
+        PostCallTranscriptionModule.provideVonagePostCallTranscription()
 
     @Provides
     fun provideChatFeature(): ChatFeature =
