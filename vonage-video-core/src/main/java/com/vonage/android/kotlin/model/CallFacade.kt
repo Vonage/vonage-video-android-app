@@ -75,11 +75,10 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
     val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>>
 
     /**
-     * Archive started/stopped events of the session. Several archives can run concurrently, so this
-     * is an event stream rather than a single state: a StateFlow would conflate back-to-back events
-     * (e.g. both archives reported on joining) and lose one of them.
+     * Archives currently running in the session, by archive id; the value is the archive name
+     * (`null` when unnamed). Several archives can run at once, e.g. a recording and a transcription.
      */
-    val archivingStateFlow: Flow<ArchivingState>
+    val activeArchives: StateFlow<Map<String, String?>>
 }
 
 /**
@@ -147,18 +146,6 @@ data class ChatState(
 data class EmojiState(
     val reactions: ImmutableList<EmojiReaction> = persistentListOf(),
 ) : SignalStateContent
-
-/**
- * Archive lifecycle events. Several archives can run at once (e.g. a recording and a
- * transcription), told apart by [Started.name]/[Stopped.name] as set by the backend.
- */
-sealed interface ArchivingState {
-    data object Idle : ArchivingState
-    data class Started(val id: String, val name: String? = null) : ArchivingState
-
-    /** [name] is the one reported when the archive started: the SDK stop callback has no name. */
-    data class Stopped(val id: String, val name: String? = null) : ArchivingState
-}
 
 @Immutable
 data class CaptionLine(

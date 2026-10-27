@@ -9,7 +9,6 @@ import com.vonage.android.kotlin.ext.sorted
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
 import com.vonage.android.kotlin.internal.CaptionsHideScheduler
 import com.vonage.android.kotlin.internal.PublisherFactory
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.CaptionLine
 import com.vonage.android.kotlin.model.ChatState
@@ -46,7 +45,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -206,11 +204,8 @@ class Call internal constructor(
     /** Flag for deferred self-captions subscription when publisher stream not yet available */
     private var pendingSelfCaptionsSubscription: Boolean = false
 
-    private val _archivingStateFlow = MutableSharedFlow<ArchivingState>(extraBufferCapacity = ARCHIVING_EVENTS_BUFFER)
-    override val archivingStateFlow: Flow<ArchivingState> = _archivingStateFlow
-
-    /** Archive name by id: the SDK only reports the name when the archive starts. */
-    private val archiveNames = ConcurrentHashMap<String, String>()
+    private val _activeArchives = MutableStateFlow<Map<String, String?>>(emptyMap())
+    override val activeArchives: StateFlow<Map<String, String?>> = _activeArchives
 
     override val chatSignalState: StateFlow<ChatState?> =
         signalPlugins
@@ -286,12 +281,11 @@ class Call internal constructor(
         }
         session.setArchiveListener(object : VonageArchiveListener {
             override fun onArchiveStarted(id: String, name: String?) {
-                name?.let { archiveNames[id] = it }
-                _archivingStateFlow.tryEmit(ArchivingState.Started(id, name))
+                _activeArchives.update { it + (id to name) }
             }
 
             override fun onArchiveStopped(id: String) {
-                _archivingStateFlow.tryEmit(ArchivingState.Stopped(id, archiveNames.remove(id)))
+                _activeArchives.update { it - id }
             }
         })
         session.connect(token)
@@ -821,6 +815,5 @@ class Call internal constructor(
         private const val ACTIVE_SPEAKER_DEBOUNCE_MILLIS = 250L
         private const val VISIBILITY_MONITOR_ENABLED = false
         private const val DEGRADATION_PREF_RESTART_DELAY_MS = 200L
-        private const val ARCHIVING_EVENTS_BUFFER = 16
     }
 }
