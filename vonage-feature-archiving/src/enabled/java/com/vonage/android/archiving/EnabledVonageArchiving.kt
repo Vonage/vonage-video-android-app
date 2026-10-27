@@ -1,11 +1,11 @@
 package com.vonage.android.archiving
 
 import com.vonage.android.archiving.data.ArchiveRepository
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.logger.vonageLogger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -24,41 +24,33 @@ class EnabledVonageArchiving(
 
     val mutex = Mutex()
 
-    /**
-     * Active archive ID per [ArchiveType]: a recording and a transcription run concurrently, so
-     * stopping one must neither send nor forget the other's ID.
-     */
-    private val activeArchiveIds = mutableMapOf<ArchiveType, ArchiveId>()
+    /** Archives the session reports as running; their IDs win over locally started ones. */
+    private var sessionArchiveIds = emptyMap<ArchiveType, ArchiveId>()
+
+    /** Archives started by this client that the session has not reported yet. */
+    private val startedArchiveIds = mutableMapOf<ArchiveType, ArchiveId>()
 
     /**
-     * Binds to a call's archiving state flow to monitor real-time state changes.
-     * Tracks the active archive ID of each type from the started/stopped events, so archives
-     * started by other participants can be stopped by ID too.
+     * Binds to the archives running in a call, by type, and tracks their IDs so archives started by
+     * other participants can be stopped by ID too.
      *
      * This should be collected in a coroutine to continuously receive state updates
      * throughout the call lifecycle.
      *
-     * @param call The call facade to monitor for archiving state changes
-     * @return Flow emitting ArchivingState updates (Started with ID, Stopped, or Idle)
+     * @param call The call facade to monitor for running archives
+     * @return Flow of the running archives by type, starting with the current ones
      */
-    override fun bind(call: CallFacade): Flow<ArchivingState> =
-        call.archivingStateFlow
-            .map {
+    override fun bind(call: CallFacade): Flow<Map<ArchiveType, ArchiveId>> =
+        call.activeArchives
+            .map { archives ->
+                archives.entries.associate { (id, name) -> ArchiveType.fromArchiveName(name) to ArchiveId(id) }
+            }
+            .onEach { archives ->
                 mutex.withLock {
-                    when (it) {
-                        is ArchivingState.Started -> {
-                            val type = ArchiveType.fromArchiveName(it.name)
-                            activeArchiveIds[type] = ArchiveId(it.id)
-                            vonageLogger.d(TAG, "bind: $type started, archiveId=${it.id}")
-                        }
-                        is ArchivingState.Stopped -> {
-                            activeArchiveIds.entries.removeAll { entry -> entry.value.id == it.id }
-                            vonageLogger.d(TAG, "bind: archive stopped, archiveId=${it.id}")
-                        }
-                        else -> {}
-                    }
-                    it
+                    sessionArchiveIds = archives
+                    startedArchiveIds.keys.removeAll(archives.keys)
                 }
+                vonageLogger.d(TAG, "bind: running archives=${archives.mapValues { it.value.id }}")
             }
 
     /**
@@ -79,7 +71,7 @@ class EnabledVonageArchiving(
             .onFailure { vonageLogger.e(TAG, "startArchive: $type failed", it) }
             .map { id ->
                 mutex.withLock {
-                    activeArchiveIds[type] = id
+                    startedArchiveIds[type] = id
                     vonageLogger.d(TAG, "startArchive: $type succeeded, archiveId=${id.id}")
                     id
                 }
@@ -98,7 +90,7 @@ class EnabledVonageArchiving(
      * @return Result with true on success, or an error on failure
      */
     override suspend fun stopArchive(sessionKey: String, type: ArchiveType): Result<Boolean> {
-        val archiveId = mutex.withLock { activeArchiveIds[type] }
+        val archiveId = mutex.withLock { sessionArchiveIds[type] ?: startedArchiveIds[type] }
         if (archiveId == null && type == ArchiveType.TRANSCRIPTION) {
             vonageLogger.e(TAG, "stopArchive: no active transcription archive")
             return Result.failure(IllegalStateException("No active transcription archive"))
@@ -107,7 +99,7 @@ class EnabledVonageArchiving(
             .onFailure { vonageLogger.e(TAG, "stopArchive: $type failed, archiveId=${archiveId?.id}", it) }
             .map {
                 mutex.withLock {
-                    activeArchiveIds.remove(type)
+                    startedArchiveIds.remove(type)
                     vonageLogger.d(TAG, "stopArchive: $type succeeded, archiveId=${archiveId?.id}")
                     it
                 }
