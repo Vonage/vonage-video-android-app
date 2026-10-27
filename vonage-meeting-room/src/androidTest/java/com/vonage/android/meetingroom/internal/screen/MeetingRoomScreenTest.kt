@@ -13,7 +13,6 @@ import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.preview.buildPublisher
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.fx.ui.VideoEffectsTestTags
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.CaptionLine
 import com.vonage.android.kotlin.model.ChatState
@@ -189,7 +188,7 @@ class MeetingRoomScreenTest {
             override fun togglePinParticipant(participantId: String) {}
             override fun forceMuteParticipant(participantId: String) {}
             override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = MutableStateFlow(persistentListOf())
-            override val archivingStateFlow: StateFlow<ArchivingState> = MutableStateFlow(ArchivingState.Idle)
+            override val activeArchives: StateFlow<Map<String, String?>> = MutableStateFlow(emptyMap())
             override val chatSignalState: StateFlow<ChatState?> = MutableStateFlow(null)
             override val emojiSignalState: StateFlow<EmojiState?> = MutableStateFlow(null)
             override fun connect(context: Context): Flow<SessionEvent> = flowOf()

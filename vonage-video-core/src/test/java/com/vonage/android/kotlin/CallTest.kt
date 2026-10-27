@@ -1,7 +1,6 @@
 package com.vonage.android.kotlin
 
 import app.cash.turbine.test
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.ParticipantState
 import com.vonage.android.kotlin.model.SessionEvent
@@ -360,60 +359,47 @@ class CallTest : CallTestBase() {
     // region Archiving
 
     @Test
-    fun `archiving started event should emit started with name`() = runTest(testDispatcher) {
+    fun `active archives should be empty initially`() = runTest(testDispatcher) {
+        val call = createCall()
+        assertEquals(emptyMap<String, String?>(), call.activeArchives.value)
+    }
+
+    @Test
+    fun `archive started should add the archive with its name`() = runTest(testDispatcher) {
         val call = createCall()
 
-        call.archivingStateFlow.test {
-            call.connect(mockContext).test {
-                capturedArchiveListener!!.onArchiveStarted("archive-1", "MyArchive")
-                cancelAndIgnoreRemainingEvents()
-            }
-            assertEquals(ArchivingState.Started("archive-1", "MyArchive"), awaitItem())
+        call.connect(mockContext).test {
+            capturedArchiveListener!!.onArchiveStarted("archive-1", "MyArchive")
+
+            assertEquals(mapOf("archive-1" to "MyArchive"), call.activeArchives.value)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `archiving stopped event should emit stopped with the name reported on start`() = runTest(testDispatcher) {
+    fun `archive stopped should remove only that archive`() = runTest(testDispatcher) {
         val call = createCall()
 
-        call.archivingStateFlow.test {
-            call.connect(mockContext).test {
-                capturedArchiveListener!!.onArchiveStarted("archive-1", "transcription")
-                capturedArchiveListener!!.onArchiveStopped("archive-1")
-                cancelAndIgnoreRemainingEvents()
-            }
-            assertEquals(ArchivingState.Started("archive-1", "transcription"), awaitItem())
-            assertEquals(ArchivingState.Stopped("archive-1", "transcription"), awaitItem())
+        call.connect(mockContext).test {
+            capturedArchiveListener!!.onArchiveStarted("recording-id", "recording")
+            capturedArchiveListener!!.onArchiveStarted("transcription-id", "transcription")
+            capturedArchiveListener!!.onArchiveStopped("recording-id")
+
+            assertEquals(mapOf("transcription-id" to "transcription"), call.activeArchives.value)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `archiving stopped event of an unknown archive should emit stopped without name`() = runTest(testDispatcher) {
+    fun `archive stopped of an unknown archive should keep the active archives`() = runTest(testDispatcher) {
         val call = createCall()
 
-        call.archivingStateFlow.test {
-            call.connect(mockContext).test {
-                capturedArchiveListener!!.onArchiveStopped("archive-1")
-                cancelAndIgnoreRemainingEvents()
-            }
-            assertEquals(ArchivingState.Stopped("archive-1", null), awaitItem())
-        }
-    }
+        call.connect(mockContext).test {
+            capturedArchiveListener!!.onArchiveStarted("archive-1", null)
+            capturedArchiveListener!!.onArchiveStopped("unknown")
 
-    @Test
-    fun `concurrent archive events should all be emitted`() = runTest(testDispatcher) {
-        val call = createCall()
-
-        call.archivingStateFlow.test {
-            call.connect(mockContext).test {
-                capturedArchiveListener!!.onArchiveStarted("recording-id", "recording")
-                capturedArchiveListener!!.onArchiveStarted("transcription-id", "transcription")
-                capturedArchiveListener!!.onArchiveStopped("recording-id")
-                cancelAndIgnoreRemainingEvents()
-            }
-            assertEquals(ArchivingState.Started("recording-id", "recording"), awaitItem())
-            assertEquals(ArchivingState.Started("transcription-id", "transcription"), awaitItem())
-            assertEquals(ArchivingState.Stopped("recording-id", "recording"), awaitItem())
+            assertEquals(mapOf("archive-1" to null), call.activeArchives.value)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
