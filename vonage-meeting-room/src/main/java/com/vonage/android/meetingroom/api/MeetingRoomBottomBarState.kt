@@ -12,6 +12,7 @@ package com.vonage.android.meetingroom.api
  * @param isScreenSharingActive `true` when a screen-sharing session is in progress.
  * @param isRecordingActive     `true` when session archiving/recording is in progress.
  * @param isCaptionsActive      `true` when live captions are enabled.
+ * @param isTranscriptionActive `true` when a post-call transcription is in progress.
  */
 @ExperimentalMeetingRoomApi
 data class MeetingRoomBottomBarState(
@@ -20,4 +21,5 @@ data class MeetingRoomBottomBarState(
     val isScreenSharingActive: Boolean,
     val isRecordingActive: Boolean,
     val isCaptionsActive: Boolean,
+    val isTranscriptionActive: Boolean = false,
 )
