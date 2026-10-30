@@ -22,10 +22,12 @@ import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
 import com.vonage.android.shared.session.SessionInfo
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
+import com.vonage.android.meetingroom.internal.screen.TranscriptionNotification
 import com.vonage.android.meetingroom.internal.screen.toCallLayoutType
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler.CallAction
 import com.vonage.android.screensharing.ScreenSharingState
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -71,7 +73,10 @@ internal class MeetingRoomViewModel(
 
     private var call: CallFacade? = null
     private val callEnded = AtomicBoolean(false)
-    private var localUserStartedRecording = false
+
+    /** Archive types the local user asked to start whose started event has not arrived yet. */
+    private val localArchiveStarts = mutableSetOf<ArchiveType>()
+    private var transcriptionNotificationJob: Job? = null
 
     init {
         if (prebuilt.foregroundServiceEnabled) {
@@ -188,6 +193,7 @@ internal class MeetingRoomViewModel(
                         roomName = roomName,
                         call = activeCall,
                         archivingUiState = ArchivingUiState.IDLE,
+                        transcriptionUiState = ArchivingUiState.IDLE,
                         captionsUiState = CaptionsUiState.IDLE,
                         isLoading = false,
                         isError = false,
@@ -294,29 +300,47 @@ internal class MeetingRoomViewModel(
     fun forceMuteParticipant(participantId: String) { call?.forceMuteParticipant(participantId) }
 
     //region Archiving
-    fun archiveCall(enable: Boolean) {
+    fun archiveCall(enable: Boolean) = toggleArchive(ArchiveType.RECORDING, enable)
+
+    /**
+     * Starts/stops the post-call transcription archive, independently of any recording.
+     * [withSummary] only applies on start and adds an AI summary to the transcript.
+     */
+    fun transcribeCall(enable: Boolean, withSummary: Boolean = DEFAULT_TRANSCRIPTION_SUMMARY) =
+        toggleArchive(ArchiveType.TRANSCRIPTION, enable, withSummary)
+
+    private fun toggleArchive(type: ArchiveType, enable: Boolean, withSummary: Boolean = false) {
         if (enable) {
-            localUserStartedRecording = true
-            _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.STARTING) }
+            localArchiveStarts += type
+            updateArchiveUiState(type, ArchivingUiState.STARTING)
         } else {
-            _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.STOPPING) }
+            updateArchiveUiState(type, ArchivingUiState.STOPPING)
         }
         viewModelScope.launch {
             val sessionKey = container.sessionKeyHolder.sessionKey
             if (enable) {
-                archiveResult(sessionKey) { container.vonageArchiving.startArchive(it) }
-                    .onSuccess { _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.RECORDING) } }
+                archiveResult(sessionKey) { container.vonageArchiving.startArchive(it, type, withSummary) }
+                    .onSuccess { updateArchiveUiState(type, ArchivingUiState.RECORDING) }
                     .onFailure {
-                        localUserStartedRecording = false
-                        _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.IDLE) }
+                        localArchiveStarts -= type
+                        updateArchiveUiState(type, ArchivingUiState.IDLE)
                     }
             } else {
-                archiveResult(sessionKey) { container.vonageArchiving.stopArchive(it) }
+                archiveResult(sessionKey) { container.vonageArchiving.stopArchive(it, type) }
                     .onSuccess {
-                        localUserStartedRecording = false
-                        _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.IDLE) }
+                        localArchiveStarts -= type
+                        updateArchiveUiState(type, ArchivingUiState.IDLE)
                     }
-                    .onFailure { _uiState.update { state -> state.copy(archivingUiState = ArchivingUiState.RECORDING) } }
+                    .onFailure { updateArchiveUiState(type, ArchivingUiState.RECORDING) }
+            }
+        }
+    }
+
+    private fun updateArchiveUiState(type: ArchiveType, archiveUiState: ArchivingUiState) {
+        _uiState.update { state ->
+            when (type) {
+                ArchiveType.RECORDING -> state.copy(archivingUiState = archiveUiState)
+                ArchiveType.TRANSCRIPTION -> state.copy(transcriptionUiState = archiveUiState)
             }
         }
     }
@@ -328,44 +352,81 @@ internal class MeetingRoomViewModel(
     ): Result<T> =
         sessionKey?.let { action(it) } ?: Result.failure(IllegalStateException("Session key not available"))
 
-    /** Running archives are state: a recording that appears or disappears is a start or stop. */
+    /**
+     * Running archives are state: an archive type that appears (or changes id) has started and one
+     * that disappears has stopped. Recording and transcription are tracked independently, so
+     * stopping one never resets the other.
+     */
     private fun listenRemoteArchiving() {
         viewModelScope.launch {
             call?.let {
-                var previousRecording: ArchiveId? = null
+                var previous = emptyMap<ArchiveType, ArchiveId>()
                 container.vonageArchiving.bind(it)
                     .onEach { archives ->
-                        val recording = archives[ArchiveType.RECORDING]
-                        when {
-                            recording != null && recording != previousRecording -> onRecordingStarted()
-                            recording == null && previousRecording != null -> _uiState.update { state ->
-                                state.copy(archivingUiState = ArchivingUiState.IDLE)
+                        ArchiveType.entries.forEach { type ->
+                            val current = archives[type]
+                            when {
+                                current != null && current != previous[type] -> onArchiveStarted(type)
+                                current == null && previous[type] != null -> onArchiveStopped(type)
                             }
                         }
-                        previousRecording = recording
+                        previous = archives
                     }
                     .collect()
             }
         }
     }
 
-    private fun onRecordingStarted() {
-        val startedByOthers = !localUserStartedRecording
-        _uiState.update { state ->
-            state.copy(
-                archivingUiState = ArchivingUiState.RECORDING,
-                recordingStartedByOthers = startedByOthers
+    private fun onArchiveStarted(type: ArchiveType) {
+        // Consume the local request so the next archive of this type is attributed correctly
+        val startedByOthers = !localArchiveStarts.remove(type)
+        when (type) {
+            ArchiveType.RECORDING -> {
+                _uiState.update { state ->
+                    state.copy(
+                        archivingUiState = ArchivingUiState.RECORDING,
+                        recordingStartedByOthers = startedByOthers,
+                    )
+                }
+                // Reset the overlay flag after the overlay duration
+                if (startedByOthers) {
+                    viewModelScope.launch {
+                        delay(RECORDING_OVERLAY_DELAY_MS)
+                        _uiState.update { state -> state.copy(recordingStartedByOthers = false) }
+                    }
+                }
+            }
+            // Everyone, including whoever started it, is told the meeting is being transcribed
+            ArchiveType.TRANSCRIPTION -> updateTranscription(
+                notification = TranscriptionNotification.STARTED,
+                transcriptionUiState = ArchivingUiState.RECORDING,
             )
         }
-        // Reset the overlay flag after the overlay duration
-        if (startedByOthers) {
-            viewModelScope.launch {
-                delay(RECORDING_OVERLAY_DELAY_MS)
-                _uiState.update { state -> state.copy(recordingStartedByOthers = false) }
-            }
+    }
+
+    private fun onArchiveStopped(type: ArchiveType) {
+        when (type) {
+            ArchiveType.RECORDING -> updateArchiveUiState(ArchiveType.RECORDING, ArchivingUiState.IDLE)
+            ArchiveType.TRANSCRIPTION -> updateTranscription(
+                notification = TranscriptionNotification.STOPPED,
+                transcriptionUiState = ArchivingUiState.IDLE,
+            )
         }
-        // Reset the local flag for next recording
-        localUserStartedRecording = false
+    }
+
+    /** Applies [transcriptionUiState] and shows its toast, which clears itself after the overlay duration. */
+    private fun updateTranscription(
+        notification: TranscriptionNotification,
+        transcriptionUiState: ArchivingUiState,
+    ) {
+        transcriptionNotificationJob?.cancel()
+        _uiState.update { state ->
+            state.copy(transcriptionUiState = transcriptionUiState, transcriptionNotification = notification)
+        }
+        transcriptionNotificationJob = viewModelScope.launch {
+            delay(RECORDING_OVERLAY_DELAY_MS)
+            _uiState.update { state -> state.copy(transcriptionNotification = null) }
+        }
     }
     //endregion
 
@@ -420,3 +481,6 @@ internal class MeetingRoomViewModel(
         const val RECORDING_OVERLAY_DELAY_MS: Long = 5_000
     }
 }
+
+/** AI summary is on unless the user unchecks it, matching the backend's transcription default. */
+internal const val DEFAULT_TRANSCRIPTION_SUMMARY = true
