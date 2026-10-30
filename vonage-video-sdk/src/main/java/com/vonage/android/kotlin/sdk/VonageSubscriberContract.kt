@@ -23,6 +23,7 @@ interface VonageSubscriber {
     fun setAudioLevelListener(listener: VonageAudioLevelListener?)
     fun setVideoStatsListener(listener: VonageSubscriberVideoStatsListener?)
     fun setAudioStatsListener(listener: VonageSubscriberAudioStatsListener?)
+    fun setNetworkConditionListener(listener: VonageNetworkConditionListener?)
     fun setCaptionsListener(listener: VonageCaptionsListener?)
 }
 
