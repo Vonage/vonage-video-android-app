@@ -9,7 +9,6 @@ import com.vonage.android.kotlin.ext.sorted
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
 import com.vonage.android.kotlin.internal.CaptionsHideScheduler
 import com.vonage.android.kotlin.internal.PublisherFactory
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.CaptionLine
 import com.vonage.android.kotlin.model.ChatState
@@ -205,8 +204,8 @@ class Call internal constructor(
     /** Flag for deferred self-captions subscription when publisher stream not yet available */
     private var pendingSelfCaptionsSubscription: Boolean = false
 
-    private val _archivingStateFlow = MutableStateFlow<ArchivingState>(ArchivingState.Idle)
-    override val archivingStateFlow: StateFlow<ArchivingState> = _archivingStateFlow
+    private val _activeArchives = MutableStateFlow<Map<String, String?>>(emptyMap())
+    override val activeArchives: StateFlow<Map<String, String?>> = _activeArchives
 
     override val chatSignalState: StateFlow<ChatState?> =
         signalPlugins
@@ -282,11 +281,11 @@ class Call internal constructor(
         }
         session.setArchiveListener(object : VonageArchiveListener {
             override fun onArchiveStarted(id: String, name: String?) {
-                _archivingStateFlow.update { ArchivingState.Started(id) }
+                _activeArchives.update { it + (id to name) }
             }
 
             override fun onArchiveStopped(id: String) {
-                _archivingStateFlow.update { ArchivingState.Stopped(id) }
+                _activeArchives.update { it - id }
             }
         })
         session.connect(token)
