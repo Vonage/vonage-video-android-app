@@ -1,0 +1,28 @@
+.maestro/flows/goodbye-view-landing-page.yaml
+  h_25498f8d57a266 4
+.maestro/flows/recording.yaml
+  h_25498f8d57a266 4
+.maestro/flows/goodbye-reenter-room.yaml
+  h_25498f8d57a266 4
+.maestro/flows/github-repo-link.yaml
+  h_25498f8d57a266 8
+.maestro/flows/waiting-room-controls-enabled.yaml
+  h_25498f8d57a266 4
+.maestro/flows/waiting-room-controls-disabled.yaml
+  h_25498f8d57a266 4
+.maestro/flows/create-new-room.yaml
+  h_25498f8d57a266 8
+.maestro/flows/join-with-camera-mic-allowed.yaml
+  h_25498f8d57a266 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5a759ca774b3438b72dd051fd0e6b3702248ea13",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
