@@ -7,8 +7,7 @@ appId: ${APP_ID}
 - launchApp:
     clearState: true
     permissions:
-      camera: allow
-      microphone: allow
+      all: allow
 
 - waitForAnimationToEnd:
     timeout: 5000
