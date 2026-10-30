@@ -93,6 +93,9 @@ data class PublisherState(
     private val _audioStats: MutableStateFlow<AudioStats?> = MutableStateFlow(null)
     val audioStats: StateFlow<AudioStats?> = _audioStats
 
+    private val _networkCondition: MutableStateFlow<NetworkCondition?> = MutableStateFlow(null)
+    val networkCondition: StateFlow<NetworkCondition?> = _networkCondition
+
     private val _noiseSuppression: MutableStateFlow<NoiseSuppression> =
         MutableStateFlow(NoiseSuppression.DISABLED)
     override val noiseSuppression: StateFlow<NoiseSuppression> = _noiseSuppression
@@ -262,6 +265,10 @@ data class PublisherState(
             launch {
                 vonagePublisher.observeAudioStats()
                     .collect { _audioStats.value = it }
+            }
+            launch {
+                observeNetworkCondition(vonagePublisher::setNetworkConditionListener)
+                    .collect { _networkCondition.value = it }
             }
             launch {
                 speakingWhileMutedDetector.isSpeakingWhileMuted

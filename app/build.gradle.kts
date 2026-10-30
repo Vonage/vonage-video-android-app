@@ -88,6 +88,12 @@ android {
             screenSharingProperty.toModuleFlavorString("screensharing"),
         )
 
+        // Post-call transcription feature — disabled by default
+        val postCallTranscriptionProperty =
+            configProps.getProperty("vonage.meetingRoom.allow_post_call_transcription", "false")
+        buildConfigField("boolean", "FEATURE_POST_CALL_TRANSCRIPTION_ENABLED", "$postCallTranscriptionProperty")
+        missingDimensionStrategy("postcalltranscription", postCallTranscriptionProperty.toEnabledString())
+
         // Background (video) effects feature
         val videoFxProperty = configProps.getProperty("vonage.video.allow_background_effects", "true")
         buildConfigField("boolean", "FEATURE_VIDEO_EFFECTS_ENABLED", "$videoFxProperty")
@@ -261,6 +267,7 @@ dependencies {
     implementation(project(":vonage-feature-captions"))
     implementation(project(":vonage-feature-okta"))
     implementation(project(":vonage-feature-settings"))
+    implementation(project(":vonage-feature-post-call-transcription"))
     implementation(project(":vonage-audio-selector"))
     implementation(project(":vonage-android-logger"))
     implementation(libs.androidx.core.ktx)
