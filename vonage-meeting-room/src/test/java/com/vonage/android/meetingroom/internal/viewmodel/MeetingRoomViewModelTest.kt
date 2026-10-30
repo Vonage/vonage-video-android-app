@@ -31,6 +31,7 @@ import com.vonage.android.meetingroom.internal.util.ActivityContextHolder
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.settings.CallSettingsHolder
+import com.vonage.android.settings.PublisherPreferences
 import com.vonage.android.shared.session.SessionInfo
 import com.vonage.android.shared.session.SessionRepository
 import io.mockk.coEvery
@@ -279,6 +280,27 @@ class MeetingRoomViewModelTest {
         sut.applyVideoEffect(VideoEffect.BlurLow)
 
         verify { mockCall.applyLocalVideoEffect(VideoEffect.BlurLow) }
+    }
+
+    @Test
+    fun `given connected call when endCall then final publisher state is saved as preferences`() = runTest {
+        val effect = VideoEffect.BackgroundImage(id = "bg-1", imagePath = "path")
+        val mockPublisher = mockk<PublisherState>(relaxed = true) {
+            every { isMicEnabled } returns MutableStateFlow(false)
+            every { isCameraEnabled } returns MutableStateFlow(true)
+            every { videoEffect } returns MutableStateFlow(effect)
+        }
+        val mockCall = givenMockCall()
+        every { mockCall.publisher } returns MutableStateFlow(mockPublisher)
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        sut.endCall()
+
+        assertEquals(
+            PublisherPreferences(publishAudio = false, publishVideo = true, videoEffect = effect),
+            callSettingsHolder.publisherPreferences.value,
+        )
     }
 
     // endregion

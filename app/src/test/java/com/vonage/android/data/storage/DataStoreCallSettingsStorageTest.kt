@@ -2,22 +2,29 @@ package com.vonage.android.data.storage
 
 import androidx.datastore.preferences.core.preferencesOf
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_AUDIO_BITRATE
+import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_BACKGROUND_ID
+import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_BACKGROUND_PATH
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_CAPTURE_FRAME_RATE
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_CAPTURE_RESOLUTION
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_CODEC_ORDER
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_DEGRADATION_PREFERENCE
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_OPUS_DTX
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_PUBLISHER_AUDIO_FALLBACK
+import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_PUBLISH_AUDIO
+import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_PUBLISH_VIDEO
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_SENDER_STATS
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_SUBSCRIBER_AUDIO_FALLBACK
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_VIDEO_BITRATE_MAX
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_VIDEO_BITRATE_PRESET
+import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_VIDEO_EFFECT
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.kotlin.model.VideoCodec
+import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.settings.PersistedCallSettings
+import com.vonage.android.settings.PublisherPreferences
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -90,5 +97,33 @@ class DataStoreCallSettingsStorageTest {
         sut.save(PersistedCallSettings())
 
         coVerify { dataStore.updateData(any()) }
+    }
+
+    @Test
+    fun `load maps stored publisher preferences`() = runTest {
+        val prefs = preferencesOf(
+            SETTINGS_PUBLISH_AUDIO to false,
+            SETTINGS_PUBLISH_VIDEO to true,
+            SETTINGS_VIDEO_EFFECT to "BACKGROUND_IMAGE",
+            SETTINGS_BACKGROUND_ID to "bg-1",
+            SETTINGS_BACKGROUND_PATH to "/path/bg-1.jpg",
+        )
+        coEvery { dataStore.data } returns flowOf(prefs)
+
+        assertEquals(
+            PublisherPreferences(
+                publishAudio = false,
+                publishVideo = true,
+                videoEffect = VideoEffect.BackgroundImage(id = "bg-1", imagePath = "/path/bg-1.jpg"),
+            ),
+            sut.load().publisherPreferences,
+        )
+    }
+
+    @Test
+    fun `load without publisher preferences returns empty preferences`() = runTest {
+        coEvery { dataStore.data } returns flowOf(preferencesOf(SETTINGS_VIDEO_EFFECT to "BACKGROUND_IMAGE"))
+
+        assertEquals(PublisherPreferences(), sut.load().publisherPreferences)
     }
 }

@@ -19,6 +19,7 @@ import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.screen.components.audio.AudioDevicesHandler
 import com.vonage.android.screen.components.audio.AudioDevicesState
 import com.vonage.android.settings.CallSettingsHolder
+import com.vonage.android.settings.PublisherPreferences
 import com.vonage.android.util.isValidUserName
 import com.vonage.android.util.sanitizeUserName
 import dagger.assisted.Assisted
@@ -39,6 +40,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 @HiltViewModel(assistedFactory = WaitingRoomViewModelFactory::class)
 @Suppress("LongParameterList")
@@ -70,11 +72,20 @@ class WaitingRoomViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val config = getConfig()
             val name = userRepository.getUserName()
+            callSettingsHolder.awaitLoaded()
+            val preferences = callSettingsHolder.publisherPreferences.value
             videoClient.configurePublisher(
                 buildPreviewConfig(
                     name = name,
-                    publishVideo = config.allowVideoOnJoin,
-                    publishAudio = config.allowAudioOnJoin,
+                    // A stored choice only applies while the user is allowed to change it.
+                    publishVideo = preferences.publishVideo?.takeIf { config.allowCameraControl }
+                        ?: config.allowVideoOnJoin,
+                    publishAudio = preferences.publishAudio?.takeIf { config.allowMicrophoneControl }
+                        ?: config.allowAudioOnJoin,
+                    initialVideoEffect = preferences.videoEffect
+                        .takeIf { config.allowBackgroundEffects }
+                        ?.orNoneIfImageMissing()
+                        ?: VideoEffect.None,
                 )
             )
             videoClient.createPreviewPublisher(context)
@@ -163,6 +174,13 @@ class WaitingRoomViewModel @AssistedInject constructor(
                 val effect = publisher.videoEffect.value
                 val publishAudio = publisher.isMicEnabled.value
                 val publishVideo = publisher.isCameraEnabled.value
+                callSettingsHolder.updatePublisherPreferences(
+                    PublisherPreferences(
+                        publishAudio = publishAudio,
+                        publishVideo = publishVideo,
+                        videoEffect = effect,
+                    ),
+                )
                 videoClient.configurePublisher(
                     PublisherConfig(
                         name = sanitizedUserName,
@@ -289,6 +307,10 @@ class WaitingRoomViewModel @AssistedInject constructor(
     )
 
     private fun currentPublisher() = _uiState.value.publisher
+
+    /** A stored background can point to a file that is gone (cache cleared, resolution changed). */
+    private fun VideoEffect.orNoneIfImageMissing(): VideoEffect =
+        if (this is VideoEffect.BackgroundImage && !File(imagePath).exists()) VideoEffect.None else this
 
     private companion object {
         const val SUBSCRIBED_TIMEOUT_MS: Long = 5_000
