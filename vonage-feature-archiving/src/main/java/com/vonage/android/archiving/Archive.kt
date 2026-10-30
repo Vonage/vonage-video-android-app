@@ -8,9 +8,12 @@ data class Archive(
     val duration: Int,
     val size: Int,
     val name: String,
+    /** Download URL. For a transcription it is the transcript, not the archived audio. */
     val url: String,
+    /** For a transcription, the status of the transcript, which becomes available after the audio. */
     val status: ArchiveStatus,
     val createdAt: Long,
+    val type: ArchiveType = ArchiveType.RECORDING,
 )
 
 @JvmInline
