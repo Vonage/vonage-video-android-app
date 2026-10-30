@@ -82,7 +82,10 @@ class WaitingRoomViewModel @AssistedInject constructor(
                         ?: config.allowVideoOnJoin,
                     publishAudio = preferences.publishAudio?.takeIf { config.allowMicrophoneControl }
                         ?: config.allowAudioOnJoin,
-                    initialVideoEffect = preferences.videoEffect.orNoneIfImageMissing(),
+                    initialVideoEffect = preferences.videoEffect
+                        .takeIf { config.allowBackgroundEffects }
+                        ?.orNoneIfImageMissing()
+                        ?: VideoEffect.None,
                 )
             )
             videoClient.createPreviewPublisher(context)

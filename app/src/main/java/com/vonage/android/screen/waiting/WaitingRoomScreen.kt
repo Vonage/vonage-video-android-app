@@ -164,6 +164,14 @@ fun WaitingRoomScreen(
             onDismissRequest = { showVideoEffects = false },
             sheetState = videoEffectsSheetState,
         ) {
+            // Sync selectedEffect to the real publisher's current effect each time the sheet
+            // opens, so the grid always highlights the correct initial selection (for example a
+            // background restored from storage).
+            LaunchedEffect(showVideoEffects) {
+                if (showVideoEffects) {
+                    selectedEffect = uiState.publisher?.videoEffect?.value ?: VideoEffect.None
+                }
+            }
             // Reset the local selection if the active background was deleted while the sheet is open.
             // Guard with isNotEmpty() so the effect doesn't fire while the list is still
             // loading (empty initial state would otherwise clear any active selection).

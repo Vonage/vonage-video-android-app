@@ -307,6 +307,32 @@ class WaitingRoomViewModelTest {
     }
 
     @Test
+    fun `given stored background when background effects are disallowed then preview starts without effect`() = runTest {
+        val image = File.createTempFile("background", ".jpg").apply { deleteOnExit() }
+        val effect = VideoEffect.BackgroundImage(id = "bg-1", imagePath = image.absolutePath)
+        callSettingsHolderPreferencesFlow.value = PublisherPreferences(videoEffect = effect)
+        every { getConfig.invoke() } returns Config.fromAppConfig().copy(
+            allowCameraControl = true,
+            allowMicrophoneControl = true,
+            allowShowParticipantList = true,
+            allowVideoOnJoin = true,
+            allowAudioOnJoin = true,
+            allowBackgroundEffects = false,
+        )
+        givenPreviewPublisher()
+        coEvery { userRepository.getUserName() } returns ""
+
+        sut.init(context)
+        sut.uiState.test {
+            awaitItem()
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify { videoClient.configurePublisher(match { it.initialVideoEffect == VideoEffect.None }) }
+    }
+
+    @Test
     fun `given stored background whose file is gone when initialize then preview starts without effect`() = runTest {
         callSettingsHolderPreferencesFlow.value = PublisherPreferences(
             videoEffect = VideoEffect.BackgroundImage(id = "bg-1", imagePath = "/does/not/exist.jpg"),
