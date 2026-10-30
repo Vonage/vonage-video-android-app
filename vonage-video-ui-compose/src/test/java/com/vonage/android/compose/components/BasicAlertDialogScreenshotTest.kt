@@ -36,4 +36,17 @@ class BasicAlertDialogScreenshotTest {
         composeTestRule.setContent { BasicAlertDialogPreview() }
         composeTestRule.onAllNodes(isRoot())[1].captureRoboImage(roborazziOptions = options)
     }
+
+    @Test
+    fun basicAlertDialogWithContent_light() {
+        composeTestRule.setContent { BasicAlertDialogWithContentPreview() }
+        composeTestRule.onAllNodes(isRoot())[1].captureRoboImage(roborazziOptions = options)
+    }
+
+    @Test
+    @Config(qualifiers = "+night")
+    fun basicAlertDialogWithContent_dark() {
+        composeTestRule.setContent { BasicAlertDialogWithContentPreview() }
+        composeTestRule.onAllNodes(isRoot())[1].captureRoboImage(roborazziOptions = options)
+    }
 }
