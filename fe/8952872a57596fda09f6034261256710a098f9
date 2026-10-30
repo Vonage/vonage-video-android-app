@@ -1,0 +1,24 @@
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomViewModel.kt
+  s_4121ebf26d9901::t_5af333d5cf63cd 85-88
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomScreen.kt
+  s_4121ebf26d9901::t_dbaba56fdfedda 167-174
+app/src/test/java/com/vonage/android/screen/waiting/WaitingRoomViewModelTest.kt
+  s_4121ebf26d9901::t_6eb351c3097651 310-334
+  s_4121ebf26d9901::t_671bc1a6bf6c82 309
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fe8952872a57596fda09f6034261256710a098f9",
+  "prompts": {},
+  "sessions": {
+    "s_4121ebf26d9901": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_2afd8a15-aea1-4d43-a39c-e385a5f3a13a",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
