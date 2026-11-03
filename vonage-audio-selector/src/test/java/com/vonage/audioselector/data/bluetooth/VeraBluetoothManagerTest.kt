@@ -64,6 +64,13 @@ class VeraBluetoothManagerTest {
     }
 
     @Test
+    fun `initial connected device name is null`() {
+        sut = createBluetoothManager()
+
+        assertEquals(null, sut.connectedDeviceName)
+    }
+
+    @Test
     fun `startBluetooth enables bluetooth SCO`() {
         sut = createBluetoothManager()
 
@@ -144,6 +151,7 @@ class VeraBluetoothManagerTest {
 
                 assertEquals(VeraBluetoothManager.BluetoothState.Connected, awaitItem())
                 assertEquals(VeraBluetoothManager.BluetoothState.Connected, sut.bluetoothState)
+                assertEquals("Test Headset", sut.connectedDeviceName)
             }
         }
 
