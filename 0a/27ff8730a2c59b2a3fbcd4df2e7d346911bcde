@@ -1,0 +1,38 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/audio/AudioDeviceList.kt
+  s_65b87fda0f7d64::t_b623a21d76b37d 143
+  s_65b87fda0f7d64::t_733f616fde04a5 164
+vonage-audio-selector/src/main/java/com/vonage/audioselector/data/GetDevices.kt
+  s_65b87fda0f7d64::t_74ea0b712c16fc 28-29
+vonage-audio-selector/src/main/java/com/vonage/audioselector/AudioDeviceSelector.kt
+  s_65b87fda0f7d64::t_8d682560d637fd 111,117
+vonage-audio-selector/src/test/java/com/vonage/audioselector/data/GetDevicesTest.kt
+  s_65b87fda0f7d64::t_4acc8266950aee 13
+  s_65b87fda0f7d64::t_ef2e462c9dd798 40
+vonage-audio-selector/src/test/java/com/vonage/audioselector/data/bluetooth/VeraBluetoothManagerTest.kt
+  s_65b87fda0f7d64::t_f439246a3bfff3 154
+  s_65b87fda0f7d64::t_951690aec3797e 67-72
+  s_65b87fda0f7d64::t_933b9b3d735d56 66
+vonage-audio-selector/src/main/java/com/vonage/audioselector/data/bluetooth/VeraBluetoothManager.kt
+  s_65b87fda0f7d64::t_536d6a620be623 90,97
+  s_65b87fda0f7d64::t_27f036aad000b7 124
+  s_65b87fda0f7d64::t_1f81b23d12b1f5 6
+app/src/main/java/com/vonage/android/screen/components/audio/AudioDeviceList.kt
+  s_65b87fda0f7d64::t_a894bf3288e48e 164
+  s_65b87fda0f7d64::t_e9b3811479b99f 143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0a27ff8730a2c59b2a3fbcd4df2e7d346911bcde",
+  "prompts": {},
+  "sessions": {
+    "s_65b87fda0f7d64": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_8a8fa1c7-5f06-46b6-b7ec-8b39964cb62e",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
