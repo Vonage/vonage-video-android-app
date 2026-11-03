@@ -60,6 +60,7 @@ import com.vonage.android.meetingroom.internal.screen.components.RecordingStarte
 import com.vonage.android.meetingroom.internal.screen.components.SpeakingWhileMutedOverlay
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBar
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarState
+import com.vonage.android.meetingroom.internal.screen.components.bottombar.ParticipantsList
 import com.vonage.android.meetingroom.internal.util.ext.isExtraPaneShow
 import com.vonage.android.meetingroom.internal.util.ext.toggleChat
 import com.vonage.android.meetingroom.internal.util.rememberNoiseSuppression
@@ -116,6 +117,9 @@ internal fun MeetingRoomScreen(
     var selectedEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
     val videoEffectsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    var showParticipants by remember { mutableStateOf(false) }
+    val participantsSheetState = rememberModalBottomSheetState()
+
     // Wire onOpenVideoEffects to local sheet state so no VM involvement is needed.
     val effectsActions = remember(actions, uiState.enabledFeatures) {
         actions.copy(onOpenVideoEffects = {
@@ -147,6 +151,7 @@ internal fun MeetingRoomScreen(
             val participants by call.participantsStateFlow.collectAsStateWithLifecycle()
             val publisher by call.publisher.collectAsStateWithLifecycle()
             val captionLines by call.captionsStateFlow.collectAsStateWithLifecycle()
+            val pinnedIds by call.pinnedParticipantIds.collectAsStateWithLifecycle()
 
             // Collect additional custom buttons (dynamic — isSelected/badgeCount can change).
             val extraActions by (additionalBottomBarActions ?: MutableStateFlow(emptyList()))
@@ -285,7 +290,6 @@ internal fun MeetingRoomScreen(
                                     onShowChat = { scope.launch { navigator.toggleChat() } },
                                     isChatShow = isChatShow,
                                     publisher = publisher,
-                                    participants = participants,
                                     layoutType = uiState.layoutType,
                                     archivingUiState = uiState.archivingUiState,
                                     screenSharingState = uiState.screenSharingState,
@@ -294,6 +298,7 @@ internal fun MeetingRoomScreen(
                                     allowMicrophoneControl = uiState.allowMicrophoneControl,
                                     allowCameraControl = uiState.allowCameraControl,
                                     enabledFeatures = uiState.enabledFeatures,
+                                    onToggleParticipants = { showParticipants = !showParticipants },
                                 ),
                                 allowFeedback = uiState.allowFeedback,
                                 reportingContent = reportingContent
@@ -330,6 +335,7 @@ internal fun MeetingRoomScreen(
                                 actions = effectsActions,
                                 participants = participants,
                                 layoutType = uiState.layoutType,
+                                onShowParticipants = { showParticipants = !showParticipants },
                             )
                         }
                     },
@@ -386,6 +392,19 @@ internal fun MeetingRoomScreen(
                         },
                         onAddBackground = actions.onAddBackground,
                         onDeleteBackground = actions.onDeleteBackground,
+                    )
+                }
+            }
+
+            if (showParticipants && uiState.allowShowParticipantList) {
+                ModalBottomSheet(
+                    onDismissRequest = { showParticipants = false },
+                    sheetState = participantsSheetState,
+                ) {
+                    ParticipantsList(
+                        participants = participants,
+                        pinnedParticipantIds = pinnedIds,
+                        actions = wrappedActions,
                     )
                 }
             }

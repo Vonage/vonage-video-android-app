@@ -3,6 +3,7 @@ package com.vonage.android.compose.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -32,6 +33,7 @@ fun ParticipantsPlaceholders(
     modifier: Modifier = Modifier,
     maxVisiblePlaceholders: Int = 2,
     spacedBy: Dp = DEFAULT_OVERLAP_SPACE.dp,
+    onClick: () -> Unit = {},
 ) {
     val visiblePlaceholders = participantNames.take(maxVisiblePlaceholders)
     val additionalCount = participantNames.size - maxVisiblePlaceholders
@@ -41,7 +43,8 @@ fun ParticipantsPlaceholders(
             .background(
                 color = VonageVideoTheme.colors.surface,
                 shape = VonageVideoTheme.shapes.medium,
-            ),
+            )
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Row(
