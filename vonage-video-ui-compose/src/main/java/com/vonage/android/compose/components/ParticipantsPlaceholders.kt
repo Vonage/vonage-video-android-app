@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
@@ -40,6 +41,7 @@ fun ParticipantsPlaceholders(
 
     Box(
         modifier = modifier
+            .testTag(ParticipantsPlaceholdersTestTags.PARTICIPANTS_PLACEHOLDER_TAG)
             .background(
                 color = VonageVideoTheme.colors.surface,
                 shape = VonageVideoTheme.shapes.medium,
@@ -75,6 +77,10 @@ fun ParticipantsPlaceholders(
             }
         }
     }
+}
+
+object ParticipantsPlaceholdersTestTags {
+    const val PARTICIPANTS_PLACEHOLDER_TAG = "participants-placeholder"
 }
 
 @Composable

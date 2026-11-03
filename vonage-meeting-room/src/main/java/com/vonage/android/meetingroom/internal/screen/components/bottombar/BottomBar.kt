@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
@@ -172,6 +173,11 @@ internal fun BottomBar(
         ) {
             visibleActions.forEach { action ->
                 ControlButton(
+                    modifier = if (action.type == BottomBarActionType.PARTICIPANTS) {
+                        Modifier.testTag(BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BUTTON)
+                    } else {
+                        Modifier
+                    },
                     icon = action.icon,
                     onClick = action.onClick,
                     badgeCount = action.badgeCount,
