@@ -39,7 +39,6 @@ import com.vonage.android.captions.ui.CaptionsOverlay
 import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.components.GenericLoading
-import com.vonage.android.compose.components.VonageCheckbox
 import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.fx.ui.VideoEffectsScreen
@@ -54,7 +53,6 @@ import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_SCREEN_TAG
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
-import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_TRANSCRIPTION_SUMMARY_CHECKBOX
 import com.vonage.android.meetingroom.internal.screen.audio.AudioDevicesMenu
 import com.vonage.android.meetingroom.internal.screen.components.ArchiveNotificationOverlay
 import com.vonage.android.meetingroom.internal.screen.components.MeetingRoomContent
@@ -65,7 +63,6 @@ import com.vonage.android.meetingroom.internal.screen.components.bottombar.Botto
 import com.vonage.android.meetingroom.internal.util.ext.isExtraPaneShow
 import com.vonage.android.meetingroom.internal.util.ext.toggleChat
 import com.vonage.android.meetingroom.internal.util.rememberNoiseSuppression
-import com.vonage.android.meetingroom.internal.viewmodel.DEFAULT_TRANSCRIPTION_SUMMARY
 import com.vonage.android.reactions.ui.EmojiReactionOverlay
 import com.vonage.android.screensharing.ScreenSharingState
 import kotlinx.collections.immutable.ImmutableList
@@ -119,7 +116,6 @@ internal fun MeetingRoomScreen(
     // of silently flipping it to confirm the opposite operation.
     var showRecordingConfirmDialog by remember(uiState.archivingUiState) { mutableStateOf(false) }
     var showTranscriptionConfirmDialog by remember(uiState.transcriptionUiState) { mutableStateOf(false) }
-    var includeTranscriptionSummary by remember { mutableStateOf(DEFAULT_TRANSCRIPTION_SUMMARY) }
 
     var showVideoEffects by remember { mutableStateOf(false) }
     var selectedEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
@@ -474,18 +470,10 @@ internal fun MeetingRoomScreen(
             cancelLabel = stringResource(R.string.generic_cancel),
             onAccept = {
                 showTranscriptionConfirmDialog = false
-                actions.onStartTranscription(includeTranscriptionSummary)
+                actions.onToggleTranscription(true)
             },
             onCancel = {
                 showTranscriptionConfirmDialog = false
-            },
-            content = {
-                VonageCheckbox(
-                    modifier = Modifier.testTag(MEETING_ROOM_TRANSCRIPTION_SUMMARY_CHECKBOX),
-                    label = stringResource(R.string.transcription_include_summary),
-                    checked = includeTranscriptionSummary,
-                    onCheckedChange = { includeTranscriptionSummary = it },
-                )
             },
         )
     }
@@ -539,5 +527,4 @@ internal object MeetingRoomScreenTestTags {
     const val MEETING_ROOM_CONTENT = "meeting-room-content"
     const val MEETING_ROOM_BOTTOM_BAR = "meeting-room-bottom-bar"
     const val MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON = "meeting-room-publisher-effects-button"
-    const val MEETING_ROOM_TRANSCRIPTION_SUMMARY_CHECKBOX = "meeting-room-transcription-summary-checkbox"
 }

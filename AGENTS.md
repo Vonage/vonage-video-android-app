@@ -32,7 +32,8 @@
 - Optional modules use flavor dimensions with `enabled`/`disabled` product flavors (e.g., `vonage-feature-chat/build.gradle.kts`).
 - Public contracts live in `src/main`; behavior implementations live in `src/enabled` and `src/disabled`. When changing a feature API, update **both** flavor source sets.
 - `vonage-meeting-room` also accepts a runtime filter: `MeetingRoomBuilder.enabledFeatures(Set<MeetingRoomFeature>)`. A feature is active only when its **compile-time flavor is `enabled`** AND it is **present in the runtime set**. You cannot enable a compile-time disabled feature at runtime.
-- `vonage-meeting-room` has its own flavor dimensions for three features (`archiving`, `captions`, `screensharing`) with full names like `archivingEnabled`/`archivingDisabled`. The remaining features (chat, reactions, videofx, audiofx, settings) always resolve to `enabled` inside this module; runtime availability is via `MeetingRoomFeature`.
+- `vonage-meeting-room` has its own flavor dimensions for two features (`captions`, `screensharing`) with full names like `captionsEnabled`/`captionsDisabled`. The remaining features (chat, reactions, videofx, audiofx, settings) always resolve to `enabled` inside this module; runtime availability is via `MeetingRoomFeature`.
+- `vonage-feature-archiving` is the exception to the flavor pattern: it has no flavors. Recording (`allowArchiving`) and post-call transcription (`allowPostCallTranscription`) are enabled independently at runtime, through `MeetingRoomFeature.ARCHIVING`/`POST_CALL_TRANSCRIPTION` and the archive types passed to `ArchivingModule.provideVonageArchiving(...)`; a disabled type is never started, stopped, reported or listed.
 
 ## Architecture Notes
 

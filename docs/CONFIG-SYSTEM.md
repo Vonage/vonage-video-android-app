@@ -121,7 +121,8 @@ a product flavor. "Wired" describes how the value reaches behavior.
 |---------|-----------|------------------|-------|
 | `meetingRoomSettings.allowChat` | `ALLOW_CHAT` | `chat` | Flavor + `MeetingRoomFeature.CHAT` |
 | `meetingRoomSettings.allowScreenShare` | `ALLOW_SCREEN_SHARE` | `screensharing` | Flavor + `MeetingRoomFeature.SCREEN_SHARE` |
-| `meetingRoomSettings.allowPostCallTranscription` | `ALLOW_POST_CALL_TRANSCRIPTION` | forces `archiving`/`archivingEnabled` on | `MeetingRoomFeature.POST_CALL_TRANSCRIPTION` |
+| `meetingRoomSettings.allowArchiving` | `ALLOW_ARCHIVING` | - | `MeetingRoomFeature.ARCHIVING` + recording type in `VonageArchiving` |
+| `meetingRoomSettings.allowPostCallTranscription` | `ALLOW_POST_CALL_TRANSCRIPTION` | - | `MeetingRoomFeature.POST_CALL_TRANSCRIPTION` + transcription type in `VonageArchiving` |
 | `meetingRoomSettings.allowPictureInPicture` | `ALLOW_PICTURE_IN_PICTURE` | - | `MeetingRoomConfiguration.allowPictureInPicture` |
 | `meetingRoomSettings.defaultLayoutMode` | `DEFAULT_LAYOUT_MODE` | - | `MeetingRoomConfiguration.defaultLayoutMode` |
 | `videoSettings.defaultResolution` | `DEFAULT_RESOLUTION` | - | **Not implemented** — parity only |

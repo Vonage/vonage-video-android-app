@@ -49,14 +49,14 @@ and setting them has no effect on Android.
 | `waitingRoomSettings.allowSettings` | Settings entry point in the waiting room top bar |
 | `waitingRoomSettings.bypassWaitingRoom` | **Not implemented — parity only.** The waiting room also captures the display name, publisher preferences and permissions, so it is always shown. |
 | `meetingRoomSettings.allowSettings` | In-call settings panel |
-| `meetingRoomSettings.allowArchiving` | Session recording |
+| `meetingRoomSettings.allowArchiving` | Session recording. Independent of `allowPostCallTranscription`. |
 | `meetingRoomSettings.allowCaptions` | Live captions |
 | `meetingRoomSettings.allowChat` | In-call chat |
 | `meetingRoomSettings.allowDeviceSelection` | Audio output selector in the call |
 | `meetingRoomSettings.allowEmojis` | Emoji reactions |
 | `meetingRoomSettings.allowFeedback` | "Report an issue" control |
 | `meetingRoomSettings.allowPictureInPicture` | Enter picture-in-picture when leaving the app mid-call |
-| `meetingRoomSettings.allowPostCallTranscription` | Start/Stop transcription button in the meeting room (`true` in the checked-in `app-config.json`; the key must be present — omitting it fails compilation, there is no safe default for a missing key). Starts a transcription archive that runs alongside any recording, so it also compiles in the archiving module even when `allowArchiving` is `false`. |
+| `meetingRoomSettings.allowPostCallTranscription` | Start/Stop transcription button in the meeting room (`true` in the checked-in `app-config.json`; the key must be present — omitting it fails compilation, there is no safe default for a missing key). Starts a transcription archive that runs alongside any recording. Independent of `allowArchiving`: either one can be on without the other. |
 | `meetingRoomSettings.allowScreenShare` | Screen sharing |
 | `meetingRoomSettings.defaultLayoutMode` | Layout on entering the room: `grid` or `activespeaker` |
 | `meetingRoomSettings.showParticipantList` | Participant list button |

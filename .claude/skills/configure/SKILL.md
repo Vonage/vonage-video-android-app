@@ -29,7 +29,7 @@ Every key travels this path; knowing it is how you debug "the flag does nothing"
 4. `Config.fromAppConfig()` (`app/src/main/java/com/vonage/android/config/Config.kt`) is the single place `AppConfig` is read; ViewModels inject `GetConfig`, composables call `Config.fromAppConfig()` →
 5. `MeetingRoomScreenRoute.kt` maps `Config` to the meeting room: `configuredMeetingRoomFeatures()` builds the runtime `Set<MeetingRoomFeature>` passed to `MeetingRoomBuilder.enabledFeatures(...)`, and the UI-control toggles go into `MeetingRoomConfiguration`.
 
-Two gates, both must be open: a feature is active only when its **compile-time flavor is `enabled`** AND it is **in the runtime set**. You cannot re-enable a flavor-disabled feature at runtime. Inside `vonage-meeting-room` itself, chat/reactions/videofx/audiofx/settings always resolve to `enabled` (its `defaultConfig` pins them) — for those, the runtime set is the only thing that turns them off; archiving/captions/screensharing additionally have real `archivingEnabled`/`…Disabled` flavors in that module.
+Two gates, both must be open: a feature is active only when its **compile-time flavor is `enabled`** AND it is **in the runtime set**. You cannot re-enable a flavor-disabled feature at runtime. Inside `vonage-meeting-room` itself, chat/reactions/videofx/audiofx/settings always resolve to `enabled` (its `defaultConfig` pins them) — for those, the runtime set is the only thing that turns them off; captions/screensharing additionally have real `captionsEnabled`/`…Disabled` flavors in that module.
 
 ### Which keys are flavor-backed
 
@@ -37,14 +37,14 @@ Two gates, both must be open: a feature is active only when its **compile-time f
 |---|---|---|
 | `meetingRoomSettings.allowChat` | `chat` | `MeetingRoomFeature.CHAT` |
 | `meetingRoomSettings.allowEmojis` | `reactions` | `MeetingRoomFeature.REACTIONS` |
-| `meetingRoomSettings.allowArchiving` | `archiving` (+ `archivingEnabled` in meeting-room) | `MeetingRoomFeature.ARCHIVING` |
 | `meetingRoomSettings.allowCaptions` | `captions` (+ `captionsEnabled`) | `MeetingRoomFeature.CAPTIONS` |
 | `meetingRoomSettings.allowScreenShare` | `screensharing` (+ `screensharingEnabled`) | `MeetingRoomFeature.SCREEN_SHARE` |
 | `videoSettings.allowBackgroundEffects` | `videofx` | `MeetingRoomFeature.BACKGROUND_EFFECTS` |
 | `audioSettings.allowAdvancedNoiseSuppression` | `audiofx` | `MeetingRoomFeature.AUDIO_EFFECTS` |
 | `meetingRoomSettings.allowSettings` | `settings` | `MeetingRoomConfiguration.allowSettings` (no `MeetingRoomFeature` case) |
 | `authSettings.allowAuthentication` | `okta` — also raises `minSdk` to 26 | n/a (landing-screen sign-in; Android-only key, not in the shared schema) |
-| `meetingRoomSettings.allowPostCallTranscription` | forces `archiving`/`archivingEnabled` on | `MeetingRoomFeature.POST_CALL_TRANSCRIPTION` (Start/Stop transcription button; `true` in the checked-in config — the key must be present, omitting it fails compilation) |
+
+`meetingRoomSettings.allowArchiving` (recording) and `meetingRoomSettings.allowPostCallTranscription` (Start/Stop transcription button) are **not** flavor-backed: `vonage-feature-archiving` has no flavors, and each key independently enables its `MeetingRoomFeature` (`ARCHIVING` / `POST_CALL_TRANSCRIPTION`) and its archive type in `ArchivingModule.provideVonageArchiving(...)`. Either can be on without the other. Both keys must be present in `app-config.json`; omitting one fails compilation.
 
 Everything else (`allowCameraControl`, `allowMicrophoneControl`, `allowAudioOnJoin`, `allowVideoOnJoin`, `allowDeviceSelection`, `allowFeedback`, `allowPictureInPicture`, `showParticipantList`, `defaultLayoutMode` = `grid` | `activeSpeaker`, …) is runtime-only via `Config`/`MeetingRoomConfiguration`. Two keys exist purely for cross-platform parity and do nothing on Android: `videoSettings.defaultResolution` and `waitingRoomSettings.bypassWaitingRoom`. `metadata` generates nothing. The full table is in `docs/CONFIGURATION.md`.
 

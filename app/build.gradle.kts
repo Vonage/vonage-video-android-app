@@ -69,20 +69,10 @@ android {
         buildConfigField("boolean", "FEATURE_REACTIONS_ENABLED", "$reactionsProperty")
         missingDimensionStrategy("reactions", reactionsProperty.toEnabledString())
 
-        // Archiving/recording feature. Post-call transcription starts/stops archives through the
-        // same module, so it is compiled in when either feature is on; the record and transcription
-        // buttons are then gated at runtime by their own MeetingRoomFeature.
+        // Archiving has no flavor: recording and transcription are each gated at runtime by their
+        // own config key, MeetingRoomFeature, and the VonageArchiving instance.
         val archivingProperty = configProps.getProperty("vonage.meetingRoom.allow_archiving", "true")
-        val postCallTranscriptionProperty =
-            configProps.getProperty("vonage.meetingRoom.allow_post_call_transcription", "false")
-        val archivingFlavorProperty =
-            (archivingProperty.toBoolean() || postCallTranscriptionProperty.toBoolean()).toString()
         buildConfigField("boolean", "FEATURE_ARCHIVING_ENABLED", "$archivingProperty")
-        missingDimensionStrategy(
-            "archiving",
-            archivingFlavorProperty.toEnabledString(),
-            archivingFlavorProperty.toModuleFlavorString("archiving"),
-        )
 
         // Captions feature
         val captionsProperty = configProps.getProperty("vonage.meetingRoom.allow_captions", "true")
