@@ -1,0 +1,23 @@
+.claude/skills/configure/SKILL.md
+  s_1943436c978f25::t_9e21c0d3aef0d1 47
+docs/CONFIG-SYSTEM.md
+  s_1943436c978f25::t_b1c8026ad06335 124
+docs/CONFIGURATION.md
+  s_1943436c978f25::t_c0f29c19071bc5 59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9fb66fa9dd45b9a718125c6b60badef63cd991fa",
+  "prompts": {},
+  "sessions": {
+    "s_1943436c978f25": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_6be39336-4edc-451e-a2cd-cf37ab3d67ad",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
