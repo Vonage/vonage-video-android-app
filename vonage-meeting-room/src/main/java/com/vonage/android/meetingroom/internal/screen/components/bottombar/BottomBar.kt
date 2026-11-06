@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.ui.recordingAction
+import com.vonage.android.archiving.ui.transcriptionAction
 import com.vonage.android.captions.CaptionsUiState
 import com.vonage.android.captions.ui.captionsAction
 import com.vonage.android.chat.ui.chatAction
@@ -66,6 +67,7 @@ internal data class BottomBarState(
     val allowMicrophoneControl: Boolean,
     val allowCameraControl: Boolean,
     val enabledFeatures: Set<MeetingRoomFeature> = MeetingRoomFeature.all,
+    val transcriptionUiState: ArchivingUiState = ArchivingUiState.IDLE,
 )
 
 // 4 because mic + camera + menu + end
@@ -275,6 +277,14 @@ private fun actionsFactory(
                 startRecordingLabel = stringResource(R.string.recording_start_recording),
                 stopRecordingLabel = stringResource(R.string.recording_stop_recording),
                 archivingUiState = state.archivingUiState,
+            )
+
+            BottomBarActionType.POST_CALL_TRANSCRIPTION -> transcriptionAction(
+                onStartTranscription = { roomActions.onToggleTranscription(true) },
+                onStopTranscription = { roomActions.onToggleTranscription(false) },
+                startTranscriptionLabel = stringResource(R.string.transcription_start_transcription),
+                stopTranscriptionLabel = stringResource(R.string.transcription_stop_transcription),
+                transcriptionUiState = state.transcriptionUiState,
             )
 
             BottomBarActionType.CAPTIONS -> captionsAction(

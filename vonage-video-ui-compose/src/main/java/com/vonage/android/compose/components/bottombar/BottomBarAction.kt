@@ -18,6 +18,7 @@ enum class BottomBarActionType {
     CHAT,
     PARTICIPANTS,
     RECORD_SESSION,
+    POST_CALL_TRANSCRIPTION,
     SCREEN_SHARING,
     CAPTIONS,
     /** Sentinel type used for buttons injected externally
