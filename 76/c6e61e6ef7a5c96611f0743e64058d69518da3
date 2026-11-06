@@ -1,0 +1,22 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  s_b3cf2946d72503::t_1b7c46d991abe4 117-121
+  s_b3cf2946d72503::t_e1870ba76ae0e2 218-222
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/ArchiveNotificationOverlay.kt
+  s_b3cf2946d72503::t_4f02aee73f7b40 22-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "76c6e61e6ef7a5c96611f0743e64058d69518da3",
+  "prompts": {},
+  "sessions": {
+    "s_b3cf2946d72503": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_62255a8b-1009-4d25-af87-403445a3b74d",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
