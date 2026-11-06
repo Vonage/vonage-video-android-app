@@ -33,6 +33,7 @@ fun SettingsScreenRoute(
             onResolutionChange = viewModel::updateCaptureResolution,
             onPreferredVideoCodecOrderChange = viewModel::updatePreferredVideoCodecOrder,
             onAudioBitrateChange = viewModel::updateAudioBitrate,
+            onCaptionsTranslationLanguageChange = viewModel::updateCaptionsTranslationLanguage,
             onDismiss = onDismiss,
         ),
     )

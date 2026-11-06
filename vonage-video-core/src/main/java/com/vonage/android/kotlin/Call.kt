@@ -204,6 +204,10 @@ class Call internal constructor(
     /** Flag for deferred self-captions subscription when publisher stream not yet available */
     private var pendingSelfCaptionsSubscription: Boolean = false
 
+    /** Target language for received captions; `null` keeps the spoken language. */
+    @Volatile
+    private var captionsTranslationLanguage: String? = null
+
     private val _activeArchives = MutableStateFlow<Map<String, String?>>(emptyMap())
     override val activeArchives: StateFlow<Map<String, String?>> = _activeArchives
 
@@ -567,6 +571,28 @@ class Call internal constructor(
         setCaptions(false)
     }
 
+    /**
+     * Translates captions from every current and future subscriber, including the hidden
+     * self-subscriber, into [languageCode]; `null` restores the spoken language.
+     */
+    override fun setCaptionsTranslationLanguage(languageCode: String?) {
+        captionsTranslationLanguage = languageCode
+        coroutineScope.launch {
+            participants.values.filterIsInstance<ParticipantState>()
+                .forEach { participant -> applyCaptionsTranslation(participant.vonageSubscriber) }
+            selfCaptionsSubscriber?.let(::applyCaptionsTranslation)
+        }
+    }
+
+    private fun applyCaptionsTranslation(subscriber: VonageSubscriber) {
+        val languageCode = captionsTranslationLanguage
+        try {
+            subscriber.setCaptionsTranslationLanguage(languageCode)
+        } catch (e: IllegalArgumentException) {
+            vonageLogger.e(TAG, "Unsupported captions translation language $languageCode", e)
+        }
+    }
+
     private fun setCaptions(enable: Boolean) {
         coroutineScope.launch {
             captionsEnabled = enable
@@ -617,6 +643,7 @@ class Call internal constructor(
                 subscriber.subscribeToVideo = false
                 subscriber.subscribeToCaptions = true
                 subscriber.setCaptionsListener(selfCaptionsDelegate)
+                applyCaptionsTranslation(subscriber)
                 selfCaptionsSubscriber = subscriber
                 vonageLogger.d(TAG, "Created hidden self-captions subscriber for stream ${stream.streamId}")
             } catch (e: Exception) {
@@ -654,6 +681,7 @@ class Call internal constructor(
                     val subscriber = session.subscribe(context, stream)
                     subscriber.setCaptionsListener(captionsDelegate)
                     subscriber.subscribeToCaptions = captionsEnabled
+                    applyCaptionsTranslation(subscriber)
                     ParticipantState(vonageSubscriber = subscriber)
                 }
                 participant.registerListeners()

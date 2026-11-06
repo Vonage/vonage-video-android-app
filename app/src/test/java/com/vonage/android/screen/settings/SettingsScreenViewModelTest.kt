@@ -2,6 +2,7 @@ package com.vonage.android.screen.settings
 
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
+import com.vonage.android.config.GetConfig
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
@@ -31,6 +32,7 @@ class SettingsScreenViewModelTest {
         appVersion = APP_VERSION,
         sdkVersion = SDK_VERSION,
         callSettingsHolder = callSettingsHolder,
+        getConfig = GetConfig(),
     )
 
     // region initial state

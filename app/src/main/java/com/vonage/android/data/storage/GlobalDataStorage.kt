@@ -35,5 +35,6 @@ class GlobalDataStorage @Inject constructor(
         val SETTINGS_VIDEO_EFFECT = stringPreferencesKey("settings_video_effect")
         val SETTINGS_BACKGROUND_ID = stringPreferencesKey("settings_background_id")
         val SETTINGS_BACKGROUND_PATH = stringPreferencesKey("settings_background_path")
+        val SETTINGS_CAPTIONS_TRANSLATION_LANGUAGE = stringPreferencesKey("settings_captions_translation_language")
     }
 }

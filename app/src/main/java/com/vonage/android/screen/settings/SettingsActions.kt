@@ -69,6 +69,11 @@ class ObserveSettingsAction :
                 actionScope.setState { copy(audioBitrate = bitrate) }
             }
         }
+        scope.launch {
+            holder.captionsTranslationLanguage.collect { languageCode ->
+                actionScope.setState { copy(captionsTranslationLanguage = languageCode) }
+            }
+        }
     }
 }
 
@@ -179,5 +184,16 @@ class UpdateAudioBitrateAction(
         actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
     ) {
         dependencies.callSettingsHolder.updateAudioBitrate(bitrate)
+    }
+}
+
+class UpdateCaptionsTranslationLanguageAction(
+    private val languageCode: String?,
+) : ViewAction<SettingsActionDependencies, SettingsUiState, SettingsViewEvent> {
+    override suspend fun execute(
+        dependencies: SettingsActionDependencies,
+        actionScope: ActionScope<SettingsUiState, SettingsViewEvent>,
+    ) {
+        dependencies.callSettingsHolder.updateCaptionsTranslationLanguage(languageCode)
     }
 }
