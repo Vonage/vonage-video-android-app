@@ -69,4 +69,6 @@ vonageArchiving.getRecordings(sessionKey)
 
 ## Build Variants
 
-This module supports feature toggles with `enabled` and `disabled` source sets for conditional compilation.
+This module has no flavors. `ArchivingModule.provideVonageArchiving(retrofit, recordingEnabled, transcriptionEnabled)`
+enables recording and transcription independently; archives of a disabled type are never started,
+stopped, reported by `bind` or listed by `getRecordings`.

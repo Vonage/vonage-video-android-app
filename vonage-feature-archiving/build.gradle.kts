@@ -29,19 +29,7 @@ android {
             all { it.useJUnitPlatform() }
         }
     }
-
-    flavorDimensions += "archiving"
-    productFlavors {
-        create("enabled") {
-            dimension = "archiving"
-        }
-        create("disabled") {
-            dimension = "archiving"
-        }
-    }
 }
-
-val enabledImplementation by configurations
 
 dependencies {
     implementation(project(":vonage-video-ui-compose"))
@@ -56,10 +44,8 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.tooling.preview)
 
-    // retrofit is shared so the disabled flavor exposes the same provider signature
-    // (provideVonageArchiving(retrofit)) as enabled; the disabled stub ignores the arg.
     implementation(libs.retrofit)
-    enabledImplementation(libs.okhttp)
+    implementation(libs.okhttp)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

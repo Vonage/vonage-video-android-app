@@ -160,13 +160,14 @@ on top; it cannot un-disable a compile-time disabled feature.
 
 | Dimension      | Enabled flavor         | Disabled flavor         |
 |----------------|------------------------|-------------------------|
-| `archiving`    | `archivingEnabled`     | `archivingDisabled`     |
 | `captions`     | `captionsEnabled`      | `captionsDisabled`      |
 | `screensharing`| `screensharingEnabled` | `screensharingDisabled` |
 | `reporting`    | `reportingEnabled`     | `reportingDisabled`     |
 
 The remaining features (chat, reactions, videofx, audiofx, settings) are always included
 at the module level; their runtime availability is controlled solely by `MeetingRoomFeature`.
+Archiving has no flavor either: `ARCHIVING` (recording) and `POST_CALL_TRANSCRIPTION` are
+independent runtime features.
 
 ---
 

@@ -122,16 +122,12 @@ class ArchiveRepositoryTest {
 
     @Test
     fun `given repository when startArchiving with transcription sends transcription request`() = runTest {
-        val request = StartArchiveRequest(
-            sessionKey = SESSION_KEY,
-            withTranscription = true,
-            archiveOptions = StartArchiveOptions(TranscriptionProperties(hasSummary = true)),
-        )
+        val request = StartArchiveRequest(sessionKey = SESSION_KEY, withTranscription = true)
         coEvery { apiService.startArchiving(request) } returns
             Response.success(
                 TrpcResponse(TrpcResult(ArchiveOperationResponse(id = "transcription-id", status = "started")))
             )
-        val response = sut.startArchive(SESSION_KEY, withTranscription = true, withSummary = true)
+        val response = sut.startArchive(SESSION_KEY, withTranscription = true)
         assertEquals(Result.success(ArchiveId("transcription-id")), response)
     }
 
@@ -142,22 +138,6 @@ class ArchiveRepositoryTest {
         assertEquals(
             """{"sessionKey":"key","withTranscription":true}""",
             json.encodeToString(StartArchiveRequest("key", withTranscription = true)),
-        )
-    }
-
-    @Test
-    fun `start archive request encodes the summary choice as transcription properties`() {
-        val json = Json { ignoreUnknownKeys = true }
-        assertEquals(
-            """{"sessionKey":"key","withTranscription":true,""" +
-                """"archiveOptions":{"transcriptionProperties":{"hasSummary":false}}}""",
-            json.encodeToString(
-                StartArchiveRequest(
-                    sessionKey = "key",
-                    withTranscription = true,
-                    archiveOptions = StartArchiveOptions(TranscriptionProperties(hasSummary = false)),
-                ),
-            ),
         )
     }
 

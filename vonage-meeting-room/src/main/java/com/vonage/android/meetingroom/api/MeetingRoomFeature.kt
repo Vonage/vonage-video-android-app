@@ -20,7 +20,7 @@ enum class MeetingRoomFeature {
 
     /**
      * Start/stop a post-call transcription, an archive that runs alongside any recording.
-     * Compiled in with the archiving flavor; the backend must support `withTranscription`.
+     * Independent of [ARCHIVING]; the backend must support `withTranscription`.
      */
     POST_CALL_TRANSCRIPTION,
 
