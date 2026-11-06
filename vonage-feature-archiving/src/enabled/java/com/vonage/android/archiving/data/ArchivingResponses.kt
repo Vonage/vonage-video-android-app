@@ -86,4 +86,19 @@ data class ServerArchive(
     val status: String,
     @SerialName("createdAt")
     val createdAt: Long,
+    /** `true` for a post-call transcription archive; its transcript is described by [transcription]. */
+    @SerialName("hasTranscription")
+    val hasTranscription: Boolean = false,
+    /** Absent until the backend starts generating the transcript. */
+    @SerialName("transcription")
+    val transcription: ServerTranscription? = null,
+)
+
+/** Transcript of a transcription archive; [url] is the transcript download (`transcription.zip`). */
+@Serializable
+data class ServerTranscription(
+    @SerialName("status")
+    val status: String,
+    @SerialName("url")
+    val url: String? = null,
 )
