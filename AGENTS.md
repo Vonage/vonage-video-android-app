@@ -12,7 +12,6 @@
 | `vonage-video-ui-compose/` | Reusable Compose components + JSON-driven theme generator |
 | `vonage-feature-*/` | Optional capabilities with `enabled`/`disabled` flavor variants |
 | `vonage-feature-okta/` | Optional Okta OIDC authentication (off by default via `authSettings.allowAuthentication`). Contract in `src/main`, Okta SDK only in `src/enabled`. See `docs/AUTHENTICATION.md`. |
-| `vonage-feature-post-call-transcription/` | Still a scaffold: the goodbye-screen module gated by `meetingRoomSettings.allowPostCallTranscription` (app-level only, Hilt `FeaturesModule`; not a `vonage-meeting-room` dependency) returns no transcriptions until the backend endpoint exists. The same flag also turns on a separate, already-functional feature: the in-call Start/Stop transcription button (`MeetingRoomFeature.POST_CALL_TRANSCRIPTION`), built on `vonage-feature-archiving`'s `ArchiveType.TRANSCRIPTION`, which also compiles the archiving flavor in. The key must be present in `app-config.json` — omitting it fails compilation, it has no safe "missing key" default. |
 | `vonage-video-shared/` | Shared utilities |
 | `vonage-android-logger/` | Logging pipeline with interceptor model |
 | `vonage-audio-selector/` | Audio output selector (Bluetooth, wired, earpiece, speaker) |
