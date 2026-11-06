@@ -1,0 +1,96 @@
+.maestro/flows/create-new-room.yaml
+  h_25498f8d57a266 8,10
+.maestro/flows/github-repo-link.yaml
+  h_25498f8d57a266 8,10
+.maestro/flows/goodbye-reenter-room.yaml
+  h_25498f8d57a266 4,6
+.maestro/flows/goodbye-view-landing-page.yaml
+  h_25498f8d57a266 4,6
+.maestro/flows/join-with-camera-mic-allowed.yaml
+  h_25498f8d57a266 4,6
+.maestro/flows/recording.yaml
+  h_25498f8d57a266 4,6
+.maestro/flows/waiting-room-controls-disabled.yaml
+  h_25498f8d57a266 4,6
+.maestro/flows/waiting-room-controls-enabled.yaml
+  h_25498f8d57a266 4,6
+app/src/main/java/com/vonage/android/data/storage/DataStoreCallSettingsStorage.kt
+  h_25498f8d57a266 3-4,7-8,15-16,21,28,31,60-64,89-114,116-129
+app/src/main/java/com/vonage/android/data/storage/GlobalDataStorage.kt
+  h_25498f8d57a266 33-37
+app/src/main/java/com/vonage/android/screen/components/audio/AudioDeviceList.kt
+  h_25498f8d57a266 143,164
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomScreen.kt
+  h_25498f8d57a266 167-174
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomViewModel.kt
+  h_25498f8d57a266 22,43,75-76,80-88,177-183,311-314
+app/src/test/java/com/vonage/android/data/storage/DataStoreCallSettingsStorageTest.kt
+  h_25498f8d57a266 5-6,13-14,19,25,27,101-128
+app/src/test/java/com/vonage/android/screen/waiting/WaitingRoomViewModelTest.kt
+  h_25498f8d57a266 22,39,53,56,286-374
+vonage-audio-selector/api/vonage-audio-selector.api
+  h_25498f8d57a266 14-15,18-20,23
+vonage-audio-selector/src/main/java/com/vonage/audioselector/AudioDeviceSelector.kt
+  h_25498f8d57a266 111,117
+vonage-audio-selector/src/main/java/com/vonage/audioselector/data/GetDevices.kt
+  h_25498f8d57a266 28-29
+vonage-audio-selector/src/main/java/com/vonage/audioselector/data/bluetooth/VeraBluetoothManager.kt
+  h_25498f8d57a266 6,44-50,90,97,124,224-237
+vonage-audio-selector/src/test/java/com/vonage/audioselector/data/GetDevicesTest.kt
+  h_25498f8d57a266 13,40,53-69
+vonage-audio-selector/src/test/java/com/vonage/audioselector/data/bluetooth/VeraBluetoothManagerTest.kt
+  h_25498f8d57a266 66-72,154
+vonage-feature-settings/src/enabled/java/com/vonage/android/settings/ui/components/stats/NetworkConditionStats.kt
+  h_25498f8d57a266 1-25
+vonage-feature-settings/src/enabled/java/com/vonage/android/settings/ui/components/stats/PublisherStats.kt
+  h_25498f8d57a266 30,42
+vonage-feature-settings/src/enabled/java/com/vonage/android/settings/ui/components/stats/SubscribersStats.kt
+  h_25498f8d57a266 35,49
+vonage-feature-settings/src/main/java/com/vonage/android/settings/CallSettingsHolder.kt
+  h_25498f8d57a266 63-78,81-83,136-140,164
+vonage-feature-settings/src/main/java/com/vonage/android/settings/CallSettingsStorage.kt
+  h_25498f8d57a266 9-19,35
+vonage-feature-settings/src/main/res/values/strings.xml
+  h_25498f8d57a266 70-71
+vonage-feature-settings/src/testEnabled/java/com/vonage/android/settings/CallSettingsHolderTest.kt
+  h_25498f8d57a266 9,193-226
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/audio/AudioDeviceList.kt
+  h_25498f8d57a266 143,164
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  h_25498f8d57a266 28,279-288
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTest.kt
+  h_25498f8d57a266 35,286-306
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/NetworkCondition.kt
+  h_25498f8d57a266 1-26
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/ParticipantState.kt
+  h_25498f8d57a266 79-81,164-167,186
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/PublisherState.kt
+  h_25498f8d57a266 96-98,269-272
+vonage-video-core/src/test/java/com/vonage/android/kotlin/model/ParticipantStateTest.kt
+  h_25498f8d57a266 4-5,18,198-225
+vonage-video-core/src/test/java/com/vonage/android/kotlin/model/PublisherStateTest.kt
+  h_25498f8d57a266 4-5,10-13,51-65
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/VonageNetworkCondition.kt
+  h_25498f8d57a266 1-16
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/VonagePublisherContract.kt
+  h_25498f8d57a266 39
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/VonageSubscriberContract.kt
+  h_25498f8d57a266 26
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/internal/OpenTokPublisher.kt
+  h_25498f8d57a266 15,251-273
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/internal/OpenTokSession.kt
+  h_25498f8d57a266 8,12,219-223
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/internal/OpenTokSubscriber.kt
+  h_25498f8d57a266 9,121-140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "716658f75a0ade29f07f2b020a87388ee891dc71",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
