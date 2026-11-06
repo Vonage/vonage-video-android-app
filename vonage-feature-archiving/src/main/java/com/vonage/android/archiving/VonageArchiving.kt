@@ -19,22 +19,29 @@ interface VonageArchiving {
     fun bind(call: CallFacade): Flow<Map<ArchiveType, ArchiveId>>
 
     /**
-     * Starts archiving/recording for the session identified by [sessionKey].
-     * Initiates a new recording session and returns the archive ID for tracking.
+     * Starts an archive of [type] for the session identified by [sessionKey]. A transcription
+     * archive is requested with `withTranscription: true`; the backend sets its output mode and tag.
      *
      * @param sessionKey The session key JWT returned by the backend when the session was created
+     * @param type Recording (default) or transcription archive
+     * @param withSummary Transcription only: also generate an AI summary of the transcript
      * @return Result containing the archive ID on success, or an error on failure
      */
-    suspend fun startArchive(sessionKey: String): Result<ArchiveId>
+    suspend fun startArchive(
+        sessionKey: String,
+        type: ArchiveType = ArchiveType.RECORDING,
+        withSummary: Boolean = false,
+    ): Result<ArchiveId>
 
     /**
-     * Stops the current active archive/recording for the session identified by [sessionKey].
-     * Ends the recording and finalizes the archive for later retrieval.
+     * Stops the active archive of [type] for the session identified by [sessionKey], leaving any
+     * archive of the other type running.
      *
      * @param sessionKey The session key JWT returned by the backend when the session was created
+     * @param type Recording (default) or transcription archive
      * @return Result indicating success (true) or failure with error details
      */
-    suspend fun stopArchive(sessionKey: String): Result<Boolean>
+    suspend fun stopArchive(sessionKey: String, type: ArchiveType = ArchiveType.RECORDING): Result<Boolean>
 
     /**
      * Retrieves all recorded archives for the session identified by [sessionKey].

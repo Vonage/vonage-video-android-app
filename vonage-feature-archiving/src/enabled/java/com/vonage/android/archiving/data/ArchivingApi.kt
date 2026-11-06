@@ -9,7 +9,7 @@ import retrofit2.http.POST
 interface ArchivingApi {
 
     @POST("v2/startArchive")
-    suspend fun startArchiving(@Body body: SessionKeyRequest): Response<TrpcResponse<ArchiveOperationResponse>>
+    suspend fun startArchiving(@Body body: StartArchiveRequest): Response<TrpcResponse<ArchiveOperationResponse>>
 
     @POST("v2/stopArchive")
     suspend fun stopArchiving(@Body body: StopArchiveRequest): Response<TrpcResponse<ArchiveOperationResponse>>
