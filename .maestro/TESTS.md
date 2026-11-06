@@ -12,6 +12,7 @@
 | `github-repo-link.yaml` | Verify GitHub repo button is visible on landing screen |
 | `auth-required-create-join-room.yaml` | Signed-out user taps Create / Join while the backend answers 401 (simulated) → sign-in sheet instead of the waiting room. Needs `authSettings.allowAuthentication: true` (always on in the Maestro CI build) |
 | `auth-login-logout.yaml` | Sign in from the top-bar button (fake Okta sign-in), check the account sheet shows the user, sign out, and check sign-in is offered again. Needs `allowAuthentication: true` |
+| `participants-list.yaml` | Create a room, join, open the participant list from the bottom bar, verify it closes again |
 
 ## Disabled
 

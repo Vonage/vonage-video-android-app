@@ -9,6 +9,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.vonage.android.compose.components.ParticipantsPlaceholdersTestTags.PARTICIPANTS_PLACEHOLDER_TAG
 import com.vonage.android.compose.preview.buildCallWithParticipants
 import com.vonage.android.compose.preview.buildPublisher
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -33,6 +34,8 @@ import com.vonage.android.meetingroom.internal.screen.components.TopBarTestTags.
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_CAMERA_BUTTON
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_MIC_BUTTON
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_MORE_BUTTON
+import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BUTTON
+import com.vonage.android.meetingroom.internal.screen.components.bottombar.SEARCH_TAG
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
@@ -150,6 +153,67 @@ class MeetingRoomScreenTest {
 
         compose.onNodeWithTag(MEETING_ROOM_BOTTOM_BAR).assertIsDisplayed()
         compose.onNodeWithTag(BOTTOM_BAR_MORE_BUTTON, useUnmergedTree = true).assertDoesNotExist()
+    }
+
+    @Test
+    fun given_participants_button_tapped_THEN_participants_sheet_opens() {
+        compose.setContent {
+            VonageVideoTheme {
+                MeetingRoomScreen(
+                    uiState = MeetingRoomUiState(
+                        roomName = "sample-name",
+                        call = buildCallWithParticipants(participantCount = 3),
+                    ),
+                    actions = MeetingRoomActions(),
+                )
+            }
+        }
+
+        compose.onNodeWithTag(SEARCH_TAG).assertDoesNotExist()
+        compose.onNodeWithTag(BOTTOM_BAR_PARTICIPANTS_BUTTON).performClick()
+        compose.onNodeWithTag(SEARCH_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun given_grid_overflow_placeholder_tapped_THEN_participants_sheet_opens() {
+        compose.setContent {
+            VonageVideoTheme {
+                MeetingRoomScreen(
+                    uiState = MeetingRoomUiState(
+                        roomName = "sample-name",
+                        // 8 participants exceeds the adaptive grid's MAX_GRID_TILES (6), forcing the
+                        // "+N" overflow placeholder to render instead of a 7th/8th video tile.
+                        call = buildCallWithParticipants(participantCount = 8),
+                        layoutType = CallLayoutType.ADAPTIVE_GRID,
+                    ),
+                    actions = MeetingRoomActions(),
+                )
+            }
+        }
+
+        compose.onNodeWithTag(PARTICIPANTS_PLACEHOLDER_TAG).performClick()
+        compose.onNodeWithTag(SEARCH_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun given_filmstrip_overflow_placeholder_tapped_THEN_participants_sheet_opens() {
+        compose.setContent {
+            VonageVideoTheme {
+                MeetingRoomScreen(
+                    uiState = MeetingRoomUiState(
+                        roomName = "sample-name",
+                        // 5 participants with no active speaker exceeds the filmstrip's
+                        // MAX_FILMSTRIP_TILES (2), forcing the "+N" overflow placeholder to render.
+                        call = buildCallWithParticipants(participantCount = 5),
+                        layoutType = CallLayoutType.SPEAKER_LAYOUT,
+                    ),
+                    actions = MeetingRoomActions(),
+                )
+            }
+        }
+
+        compose.onNodeWithTag(PARTICIPANTS_PLACEHOLDER_TAG).performClick()
+        compose.onNodeWithTag(SEARCH_TAG).assertIsDisplayed()
     }
 
     @Test
