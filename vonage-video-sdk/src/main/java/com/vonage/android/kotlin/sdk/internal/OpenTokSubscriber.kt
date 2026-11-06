@@ -6,6 +6,7 @@ import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
 import com.vonage.android.kotlin.sdk.VonageAudioLevelListener
 import com.vonage.android.kotlin.sdk.VonageCaptionsListener
+import com.vonage.android.kotlin.sdk.VonageNetworkConditionListener
 import com.vonage.android.kotlin.sdk.VonageStream
 import com.vonage.android.kotlin.sdk.VonageSubscriber
 import com.vonage.android.kotlin.sdk.VonageSubscriberAudioStatsEntry
@@ -115,6 +116,26 @@ internal class OpenTokSubscriber(
                 ),
             )
         }
+    }
+
+    override fun setNetworkConditionListener(listener: VonageNetworkConditionListener?) {
+        if (listener == null) { raw.setMediaLinkStatsListener(null); return }
+        raw.setMediaLinkStatsListener(object : SubscriberKit.MediaLinkStatsListener {
+            override fun onMediaLinkStats(
+                subscriber: SubscriberKit,
+                stats: SubscriberKit.SubscriberMediaLinkStats,
+            ) {
+                listener.onNetworkCondition(stats.transport.toVonageNetworkCondition())
+            }
+
+            override fun onNetworkConditionChanged(
+                subscriber: SubscriberKit,
+                stats: SubscriberKit.SubscriberMediaLinkStats,
+                reason: String,
+            ) {
+                listener.onNetworkCondition(stats.transport.toVonageNetworkCondition())
+            }
+        })
     }
 
     override fun setCaptionsListener(listener: VonageCaptionsListener?) {

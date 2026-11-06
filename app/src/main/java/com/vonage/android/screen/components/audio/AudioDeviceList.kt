@@ -140,7 +140,7 @@ private fun AudioDeviceCell(
 private fun AudioDevice.toLabel(): String =
     when (this.type) {
         AudioDeviceType.EARPIECE -> stringResource(R.string.audio_device_selector_earpiece_audio_device)
-        AudioDeviceType.BLUETOOTH -> stringResource(R.string.audio_device_selector_bluetooth_audio_device)
+        AudioDeviceType.BLUETOOTH -> this.name ?: stringResource(R.string.audio_device_selector_bluetooth_audio_device)
         AudioDeviceType.SPEAKER -> stringResource(R.string.audio_device_selector_speaker_audio_device)
         AudioDeviceType.WIRED_HEADSET -> stringResource(R.string.audio_device_selector_headset_audio_device)
     }
@@ -161,7 +161,7 @@ internal fun AudioDeviceListPreview() {
         AudioDeviceList(
             modifier = Modifier.background(VonageVideoTheme.colors.surface),
             availableDevices = persistentListOf(
-                AudioDevice(1, AudioDeviceType.BLUETOOTH),
+                AudioDevice(1, AudioDeviceType.BLUETOOTH, name = "AirPods Pro"),
                 AudioDevice(2, AudioDeviceType.EARPIECE),
                 AudioDevice(3, AudioDeviceType.SPEAKER),
                 AudioDevice(4, AudioDeviceType.WIRED_HEADSET),

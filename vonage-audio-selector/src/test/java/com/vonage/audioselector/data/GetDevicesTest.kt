@@ -10,6 +10,7 @@ import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager.BluetoothSta
 import com.vonage.audioselector.data.bluetooth.VeraBluetoothManager.WiredState
 import io.mockk.every
 import io.mockk.mockk
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments.of
 import org.junit.jupiter.params.provider.MethodSource
@@ -36,6 +37,7 @@ internal class GetDevicesTest {
     ) {
         every { bluetoothManager.bluetoothState } returns bluetoothState
         every { bluetoothManager.wiredState } returns wiredState
+        every { bluetoothManager.connectedDeviceName } returns null
         every { context.packageManager } returns mockk<PackageManager> {
             every { hasSystemFeature(PackageManager.FEATURE_TELEPHONY) } returns hasEarpiece
         }
@@ -45,6 +47,23 @@ internal class GetDevicesTest {
         assertEquals(
             expectedDeviceList,
             devices,
+        )
+    }
+
+    @Test
+    fun `should include connected bluetooth device name`() {
+        every { bluetoothManager.bluetoothState } returns BluetoothState.Connected
+        every { bluetoothManager.wiredState } returns WiredState.UnPlugged
+        every { bluetoothManager.connectedDeviceName } returns "AirPods Pro"
+        every { context.packageManager } returns mockk<PackageManager> {
+            every { hasSystemFeature(PackageManager.FEATURE_TELEPHONY) } returns true
+        }
+
+        val devices = sut.invoke()
+
+        assertEquals(
+            AudioDevice(id = 1, type = AudioDeviceType.BLUETOOTH, name = "AirPods Pro"),
+            devices.first(),
         )
     }
 

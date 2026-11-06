@@ -32,6 +32,7 @@ fun SubscribersStats(
             .forEach { sub ->
                 val videoStats by sub.videoStats.collectAsStateWithLifecycle()
                 val audioStats by sub.audioStats.collectAsStateWithLifecycle()
+                val networkCondition by sub.networkCondition.collectAsStateWithLifecycle()
                 SectionDivider()
                 SectionHeader(
                     text = stringResource(
@@ -45,6 +46,7 @@ fun SubscribersStats(
                         value = it.formatBitrate(),
                     )
                 }
+                networkCondition?.let { NetworkConditionStats(it) }
                 videoStats?.let { SubscriberVideoStats(it) }
                 audioStats?.let { SubscriberAudioStats(it) }
             }

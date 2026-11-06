@@ -60,21 +60,26 @@ class CallSettingsHolder(
     private val _audioBitrate = MutableStateFlow<Int?>(null)
     val audioBitrate: StateFlow<Int?> = _audioBitrate.asStateFlow()
 
-    init {
-        scope.launch {
-            val p = storage.load()
-            _captureFrameRate.value = p.captureFrameRate
-            _captureResolution.value = p.captureResolution
-            _preferredVideoCodecOrder.value = p.preferredVideoCodecOrder
-            _audioBitrate.value = p.audioBitrate
-            _opusDtxEnabled.value = p.opusDtxEnabled
-            _publisherAudioFallbackEnabled.value = p.publisherAudioFallbackEnabled
-            _subscriberAudioFallbackEnabled.value = p.subscriberAudioFallbackEnabled
-            _senderStatsEnabled.value = p.senderStatsEnabled
-            _videoBitrateConfig.value = p.videoBitrateConfig
-            _degradationPreference.value = p.degradationPreference
-        }
+    private val _publisherPreferences = MutableStateFlow(PublisherPreferences())
+    val publisherPreferences: StateFlow<PublisherPreferences> = _publisherPreferences.asStateFlow()
+
+    private val loadJob = scope.launch {
+        val p = storage.load()
+        _captureFrameRate.value = p.captureFrameRate
+        _captureResolution.value = p.captureResolution
+        _preferredVideoCodecOrder.value = p.preferredVideoCodecOrder
+        _audioBitrate.value = p.audioBitrate
+        _opusDtxEnabled.value = p.opusDtxEnabled
+        _publisherAudioFallbackEnabled.value = p.publisherAudioFallbackEnabled
+        _subscriberAudioFallbackEnabled.value = p.subscriberAudioFallbackEnabled
+        _senderStatsEnabled.value = p.senderStatsEnabled
+        _videoBitrateConfig.value = p.videoBitrateConfig
+        _degradationPreference.value = p.degradationPreference
+        _publisherPreferences.value = p.publisherPreferences
     }
+
+    /** Suspends until the persisted values are loaded (matters on a cold start via deep link). */
+    suspend fun awaitLoaded() = loadJob.join()
 
     fun updateSenderStatsEnabled(enabled: Boolean) {
         _senderStatsEnabled.value = enabled
@@ -128,6 +133,11 @@ class CallSettingsHolder(
         save()
     }
 
+    fun updatePublisherPreferences(preferences: PublisherPreferences) {
+        _publisherPreferences.value = preferences
+        save()
+    }
+
     fun clearCall() {
         _call.value = null
     }
@@ -151,5 +161,6 @@ class CallSettingsHolder(
         senderStatsEnabled = _senderStatsEnabled.value,
         videoBitrateConfig = _videoBitrateConfig.value,
         degradationPreference = _degradationPreference.value,
+        publisherPreferences = _publisherPreferences.value,
     )
 }

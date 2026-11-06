@@ -76,6 +76,9 @@ data class ParticipantState(
     private val _audioStats: MutableStateFlow<SubscriberAudioStats?> = MutableStateFlow(null)
     val audioStats: StateFlow<SubscriberAudioStats?> = _audioStats
 
+    private val _networkCondition: MutableStateFlow<NetworkCondition?> = MutableStateFlow(null)
+    val networkCondition: StateFlow<NetworkCondition?> = _networkCondition
+
     internal val stream: VonageStream = vonageSubscriber.stream
 
     override fun changeVisibility(visible: Boolean) {
@@ -158,6 +161,10 @@ data class ParticipantState(
                 vonageSubscriber.observeAudioStats()
                     .collect { _audioStats.value = it }
             }
+            launch {
+                observeNetworkCondition(vonageSubscriber::setNetworkConditionListener)
+                    .collect { _networkCondition.value = it }
+            }
             vonageSubscriber.observeAudioLevel()
                 .movingAverage(windowSize = 5)
                 .distinctUntilChanged()
@@ -176,6 +183,7 @@ data class ParticipantState(
         vonageSubscriber.setStreamListener(null)
         vonageSubscriber.setVideoStatsListener(null)
         vonageSubscriber.setAudioStatsListener(null)
+        vonageSubscriber.setNetworkConditionListener(null)
         vonageSubscriber.setAudioLevelListener(null)
         session.unsubscribe(vonageSubscriber)
     }

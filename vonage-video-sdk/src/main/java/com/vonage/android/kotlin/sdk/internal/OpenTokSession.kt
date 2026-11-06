@@ -5,9 +5,11 @@ import com.opentok.android.OpentokError
 import com.opentok.android.Session
 import com.opentok.android.Stream
 import com.opentok.android.Subscriber
+import com.opentok.android.TransportStats
 import com.vonage.android.kotlin.sdk.VonageArchiveListener
 import com.vonage.android.kotlin.sdk.VonageConnection
 import com.vonage.android.kotlin.sdk.VonageError
+import com.vonage.android.kotlin.sdk.VonageNetworkCondition
 import com.vonage.android.kotlin.sdk.VonagePublisher
 import com.vonage.android.kotlin.sdk.VonageSession
 import com.vonage.android.kotlin.sdk.VonageSessionListener
@@ -212,6 +214,11 @@ internal fun OpentokError.toVonage(): VonageError = VonageError(
     code = errorCode.ordinal,
     message = message,
     domain = errorDomain?.name.orEmpty(),
+)
+
+internal fun TransportStats.toVonageNetworkCondition(): VonageNetworkCondition = VonageNetworkCondition(
+    score = networkCondition,
+    reason = networkConditionReason ?: TransportStats.NETWORK_CONDITION_REASON_UNKNOWN,
 )
 
 // endregion
