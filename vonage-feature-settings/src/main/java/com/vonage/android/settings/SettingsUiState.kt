@@ -28,4 +28,8 @@ data class SettingsUiState(
     val captureResolution: CaptureResolution? = null,
     val preferredVideoCodecOrder: List<VideoCodec>? = null,
     val audioBitrate: Int? = null,
+    /** True when both captions and caption translation are allowed by the app config. */
+    val showCaptionsTranslation: Boolean = false,
+    /** BCP-47 target language for received captions; `null` keeps the spoken language. */
+    val captionsTranslationLanguage: String? = null,
 ) : ViewState

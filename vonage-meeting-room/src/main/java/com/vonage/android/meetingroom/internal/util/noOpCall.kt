@@ -36,6 +36,7 @@ internal val noOpCall = object : CallFacade {
     override fun connect(context: Context): Flow<SessionEvent> = flowOf()
     override fun enableCaptions() {}
     override fun disableCaptions() {}
+    override fun setCaptionsTranslationLanguage(languageCode: String?) {}
     override fun pauseSession() {}
     override fun resumeSession() {}
     override fun endSession() {}

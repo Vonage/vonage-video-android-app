@@ -1,6 +1,7 @@
 package com.vonage.android.screen.settings
 
 import androidx.lifecycle.viewModelScope
+import com.vonage.android.config.GetConfig
 import com.vonage.android.core.BaseViewModel
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
@@ -19,8 +20,13 @@ class SettingsScreenViewModel @AssistedInject constructor(
     @Assisted("appVersion") appVersion: String,
     @Assisted("sdkVersion") sdkVersion: String,
     private val callSettingsHolder: CallSettingsHolder,
+    getConfig: GetConfig,
 ) : BaseViewModel<SettingsUiState, SettingsViewEvent>(
-    SettingsUiState(appVersion = appVersion, sdkVersion = sdkVersion),
+    SettingsUiState(
+        appVersion = appVersion,
+        sdkVersion = sdkVersion,
+        showCaptionsTranslation = getConfig().let { it.allowCaptions && it.allowCaptionTranslation },
+    ),
 ) {
 
     override val dependencies = SettingsActionDependencies(
@@ -51,6 +57,9 @@ class SettingsScreenViewModel @AssistedInject constructor(
     fun updatePreferredVideoCodecOrder(order: List<VideoCodec>?) = dispatch(UpdatePreferredVideoCodecOrderAction(order))
 
     fun updateAudioBitrate(bitrate: Int?) = dispatch(UpdateAudioBitrateAction(bitrate))
+
+    fun updateCaptionsTranslationLanguage(languageCode: String?) =
+        dispatch(UpdateCaptionsTranslationLanguageAction(languageCode))
 }
 
 @AssistedFactory
