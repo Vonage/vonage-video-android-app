@@ -67,4 +67,6 @@
     <string name="settings_stats_subscriber_audio_header">Audio</string>
     <string name="settings_stats_subscriber_audio_packets_received">Packets received/Packets lost</string>
     <string name="settings_stats_subscriber_audio_bytes_received">Bytes received</string>
+    <string name="settings_stats_network_condition">Network condition (0-5)</string>
+    <string name="settings_stats_network_condition_reason">Network condition reason</string>
 </resources>

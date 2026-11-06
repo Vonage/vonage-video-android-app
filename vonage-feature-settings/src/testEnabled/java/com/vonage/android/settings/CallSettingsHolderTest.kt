@@ -6,6 +6,7 @@ import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
+import com.vonage.android.kotlin.model.VideoEffect
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -185,6 +186,40 @@ class CallSettingsHolderTest {
         assertEquals(CaptureResolution.HIGH_1080P, sut.captureResolution.value)
         assertEquals(false, sut.publisherAudioFallbackEnabled.value)
         assertEquals(false, sut.subscriberAudioFallbackEnabled.value)
+    }
+
+    // endregion
+
+    // region publisherPreferences
+
+    @Test
+    fun `initial publisherPreferences are empty`() {
+        assertEquals(PublisherPreferences(), sut.publisherPreferences.value)
+    }
+
+    @Test
+    fun `when updatePublisherPreferences then storage receives them`() = runTest {
+        val fake = FakeCallSettingsStorage()
+        val holder = CallSettingsHolder(storage = fake, scope = this)
+        advanceUntilIdle()
+        val preferences = PublisherPreferences(publishAudio = false, publishVideo = true, videoEffect = VideoEffect.BlurHigh)
+
+        holder.updatePublisherPreferences(preferences)
+        advanceUntilIdle()
+
+        assertEquals(preferences, holder.publisherPreferences.value)
+        assertEquals(preferences, fake.saved?.publisherPreferences)
+    }
+
+    @Test
+    fun `given stored publisherPreferences when awaitLoaded then they are restored`() = runTest {
+        val preferences = PublisherPreferences(publishAudio = true, videoEffect = VideoEffect.BlurLow)
+        val fake = FakeCallSettingsStorage(initial = PersistedCallSettings(publisherPreferences = preferences))
+        val holder = CallSettingsHolder(storage = fake, scope = TestScope(StandardTestDispatcher(testScheduler)))
+
+        holder.awaitLoaded()
+
+        assertEquals(preferences, holder.publisherPreferences.value)
     }
 
     // endregion

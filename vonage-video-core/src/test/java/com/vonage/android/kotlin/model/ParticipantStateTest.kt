@@ -1,6 +1,8 @@
 package com.vonage.android.kotlin.model
 
 import com.vonage.android.kotlin.sdk.VonageConnection
+import com.vonage.android.kotlin.sdk.VonageNetworkCondition
+import com.vonage.android.kotlin.sdk.VonageNetworkConditionListener
 import com.vonage.android.kotlin.sdk.VonageStream
 import com.vonage.android.kotlin.sdk.VonageSubscriber
 import com.vonage.android.kotlin.sdk.VonageSubscriberVideoListener
@@ -13,6 +15,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -189,6 +192,34 @@ class ParticipantStateTest {
 
             assertTrue(state.isCameraEnabled.value)
         }
+
+    // endregion
+
+    // region Network condition
+
+    @Test
+    fun `given_setup_WHEN_sdkReportsNetworkCondition_THEN_networkConditionIsExposed`() =
+        runTest(UnconfinedTestDispatcher()) {
+            var listener: VonageNetworkConditionListener? = null
+            val subscriber = buildMockSubscriber()
+            every { subscriber.setNetworkConditionListener(any()) } answers { listener = firstArg() }
+            val state = ParticipantState(vonageSubscriber = subscriber)
+            backgroundScope.launch { state.setup() }
+
+            listener!!.onNetworkCondition(VonageNetworkCondition(score = 2, reason = "packet_loss"))
+
+            assertEquals(NetworkCondition(score = 2, reason = "packet_loss"), state.networkCondition.value)
+        }
+
+    @Test
+    fun `given_clean_THEN_networkConditionListenerIsRemoved`() {
+        val subscriber = buildMockSubscriber()
+        val state = ParticipantState(vonageSubscriber = subscriber)
+
+        state.clean(mockk(relaxed = true))
+
+        verify { subscriber.setNetworkConditionListener(null) }
+    }
 
     // endregion
 

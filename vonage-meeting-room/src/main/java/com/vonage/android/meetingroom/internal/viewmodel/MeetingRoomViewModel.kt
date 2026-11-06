@@ -26,6 +26,7 @@ import com.vonage.android.meetingroom.internal.screen.TranscriptionNotification
 import com.vonage.android.meetingroom.internal.screen.toCallLayoutType
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler.CallAction
 import com.vonage.android.screensharing.ScreenSharingState
+import com.vonage.android.settings.PublisherPreferences
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -281,6 +282,16 @@ internal class MeetingRoomViewModel(
         }
         container.vonageScreenSharing.stopSharingScreen()
         container.audioDevicesHandler.stop()
+        // Persist what the user ended the call with so the next join starts the same way.
+        call?.publisher?.value?.let { publisher ->
+            container.callSettingsHolder.updatePublisherPreferences(
+                PublisherPreferences(
+                    publishAudio = publisher.isMicEnabled.value,
+                    publishVideo = publisher.isCameraEnabled.value,
+                    videoEffect = publisher.videoEffect.value,
+                ),
+            )
+        }
         container.callSettingsHolder.clearCall()
         call?.endSession()
     }
