@@ -117,6 +117,7 @@ fun MeetingRoomScreenRoute(
 private fun configuredMeetingRoomFeatures(config: Config): Set<MeetingRoomFeature> = buildSet {
     if (config.allowChat) add(MeetingRoomFeature.CHAT)
     if (config.allowArchiving) add(MeetingRoomFeature.ARCHIVING)
+    if (config.allowPostCallTranscription) add(MeetingRoomFeature.POST_CALL_TRANSCRIPTION)
     if (config.allowCaptions) add(MeetingRoomFeature.CAPTIONS)
     if (config.allowEmojis) add(MeetingRoomFeature.REACTIONS)
     if (config.allowScreenShare) add(MeetingRoomFeature.SCREEN_SHARE)
