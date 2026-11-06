@@ -19,6 +19,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.zIndex
 import com.vonage.android.compose.components.NotificationToast
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -66,6 +69,7 @@ internal fun ArchiveNotificationOverlay(
             exit = toastExit,
         ) {
             NotificationToast(
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
                 icon = VividIcons.Solid.Rec,
                 text = stringResource(R.string.recording_started_notification),
             )
@@ -79,6 +83,7 @@ internal fun ArchiveNotificationOverlay(
         ) { notification ->
             if (notification != null) {
                 NotificationToast(
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
                     icon = VividIcons.Solid.VoicemailTranscript,
                     text = stringResource(
                         when (notification) {

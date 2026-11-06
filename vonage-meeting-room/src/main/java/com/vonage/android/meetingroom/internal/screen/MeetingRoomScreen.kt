@@ -114,8 +114,11 @@ internal fun MeetingRoomScreen(
     var showAudioOutputs by remember { mutableStateOf(false) }
     val audioOutputsSheetState = rememberModalBottomSheetState()
 
-    var showRecordingConfirmDialog by remember { mutableStateOf(false) }
-    var showTranscriptionConfirmDialog by remember { mutableStateOf(false) }
+    // Keyed to the archive state so a remote state change (another participant starting or
+    // stopping the archive while this dialog is open) dismisses the pending confirmation instead
+    // of silently flipping it to confirm the opposite operation.
+    var showRecordingConfirmDialog by remember(uiState.archivingUiState) { mutableStateOf(false) }
+    var showTranscriptionConfirmDialog by remember(uiState.transcriptionUiState) { mutableStateOf(false) }
     var includeTranscriptionSummary by remember { mutableStateOf(DEFAULT_TRANSCRIPTION_SUMMARY) }
 
     var showVideoEffects by remember { mutableStateOf(false) }
@@ -212,18 +215,19 @@ internal fun MeetingRoomScreen(
             // Wrap actions to show confirmation dialog before starting/stopping recording or transcription
             val wrappedActions = remember(actions, uiState.archivingUiState, uiState.transcriptionUiState) {
                 actions.copy(
+                    // Only a valid IDLE->start or RECORDING->stop transition opens a dialog.
+                    // Any other call (in-flight STARTING/STOPPING, or a toggle that matches the
+                    // current state already) is ignored instead of forwarded, so a custom bottom
+                    // bar re-dispatching a toggle mid-request cannot submit a second, unconfirmed
+                    // start/stop.
                     onToggleRecording = { enable ->
                         if (uiState.archivingUiState.needsConfirmation(enable)) {
                             showRecordingConfirmDialog = true
-                        } else {
-                            actions.onToggleRecording(enable)
                         }
                     },
                     onToggleTranscription = { enable ->
                         if (uiState.transcriptionUiState.needsConfirmation(enable)) {
                             showTranscriptionConfirmDialog = true
-                        } else {
-                            actions.onToggleTranscription(enable)
                         }
                     },
                 )
