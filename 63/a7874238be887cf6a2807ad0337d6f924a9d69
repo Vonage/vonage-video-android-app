@@ -1,0 +1,158 @@
+vonage-feature-archiving/src/disabled/java/com/vonage/android/archiving/di/ArchivingModule.kt
+  s_837a921650d66a::t_89bfe14bf7f760 5,9
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/feedback/FeedbackService.kt
+  s_837a921650d66a::t_136a4522a010be 1-7
+vonage-feature-captions/src/enabled/java/com/vonage/android/captions/di/CaptionsModule.kt
+  s_837a921650d66a::t_65c547ead3aeab 6,10,12
+vonage-feature-captions/src/enabled/java/com/vonage/android/captions/data/CaptionsRepository.kt
+  s_837a921650d66a::t_1251e2b6801132 3,6,16
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/captions/CaptionsService.kt
+  s_837a921650d66a::t_b79a528a3b0cbf 1-24
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/http/redactSecrets.kt
+  s_837a921650d66a::t_332e2fb181a31f 1-9
+vonage-vera-api-client/src/test/java/com/vonage/android/vera/api/archiving/ArchivingApiTest.kt
+  s_837a921650d66a::t_570cbdcfe3533a 1-222
+vonage-vera-api-client/src/test/java/com/vonage/android/vera/api/session/SessionApiTest.kt
+  s_837a921650d66a::t_1fcc50023f0465 1-5
+vonage-meeting-room/README.md
+  s_837a921650d66a::t_6abac2c22af948 198
+docs/TESTING.md
+  s_837a921650d66a::t_0b171b19381718 11
+.claude/skills/setup/SKILL.md
+  s_837a921650d66a::t_6f6697eb47dd3b 62
+app/src/main/java/com/vonage/android/data/network/interceptor/E2eForceUnauthorizedInterceptor.kt
+  s_837a921650d66a::t_eb2f67d270c54d 16-17
+vonage-meeting-room/src/captionsDisabled/java/com/vonage/android/meetingroom/internal/factory/CaptionsFactory.kt
+  s_837a921650d66a::t_8ddfc17298e59c 5,8-9
+app/src/main/java/com/vonage/android/data/network/OktaAuthTokenProvider.kt
+  s_837a921650d66a::t_d8ebf8ab0d3462 1-18
+app/src/main/java/com/vonage/android/data/network/veraUserAgent.kt
+  s_837a921650d66a::t_2ed0dade261015 1-7
+app/src/main/java/com/vonage/android/data/ReportingRepository.kt
+  s_837a921650d66a::t_82536545882507 3-5,9,13
+vonage-vera-api-client/src/test/java/com/vonage/android/vera/api/http/UserAgentInterceptorTest.kt
+  s_837a921650d66a::t_c29cc70b98db1b 1-65
+app/src/test/java/com/vonage/android/data/network/VeraUserAgentTest.kt
+  s_837a921650d66a::t_7aadf4e32611b0 1-23
+AGENTS.md
+  s_837a921650d66a::t_6b5a8a25f66a75 10-11
+  s_837a921650d66a::t_a123c3a25e7784 39
+docs/AUTHENTICATION.md
+  s_837a921650d66a::t_9b380374bda2b0 134,136-137
+  s_837a921650d66a::t_539e934addc343 156
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/http/calls.kt
+  s_837a921650d66a::t_3e250558344d62 1-35
+vonage-feature-archiving/src/testEnabled/java/com/vonage/android/archiving/data/ArchiveRepositoryTest.kt
+  s_837a921650d66a::t_7a99efabeb85ec 7-10,20,22,27,34,41,48,55,61-64,69,76,83,134,154-168,170-176,181,185-187
+.claude/skills/configure/SKILL.md
+  s_837a921650d66a::t_70aa9411ac6593 88
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/session/SessionModels.kt
+  s_837a921650d66a::t_188978598bf2e8 1-23
+vonage-vera-api-client/build.gradle.kts
+  s_837a921650d66a::t_99df3e3c9d1e07 1-39
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/AuthTokenProvider.kt
+  s_837a921650d66a::t_e3dd6b3b57d590 1-14
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/session/SessionApi.kt
+  s_837a921650d66a::t_a38c786d42f6aa 1-54
+app/src/main/java/com/vonage/android/di/NetworkModule.kt
+  s_837a921650d66a::t_d4fcce03476e5e 4-43
+app/src/test/java/com/vonage/android/data/network/OktaAuthTokenProviderTest.kt
+  s_837a921650d66a::t_58db8fd3ca7d59 1-28
+.claude/skills/run-tests/SKILL.md
+  s_837a921650d66a::t_67c687772518a7 21
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/VeraApiException.kt
+  s_837a921650d66a::t_924d630db23244 1-12
+vonage-meeting-room/src/archivingEnabled/java/com/vonage/android/meetingroom/internal/factory/ArchivingFactory.kt
+  s_837a921650d66a::t_c19cbc453e7e21 5,7-8
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/data/ArchiveRepository.kt
+  s_837a921650d66a::t_8c4cbc96649fc7 7-9,15-16,23-25,36-38,45-58
+  s_837a921650d66a::t_145e3829c514f5 83-84
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/archiving/ArchivingService.kt
+  s_837a921650d66a::t_b23e461ab37b8d 1-9
+vonage-meeting-room/src/archivingDisabled/java/com/vonage/android/meetingroom/internal/factory/ArchivingFactory.kt
+  s_837a921650d66a::t_3f666f8ce1b0cc 5,8-9
+vonage-vera-api-client/src/test/java/com/vonage/android/vera/api/http/AuthorizationInterceptorTest.kt
+  s_837a921650d66a::t_e637ec3a85cd46 1-66
+app/src/test/java/com/vonage/android/data/ReportingRepositoryTest.kt
+  s_837a921650d66a::t_73d4a13bd07d41 3-5,16,18,23,25,30
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/archiving/ArchivingApi.kt
+  s_837a921650d66a::t_24addee1284e5f 1-63
+vonage-vera-api-client/src/test/java/com/vonage/android/vera/api/captions/CaptionsApiTest.kt
+  s_837a921650d66a::t_b7202bcdc48c96 1-68
+vonage-feature-captions/src/disabled/java/com/vonage/android/captions/di/CaptionsModule.kt
+  s_837a921650d66a::t_70a680dea54816 5,9
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/http/TrpcResponse.kt
+  s_837a921650d66a::t_189d78697c80e2 1-25
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/http/UserAgentInterceptor.kt
+  s_837a921650d66a::t_0f9783b55d999c 1-13
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/captions/CaptionsApi.kt
+  s_837a921650d66a::t_d9bfd30e79784b 1-24
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/http/AuthorizationInterceptor.kt
+  s_837a921650d66a::t_90e9db736a12b3 1-20
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  s_837a921650d66a::t_f2bf9c1770d987 132
+app/build.gradle.kts
+  s_837a921650d66a::t_05b746e5adcd39 275
+vonage-feature-archiving/src/enabled/java/com/vonage/android/archiving/di/ArchivingModule.kt
+  s_837a921650d66a::t_4d61d7d163c579 6,10,12
+vonage-feature-captions/src/testEnabled/java/com/vonage/android/captions/data/CaptionsRepositoryTest.kt
+  s_837a921650d66a::t_1bfa3980982377 3,13,15,20,27,34
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/container/MeetingRoomContainer.kt
+  s_837a921650d66a::t_822822afff954b 28-30
+  s_837a921650d66a::t_001f765f7c1f89 46-50,53-54
+vonage-feature-archiving/build.gradle.kts
+  s_837a921650d66a::t_ef5b6082443af2 46-48
+vonage-meeting-room/src/captionsEnabled/java/com/vonage/android/meetingroom/internal/factory/CaptionsFactory.kt
+  s_837a921650d66a::t_273927c0d44d2f 5,7-8
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/VeraApiClient.kt
+  s_837a921650d66a::t_9effa67d2861d5 1-91
+app/src/main/java/com/vonage/android/di/FeaturesModule.kt
+  s_837a921650d66a::t_8066b1092e590c 46-47,51-52
+vonage-video-core/src/main/java/com/vonage/android/kotlin/VonageVideoClient.kt
+  s_837a921650d66a::t_99d6bcb3aa8a2f 75
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/session/SessionService.kt
+  s_837a921650d66a::t_fe251d0a416f43 1-10
+.github/instructions/android-kotlin.instructions.md
+  s_837a921650d66a::t_b0eda6e997ed52 12
+.github/copilot-instructions.md
+  s_837a921650d66a::t_7d3cec37633b2a 21-22
+.claude/skills/new-feature-module/SKILL.md
+  s_837a921650d66a::t_7ef42ba1acabee 38
+  s_837a921650d66a::t_440b2d9a15b399 47
+vonage-feature-captions/build.gradle.kts
+  s_837a921650d66a::t_fa286bb3f1fad7 42-44
+vonage-meeting-room/consumer-rules.pro
+  s_837a921650d66a::t_650f3af702fc8c 4-5
+vonage-vera-api-client/consumer-rules.pro
+  s_837a921650d66a::t_a989c8b5f8c349 1-9
+app/src/main/java/com/vonage/android/data/RoomAccessRepository.kt
+  s_837a921650d66a::t_05bc38e3f54608 4-5
+vonage-meeting-room/build.gradle.kts
+  s_837a921650d66a::t_d7ae7554048dc7 84
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/feedback/FeedbackApi.kt
+  s_837a921650d66a::t_e0cd199b0a16fb 1-18
+settings.gradle.kts
+  s_837a921650d66a::t_aa921c61813ae9 29
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/feedback/FeedbackModels.kt
+  s_837a921650d66a::t_ebde398d3f95ba 1-14
+vonage-vera-api-client/.gitignore
+  s_837a921650d66a::t_87d981f46b0dc9 1
+vonage-vera-api-client/src/test/java/com/vonage/android/vera/api/feedback/FeedbackApiTest.kt
+  s_837a921650d66a::t_a654cb8bab0206 1-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "63a7874238be887cf6a2807ad0337d6f924a9d69",
+  "prompts": {},
+  "sessions": {
+    "s_837a921650d66a": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_680e3948-d10a-418e-98d9-a28766556945",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
