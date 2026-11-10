@@ -3,6 +3,7 @@ package com.vonage.android.compose.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
@@ -32,16 +34,19 @@ fun ParticipantsPlaceholders(
     modifier: Modifier = Modifier,
     maxVisiblePlaceholders: Int = 2,
     spacedBy: Dp = DEFAULT_OVERLAP_SPACE.dp,
+    onClick: () -> Unit = {},
 ) {
     val visiblePlaceholders = participantNames.take(maxVisiblePlaceholders)
     val additionalCount = participantNames.size - maxVisiblePlaceholders
 
     Box(
         modifier = modifier
+            .testTag(ParticipantsPlaceholdersTestTags.PARTICIPANTS_PLACEHOLDER_TAG)
             .background(
                 color = VonageVideoTheme.colors.surface,
                 shape = VonageVideoTheme.shapes.medium,
-            ),
+            )
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Row(
@@ -72,6 +77,10 @@ fun ParticipantsPlaceholders(
             }
         }
     }
+}
+
+object ParticipantsPlaceholdersTestTags {
+    const val PARTICIPANTS_PLACEHOLDER_TAG = "participants-placeholder"
 }
 
 @Composable

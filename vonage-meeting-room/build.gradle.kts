@@ -30,6 +30,16 @@ android {
 
     testOptions {
         unitTests.all { it.useJUnitPlatform() }
+        animationsDisabled = true
+        managedDevices {
+            localDevices {
+                create("pixel") {
+                    device = "Pixel 2"
+                    apiLevel = 34
+                    systemImageSource = "aosp-atd"
+                }
+            }
+        }
     }
 
     // Only dimensions with actual source-set differences in this module need explicit flavors.
@@ -105,6 +115,7 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
