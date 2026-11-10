@@ -14,7 +14,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.shared.linkify.Linkify
+import com.vonage.android.compose.linkify.Linkify
 
 @Composable
 fun LinkifyText(

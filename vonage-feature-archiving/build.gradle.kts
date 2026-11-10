@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -10,7 +9,6 @@ android {
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     compileOptions {
@@ -41,25 +39,19 @@ android {
     }
 }
 
-val enabledImplementation by configurations
-
 dependencies {
     implementation(project(":vonage-video-ui-compose"))
     implementation(project(":vonage-video-core"))
-    implementation(project(":vonage-video-shared"))
     implementation(project(":vonage-android-logger"))
+    // Provider signature is the same in both flavors (provideVonageArchiving(apiClient));
+    // the disabled stub ignores the arg.
+    implementation(project(":vonage-vera-api-client"))
     implementation(libs.kotlinx.collections.immutable)
-    implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.tooling.preview)
-
-    // retrofit is shared so the disabled flavor exposes the same provider signature
-    // (provideVonageArchiving(retrofit)) as enabled; the disabled stub ignores the arg.
-    implementation(libs.retrofit)
-    enabledImplementation(libs.okhttp)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

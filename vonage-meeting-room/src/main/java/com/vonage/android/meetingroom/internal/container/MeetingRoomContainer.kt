@@ -15,7 +15,6 @@ import com.vonage.android.kotlin.sdk.VonageSdkFactory
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.api.SessionKeyHolder
-import com.vonage.android.meetingroom.internal.data.MeetingRoomNetworkFactory
 import com.vonage.android.meetingroom.internal.factory.createVonageArchiving
 import com.vonage.android.meetingroom.internal.factory.createVonageCaptions
 import com.vonage.android.meetingroom.internal.factory.createVonageScreenSharing
@@ -26,12 +25,12 @@ import com.vonage.android.reactions.ReactionSignalPlugin
 import com.vonage.android.reactions.di.ReactionsModule
 import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.settings.CallSettingsHolder
-import com.vonage.android.shared.session.SessionApiService
-import com.vonage.android.shared.session.SessionRepository
+import com.vonage.android.vera.api.AuthTokenProvider
+import com.vonage.android.vera.api.VeraApiClient
+import com.vonage.android.vera.api.session.SessionApi
 import com.vonage.audioselector.AudioDeviceSelector
 import com.vonage.audioselector.VeraAudioDevice
 import kotlinx.coroutines.Dispatchers
-import retrofit2.Retrofit
 
 /**
  * Manual DI container for the meeting room session.
@@ -44,20 +43,15 @@ internal class MeetingRoomContainer(
     val prebuilt: MeetingRoomPrebuilt,
 ) {
 
-    private val retrofit: Retrofit by lazy {
-        MeetingRoomNetworkFactory.createRetrofit(
-            baseUrl = prebuilt.baseUrl,
-            isDebug = prebuilt.isDebug,
-            authTokenProvider = prebuilt.authTokenProvider,
-        )
+    private val apiClient: VeraApiClient by lazy {
+        VeraApiClient.Builder(prebuilt.baseUrl)
+            .logBodies(prebuilt.isDebug)
+            .authTokenProvider(prebuilt.authTokenProvider?.let { provider -> AuthTokenProvider(provider::currentToken) })
+            .build()
     }
 
-    private val apiService: SessionApiService by lazy {
-        retrofit.create(SessionApiService::class.java)
-    }
-
-    val sessionRepository: SessionRepository by lazy {
-        SessionRepository(apiService)
+    val sessionApi: SessionApi by lazy {
+        apiClient.session
     }
 
     val sessionKeyHolder: SessionKeyHolder by lazy {
@@ -94,11 +88,11 @@ internal class MeetingRoomContainer(
     }
 
     val vonageArchiving: VonageArchiving by lazy {
-        createVonageArchiving(retrofit)
+        createVonageArchiving(apiClient)
     }
 
     val vonageCaptions: VonageCaptions by lazy {
-        createVonageCaptions(retrofit)
+        createVonageCaptions(apiClient)
     }
 
     val vonageScreenSharing: VonageScreenSharing by lazy {

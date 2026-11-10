@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import app.cash.turbine.test
 import com.vonage.android.MainDispatcherRule
 import com.vonage.android.data.ReportingRepository
-import com.vonage.android.data.network.ReportResponseData
+import com.vonage.android.vera.api.feedback.ReportResponseData
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.util.ImageProcessor
 import io.mockk.coEvery

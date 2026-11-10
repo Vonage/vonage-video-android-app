@@ -3,16 +3,12 @@ package com.vonage.android.archiving.di
 import com.vonage.android.archiving.EnabledVonageArchiving
 import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.archiving.data.ArchiveRepository
-import com.vonage.android.archiving.data.ArchivingApi
-import retrofit2.Retrofit
+import com.vonage.android.vera.api.VeraApiClient
 
 object ArchivingModule {
 
-    fun provideVonageArchiving(retrofit: Retrofit): VonageArchiving =
+    fun provideVonageArchiving(apiClient: VeraApiClient): VonageArchiving =
         EnabledVonageArchiving(
-            archiveRepository = ArchiveRepository(provideApiService(retrofit))
+            archiveRepository = ArchiveRepository(apiClient.archiving)
         )
-
-    private fun provideApiService(retrofit: Retrofit): ArchivingApi = retrofit
-        .create(ArchivingApi::class.java)
 }

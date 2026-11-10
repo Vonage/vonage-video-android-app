@@ -5,8 +5,8 @@ import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.kotlin.signal.RawSignal
-import com.vonage.android.shared.ChatMessage
-import com.vonage.android.shared.isInBackground
+import com.vonage.android.kotlin.model.ChatMessage
+import com.vonage.android.kotlin.ext.isInBackground
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow

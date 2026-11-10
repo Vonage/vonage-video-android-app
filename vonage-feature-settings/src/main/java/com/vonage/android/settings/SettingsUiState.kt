@@ -8,7 +8,7 @@ import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.kotlin.model.VideoCodec
-import com.vonage.android.shared.ViewState
+import com.vonage.android.kotlin.model.ViewState
 
 @Stable
 data class SettingsUiState(

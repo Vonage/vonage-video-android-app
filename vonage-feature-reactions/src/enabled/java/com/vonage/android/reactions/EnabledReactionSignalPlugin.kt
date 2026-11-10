@@ -4,7 +4,7 @@ import com.vonage.android.kotlin.model.EmojiState
 import com.vonage.android.kotlin.model.SignalStateContent
 import com.vonage.android.kotlin.model.SignalType
 import com.vonage.android.kotlin.signal.RawSignal
-import com.vonage.android.shared.EmojiReaction
+import com.vonage.android.kotlin.model.EmojiReaction
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher

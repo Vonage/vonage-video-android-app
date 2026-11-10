@@ -36,7 +36,7 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.line.Close
 import com.vonage.android.compose.vivid.icons.solid.MessageSent
-import com.vonage.android.shared.ChatMessage
+import com.vonage.android.kotlin.model.ChatMessage
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch

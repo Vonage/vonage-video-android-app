@@ -2,10 +2,10 @@ package com.vonage.android.archiving.di
 
 import com.vonage.android.archiving.DisabledVonageArchiving
 import com.vonage.android.archiving.VonageArchiving
-import retrofit2.Retrofit
+import com.vonage.android.vera.api.VeraApiClient
 
 object ArchivingModule {
 
-    fun provideVonageArchiving(@Suppress("UNUSED_PARAMETER") retrofit: Retrofit): VonageArchiving =
+    fun provideVonageArchiving(@Suppress("UNUSED_PARAMETER") apiClient: VeraApiClient): VonageArchiving =
         DisabledVonageArchiving()
 }
