@@ -1,4 +1,4 @@
-package com.vonage.android.util.pip
+package com.vonage.android.compose.util.pip
 
 import android.app.PictureInPictureParams
 import android.content.Context
@@ -37,13 +37,9 @@ fun pipEffect(
                         .enterPictureInPictureMode(PictureInPictureParams.Builder().build())
                 }
             }
-            context.findActivity().addOnUserLeaveHintListener(
-                onUserLeaveBehavior
-            )
+            context.findActivity().addOnUserLeaveHintListener(onUserLeaveBehavior)
             onDispose {
-                context.findActivity().removeOnUserLeaveHintListener(
-                    onUserLeaveBehavior
-                )
+                context.findActivity().removeOnUserLeaveHintListener(onUserLeaveBehavior)
             }
         }
     } else {
@@ -53,7 +49,6 @@ fun pipEffect(
     val pipModifier = modifier.onGloballyPositioned { _ ->
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val builder = PictureInPictureParams.Builder()
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 builder.setAutoEnterEnabled(shouldEnterPipMode)
             }
@@ -73,9 +68,7 @@ fun rememberIsInPipMode(): Boolean =
             val observer = Consumer<PictureInPictureModeChangedInfo> { info ->
                 pipMode = info.isInPictureInPictureMode
             }
-            activity.addOnPictureInPictureModeChangedListener(
-                observer
-            )
+            activity.addOnPictureInPictureModeChangedListener(observer)
             onDispose { activity.removeOnPictureInPictureModeChangedListener(observer) }
         }
         pipMode
@@ -83,7 +76,7 @@ fun rememberIsInPipMode(): Boolean =
         false
     }
 
-internal fun Context.findActivity(): ComponentActivity {
+fun Context.findActivity(): ComponentActivity {
     var context = this
     while (context is ContextWrapper) {
         if (context is ComponentActivity) return context

@@ -22,14 +22,13 @@ import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.ui.RecordingIndicator
 import com.vonage.android.compose.components.TranscriptionIndicator
 import com.vonage.android.compose.components.VonageTopAppBar
+import com.vonage.android.compose.components.audio.toImageVector
 import com.vonage.android.compose.icons.AudioSelectorIcon
 import com.vonage.android.compose.icons.CameraSwitchIcon
 import com.vonage.android.compose.icons.ShareIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.meetingroom.R
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
-import com.vonage.android.meetingroom.internal.screen.audio.AudioDevicesState
-import com.vonage.android.meetingroom.internal.screen.audio.toImageVector
 import com.vonage.android.meetingroom.internal.screen.components.TopBarTestTags.TOP_BAR_ARCHIVING_INDICATOR
 import com.vonage.android.meetingroom.internal.screen.components.TopBarTestTags.TOP_BAR_AUDIO_SELECTOR_ACTION
 import com.vonage.android.meetingroom.internal.screen.components.TopBarTestTags.TOP_BAR_CAMERA_SWITCH_ACTION
@@ -37,6 +36,7 @@ import com.vonage.android.meetingroom.internal.screen.components.TopBarTestTags.
 import com.vonage.android.meetingroom.internal.screen.components.TopBarTestTags.TOP_BAR_TITLE
 import com.vonage.android.meetingroom.internal.screen.components.TopBarTestTags.TOP_BAR_TRANSCRIPTION_INDICATOR
 import com.vonage.android.settings.ui.SettingsIcon
+import com.vonage.audioselector.AudioDevicesState
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 

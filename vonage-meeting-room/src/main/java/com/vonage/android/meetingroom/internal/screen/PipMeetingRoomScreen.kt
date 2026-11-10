@@ -17,7 +17,7 @@ import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.components.GenericLoading
 import com.vonage.android.meetingroom.R
 import com.vonage.android.meetingroom.internal.screen.components.ParticipantVideoCard
-import com.vonage.android.meetingroom.internal.util.pip.findActivity
+import com.vonage.android.compose.util.pip.findActivity
 
 @Suppress("LongMethod")
 @Composable

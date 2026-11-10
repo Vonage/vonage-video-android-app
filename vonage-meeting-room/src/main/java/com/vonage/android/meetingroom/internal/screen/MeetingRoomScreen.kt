@@ -42,6 +42,10 @@ import com.vonage.android.compose.components.GenericLoading
 import com.vonage.android.compose.components.VonageCheckbox
 import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
+import com.vonage.android.audiofx.R as AudioFxR
+import com.vonage.android.compose.components.audio.AudioDevicesMenu
+import com.vonage.android.fx.rememberNoiseSuppression
+import com.vonage.android.fx.ui.NoiseSuppressorToggle
 import com.vonage.android.fx.ui.VideoEffectsScreen
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.VideoEffect
@@ -55,7 +59,6 @@ import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_SCREEN_TAG
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_TRANSCRIPTION_SUMMARY_CHECKBOX
-import com.vonage.android.meetingroom.internal.screen.audio.AudioDevicesMenu
 import com.vonage.android.meetingroom.internal.screen.components.ArchiveNotificationOverlay
 import com.vonage.android.meetingroom.internal.screen.components.MeetingRoomContent
 import com.vonage.android.meetingroom.internal.screen.components.MeetingTopBar
@@ -65,7 +68,6 @@ import com.vonage.android.meetingroom.internal.screen.components.bottombar.Botto
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.ParticipantsList
 import com.vonage.android.meetingroom.internal.util.ext.isExtraPaneShow
 import com.vonage.android.meetingroom.internal.util.ext.toggleChat
-import com.vonage.android.meetingroom.internal.util.rememberNoiseSuppression
 import com.vonage.android.meetingroom.internal.viewmodel.DEFAULT_TRANSCRIPTION_SUMMARY
 import com.vonage.android.reactions.ui.EmojiReactionOverlay
 import com.vonage.android.screensharing.ScreenSharingState
@@ -388,13 +390,16 @@ internal fun MeetingRoomScreen(
                                     showAudioOutputs = false
                                 }
                             },
-                            noiseSuppressionEnabled = noiseSuppression.isEnabled(),
-                            onNoiseSuppressorToggle = {
-                                publisher?.toggleNoiseSuppression()
-                            },
-                            showNoiseSuppressionToggle = MeetingRoomFeature.AUDIO_EFFECTS in uiState.enabledFeatures,
-                            testSpeakerContent = testSpeakerContent ?: {},
-                        )
+                        ) {
+                            if (MeetingRoomFeature.AUDIO_EFFECTS in uiState.enabledFeatures) {
+                                NoiseSuppressorToggle(
+                                    title = stringResource(AudioFxR.string.advanced_noise_suppression),
+                                    isChecked = noiseSuppression.isEnabled(),
+                                    onCheckedChange = { publisher?.toggleNoiseSuppression() },
+                                )
+                            }
+                            testSpeakerContent?.invoke()
+                        }
                     }
                 }
             }
@@ -460,7 +465,6 @@ internal fun MeetingRoomScreen(
         BasicAlertDialog(
             text = stringResource(R.string.recording_confirm_dialog_message),
             acceptLabel = stringResource(R.string.recording_confirm_button),
-            cancelLabel = stringResource(R.string.generic_cancel),
             onAccept = {
                 showRecordingConfirmDialog = false
                 actions.onToggleRecording(true)
@@ -474,7 +478,6 @@ internal fun MeetingRoomScreen(
         BasicAlertDialog(
             text = stringResource(R.string.recording_stop_confirm_dialog_message),
             acceptLabel = stringResource(R.string.recording_stop_confirm_button),
-            cancelLabel = stringResource(R.string.generic_cancel),
             onAccept = {
                 showRecordingConfirmDialog = false
                 actions.onToggleRecording(false)
@@ -490,7 +493,6 @@ internal fun MeetingRoomScreen(
         BasicAlertDialog(
             text = stringResource(R.string.transcription_confirm_dialog_message),
             acceptLabel = stringResource(R.string.transcription_start_transcription),
-            cancelLabel = stringResource(R.string.generic_cancel),
             onAccept = {
                 showTranscriptionConfirmDialog = false
                 actions.onStartTranscription(includeTranscriptionSummary)
@@ -512,7 +514,6 @@ internal fun MeetingRoomScreen(
         BasicAlertDialog(
             text = stringResource(R.string.transcription_stop_confirm_dialog_message),
             acceptLabel = stringResource(R.string.transcription_stop_transcription),
-            cancelLabel = stringResource(R.string.generic_cancel),
             onAccept = {
                 showTranscriptionConfirmDialog = false
                 actions.onToggleTranscription(false)

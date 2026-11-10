@@ -19,7 +19,6 @@ import com.vonage.android.meetingroom.internal.data.MeetingRoomNetworkFactory
 import com.vonage.android.meetingroom.internal.factory.createVonageArchiving
 import com.vonage.android.meetingroom.internal.factory.createVonageCaptions
 import com.vonage.android.meetingroom.internal.factory.createVonageScreenSharing
-import com.vonage.android.meetingroom.internal.screen.audio.MeetingRoomAudioDevicesHandler
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler
 import com.vonage.android.meetingroom.internal.util.ActivityContextHolder
 import com.vonage.android.reactions.ReactionSignalPlugin
@@ -29,6 +28,7 @@ import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.shared.session.SessionApiService
 import com.vonage.android.shared.session.SessionRepository
 import com.vonage.audioselector.AudioDeviceSelector
+import com.vonage.audioselector.AudioDevicesHandler
 import com.vonage.audioselector.VeraAudioDevice
 import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
@@ -115,12 +115,12 @@ internal class MeetingRoomContainer(
         handler
     }
 
-    val audioDevicesHandler: MeetingRoomAudioDevicesHandler by lazy {
+    val audioDevicesHandler: AudioDevicesHandler by lazy {
         val audioDeviceSelector = AudioDeviceSelector(
             context = applicationContext,
             dispatcher = Dispatchers.Default,
         )
-        MeetingRoomAudioDevicesHandler(audioDeviceSelector)
+        AudioDevicesHandler(audioDeviceSelector)
     }
 
     val activityContextHolder: ActivityContextHolder by lazy {
