@@ -1,0 +1,29 @@
+vonage-feature-settings/src/main/java/com/vonage/android/settings/CaptionsTranslationLanguage.kt
+  s_871ce5511ede2b::t_392718721da651 1-26
+vonage-feature-settings/src/testEnabled/java/com/vonage/android/settings/CaptionsTranslationLanguageTest.kt
+  s_871ce5511ede2b::t_c6784b9d556cc7 1-27
+vonage-feature-settings/src/main/java/com/vonage/android/settings/SettingsUiState.kt
+  s_871ce5511ede2b::t_cd6d982d23db89 37-38
+vonage-feature-settings/src/enabled/java/com/vonage/android/settings/ui/SettingsScreen.kt
+  s_871ce5511ede2b::t_fdc47a39e1c2e7 384
+app/src/main/java/com/vonage/android/screen/settings/SettingsScreenViewModel.kt
+  s_871ce5511ede2b::t_6d074c024d6cb8 31
+vonage-feature-settings/src/enabled/java/com/vonage/android/settings/ui/components/CaptionsTranslationLanguageSelector.kt
+  s_871ce5511ede2b::t_bd2e79ea77e4d6 9,11,17,23-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0aabe721bb665fe9e7082fab7531779dd76f582d",
+  "prompts": {},
+  "sessions": {
+    "s_871ce5511ede2b": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_9547370a-23ad-4e4d-9289-ed49b1b755f6",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
