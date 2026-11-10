@@ -1,7 +1,6 @@
 package com.vonage.android.kotlin
 
 import app.cash.turbine.test
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.ParticipantState
 import com.vonage.android.kotlin.model.SessionEvent
@@ -360,34 +359,48 @@ class CallTest : CallTestBase() {
     // region Archiving
 
     @Test
-    fun `archiving started event should update archiving state flow`() = runTest(testDispatcher) {
+    fun `active archives should be empty initially`() = runTest(testDispatcher) {
+        val call = createCall()
+        assertEquals(emptyMap<String, String?>(), call.activeArchives.value)
+    }
+
+    @Test
+    fun `archive started should add the archive with its name`() = runTest(testDispatcher) {
         val call = createCall()
 
         call.connect(mockContext).test {
             capturedArchiveListener!!.onArchiveStarted("archive-1", "MyArchive")
 
-            assertEquals(ArchivingState.Started("archive-1"), call.archivingStateFlow.value)
+            assertEquals(mapOf("archive-1" to "MyArchive"), call.activeArchives.value)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `archiving stopped event should update archiving state flow`() = runTest(testDispatcher) {
+    fun `archive stopped should remove only that archive`() = runTest(testDispatcher) {
+        val call = createCall()
+
+        call.connect(mockContext).test {
+            capturedArchiveListener!!.onArchiveStarted("recording-id", "recording")
+            capturedArchiveListener!!.onArchiveStarted("transcription-id", "transcription")
+            capturedArchiveListener!!.onArchiveStopped("recording-id")
+
+            assertEquals(mapOf("transcription-id" to "transcription"), call.activeArchives.value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `archive stopped of an unknown archive should keep the active archives`() = runTest(testDispatcher) {
         val call = createCall()
 
         call.connect(mockContext).test {
             capturedArchiveListener!!.onArchiveStarted("archive-1", null)
-            capturedArchiveListener!!.onArchiveStopped("archive-1")
+            capturedArchiveListener!!.onArchiveStopped("unknown")
 
-            assertEquals(ArchivingState.Stopped("archive-1"), call.archivingStateFlow.value)
+            assertEquals(mapOf("archive-1" to null), call.activeArchives.value)
             cancelAndIgnoreRemainingEvents()
         }
-    }
-
-    @Test
-    fun `archiving state should be Idle initially`() = runTest(testDispatcher) {
-        val call = createCall()
-        assertEquals(ArchivingState.Idle, call.archivingStateFlow.value)
     }
 
     // endregion

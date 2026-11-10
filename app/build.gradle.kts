@@ -69,10 +69,20 @@ android {
         buildConfigField("boolean", "FEATURE_REACTIONS_ENABLED", "$reactionsProperty")
         missingDimensionStrategy("reactions", reactionsProperty.toEnabledString())
 
-        // Archiving/recording feature
+        // Archiving/recording feature. Post-call transcription starts/stops archives through the
+        // same module, so it is compiled in when either feature is on; the record and transcription
+        // buttons are then gated at runtime by their own MeetingRoomFeature.
         val archivingProperty = configProps.getProperty("vonage.meetingRoom.allow_archiving", "true")
+        val postCallTranscriptionProperty =
+            configProps.getProperty("vonage.meetingRoom.allow_post_call_transcription", "false")
+        val archivingFlavorProperty =
+            (archivingProperty.toBoolean() || postCallTranscriptionProperty.toBoolean()).toString()
         buildConfigField("boolean", "FEATURE_ARCHIVING_ENABLED", "$archivingProperty")
-        missingDimensionStrategy("archiving", archivingProperty.toEnabledString(), archivingProperty.toModuleFlavorString("archiving"))
+        missingDimensionStrategy(
+            "archiving",
+            archivingFlavorProperty.toEnabledString(),
+            archivingFlavorProperty.toModuleFlavorString("archiving"),
+        )
 
         // Captions feature
         val captionsProperty = configProps.getProperty("vonage.meetingRoom.allow_captions", "true")
@@ -87,12 +97,6 @@ android {
             screenSharingProperty.toEnabledString(),
             screenSharingProperty.toModuleFlavorString("screensharing"),
         )
-
-        // Post-call transcription feature — disabled by default
-        val postCallTranscriptionProperty =
-            configProps.getProperty("vonage.meetingRoom.allow_post_call_transcription", "false")
-        buildConfigField("boolean", "FEATURE_POST_CALL_TRANSCRIPTION_ENABLED", "$postCallTranscriptionProperty")
-        missingDimensionStrategy("postcalltranscription", postCallTranscriptionProperty.toEnabledString())
 
         // Background (video) effects feature
         val videoFxProperty = configProps.getProperty("vonage.video.allow_background_effects", "true")
@@ -267,7 +271,6 @@ dependencies {
     implementation(project(":vonage-feature-captions"))
     implementation(project(":vonage-feature-okta"))
     implementation(project(":vonage-feature-settings"))
-    implementation(project(":vonage-feature-post-call-transcription"))
     implementation(project(":vonage-audio-selector"))
     implementation(project(":vonage-android-logger"))
     implementation(libs.androidx.core.ktx)

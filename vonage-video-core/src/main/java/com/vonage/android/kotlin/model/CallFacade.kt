@@ -74,8 +74,11 @@ interface CallFacade : SessionFacade, PublisherFacade, ChatFacade, EmojiFacade, 
     /** StateFlow of caption lines from remote participants */
     val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>>
 
-    /** StateFlow of archiving of the session */
-    val archivingStateFlow: StateFlow<ArchivingState>
+    /**
+     * Archives currently running in the session, by archive id; the value is the archive name
+     * (`null` when unnamed). Several archives can run at once, e.g. a recording and a transcription.
+     */
+    val activeArchives: StateFlow<Map<String, String?>>
 }
 
 /**
@@ -143,12 +146,6 @@ data class ChatState(
 data class EmojiState(
     val reactions: ImmutableList<EmojiReaction> = persistentListOf(),
 ) : SignalStateContent
-
-sealed interface ArchivingState {
-    data object Idle : ArchivingState
-    data class Started(val id: String) : ArchivingState
-    data class Stopped(val id: String) : ArchivingState
-}
 
 @Immutable
 data class CaptionLine(

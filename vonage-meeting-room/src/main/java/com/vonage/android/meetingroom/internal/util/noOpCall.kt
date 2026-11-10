@@ -2,7 +2,6 @@ package com.vonage.android.meetingroom.internal.util
 
 import android.content.Context
 import android.media.projection.MediaProjection
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.CaptionLine
 import com.vonage.android.kotlin.model.ChatState
@@ -31,7 +30,7 @@ internal val noOpCall = object : CallFacade {
     override fun togglePinParticipant(participantId: String) {}
     override fun forceMuteParticipant(participantId: String) {}
     override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = MutableStateFlow(persistentListOf())
-    override val archivingStateFlow: StateFlow<ArchivingState> = MutableStateFlow(ArchivingState.Idle)
+    override val activeArchives: StateFlow<Map<String, String?>> = MutableStateFlow(emptyMap())
     override val chatSignalState: StateFlow<ChatState?> = MutableStateFlow(null)
     override val emojiSignalState: StateFlow<EmojiState?> = MutableStateFlow(null)
     override fun connect(context: Context): Flow<SessionEvent> = flowOf()

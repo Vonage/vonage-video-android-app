@@ -4,6 +4,37 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Body for `POST /v2/startArchive`.
+ *
+ * [withTranscription] asks the backend for a transcription archive instead of a recording; it
+ * applies the matching archive options (output mode, `multiArchiveTag`). [archiveOptions] are
+ * merged over those defaults. Defaults are not encoded, so a recording request only carries the
+ * session key.
+ */
+@Serializable
+data class StartArchiveRequest(
+    @SerialName("sessionKey")
+    val sessionKey: String,
+    @SerialName("withTranscription")
+    val withTranscription: Boolean = false,
+    @SerialName("archiveOptions")
+    val archiveOptions: StartArchiveOptions? = null,
+)
+
+@Serializable
+data class StartArchiveOptions(
+    @SerialName("transcriptionProperties")
+    val transcriptionProperties: TranscriptionProperties,
+)
+
+/** [hasSummary] adds an AI-generated summary to the transcript. */
+@Serializable
+data class TranscriptionProperties(
+    @SerialName("hasSummary")
+    val hasSummary: Boolean,
+)
+
+/**
  * Body for `POST /v2/stopArchive`.
  *
  * [archiveId] is optional: when omitted the backend stops the archive it has stored for the session.
@@ -55,4 +86,19 @@ data class ServerArchive(
     val status: String,
     @SerialName("createdAt")
     val createdAt: Long,
+    /** `true` for a post-call transcription archive; its transcript is described by [transcription]. */
+    @SerialName("hasTranscription")
+    val hasTranscription: Boolean = false,
+    /** Absent until the backend starts generating the transcript. */
+    @SerialName("transcription")
+    val transcription: ServerTranscription? = null,
+)
+
+/** Transcript of a transcription archive; [url] is the transcript download (`transcription.zip`). */
+@Serializable
+data class ServerTranscription(
+    @SerialName("status")
+    val status: String,
+    @SerialName("url")
+    val url: String? = null,
 )

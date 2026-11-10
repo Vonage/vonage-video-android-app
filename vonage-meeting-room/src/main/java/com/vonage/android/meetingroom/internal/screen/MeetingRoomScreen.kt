@@ -39,6 +39,7 @@ import com.vonage.android.captions.ui.CaptionsOverlay
 import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.components.GenericLoading
+import com.vonage.android.compose.components.VonageCheckbox
 import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.fx.ui.VideoEffectsScreen
@@ -53,10 +54,11 @@ import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_CONTENT
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_SCREEN_TAG
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_TOP_BAR
+import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreenTestTags.MEETING_ROOM_TRANSCRIPTION_SUMMARY_CHECKBOX
 import com.vonage.android.meetingroom.internal.screen.audio.AudioDevicesMenu
+import com.vonage.android.meetingroom.internal.screen.components.ArchiveNotificationOverlay
 import com.vonage.android.meetingroom.internal.screen.components.MeetingRoomContent
 import com.vonage.android.meetingroom.internal.screen.components.MeetingTopBar
-import com.vonage.android.meetingroom.internal.screen.components.RecordingStartedOverlay
 import com.vonage.android.meetingroom.internal.screen.components.SpeakingWhileMutedOverlay
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBar
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarState
@@ -64,6 +66,7 @@ import com.vonage.android.meetingroom.internal.screen.components.bottombar.Parti
 import com.vonage.android.meetingroom.internal.util.ext.isExtraPaneShow
 import com.vonage.android.meetingroom.internal.util.ext.toggleChat
 import com.vonage.android.meetingroom.internal.util.rememberNoiseSuppression
+import com.vonage.android.meetingroom.internal.viewmodel.DEFAULT_TRANSCRIPTION_SUMMARY
 import com.vonage.android.reactions.ui.EmojiReactionOverlay
 import com.vonage.android.screensharing.ScreenSharingState
 import kotlinx.collections.immutable.ImmutableList
@@ -85,6 +88,7 @@ private fun enabledBottomBarActions(
     when (actionType) {
         BottomBarActionType.CHAT -> MeetingRoomFeature.CHAT in enabledFeatures
         BottomBarActionType.RECORD_SESSION -> MeetingRoomFeature.ARCHIVING in enabledFeatures
+        BottomBarActionType.POST_CALL_TRANSCRIPTION -> MeetingRoomFeature.POST_CALL_TRANSCRIPTION in enabledFeatures
         BottomBarActionType.CAPTIONS -> MeetingRoomFeature.CAPTIONS in enabledFeatures
         BottomBarActionType.SCREEN_SHARING -> MeetingRoomFeature.SCREEN_SHARE in enabledFeatures
         // CUSTOM is never in the action type list — it is injected via additionalActions
@@ -111,7 +115,12 @@ internal fun MeetingRoomScreen(
     var showAudioOutputs by remember { mutableStateOf(false) }
     val audioOutputsSheetState = rememberModalBottomSheetState()
 
-    var showRecordingConfirmDialog by remember { mutableStateOf(false) }
+    // Keyed to the archive state so a remote state change (another participant starting or
+    // stopping the archive while this dialog is open) dismisses the pending confirmation instead
+    // of silently flipping it to confirm the opposite operation.
+    var showRecordingConfirmDialog by remember(uiState.archivingUiState) { mutableStateOf(false) }
+    var showTranscriptionConfirmDialog by remember(uiState.transcriptionUiState) { mutableStateOf(false) }
+    var includeTranscriptionSummary by remember { mutableStateOf(DEFAULT_TRANSCRIPTION_SUMMARY) }
 
     var showVideoEffects by remember { mutableStateOf(false) }
     var selectedEffect by remember { mutableStateOf<VideoEffect>(VideoEffect.None) }
@@ -183,6 +192,7 @@ internal fun MeetingRoomScreen(
                     isScreenSharingActive = uiState.screenSharingState == ScreenSharingState.SHARING,
                     isRecordingActive = uiState.archivingUiState == ArchivingUiState.RECORDING,
                     isCaptionsActive = uiState.captionsUiState == CaptionsUiState.ENABLED,
+                    isTranscriptionActive = uiState.transcriptionUiState == ArchivingUiState.RECORDING,
                 )
             }
 
@@ -207,18 +217,24 @@ internal fun MeetingRoomScreen(
                 }
             }
 
-            // Wrap actions to show confirmation dialog before starting recording
-            val wrappedActions = remember(actions, uiState.archivingUiState) {
+            // Wrap actions to show confirmation dialog before starting/stopping recording or transcription
+            val wrappedActions = remember(actions, uiState.archivingUiState, uiState.transcriptionUiState) {
                 actions.copy(
+                    // Only a valid IDLE->start or RECORDING->stop transition opens a dialog.
+                    // Any other call (in-flight STARTING/STOPPING, or a toggle that matches the
+                    // current state already) is ignored instead of forwarded, so a custom bottom
+                    // bar re-dispatching a toggle mid-request cannot submit a second, unconfirmed
+                    // start/stop.
                     onToggleRecording = { enable ->
-                        if (enable && uiState.archivingUiState == ArchivingUiState.IDLE) {
+                        if (uiState.archivingUiState.needsConfirmation(enable)) {
                             showRecordingConfirmDialog = true
-                        } else if (!enable && uiState.archivingUiState == ArchivingUiState.RECORDING) {
-                            showRecordingConfirmDialog = true
-                        } else {
-                            actions.onToggleRecording(enable)
                         }
-                    }
+                    },
+                    onToggleTranscription = { enable ->
+                        if (uiState.transcriptionUiState.needsConfirmation(enable)) {
+                            showTranscriptionConfirmDialog = true
+                        }
+                    },
                 )
             }
 
@@ -242,6 +258,7 @@ internal fun MeetingRoomScreen(
                             modifier = Modifier.testTag(MEETING_ROOM_TOP_BAR),
                             roomName = uiState.roomName,
                             archivingUiState = uiState.archivingUiState,
+                            transcriptionUiState = uiState.transcriptionUiState,
                             actions = actions,
                             allowSettings = uiState.allowSettings,
                             allowCameraControl = uiState.allowCameraControl,
@@ -274,6 +291,7 @@ internal fun MeetingRoomScreen(
                                     onToggleRecording = wrappedActions.onToggleRecording,
                                     onToggleCaptions = wrappedActions.onToggleCaptions,
                                     onToggleScreenSharing = wrappedActions.onToggleScreenSharing,
+                                    onToggleTranscription = wrappedActions.onToggleTranscription,
                                 )
                             }
                             customBottomBar(bottomBarState, customActions)
@@ -292,6 +310,7 @@ internal fun MeetingRoomScreen(
                                     publisher = publisher,
                                     layoutType = uiState.layoutType,
                                     archivingUiState = uiState.archivingUiState,
+                                    transcriptionUiState = uiState.transcriptionUiState,
                                     screenSharingState = uiState.screenSharingState,
                                     captionsUiState = uiState.captionsUiState,
                                     allowShowParticipantList = uiState.allowShowParticipantList,
@@ -326,7 +345,10 @@ internal fun MeetingRoomScreen(
                             EmojiReactionOverlay(call = call)
                             CaptionsOverlay(captionLines = captionLines)
                             SpeakingWhileMutedOverlay(publisher = publisher)
-                            RecordingStartedOverlay(isRecordingStartedByOthers = uiState.recordingStartedByOthers)
+                            ArchiveNotificationOverlay(
+                                isRecordingStartedByOthers = uiState.recordingStartedByOthers,
+                                transcriptionNotification = uiState.transcriptionNotification,
+                            )
                             // MeetingRoomContent is always visible — the effects sheet is a
                             // ModalBottomSheet that overlays it without disturbing the publisher.
                             MeetingRoomContent(
@@ -462,7 +484,49 @@ internal fun MeetingRoomScreen(
             }
         )
     }
+
+    // Transcription confirmation dialogs
+    if (showTranscriptionConfirmDialog && uiState.transcriptionUiState == ArchivingUiState.IDLE) {
+        BasicAlertDialog(
+            text = stringResource(R.string.transcription_confirm_dialog_message),
+            acceptLabel = stringResource(R.string.transcription_start_transcription),
+            cancelLabel = stringResource(R.string.generic_cancel),
+            onAccept = {
+                showTranscriptionConfirmDialog = false
+                actions.onStartTranscription(includeTranscriptionSummary)
+            },
+            onCancel = {
+                showTranscriptionConfirmDialog = false
+            },
+            content = {
+                VonageCheckbox(
+                    modifier = Modifier.testTag(MEETING_ROOM_TRANSCRIPTION_SUMMARY_CHECKBOX),
+                    label = stringResource(R.string.transcription_include_summary),
+                    checked = includeTranscriptionSummary,
+                    onCheckedChange = { includeTranscriptionSummary = it },
+                )
+            },
+        )
+    }
+    if (showTranscriptionConfirmDialog && uiState.transcriptionUiState == ArchivingUiState.RECORDING) {
+        BasicAlertDialog(
+            text = stringResource(R.string.transcription_stop_confirm_dialog_message),
+            acceptLabel = stringResource(R.string.transcription_stop_transcription),
+            cancelLabel = stringResource(R.string.generic_cancel),
+            onAccept = {
+                showTranscriptionConfirmDialog = false
+                actions.onToggleTranscription(false)
+            },
+            onCancel = {
+                showTranscriptionConfirmDialog = false
+            }
+        )
+    }
 }
+
+/** Starting from idle and stopping an active archive are both confirmed; in-flight toggles are not. */
+private fun ArchivingUiState.needsConfirmation(enable: Boolean): Boolean =
+    (enable && this == ArchivingUiState.IDLE) || (!enable && this == ArchivingUiState.RECORDING)
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -494,4 +558,5 @@ internal object MeetingRoomScreenTestTags {
     const val MEETING_ROOM_CONTENT = "meeting-room-content"
     const val MEETING_ROOM_BOTTOM_BAR = "meeting-room-bottom-bar"
     const val MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON = "meeting-room-publisher-effects-button"
+    const val MEETING_ROOM_TRANSCRIPTION_SUMMARY_CHECKBOX = "meeting-room-transcription-summary-checkbox"
 }

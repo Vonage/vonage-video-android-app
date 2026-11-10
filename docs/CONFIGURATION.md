@@ -56,7 +56,7 @@ and setting them has no effect on Android.
 | `meetingRoomSettings.allowEmojis` | Emoji reactions |
 | `meetingRoomSettings.allowFeedback` | "Report an issue" control |
 | `meetingRoomSettings.allowPictureInPicture` | Enter picture-in-picture when leaving the app mid-call |
-| `meetingRoomSettings.allowPostCallTranscription` | Post-call transcriptions (`vonage-feature-post-call-transcription`, default `false`). Scaffold only: the module is compiled in/out, but no backend endpoint or UI consumes it yet. |
+| `meetingRoomSettings.allowPostCallTranscription` | Start/Stop transcription button in the meeting room (`true` in the checked-in `app-config.json`; the key must be present — omitting it fails compilation, there is no safe default for a missing key). Starts a transcription archive that runs alongside any recording, so it also compiles in the archiving module even when `allowArchiving` is `false`. |
 | `meetingRoomSettings.allowScreenShare` | Screen sharing |
 | `meetingRoomSettings.defaultLayoutMode` | Layout on entering the room: `grid` or `activespeaker` |
 | `meetingRoomSettings.showParticipantList` | Participant list button |

@@ -2,7 +2,6 @@ package com.vonage.android.archiving
 
 import app.cash.turbine.test
 import com.vonage.android.archiving.data.ArchiveRepository
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -19,59 +18,48 @@ class EnabledVonageArchivingTest {
 
     private val archiveRepository: ArchiveRepository = mockk()
     private val callFacade: CallFacade = mockk()
-    private val callArchivingStateFlow = MutableStateFlow<ArchivingState>(ArchivingState.Idle)
+    private val activeArchives = MutableStateFlow<Map<String, String?>>(emptyMap())
     
     private lateinit var sut: EnabledVonageArchiving
 
     @BeforeEach
     fun setup() {
-        every { callFacade.archivingStateFlow } returns callArchivingStateFlow
+        every { callFacade.activeArchives } returns activeArchives
         sut = EnabledVonageArchiving(archiveRepository)
     }
 
     @Test
-    fun `bind should emit idle state initially`() = runTest {
+    fun `bind should emit no archives initially`() = runTest {
         sut.bind(callFacade).test {
-            callArchivingStateFlow.value = ArchivingState.Idle
-            assertEquals(ArchivingState.Idle, awaitItem())
+            assertEquals(emptyMap<ArchiveType, ArchiveId>(), awaitItem())
         }
     }
 
     @Test
-    fun `bind should emit started state and update currentArchiveId`() = runTest {
+    fun `bind should emit running archives by type`() = runTest {
         sut.bind(callFacade).test {
             awaitItem()
-            val startedState = ArchivingState.Started("test-archive-id")
-            callArchivingStateFlow.value = startedState
-            
-            val emittedState = awaitItem()
-            assertEquals(startedState, emittedState)
+            activeArchives.value = mapOf("recording-id" to "recording", "transcription-id" to "transcription")
+
+            assertEquals(
+                mapOf(
+                    ArchiveType.RECORDING to ArchiveId("recording-id"),
+                    ArchiveType.TRANSCRIPTION to ArchiveId("transcription-id"),
+                ),
+                awaitItem(),
+            )
         }
     }
 
     @Test
-    fun `bind should emit stopped state and clear currentArchiveId`() = runTest {
+    fun `bind should treat unnamed archives as recordings`() = runTest {
         sut.bind(callFacade).test {
             awaitItem()
-            callArchivingStateFlow.value = ArchivingState.Started("test-archive-id")
-            awaitItem()
+            activeArchives.value = mapOf("archive-123" to null)
+            assertEquals(mapOf(ArchiveType.RECORDING to ArchiveId("archive-123")), awaitItem())
 
-            callArchivingStateFlow.value = ArchivingState.Stopped("test-archive-id")
-            assertEquals(ArchivingState.Stopped("test-archive-id"), awaitItem())
-        }
-    }
-
-    @Test
-    fun `bind should handle state transitions from idle to started to stopped`() = runTest {
-        sut.bind(callFacade).test {
-            callArchivingStateFlow.value = ArchivingState.Idle
-            assertEquals(ArchivingState.Idle, awaitItem())
-
-            callArchivingStateFlow.value = ArchivingState.Started("archive-123")
-            assertEquals(ArchivingState.Started("archive-123"), awaitItem())
-
-            callArchivingStateFlow.value = ArchivingState.Stopped("archive-123")
-            assertEquals(ArchivingState.Stopped("archive-123"), awaitItem())
+            activeArchives.value = emptyMap()
+            assertEquals(emptyMap<ArchiveType, ArchiveId>(), awaitItem())
         }
     }
 
@@ -129,7 +117,7 @@ class EnabledVonageArchivingTest {
 
         sut.bind(callFacade).test {
             awaitItem()
-            callArchivingStateFlow.value = ArchivingState.Started("remote-id")
+            activeArchives.value = mapOf("remote-id" to "recording")
             awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
@@ -137,6 +125,24 @@ class EnabledVonageArchivingTest {
 
         assertTrue(result.isSuccess)
         coVerify { archiveRepository.stopArchive("test-session-key", ArchiveId("remote-id")) }
+    }
+
+    @Test
+    fun `stopArchive prefers the recording id reported by the session`() = runTest {
+        coEvery { archiveRepository.startArchive("test-session-key") } returns Result.success(ArchiveId("local-id"))
+        coEvery { archiveRepository.stopArchive("test-session-key", ArchiveId("rotated-id")) } returns
+            Result.success(true)
+        sut.startArchive("test-session-key")
+
+        sut.bind(callFacade).test {
+            awaitItem()
+            activeArchives.value = mapOf("rotated-id" to "recording")
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertTrue(sut.stopArchive("test-session-key").isSuccess)
+        coVerify { archiveRepository.stopArchive("test-session-key", ArchiveId("rotated-id")) }
     }
 
     @Test
@@ -209,7 +215,7 @@ class EnabledVonageArchivingTest {
     }
 
     @Test
-    fun `multiple startArchive calls should update currentArchiveId`() = runTest {
+    fun `multiple startArchive calls should return each archive id`() = runTest {
         val archiveId1 = ArchiveId("archive-1")
         val archiveId2 = ArchiveId("archive-2")
         
@@ -232,13 +238,129 @@ class EnabledVonageArchivingTest {
         
         sut.bind(callFacade).test {
             awaitItem()
-            callArchivingStateFlow.value = ArchivingState.Started(archiveIdFromBind)
-            assertEquals(ArchivingState.Started(archiveIdFromBind), awaitItem())
+            activeArchives.value = mapOf(archiveIdFromBind to null)
+            assertEquals(mapOf(ArchiveType.RECORDING to ArchiveId(archiveIdFromBind)), awaitItem())
             
             val result = sut.startArchive("test-session-key")
             assertEquals(archiveIdFromStart, result.getOrNull())
             
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    // region Transcription
+
+    @Test
+    fun `startArchive transcription requests archive with transcription`() = runTest {
+        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = true) } returns
+            Result.success(ArchiveId("transcription-id"))
+
+        val result = sut.startArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION)
+
+        assertEquals(ArchiveId("transcription-id"), result.getOrNull())
+        coVerify { archiveRepository.startArchive(SESSION_KEY, withTranscription = true) }
+    }
+
+    @Test
+    fun `startArchive transcription forwards the summary choice`() = runTest {
+        coEvery {
+            archiveRepository.startArchive(SESSION_KEY, withTranscription = true, withSummary = true)
+        } returns Result.success(ArchiveId("transcription-id"))
+
+        sut.startArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION, withSummary = true)
+
+        coVerify { archiveRepository.startArchive(SESSION_KEY, withTranscription = true, withSummary = true) }
+    }
+
+    @Test
+    fun `stopArchive of each type sends its own archive id while both run`() = runTest {
+        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = false) } returns
+            Result.success(ArchiveId("recording-id"))
+        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = true) } returns
+            Result.success(ArchiveId("transcription-id"))
+        coEvery { archiveRepository.stopArchive(SESSION_KEY, any()) } returns Result.success(true)
+
+        sut.startArchive(SESSION_KEY, ArchiveType.RECORDING)
+        sut.startArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION)
+
+        assertTrue(sut.stopArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION).isSuccess)
+        coVerify { archiveRepository.stopArchive(SESSION_KEY, ArchiveId("transcription-id")) }
+
+        assertTrue(sut.stopArchive(SESSION_KEY, ArchiveType.RECORDING).isSuccess)
+        coVerify { archiveRepository.stopArchive(SESSION_KEY, ArchiveId("recording-id")) }
+    }
+
+    @Test
+    fun `stopArchive transcription without tracked archive id fails without calling backend`() = runTest {
+        val result = sut.stopArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION)
+
+        assertTrue(result.isFailure)
+        coVerify(exactly = 0) { archiveRepository.stopArchive(any(), any()) }
+    }
+
+    @Test
+    fun `bind tracks archive ids by name and a stopped transcription keeps the recording id`() = runTest {
+        coEvery { archiveRepository.stopArchive(SESSION_KEY, any()) } returns Result.success(true)
+
+        sut.bind(callFacade).test {
+            awaitItem()
+            activeArchives.value = mapOf("recording-id" to "recording", "transcription-id" to "transcription")
+            awaitItem()
+            activeArchives.value = mapOf("recording-id" to "recording")
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertTrue(sut.stopArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION).isFailure)
+        assertTrue(sut.stopArchive(SESSION_KEY, ArchiveType.RECORDING).isSuccess)
+        coVerify { archiveRepository.stopArchive(SESSION_KEY, ArchiveId("recording-id")) }
+    }
+
+    @Test
+    fun `stopArchive transcription sends archive id tracked from bind`() = runTest {
+        coEvery { archiveRepository.stopArchive(SESSION_KEY, ArchiveId("remote-transcription-id")) } returns
+            Result.success(true)
+
+        sut.bind(callFacade).test {
+            awaitItem()
+            activeArchives.value = mapOf("remote-transcription-id" to "transcription")
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertTrue(sut.stopArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION).isSuccess)
+        coVerify { archiveRepository.stopArchive(SESSION_KEY, ArchiveId("remote-transcription-id")) }
+    }
+
+    @Test
+    fun `locally started transcription is kept while the session only reports the recording`() = runTest {
+        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = true) } returns
+            Result.success(ArchiveId("transcription-id"))
+        coEvery { archiveRepository.stopArchive(SESSION_KEY, ArchiveId("transcription-id")) } returns
+            Result.success(true)
+        sut.startArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION)
+
+        sut.bind(callFacade).test {
+            awaitItem()
+            activeArchives.value = mapOf("recording-id" to "recording")
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertTrue(sut.stopArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION).isSuccess)
+        coVerify { archiveRepository.stopArchive(SESSION_KEY, ArchiveId("transcription-id")) }
+    }
+
+    @Test
+    fun `archive type is resolved from the archive name`() {
+        assertEquals(ArchiveType.TRANSCRIPTION, ArchiveType.fromArchiveName("transcription"))
+        assertEquals(ArchiveType.RECORDING, ArchiveType.fromArchiveName("recording"))
+        assertEquals(ArchiveType.RECORDING, ArchiveType.fromArchiveName(null))
+    }
+
+    // endregion
+
+    private companion object {
+        const val SESSION_KEY = "test-session-key"
     }
 }

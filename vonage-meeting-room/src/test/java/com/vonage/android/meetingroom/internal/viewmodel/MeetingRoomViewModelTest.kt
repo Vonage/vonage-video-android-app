@@ -3,12 +3,13 @@ package com.vonage.android.meetingroom.internal.viewmodel
 import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
+import com.vonage.android.archiving.ArchiveId
+import com.vonage.android.archiving.ArchiveType
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.captions.CaptionsUiState
 import com.vonage.android.captions.VonageCaptions
 import com.vonage.android.kotlin.VonageVideoClient
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
@@ -386,7 +387,7 @@ class MeetingRoomViewModelTest {
     fun `given viewmodel when archiveCall true then emit correct state`() = runTest {
         givenMockCall()
         coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY) } returns success(
-            com.vonage.android.archiving.ArchiveId("archiveId"),
+            ArchiveId("archiveId"),
         )
 
         sut.uiState.test {
@@ -407,7 +408,7 @@ class MeetingRoomViewModelTest {
     fun `given viewmodel when archiveCall false then emit correct state`() = runTest {
         givenMockCall()
         coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY) } returns success(
-            com.vonage.android.archiving.ArchiveId("archiveId"),
+            ArchiveId("archiveId"),
         )
         coEvery { vonageArchiving.stopArchive(ANY_SESSION_KEY) } returns success(true)
 
@@ -433,8 +434,8 @@ class MeetingRoomViewModelTest {
     @Test
     fun `given viewmodel when other participant starts archiving then emit correct state`() = runTest {
         val mockCall = givenMockCall()
-        val archivingStateFlow = MutableSharedFlow<ArchivingState>()
-        every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+        val runningArchives = MutableSharedFlow<Map<ArchiveType, ArchiveId>>()
+        every { vonageArchiving.bind(mockCall) } returns runningArchives
 
         sut.uiState.test {
             awaitItem()
@@ -443,7 +444,7 @@ class MeetingRoomViewModelTest {
             awaitItem() // audio devices
             assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState) // connected
 
-            archivingStateFlow.emit(ArchivingState.Started("any-archiving-id"))
+            runningArchives.emit(mapOf(ArchiveType.RECORDING to ArchiveId("any-archiving-id")))
             assertEquals(ArchivingUiState.RECORDING, awaitItem().archivingUiState)
         }
     }
@@ -451,8 +452,8 @@ class MeetingRoomViewModelTest {
     @Test
     fun `given viewmodel when other participant stops archiving then emit correct state`() = runTest {
         val mockCall = givenMockCall()
-        val archivingStateFlow = MutableSharedFlow<ArchivingState>()
-        every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+        val runningArchives = MutableSharedFlow<Map<ArchiveType, ArchiveId>>()
+        every { vonageArchiving.bind(mockCall) } returns runningArchives
 
         sut.uiState.test {
             awaitItem()
@@ -461,10 +462,10 @@ class MeetingRoomViewModelTest {
             awaitItem() // audio devices
             assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState) // connected
 
-            archivingStateFlow.emit(ArchivingState.Started("any-archiving-id"))
+            runningArchives.emit(mapOf(ArchiveType.RECORDING to ArchiveId("any-archiving-id")))
             assertEquals(ArchivingUiState.RECORDING, awaitItem().archivingUiState)
 
-            archivingStateFlow.emit(ArchivingState.Stopped("any-archiving-id"))
+            runningArchives.emit(emptyMap())
             assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState)
         }
     }
@@ -472,10 +473,10 @@ class MeetingRoomViewModelTest {
     @Test
     fun `given local user starts recording then recordingStartedByOthers is false`() = runTest {
         val mockCall = givenMockCall()
-        val archivingStateFlow = MutableSharedFlow<ArchivingState>()
-        every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+        val runningArchives = MutableSharedFlow<Map<ArchiveType, ArchiveId>>()
+        every { vonageArchiving.bind(mockCall) } returns runningArchives
         coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY) } returns success(
-            com.vonage.android.archiving.ArchiveId("archiveId"),
+            ArchiveId("archiveId"),
         )
 
         sut.uiState.test {
@@ -490,7 +491,7 @@ class MeetingRoomViewModelTest {
             assertEquals(ArchivingUiState.RECORDING, awaitItem().archivingUiState)
 
             // Emit the Started event (may not emit a new uiState item if we're already RECORDING)
-            archivingStateFlow.emit(ArchivingState.Started("archiveId"))
+            runningArchives.emit(mapOf(ArchiveType.RECORDING to ArchiveId("archiveId")))
             testScheduler.advanceUntilIdle()
 
             assertEquals(ArchivingUiState.RECORDING, sut.uiState.value.archivingUiState)
@@ -500,8 +501,8 @@ class MeetingRoomViewModelTest {
     @Test
     fun `given remote participant starts recording then recordingStartedByOthers is true`() = runTest {
         val mockCall = givenMockCall()
-        val archivingStateFlow = MutableSharedFlow<ArchivingState>()
-        every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+        val runningArchives = MutableSharedFlow<Map<ArchiveType, ArchiveId>>()
+        every { vonageArchiving.bind(mockCall) } returns runningArchives
 
         sut.uiState.test {
             awaitItem()
@@ -511,7 +512,7 @@ class MeetingRoomViewModelTest {
             awaitItem() // connected
 
             // Remote participant starts recording (without local archiveCall)
-            archivingStateFlow.emit(ArchivingState.Started("remote-archive-id"))
+            runningArchives.emit(mapOf(ArchiveType.RECORDING to ArchiveId("remote-archive-id")))
 
             val recordingState = awaitItem()
             assertEquals(ArchivingUiState.RECORDING, recordingState.archivingUiState)

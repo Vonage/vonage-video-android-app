@@ -108,11 +108,13 @@ class AudioDeviceSelector {
      * Represents an audio output device.
      * @param id Unique device identifier
      * @param type The type of audio device
+     * @param name Human-readable device name (e.g. the paired Bluetooth device name), when known
      */
     @Stable
     data class AudioDevice(
         val id: Int,
         val type: AudioDeviceType,
+        val name: String? = null,
     )
 
     /**

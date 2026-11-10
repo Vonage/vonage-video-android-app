@@ -13,3 +13,13 @@ fun recordingAction(
     stopRecordingLabel: String,
     archivingUiState: ArchivingUiState,
 ): BottomBarAction? = null
+
+@Suppress("UnusedParameter", "FunctionOnlyReturningConstant")
+@Composable
+fun transcriptionAction(
+    onStartTranscription: () -> Unit,
+    onStopTranscription: () -> Unit,
+    startTranscriptionLabel: String,
+    stopTranscriptionLabel: String,
+    transcriptionUiState: ArchivingUiState,
+): BottomBarAction? = null

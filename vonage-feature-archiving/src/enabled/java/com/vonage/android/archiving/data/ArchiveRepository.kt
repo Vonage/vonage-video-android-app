@@ -3,6 +3,7 @@ package com.vonage.android.archiving.data
 import com.vonage.android.archiving.Archive
 import com.vonage.android.archiving.ArchiveId
 import com.vonage.android.archiving.ArchiveStatus
+import com.vonage.android.archiving.ArchiveType
 import com.vonage.android.shared.network.SessionKeyRequest
 import com.vonage.logger.vonageLogger
 
@@ -37,9 +38,26 @@ class ArchiveRepository(
             vonageLogger.e(TAG, "getRecordings: exception", it)
         }
 
-    suspend fun startArchive(sessionKey: String): Result<ArchiveId> =
+    /**
+     * Starts an archive. A transcription ([withTranscription]) always sends [withSummary]
+     * explicitly, so the backend's own summary default never applies.
+     */
+    suspend fun startArchive(
+        sessionKey: String,
+        withTranscription: Boolean = false,
+        withSummary: Boolean = false,
+    ): Result<ArchiveId> =
         runCatching {
-            val response = archivingApi.startArchiving(SessionKeyRequest(sessionKey))
+            val request = StartArchiveRequest(
+                sessionKey = sessionKey,
+                withTranscription = withTranscription,
+                archiveOptions = if (withTranscription) {
+                    StartArchiveOptions(TranscriptionProperties(hasSummary = withSummary))
+                } else {
+                    null
+                },
+            )
+            val response = archivingApi.startArchiving(request)
             return if (response.isSuccessful) {
                 response.body()?.let {
                     Result.success(ArchiveId(it.result.data.id))
@@ -81,19 +99,46 @@ class ArchiveRepository(
 }
 
 private fun ServerArchive.toModel() =
-    Archive(
+    if (hasTranscription) {
+        toTranscriptionModel()
+    } else {
+        Archive(
+            id = ArchiveId(id),
+            name = name,
+            url = url.orEmpty(),
+            status = status.toArchiveStatus(),
+            createdAt = createdAt,
+            duration = duration,
+            size = size,
+        )
+    }
+
+/**
+ * A transcription archive is downloaded from its transcript URL, which is only ready once
+ * `transcription.status` is `available`: until then (including before the backend adds the
+ * `transcription` object) it stays pending, so the goodbye screen keeps polling.
+ */
+private fun ServerArchive.toTranscriptionModel(): Archive {
+    val archiveStatus = status.toArchiveStatus()
+    return Archive(
         id = ArchiveId(id),
         name = name,
-        url = url.orEmpty(),
-        status = status.toArchiveStatus(),
+        url = transcription?.url.orEmpty(),
+        status = when {
+            archiveStatus == ArchiveStatus.FAILED -> ArchiveStatus.FAILED
+            transcription == null -> ArchiveStatus.PENDING
+            else -> transcription.status.toArchiveStatus()
+        },
         createdAt = createdAt,
         duration = duration,
         size = size,
+        type = ArchiveType.TRANSCRIPTION,
     )
+}
 
 private fun String.toArchiveStatus(): ArchiveStatus =
     when (this) {
         "available" -> ArchiveStatus.AVAILABLE
-        "started", "stopped", "uploaded", "paused" -> ArchiveStatus.PENDING
+        "requested", "started", "stopped", "uploaded", "paused" -> ArchiveStatus.PENDING
         else -> ArchiveStatus.FAILED
     }

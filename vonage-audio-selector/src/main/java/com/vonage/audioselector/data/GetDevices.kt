@@ -25,7 +25,8 @@ internal class GetDevices(
             devices.add(
                 AudioDeviceSelector.AudioDevice(
                     id = 1,
-                    type = AudioDeviceSelector.AudioDeviceType.BLUETOOTH
+                    type = AudioDeviceSelector.AudioDeviceType.BLUETOOTH,
+                    name = bluetoothManager.connectedDeviceName,
                 )
             )
         }
