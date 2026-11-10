@@ -16,10 +16,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * @param captionsTranslationAllowed when false, a persisted captions translation language is
+ * ignored and never applied to a call, so turning the feature off cannot leave users stuck on it.
+ */
 @Stable
 class CallSettingsHolder(
     private val storage: CallSettingsStorage = NoOpCallSettingsStorage(),
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
+    private val captionsTranslationAllowed: Boolean = true,
 ) {
 
     private val _call = MutableStateFlow<CallFacade?>(null)
@@ -79,7 +84,7 @@ class CallSettingsHolder(
         _videoBitrateConfig.value = p.videoBitrateConfig
         _degradationPreference.value = p.degradationPreference
         _publisherPreferences.value = p.publisherPreferences
-        _captionsTranslationLanguage.value = p.captionsTranslationLanguage
+        _captionsTranslationLanguage.value = p.captionsTranslationLanguage.takeIf { captionsTranslationAllowed }
     }
 
     /** Suspends until the persisted values are loaded (matters on a cold start via deep link). */
@@ -144,6 +149,7 @@ class CallSettingsHolder(
 
     /** Applies immediately to the bound call; `null` restores the spoken language. */
     fun updateCaptionsTranslationLanguage(languageCode: String?) {
+        if (!captionsTranslationAllowed) return
         _captionsTranslationLanguage.value = languageCode
         _call.value?.setCaptionsTranslationLanguage(languageCode)
         save()
@@ -155,6 +161,7 @@ class CallSettingsHolder(
 
     fun bind(call: CallFacade) {
         _call.value = call
+        if (!captionsTranslationAllowed) return
         // Wait for the persisted language on a cold start, then apply it to the new call.
         scope.launch {
             loadJob.join()

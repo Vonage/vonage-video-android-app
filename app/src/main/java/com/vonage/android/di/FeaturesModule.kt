@@ -7,6 +7,7 @@ import com.vonage.android.captions.VonageCaptions
 import com.vonage.android.captions.di.CaptionsModule
 import com.vonage.android.chat.ChatFeature
 import com.vonage.android.chat.ChatModule
+import com.vonage.android.config.GetConfig
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.meetingroom.api.SessionKeyHolder
 import com.vonage.android.meetingroom.api.SessionKeyProvider
@@ -74,8 +75,14 @@ object FeaturesModule {
 
     @Singleton
     @Provides
-    fun provideCallSettingsHolder(storage: DataStoreCallSettingsStorage): CallSettingsHolder =
-        CallSettingsHolder(storage = storage)
+    fun provideCallSettingsHolder(
+        storage: DataStoreCallSettingsStorage,
+        getConfig: GetConfig,
+    ): CallSettingsHolder =
+        CallSettingsHolder(
+            storage = storage,
+            captionsTranslationAllowed = getConfig().let { it.allowCaptions && it.allowCaptionTranslation },
+        )
 
     /** Shared with the meeting room so the goodbye screen can list the session recordings. */
     @Singleton

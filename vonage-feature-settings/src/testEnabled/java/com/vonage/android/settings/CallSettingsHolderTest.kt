@@ -272,4 +272,42 @@ class CallSettingsHolderTest {
     }
 
     // endregion
+
+    // region captions translation not allowed
+
+    @Test
+    fun `given translation not allowed when storage has a language then it is ignored`() = runTest {
+        val fake = FakeCallSettingsStorage(initial = PersistedCallSettings(captionsTranslationLanguage = "es-ES"))
+        val holder = CallSettingsHolder(storage = fake, scope = this, captionsTranslationAllowed = false)
+
+        holder.awaitLoaded()
+
+        assertNull(holder.captionsTranslationLanguage.value)
+    }
+
+    @Test
+    fun `given translation not allowed when bind then language is not applied to call`() = runTest {
+        val fake = FakeCallSettingsStorage(initial = PersistedCallSettings(captionsTranslationLanguage = "es-ES"))
+        val holder = CallSettingsHolder(storage = fake, scope = this, captionsTranslationAllowed = false)
+        val call: CallFacade = mockk(relaxed = true)
+
+        holder.bind(call)
+        advanceUntilIdle()
+
+        verify(exactly = 0) { call.setCaptionsTranslationLanguage(any()) }
+    }
+
+    @Test
+    fun `given translation not allowed when updateCaptionsTranslationLanguage then it is ignored`() {
+        val holder = CallSettingsHolder(scope = testScope, captionsTranslationAllowed = false)
+        val call: CallFacade = mockk(relaxed = true)
+        holder.bind(call)
+
+        holder.updateCaptionsTranslationLanguage("es-ES")
+
+        assertNull(holder.captionsTranslationLanguage.value)
+        verify(exactly = 0) { call.setCaptionsTranslationLanguage(any()) }
+    }
+
+    // endregion
 }
