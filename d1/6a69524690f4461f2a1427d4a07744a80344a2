@@ -1,0 +1,19 @@
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/CaptionsTranslationLanguages.kt
+  s_871ce5511ede2b::t_788d80c50a844f 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d16a69524690f4461f2a1427d4a07744a80344a2",
+  "prompts": {},
+  "sessions": {
+    "s_871ce5511ede2b": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_9547370a-23ad-4e4d-9289-ed49b1b755f6",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
