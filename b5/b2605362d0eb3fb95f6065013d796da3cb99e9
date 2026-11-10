@@ -1,0 +1,21 @@
+vonage-feature-settings/src/testEnabled/java/com/vonage/android/settings/CallSettingsHolderTest.kt
+  s_871ce5511ede2b::t_b508bb95bce503 275-312
+app/src/main/java/com/vonage/android/di/FeaturesModule.kt
+  s_871ce5511ede2b::t_9fd8356d404e49 10,78-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b5b2605362d0eb3fb95f6065013d796da3cb99e9",
+  "prompts": {},
+  "sessions": {
+    "s_871ce5511ede2b": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_9547370a-23ad-4e4d-9289-ed49b1b755f6",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
