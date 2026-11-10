@@ -273,6 +273,63 @@ class CallSettingsHolderTest {
 
     // endregion
 
+    // region captions translation
+
+    @Test
+    fun `initial captionsTranslationLanguage is null`() {
+        assertNull(sut.captionsTranslationLanguage.value)
+    }
+
+    @Test
+    fun `when updateCaptionsTranslationLanguage with bound call then value is updated and applied`() {
+        val call: CallFacade = mockk(relaxed = true)
+        sut.bind(call)
+
+        sut.updateCaptionsTranslationLanguage("es-ES")
+
+        assertEquals("es-ES", sut.captionsTranslationLanguage.value)
+        verify { call.setCaptionsTranslationLanguage("es-ES") }
+    }
+
+    @Test
+    fun `when updateCaptionsTranslationLanguage with null then spoken language is restored`() {
+        val call: CallFacade = mockk(relaxed = true)
+        sut.bind(call)
+        sut.updateCaptionsTranslationLanguage("es-ES")
+
+        sut.updateCaptionsTranslationLanguage(null)
+
+        assertNull(sut.captionsTranslationLanguage.value)
+        verify { call.setCaptionsTranslationLanguage(null) }
+    }
+
+    @Test
+    fun `when updateCaptionsTranslationLanguage then storage receives save with new value`() = runTest {
+        val fake = FakeCallSettingsStorage()
+        val holder = CallSettingsHolder(storage = fake, scope = this)
+        advanceUntilIdle()
+
+        holder.updateCaptionsTranslationLanguage("fr-FR")
+        advanceUntilIdle()
+
+        assertEquals("fr-FR", fake.saved?.captionsTranslationLanguage)
+    }
+
+    @Test
+    fun `given stored captionsTranslationLanguage when bind then it is applied after loading`() = runTest {
+        val fake = FakeCallSettingsStorage(initial = PersistedCallSettings(captionsTranslationLanguage = "de-DE"))
+        val holder = CallSettingsHolder(storage = fake, scope = this)
+        val call: CallFacade = mockk(relaxed = true)
+
+        holder.bind(call)
+        advanceUntilIdle()
+
+        assertEquals("de-DE", holder.captionsTranslationLanguage.value)
+        verify { call.setCaptionsTranslationLanguage("de-DE") }
+    }
+
+    // endregion
+
     // region captions translation not allowed
 
     @Test

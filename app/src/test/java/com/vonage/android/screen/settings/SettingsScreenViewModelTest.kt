@@ -60,6 +60,16 @@ class SettingsScreenViewModelTest {
             assertEquals(CaptureFrameRate.FPS_15, state.captureFrameRate)
             assertNull(state.captureResolution)
             assertNull(state.call)
+            assertNull(state.captionsTranslationLanguage)
+        }
+    }
+
+    @Test
+    fun `given viewmodel when created then showCaptionsTranslation follows the config`() = runTest {
+        val config = GetConfig()()
+        val sut = sut()
+        sut.state.test {
+            assertEquals(config.allowCaptions && config.allowCaptionTranslation, awaitItem().showCaptionsTranslation)
         }
     }
 
@@ -173,6 +183,17 @@ class SettingsScreenViewModelTest {
 
         sut.state.test {
             assertNull(awaitItem().captureResolution)
+        }
+    }
+
+    @Test
+    fun `when updateCaptionsTranslationLanguage then state is updated`() = runTest {
+        val sut = sut()
+        sut.updateCaptionsTranslationLanguage("ja-JP")
+        mainDispatcherRule.testScheduler.advanceUntilIdle()
+
+        sut.state.test {
+            assertEquals("ja-JP", awaitItem().captionsTranslationLanguage)
         }
     }
 
