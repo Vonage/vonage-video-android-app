@@ -381,6 +381,7 @@ private fun LazyListScope.captionsTranslationLanguageItem(
     if (!uiState.showCaptionsTranslation) return
     item {
         CaptionsTranslationLanguageSelector(
+            languages = uiState.captionsTranslationLanguages,
             selected = uiState.captionsTranslationLanguage,
             onSelectionChange = actions.onCaptionsTranslationLanguageChange,
         )

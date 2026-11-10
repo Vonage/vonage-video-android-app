@@ -9,11 +9,13 @@ import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoCodec
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.settings.SettingsUiState
+import com.vonage.android.settings.captionsTranslationLanguages
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Locale
 
 @HiltViewModel(assistedFactory = SettingsScreenViewModelFactory::class)
 class SettingsScreenViewModel @AssistedInject constructor(
@@ -26,6 +28,7 @@ class SettingsScreenViewModel @AssistedInject constructor(
         appVersion = appVersion,
         sdkVersion = sdkVersion,
         showCaptionsTranslation = getConfig().let { it.allowCaptions && it.allowCaptionTranslation },
+        captionsTranslationLanguages = captionsTranslationLanguages(Locale.getDefault()),
     ),
 ) {
 
