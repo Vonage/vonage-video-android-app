@@ -3,11 +3,15 @@ package com.vonage.android.meetingroom.internal.screen
 import android.content.Context
 import android.media.projection.MediaProjection
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.test.DeviceConfigurationOverride
+import androidx.compose.ui.test.ForcedSize
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.vonage.android.compose.components.ParticipantsPlaceholdersTestTags.PARTICIPANTS_PLACEHOLDER_TAG
 import com.vonage.android.compose.preview.buildCallWithParticipants
@@ -52,6 +56,19 @@ class MeetingRoomScreenTest {
     @get:Rule
     val compose = createComposeRule()
 
+    /**
+     * The bottom bar only shows as many actions as fit its width and moves the rest into the
+     * "more" sheet. Forcing a wide window keeps tests that look for a specific bar button
+     * independent of the width of the device they run on.
+     */
+    @Composable
+    private fun WideScreen(content: @Composable () -> Unit) {
+        DeviceConfigurationOverride(
+            override = DeviceConfigurationOverride.ForcedSize(DpSize(WIDE_SCREEN_DP.dp, WIDE_SCREEN_DP.dp)),
+            content = content,
+        )
+    }
+
     @Test
     fun given_initial_state_THEN_components_are_displayed() {
         compose.setContent {
@@ -80,18 +97,20 @@ class MeetingRoomScreenTest {
     @Test
     fun given_initial_state_with_allowMicrophoneControl_false_THEN_components_are_displayed() {
         compose.setContent {
-            VonageVideoTheme {
-                MeetingRoomScreen(
-                    uiState = MeetingRoomUiState(
-                        roomName = "sample-name",
-                        call = buildCallWithParticipants(
-                            participantCount = 5,
-                            unreadCount = 8,
+            WideScreen {
+                VonageVideoTheme {
+                    MeetingRoomScreen(
+                        uiState = MeetingRoomUiState(
+                            roomName = "sample-name",
+                            call = buildCallWithParticipants(
+                                participantCount = 5,
+                                unreadCount = 8,
+                            ),
+                            allowMicrophoneControl = false,
                         ),
-                        allowMicrophoneControl = false,
-                    ),
-                    actions = MeetingRoomActions(),
-                )
+                        actions = MeetingRoomActions(),
+                    )
+                }
             }
         }
 
@@ -100,25 +119,27 @@ class MeetingRoomScreenTest {
             .assertIsDisplayed()
             .assertTextEquals("sample-name")
         compose.onNodeWithTag(MEETING_ROOM_CONTENT).assertIsDisplayed()
-        compose.onNodeWithTag("$BOTTOM_BAR_CAMERA_BUTTON-enabled", useUnmergedTree = true).assertIsDisplayed()
-        compose.onNodeWithTag("$BOTTOM_BAR_MIC_BUTTON-enabled", useUnmergedTree = true).assertDoesNotExist()
+        compose.onNodeWithTag("$BOTTOM_BAR_CAMERA_BUTTON-disabled", useUnmergedTree = true).assertIsDisplayed()
+        compose.onNodeWithTag("$BOTTOM_BAR_MIC_BUTTON-disabled", useUnmergedTree = true).assertDoesNotExist()
     }
 
     @Test
     fun given_initial_state_with_allowCameraControl_false_THEN_components_are_displayed() {
         compose.setContent {
-            VonageVideoTheme {
-                MeetingRoomScreen(
-                    uiState = MeetingRoomUiState(
-                        roomName = "sample-name",
-                        call = buildCallWithParticipants(
-                            participantCount = 5,
-                            unreadCount = 8,
+            WideScreen {
+                VonageVideoTheme {
+                    MeetingRoomScreen(
+                        uiState = MeetingRoomUiState(
+                            roomName = "sample-name",
+                            call = buildCallWithParticipants(
+                                participantCount = 5,
+                                unreadCount = 8,
+                            ),
+                            allowCameraControl = false,
                         ),
-                        allowCameraControl = false,
-                    ),
-                    actions = MeetingRoomActions(),
-                )
+                        actions = MeetingRoomActions(),
+                    )
+                }
             }
         }
 
@@ -127,26 +148,28 @@ class MeetingRoomScreenTest {
             .assertIsDisplayed()
             .assertTextEquals("sample-name")
         compose.onNodeWithTag(MEETING_ROOM_CONTENT).assertIsDisplayed()
-        compose.onNodeWithTag("$BOTTOM_BAR_CAMERA_BUTTON-enabled", useUnmergedTree = true).assertDoesNotExist()
-        compose.onNodeWithTag("$BOTTOM_BAR_MIC_BUTTON-enabled", useUnmergedTree = true).assertIsDisplayed()
+        compose.onNodeWithTag("$BOTTOM_BAR_CAMERA_BUTTON-disabled", useUnmergedTree = true).assertDoesNotExist()
+        compose.onNodeWithTag("$BOTTOM_BAR_MIC_BUTTON-disabled", useUnmergedTree = true).assertIsDisplayed()
         compose.onNodeWithTag(TOP_BAR_CAMERA_SWITCH_ACTION, useUnmergedTree = true).assertDoesNotExist()
     }
 
     @Test
     fun given_all_optional_features_disabled_THEN_more_options_button_not_displayed() {
         compose.setContent {
-            VonageVideoTheme {
-                MeetingRoomScreen(
-                    uiState = MeetingRoomUiState(
-                        roomName = "sample-name",
-                        call = buildCallWithParticipants(
-                            participantCount = 5,
-                            unreadCount = 8,
+            WideScreen {
+                VonageVideoTheme {
+                    MeetingRoomScreen(
+                        uiState = MeetingRoomUiState(
+                            roomName = "sample-name",
+                            call = buildCallWithParticipants(
+                                participantCount = 5,
+                                unreadCount = 8,
+                            ),
+                            enabledFeatures = emptySet(),
                         ),
-                        enabledFeatures = emptySet(),
-                    ),
-                    actions = MeetingRoomActions(),
-                )
+                        actions = MeetingRoomActions(),
+                    )
+                }
             }
         }
 
@@ -157,14 +180,16 @@ class MeetingRoomScreenTest {
     @Test
     fun given_participants_button_tapped_THEN_participants_sheet_opens() {
         compose.setContent {
-            VonageVideoTheme {
-                MeetingRoomScreen(
-                    uiState = MeetingRoomUiState(
-                        roomName = "sample-name",
-                        call = buildCallWithParticipants(participantCount = 3),
-                    ),
-                    actions = MeetingRoomActions(),
-                )
+            WideScreen {
+                VonageVideoTheme {
+                    MeetingRoomScreen(
+                        uiState = MeetingRoomUiState(
+                            roomName = "sample-name",
+                            call = buildCallWithParticipants(participantCount = 3),
+                        ),
+                        actions = MeetingRoomActions(),
+                    )
+                }
             }
         }
 
@@ -268,7 +293,6 @@ class MeetingRoomScreenTest {
             override fun applyLocalVideoEffect(effect: VideoEffect) {}
             override fun setVideoBitrate(config: VideoBitrateConfig) {}
             override fun setDegradationPreference(preference: DegradationPreference) {}
-            override fun refreshPublisher(context: Context) {}
             override fun sendChatMessage(message: String) {}
             override fun listenUnreadChatMessages(enable: Boolean) {}
             override fun sendEmoji(emoji: String) {}
@@ -277,3 +301,5 @@ class MeetingRoomScreenTest {
         }
     }
 }
+
+private const val WIDE_SCREEN_DP = 900

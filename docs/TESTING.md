@@ -148,8 +148,6 @@ Tests target elements using Compose `testTag` modifiers exposed as resource IDs 
 - `meeting-room-end-call-button` — End call button
 - `meeting-room-mic-enabled` / `meeting-room-mic-disabled` — Mic toggle (dynamic)
 - `meeting-room-camera-enabled` / `meeting-room-camera-disabled` — Camera toggle (dynamic)
-- `bottom-bar-participants-button` — Open participant list button
-- `search` — Participant list search field (used to assert the sheet opened)
 
 **Goodbye Screen** (`GoodbyeScreenTestTags`):
 - `goodbye-screen` — Screen container
