@@ -1,0 +1,28 @@
+app/src/test/java/com/vonage/android/data/storage/DataStoreCallSettingsStorageTest.kt
+  s_871ce5511ede2b::t_1ae9a92c24e7ad 130-150
+app/src/test/java/com/vonage/android/screen/settings/SettingsActionsTest.kt
+  s_871ce5511ede2b::t_6e7e372918e51c 139-149
+app/src/test/java/com/vonage/android/screen/settings/SettingsScreenViewModelTest.kt
+  s_871ce5511ede2b::t_b1bb945b40db26 63-72,193,195
+  s_871ce5511ede2b::t_0478365e2439ff 190-192
+  s_871ce5511ede2b::t_f1ee5e9a4ae052 194
+  s_871ce5511ede2b::t_49cb82d2aa770b 196-198
+vonage-feature-settings/src/testEnabled/java/com/vonage/android/settings/CallSettingsHolderTest.kt
+  s_871ce5511ede2b::t_f70a4d27028198 276-332
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "db4db87cff3114c9ab0be4bca11060de68019674",
+  "prompts": {},
+  "sessions": {
+    "s_871ce5511ede2b": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_9547370a-23ad-4e4d-9289-ed49b1b755f6",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
