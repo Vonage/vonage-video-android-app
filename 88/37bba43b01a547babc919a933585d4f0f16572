@@ -1,0 +1,24 @@
+vonage-video-core/src/main/java/com/vonage/android/kotlin/Call.kt
+  s_871ce5511ede2b::t_2f4310e3d02fd0 579,581-582,590-592
+  s_871ce5511ede2b::t_e08917c6eb2690 593-594
+vonage-video-core/src/test/java/com/vonage/android/kotlin/CallTest.kt
+  s_871ce5511ede2b::t_f21471031ebdb5 556-624
+  s_871ce5511ede2b::t_2942735d43a099 18
+  s_871ce5511ede2b::t_68df290b60fc23 625
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8837bba43b01a547babc919a933585d4f0f16572",
+  "prompts": {},
+  "sessions": {
+    "s_871ce5511ede2b": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_9547370a-23ad-4e4d-9289-ed49b1b755f6",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
