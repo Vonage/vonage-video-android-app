@@ -576,12 +576,20 @@ class Call internal constructor(
      * self-subscriber, into [languageCode]; `null` restores the spoken language.
      */
     override fun setCaptionsTranslationLanguage(languageCode: String?) {
+        val previousLanguageCode = captionsTranslationLanguage
         captionsTranslationLanguage = languageCode
+        // Subscribers keep the spoken language until a translation is applied: nothing to restore.
+        if (languageCode == null && previousLanguageCode == null) return
         coroutineScope.launch {
             participants.values.filterIsInstance<ParticipantState>()
                 .forEach { participant -> applyCaptionsTranslation(participant.vonageSubscriber) }
             selfCaptionsSubscriber?.let(::applyCaptionsTranslation)
         }
+    }
+
+    /** New subscribers start in the spoken language, so only a selected translation is applied. */
+    private fun applyCaptionsTranslationIfSet(subscriber: VonageSubscriber) {
+        if (captionsTranslationLanguage != null) applyCaptionsTranslation(subscriber)
     }
 
     private fun applyCaptionsTranslation(subscriber: VonageSubscriber) {
@@ -643,7 +651,7 @@ class Call internal constructor(
                 subscriber.subscribeToVideo = false
                 subscriber.subscribeToCaptions = true
                 subscriber.setCaptionsListener(selfCaptionsDelegate)
-                applyCaptionsTranslation(subscriber)
+                applyCaptionsTranslationIfSet(subscriber)
                 selfCaptionsSubscriber = subscriber
                 vonageLogger.d(TAG, "Created hidden self-captions subscriber for stream ${stream.streamId}")
             } catch (e: Exception) {
@@ -681,7 +689,7 @@ class Call internal constructor(
                     val subscriber = session.subscribe(context, stream)
                     subscriber.setCaptionsListener(captionsDelegate)
                     subscriber.subscribeToCaptions = captionsEnabled
-                    applyCaptionsTranslation(subscriber)
+                    applyCaptionsTranslationIfSet(subscriber)
                     ParticipantState(vonageSubscriber = subscriber)
                 }
                 participant.registerListeners()
