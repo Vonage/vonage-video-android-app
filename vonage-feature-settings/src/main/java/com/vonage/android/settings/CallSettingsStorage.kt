@@ -33,6 +33,8 @@ data class PersistedCallSettings(
     ),
     val degradationPreference: DegradationPreference = DegradationPreference.NOT_SET,
     val publisherPreferences: PublisherPreferences = PublisherPreferences(),
+    /** BCP-47 target language for received captions; `null` keeps the spoken language. */
+    val captionsTranslationLanguage: String? = null,
 )
 
 interface CallSettingsStorage {

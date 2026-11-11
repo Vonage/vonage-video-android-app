@@ -98,6 +98,13 @@ interface SessionFacade {
     fun connect(context: Context): Flow<SessionEvent>
     fun enableCaptions()
     fun disableCaptions()
+
+    /**
+     * Translates received captions (including the local user's own) into [languageCode],
+     * one of [CAPTIONS_TRANSLATION_LANGUAGES], or shows them in the spoken language when `null`.
+     * Applies immediately and to subscribers that join later.
+     */
+    fun setCaptionsTranslationLanguage(languageCode: String?)
     fun pauseSession()
     fun resumeSession()
     fun endSession()

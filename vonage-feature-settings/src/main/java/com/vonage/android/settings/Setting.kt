@@ -10,6 +10,7 @@ import androidx.annotation.StringRes
 enum class SettingsSection(@param:StringRes val titleRes: Int) {
     VIDEO(R.string.settings_section_video),
     AUDIO(R.string.settings_section_audio),
+    CAPTIONS(R.string.settings_section_captions),
     STATS(R.string.settings_section_stats),
 }
 
@@ -30,8 +31,16 @@ enum class Setting(val section: SettingsSection) {
     AUDIO_BITRATE(section = SettingsSection.AUDIO),
     PUBLISHER_AUDIO_FALLBACK(section = SettingsSection.AUDIO),
     SUBSCRIBER_AUDIO_FALLBACK(section = SettingsSection.AUDIO),
+    CAPTIONS_TRANSLATION_LANGUAGE(section = SettingsSection.CAPTIONS),
     SENDER_STATS(section = SettingsSection.STATS),
 }
+
+/**
+ * Sections shown for [uiState] in declaration order. [SettingsSection.CAPTIONS] only holds the
+ * translation language, so it is hidden when caption translation is not available.
+ */
+fun visibleSettingsSections(uiState: SettingsUiState): List<SettingsSection> =
+    SettingsSection.entries.filter { it != SettingsSection.CAPTIONS || uiState.showCaptionsTranslation }
 
 /**
  * Returns the settings for this section in declaration order.

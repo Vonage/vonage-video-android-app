@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_AUDIO_BITRATE
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_BACKGROUND_ID
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_BACKGROUND_PATH
+import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_CAPTIONS_TRANSLATION_LANGUAGE
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_CAPTURE_FRAME_RATE
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_CAPTURE_RESOLUTION
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_CODEC_ORDER
@@ -19,6 +20,7 @@ import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_SUBS
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_VIDEO_BITRATE_MAX
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_VIDEO_BITRATE_PRESET
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_VIDEO_EFFECT
+import com.vonage.android.kotlin.model.CAPTIONS_TRANSLATION_LANGUAGES
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
@@ -62,6 +64,9 @@ class DataStoreCallSettingsStorage @Inject constructor(
                 publishVideo = prefs[SETTINGS_PUBLISH_VIDEO],
                 videoEffect = prefs.videoEffect(),
             ),
+            // Drop codes no longer offered, so a stale value falls back to the spoken language.
+            captionsTranslationLanguage = prefs[SETTINGS_CAPTIONS_TRANSLATION_LANGUAGE]
+                ?.takeIf { it in CAPTIONS_TRANSLATION_LANGUAGES },
         )
     }
 
@@ -87,6 +92,7 @@ class DataStoreCallSettingsStorage @Inject constructor(
             else prefs.remove(SETTINGS_VIDEO_BITRATE_MAX)
             prefs[SETTINGS_DEGRADATION_PREFERENCE] = settings.degradationPreference.name
             prefs.putPublisherPreferences(settings.publisherPreferences)
+            prefs.putOrRemove(SETTINGS_CAPTIONS_TRANSLATION_LANGUAGE, settings.captionsTranslationLanguage)
         }
     }
 

@@ -51,6 +51,7 @@ and setting them has no effect on Android.
 | `meetingRoomSettings.allowSettings` | In-call settings panel |
 | `meetingRoomSettings.allowArchiving` | Session recording. Independent of `allowPostCallTranscription`. |
 | `meetingRoomSettings.allowCaptions` | Live captions |
+| `meetingRoomSettings.allowCaptionTranslation` | Captions translation language picker in the settings screen (Captions section); shown only when `allowCaptions` is also `true`. Translation runs per viewer through the Video SDK; the Vonage project must have caption translation enabled (private beta), and the backend's `CAPTIONS_TRANSLATION_LEVEL` controls how partial captions are translated. |
 | `meetingRoomSettings.allowChat` | In-call chat |
 | `meetingRoomSettings.allowDeviceSelection` | Audio output selector in the call |
 | `meetingRoomSettings.allowEmojis` | Emoji reactions |
