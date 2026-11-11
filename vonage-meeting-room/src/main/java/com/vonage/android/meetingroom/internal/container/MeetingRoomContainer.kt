@@ -2,6 +2,7 @@ package com.vonage.android.meetingroom.internal.container
 
 import android.content.Context
 import com.vonage.android.archiving.VonageArchiving
+import com.vonage.android.archiving.di.ArchivingModule
 import com.vonage.android.captions.VonageCaptions
 import com.vonage.android.chat.ChatModule
 import com.vonage.android.fx.data.BackgroundEffectsRepository
@@ -13,10 +14,10 @@ import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.sdk.VonageSdkFactory
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
+import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.api.SessionKeyHolder
 import com.vonage.android.meetingroom.internal.data.MeetingRoomNetworkFactory
-import com.vonage.android.meetingroom.internal.factory.createVonageArchiving
 import com.vonage.android.meetingroom.internal.factory.createVonageCaptions
 import com.vonage.android.meetingroom.internal.factory.createVonageScreenSharing
 import com.vonage.android.meetingroom.internal.screen.audio.MeetingRoomAudioDevicesHandler
@@ -94,7 +95,11 @@ internal class MeetingRoomContainer(
     }
 
     val vonageArchiving: VonageArchiving by lazy {
-        createVonageArchiving(retrofit)
+        ArchivingModule.provideVonageArchiving(
+            retrofit = retrofit,
+            recordingEnabled = MeetingRoomFeature.ARCHIVING in prebuilt.enabledFeatures,
+            transcriptionEnabled = MeetingRoomFeature.POST_CALL_TRANSCRIPTION in prebuilt.enabledFeatures,
+        )
     }
 
     val vonageCaptions: VonageCaptions by lazy {

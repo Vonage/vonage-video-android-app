@@ -14,18 +14,18 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class EnabledVonageArchivingTest {
+class DefaultVonageArchivingTest {
 
     private val archiveRepository: ArchiveRepository = mockk()
     private val callFacade: CallFacade = mockk()
     private val activeArchives = MutableStateFlow<Map<String, String?>>(emptyMap())
     
-    private lateinit var sut: EnabledVonageArchiving
+    private lateinit var sut: DefaultVonageArchiving
 
     @BeforeEach
     fun setup() {
         every { callFacade.activeArchives } returns activeArchives
-        sut = EnabledVonageArchiving(archiveRepository)
+        sut = DefaultVonageArchiving(archiveRepository, enabledTypes = ArchiveType.entries.toSet())
     }
 
     @Test
@@ -259,17 +259,6 @@ class EnabledVonageArchivingTest {
 
         assertEquals(ArchiveId("transcription-id"), result.getOrNull())
         coVerify { archiveRepository.startArchive(SESSION_KEY, withTranscription = true) }
-    }
-
-    @Test
-    fun `startArchive transcription forwards the summary choice`() = runTest {
-        coEvery {
-            archiveRepository.startArchive(SESSION_KEY, withTranscription = true, withSummary = true)
-        } returns Result.success(ArchiveId("transcription-id"))
-
-        sut.startArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION, withSummary = true)
-
-        coVerify { archiveRepository.startArchive(SESSION_KEY, withTranscription = true, withSummary = true) }
     }
 
     @Test

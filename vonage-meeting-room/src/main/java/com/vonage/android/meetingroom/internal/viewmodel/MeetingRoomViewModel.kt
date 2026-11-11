@@ -313,14 +313,10 @@ internal class MeetingRoomViewModel(
     //region Archiving
     fun archiveCall(enable: Boolean) = toggleArchive(ArchiveType.RECORDING, enable)
 
-    /**
-     * Starts/stops the post-call transcription archive, independently of any recording.
-     * [withSummary] only applies on start and adds an AI summary to the transcript.
-     */
-    fun transcribeCall(enable: Boolean, withSummary: Boolean = DEFAULT_TRANSCRIPTION_SUMMARY) =
-        toggleArchive(ArchiveType.TRANSCRIPTION, enable, withSummary)
+    /** Starts/stops the post-call transcription archive, independently of any recording. */
+    fun transcribeCall(enable: Boolean) = toggleArchive(ArchiveType.TRANSCRIPTION, enable)
 
-    private fun toggleArchive(type: ArchiveType, enable: Boolean, withSummary: Boolean = false) {
+    private fun toggleArchive(type: ArchiveType, enable: Boolean) {
         if (enable) {
             localArchiveStarts += type
             updateArchiveUiState(type, ArchivingUiState.STARTING)
@@ -330,7 +326,7 @@ internal class MeetingRoomViewModel(
         viewModelScope.launch {
             val sessionKey = container.sessionKeyHolder.sessionKey
             if (enable) {
-                archiveResult(sessionKey) { container.vonageArchiving.startArchive(it, type, withSummary) }
+                archiveResult(sessionKey) { container.vonageArchiving.startArchive(it, type) }
                     .onSuccess { updateArchiveUiState(type, ArchivingUiState.RECORDING) }
                     .onFailure {
                         localArchiveStarts -= type
@@ -492,6 +488,3 @@ internal class MeetingRoomViewModel(
         const val RECORDING_OVERLAY_DELAY_MS: Long = 5_000
     }
 }
-
-/** AI summary is on unless the user unchecks it, matching the backend's transcription default. */
-internal const val DEFAULT_TRANSCRIPTION_SUMMARY = true
