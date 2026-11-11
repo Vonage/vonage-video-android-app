@@ -20,16 +20,18 @@ interface VonageArchiving {
 
     /**
      * Starts an archive of [type] for the session identified by [sessionKey]. A transcription
-     * archive is requested with `withTranscription: true`; the backend sets its options, including
-     * the AI summary.
+     * archive is requested with `withTranscription: true` and `withSummary`; the backend sets its
+     * options, including the AI summary when [withSummary] is true.
      *
      * @param sessionKey The session key JWT returned by the backend when the session was created
      * @param type Recording (default) or transcription archive
+     * @param withSummary Whether a transcription includes the AI summary; ignored for a recording
      * @return Result containing the archive ID on success, or an error on failure
      */
     suspend fun startArchive(
         sessionKey: String,
         type: ArchiveType = ArchiveType.RECORDING,
+        withSummary: Boolean = true,
     ): Result<ArchiveId>
 
     /**

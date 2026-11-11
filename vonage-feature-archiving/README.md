@@ -46,6 +46,9 @@ vonageArchiving.startArchive(sessionKey)
         // Handle error
     }
 
+// Start a post-call transcription; withSummary = false asks the backend to leave out the AI summary
+vonageArchiving.startArchive(sessionKey, ArchiveType.TRANSCRIPTION, withSummary = false)
+
 // Stop recording
 vonageArchiving.stopArchive(sessionKey)
     .onSuccess {

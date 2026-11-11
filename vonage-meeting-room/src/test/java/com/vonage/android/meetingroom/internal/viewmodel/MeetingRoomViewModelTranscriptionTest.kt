@@ -119,6 +119,26 @@ class MeetingRoomViewModelTranscriptionTest {
     }
 
     @Test
+    fun `given viewmodel when transcribeCall without summary then forwards withSummary false`() = runTest {
+        givenMockCall()
+        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION, false) } returns
+            success(ArchiveId("transcription-id"))
+
+        sut.uiState.test {
+            awaitItem()
+            sut.setup(context)
+            testScheduler.advanceUntilIdle()
+            awaitItem() // audio devices
+            awaitItem() // connected
+
+            sut.transcribeCall(enable = true, withSummary = false)
+            assertEquals(ArchivingUiState.STARTING, awaitItem().transcriptionUiState)
+            assertEquals(ArchivingUiState.RECORDING, awaitItem().transcriptionUiState)
+            coVerify { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION, false) }
+        }
+    }
+
+    @Test
     fun `given transcription running when transcribeCall false then stops transcription archive`() = runTest {
         givenMockCall()
         coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION) } returns
