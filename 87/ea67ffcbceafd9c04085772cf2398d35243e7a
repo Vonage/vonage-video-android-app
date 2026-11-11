@@ -1,0 +1,126 @@
+.claude/skills/configure/SKILL.md
+  h_25498f8d57a266 32,46-47
+.claude/skills/feature-flag/SKILL.md
+  h_25498f8d57a266 16
+.claude/skills/run-tests/SKILL.md
+  h_25498f8d57a266 12,23-24,28,53
+AGENTS.md
+  h_25498f8d57a266 35-36
+app-config.json
+  h_25498f8d57a266 33
+app/build.gradle.kts
+  h_25498f8d57a266 72-73
+app/src/main/java/com/vonage/android/config/Config.kt
+  h_25498f8d57a266 48,75
+app/src/main/java/com/vonage/android/data/storage/DataStoreCallSettingsStorage.kt
+  h_25498f8d57a266 9,23,67-69,95
+app/src/main/java/com/vonage/android/data/storage/GlobalDataStorage.kt
+  h_25498f8d57a266 38
+app/src/main/java/com/vonage/android/di/FeaturesModule.kt
+  h_25498f8d57a266 10,47-54,84-91
+app/src/main/java/com/vonage/android/screen/settings/SettingsActions.kt
+  h_25498f8d57a266 72-76,189-199
+app/src/main/java/com/vonage/android/screen/settings/SettingsScreenRoute.kt
+  h_25498f8d57a266 36
+app/src/main/java/com/vonage/android/screen/settings/SettingsScreenViewModel.kt
+  h_25498f8d57a266 4,12,18,25,27-32,63-65
+app/src/main/java/com/vonage/android/screen/waiting/components/VideoPreviewContainer.kt
+  h_25498f8d57a266 13,25,34,109,114-119,122,162,186-208
+app/src/test/java/com/vonage/android/config/GetConfigTest.kt
+  h_25498f8d57a266 87-90
+app/src/test/java/com/vonage/android/data/storage/DataStoreCallSettingsStorageTest.kt
+  h_25498f8d57a266 7,130-150
+app/src/test/java/com/vonage/android/screen/settings/SettingsActionsTest.kt
+  h_25498f8d57a266 139-149,293-313
+app/src/test/java/com/vonage/android/screen/settings/SettingsScreenViewModelTest.kt
+  h_25498f8d57a266 5,35,63-72,189-199
+docs/CONFIG-SYSTEM.md
+  h_25498f8d57a266 124-125
+docs/CONFIGURATION.md
+  h_25498f8d57a266 52,54,60
+vonage-feature-archiving/README.md
+  h_25498f8d57a266 72-74
+vonage-feature-archiving/build.gradle.kts
+  h_25498f8d57a266 48
+vonage-feature-archiving/src/main/java/com/vonage/android/archiving/DefaultVonageArchiving.kt
+  h_25498f8d57a266 12,15-16,18-20,22,24,48-50,68-70,82,97,115-116,121-125,127-130
+vonage-feature-archiving/src/main/java/com/vonage/android/archiving/VonageArchiving.kt
+  h_25498f8d57a266 23-24
+vonage-feature-archiving/src/main/java/com/vonage/android/archiving/data/ArchiveRepository.kt
+  h_25498f8d57a266 41,47
+vonage-feature-archiving/src/main/java/com/vonage/android/archiving/data/ArchivingResponses.kt
+  h_25498f8d57a266 10-13
+vonage-feature-archiving/src/main/java/com/vonage/android/archiving/di/ArchivingModule.kt
+  h_25498f8d57a266 3-4,12-23
+vonage-feature-archiving/src/test/java/com/vonage/android/archiving/DefaultVonageArchivingTest.kt
+  h_25498f8d57a266 17,23,28
+vonage-feature-archiving/src/test/java/com/vonage/android/archiving/data/ArchiveRepositoryTest.kt
+  h_25498f8d57a266 125,130
+vonage-feature-settings/src/enabled/java/com/vonage/android/settings/ui/SettingsScreen.kt
+  h_25498f8d57a266 37,45,47,107,129,133,156,168,258,377-390,410
+vonage-feature-settings/src/enabled/java/com/vonage/android/settings/ui/components/CaptionsTranslationLanguageSelector.kt
+  h_25498f8d57a266 1,4,6-10,12,14,16-19,22-26,28-36
+vonage-feature-settings/src/main/java/com/vonage/android/settings/CallSettingsHolder.kt
+  h_25498f8d57a266 19-22,27,71-73,87,150-157,164-169,188
+vonage-feature-settings/src/main/java/com/vonage/android/settings/CallSettingsStorage.kt
+  h_25498f8d57a266 36-37
+vonage-feature-settings/src/main/java/com/vonage/android/settings/CaptionsTranslationLanguage.kt
+  h_25498f8d57a266 1-26
+vonage-feature-settings/src/main/java/com/vonage/android/settings/Setting.kt
+  h_25498f8d57a266 13,34,38-44
+vonage-feature-settings/src/main/java/com/vonage/android/settings/SettingsScreenActions.kt
+  h_25498f8d57a266 22
+vonage-feature-settings/src/main/java/com/vonage/android/settings/SettingsUiState.kt
+  h_25498f8d57a266 12-13,33-38
+vonage-feature-settings/src/main/res/values/strings.xml
+  h_25498f8d57a266 7,45-49
+vonage-feature-settings/src/testEnabled/java/com/vonage/android/settings/CallSettingsHolderTest.kt
+  h_25498f8d57a266 275-369
+vonage-feature-settings/src/testEnabled/java/com/vonage/android/settings/CaptionsTranslationLanguageTest.kt
+  h_25498f8d57a266 1-27
+vonage-meeting-room-sample-app/build.gradle.kts
+  h_25498f8d57a266 18
+vonage-meeting-room/README.md
+  h_25498f8d57a266 169-170
+vonage-meeting-room/build.gradle.kts
+  h_25498f8d57a266 47-48
+vonage-meeting-room/src/androidTest/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreenTest.kt
+  h_25498f8d57a266 286
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/api/MeetingRoomFeature.kt
+  h_25498f8d57a266 23
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/container/MeetingRoomContainer.kt
+  h_25498f8d57a266 5,17,98-102
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  h_25498f8d57a266 494
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/util/noOpCall.kt
+  h_25498f8d57a266 39
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModel.kt
+  h_25498f8d57a266 316-317,319,329
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTranscriptionTest.kt
+  h_25498f8d57a266 101,116-117,124,150
+vonage-video-core/src/main/java/com/vonage/android/kotlin/Call.kt
+  h_25498f8d57a266 207-210,574-603,654,692
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/CallFacade.kt
+  h_25498f8d57a266 101-107
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/CaptionsTranslationLanguages.kt
+  h_25498f8d57a266 1-15
+vonage-video-core/src/test/java/com/vonage/android/kotlin/CallTest.kt
+  h_25498f8d57a266 18,556-625
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/VonageSubscriberContract.kt
+  h_25498f8d57a266 28-35
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/internal/OpenTokSubscriber.kt
+  h_25498f8d57a266 152-155
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/preview/buildCallWithParticipants.kt
+  h_25498f8d57a266 47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "87ea67ffcbceafd9c04085772cf2398d35243e7a",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
