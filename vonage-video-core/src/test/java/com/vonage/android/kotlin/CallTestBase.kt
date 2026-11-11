@@ -139,14 +139,12 @@ abstract class CallTestBase {
     )
 
     /**
-     * Triggers [VonageSessionListener.onConnected] and waits for [Call.publishToSession]
-     * (which internally uses [Dispatchers.Default]) to complete, then processes any remaining
-     * queued work on [callDispatcher].
+     * Triggers [VonageSessionListener.onConnected] and runs [Call.publishToSession]
+     * to completion on [callScheduler]'s virtual time. [Call.publishToSession] launches
+     * on the injected [callDispatcher], so no real-time wait is needed.
      */
-    @Suppress("MagicNumber")
     fun triggerConnectedAndWaitForPublisher() {
         capturedSessionListener!!.onConnected()
-        Thread.sleep(200)
         callScheduler.runCurrent()
     }
 

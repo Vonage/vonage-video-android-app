@@ -448,7 +448,7 @@ class Call internal constructor(
      * Called automatically when connecting to the session.
      */
     private fun publishToSession() {
-        coroutineScope.launch(Dispatchers.Default) {
+        coroutineScope.launch {
             val newPublisher = withContext(Dispatchers.Main) {
                 val publisherState = publisherFactory.createPublisherState(context)
                 session.publish(publisherState.vonagePublisher)
@@ -494,7 +494,7 @@ class Call internal constructor(
      * @param mediaProjection Android MediaProjection for capturing screen content
      */
     override fun startCapturingScreen(mediaProjection: MediaProjection) {
-        coroutineScope.launch(Dispatchers.Default) {
+        coroutineScope.launch {
             val name = "${publisher()?.vonagePublisher?.name}'s Screen"
             val publisher = withContext(Dispatchers.Main) {
                 val screenPublisherState = publisherFactory.createScreenSharePublisherState(
@@ -707,7 +707,7 @@ class Call internal constructor(
     override fun updateParticipantVisibilityFlow(snapshotFlow: Flow<List<String>>) {
         if (!VISIBILITY_MONITOR_ENABLED) return
         participantsOnScreenJob?.cancel()
-        participantsOnScreenJob = coroutineScope.launch(Dispatchers.Default) {
+        participantsOnScreenJob = coroutineScope.launch {
             snapshotFlow
                 .distinctUntilChanged()
                 .collectLatest { visibleParticipants ->
