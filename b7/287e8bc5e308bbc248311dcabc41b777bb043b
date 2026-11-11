@@ -1,0 +1,26 @@
+app/src/main/java/com/vonage/android/screen/waiting/components/VideoPreviewContainer.kt
+  s_7838685875e938::t_cf681ed88bc93d 109,114-119,122,162
+  s_7838685875e938::t_78410730a17ebf 13
+  s_7838685875e938::t_b95f7e203a7925 186-208
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b7287e8bc5e308bbc248311dcabc41b777bb043b",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_7838685875e938": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_4f06d406-7101-426b-bf2b-80197705e628",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
