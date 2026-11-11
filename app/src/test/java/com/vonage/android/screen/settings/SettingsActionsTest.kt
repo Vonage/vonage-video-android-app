@@ -136,6 +136,17 @@ class SettingsActionsTest {
         collectScope.cancel()
     }
 
+    @Test
+    fun `ObserveSettingsAction syncs captionsTranslationLanguage from holder`() = runTest {
+        val collectScope = CoroutineScope(UnconfinedTestDispatcher(testScheduler))
+        val dependencies = SettingsActionDependencies(collectScope, callSettingsHolder)
+        val (scope, stateFlow) = actionScope()
+        ObserveSettingsAction().execute(dependencies, scope)
+        callSettingsHolder.updateCaptionsTranslationLanguage("es-ES")
+        assertEquals("es-ES", stateFlow.value.captionsTranslationLanguage)
+        collectScope.cancel()
+    }
+
     // endregion
 
     // region ToggleSenderStatsAction
@@ -276,6 +287,27 @@ class SettingsActionsTest {
         val (scope, _) = actionScope()
         UpdateCaptureResolutionAction(null).execute(dependencies, scope)
         assertNull(callSettingsHolder.captureResolution.value)
+    }
+
+    // endregion
+
+    // region UpdateCaptionsTranslationLanguageAction
+
+    @Test
+    fun `UpdateCaptionsTranslationLanguageAction updates holder`() = runTest {
+        val dependencies = SettingsActionDependencies(this, callSettingsHolder)
+        val (scope, _) = actionScope()
+        UpdateCaptionsTranslationLanguageAction("fr-FR").execute(dependencies, scope)
+        assertEquals("fr-FR", callSettingsHolder.captionsTranslationLanguage.value)
+    }
+
+    @Test
+    fun `UpdateCaptionsTranslationLanguageAction updates holder with null`() = runTest {
+        val dependencies = SettingsActionDependencies(this, callSettingsHolder)
+        callSettingsHolder.updateCaptionsTranslationLanguage("fr-FR")
+        val (scope, _) = actionScope()
+        UpdateCaptionsTranslationLanguageAction(null).execute(dependencies, scope)
+        assertNull(callSettingsHolder.captionsTranslationLanguage.value)
     }
 
     // endregion

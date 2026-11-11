@@ -13,7 +13,7 @@ A key is "wired" only when every hop below exists. The generator is permissive i
 
 ## First decide which kind of key it is
 
-- **A. Optional capability with its own module** (chat, captions, archiving…): needs a `vonage-feature-*` module with `enabled`/`disabled` flavors, an app-side `missingDimensionStrategy`, and a `MeetingRoomFeature` runtime case. If the module doesn't exist yet, scaffold it first (`/new-feature-module`, `#vera-new-module` in kiro) and come back here.
+- **A. Optional capability with its own module** (chat, captions, screen sharing…): needs a `vonage-feature-*` module with `enabled`/`disabled` flavors, an app-side `missingDimensionStrategy`, and a `MeetingRoomFeature` runtime case. If the module doesn't exist yet, scaffold it first (`/new-feature-module`, `#vera-new-module` in kiro) and come back here.
 - **B. Runtime-only toggle** (show a button, start muted, default layout): no flavor, no `BuildConfig`; `Config` field → `MeetingRoomConfiguration` / waiting-room / ViewModel.
 - **C. Non-boolean value** (string/number): same as B, but the shared schema only allows extra **booleans** inside the settings groups, so CI schema validation fails until the React repo's `specs/app-config.schema.json` gains the key. Coordinate cross-platform before merging.
 
