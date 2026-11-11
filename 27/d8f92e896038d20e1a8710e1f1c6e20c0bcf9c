@@ -1,0 +1,19 @@
+.github/workflows/android.yml
+  s_ca16594b39d577::t_ee8145bf459210 141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "27d8f92e896038d20e1a8710e1f1c6e20c0bcf9c",
+  "prompts": {},
+  "sessions": {
+    "s_ca16594b39d577": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_b311f67e-7929-417d-a909-7aa5cf5ea1d0",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
