@@ -3,7 +3,6 @@ package com.vonage.android.screen.waiting.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.components.AudioVolumeIndicator
@@ -30,6 +31,7 @@ import com.vonage.android.compose.components.CircularControlButton
 import com.vonage.android.compose.components.ParticipantVideoRenderer
 import com.vonage.android.compose.components.VideoLabel
 import com.vonage.android.compose.modifier.conditional
+import com.vonage.android.compose.preview.buildPublisher
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.MicMute
@@ -104,19 +106,20 @@ internal fun VideoControlPanel(
     val audioLevel by publisher.audioLevel.collectAsStateWithLifecycle()
     val videoEffect by publisher.videoEffect.collectAsStateWithLifecycle()
 
-    Row(
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = VonageVideoTheme.dimens.spaceDefault),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
     ) {
-        MicVolumeIndicator(
-            isMicEnabled = isMicEnabled,
-            audioLevel = audioLevel,
-        )
+        Box(modifier = Modifier.align(Alignment.CenterStart)) {
+            MicVolumeIndicator(
+                isMicEnabled = isMicEnabled,
+                audioLevel = audioLevel,
+            )
+        }
 
         Row(
+            modifier = Modifier.align(Alignment.Center),
             horizontalArrangement = spacedBy(VonageVideoTheme.dimens.spaceDefault),
         ) {
             if (allowMicrophoneControl) {
@@ -156,6 +159,7 @@ internal fun VideoControlPanel(
 
         VideoEffectIndicator(
             modifier = Modifier
+                .align(Alignment.CenterEnd)
                 .testTag(CAMERA_BLUR_BUTTON_TAG),
             videoEffect = videoEffect,
             onClick = actions.onOpenVideoEffects,
@@ -177,5 +181,28 @@ private fun MicVolumeIndicator(
         )
     } else {
         Spacer(modifier = Modifier.size(VonageVideoTheme.dimens.spaceXLarge))
+    }
+}
+
+@PreviewLightDark
+@Composable
+internal fun VideoPreviewContainerPreview() {
+    VonageVideoTheme {
+        val publisher = buildPublisher()
+        VideoPreviewContainer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(245.dp),
+            name = "User Name",
+            publisher = publisher,
+        ) {
+            VideoControlPanel(
+                modifier = Modifier.padding(bottom = VonageVideoTheme.dimens.paddingSmall),
+                publisher = publisher,
+                actions = WaitingRoomActions(),
+                allowMicrophoneControl = true,
+                allowCameraControl = true,
+            )
+        }
     }
 }
