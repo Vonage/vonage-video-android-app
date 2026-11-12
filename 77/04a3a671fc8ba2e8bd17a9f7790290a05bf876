@@ -1,19 +1,34 @@
 AGENTS.md
-  s_ca16594b39d577::t_4a8213ae316717 126
+  e16f037c2e230442 126
 ---
 {
   "schema_version": "authorship/3.0.0",
-  "git_ai_version": "1.7.5",
+  "git_ai_version": "vonage-override-1.0.0",
   "base_commit_sha": "7704a3a671fc8ba2e8bd17a9f7790290a05bf876",
-  "prompts": {},
-  "sessions": {
-    "s_ca16594b39d577": {
+  "prompts": {
+    "e16f037c2e230442": {
       "agent_id": {
         "tool": "kiro",
-        "id": "sess_b311f67e-7929-417d-a909-7aa5cf5ea1d0",
+        "id": "af7529e6-12dd-442f-878c-fa9d8e0ccb34",
         "model": "auto"
       },
-      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>",
+      "messages": [
+        {
+          "type": "user",
+          "text": "[vg-ai attribution override: 100% AI]",
+          "timestamp": "2026-11-12T11:59:14.970Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Attribution set via vg-ai attribution override (kiro/auto).",
+          "timestamp": "2026-11-12T11:59:14.970Z"
+        }
+      ],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
     }
   }
 }
