@@ -1,0 +1,14 @@
+.github/workflows/android.yml
+  h_25498f8d57a266 141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0096d153bd26e3855d9d37a6a6c067ea06b25f6f",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
