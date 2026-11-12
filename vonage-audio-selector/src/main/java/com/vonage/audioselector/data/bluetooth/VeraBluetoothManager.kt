@@ -3,6 +3,7 @@ package com.vonage.audioselector.data.bluetooth
 import android.Manifest.permission
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothHeadset
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
@@ -39,6 +40,13 @@ internal class VeraBluetoothManager(
     }
 
     var bluetoothState: BluetoothState = BluetoothState.Disconnected
+
+    /**
+     * Name of the currently connected Bluetooth headset, when known.
+     * Null when no Bluetooth headset is connected or the name is unavailable.
+     */
+    var connectedDeviceName: String? = null
+        private set
 
     enum class WiredState {
         Plugged,
@@ -79,12 +87,14 @@ internal class VeraBluetoothManager(
                         BluetoothProfile.STATE_CONNECTED -> {
                             Log.d(TAG, "onReceive(): BluetoothHeadset.STATE_CONNECTED")
                             bluetoothState = BluetoothState.Connected
+                            connectedDeviceName = getDeviceNameFromIntent(intent)
                             _bluetoothStates.value = BluetoothState.Connected
                         }
 
                         BluetoothProfile.STATE_DISCONNECTED -> {
                             Log.d(TAG, "onReceive(): BluetoothHeadset.STATE_DISCONNECTED")
                             bluetoothState = BluetoothState.Disconnected
+                            connectedDeviceName = null
                             _bluetoothStates.value = BluetoothState.Disconnected
                         }
 
@@ -111,6 +121,7 @@ internal class VeraBluetoothManager(
                 }
                 if (devices.isNotEmpty()) {
                     bluetoothState = BluetoothState.Connected
+                    connectedDeviceName = devices.first().name
                     _bluetoothStates.value = BluetoothState.Connected
                 }
             }
@@ -209,6 +220,20 @@ internal class VeraBluetoothManager(
         intent.putExtra(BluetoothHeadset.EXTRA_STATE, BluetoothProfile.STATE_DISCONNECTED)
         bluetoothBroadcastReceiver.onReceive(context, intent)
     }
+
+    @SuppressLint("MissingPermission")
+    private fun getDeviceNameFromIntent(intent: Intent): String? =
+        if (checkPermission()) {
+            val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+            }
+            device?.name
+        } else {
+            null
+        }
 
     private fun checkPermission(): Boolean =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||

@@ -7,7 +7,13 @@ interface VonageCaptions {
     /** True when the captions feature is compiled in (captionsEnabled flavor). */
     val isCapable: Boolean
 
-    fun init(callFacade: CallFacade, roomName: String, captionsId: String?)
+    /**
+     * Binds captions to the active call.
+     *
+     * @param callFacade The connected call.
+     * @param sessionKey The session key JWT returned by the backend when the session was created.
+     */
+    fun init(callFacade: CallFacade, sessionKey: String)
 
     suspend fun enable(): Result<Unit>
 

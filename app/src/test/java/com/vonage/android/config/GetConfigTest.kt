@@ -84,6 +84,10 @@ class GetConfigTest {
         assertEquals(AppConfig.MeetingRoomSettings.ALLOW_SETTINGS, config.allowMeetingRoomSettings)
         assertEquals(AppConfig.MeetingRoomSettings.ALLOW_ARCHIVING, config.allowArchiving)
         assertEquals(AppConfig.MeetingRoomSettings.ALLOW_CAPTIONS, config.allowCaptions)
+        assertEquals(
+            AppConfig.MeetingRoomSettings.ALLOW_CAPTION_TRANSLATION,
+            config.allowCaptionTranslation,
+        )
         assertEquals(AppConfig.MeetingRoomSettings.ALLOW_CHAT, config.allowChat)
         assertEquals(
             AppConfig.MeetingRoomSettings.ALLOW_DEVICE_SELECTION,
@@ -94,6 +98,10 @@ class GetConfigTest {
         assertEquals(
             AppConfig.MeetingRoomSettings.ALLOW_PICTURE_IN_PICTURE,
             config.allowPictureInPicture,
+        )
+        assertEquals(
+            AppConfig.MeetingRoomSettings.ALLOW_POST_CALL_TRANSCRIPTION,
+            config.allowPostCallTranscription,
         )
         assertEquals(AppConfig.MeetingRoomSettings.ALLOW_SCREEN_SHARE, config.allowScreenShare)
         assertEquals(

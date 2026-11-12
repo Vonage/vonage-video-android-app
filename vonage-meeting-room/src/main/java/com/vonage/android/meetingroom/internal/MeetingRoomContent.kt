@@ -122,6 +122,7 @@ private fun MeetingRoomContentInner(
             onListenUnread = viewModel::listenUnread,
             onEmojiSent = viewModel::sendEmoji,
             onToggleRecording = viewModel::archiveCall,
+            onToggleTranscription = viewModel::transcribeCall,
             onToggleCaptions = viewModel::captions,
             onToggleScreenSharing = { enable ->
                 if (enable) {

@@ -39,6 +39,7 @@ fun AdaptiveGrid(
     participantContent: @Composable (Participant, Modifier) -> Unit,
     modifier: Modifier = Modifier,
     spacing: Dp = 8.dp,
+    onPlaceholderClick: () -> Unit = {},
 ) {
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val dimensions = remember(participants.size, isLandscape) {
@@ -101,6 +102,7 @@ fun AdaptiveGrid(
                             .takeLast(participants.size - takeCount)
                             .map { it.name }
                             .toImmutableList(),
+                        onClick = onPlaceholderClick,
                     )
                 }
             }

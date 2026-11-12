@@ -3,12 +3,13 @@ package com.vonage.android.meetingroom.internal.viewmodel
 import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
+import com.vonage.android.archiving.ArchiveId
+import com.vonage.android.archiving.ArchiveType
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.VonageArchiving
 import com.vonage.android.captions.CaptionsUiState
 import com.vonage.android.captions.VonageCaptions
 import com.vonage.android.kotlin.VonageVideoClient
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
@@ -20,6 +21,7 @@ import com.vonage.android.meetingroom.api.MeetingRoomLayoutMode
 import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.api.PublisherSettings
+import com.vonage.android.meetingroom.api.SessionKeyHolder
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
@@ -30,6 +32,7 @@ import com.vonage.android.meetingroom.internal.util.ActivityContextHolder
 import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.settings.CallSettingsHolder
+import com.vonage.android.settings.PublisherPreferences
 import com.vonage.android.shared.session.SessionInfo
 import com.vonage.android.shared.session.SessionRepository
 import io.mockk.coEvery
@@ -86,6 +89,7 @@ class MeetingRoomViewModelTest {
         )
     }
     private val userBackgroundRepository: UserBackgroundRepository = mockk(relaxed = true)
+    private val sessionKeyHolder = SessionKeyHolder()
 
     private lateinit var sut: MeetingRoomViewModel
 
@@ -103,6 +107,7 @@ class MeetingRoomViewModelTest {
         every { container.callSettingsHolder } returns callSettingsHolder
         every { container.getBackgroundsUseCase } returns getBackgroundsUseCase
         every { container.userBackgroundRepository } returns userBackgroundRepository
+        every { container.sessionKeyHolder } returns sessionKeyHolder
 
         every { prebuilt.roomName } returns ANY_ROOM_NAME
         every { prebuilt.configuration } returns MeetingRoomConfiguration()
@@ -131,6 +136,8 @@ class MeetingRoomViewModelTest {
 
         verify { activityContextHolder.setActivityContext(context) }
         verify { mockCall.connect(any(Context::class)) }
+        verify { videoClient.initializeSession("application-id", "session-id", "token") }
+        assertEquals(ANY_SESSION_KEY, sessionKeyHolder.sessionKey)
     }
 
     @Test
@@ -162,6 +169,7 @@ class MeetingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when initialize fails then returns error state`() = runTest {
+        sessionKeyHolder.sessionKey = "stale-key"
         coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns Result.failure(Exception("Empty response"))
 
         sut.setup(context)
@@ -172,6 +180,7 @@ class MeetingRoomViewModelTest {
         assertEquals(false, errorState.isLoading)
         assertEquals(true, errorState.isError)
         assertEquals(audioDevicesStateMock, errorState.audioDevicesState)
+        assertEquals(null, sessionKeyHolder.sessionKey) // never keeps a previous room's key
     }
 
     @Test
@@ -274,6 +283,27 @@ class MeetingRoomViewModelTest {
         verify { mockCall.applyLocalVideoEffect(VideoEffect.BlurLow) }
     }
 
+    @Test
+    fun `given connected call when endCall then final publisher state is saved as preferences`() = runTest {
+        val effect = VideoEffect.BackgroundImage(id = "bg-1", imagePath = "path")
+        val mockPublisher = mockk<PublisherState>(relaxed = true) {
+            every { isMicEnabled } returns MutableStateFlow(false)
+            every { isCameraEnabled } returns MutableStateFlow(true)
+            every { videoEffect } returns MutableStateFlow(effect)
+        }
+        val mockCall = givenMockCall()
+        every { mockCall.publisher } returns MutableStateFlow(mockPublisher)
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        sut.endCall()
+
+        assertEquals(
+            PublisherPreferences(publishAudio = false, publishVideo = true, videoEffect = effect),
+            callSettingsHolder.publisherPreferences.value,
+        )
+    }
+
     // endregion
 
     // region End call
@@ -356,8 +386,8 @@ class MeetingRoomViewModelTest {
     @Test
     fun `given viewmodel when archiveCall true then emit correct state`() = runTest {
         givenMockCall()
-        coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(
-            com.vonage.android.archiving.ArchiveId("archiveId"),
+        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY) } returns success(
+            ArchiveId("archiveId"),
         )
 
         sut.uiState.test {
@@ -370,17 +400,17 @@ class MeetingRoomViewModelTest {
             sut.archiveCall(true)
             assertEquals(ArchivingUiState.STARTING, awaitItem().archivingUiState)
             assertEquals(ArchivingUiState.RECORDING, awaitItem().archivingUiState)
-            coVerify { vonageArchiving.startArchive(ANY_ROOM_NAME) }
+            coVerify { vonageArchiving.startArchive(ANY_SESSION_KEY) }
         }
     }
 
     @Test
     fun `given viewmodel when archiveCall false then emit correct state`() = runTest {
         givenMockCall()
-        coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(
-            com.vonage.android.archiving.ArchiveId("archiveId"),
+        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY) } returns success(
+            ArchiveId("archiveId"),
         )
-        coEvery { vonageArchiving.stopArchive(ANY_ROOM_NAME) } returns success(true)
+        coEvery { vonageArchiving.stopArchive(ANY_SESSION_KEY) } returns success(true)
 
         sut.uiState.test {
             awaitItem()
@@ -392,20 +422,20 @@ class MeetingRoomViewModelTest {
             sut.archiveCall(true)
             assertEquals(ArchivingUiState.STARTING, awaitItem().archivingUiState)
             assertEquals(ArchivingUiState.RECORDING, awaitItem().archivingUiState)
-            coVerify { vonageArchiving.startArchive(ANY_ROOM_NAME) }
+            coVerify { vonageArchiving.startArchive(ANY_SESSION_KEY) }
 
             sut.archiveCall(false)
             assertEquals(ArchivingUiState.STOPPING, awaitItem().archivingUiState)
             assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState)
-            coVerify { vonageArchiving.stopArchive(ANY_ROOM_NAME) }
+            coVerify { vonageArchiving.stopArchive(ANY_SESSION_KEY) }
         }
     }
 
     @Test
     fun `given viewmodel when other participant starts archiving then emit correct state`() = runTest {
         val mockCall = givenMockCall()
-        val archivingStateFlow = MutableSharedFlow<ArchivingState>()
-        every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+        val runningArchives = MutableSharedFlow<Map<ArchiveType, ArchiveId>>()
+        every { vonageArchiving.bind(mockCall) } returns runningArchives
 
         sut.uiState.test {
             awaitItem()
@@ -414,7 +444,7 @@ class MeetingRoomViewModelTest {
             awaitItem() // audio devices
             assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState) // connected
 
-            archivingStateFlow.emit(ArchivingState.Started("any-archiving-id"))
+            runningArchives.emit(mapOf(ArchiveType.RECORDING to ArchiveId("any-archiving-id")))
             assertEquals(ArchivingUiState.RECORDING, awaitItem().archivingUiState)
         }
     }
@@ -422,8 +452,8 @@ class MeetingRoomViewModelTest {
     @Test
     fun `given viewmodel when other participant stops archiving then emit correct state`() = runTest {
         val mockCall = givenMockCall()
-        val archivingStateFlow = MutableSharedFlow<ArchivingState>()
-        every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+        val runningArchives = MutableSharedFlow<Map<ArchiveType, ArchiveId>>()
+        every { vonageArchiving.bind(mockCall) } returns runningArchives
 
         sut.uiState.test {
             awaitItem()
@@ -432,10 +462,10 @@ class MeetingRoomViewModelTest {
             awaitItem() // audio devices
             assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState) // connected
 
-            archivingStateFlow.emit(ArchivingState.Started("any-archiving-id"))
+            runningArchives.emit(mapOf(ArchiveType.RECORDING to ArchiveId("any-archiving-id")))
             assertEquals(ArchivingUiState.RECORDING, awaitItem().archivingUiState)
 
-            archivingStateFlow.emit(ArchivingState.Stopped("any-archiving-id"))
+            runningArchives.emit(emptyMap())
             assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState)
         }
     }
@@ -443,10 +473,10 @@ class MeetingRoomViewModelTest {
     @Test
     fun `given local user starts recording then recordingStartedByOthers is false`() = runTest {
         val mockCall = givenMockCall()
-        val archivingStateFlow = MutableSharedFlow<ArchivingState>()
-        every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
-        coEvery { vonageArchiving.startArchive(ANY_ROOM_NAME) } returns success(
-            com.vonage.android.archiving.ArchiveId("archiveId"),
+        val runningArchives = MutableSharedFlow<Map<ArchiveType, ArchiveId>>()
+        every { vonageArchiving.bind(mockCall) } returns runningArchives
+        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY) } returns success(
+            ArchiveId("archiveId"),
         )
 
         sut.uiState.test {
@@ -461,7 +491,7 @@ class MeetingRoomViewModelTest {
             assertEquals(ArchivingUiState.RECORDING, awaitItem().archivingUiState)
 
             // Emit the Started event (may not emit a new uiState item if we're already RECORDING)
-            archivingStateFlow.emit(ArchivingState.Started("archiveId"))
+            runningArchives.emit(mapOf(ArchiveType.RECORDING to ArchiveId("archiveId")))
             testScheduler.advanceUntilIdle()
 
             assertEquals(ArchivingUiState.RECORDING, sut.uiState.value.archivingUiState)
@@ -471,8 +501,8 @@ class MeetingRoomViewModelTest {
     @Test
     fun `given remote participant starts recording then recordingStartedByOthers is true`() = runTest {
         val mockCall = givenMockCall()
-        val archivingStateFlow = MutableSharedFlow<ArchivingState>()
-        every { vonageArchiving.bind(mockCall) } returns archivingStateFlow
+        val runningArchives = MutableSharedFlow<Map<ArchiveType, ArchiveId>>()
+        every { vonageArchiving.bind(mockCall) } returns runningArchives
 
         sut.uiState.test {
             awaitItem()
@@ -482,7 +512,7 @@ class MeetingRoomViewModelTest {
             awaitItem() // connected
 
             // Remote participant starts recording (without local archiveCall)
-            archivingStateFlow.emit(ArchivingState.Started("remote-archive-id"))
+            runningArchives.emit(mapOf(ArchiveType.RECORDING to ArchiveId("remote-archive-id")))
 
             val recordingState = awaitItem()
             assertEquals(ArchivingUiState.RECORDING, recordingState.archivingUiState)
@@ -582,18 +612,17 @@ class MeetingRoomViewModelTest {
     // region Captions
 
     @Test
-    fun `given viewmodel when init with captionsId then emit correct state`() = runTest {
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse(captionsId = "captionsId")
-        val mockCall: CallFacade = buildMockCall()
-        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
+    fun `given viewmodel when connected then captions start idle and bind with session key`() = runTest {
+        val mockCall = givenMockCall()
 
         sut.uiState.test {
             awaitItem()
             sut.setup(context)
             testScheduler.advanceUntilIdle()
             awaitItem() // audio devices
-            assertEquals(CaptionsUiState.ENABLED, awaitItem().captionsUiState)
+            assertEquals(CaptionsUiState.IDLE, awaitItem().captionsUiState)
         }
+        verify { vonageCaptions.init(mockCall, ANY_SESSION_KEY) }
     }
 
     @Test
@@ -922,17 +951,18 @@ class MeetingRoomViewModelTest {
     }
 
     private fun buildSuccessSessionResponse(
-        apiKey: String = "api-key",
+        applicationId: String = "application-id",
         sessionId: String = "session-id",
         token: String = "token",
-        captionsId: String? = null,
+        sessionKey: String = ANY_SESSION_KEY,
     ) = success(
-        SessionInfo(apiKey = apiKey, sessionId = sessionId, token = token, captionsId = captionsId),
+        SessionInfo(applicationId = applicationId, sessionId = sessionId, token = token, sessionKey = sessionKey),
     )
 
     // endregion
 
     private companion object {
         const val ANY_ROOM_NAME = "room-name"
+        const val ANY_SESSION_KEY = "session-key"
     }
 }

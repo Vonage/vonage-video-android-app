@@ -1,6 +1,7 @@
 package com.vonage.android.meetingroom.internal.data
 
 import com.vonage.android.meetingroom.api.MeetingRoomAuthTokenProvider
+import com.vonage.android.shared.network.redactSecrets
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -17,7 +18,10 @@ internal object MeetingRoomNetworkFactory {
     ): Retrofit {
         val client = OkHttpClient.Builder()
             .addInterceptor(
-                HttpLoggingInterceptor().apply {
+                // Bodies carry the session key and client token: mask them before logging.
+                HttpLoggingInterceptor { message ->
+                    HttpLoggingInterceptor.Logger.DEFAULT.log(message.redactSecrets())
+                }.apply {
                     level = if (isDebug) HttpLoggingInterceptor.Level.BODY
                     else HttpLoggingInterceptor.Level.NONE
                 }

@@ -34,6 +34,7 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.AudioMid
 import com.vonage.android.compose.vivid.icons.solid.Chart
+import com.vonage.android.compose.vivid.icons.solid.ClosedCaptioning
 import com.vonage.android.compose.vivid.icons.solid.Video
 import com.vonage.android.settings.R
 import com.vonage.android.settings.Setting
@@ -41,7 +42,9 @@ import com.vonage.android.settings.SettingsScreenActions
 import com.vonage.android.settings.SettingsSection
 import com.vonage.android.settings.SettingsUiState
 import com.vonage.android.settings.settings
+import com.vonage.android.settings.visibleSettingsSections
 import com.vonage.android.settings.ui.components.AudioBitrateSelector
+import com.vonage.android.settings.ui.components.CaptionsTranslationLanguageSelector
 import com.vonage.android.settings.ui.components.DegradationPreferenceSelector
 import com.vonage.android.settings.ui.components.FrameRateSelector
 import com.vonage.android.settings.ui.components.PreferredCodecOrderSelector
@@ -101,7 +104,7 @@ private fun SettingsListLayout(
             .padding(horizontal = VonageVideoTheme.dimens.paddingDefault),
         verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceXSmall),
     ) {
-        SettingsSection.entries.forEach { section ->
+        visibleSettingsSections(uiState).forEach { section ->
             item { SectionHeader(
                 text = stringResource(section.titleRes),
                 icon = section.icon,
@@ -123,9 +126,11 @@ private fun SettingsTabLayout(
     modifier: Modifier = Modifier,
 ) {
     var selectedSection by rememberSaveable { mutableStateOf(SettingsSection.VIDEO) }
+    val sections = visibleSettingsSections(uiState)
 
     Row(modifier = modifier) {
         SettingsTabRail(
+            sections = sections,
             selectedSection = selectedSection,
             onSelectSection = { selectedSection = it },
         )
@@ -148,6 +153,7 @@ private fun SettingsTabLayout(
 
 @Composable
 private fun SettingsTabRail(
+    sections: List<SettingsSection>,
     selectedSection: SettingsSection,
     onSelectSection: (SettingsSection) -> Unit,
     modifier: Modifier = Modifier,
@@ -159,7 +165,7 @@ private fun SettingsTabRail(
             .background(VonageVideoTheme.colors.background)
             .padding(vertical = VonageVideoTheme.dimens.paddingSmall),
     ) {
-        SettingsSection.entries.forEach { section ->
+        sections.forEach { section ->
             SettingsTabItem(
                 icon = section.icon,
                 label = stringResource(section.titleRes),
@@ -249,6 +255,7 @@ private fun LazyListScope.settingItem(
         Setting.AUDIO_BITRATE -> audioBitrateItem(uiState, actions)
         Setting.PUBLISHER_AUDIO_FALLBACK -> publisherAudioFallbackItem(uiState, actions)
         Setting.SUBSCRIBER_AUDIO_FALLBACK -> subscriberAudioFallbackItem(uiState, actions)
+        Setting.CAPTIONS_TRANSLATION_LANGUAGE -> captionsTranslationLanguageItem(uiState, actions)
         Setting.SENDER_STATS -> senderStatsItem(uiState, actions)
     }
 }
@@ -367,6 +374,20 @@ private fun LazyListScope.subscriberAudioFallbackItem(
     }
 }
 
+private fun LazyListScope.captionsTranslationLanguageItem(
+    uiState: SettingsUiState,
+    actions: SettingsScreenActions,
+) {
+    if (!uiState.showCaptionsTranslation) return
+    item {
+        CaptionsTranslationLanguageSelector(
+            languages = uiState.captionsTranslationLanguages,
+            selected = uiState.captionsTranslationLanguage,
+            onSelectionChange = actions.onCaptionsTranslationLanguageChange,
+        )
+    }
+}
+
 private fun LazyListScope.senderStatsItem(uiState: SettingsUiState, actions: SettingsScreenActions) {
     item {
         val isCallActive = uiState.call != null
@@ -386,6 +407,7 @@ private val SettingsSection.icon: ImageVector
     get() = when (this) {
         SettingsSection.VIDEO -> VividIcons.Solid.Video
         SettingsSection.AUDIO -> VividIcons.Solid.AudioMid
+        SettingsSection.CAPTIONS -> VividIcons.Solid.ClosedCaptioning
         SettingsSection.STATS -> VividIcons.Solid.Chart
     }
 

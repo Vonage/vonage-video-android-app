@@ -30,16 +30,24 @@ android {
 
     testOptions {
         unitTests.all { it.useJUnitPlatform() }
+        animationsDisabled = true
+        managedDevices {
+            localDevices {
+                create("pixel") {
+                    device = "Pixel 2"
+                    apiLevel = 34
+                    systemImageSource = "aosp-atd"
+                }
+            }
+        }
     }
 
     // Only dimensions with actual source-set differences in this module need explicit flavors.
     // Dimensions without custom source sets (chat, reactions, videofx, audiofx, settings) are
-    // handled via missingDimensionStrategy in defaultConfig, reducing variants from 512 to 16.
-    flavorDimensions += listOf("archiving", "captions", "screensharing")
+    // handled via missingDimensionStrategy in defaultConfig, reducing variants from 256 to 8.
+    flavorDimensions += listOf("captions", "screensharing")
 
     productFlavors {
-        create("archivingEnabled") { dimension = "archiving"; matchingFallbacks += listOf("enabled") }
-        create("archivingDisabled") { dimension = "archiving"; matchingFallbacks += listOf("disabled") }
         create("captionsEnabled") { dimension = "captions"; matchingFallbacks += listOf("enabled") }
         create("captionsDisabled") { dimension = "captions"; matchingFallbacks += listOf("disabled") }
         create("screensharingEnabled") { dimension = "screensharing"; matchingFallbacks += listOf("enabled") }
@@ -105,6 +113,7 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.ui.test.junit4)
 

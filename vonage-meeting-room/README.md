@@ -52,6 +52,7 @@ The main entry point. All methods return `this` for fluent chaining.
 | `.isDebug(Boolean)` | Enables verbose HTTP logging. |
 | `.reportingContent(@Composable (() -> Unit) -> Unit)` | Custom report-issue bottom sheet content. |
 | `.testSpeakerContent(@Composable () -> Unit)` | Optional "test speakers" control shown in the audio output selector. |
+| `.sessionKeyHolder(SessionKeyHolder?)` | Shared holder the SDK fills with the backend session key JWT, e.g. to list recordings after the call. |
 | `.build()` | Builds and returns `MeetingRoomPrebuilt`. |
 
 ### `MeetingRoomPrebuilt`
@@ -159,13 +160,14 @@ on top; it cannot un-disable a compile-time disabled feature.
 
 | Dimension      | Enabled flavor         | Disabled flavor         |
 |----------------|------------------------|-------------------------|
-| `archiving`    | `archivingEnabled`     | `archivingDisabled`     |
 | `captions`     | `captionsEnabled`      | `captionsDisabled`      |
 | `screensharing`| `screensharingEnabled` | `screensharingDisabled` |
 | `reporting`    | `reportingEnabled`     | `reportingDisabled`     |
 
 The remaining features (chat, reactions, videofx, audiofx, settings) are always included
 at the module level; their runtime availability is controlled solely by `MeetingRoomFeature`.
+Archiving has no flavor either: `ARCHIVING` (recording) and `POST_CALL_TRANSCRIPTION` are
+independent runtime features.
 
 ---
 

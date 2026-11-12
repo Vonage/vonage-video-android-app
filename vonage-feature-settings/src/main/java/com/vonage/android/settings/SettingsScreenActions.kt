@@ -19,5 +19,6 @@ data class SettingsScreenActions(
     val onPublisherAudioFallbackToggle: (Boolean) -> Unit = {},
     val onSubscriberAudioFallbackToggle: (Boolean) -> Unit = {},
     val onSenderStatsTrackToggle: (Boolean) -> Unit = {},
+    val onCaptionsTranslationLanguageChange: (String?) -> Unit = {},
     val onDismiss: () -> Unit = {},
 )

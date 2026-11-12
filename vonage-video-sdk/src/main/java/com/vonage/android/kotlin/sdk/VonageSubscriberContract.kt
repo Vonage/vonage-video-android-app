@@ -23,7 +23,16 @@ interface VonageSubscriber {
     fun setAudioLevelListener(listener: VonageAudioLevelListener?)
     fun setVideoStatsListener(listener: VonageSubscriberVideoStatsListener?)
     fun setAudioStatsListener(listener: VonageSubscriberAudioStatsListener?)
+    fun setNetworkConditionListener(listener: VonageNetworkConditionListener?)
     fun setCaptionsListener(listener: VonageCaptionsListener?)
+
+    /**
+     * Translates the captions received from this subscriber into [languageCode]
+     * (BCP-47, e.g. `es-ES`), or restores the original language when `null`.
+     *
+     * @throws IllegalArgumentException if the SDK does not support [languageCode].
+     */
+    fun setCaptionsTranslationLanguage(languageCode: String?)
 }
 
 // region Subscriber listener interfaces

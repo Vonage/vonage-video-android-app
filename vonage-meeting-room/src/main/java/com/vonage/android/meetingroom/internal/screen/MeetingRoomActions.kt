@@ -21,6 +21,7 @@ internal data class MeetingRoomActions(
     val onMessageSent: (String) -> Unit = {},
     val onListenUnread: (Boolean) -> Unit = {},
     val onToggleRecording: (Boolean) -> Unit = {},
+    val onToggleTranscription: (Boolean) -> Unit = {},
     val onToggleCaptions: (Boolean) -> Unit = {},
     val onToggleScreenSharing: (Boolean) -> Unit = {},
     val onChangeLayout: (CallLayoutType) -> Unit = {},

@@ -32,11 +32,13 @@
 - Optional modules use flavor dimensions with `enabled`/`disabled` product flavors (e.g., `vonage-feature-chat/build.gradle.kts`).
 - Public contracts live in `src/main`; behavior implementations live in `src/enabled` and `src/disabled`. When changing a feature API, update **both** flavor source sets.
 - `vonage-meeting-room` also accepts a runtime filter: `MeetingRoomBuilder.enabledFeatures(Set<MeetingRoomFeature>)`. A feature is active only when its **compile-time flavor is `enabled`** AND it is **present in the runtime set**. You cannot enable a compile-time disabled feature at runtime.
-- `vonage-meeting-room` has its own flavor dimensions for three features (`archiving`, `captions`, `screensharing`) with full names like `archivingEnabled`/`archivingDisabled`. The remaining features (chat, reactions, videofx, audiofx, settings) always resolve to `enabled` inside this module; runtime availability is via `MeetingRoomFeature`.
+- `vonage-meeting-room` has its own flavor dimensions for two features (`captions`, `screensharing`) with full names like `captionsEnabled`/`captionsDisabled`. The remaining features (chat, reactions, videofx, audiofx, settings) always resolve to `enabled` inside this module; runtime availability is via `MeetingRoomFeature`.
+- `vonage-feature-archiving` is the exception to the flavor pattern: it has no flavors. Recording (`allowArchiving`) and post-call transcription (`allowPostCallTranscription`) are enabled independently at runtime, through `MeetingRoomFeature.ARCHIVING`/`POST_CALL_TRANSCRIPTION` and the archive types passed to `ArchivingModule.provideVonageArchiving(...)`; a disabled type is never started, stopped, reported or listed.
 
 ## Architecture Notes
 
-- Session bootstrap path: `APIService.getSession()` → `SessionRepository` → `MeetingRoomViewModel.connect(...)` → `VonageVideoClient.initializeSession(...)`.
+- Session bootstrap path: `SessionApiService.createSession()` + `joinSession()` (v2 tRPC, `{result:{data}}` envelope `TrpcResponse`) → `SessionRepository` (both in `vonage-video-shared`, `com.vonage.android.shared.session`) → `MeetingRoomViewModel.connect(...)` → `VonageVideoClient.initializeSession(...)`.
+- The v2 `sessionKey` JWT scopes archiving and captions calls. The SDK writes it to `SessionKeyHolder` (shared with the app via `MeetingRoomBuilder.sessionKeyHolder(...)` and Hilt) so the goodbye screen can list recordings. Treat it as a secret: never log it or put it in nav args.
 - `BASE_API_URL` propagates to three locations: Retrofit base URL (`RetrofitModule.kt`), deep links (`AppNavHost.kt`), and sharing links (`util/navigateToShare.kt`).
 - Hilt DI is used in `app/`. `vonage-meeting-room` uses a **manual** `MeetingRoomContainer` — do not introduce Hilt into that module.
 - Feature signal plugins (chat, reactions) are injected into `VonageVideoClient` via `SdkModule.provideVonageVideoClient(...)` in `app/`.
@@ -44,6 +46,12 @@
 - `vonage-meeting-room` is under active refactoring: use cases are being introduced and `Call.kt` (~800 lines) is being split into focused collaborators. Consult the inline comments in that module before making changes there.
 - Debug builds append `.debug` to `applicationId` and `-DEBUG` to `versionName`, allowing debug and release to co-exist on device.
 - Firebase/Crashlytics plugins are **only applied for release builds** (guarded by `isReleaseBuild` check in `app/build.gradle.kts`).
+
+## AI Assistant Skills
+
+- Task-specific guides live in `.claude/skills/<name>/SKILL.md` (index: `.claude/skills/README.md`), mirrored for kiro as symlinks in `.kiro/steering/`. Use them for setup (`/setup`), configuration (`/configure`), new config keys (`/feature-flag`), new modules (`/new-feature-module`), test routing (`/run-tests`) and snapshots (`/record-snapshots`).
+- They are verified against the build, not the docs; where they disagree with a doc, trust the skill and fix the doc (`.claude/skills/EVALUATIONS.md` lists known drift).
+- Theme regeneration is `./gradlew updateTheme`, **not** `generateVonageConfig`; feature-module tests are `:<module>:testEnabledDebugUnitTest`; the binary-API tasks are `androidApiCheck` / `androidApiDump`.
 
 ## Developer Workflows
 

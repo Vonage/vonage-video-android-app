@@ -1,7 +1,6 @@
 package com.vonage.android.kotlin
 
 import app.cash.turbine.test
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.ParticipantState
 import com.vonage.android.kotlin.model.SessionEvent
@@ -16,6 +15,7 @@ import com.vonage.android.kotlin.signal.SignalPlugin
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import io.mockk.verifyOrder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -360,34 +360,48 @@ class CallTest : CallTestBase() {
     // region Archiving
 
     @Test
-    fun `archiving started event should update archiving state flow`() = runTest(testDispatcher) {
+    fun `active archives should be empty initially`() = runTest(testDispatcher) {
+        val call = createCall()
+        assertEquals(emptyMap<String, String?>(), call.activeArchives.value)
+    }
+
+    @Test
+    fun `archive started should add the archive with its name`() = runTest(testDispatcher) {
         val call = createCall()
 
         call.connect(mockContext).test {
             capturedArchiveListener!!.onArchiveStarted("archive-1", "MyArchive")
 
-            assertEquals(ArchivingState.Started("archive-1"), call.archivingStateFlow.value)
+            assertEquals(mapOf("archive-1" to "MyArchive"), call.activeArchives.value)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `archiving stopped event should update archiving state flow`() = runTest(testDispatcher) {
+    fun `archive stopped should remove only that archive`() = runTest(testDispatcher) {
+        val call = createCall()
+
+        call.connect(mockContext).test {
+            capturedArchiveListener!!.onArchiveStarted("recording-id", "recording")
+            capturedArchiveListener!!.onArchiveStarted("transcription-id", "transcription")
+            capturedArchiveListener!!.onArchiveStopped("recording-id")
+
+            assertEquals(mapOf("transcription-id" to "transcription"), call.activeArchives.value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `archive stopped of an unknown archive should keep the active archives`() = runTest(testDispatcher) {
         val call = createCall()
 
         call.connect(mockContext).test {
             capturedArchiveListener!!.onArchiveStarted("archive-1", null)
-            capturedArchiveListener!!.onArchiveStopped("archive-1")
+            capturedArchiveListener!!.onArchiveStopped("unknown")
 
-            assertEquals(ArchivingState.Stopped("archive-1"), call.archivingStateFlow.value)
+            assertEquals(mapOf("archive-1" to null), call.activeArchives.value)
             cancelAndIgnoreRemainingEvents()
         }
-    }
-
-    @Test
-    fun `archiving state should be Idle initially`() = runTest(testDispatcher) {
-        val call = createCall()
-        assertEquals(ArchivingState.Idle, call.archivingStateFlow.value)
     }
 
     // endregion
@@ -538,6 +552,76 @@ class CallTest : CallTestBase() {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `new subscriber without translation language should not call the SDK`() = runTest(testDispatcher) {
+        val call = createCall()
+        val stream = createVonageStream("stream-1", "Alice")
+        val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+            every { this@mockk.stream } returns stream
+        }
+        every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+        call.connect(mockContext).test {
+            capturedSessionListener!!.onStreamReceived(stream)
+            runCurrent()
+            awaitItem() // StreamReceived
+
+            call.setCaptionsTranslationLanguage(null)
+            runCurrent()
+
+            verify(exactly = 0) { mockSubscriber.setCaptionsTranslationLanguage(any()) }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `new subscriber should receive the selected translation language`() = runTest(testDispatcher) {
+        val call = createCall()
+        val stream = createVonageStream("stream-1", "Alice")
+        val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+            every { this@mockk.stream } returns stream
+        }
+        every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+        call.setCaptionsTranslationLanguage("es-ES")
+        runCurrent()
+
+        call.connect(mockContext).test {
+            capturedSessionListener!!.onStreamReceived(stream)
+            runCurrent()
+            awaitItem() // StreamReceived
+
+            verify(exactly = 1) { mockSubscriber.setCaptionsTranslationLanguage("es-ES") }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `clearing the translation language should restore the spoken language`() = runTest(testDispatcher) {
+        val call = createCall()
+        val stream = createVonageStream("stream-1", "Alice")
+        val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+            every { this@mockk.stream } returns stream
+        }
+        every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+        call.connect(mockContext).test {
+            capturedSessionListener!!.onStreamReceived(stream)
+            runCurrent()
+            awaitItem() // StreamReceived
+
+            call.setCaptionsTranslationLanguage("es-ES")
+            runCurrent()
+            call.setCaptionsTranslationLanguage(null)
+            runCurrent()
+
+            verifyOrder {
+                mockSubscriber.setCaptionsTranslationLanguage("es-ES")
+                mockSubscriber.setCaptionsTranslationLanguage(null)
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     // endregion
 

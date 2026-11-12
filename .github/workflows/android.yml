@@ -138,7 +138,7 @@ jobs:
 
       - name: Run UI Tests
         run: |
-          ./gradlew pixelDebugAndroidTest --info --stacktrace --no-build-cache
+          ./gradlew pixelDebugAndroidTest :vonage-meeting-room:pixelCaptionsEnabledScreensharingEnabledDebugAndroidTest --info --stacktrace --no-build-cache
 
       - name: Upload UI test reports
         uses: actions/upload-artifact@v4
@@ -148,3 +148,5 @@ jobs:
           path: |
             app/build/reports/androidTests/
             app/build/outputs/androidTest-results/
+            vonage-meeting-room/build/reports/androidTests/
+            vonage-meeting-room/build/outputs/androidTest-results/

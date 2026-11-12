@@ -43,6 +43,7 @@ import kotlinx.collections.immutable.toImmutableList
 
 internal const val ASPECT_RATIO_16_9 = 16f / 9f
 
+@Suppress("LongParameterList")
 @Composable
 fun ActiveSpeakerLayout(
     participants: ImmutableList<Participant>,
@@ -52,6 +53,7 @@ fun ActiveSpeakerLayout(
     spotlightWeight: Float = 0.7f,
     otherParticipantsWeight: Float = 0.3f,
     otherParticipantsSize: Dp = 200.dp,
+    onPlaceholderClick: () -> Unit = {},
 ) {
     val mainParticipant by call.activeSpeaker.collectAsStateWithLifecycle()
     val nonMainParticipant = remember(participants, mainParticipant) {
@@ -92,6 +94,7 @@ fun ActiveSpeakerLayout(
                     visibleFilmstripItems = visibleFilmstripItems,
                     overflowFilmstripNames = overflowFilmstripNames,
                     otherParticipantsSize = otherParticipantsSize,
+                    onPlaceholderClick = onPlaceholderClick,
                 )
             }
 
@@ -105,6 +108,7 @@ fun ActiveSpeakerLayout(
                     visibleFilmstripItems = visibleFilmstripItems,
                     overflowFilmstripNames = overflowFilmstripNames,
                     otherParticipantsSize = otherParticipantsSize,
+                    onPlaceholderClick = onPlaceholderClick,
                 )
             }
         }
@@ -122,6 +126,7 @@ private fun ActiveSpeakerVerticalLayout(
     visibleFilmstripItems: ImmutableList<Participant>,
     overflowFilmstripNames: ImmutableList<String>,
     otherParticipantsSize: Dp,
+    onPlaceholderClick: () -> Unit,
 ) {
     val hasFilmstripContent = visibleFilmstripItems.isNotEmpty() || overflowFilmstripNames.isNotEmpty()
     Column(
@@ -163,6 +168,7 @@ private fun ActiveSpeakerVerticalLayout(
                                 .width(otherParticipantsSize)
                                 .height(otherParticipantsSize),
                             participantNames = overflowFilmstripNames,
+                            onClick = onPlaceholderClick,
                         )
                     }
                 }
@@ -182,6 +188,7 @@ private fun ActiveSpeakerHorizontalLayout(
     visibleFilmstripItems: ImmutableList<Participant>,
     overflowFilmstripNames: ImmutableList<String>,
     otherParticipantsSize: Dp,
+    onPlaceholderClick: () -> Unit,
 ) {
     val hasFilmstripContent = visibleFilmstripItems.isNotEmpty() || overflowFilmstripNames.isNotEmpty()
     Row(
@@ -223,6 +230,7 @@ private fun ActiveSpeakerHorizontalLayout(
                                 .height(otherParticipantsSize)
                                 .aspectRatio(ASPECT_RATIO_16_9),
                             participantNames = overflowFilmstripNames,
+                            onClick = onPlaceholderClick,
                         )
                     }
                 }

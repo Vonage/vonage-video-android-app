@@ -12,6 +12,7 @@ import com.vonage.android.kotlin.sdk.VonageBlurLevel
 import com.vonage.android.kotlin.sdk.VonageCameraListener
 import com.vonage.android.kotlin.sdk.VonageDegradationPref
 import com.vonage.android.kotlin.sdk.VonageMuteListener
+import com.vonage.android.kotlin.sdk.VonageNetworkConditionListener
 import com.vonage.android.kotlin.sdk.VonageNoiseSuppression
 import com.vonage.android.kotlin.sdk.VonagePublisher
 import com.vonage.android.kotlin.sdk.VonagePublisherAudioStatsEntry
@@ -245,6 +246,29 @@ internal class OpenTokPublisher(
             }
             listener.onAudioStats(entries)
         }
+    }
+
+    override fun setNetworkConditionListener(listener: VonageNetworkConditionListener?) {
+        if (listener == null) {
+            raw.setMediaLinkStatsListener(null); return
+        }
+        raw.setMediaLinkStatsListener(object : PublisherKit.MediaLinkStatsListener {
+            override fun onMediaLinkStats(
+                publisher: PublisherKit,
+                stats: Array<PublisherKit.PublisherMediaLinkStats>,
+            ) {
+                // Routed sessions report a single entry; relayed ones one per subscriber.
+                stats.firstOrNull()?.let { listener.onNetworkCondition(it.transport.toVonageNetworkCondition()) }
+            }
+
+            override fun onNetworkConditionChanged(
+                publisher: PublisherKit,
+                stats: PublisherKit.PublisherMediaLinkStats,
+                reason: String,
+            ) {
+                listener.onNetworkCondition(stats.transport.toVonageNetworkCondition())
+            }
+        })
     }
 
     // endregion

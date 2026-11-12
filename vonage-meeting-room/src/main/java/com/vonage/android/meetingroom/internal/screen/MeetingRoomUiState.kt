@@ -17,6 +17,8 @@ import kotlinx.collections.immutable.persistentListOf
 internal data class MeetingRoomUiState(
     val roomName: String,
     val archivingUiState: ArchivingUiState = ArchivingUiState.IDLE,
+    /** Post-call transcription archive, tracked separately so it can run alongside a recording. */
+    val transcriptionUiState: ArchivingUiState = ArchivingUiState.IDLE,
     val captionsUiState: CaptionsUiState = CaptionsUiState.IDLE,
     val screenSharingState: ScreenSharingState = ScreenSharingState.IDLE,
     val audioDevicesState: AudioDevicesState? = null,
@@ -37,7 +39,14 @@ internal data class MeetingRoomUiState(
     /** Runtime feature set — applied on top of compile-time flavor toggles. */
     val enabledFeatures: Set<MeetingRoomFeature> = MeetingRoomFeature.all,
     val recordingStartedByOthers: Boolean = false,
+    /** Transient "transcription started/stopped" toast; null when nothing is shown. */
+    val transcriptionNotification: TranscriptionNotification? = null,
 )
+
+internal enum class TranscriptionNotification {
+    STARTED,
+    STOPPED,
+}
 
 internal enum class CallLayoutType {
     SPEAKER_LAYOUT,

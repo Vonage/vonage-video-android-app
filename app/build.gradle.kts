@@ -44,8 +44,8 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
         // NOTE: The following versionCode and versionName are placeholders.
         // Actual values are set dynamically by the GitHub Actions workflow during CI/CD.
-        versionCode = 140
-        versionName = "1.4.0"
+        versionCode = 150
+        versionName = "1.5.0"
 
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
@@ -69,10 +69,10 @@ android {
         buildConfigField("boolean", "FEATURE_REACTIONS_ENABLED", "$reactionsProperty")
         missingDimensionStrategy("reactions", reactionsProperty.toEnabledString())
 
-        // Archiving/recording feature
+        // Archiving has no flavor: recording and transcription are each gated at runtime by their
+        // own config key, MeetingRoomFeature, and the VonageArchiving instance.
         val archivingProperty = configProps.getProperty("vonage.meetingRoom.allow_archiving", "true")
         buildConfigField("boolean", "FEATURE_ARCHIVING_ENABLED", "$archivingProperty")
-        missingDimensionStrategy("archiving", archivingProperty.toEnabledString(), archivingProperty.toModuleFlavorString("archiving"))
 
         // Captions feature
         val captionsProperty = configProps.getProperty("vonage.meetingRoom.allow_captions", "true")
@@ -241,7 +241,7 @@ android {
 
 play {
     serviceAccountCredentials.set(rootProject.file(".sign/service_account.json"))
-    track.set("alpha")
+    track.set("production")
     releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.COMPLETED)
     artifactDir.set(file("build/outputs/bundle/release"))
     defaultToAppBundles.set(true)

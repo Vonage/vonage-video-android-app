@@ -3,7 +3,6 @@ package com.vonage.android.compose.preview
 import android.content.Context
 import android.media.projection.MediaProjection
 import androidx.compose.runtime.Composable
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.CaptionLine
 import com.vonage.android.kotlin.model.ChatState
@@ -45,6 +44,7 @@ fun buildCallWithParticipants(
     override fun connect(context: Context): Flow<SessionEvent> = flowOf()
     override fun enableCaptions() { /* empty on purpose */ }
     override fun disableCaptions() { /* empty on purpose */ }
+    override fun setCaptionsTranslationLanguage(languageCode: String?) { /* empty on purpose */ }
     override fun pauseSession() { /* empty on purpose */ }
     override fun resumeSession() { /* empty on purpose */ }
     override fun endSession() { /* empty on purpose */ }
@@ -60,7 +60,7 @@ fun buildCallWithParticipants(
     override fun setDegradationPreference(preference: DegradationPreference) { /* empty on purpose */ }
 
     override val captionsStateFlow: StateFlow<ImmutableList<CaptionLine>> = MutableStateFlow(persistentListOf())
-    override val archivingStateFlow: StateFlow<ArchivingState> = MutableStateFlow(ArchivingState.Idle)
+    override val activeArchives: StateFlow<Map<String, String?>> = MutableStateFlow(emptyMap())
 
     override val chatSignalState: StateFlow<ChatState?> = MutableStateFlow(
         ChatState(

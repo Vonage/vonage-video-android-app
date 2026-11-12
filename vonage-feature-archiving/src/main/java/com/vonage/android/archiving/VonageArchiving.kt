@@ -1,6 +1,5 @@
 package com.vonage.android.archiving
 
-import com.vonage.android.kotlin.model.ArchivingState
 import com.vonage.android.kotlin.model.CallFacade
 import kotlinx.coroutines.flow.Flow
 
@@ -11,39 +10,45 @@ import kotlinx.coroutines.flow.Flow
 interface VonageArchiving {
 
     /**
-     * Binds to a call's archiving state flow to monitor real-time changes.
-     * Listen to this flow to react to archiving state transitions (Started, Stopped, Idle).
+     * Binds to the archives running in a call. Emits the current ones first, then every change;
+     * several can run at once, at most one per [ArchiveType].
      *
-     * @param call The call facade to bind to for archiving state updates
-     * @return Flow emitting archiving state changes throughout the call lifecycle
+     * @param call The call facade to bind to
+     * @return Flow of the running archives by type
      */
-    fun bind(call: CallFacade): Flow<ArchivingState>
+    fun bind(call: CallFacade): Flow<Map<ArchiveType, ArchiveId>>
 
     /**
-     * Starts archiving/recording for the specified room.
-     * Initiates a new recording session and returns the archive ID for tracking.
+     * Starts an archive of [type] for the session identified by [sessionKey]. A transcription
+     * archive is requested with `withTranscription: true`; the backend sets its options, including
+     * the AI summary.
      *
-     * @param roomName The name of the room to start archiving
+     * @param sessionKey The session key JWT returned by the backend when the session was created
+     * @param type Recording (default) or transcription archive
      * @return Result containing the archive ID on success, or an error on failure
      */
-    suspend fun startArchive(roomName: String): Result<ArchiveId>
+    suspend fun startArchive(
+        sessionKey: String,
+        type: ArchiveType = ArchiveType.RECORDING,
+    ): Result<ArchiveId>
 
     /**
-     * Stops the current active archive/recording session for the room.
-     * Ends the recording and finalizes the archive for later retrieval.
+     * Stops the active archive of [type] for the session identified by [sessionKey], leaving any
+     * archive of the other type running.
      *
-     * @param roomName The name of the room to stop archiving
+     * @param sessionKey The session key JWT returned by the backend when the session was created
+     * @param type Recording (default) or transcription archive
      * @return Result indicating success (true) or failure with error details
      */
-    suspend fun stopArchive(roomName: String): Result<Boolean>
+    suspend fun stopArchive(sessionKey: String, type: ArchiveType = ArchiveType.RECORDING): Result<Boolean>
 
     /**
-     * Retrieves all recorded archives for the specified room.
+     * Retrieves all recorded archives for the session identified by [sessionKey].
      * Returns a list of previously recorded sessions with their metadata.
      *
-     * @param roomName The name of the room to retrieve recordings for
+     * @param sessionKey The session key JWT returned by the backend when the session was created
      * @return Result containing a list of archives on success, or an error on failure
      */
-    suspend fun getRecordings(roomName: String): Result<List<Archive>>
+    suspend fun getRecordings(sessionKey: String): Result<List<Archive>>
 
 }

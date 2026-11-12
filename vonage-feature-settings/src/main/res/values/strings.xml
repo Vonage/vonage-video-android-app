@@ -4,6 +4,7 @@
 
     <string name="settings_section_audio">Audio</string>
     <string name="settings_section_video">Video</string>
+    <string name="settings_section_captions">Captions</string>
     <string name="settings_section_stats">Stats</string>
 
     <string name="settings_close">Close settings</string>
@@ -41,6 +42,11 @@
     <!-- Preferred Video Codec Order -->
     <string name="settings_codec_order_title">Preferred Video Codec</string>
     <string name="settings_codec_order_auto">Automatic (SDK decides)</string>
+    <!-- Captions translation -->
+    <string name="settings_captions_translation_title">Translation language</string>
+    <string name="settings_captions_translation_label">Language</string>
+    <string name="settings_captions_translation_original">Original (no translation)</string>
+    <string name="settings_captions_translation_description">Captions from other participants are translated into the selected language. Applies immediately while captions are enabled.</string>
     <!-- Footer -->
     <string name="settings_app_version">App version: %1$s</string>
     <string name="settings_vonage_sdk">Vonage SDK: %1$s</string>
@@ -67,4 +73,6 @@
     <string name="settings_stats_subscriber_audio_header">Audio</string>
     <string name="settings_stats_subscriber_audio_packets_received">Packets received/Packets lost</string>
     <string name="settings_stats_subscriber_audio_bytes_received">Bytes received</string>
+    <string name="settings_stats_network_condition">Network condition (0-5)</string>
+    <string name="settings_stats_network_condition_reason">Network condition reason</string>
 </resources>

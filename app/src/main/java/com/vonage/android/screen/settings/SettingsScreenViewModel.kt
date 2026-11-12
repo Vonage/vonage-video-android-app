@@ -1,6 +1,7 @@
 package com.vonage.android.screen.settings
 
 import androidx.lifecycle.viewModelScope
+import com.vonage.android.config.GetConfig
 import com.vonage.android.core.BaseViewModel
 import com.vonage.android.kotlin.model.CaptureFrameRate
 import com.vonage.android.kotlin.model.CaptureResolution
@@ -8,19 +9,27 @@ import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoCodec
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.settings.SettingsUiState
+import com.vonage.android.settings.captionsTranslationLanguages
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Locale
 
 @HiltViewModel(assistedFactory = SettingsScreenViewModelFactory::class)
 class SettingsScreenViewModel @AssistedInject constructor(
     @Assisted("appVersion") appVersion: String,
     @Assisted("sdkVersion") sdkVersion: String,
     private val callSettingsHolder: CallSettingsHolder,
+    getConfig: GetConfig,
 ) : BaseViewModel<SettingsUiState, SettingsViewEvent>(
-    SettingsUiState(appVersion = appVersion, sdkVersion = sdkVersion),
+    SettingsUiState(
+        appVersion = appVersion,
+        sdkVersion = sdkVersion,
+        showCaptionsTranslation = getConfig().let { it.allowCaptions && it.allowCaptionTranslation },
+        captionsTranslationLanguages = captionsTranslationLanguages(Locale.getDefault()),
+    ),
 ) {
 
     override val dependencies = SettingsActionDependencies(
@@ -51,6 +60,9 @@ class SettingsScreenViewModel @AssistedInject constructor(
     fun updatePreferredVideoCodecOrder(order: List<VideoCodec>?) = dispatch(UpdatePreferredVideoCodecOrderAction(order))
 
     fun updateAudioBitrate(bitrate: Int?) = dispatch(UpdateAudioBitrateAction(bitrate))
+
+    fun updateCaptionsTranslationLanguage(languageCode: String?) =
+        dispatch(UpdateCaptionsTranslationLanguageAction(languageCode))
 }
 
 @AssistedFactory

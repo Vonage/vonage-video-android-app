@@ -30,6 +30,7 @@ internal fun MeetingRoomContent(
     participants: ImmutableList<Participant>,
     layoutType: CallLayoutType,
     modifier: Modifier = Modifier,
+    onShowParticipants: () -> Unit = {},
 ) {
     val pinnedIds by call.pinnedParticipantIds.collectAsStateWithLifecycle()
 
@@ -45,6 +46,7 @@ internal fun MeetingRoomContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .testTag(MEETING_ROOM_PARTICIPANTS_GRID),
+                    onPlaceholderClick = onShowParticipants,
                     participantContent = { participant, tileModifier ->
                         key("${participant.id}_grid") {
                             ParticipantVideoCard(
@@ -65,6 +67,7 @@ internal fun MeetingRoomContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .testTag(MEETING_ROOM_PARTICIPANTS_SPEAKER_LAYOUT),
+                    onPlaceholderClick = onShowParticipants,
                     participantContent = { participant, tileModifier ->
                         key("${participant.id}_speaker") {
                             ParticipantVideoCard(

@@ -28,5 +28,5 @@ Passed with `launchApp: arguments:` and read by `E2eTestFlags`. They are honoure
 
 | Argument | Effect |
 |---|---|
-| `e2eForceAuthRequired` | Signed-out `GET session/{room}` requests get a local `401` (simulates an auth-enforcing backend) |
+| `e2eForceAuthRequired` | Signed-out `POST v2/createSession` requests get a local `401` (simulates an auth-enforcing backend) |
 | `e2eFakeSignIn` | "Sign in with Okta" succeeds instantly as "E2E Test User" without opening the browser (the Okta page and redirect are not exercised) |

@@ -21,12 +21,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.archiving.ArchivingUiState
 import com.vonage.android.archiving.ui.recordingAction
+import com.vonage.android.archiving.ui.transcriptionAction
 import com.vonage.android.captions.CaptionsUiState
 import com.vonage.android.captions.ui.captionsAction
 import com.vonage.android.chat.ui.chatAction
@@ -61,11 +63,12 @@ internal data class BottomBarState(
     val archivingUiState: ArchivingUiState,
     val screenSharingState: ScreenSharingState,
     val captionsUiState: CaptionsUiState,
-    val participants: ImmutableList<Participant>,
     val allowShowParticipantList: Boolean,
     val allowMicrophoneControl: Boolean,
     val allowCameraControl: Boolean,
     val enabledFeatures: Set<MeetingRoomFeature> = MeetingRoomFeature.all,
+    val onToggleParticipants: () -> Unit = {},
+    val transcriptionUiState: ArchivingUiState = ArchivingUiState.IDLE,
 )
 
 // 4 because mic + camera + menu + end
@@ -85,8 +88,6 @@ internal fun BottomBar(
 ) {
     val scope = rememberCoroutineScope()
 
-    var showParticipants by remember { mutableStateOf(false) }
-    val participantsSheetState = rememberModalBottomSheetState()
     var showMoreActions by remember { mutableStateOf(false) }
     val moreActionsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showReporting by remember { mutableStateOf(false) }
@@ -114,7 +115,7 @@ internal fun BottomBar(
         call = call,
         onShowParticipants = {
             scope.launch {
-                showParticipants = !showParticipants
+                state.onToggleParticipants()
                 moreActionsSheetState.hide()
                 showMoreActions = false
             }
@@ -174,6 +175,11 @@ internal fun BottomBar(
         ) {
             visibleActions.forEach { action ->
                 ControlButton(
+                    modifier = if (action.type == BottomBarActionType.PARTICIPANTS) {
+                        Modifier.testTag(BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BUTTON)
+                    } else {
+                        Modifier
+                    },
                     icon = action.icon,
                     onClick = action.onClick,
                     badgeCount = action.badgeCount,
@@ -195,20 +201,6 @@ internal fun BottomBar(
             }
             MoreActionsGrid(
                 actions = overflowActions.toImmutableList(),
-            )
-        }
-    }
-
-    if (showParticipants && state.allowShowParticipantList) {
-        ModalBottomSheet(
-            onDismissRequest = { showParticipants = false },
-            sheetState = participantsSheetState,
-        ) {
-            val pinnedIds by call.pinnedParticipantIds.collectAsStateWithLifecycle()
-            ParticipantsList(
-                participants = state.participants,
-                pinnedParticipantIds = pinnedIds,
-                actions = roomActions,
             )
         }
     }
@@ -277,6 +269,14 @@ private fun actionsFactory(
                 archivingUiState = state.archivingUiState,
             )
 
+            BottomBarActionType.POST_CALL_TRANSCRIPTION -> transcriptionAction(
+                onStartTranscription = { roomActions.onToggleTranscription(true) },
+                onStopTranscription = { roomActions.onToggleTranscription(false) },
+                startTranscriptionLabel = stringResource(R.string.transcription_start_transcription),
+                stopTranscriptionLabel = stringResource(R.string.transcription_stop_transcription),
+                transcriptionUiState = state.transcriptionUiState,
+            )
+
             BottomBarActionType.CAPTIONS -> captionsAction(
                 onEnableCaptions = { roomActions.onToggleCaptions(true) },
                 onDisableCaptions = { roomActions.onToggleCaptions(false) },
@@ -313,7 +313,6 @@ internal fun BottomBarPreview() {
             call = noOpCall,
             state = BottomBarState(
                 publisher = buildParticipants(15).first(),
-                participants = buildParticipants(15).toImmutableList(),
                 onShowChat = {},
                 isChatShow = false,
                 layoutType = CallLayoutType.SPEAKER_LAYOUT,
@@ -323,6 +322,7 @@ internal fun BottomBarPreview() {
                 allowShowParticipantList = true,
                 allowMicrophoneControl = true,
                 allowCameraControl = true,
+                onToggleParticipants = {},
             ),
         )
     }

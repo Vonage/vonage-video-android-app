@@ -37,7 +37,8 @@ vonageArchiving.bind(call)
     .collect()
 
 // Start recording
-vonageArchiving.startArchive(roomName)
+// sessionKey: JWT returned by the backend when the session was created
+vonageArchiving.startArchive(sessionKey)
     .onSuccess { archiveId -> 
         // Recording started successfully
     }
@@ -46,7 +47,7 @@ vonageArchiving.startArchive(roomName)
     }
 
 // Stop recording
-vonageArchiving.stopArchive(roomName)
+vonageArchiving.stopArchive(sessionKey)
     .onSuccess {
         // Recording stopped successfully
     }
@@ -55,7 +56,7 @@ vonageArchiving.stopArchive(roomName)
     }
 
 // Retrieve past recordings
-vonageArchiving.getRecordings(roomName)
+vonageArchiving.getRecordings(sessionKey)
     .onSuccess { archives ->
         archives.forEach { archive ->
             // Display or process archive
@@ -68,4 +69,6 @@ vonageArchiving.getRecordings(roomName)
 
 ## Build Variants
 
-This module supports feature toggles with `enabled` and `disabled` source sets for conditional compilation.
+This module has no flavors. `ArchivingModule.provideVonageArchiving(retrofit, recordingEnabled, transcriptionEnabled)`
+enables recording and transcription independently; archives of a disabled type are never started,
+stopped, reported by `bind` or listed by `getRecordings`.

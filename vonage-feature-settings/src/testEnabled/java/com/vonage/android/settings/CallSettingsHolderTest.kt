@@ -6,6 +6,7 @@ import com.vonage.android.kotlin.model.CaptureResolution
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
+import com.vonage.android.kotlin.model.VideoEffect
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -189,6 +190,40 @@ class CallSettingsHolderTest {
 
     // endregion
 
+    // region publisherPreferences
+
+    @Test
+    fun `initial publisherPreferences are empty`() {
+        assertEquals(PublisherPreferences(), sut.publisherPreferences.value)
+    }
+
+    @Test
+    fun `when updatePublisherPreferences then storage receives them`() = runTest {
+        val fake = FakeCallSettingsStorage()
+        val holder = CallSettingsHolder(storage = fake, scope = this)
+        advanceUntilIdle()
+        val preferences = PublisherPreferences(publishAudio = false, publishVideo = true, videoEffect = VideoEffect.BlurHigh)
+
+        holder.updatePublisherPreferences(preferences)
+        advanceUntilIdle()
+
+        assertEquals(preferences, holder.publisherPreferences.value)
+        assertEquals(preferences, fake.saved?.publisherPreferences)
+    }
+
+    @Test
+    fun `given stored publisherPreferences when awaitLoaded then they are restored`() = runTest {
+        val preferences = PublisherPreferences(publishAudio = true, videoEffect = VideoEffect.BlurLow)
+        val fake = FakeCallSettingsStorage(initial = PersistedCallSettings(publisherPreferences = preferences))
+        val holder = CallSettingsHolder(storage = fake, scope = TestScope(StandardTestDispatcher(testScheduler)))
+
+        holder.awaitLoaded()
+
+        assertEquals(preferences, holder.publisherPreferences.value)
+    }
+
+    // endregion
+
     // region storage
 
     @Test
@@ -234,6 +269,101 @@ class CallSettingsHolderTest {
         advanceUntilIdle()
 
         assertEquals(false, fake.saved?.opusDtxEnabled)
+    }
+
+    // endregion
+
+    // region captions translation
+
+    @Test
+    fun `initial captionsTranslationLanguage is null`() {
+        assertNull(sut.captionsTranslationLanguage.value)
+    }
+
+    @Test
+    fun `when updateCaptionsTranslationLanguage with bound call then value is updated and applied`() {
+        val call: CallFacade = mockk(relaxed = true)
+        sut.bind(call)
+
+        sut.updateCaptionsTranslationLanguage("es-ES")
+
+        assertEquals("es-ES", sut.captionsTranslationLanguage.value)
+        verify { call.setCaptionsTranslationLanguage("es-ES") }
+    }
+
+    @Test
+    fun `when updateCaptionsTranslationLanguage with null then spoken language is restored`() {
+        val call: CallFacade = mockk(relaxed = true)
+        sut.bind(call)
+        sut.updateCaptionsTranslationLanguage("es-ES")
+
+        sut.updateCaptionsTranslationLanguage(null)
+
+        assertNull(sut.captionsTranslationLanguage.value)
+        verify { call.setCaptionsTranslationLanguage(null) }
+    }
+
+    @Test
+    fun `when updateCaptionsTranslationLanguage then storage receives save with new value`() = runTest {
+        val fake = FakeCallSettingsStorage()
+        val holder = CallSettingsHolder(storage = fake, scope = this)
+        advanceUntilIdle()
+
+        holder.updateCaptionsTranslationLanguage("fr-FR")
+        advanceUntilIdle()
+
+        assertEquals("fr-FR", fake.saved?.captionsTranslationLanguage)
+    }
+
+    @Test
+    fun `given stored captionsTranslationLanguage when bind then it is applied after loading`() = runTest {
+        val fake = FakeCallSettingsStorage(initial = PersistedCallSettings(captionsTranslationLanguage = "de-DE"))
+        val holder = CallSettingsHolder(storage = fake, scope = this)
+        val call: CallFacade = mockk(relaxed = true)
+
+        holder.bind(call)
+        advanceUntilIdle()
+
+        assertEquals("de-DE", holder.captionsTranslationLanguage.value)
+        verify { call.setCaptionsTranslationLanguage("de-DE") }
+    }
+
+    // endregion
+
+    // region captions translation not allowed
+
+    @Test
+    fun `given translation not allowed when storage has a language then it is ignored`() = runTest {
+        val fake = FakeCallSettingsStorage(initial = PersistedCallSettings(captionsTranslationLanguage = "es-ES"))
+        val holder = CallSettingsHolder(storage = fake, scope = this, captionsTranslationAllowed = false)
+
+        holder.awaitLoaded()
+
+        assertNull(holder.captionsTranslationLanguage.value)
+    }
+
+    @Test
+    fun `given translation not allowed when bind then language is not applied to call`() = runTest {
+        val fake = FakeCallSettingsStorage(initial = PersistedCallSettings(captionsTranslationLanguage = "es-ES"))
+        val holder = CallSettingsHolder(storage = fake, scope = this, captionsTranslationAllowed = false)
+        val call: CallFacade = mockk(relaxed = true)
+
+        holder.bind(call)
+        advanceUntilIdle()
+
+        verify(exactly = 0) { call.setCaptionsTranslationLanguage(any()) }
+    }
+
+    @Test
+    fun `given translation not allowed when updateCaptionsTranslationLanguage then it is ignored`() {
+        val holder = CallSettingsHolder(scope = testScope, captionsTranslationAllowed = false)
+        val call: CallFacade = mockk(relaxed = true)
+        holder.bind(call)
+
+        holder.updateCaptionsTranslationLanguage("es-ES")
+
+        assertNull(holder.captionsTranslationLanguage.value)
+        verify(exactly = 0) { call.setCaptionsTranslationLanguage(any()) }
     }
 
     // endregion

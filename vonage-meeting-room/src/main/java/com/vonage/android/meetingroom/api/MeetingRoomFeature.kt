@@ -18,6 +18,12 @@ enum class MeetingRoomFeature {
     /** Session recording. */
     ARCHIVING,
 
+    /**
+     * Start/stop a post-call transcription, an archive that runs alongside any recording.
+     * Independent of [ARCHIVING]; the backend must support `withTranscription`.
+     */
+    POST_CALL_TRANSCRIPTION,
+
     /** Live captions overlay. */
     CAPTIONS,
 
