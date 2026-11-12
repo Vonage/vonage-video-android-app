@@ -42,7 +42,7 @@ body:
     attributes:
       label: App version
       description: The versionName / versionCode shown in app settings, or the branch/commit if running from source
-      placeholder: 1.4.0 (140)
+      placeholder: 1.5.0 (150)
     validations:
       required: true
 
