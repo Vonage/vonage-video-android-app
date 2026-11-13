@@ -38,13 +38,22 @@ class ArchiveRepository(
             vonageLogger.e(TAG, "getRecordings: exception", it)
         }
 
-    /** Starts an archive; [withTranscription] asks the backend for a transcription archive instead of a recording. */
+    /**
+     * Starts an archive; [withTranscription] asks the backend for a transcription archive instead of
+     * a recording, and [withSummary] (transcription only, `null` leaves it to the backend) whether
+     * the transcript includes the AI summary.
+     */
     suspend fun startArchive(
         sessionKey: String,
         withTranscription: Boolean = false,
+        withSummary: Boolean? = null,
     ): Result<ArchiveId> =
         runCatching {
-            val request = StartArchiveRequest(sessionKey = sessionKey, withTranscription = withTranscription)
+            val request = StartArchiveRequest(
+                sessionKey = sessionKey,
+                withTranscription = withTranscription,
+                withSummary = withSummary,
+            )
             val response = archivingApi.startArchiving(request)
             return if (response.isSuccessful) {
                 response.body()?.let {

@@ -139,6 +139,10 @@ class ArchiveRepositoryTest {
             """{"sessionKey":"key","withTranscription":true}""",
             json.encodeToString(StartArchiveRequest("key", withTranscription = true)),
         )
+        assertEquals(
+            """{"sessionKey":"key","withTranscription":true,"withSummary":false}""",
+            json.encodeToString(StartArchiveRequest("key", withTranscription = true, withSummary = false)),
+        )
     }
 
     @Test

@@ -44,8 +44,8 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
         // NOTE: The following versionCode and versionName are placeholders.
         // Actual values are set dynamically by the GitHub Actions workflow during CI/CD.
-        versionCode = 140
-        versionName = "1.4.0"
+        versionCode = 150
+        versionName = "1.5.0"
 
         testInstrumentationRunner = "com.vonage.android.HiltTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"

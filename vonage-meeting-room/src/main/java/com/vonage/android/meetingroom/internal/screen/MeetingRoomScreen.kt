@@ -39,6 +39,7 @@ import com.vonage.android.captions.ui.CaptionsOverlay
 import com.vonage.android.chat.ui.ChatPanel
 import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.components.GenericLoading
+import com.vonage.android.compose.components.VonageCheckbox
 import com.vonage.android.compose.components.bottombar.BottomBarAction
 import com.vonage.android.compose.components.bottombar.BottomBarActionType
 import com.vonage.android.audiofx.R as AudioFxR
@@ -486,15 +487,25 @@ internal fun MeetingRoomScreen(
 
     // Transcription confirmation dialogs
     if (showTranscriptionConfirmDialog && uiState.transcriptionUiState == ArchivingUiState.IDLE) {
+        // Defaults to on (the backend's default) every time the dialog opens
+        var includeSummary by remember { mutableStateOf(true) }
         BasicAlertDialog(
             text = stringResource(R.string.transcription_confirm_dialog_message),
             acceptLabel = stringResource(R.string.transcription_start_transcription),
             onAccept = {
                 showTranscriptionConfirmDialog = false
-                actions.onToggleTranscription(true)
+                actions.onStartTranscription(includeSummary)
             },
             onCancel = {
                 showTranscriptionConfirmDialog = false
+            },
+            content = {
+                VonageCheckbox(
+                    modifier = Modifier.testTag(MeetingRoomScreenTestTags.TRANSCRIPTION_SUMMARY_CHECKBOX),
+                    label = stringResource(R.string.transcription_include_summary),
+                    checked = includeSummary,
+                    onCheckedChange = { includeSummary = it },
+                )
             },
         )
     }
@@ -547,4 +558,5 @@ internal object MeetingRoomScreenTestTags {
     const val MEETING_ROOM_CONTENT = "meeting-room-content"
     const val MEETING_ROOM_BOTTOM_BAR = "meeting-room-bottom-bar"
     const val MEETING_ROOM_PUBLISHER_EFFECTS_BUTTON = "meeting-room-publisher-effects-button"
+    const val TRANSCRIPTION_SUMMARY_CHECKBOX = "meeting-room-transcription-summary-checkbox"
 }
