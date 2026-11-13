@@ -65,7 +65,6 @@ dependencies {
     // Core SDK and UI
     implementation(project(":vonage-video-core"))
     implementation(project(":vonage-video-ui-compose"))
-    implementation(project(":vonage-video-shared"))
     implementation(project(":vonage-android-logger"))
     implementation(project(":vonage-audio-selector"))
 
@@ -80,10 +79,7 @@ dependencies {
     implementation(project(":vonage-feature-settings"))
 
     // Networking
-    implementation(libs.okhttp)
-    implementation(libs.logging.interceptor)
-    implementation(libs.retrofit)
-    implementation(libs.converter.kotlinx.serialization)
+    implementation(project(":vonage-vera-api-client"))
 
     // AndroidX / Compose
     implementation(libs.androidx.core.ktx)

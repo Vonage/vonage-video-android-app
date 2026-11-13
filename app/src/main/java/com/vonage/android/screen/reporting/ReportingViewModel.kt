@@ -7,8 +7,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vonage.android.data.ReportingRepository
-import com.vonage.android.data.network.ReportDataRequest
-import com.vonage.android.data.network.ReportResponseData
+import com.vonage.android.vera.api.feedback.ReportDataRequest
+import com.vonage.android.vera.api.feedback.ReportResponseData
 import com.vonage.android.kotlin.VonageVideoClient
 import com.vonage.android.util.ImageProcessor
 import dagger.hilt.android.lifecycle.HiltViewModel

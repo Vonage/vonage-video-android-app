@@ -127,7 +127,6 @@ every { mockFactory.createSession(any(), any(), any()) } returns mockSession
 
 ```
 vonage-video-sdk
- ├── vonage-video-shared
  ├── vonage-android-logger
  └── opentok-android-sdk (internal only)
 ```

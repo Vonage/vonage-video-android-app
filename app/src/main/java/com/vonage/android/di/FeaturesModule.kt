@@ -17,12 +17,12 @@ import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.screensharing.di.ScreenSharingModule
 import com.vonage.android.data.storage.DataStoreCallSettingsStorage
 import com.vonage.android.settings.CallSettingsHolder
+import com.vonage.android.vera.api.VeraApiClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import retrofit2.Retrofit
 import javax.inject.Singleton
 import dagger.hilt.EntryPoint
 
@@ -44,10 +44,10 @@ object FeaturesModule {
 
     @Singleton
     @Provides
-    fun provideVonageArchiving(retrofit: Retrofit, getConfig: GetConfig): VonageArchiving {
+    fun provideVonageArchiving(apiClient: VeraApiClient, getConfig: GetConfig): VonageArchiving {
         val config = getConfig()
         return ArchivingModule.provideVonageArchiving(
-            retrofit = retrofit,
+            apiClient = apiClient,
             recordingEnabled = config.allowArchiving,
             transcriptionEnabled = config.allowPostCallTranscription,
         )
@@ -55,8 +55,8 @@ object FeaturesModule {
 
     @Singleton
     @Provides
-    fun provideVonageCaptions(retrofit: Retrofit): VonageCaptions =
-        CaptionsModule.provideVonageCaptions(retrofit)
+    fun provideVonageCaptions(apiClient: VeraApiClient): VonageCaptions =
+        CaptionsModule.provideVonageCaptions(apiClient)
 
     @Provides
     fun provideChatFeature(): ChatFeature =

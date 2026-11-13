@@ -131,10 +131,10 @@ Only `src/enabled` references the Okta SDK (via `enabledImplementation` in the m
 
 ### Token injection
 
-Backend requests attach the access token through two interceptors, mirroring the decorator approach used by the iOS reference app:
+Backend requests are made by `VeraApiClient` (`vonage-vera-api-client`), which attaches the access token through an `AuthTokenProvider`, mirroring the decorator approach used by the iOS reference app. There are two clients:
 
-- **App-level Retrofit** (feedback endpoint, etc.): `AuthorizationInterceptor` in `app/src/main/java/com/vonage/android/data/network/interceptor/` is registered in `RetrofitModule.provideHttpClient()`.
-- **Meeting-room SDK Retrofit** (session fetch, archiving, captions): `MeetingRoomBuilder.authTokenProvider { ... }` accepts an optional `MeetingRoomAuthTokenProvider`; the app supplies one backed by `VonageOktaAuth` in `AppNavHost`. `vonage-meeting-room` stays Hilt-free and Okta-free — it only sees a `() -> String?`-shaped provider.
+- **App client** (feedback endpoint, session probe, archiving/captions for the app's own screens): built in `NetworkModule.provideVeraApiClient()` with `OktaAuthTokenProvider` (`app/src/main/java/com/vonage/android/data/network/`).
+- **Meeting-room SDK client** (session fetch, archiving, captions): `MeetingRoomBuilder.authTokenProvider { ... }` accepts an optional `MeetingRoomAuthTokenProvider`; the app supplies one backed by `VonageOktaAuth` in `AppNavHost`. `vonage-meeting-room` stays Hilt-free and Okta-free — it only sees a `() -> String?`-shaped provider.
 
 In both places the same rule applies: **no token → no header**. Sign-in state never blocks a request, so the app remains fully usable against a backend that does not (yet) enforce authentication. Token refresh happens transparently inside the provider when the access token has expired.
 
@@ -153,7 +153,7 @@ Rather than forcing every user to sign in up front (which would break backends w
 
 1. On **Create room** / **Join**, `LandingScreenViewModel` asks `RoomAccessRepository.requiresAuthentication(room)`.
 2. When the okta flavor is disabled this returns `false` immediately — no extra request is made and the flow is unchanged.
-3. Otherwise it calls `POST v2/createSession` + `POST v2/joinSession` through the shared `SessionRepository` (`vonage-video-shared`, the same one the meeting room uses), on the app's Retrofit so the token, if any, is attached by `AuthorizationInterceptor`. Only a `401 Unauthorized` (from either call) counts as "sign-in required"; success, other errors and network failures proceed to the waiting room as before.
+3. Otherwise it calls `POST v2/createSession` + `POST v2/joinSession` through the shared `SessionApi` (`vonage-vera-api-client`, the same one the meeting room uses), on the app's `VeraApiClient` so the token, if any, is attached by `OktaAuthTokenProvider`. Only a `401 Unauthorized` (from either call) counts as "sign-in required"; success, other errors and network failures proceed to the waiting room as before.
 4. On `401` the landing screen shows `AuthenticationRequiredSheet` (same sheet and test tags as the top-bar sign-in). A successful browser sign-in continues to the waiting room for the room the user picked; dismissing the sheet keeps them on the landing screen.
 
 ### Session persistence & security

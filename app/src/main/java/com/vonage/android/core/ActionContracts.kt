@@ -1,7 +1,7 @@
 package com.vonage.android.core
 
-import com.vonage.android.shared.ViewEvent
-import com.vonage.android.shared.ViewState
+import com.vonage.android.kotlin.model.ViewEvent
+import com.vonage.android.kotlin.model.ViewState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

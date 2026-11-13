@@ -22,7 +22,7 @@ import com.vonage.android.compose.components.AvatarInitialsTestTags.USER_INITIAL
 import com.vonage.android.compose.getParticipantColor
 import com.vonage.android.compose.icons.PersonIcon
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.shared.getInitials
+import com.vonage.android.compose.getInitials
 
 @Composable
 fun AvatarInitials(

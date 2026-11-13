@@ -4,183 +4,92 @@ import com.vonage.android.archiving.Archive
 import com.vonage.android.archiving.ArchiveId
 import com.vonage.android.archiving.ArchiveStatus
 import com.vonage.android.archiving.ArchiveType
-import com.vonage.android.shared.network.SessionKeyRequest
-import com.vonage.android.shared.network.TrpcResponse
-import com.vonage.android.shared.network.TrpcResult
+import com.vonage.android.vera.api.VeraApiException
+import com.vonage.android.vera.api.archiving.ArchivingApi
+import com.vonage.android.vera.api.archiving.ServerArchive
+import com.vonage.android.vera.api.archiving.ServerTranscription
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.Json
-import okhttp3.ResponseBody
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import retrofit2.Response
 
 class ArchiveRepositoryTest {
 
-    val apiService: ArchivingApi = mockk()
+    val archivingApi: ArchivingApi = mockk()
     val sut = ArchiveRepository(
-        archivingApi = apiService,
+        archivingApi = archivingApi,
     )
 
     @Test
     fun `given repository when getRecordings api success returns success`() = runTest {
-        coEvery { apiService.searchArchives(SESSION_KEY_REQUEST) } returns Response.success(
-            TrpcResponse(TrpcResult(SearchArchivesResponse(items = serverArchives, count = serverArchives.size)))
-        )
+        coEvery { archivingApi.searchArchives(SESSION_KEY) } returns Result.success(serverArchives)
         val response = sut.getRecordings(SESSION_KEY)
         assertEquals(Result.success(archives), response)
     }
 
     @Test
-    fun `given repository when getRecordings api success with empty returns success`() = runTest {
-        coEvery { apiService.searchArchives(SESSION_KEY_REQUEST) } returns Response.success(null)
-        val response = sut.getRecordings(SESSION_KEY)
-        assertTrue(response.isFailure)
-    }
-
-    @Test
     fun `given repository when getRecordings api fails returns error`() = runTest {
-        coEvery { apiService.searchArchives(SESSION_KEY_REQUEST) } returns Response.error(
-            500, ResponseBody.EMPTY
-        )
+        coEvery { archivingApi.searchArchives(SESSION_KEY) } returns Result.failure(API_ERROR)
         val response = sut.getRecordings(SESSION_KEY)
         assertTrue(response.isFailure)
     }
 
     @Test
     fun `given repository when getRecordings api fails with exception returns error`() = runTest {
-        coEvery { apiService.searchArchives(SESSION_KEY_REQUEST) } throws Exception("Network error")
+        coEvery { archivingApi.searchArchives(SESSION_KEY) } returns Result.failure(Exception("Network error"))
         val response = sut.getRecordings(SESSION_KEY)
         assertTrue(response.isFailure)
     }
 
     @Test
     fun `given repository when startArchiving api success returns success`() = runTest {
-        coEvery { apiService.startArchiving(START_ARCHIVE_REQUEST) } returns Response.success(
-            TrpcResponse(TrpcResult(ArchiveOperationResponse(id = "archive-id", status = "started")))
-        )
+        coEvery { archivingApi.startArchive(SESSION_KEY, false, null) } returns Result.success("archive-id")
         val response = sut.startArchive(SESSION_KEY)
         assertEquals(Result.success(ArchiveId("archive-id")), response)
     }
 
     @Test
-    fun `given repository when startArchiving api success with empty returns success`() = runTest {
-        coEvery { apiService.startArchiving(START_ARCHIVE_REQUEST) } returns Response.success(null)
-        val response = sut.startArchive(SESSION_KEY)
-        assertTrue(response.isFailure)
-    }
-
-    @Test
     fun `given repository when startArchiving api fails returns error`() = runTest {
-        coEvery { apiService.startArchiving(START_ARCHIVE_REQUEST) } returns Response.error(
-            500, ResponseBody.EMPTY
-        )
+        coEvery { archivingApi.startArchive(SESSION_KEY, false, null) } returns Result.failure(API_ERROR)
         val response = sut.startArchive(SESSION_KEY)
         assertTrue(response.isFailure)
     }
 
     @Test
-    fun `given repository when startArchiving api fails with exception returns error`() = runTest {
-        coEvery { apiService.startArchiving(START_ARCHIVE_REQUEST) } throws Exception("Network error")
-        val response = sut.startArchive(SESSION_KEY)
-        assertTrue(response.isFailure)
+    fun `given repository when startArchiving with transcription leaves the summary to the backend`() = runTest {
+        coEvery { archivingApi.startArchive(SESSION_KEY, true, null) } returns Result.success("transcription-id")
+        val response = sut.startArchive(SESSION_KEY, withTranscription = true)
+        assertEquals(Result.success(ArchiveId("transcription-id")), response)
+    }
+
+    @Test
+    fun `given repository when startArchiving with transcription forwards the transcription options`() = runTest {
+        coEvery { archivingApi.startArchive(SESSION_KEY, true, true) } returns Result.success("transcription-id")
+        val response = sut.startArchive(SESSION_KEY, withTranscription = true, withSummary = true)
+        assertEquals(Result.success(ArchiveId("transcription-id")), response)
     }
 
     @Test
     fun `given repository when stopArchiving api success returns success`() = runTest {
-        coEvery { apiService.stopArchiving(StopArchiveRequest(SESSION_KEY, "archive-id")) } returns
-                Response.success(TrpcResponse(TrpcResult(ArchiveOperationResponse(id = "archive-id", status = "stopped"))))
+        coEvery { archivingApi.stopArchive(SESSION_KEY, "archive-id") } returns Result.success(Unit)
         val response = sut.stopArchive(SESSION_KEY, ArchiveId("archive-id"))
         assertEquals(Result.success(true), response)
     }
 
     @Test
     fun `given repository when stopArchiving api fails returns error`() = runTest {
-        coEvery { apiService.stopArchiving(StopArchiveRequest(SESSION_KEY, "archive-id")) } returns Response.error(
-            500, ResponseBody.EMPTY
-        )
-        val response = sut.stopArchive(SESSION_KEY, ArchiveId("archive-id"))
-        assertTrue(response.isFailure)
-    }
-
-    @Test
-    fun `given repository when stopArchiving api fails with exception returns error`() = runTest {
-        coEvery { apiService.stopArchiving(StopArchiveRequest(SESSION_KEY, "archive-id")) } throws Exception("Network error")
+        coEvery { archivingApi.stopArchive(SESSION_KEY, "archive-id") } returns Result.failure(API_ERROR)
         val response = sut.stopArchive(SESSION_KEY, ArchiveId("archive-id"))
         assertTrue(response.isFailure)
     }
 
     @Test
     fun `given repository when stopArchiving without archive id sends request without it`() = runTest {
-        coEvery { apiService.stopArchiving(StopArchiveRequest(SESSION_KEY, null)) } returns
-                Response.success(TrpcResponse(TrpcResult(ArchiveOperationResponse(id = "archive-id", status = "stopped"))))
+        coEvery { archivingApi.stopArchive(SESSION_KEY, null) } returns Result.success(Unit)
         val response = sut.stopArchive(SESSION_KEY, null)
         assertEquals(Result.success(true), response)
-    }
-
-    @Test
-    fun `given repository when startArchiving with transcription sends transcription request`() = runTest {
-        val request = StartArchiveRequest(sessionKey = SESSION_KEY, withTranscription = true)
-        coEvery { apiService.startArchiving(request) } returns
-            Response.success(
-                TrpcResponse(TrpcResult(ArchiveOperationResponse(id = "transcription-id", status = "started")))
-            )
-        val response = sut.startArchive(SESSION_KEY, withTranscription = true)
-        assertEquals(Result.success(ArchiveId("transcription-id")), response)
-    }
-
-    @Test
-    fun `start archive request only encodes withTranscription when requested`() {
-        val json = Json { ignoreUnknownKeys = true }
-        assertEquals("""{"sessionKey":"key"}""", json.encodeToString(StartArchiveRequest("key")))
-        assertEquals(
-            """{"sessionKey":"key","withTranscription":true}""",
-            json.encodeToString(StartArchiveRequest("key", withTranscription = true)),
-        )
-        assertEquals(
-            """{"sessionKey":"key","withTranscription":true,"withSummary":false}""",
-            json.encodeToString(StartArchiveRequest("key", withTranscription = true, withSummary = false)),
-        )
-    }
-
-    @Test
-    fun `stop archive request omits null archive id from json`() {
-        val json = Json { ignoreUnknownKeys = true }
-        assertEquals("""{"sessionKey":"key"}""", json.encodeToString(StopArchiveRequest("key")))
-        assertEquals(
-            """{"sessionKey":"key","archiveId":"id"}""",
-            json.encodeToString(StopArchiveRequest("key", "id")),
-        )
-    }
-
-    @Test
-    fun `search archives response decodes tRPC payload`() {
-        val json = Json { ignoreUnknownKeys = true }
-        val body = """{"result":{"data":{"count":1,"items":[{"id":"id","duration":789,"name":"name",""" +
-            """"url":"url","size":456,"status":"available","createdAt":123,"sessionId":"s"}]}}}"""
-        val decoded = json.decodeFromString<TrpcResponse<SearchArchivesResponse>>(body)
-        assertEquals(listOf(serverArchives.first()), decoded.result.data.items)
-    }
-
-    @Test
-    fun `search archives response decodes transcription archive`() {
-        val json = Json { ignoreUnknownKeys = true }
-        // Shape returned by the backend for a finished transcription (signed URLs replaced).
-        val body = """{"result":{"data":{"count":1,"items":[{
-            "id":"transcription-id","status":"available","name":"transcription","reason":"session ended",
-            "sessionId":"s","applicationId":"a","createdAt":1793102510000,"size":2546374,"duration":644,
-            "outputMode":"individual","streamMode":"auto","hasAudio":true,"hasVideo":false,
-            "hasTranscription":true,"sha256sum":"sum","password":"","updatedAt":1793103218000,
-            "multiArchiveTag":"transcription","event":"archive","url":"$AUDIO_URL",
-            "transcription":{"status":"available","reason":"","url":"$TRANSCRIPT_URL",
-            "primaryLanguageCode":"en-US","hasSummary":true}}]}}}"""
-        val decoded = json.decodeFromString<TrpcResponse<SearchArchivesResponse>>(body)
-        assertEquals(
-            listOf(transcriptionArchive(transcription = ServerTranscription("available", TRANSCRIPT_URL))),
-            decoded.result.data.items,
-        )
     }
 
     @Test
@@ -229,9 +138,7 @@ class ArchiveRepositoryTest {
     }
 
     private fun givenSearchArchives(vararg items: ServerArchive) {
-        coEvery { apiService.searchArchives(SESSION_KEY_REQUEST) } returns Response.success(
-            TrpcResponse(TrpcResult(SearchArchivesResponse(items = items.toList(), count = items.size)))
-        )
+        coEvery { archivingApi.searchArchives(SESSION_KEY) } returns Result.success(items.toList())
     }
 
     private fun transcriptionArchive(status: String = "available", transcription: ServerTranscription?) =
@@ -251,120 +158,37 @@ class ArchiveRepositoryTest {
         const val SESSION_KEY = "any-session-key"
         const val AUDIO_URL = "https://archives.example.com/transcription-id/archive.zip"
         const val TRANSCRIPT_URL = "https://archives.example.com/transcription-id/transcription.zip"
-        val SESSION_KEY_REQUEST = SessionKeyRequest(SESSION_KEY)
-        val START_ARCHIVE_REQUEST = StartArchiveRequest(SESSION_KEY)
+        val API_ERROR = VeraApiException("Failed", httpCode = 500)
     }
 
-    private val serverArchives = listOf(
-        ServerArchive(
-            id = "id",
-            name = "name",
-            url = "url",
-            status = "available",
-            createdAt = 123,
-            duration = 789,
-            size = 456,
-        ),
-        ServerArchive(
-            id = "id",
-            name = "name",
-            url = "url",
-            status = "started",
-            createdAt = 123,
-            duration = 789,
-            size = 456,
-        ),
-        ServerArchive(
-            id = "id",
-            name = "name",
-            url = "url",
-            status = "stopped",
-            createdAt = 123,
-            duration = 789,
-            size = 456,
-        ),
-        ServerArchive(
-            id = "id",
-            name = "name",
-            url = "url",
-            status = "uploaded",
-            createdAt = 123,
-            duration = 789,
-            size = 456,
-        ),
-        ServerArchive(
-            id = "id",
-            name = "name",
-            url = "url",
-            status = "paused",
-            createdAt = 123,
-            duration = 789,
-            size = 456,
-        ),
-        ServerArchive(
-            id = "id",
-            name = "name",
-            url = "url",
-            status = "failed",
-            createdAt = 123,
-            duration = 789,
-            size = 456,
-        ),
-    )
+    private val serverArchives = listOf("available", "started", "stopped", "uploaded", "paused", "failed")
+        .map { status ->
+            ServerArchive(
+                id = "id",
+                name = "name",
+                url = "url",
+                status = status,
+                createdAt = 123,
+                duration = 789,
+                size = 456,
+            )
+        }
     private val archives = listOf(
+        ArchiveStatus.AVAILABLE,
+        ArchiveStatus.PENDING,
+        ArchiveStatus.PENDING,
+        ArchiveStatus.PENDING,
+        ArchiveStatus.PENDING,
+        ArchiveStatus.FAILED,
+    ).map { status ->
         Archive(
             id = ArchiveId("id"),
             name = "name",
             url = "url",
-            status = ArchiveStatus.AVAILABLE,
+            status = status,
             createdAt = 123,
             duration = 789,
             size = 456,
-        ),
-        Archive(
-            id = ArchiveId("id"),
-            name = "name",
-            url = "url",
-            status = ArchiveStatus.PENDING,
-            createdAt = 123,
-            duration = 789,
-            size = 456,
-        ),
-        Archive(
-            id = ArchiveId("id"),
-            name = "name",
-            url = "url",
-            status = ArchiveStatus.PENDING,
-            createdAt = 123,
-            duration = 789,
-            size = 456,
-        ),
-        Archive(
-            id = ArchiveId("id"),
-            name = "name",
-            url = "url",
-            status = ArchiveStatus.PENDING,
-            createdAt = 123,
-            duration = 789,
-            size = 456,
-        ),
-        Archive(
-            id = ArchiveId("id"),
-            name = "name",
-            url = "url",
-            status = ArchiveStatus.PENDING,
-            createdAt = 123,
-            duration = 789,
-            size = 456,
-        ),
-        Archive(
-            id = ArchiveId("id"),
-            name = "name",
-            url = "url",
-            status = ArchiveStatus.FAILED,
-            createdAt = 123,
-            duration = 789,
-            size = 456,
-        ),
-    )
+        )
+    }
 }
