@@ -1,0 +1,20 @@
+vonage-feature-archiving/README.md
+  s_5c084ea17692a3::t_f2dd3447561324 75
+  s_5c084ea17692a3::t_9bb42f72e3c1d3 76-77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ffe99cc531169390b681a6e5694a4863aaaa68a9",
+  "prompts": {},
+  "sessions": {
+    "s_5c084ea17692a3": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_be3441e0-5474-4fa2-b8fd-2f22bed272ce",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
