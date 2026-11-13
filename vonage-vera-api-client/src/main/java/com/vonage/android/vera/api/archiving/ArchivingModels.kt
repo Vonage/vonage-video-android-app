@@ -7,9 +7,14 @@ import kotlinx.serialization.Serializable
  * Body for `POST /v2/startArchive`.
  *
  * [withTranscription] asks the backend for a transcription archive instead of a recording; it
- * applies the matching archive options (output mode, `multiArchiveTag`). [archiveOptions] are
- * merged over those defaults. Defaults are not encoded, so a recording request only carries the
- * session key.
+ * applies the matching archive options (name, output mode, `multiArchiveTag`, summary). No
+ * `archiveOptions` are sent: the backend replaces its merged defaults with the client's
+ * `archiveOptions`, which would start an unnamed recording instead of a transcription. Defaults
+ * are not encoded, so a recording request only carries the session key.
+ *
+ * [withSummary] is only sent with a transcription: `false` asks the backend to drop the AI summary
+ * (`transcriptionProperties.hasSummary`), which it otherwise includes. A backend without
+ * `withSummary` support ignores the key and keeps the summary.
  */
 @Serializable
 internal data class StartArchiveRequest(
@@ -17,21 +22,8 @@ internal data class StartArchiveRequest(
     val sessionKey: String,
     @SerialName("withTranscription")
     val withTranscription: Boolean = false,
-    @SerialName("archiveOptions")
-    val archiveOptions: StartArchiveOptions? = null,
-)
-
-@Serializable
-internal data class StartArchiveOptions(
-    @SerialName("transcriptionProperties")
-    val transcriptionProperties: TranscriptionProperties,
-)
-
-/** [hasSummary] adds an AI-generated summary to the transcript. */
-@Serializable
-internal data class TranscriptionProperties(
-    @SerialName("hasSummary")
-    val hasSummary: Boolean,
+    @SerialName("withSummary")
+    val withSummary: Boolean? = null,
 )
 
 /**

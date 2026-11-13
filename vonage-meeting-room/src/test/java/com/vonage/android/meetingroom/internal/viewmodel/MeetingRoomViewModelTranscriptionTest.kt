@@ -98,7 +98,7 @@ class MeetingRoomViewModelTranscriptionTest {
     @Test
     fun `given viewmodel when transcribeCall true then starts transcription archive only`() = runTest {
         givenMockCall()
-        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION, withSummary = true) } returns
+        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION) } returns
             success(ArchiveId("transcription-id"))
 
         sut.uiState.test {
@@ -113,15 +113,15 @@ class MeetingRoomViewModelTranscriptionTest {
             val started = awaitItem()
             assertEquals(ArchivingUiState.RECORDING, started.transcriptionUiState)
             assertEquals(ArchivingUiState.IDLE, started.archivingUiState)
-            coVerify { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION, withSummary = true) }
-            coVerify(exactly = 0) { vonageArchiving.startArchive(any(), ArchiveType.RECORDING, any()) }
+            coVerify { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION) }
+            coVerify(exactly = 0) { vonageArchiving.startArchive(any(), ArchiveType.RECORDING) }
         }
     }
 
     @Test
-    fun `given summary unchecked when transcription starts then requests it without summary`() = runTest {
+    fun `given viewmodel when transcribeCall without summary then forwards withSummary false`() = runTest {
         givenMockCall()
-        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION, withSummary = false) } returns
+        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION, false) } returns
             success(ArchiveId("transcription-id"))
 
         sut.uiState.test {
@@ -132,16 +132,16 @@ class MeetingRoomViewModelTranscriptionTest {
             awaitItem() // connected
 
             sut.transcribeCall(enable = true, withSummary = false)
-            awaitItem() // starting
+            assertEquals(ArchivingUiState.STARTING, awaitItem().transcriptionUiState)
             assertEquals(ArchivingUiState.RECORDING, awaitItem().transcriptionUiState)
-            coVerify { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION, withSummary = false) }
+            coVerify { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION, false) }
         }
     }
 
     @Test
     fun `given transcription running when transcribeCall false then stops transcription archive`() = runTest {
         givenMockCall()
-        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION, withSummary = true) } returns
+        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION) } returns
             success(ArchiveId("transcription-id"))
         coEvery { vonageArchiving.stopArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION) } returns success(true)
 
@@ -167,7 +167,7 @@ class MeetingRoomViewModelTranscriptionTest {
     @Test
     fun `given transcription start fails then transcription returns to idle`() = runTest {
         givenMockCall()
-        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION, withSummary = true) } returns
+        coEvery { vonageArchiving.startArchive(ANY_SESSION_KEY, ArchiveType.TRANSCRIPTION) } returns
             Result.failure(Exception("boom"))
 
         sut.uiState.test {

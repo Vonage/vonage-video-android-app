@@ -27,24 +27,12 @@ android {
             all { it.useJUnitPlatform() }
         }
     }
-
-    flavorDimensions += "archiving"
-    productFlavors {
-        create("enabled") {
-            dimension = "archiving"
-        }
-        create("disabled") {
-            dimension = "archiving"
-        }
-    }
 }
 
 dependencies {
     implementation(project(":vonage-video-ui-compose"))
     implementation(project(":vonage-video-core"))
     implementation(project(":vonage-android-logger"))
-    // Provider signature is the same in both flavors (provideVonageArchiving(apiClient));
-    // the disabled stub ignores the arg.
     implementation(project(":vonage-vera-api-client"))
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.androidx.core.ktx)

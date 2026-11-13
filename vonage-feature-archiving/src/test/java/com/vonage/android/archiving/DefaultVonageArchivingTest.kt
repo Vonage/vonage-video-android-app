@@ -14,18 +14,18 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class EnabledVonageArchivingTest {
+class DefaultVonageArchivingTest {
 
     private val archiveRepository: ArchiveRepository = mockk()
     private val callFacade: CallFacade = mockk()
     private val activeArchives = MutableStateFlow<Map<String, String?>>(emptyMap())
     
-    private lateinit var sut: EnabledVonageArchiving
+    private lateinit var sut: DefaultVonageArchiving
 
     @BeforeEach
     fun setup() {
         every { callFacade.activeArchives } returns activeArchives
-        sut = EnabledVonageArchiving(archiveRepository)
+        sut = DefaultVonageArchiving(archiveRepository, enabledTypes = ArchiveType.entries.toSet())
     }
 
     @Test
@@ -252,31 +252,41 @@ class EnabledVonageArchivingTest {
 
     @Test
     fun `startArchive transcription requests archive with transcription`() = runTest {
-        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = true) } returns
+        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = true, withSummary = true) } returns
             Result.success(ArchiveId("transcription-id"))
 
         val result = sut.startArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION)
 
         assertEquals(ArchiveId("transcription-id"), result.getOrNull())
-        coVerify { archiveRepository.startArchive(SESSION_KEY, withTranscription = true) }
+        coVerify { archiveRepository.startArchive(SESSION_KEY, withTranscription = true, withSummary = true) }
     }
 
     @Test
-    fun `startArchive transcription forwards the summary choice`() = runTest {
-        coEvery {
-            archiveRepository.startArchive(SESSION_KEY, withTranscription = true, withSummary = true)
-        } returns Result.success(ArchiveId("transcription-id"))
+    fun `startArchive transcription without summary asks the backend to drop it`() = runTest {
+        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = true, withSummary = false) } returns
+            Result.success(ArchiveId("transcription-id"))
 
-        sut.startArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION, withSummary = true)
+        val result = sut.startArchive(SESSION_KEY, ArchiveType.TRANSCRIPTION, withSummary = false)
 
-        coVerify { archiveRepository.startArchive(SESSION_KEY, withTranscription = true, withSummary = true) }
+        assertEquals(ArchiveId("transcription-id"), result.getOrNull())
+        coVerify { archiveRepository.startArchive(SESSION_KEY, withTranscription = true, withSummary = false) }
+    }
+
+    @Test
+    fun `startArchive recording never sends withSummary`() = runTest {
+        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = false, withSummary = null) } returns
+            Result.success(ArchiveId("recording-id"))
+
+        sut.startArchive(SESSION_KEY, ArchiveType.RECORDING, withSummary = false)
+
+        coVerify { archiveRepository.startArchive(SESSION_KEY, withTranscription = false, withSummary = null) }
     }
 
     @Test
     fun `stopArchive of each type sends its own archive id while both run`() = runTest {
         coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = false) } returns
             Result.success(ArchiveId("recording-id"))
-        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = true) } returns
+        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = true, withSummary = true) } returns
             Result.success(ArchiveId("transcription-id"))
         coEvery { archiveRepository.stopArchive(SESSION_KEY, any()) } returns Result.success(true)
 
@@ -334,7 +344,7 @@ class EnabledVonageArchivingTest {
 
     @Test
     fun `locally started transcription is kept while the session only reports the recording`() = runTest {
-        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = true) } returns
+        coEvery { archiveRepository.startArchive(SESSION_KEY, withTranscription = true, withSummary = true) } returns
             Result.success(ArchiveId("transcription-id"))
         coEvery { archiveRepository.stopArchive(SESSION_KEY, ArchiveId("transcription-id")) } returns
             Result.success(true)

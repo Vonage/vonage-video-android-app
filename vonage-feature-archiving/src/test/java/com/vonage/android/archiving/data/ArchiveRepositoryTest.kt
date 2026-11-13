@@ -45,16 +45,23 @@ class ArchiveRepositoryTest {
 
     @Test
     fun `given repository when startArchiving api success returns success`() = runTest {
-        coEvery { archivingApi.startArchive(SESSION_KEY, false, false) } returns Result.success("archive-id")
+        coEvery { archivingApi.startArchive(SESSION_KEY, false, null) } returns Result.success("archive-id")
         val response = sut.startArchive(SESSION_KEY)
         assertEquals(Result.success(ArchiveId("archive-id")), response)
     }
 
     @Test
     fun `given repository when startArchiving api fails returns error`() = runTest {
-        coEvery { archivingApi.startArchive(SESSION_KEY, false, false) } returns Result.failure(API_ERROR)
+        coEvery { archivingApi.startArchive(SESSION_KEY, false, null) } returns Result.failure(API_ERROR)
         val response = sut.startArchive(SESSION_KEY)
         assertTrue(response.isFailure)
+    }
+
+    @Test
+    fun `given repository when startArchiving with transcription leaves the summary to the backend`() = runTest {
+        coEvery { archivingApi.startArchive(SESSION_KEY, true, null) } returns Result.success("transcription-id")
+        val response = sut.startArchive(SESSION_KEY, withTranscription = true)
+        assertEquals(Result.success(ArchiveId("transcription-id")), response)
     }
 
     @Test

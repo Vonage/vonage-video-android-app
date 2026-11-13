@@ -9,17 +9,19 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-private const val TAG = "EnabledVonageArchiving"
+private const val TAG = "DefaultVonageArchiving"
 
 /**
- * EnabledVonageArchiving is the active implementation of VonageArchiving for call recording.
- * This class provides full archiving functionality including starting/stopping recordings and
- * transcriptions, monitoring state changes, and retrieving past recordings.
+ * Implementation of VonageArchiving for recordings and transcriptions: starting/stopping them,
+ * monitoring the running ones, and retrieving past ones.
  *
- * Used when the archiving feature is enabled in the build configuration.
+ * Only archive types in [enabledTypes] are handled, so recording and transcription can be turned
+ * on independently. Other types are left out of [bind] and [getRecordings], and starting or
+ * stopping them fails without reaching the backend.
  */
-class EnabledVonageArchiving(
+class DefaultVonageArchiving(
     private val archiveRepository: ArchiveRepository,
+    private val enabledTypes: Set<ArchiveType>,
 ) : VonageArchiving {
 
     val mutex = Mutex()
@@ -43,7 +45,9 @@ class EnabledVonageArchiving(
     override fun bind(call: CallFacade): Flow<Map<ArchiveType, ArchiveId>> =
         call.activeArchives
             .map { archives ->
-                archives.entries.associate { (id, name) -> ArchiveType.fromArchiveName(name) to ArchiveId(id) }
+                archives.entries
+                    .associate { (id, name) -> ArchiveType.fromArchiveName(name) to ArchiveId(id) }
+                    .filterKeys { it in enabledTypes }
             }
             .onEach { archives ->
                 mutex.withLock {
@@ -59,14 +63,16 @@ class EnabledVonageArchiving(
      *
      * @param sessionKey The session key JWT returned by the backend when the session was created
      * @param type Recording or transcription archive
-     * @param withSummary Transcription only: also generate an AI summary of the transcript
+     * @param withSummary Whether a transcription includes the AI summary; not sent for a recording
      * @return Result containing the ArchiveId on success, or an error on failure
      */
-    override suspend fun startArchive(sessionKey: String, type: ArchiveType, withSummary: Boolean): Result<ArchiveId> =
-        archiveRepository.startArchive(
+    override suspend fun startArchive(sessionKey: String, type: ArchiveType, withSummary: Boolean): Result<ArchiveId> {
+        if (type !in enabledTypes) return disabled(type)
+        val isTranscription = type == ArchiveType.TRANSCRIPTION
+        return archiveRepository.startArchive(
             sessionKey = sessionKey,
-            withTranscription = type == ArchiveType.TRANSCRIPTION,
-            withSummary = withSummary,
+            withTranscription = isTranscription,
+            withSummary = withSummary.takeIf { isTranscription },
         )
             .onFailure { vonageLogger.e(TAG, "startArchive: $type failed", it) }
             .map { id ->
@@ -76,6 +82,7 @@ class EnabledVonageArchiving(
                     id
                 }
             }
+    }
 
     /**
      * Stops the active archive of [type] for the session identified by [sessionKey].
@@ -90,6 +97,7 @@ class EnabledVonageArchiving(
      * @return Result with true on success, or an error on failure
      */
     override suspend fun stopArchive(sessionKey: String, type: ArchiveType): Result<Boolean> {
+        if (type !in enabledTypes) return disabled(type)
         val archiveId = mutex.withLock { sessionArchiveIds[type] ?: startedArchiveIds[type] }
         if (archiveId == null && type == ArchiveType.TRANSCRIPTION) {
             vonageLogger.e(TAG, "stopArchive: no active transcription archive")
@@ -107,13 +115,20 @@ class EnabledVonageArchiving(
     }
 
     /**
-     * Retrieves all past recording archives for the session identified by [sessionKey].
-     * Returns a list of Archive objects containing metadata about completed recordings.
+     * Retrieves the past archives of the enabled types for the session identified by [sessionKey].
+     * Fails without reaching the backend when no type is enabled.
      *
      * @param sessionKey The session key JWT returned by the backend when the session was created
      * @return Result containing a list of Archive objects, or an error on failure
      */
-    override suspend fun getRecordings(sessionKey: String): Result<List<Archive>> =
-        archiveRepository.getRecordings(sessionKey)
+    override suspend fun getRecordings(sessionKey: String): Result<List<Archive>> {
+        if (enabledTypes.isEmpty()) return Result.failure(IllegalStateException("Archiving is disabled"))
+        return archiveRepository.getRecordings(sessionKey)
+            .map { archives -> archives.filter { it.type in enabledTypes } }
+    }
 
+    private fun <T> disabled(type: ArchiveType): Result<T> {
+        vonageLogger.e(TAG, "$type archives are disabled")
+        return Result.failure(IllegalStateException("$type archives are disabled"))
+    }
 }

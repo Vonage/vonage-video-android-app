@@ -46,6 +46,9 @@ vonageArchiving.startArchive(sessionKey)
         // Handle error
     }
 
+// Start a post-call transcription; withSummary = false asks the backend to leave out the AI summary
+vonageArchiving.startArchive(sessionKey, ArchiveType.TRANSCRIPTION, withSummary = false)
+
 // Stop recording
 vonageArchiving.stopArchive(sessionKey)
     .onSuccess {
@@ -69,4 +72,6 @@ vonageArchiving.getRecordings(sessionKey)
 
 ## Build Variants
 
-This module supports feature toggles with `enabled` and `disabled` source sets for conditional compilation.
+This module has no flavors. `ArchivingModule.provideVonageArchiving(apiClient, recordingEnabled, transcriptionEnabled)`
+enables recording and transcription independently; archives of a disabled type are never started,
+stopped, reported by `bind` or listed by `getRecordings`.

@@ -4,6 +4,7 @@ import androidx.datastore.preferences.core.preferencesOf
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_AUDIO_BITRATE
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_BACKGROUND_ID
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_BACKGROUND_PATH
+import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_CAPTIONS_TRANSLATION_LANGUAGE
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_CAPTURE_FRAME_RATE
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_CAPTURE_RESOLUTION
 import com.vonage.android.data.storage.GlobalDataStorage.Companion.SETTINGS_CODEC_ORDER
@@ -125,5 +126,26 @@ class DataStoreCallSettingsStorageTest {
         coEvery { dataStore.data } returns flowOf(preferencesOf(SETTINGS_VIDEO_EFFECT to "BACKGROUND_IMAGE"))
 
         assertEquals(PublisherPreferences(), sut.load().publisherPreferences)
+    }
+
+    @Test
+    fun `load maps stored captions translation language`() = runTest {
+        coEvery { dataStore.data } returns flowOf(preferencesOf(SETTINGS_CAPTIONS_TRANSLATION_LANGUAGE to "es-ES"))
+
+        assertEquals("es-ES", sut.load().captionsTranslationLanguage)
+    }
+
+    @Test
+    fun `load drops a captions translation language that is no longer offered`() = runTest {
+        coEvery { dataStore.data } returns flowOf(preferencesOf(SETTINGS_CAPTIONS_TRANSLATION_LANGUAGE to "xx-XX"))
+
+        assertNull(sut.load().captionsTranslationLanguage)
+    }
+
+    @Test
+    fun `load without captions translation language returns null`() = runTest {
+        coEvery { dataStore.data } returns flowOf(preferencesOf(SETTINGS_OPUS_DTX to true))
+
+        assertNull(sut.load().captionsTranslationLanguage)
     }
 }

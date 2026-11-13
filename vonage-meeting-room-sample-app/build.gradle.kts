@@ -15,8 +15,7 @@ android {
         versionName = "1.0"
 
         // Flavor dimension strategies: first value matches feature modules (enabled/disabled),
-        // second value matches vonage-meeting-room prefixed flavors (archivingEnabled, etc.)
-        missingDimensionStrategy("archiving", "enabled", "archivingEnabled")
+        // second value matches vonage-meeting-room prefixed flavors (captionsEnabled, etc.)
         missingDimensionStrategy("captions", "enabled", "captionsEnabled")
         missingDimensionStrategy("screensharing", "enabled", "screensharingEnabled")
         missingDimensionStrategy("chat", "enabled")

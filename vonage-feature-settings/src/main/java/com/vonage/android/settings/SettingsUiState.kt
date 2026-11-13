@@ -9,6 +9,8 @@ import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoBitratePreset
 import com.vonage.android.kotlin.model.VideoCodec
 import com.vonage.android.kotlin.model.ViewState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Stable
 data class SettingsUiState(
@@ -28,4 +30,10 @@ data class SettingsUiState(
     val captureResolution: CaptureResolution? = null,
     val preferredVideoCodecOrder: List<VideoCodec>? = null,
     val audioBitrate: Int? = null,
+    /** True when both captions and caption translation are allowed by the app config. */
+    val showCaptionsTranslation: Boolean = false,
+    /** BCP-47 target language for received captions; `null` keeps the spoken language. */
+    val captionsTranslationLanguage: String? = null,
+    /** Languages offered by the captions translation picker, already named and sorted. */
+    val captionsTranslationLanguages: ImmutableList<CaptionsTranslationLanguage> = persistentListOf(),
 ) : ViewState

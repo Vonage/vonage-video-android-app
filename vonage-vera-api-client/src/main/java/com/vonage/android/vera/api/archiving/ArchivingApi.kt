@@ -14,13 +14,14 @@ interface ArchivingApi {
     suspend fun searchArchives(sessionKey: String): Result<List<ServerArchive>>
 
     /**
-     * Starts an archive and returns its id. A transcription ([withTranscription]) always sends
-     * [withSummary] explicitly, so the backend's own summary default never applies.
+     * Starts an archive and returns its id; [withTranscription] asks the backend for a
+     * transcription archive instead of a recording, and [withSummary] (transcription only, `null`
+     * leaves it to the backend) whether the transcript includes the AI summary.
      */
     suspend fun startArchive(
         sessionKey: String,
         withTranscription: Boolean = false,
-        withSummary: Boolean = false,
+        withSummary: Boolean? = null,
     ): Result<String>
 
     /**
@@ -41,16 +42,12 @@ internal class DefaultArchivingApi(
     override suspend fun startArchive(
         sessionKey: String,
         withTranscription: Boolean,
-        withSummary: Boolean,
+        withSummary: Boolean?,
     ): Result<String> {
         val request = StartArchiveRequest(
             sessionKey = sessionKey,
             withTranscription = withTranscription,
-            archiveOptions = if (withTranscription) {
-                StartArchiveOptions(TranscriptionProperties(hasSummary = withSummary))
-            } else {
-                null
-            },
+            withSummary = withSummary,
         )
         return execute("Failed to start archiving") { service.startArchiving(request) }
             .map { it.result.data.id }

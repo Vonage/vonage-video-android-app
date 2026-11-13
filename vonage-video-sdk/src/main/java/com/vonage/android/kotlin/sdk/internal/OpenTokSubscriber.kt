@@ -149,4 +149,8 @@ internal class OpenTokSubscriber(
             )
         }
     }
+
+    override fun setCaptionsTranslationLanguage(languageCode: String?) {
+        raw.captionsTranslationLanguage = languageCode
+    }
 }

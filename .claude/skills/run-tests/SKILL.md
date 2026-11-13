@@ -9,7 +9,7 @@ fileMatchPattern: '**/src/test*/**'
 
 In kiro this attaches when a unit-test file is in context; pull it in with `#vera-testing` for instrumented, snapshot or Maestro work.
 
-Pick the narrowest task that covers the change. The naive `./gradlew test` builds and runs **every** flavor combination — `vonage-meeting-room` alone has 16 variants (archiving × captions × screensharing × debug/release) and each feature module runs its `disabled` variant too, where there are no tests. The per-variant tasks below give the same coverage in a fraction of the time and are what CI effectively exercises.
+Pick the narrowest task that covers the change. The naive `./gradlew test` builds and runs **every** flavor combination — `vonage-meeting-room` alone has 8 variants (captions × screensharing × debug/release) and each feature module runs its `disabled` variant too, where there are no tests. The per-variant tasks below give the same coverage in a fraction of the time and are what CI effectively exercises.
 
 Prerequisite for anything under `:app:` — `BASE_API_URL` in `local.properties` or the env (`/setup`, `#vera-setup`). Other modules don't need it.
 
@@ -20,11 +20,12 @@ Prerequisite for anything under `:app:` — `BASE_API_URL` in `local.properties`
 | `app/src/main` or `app/src/test` | `./gradlew :app:testDebugUnitTest` | JUnit 5 (`useJUnitPlatform`), MockK, Turbine, `isReturnDefaultValues = true`. `:app:test` would also build release. |
 | `vonage-video-core`, `vonage-vera-api-client`, `vonage-android-logger`, `vonage-audio-selector`, `vonage-video-ui-compose` (non-snapshot tests, e.g. `GridLayoutCalculatorTest`) | `./gradlew :<module>:testDebugUnitTest` | |
 | `vonage-feature-*/src/{main,enabled,testEnabled}` | `./gradlew :vonage-feature-<x>:testEnabledDebugUnitTest` | Tests live in `src/testEnabled` only; `:…:test` additionally compiles/runs the empty `disabled` variant. |
-| `vonage-meeting-room/src/{main,test}` | `./gradlew :vonage-meeting-room:testArchivingEnabledCaptionsEnabledScreensharingEnabledDebugUnitTest` | The all-enabled variant is the one the app ships with the default config. Run a `…Disabled…` variant only when you changed flavor-specific code. |
+| `vonage-feature-archiving/src/{main,test}` | `./gradlew :vonage-feature-archiving:testDebugUnitTest` | The one feature module without flavors. |
+| `vonage-meeting-room/src/{main,test}` | `./gradlew :vonage-meeting-room:testCaptionsEnabledScreensharingEnabledDebugUnitTest` | The all-enabled variant is the one the app ships with the default config. Run a `…Disabled…` variant only when you changed flavor-specific code. |
 | `vonage-config-idea-plugin/src/test` | `./gradlew :vonage-config-idea-plugin:test` | Plain JVM module, **JDK 21 toolchain** required. |
 | `vonage-video-ui-compose/src/test/**ScreenshotTest.kt` or any `src/main` Compose component there | `./gradlew :vonage-video-ui-compose:verifyRoborazziDebug` | Snapshot compare against committed goldens (1 % threshold). Failures → `/record-snapshots` (`#vera-snapshot-tests`). |
 | `app/src/androidTest` | `./gradlew :app:pixelDebugAndroidTest` (Gradle Managed Device, what CI runs) or `./gradlew :app:connectedDebugAndroidTest` (attached device/emulator) | Hilt + Compose UI tests, JUnit 4, `HiltTestRunner`. |
-| `vonage-meeting-room/src/androidTest` | `./gradlew :vonage-meeting-room:connectedArchivingEnabledCaptionsEnabledScreensharingEnabledDebugAndroidTest` | No managed device is defined for this module; needs a connected device. |
+| `vonage-meeting-room/src/androidTest` | `./gradlew :vonage-meeting-room:connectedCaptionsEnabledScreensharingEnabledDebugAndroidTest` | No managed device is defined for this module; needs a connected device. |
 | `build-tools/gradle-config-plugin` | `./gradlew generateVonageConfig` then `:app:testDebugUnitTest --tests '*GetConfigTest'` | The plugin has no unit tests; the app's `GetConfigTest` pins the generated mapping. |
 | `.maestro/flows/*.yaml`, test tags, screen routes | `./scripts/run_maestro_tests.sh [flow.yaml]` | See E2E below. |
 
@@ -49,7 +50,7 @@ Most unit tests use JUnit 5 (`org.junit.jupiter.api.Test`, backtick names or `gi
 ./gradlew :app:pixelDebugAndroidTest --no-build-cache               # UI tests job (needs KVM/HAXM locally; slow)
 ```
 
-`koverXmlReportDebug` only runs `testDebugUnitTest` in the **non-flavored** modules (`app`, `vonage-video-core`, `vonage-vera-api-client`, `vonage-android-logger`, `vonage-audio-selector`, the sample app). It does **not** execute the unit tests of `vonage-meeting-room` or any `vonage-feature-*` module, because their variants are flavored (`enabledDebug`, `archivingEnabled…Debug`) and have no plain `debug` unit-test task (verified with `./gradlew koverXmlReportDebug --dry-run`). CI only compiles those modules and runs detekt on them, so run their single-variant tasks from the routing table yourself before pushing. `vonage-video-ui-compose`, `vonage-video-sdk` and `vonage-config-idea-plugin` are excluded from kover entirely and must also be run separately. The pre-push hook (`./gradlew installGitHooks`) runs `detekt` and `git lfs pre-push` — a detekt finding blocks the push locally before CI sees it.
+`koverXmlReportDebug` only runs `testDebugUnitTest` in the **non-flavored** modules (`app`, `vonage-video-core`, `vonage-vera-api-client`, `vonage-android-logger`, `vonage-audio-selector`, the sample app, and `vonage-feature-archiving`, which has no flavors). It does **not** execute the unit tests of `vonage-meeting-room` or the other `vonage-feature-*` modules, because their variants are flavored (`enabledDebug`, `captionsEnabled…Debug`) and have no plain `debug` unit-test task (verified with `./gradlew koverXmlReportDebug --dry-run`). CI only compiles those modules and runs detekt on them, so run their single-variant tasks from the routing table yourself before pushing. `vonage-video-ui-compose`, `vonage-video-sdk` and `vonage-config-idea-plugin` are excluded from kover entirely and must also be run separately. The pre-push hook (`./gradlew installGitHooks`) runs `detekt` and `git lfs pre-push` — a detekt finding blocks the push locally before CI sees it.
 
 `androidApiCheck`/`androidApiDump` are the task names here; the stock `apiCheck`/`apiDump` from the binary-compatibility-validator plugin are not registered under AGP 9 (see the workaround comment in those modules' `build.gradle.kts`). After an intentional public-API change: `./gradlew <module>:androidApiDump` and commit the `.api` file.
 

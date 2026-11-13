@@ -25,13 +25,14 @@ class ArchiveRepository(
             .onFailure { logFailure("getRecordings", it) }
 
     /**
-     * Starts an archive. A transcription ([withTranscription]) always sends [withSummary]
-     * explicitly, so the backend's own summary default never applies.
+     * Starts an archive; [withTranscription] asks the backend for a transcription archive instead of
+     * a recording, and [withSummary] (transcription only, `null` leaves it to the backend) whether
+     * the transcript includes the AI summary.
      */
     suspend fun startArchive(
         sessionKey: String,
         withTranscription: Boolean = false,
-        withSummary: Boolean = false,
+        withSummary: Boolean? = null,
     ): Result<ArchiveId> =
         archivingApi.startArchive(sessionKey, withTranscription, withSummary)
             .map { ArchiveId(it) }

@@ -15,6 +15,7 @@ import com.vonage.android.kotlin.signal.SignalPlugin
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import io.mockk.verifyOrder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -551,6 +552,76 @@ class CallTest : CallTestBase() {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `new subscriber without translation language should not call the SDK`() = runTest(testDispatcher) {
+        val call = createCall()
+        val stream = createVonageStream("stream-1", "Alice")
+        val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+            every { this@mockk.stream } returns stream
+        }
+        every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+        call.connect(mockContext).test {
+            capturedSessionListener!!.onStreamReceived(stream)
+            runCurrent()
+            awaitItem() // StreamReceived
+
+            call.setCaptionsTranslationLanguage(null)
+            runCurrent()
+
+            verify(exactly = 0) { mockSubscriber.setCaptionsTranslationLanguage(any()) }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `new subscriber should receive the selected translation language`() = runTest(testDispatcher) {
+        val call = createCall()
+        val stream = createVonageStream("stream-1", "Alice")
+        val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+            every { this@mockk.stream } returns stream
+        }
+        every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+        call.setCaptionsTranslationLanguage("es-ES")
+        runCurrent()
+
+        call.connect(mockContext).test {
+            capturedSessionListener!!.onStreamReceived(stream)
+            runCurrent()
+            awaitItem() // StreamReceived
+
+            verify(exactly = 1) { mockSubscriber.setCaptionsTranslationLanguage("es-ES") }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `clearing the translation language should restore the spoken language`() = runTest(testDispatcher) {
+        val call = createCall()
+        val stream = createVonageStream("stream-1", "Alice")
+        val mockSubscriber = mockk<VonageSubscriber>(relaxed = true) {
+            every { this@mockk.stream } returns stream
+        }
+        every { mockSession.subscribe(any(), any()) } returns mockSubscriber
+
+        call.connect(mockContext).test {
+            capturedSessionListener!!.onStreamReceived(stream)
+            runCurrent()
+            awaitItem() // StreamReceived
+
+            call.setCaptionsTranslationLanguage("es-ES")
+            runCurrent()
+            call.setCaptionsTranslationLanguage(null)
+            runCurrent()
+
+            verifyOrder {
+                mockSubscriber.setCaptionsTranslationLanguage("es-ES")
+                mockSubscriber.setCaptionsTranslationLanguage(null)
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     // endregion
 
