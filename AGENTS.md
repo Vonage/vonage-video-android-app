@@ -123,7 +123,7 @@
 
 - Kotlin + Java 17 throughout (`sourceCompatibility`/`targetCompatibility` = `VERSION_17`).
 - Compose lint is strict via detekt compose rules plugin (`build-tools/detekt/detekt.yml`). Run `./gradlew detekt` before pushing (the pre-push hook does this automatically once `installGitHooks` is run).
-- Branch from `develop`, not `main`; PRs target `develop`. Branch naming for internal contributors: `DEVELOPERNAME/TICKETNUMBER-SHORTDESCRIPTION`.
+- Branch from `develop`, not `main`; PRs target `develop`. Branch naming: `TICKETNUMBER-SHORTDESCRIPTION` (no developer name).
 - Do not hardcode backend endpoints; use `BuildConfig.BASE_API_URL` or generated `AppConfig`.
 - Do not add feature flags ad-hoc in `app/` when a feature module boundary already exists.
 - SDK version is in `gradle/libs.versions.toml` (`opentokAndroidSdk`); do not pin it elsewhere.

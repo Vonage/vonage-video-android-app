@@ -63,13 +63,16 @@ class DefaultVonageArchiving(
      *
      * @param sessionKey The session key JWT returned by the backend when the session was created
      * @param type Recording or transcription archive
+     * @param withSummary Whether a transcription includes the AI summary; not sent for a recording
      * @return Result containing the ArchiveId on success, or an error on failure
      */
-    override suspend fun startArchive(sessionKey: String, type: ArchiveType): Result<ArchiveId> {
+    override suspend fun startArchive(sessionKey: String, type: ArchiveType, withSummary: Boolean): Result<ArchiveId> {
         if (type !in enabledTypes) return disabled(type)
+        val isTranscription = type == ArchiveType.TRANSCRIPTION
         return archiveRepository.startArchive(
             sessionKey = sessionKey,
-            withTranscription = type == ArchiveType.TRANSCRIPTION,
+            withTranscription = isTranscription,
+            withSummary = withSummary.takeIf { isTranscription },
         )
             .onFailure { vonageLogger.e(TAG, "startArchive: $type failed", it) }
             .map { id ->
