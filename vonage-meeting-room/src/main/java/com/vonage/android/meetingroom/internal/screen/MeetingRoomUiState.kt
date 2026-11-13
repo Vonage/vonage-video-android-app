@@ -8,8 +8,8 @@ import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.meetingroom.api.MeetingRoomFeature
 import com.vonage.android.meetingroom.api.MeetingRoomLayoutMode
-import com.vonage.android.meetingroom.internal.screen.audio.AudioDevicesState
 import com.vonage.android.screensharing.ScreenSharingState
+import com.vonage.audioselector.AudioDevicesState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

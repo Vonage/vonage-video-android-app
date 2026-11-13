@@ -7,6 +7,7 @@ import com.vonage.android.kotlin.internal.PublisherFactory
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.reactions.ReactionSignalPlugin
 import com.vonage.audioselector.AudioDeviceSelector
+import com.vonage.audioselector.AudioDevicesHandler
 import com.vonage.audioselector.VeraAudioDevice
 import dagger.Module
 import dagger.Provides
@@ -30,6 +31,11 @@ object SdkModule {
             context = context,
             dispatcher = dispatcher,
         )
+
+    @Provides
+    fun provideAudioDevicesHandler(
+        audioDeviceSelector: AudioDeviceSelector,
+    ): AudioDevicesHandler = AudioDevicesHandler(audioDeviceSelector)
 
     @Singleton
     @Provides

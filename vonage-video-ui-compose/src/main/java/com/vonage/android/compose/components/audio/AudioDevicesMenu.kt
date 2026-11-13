@@ -1,29 +1,29 @@
-package com.vonage.android.meetingroom.internal.screen.audio
+package com.vonage.android.compose.components.audio
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.theme.VonageVideoTheme
-import com.vonage.android.fx.ui.NoiseSuppressorToggle
-import com.vonage.android.meetingroom.R
 import com.vonage.audioselector.AudioDeviceSelector.AudioDevice
 import com.vonage.audioselector.AudioDeviceSelector.AudioDeviceType
+import com.vonage.audioselector.AudioDevicesState
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 
+/**
+ * Audio output picker. [headerContent] renders above the device list
+ * (e.g. noise suppression toggle, speaker test).
+ */
 @Composable
-internal fun AudioDevicesMenu(
+fun AudioDevicesMenu(
     audioDevicesState: AudioDevicesState,
     onDismissRequest: () -> Unit,
-    onNoiseSuppressorToggle: (Boolean) -> Unit,
-    noiseSuppressionEnabled: Boolean,
     modifier: Modifier = Modifier,
-    showNoiseSuppressionToggle: Boolean = true,
-    testSpeakerContent: @Composable () -> Unit = {},
+    headerContent: @Composable ColumnScope.() -> Unit = {},
 ) {
     val availableDevices by audioDevicesState.availableDevices.collectAsStateWithLifecycle()
     val activeDevice by audioDevicesState.activeDevice.collectAsStateWithLifecycle()
@@ -31,14 +31,7 @@ internal fun AudioDevicesMenu(
     Column(
         modifier = modifier,
     ) {
-        if (showNoiseSuppressionToggle) {
-            NoiseSuppressorToggle(
-                title = stringResource(R.string.advanced_noise_suppression),
-                isChecked = noiseSuppressionEnabled,
-                onCheckedChange = onNoiseSuppressorToggle,
-            )
-        }
-        testSpeakerContent()
+        headerContent()
         AudioDeviceList(
             availableDevices = availableDevices,
             activeDevice = activeDevice,
@@ -65,10 +58,7 @@ internal fun AudioDevicesMenuPreview() {
                 activeDevice = MutableStateFlow(null),
                 selectDevice = { _ -> },
             ),
-            testSpeakerContent = {},
             onDismissRequest = {},
-            onNoiseSuppressorToggle = {},
-            noiseSuppressionEnabled = true,
         )
     }
 }

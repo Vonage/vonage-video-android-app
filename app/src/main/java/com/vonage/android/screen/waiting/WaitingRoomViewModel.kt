@@ -16,12 +16,12 @@ import com.vonage.android.kotlin.model.PublisherConfig
 import com.vonage.android.kotlin.model.PublisherParticipant
 import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.PublisherSettings
-import com.vonage.android.screen.components.audio.AudioDevicesHandler
-import com.vonage.android.screen.components.audio.AudioDevicesState
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.settings.PublisherPreferences
 import com.vonage.android.util.isValidUserName
 import com.vonage.android.util.sanitizeUserName
+import com.vonage.audioselector.AudioDevicesHandler
+import com.vonage.audioselector.AudioDevicesState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

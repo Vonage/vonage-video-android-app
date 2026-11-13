@@ -21,17 +21,6 @@
     <string name="waiting_room_join">Join meeting</string>
     <string name="waiting_room_switch_camera">Switch camera</string>
     <string name="waiting_room_audio_output">Audio output</string>
-    <string name="waiting_room_available_audio_outputs">Available Audio Outputs</string>
-
-    <!-- Meeting Screen -->
-    <string name="meeting_room_participants_list_title">Participants (%d)</string>
-    <string name="meeting_room_participants_list_search_placeholder">Search</string>
-    <string name="meeting_room_participants_list_search_not_found">Participant not found</string>
-    <string name="meeting_screen_session_creation_error">Error while creating room, please try again</string>
-    <string name="meeting_room_share_room_link">Share room link</string>
-    <string name="meeting_room_pin_participant">Pin</string>
-    <string name="meeting_room_unpin_participant">Unpin</string>
-    <string name="meeting_room_mute_participant">Mute</string>
 
     <!-- Goodbye Screen -->
     <string name="goodbye_title">You have left the meeting</string>
@@ -45,38 +34,15 @@
     <string name="request_permissions">Request permissions</string>
     <string name="request_permissions_to_system">Request permissions to system</string>
 
-    <!-- Audio device selector -->
-    <string name="audio_device_selector_change_audio_output">Change audio output</string>
-    <string name="audio_device_selector_earpiece_audio_device">Earpiece</string>
-    <string name="audio_device_selector_bluetooth_audio_device">Bluetooth</string>
-    <string name="audio_device_selector_speaker_audio_device">Speaker</string>
-    <string name="audio_device_selector_headset_audio_device">Headset</string>
-
     <!-- Test speakers -->
     <string name="test_speakers_start">Start test speakers</string>
     <string name="test_speakers_stop">Stop testing</string>
 
-    <!-- Chat -->
-    <string name="chat_panel_title">Chat</string>
-    <string name="chat_panel_input_text_placeholder">Send a message</string>
-    <string name="chat_panel_jump_to_bottom">Jump to bottom</string>
-
     <!-- Recordings -->
     <string name="recording_title">Download latest recording</string>
     <string name="recording_empty_title">The meeting hasn’t been recorded</string>
-    <string name="recording_stop_recording">Stop Recording</string>
-    <string name="recording_start_recording">Start Recording</string>
-
-    <!-- Screen Share -->
-    <string name="screen_share_start">Share screen</string>
-    <string name="screen_share_stop">Stop sharing screen</string>
-
-    <!-- Captions -->
-    <string name="captions_start">Enable captions</string>
-    <string name="captions_stop">Disable captions</string>
 
     <!-- Report -->
-    <string name="report_bottombar_button_label">Report Issue</string>
     <string name="report_title">Report Issue</string>
     <string name="report_capture_screenshot">Capture screenshot</string>
     <string name="report_add_screenshot">Add screenshot</string>
@@ -91,11 +57,6 @@
     <string name="report_error_message">Something failed, please try again</string>
 
     <!-- Generic -->
-    <string name="generic_retry">Retry</string>
     <string name="report_issue">Report issue</string>
-    <string name="change_layout">Change layout</string>
-    <string name="chat">Chat</string>
-    <string name="speaking_while_muted_message">You are muted. Unmute to speak.</string>
-    <string name="advanced_noise_suppression">Advanced noise suppression</string>
 
 </resources>
