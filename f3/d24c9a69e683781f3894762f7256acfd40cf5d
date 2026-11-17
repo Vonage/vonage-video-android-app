@@ -1,0 +1,28 @@
+vonage-feature-screensharing/src/enabled/java/com/vonage/android/screensharing/EnabledScreenSharing.kt
+  h_25498f8d57a266 62,81-83
+vonage-feature-screensharing/src/enabled/res/values/strings.xml
+  h_25498f8d57a266 1-5
+vonage-feature-screensharing/src/testEnabled/java/com/vonage/android/screensharing/EnabledScreenSharingTest.kt
+  h_25498f8d57a266 14,27,56,106-122,164,194,364
+vonage-meeting-room/src/androidTest/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreenTest.kt
+  h_25498f8d57a266 300
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/util/noOpCall.kt
+  h_25498f8d57a266 53
+vonage-video-core/src/main/java/com/vonage/android/kotlin/Call.kt
+  h_25498f8d57a266 499,501
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/CallFacade.kt
+  h_25498f8d57a266 123-128
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/preview/buildCallWithParticipants.kt
+  h_25498f8d57a266 81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f3d24c9a69e683781f3894762f7256acfd40cf5d",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
