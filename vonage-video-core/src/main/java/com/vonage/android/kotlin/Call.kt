@@ -496,10 +496,10 @@ class Call internal constructor(
      * Creates a separate publisher for the screen stream with video only (no audio).
      *
      * @param mediaProjection Android MediaProjection for capturing screen content
+     * @param name Stream name shown to other participants for the screen share
      */
-    override fun startCapturingScreen(mediaProjection: MediaProjection) {
+    override fun startCapturingScreen(mediaProjection: MediaProjection, name: String) {
         coroutineScope.launch(Dispatchers.Default) {
-            val name = "${publisher()?.vonagePublisher?.name}'s Screen"
             val publisher = withContext(Dispatchers.Main) {
                 val screenPublisherState = publisherFactory.createScreenSharePublisherState(
                     context = context,

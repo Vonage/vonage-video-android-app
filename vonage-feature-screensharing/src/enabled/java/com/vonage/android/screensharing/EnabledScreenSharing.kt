@@ -59,7 +59,7 @@ class EnabledScreenSharing(
                     ?.let { mediaProjection ->
                         currentMediaProjection = mediaProjection
                         currentMediaProjection?.registerCallback(mediaProjectionCallback, null)
-                        call.startCapturingScreen(mediaProjection)
+                        call.startCapturingScreen(mediaProjection, screenShareName(call))
                         showOverlay()
                         onStarted()
                     }
@@ -77,6 +77,9 @@ class EnabledScreenSharing(
             Context.BIND_AUTO_CREATE
         )
     }
+
+    private fun screenShareName(call: CallFacade): String =
+        context.getString(R.string.screen_share_participant_name, call.publisher.value?.name.orEmpty())
 
     @Synchronized
     override fun stopSharingScreen() {

@@ -50,6 +50,6 @@ internal val noOpCall = object : CallFacade {
     override fun sendChatMessage(message: String) {}
     override fun listenUnreadChatMessages(enable: Boolean) {}
     override fun sendEmoji(emoji: String) {}
-    override fun startCapturingScreen(mediaProjection: MediaProjection) {}
+    override fun startCapturingScreen(mediaProjection: MediaProjection, name: String) {}
     override fun stopCapturingScreen() {}
 }
