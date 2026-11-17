@@ -1,0 +1,16 @@
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/http/calls.kt
+  h_25498f8d57a266 4,11-12,19,32,38-41
+vonage-vera-api-client/src/test/java/com/vonage/android/vera/api/http/CallsTest.kt
+  h_25498f8d57a266 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "16a4f5467d68ade7d48c2ff9912a5567855c89c6",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
