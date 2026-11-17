@@ -1,0 +1,19 @@
+.github/workflows/check-pull-request-size.yml
+  s_40ea954bb5b349::t_e91330ac6c934e 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "ad082ad33611b962d603462766e8b984c3e8fc91",
+  "prompts": {},
+  "sessions": {
+    "s_40ea954bb5b349": {
+      "agent_id": {
+        "tool": "mock_ai",
+        "id": "ai-thread-1794864732437356000",
+        "model": "unknown"
+      },
+      "human_author": "Ivan <210490533+VZaphod@users.noreply.github.com>"
+    }
+  }
+}
