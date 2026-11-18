@@ -84,7 +84,7 @@ internal fun ParticipantVideoCard(
         if (participant.name.isNotBlank()) {
             VideoLabel(
                 modifier = Modifier.align(Alignment.BottomStart),
-                text = participant.name
+                text = participantDisplayName(participant),
             )
         }
 

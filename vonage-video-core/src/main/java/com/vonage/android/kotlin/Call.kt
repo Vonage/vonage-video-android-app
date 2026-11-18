@@ -494,12 +494,15 @@ class Call internal constructor(
      * Starts screen sharing using the provided MediaProjection.
      *
      * Creates a separate publisher for the screen stream with video only (no audio).
+     * The stream is named after the sharer as-is; each receiving client localizes the
+     * "<name>'s screen" label in its own UI (as the web client does), so no
+     * locale-specific text goes over the wire.
      *
      * @param mediaProjection Android MediaProjection for capturing screen content
      */
     override fun startCapturingScreen(mediaProjection: MediaProjection) {
         coroutineScope.launch {
-            val name = "${publisher()?.vonagePublisher?.name}'s Screen"
+            val name = publisher()?.vonagePublisher?.name.orEmpty()
             val publisher = withContext(Dispatchers.Main) {
                 val screenPublisherState = publisherFactory.createScreenSharePublisherState(
                     context = context,
