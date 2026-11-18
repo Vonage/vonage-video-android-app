@@ -36,7 +36,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":vonage-video-shared"))
     implementation(project(":vonage-android-logger"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

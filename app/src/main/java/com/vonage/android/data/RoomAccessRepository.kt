@@ -1,8 +1,8 @@
 package com.vonage.android.data
 
 import com.vonage.android.okta.VonageOktaAuth
-import com.vonage.android.shared.session.SessionRepository
-import com.vonage.android.shared.session.SessionUnauthorizedException
+import com.vonage.android.vera.api.session.SessionApi
+import com.vonage.android.vera.api.session.SessionUnauthorizedException
 import javax.inject.Inject
 
 /**
@@ -14,15 +14,15 @@ import javax.inject.Inject
  * keep working without forcing a sign-in.
  */
 class RoomAccessRepository @Inject constructor(
-    private val sessionRepository: SessionRepository,
+    private val sessionApi: SessionApi,
     private val oktaAuth: VonageOktaAuth,
 ) {
 
     suspend fun requiresAuthentication(roomName: String): Boolean {
         if (!oktaAuth.isCapable) return false
-        // The Authorization header (if any) is attached by AuthorizationInterceptor, so an
+        // The Authorization header (if any) is attached by the API client, so an
         // expired, non-refreshable session is also reported as unauthorized. Any other failure
         // (network, server error) is surfaced later by the meeting room itself.
-        return sessionRepository.getSession(roomName).exceptionOrNull() is SessionUnauthorizedException
+        return sessionApi.getSession(roomName).exceptionOrNull() is SessionUnauthorizedException
     }
 }

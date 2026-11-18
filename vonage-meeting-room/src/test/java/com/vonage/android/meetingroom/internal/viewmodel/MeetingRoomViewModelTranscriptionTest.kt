@@ -23,8 +23,8 @@ import com.vonage.android.meetingroom.internal.screen.TranscriptionNotification
 import com.vonage.android.meetingroom.internal.screen.audio.MeetingRoomAudioDevicesHandler
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler
 import com.vonage.android.settings.CallSettingsHolder
-import com.vonage.android.shared.session.SessionInfo
-import com.vonage.android.shared.session.SessionRepository
+import com.vonage.android.vera.api.session.SessionInfo
+import com.vonage.android.vera.api.session.SessionApi
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -53,7 +53,7 @@ class MeetingRoomViewModelTranscriptionTest {
     private val context: Context = mockk(relaxed = true)
     private val container: MeetingRoomContainer = mockk(relaxed = true)
     private val prebuilt: MeetingRoomPrebuilt = mockk(relaxed = true)
-    private val sessionRepository: SessionRepository = mockk()
+    private val sessionApi: SessionApi = mockk()
     private val vonageArchiving: VonageArchiving = mockk(relaxed = true)
     private val videoClient: VonageVideoClient = mockk(relaxed = true)
     private val sessionKeyHolder = SessionKeyHolder()
@@ -75,7 +75,7 @@ class MeetingRoomViewModelTranscriptionTest {
     @BeforeEach
     fun setUp() {
         every { container.prebuilt } returns prebuilt
-        every { container.sessionRepository } returns sessionRepository
+        every { container.sessionApi } returns sessionApi
         every { container.sessionKeyHolder } returns sessionKeyHolder
         every { container.vonageArchiving } returns vonageArchiving
         every { container.videoClient } returns videoClient
@@ -315,7 +315,7 @@ class MeetingRoomViewModelTranscriptionTest {
     }
 
     private fun givenMockCall(): CallFacade {
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns success(
+        coEvery { sessionApi.getSession(ANY_ROOM_NAME) } returns success(
             SessionInfo(
                 applicationId = "application-id",
                 sessionId = "session-id",

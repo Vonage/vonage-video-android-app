@@ -7,12 +7,12 @@
 | `app/` | Composition root: navigation, Hilt DI, networking, screen orchestration |
 | `vonage-meeting-room/` | Self-contained prebuilt meeting-room library — **no Hilt**, manual DI via `MeetingRoomContainer`. Public API is only the classes in `api/`; everything else is `internal`. |
 | `vonage-meeting-room-sample-app/` | Minimal host app demonstrating `vonage-meeting-room` in isolation |
-| `vonage-video-core/` | Wraps `vonage-video-sdk` abstractions behind `VonageVideoClient` + `CallFacade` |
+| `vonage-video-core/` | Wraps `vonage-video-sdk` abstractions behind `VonageVideoClient` + `CallFacade`. Also hosts shared models (`ChatMessage`, `EmojiReaction`, `ViewState`/`ViewEvent`) |
+| `vonage-vera-api-client/` | Backend client (`VeraApiClient`): session, archiving, captions and feedback endpoints returning `Result`. Retrofit is internal; no Hilt. Callers build one with `VeraApiClient.Builder` |
 | `vonage-video-sdk/` | Mockable Kotlin interfaces over the OpenTok SDK (`VonageSession`, `VonageSdkFactory`, etc.). Other modules depend on these, never on OpenTok directly. |
-| `vonage-video-ui-compose/` | Reusable Compose components + JSON-driven theme generator |
+| `vonage-video-ui-compose/` | Reusable Compose components + JSON-driven theme generator. Also hosts UI helpers (`getInitials`, `linkify/`, `util/buildTestTag`) |
 | `vonage-feature-*/` | Optional capabilities with `enabled`/`disabled` flavor variants |
 | `vonage-feature-okta/` | Optional Okta OIDC authentication (off by default via `authSettings.allowAuthentication`). Contract in `src/main`, Okta SDK only in `src/enabled`. See `docs/AUTHENTICATION.md`. |
-| `vonage-video-shared/` | Shared utilities |
 | `vonage-android-logger/` | Logging pipeline with interceptor model |
 | `vonage-audio-selector/` | Audio output selector (Bluetooth, wired, earpiece, speaker) |
 | `build-tools/` | Custom Gradle plugins: `com.vonage.json-config`, `com.vonage.theme-generator`, detekt/kover/sonar wiring |
@@ -37,12 +37,12 @@
 
 ## Architecture Notes
 
-- Session bootstrap path: `SessionApiService.createSession()` + `joinSession()` (v2 tRPC, `{result:{data}}` envelope `TrpcResponse`) → `SessionRepository` (both in `vonage-video-shared`, `com.vonage.android.shared.session`) → `MeetingRoomViewModel.connect(...)` → `VonageVideoClient.initializeSession(...)`.
+- Session bootstrap path: `SessionApi.getSession()` (v2 tRPC `createSession` + `joinSession`, `{result:{data}}` envelope, in `vonage-vera-api-client`, `com.vonage.android.vera.api.session`) → `MeetingRoomViewModel.connect(...)` → `VonageVideoClient.initializeSession(...)`.
 - The v2 `sessionKey` JWT scopes archiving and captions calls. The SDK writes it to `SessionKeyHolder` (shared with the app via `MeetingRoomBuilder.sessionKeyHolder(...)` and Hilt) so the goodbye screen can list recordings. Treat it as a secret: never log it or put it in nav args.
-- `BASE_API_URL` propagates to three locations: Retrofit base URL (`RetrofitModule.kt`), deep links (`AppNavHost.kt`), and sharing links (`util/navigateToShare.kt`).
+- `BASE_API_URL` propagates to three locations: API client base URL (`NetworkModule.kt`), deep links (`AppNavHost.kt`), and sharing links (`util/navigateToShare.kt`).
 - Hilt DI is used in `app/`. `vonage-meeting-room` uses a **manual** `MeetingRoomContainer` — do not introduce Hilt into that module.
 - Feature signal plugins (chat, reactions) are injected into `VonageVideoClient` via `SdkModule.provideVonageVideoClient(...)` in `app/`.
-- Backend authentication (optional, Okta): `AuthorizationInterceptor` on the app OkHttp client and `MeetingRoomBuilder.authTokenProvider(...)` for the meeting-room's own Retrofit both attach `Authorization: Bearer` only when a token exists — no token never blocks a request. Okta credentials come from `local.properties`/env (`OKTA_*` keys), not from `app-config.json`.
+- Backend authentication (optional, Okta): `OktaAuthTokenProvider` on the app's `VeraApiClient` and `MeetingRoomBuilder.authTokenProvider(...)` for the meeting-room's own client both attach `Authorization: Bearer` only when a token exists — no token never blocks a request. Okta credentials come from `local.properties`/env (`OKTA_*` keys), not from `app-config.json`.
 - `vonage-meeting-room` is under active refactoring: use cases are being introduced and `Call.kt` (~800 lines) is being split into focused collaborators. Consult the inline comments in that module before making changes there.
 - Debug builds append `.debug` to `applicationId` and `-DEBUG` to `versionName`, allowing debug and release to co-exist on device.
 - Firebase/Crashlytics plugins are **only applied for release builds** (guarded by `isReleaseBuild` check in `app/build.gradle.kts`).

@@ -1,14 +1,11 @@
 package com.vonage.android.data
 
-import com.vonage.android.data.network.APIService
-import com.vonage.android.data.network.ReportDataRequest
-import com.vonage.android.data.network.ReportResponse
-import com.vonage.android.data.network.ReportResponseData
+import com.vonage.android.vera.api.feedback.FeedbackApi
+import com.vonage.android.vera.api.feedback.ReportDataRequest
+import com.vonage.android.vera.api.feedback.ReportResponseData
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import okhttp3.ResponseBody
-import retrofit2.Response
 import kotlin.Result.Companion.success
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -16,41 +13,21 @@ import org.junit.jupiter.api.Test
 
 class ReportingRepositoryTest {
 
-    val apiService: APIService = mockk()
+    val feedbackApi: FeedbackApi = mockk()
     val sut = ReportingRepository(
-        apiService = apiService,
+        feedbackApi = feedbackApi,
     )
 
     @Test
     fun `given repository when report api success returns success`() = runTest {
-        coEvery { apiService.report(reportDataRequest) } returns Response<ReportResponse>.success(
-            ReportResponse(
-                feedbackData = responseData,
-            )
-        )
-        val response = sut.sendReport(
-            ReportDataRequest(
-                title = "any title",
-                name = "any name",
-                issue = "any issue",
-                attachment = "base64 attachment"
-            )
-        )
+        coEvery { feedbackApi.report(reportDataRequest) } returns success(responseData)
+        val response = sut.sendReport(reportDataRequest)
         assertEquals(success(responseData), response)
     }
 
     @Test
-    fun `given repository when report api success with empty returns failure`() = runTest {
-        coEvery { apiService.report(reportDataRequest) } returns Response.success(null)
-        val response = sut.sendReport(reportDataRequest)
-        assertTrue(response.isFailure)
-    }
-
-    @Test
     fun `given repository when report api fails returns error`() = runTest {
-        coEvery { apiService.report(reportDataRequest) } returns Response.error(
-            500, ResponseBody.EMPTY
-        )
+        coEvery { feedbackApi.report(reportDataRequest) } returns Result.failure(Exception("Failed sending report"))
         val response = sut.sendReport(reportDataRequest)
         assertTrue(response.isFailure)
     }

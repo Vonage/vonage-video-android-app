@@ -1,7 +1,7 @@
 package com.vonage.android.chat
 
 import android.app.NotificationManager
-import com.vonage.android.shared.ChatMessage
+import com.vonage.android.kotlin.model.ChatMessage
 
 interface ChatFeature {
     fun createNotificationChannel(manager: NotificationManager)

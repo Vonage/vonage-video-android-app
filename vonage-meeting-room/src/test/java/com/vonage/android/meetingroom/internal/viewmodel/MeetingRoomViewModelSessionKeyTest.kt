@@ -20,8 +20,8 @@ import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
 import com.vonage.android.meetingroom.internal.screen.audio.MeetingRoomAudioDevicesHandler
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler
 import com.vonage.android.settings.CallSettingsHolder
-import com.vonage.android.shared.session.SessionInfo
-import com.vonage.android.shared.session.SessionRepository
+import com.vonage.android.vera.api.session.SessionInfo
+import com.vonage.android.vera.api.session.SessionApi
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -47,7 +47,7 @@ class MeetingRoomViewModelSessionKeyTest {
     private val context: Context = mockk(relaxed = true)
     private val container: MeetingRoomContainer = mockk(relaxed = true)
     private val prebuilt: MeetingRoomPrebuilt = mockk(relaxed = true)
-    private val sessionRepository: SessionRepository = mockk()
+    private val sessionApi: SessionApi = mockk()
     private val vonageArchiving: VonageArchiving = mockk(relaxed = true)
     private val videoClient: VonageVideoClient = mockk(relaxed = true)
     private val sessionKeyHolder = SessionKeyHolder()
@@ -69,7 +69,7 @@ class MeetingRoomViewModelSessionKeyTest {
     @BeforeEach
     fun setUp() {
         every { container.prebuilt } returns prebuilt
-        every { container.sessionRepository } returns sessionRepository
+        every { container.sessionApi } returns sessionApi
         every { container.sessionKeyHolder } returns sessionKeyHolder
         every { container.vonageArchiving } returns vonageArchiving
         every { container.videoClient } returns videoClient
@@ -91,7 +91,7 @@ class MeetingRoomViewModelSessionKeyTest {
     @Test
     fun `given user leaves while session is fetched then late session is not connected`() = runTest {
         val session = CompletableDeferred<Result<SessionInfo>>()
-        coEvery { sessionRepository.getSession(ROOM_NAME) } coAnswers { session.await() }
+        coEvery { sessionApi.getSession(ROOM_NAME) } coAnswers { session.await() }
 
         sut.setup(context)
         sut.endCall()
@@ -104,7 +104,7 @@ class MeetingRoomViewModelSessionKeyTest {
 
     @Test
     fun `given no session key when archiveCall true then fail without calling backend`() = runTest {
-        coEvery { sessionRepository.getSession(ROOM_NAME) } returns Result.success(SESSION_INFO)
+        coEvery { sessionApi.getSession(ROOM_NAME) } returns Result.success(SESSION_INFO)
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall()
 
         sut.uiState.test {

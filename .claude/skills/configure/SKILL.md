@@ -85,7 +85,7 @@ Hosts embedding only the `vonage-meeting-room` library don't use `theme.json`; t
 
 ## Backend URL
 
-`baseApiUrl` in `app-config.json` stays `${BASE_API_URL}`; the value comes from `local.properties` or the `BASE_API_URL` environment variable (env wins). The generator fails without one. It reaches three places: Retrofit base URL (`RetrofitModule.kt`), the App Link host (`manifestPlaceholders["hostName"]`, so deep links into `AppNavHost.kt`), and share links (`util/navigateToShare.kt`). Emulator → host machine: `10.0.2.2`.
+`baseApiUrl` in `app-config.json` stays `${BASE_API_URL}`; the value comes from `local.properties` or the `BASE_API_URL` environment variable (env wins). The generator fails without one. It reaches three places: API client base URL (`NetworkModule.kt`), the App Link host (`manifestPlaceholders["hostName"]`, so deep links into `AppNavHost.kt`), and share links (`util/navigateToShare.kt`). Emulator → host machine: `10.0.2.2`.
 
 ## "My change isn't taking effect" — checklist
 

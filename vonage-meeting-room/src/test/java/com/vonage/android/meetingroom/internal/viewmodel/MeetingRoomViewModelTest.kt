@@ -33,8 +33,8 @@ import com.vonage.android.screensharing.ScreenSharingState
 import com.vonage.android.screensharing.VonageScreenSharing
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.settings.PublisherPreferences
-import com.vonage.android.shared.session.SessionInfo
-import com.vonage.android.shared.session.SessionRepository
+import com.vonage.android.vera.api.session.SessionInfo
+import com.vonage.android.vera.api.session.SessionApi
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -67,7 +67,7 @@ class MeetingRoomViewModelTest {
     private val context: Context = mockk(relaxed = true)
     private val container: MeetingRoomContainer = mockk(relaxed = true)
     private val prebuilt: MeetingRoomPrebuilt = mockk(relaxed = true)
-    private val sessionRepository: SessionRepository = mockk()
+    private val sessionApi: SessionApi = mockk()
     private val vonageArchiving: VonageArchiving = mockk(relaxed = true)
     private val vonageCaptions: VonageCaptions = mockk(relaxed = true)
     private val vonageScreenSharing: VonageScreenSharing = mockk(relaxed = true)
@@ -96,7 +96,7 @@ class MeetingRoomViewModelTest {
     @BeforeEach
     fun setUp() {
         every { container.prebuilt } returns prebuilt
-        every { container.sessionRepository } returns sessionRepository
+        every { container.sessionApi } returns sessionApi
         every { container.vonageArchiving } returns vonageArchiving
         every { container.vonageCaptions } returns vonageCaptions
         every { container.vonageScreenSharing } returns vonageScreenSharing
@@ -170,7 +170,7 @@ class MeetingRoomViewModelTest {
     @Test
     fun `given viewmodel when initialize fails then returns error state`() = runTest {
         sessionKeyHolder.sessionKey = "stale-key"
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns Result.failure(Exception("Empty response"))
+        coEvery { sessionApi.getSession(ANY_ROOM_NAME) } returns Result.failure(Exception("Empty response"))
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
@@ -718,7 +718,7 @@ class MeetingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when connection fails then sets error state`() = runTest {
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns Result.failure(Exception("Network error"))
+        coEvery { sessionApi.getSession(ANY_ROOM_NAME) } returns Result.failure(Exception("Network error"))
 
         sut.setup(context)
         testScheduler.advanceUntilIdle()
@@ -730,7 +730,7 @@ class MeetingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when SessionEvent Disconnected then endCall is invoked`() = runTest {
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        coEvery { sessionApi.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         val mockCall: CallFacade = mockk(relaxed = true) {
             every { publisher } returns MutableStateFlow<PublisherState?>(null)
             every { participantsCount } returns MutableStateFlow(0)
@@ -749,7 +749,7 @@ class MeetingRoomViewModelTest {
     @Test
     fun `given viewmodel when SessionEvent Error then sets error state with message`() = runTest {
         val vonageError = VonageError(code = 1, message = "Session error")
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        coEvery { sessionApi.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         val mockCall: CallFacade = mockk(relaxed = true) {
             every { publisher } returns MutableStateFlow<PublisherState?>(null)
             every { participantsCount } returns MutableStateFlow(0)
@@ -852,7 +852,7 @@ class MeetingRoomViewModelTest {
             every { isMicEnabled } returns MutableStateFlow(true)
             every { isCameraEnabled } returns MutableStateFlow(true)
         }
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        coEvery { sessionApi.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         val mockCall = mockk<CallFacade>(relaxed = true) {
             every { publisher } returns MutableStateFlow<PublisherState?>(mockPublisher)
             every { participantsCount } returns MutableStateFlow(0)
@@ -879,7 +879,7 @@ class MeetingRoomViewModelTest {
             every { isMicEnabled } returns MutableStateFlow(true)
             every { isCameraEnabled } returns MutableStateFlow(true)
         }
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        coEvery { sessionApi.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         val mockCall = mockk<CallFacade>(relaxed = true) {
             every { publisher } returns MutableStateFlow<PublisherState?>(mockPublisher)
             every { participantsCount } returns MutableStateFlow(0)
@@ -937,7 +937,7 @@ class MeetingRoomViewModelTest {
     // region Helpers
 
     private fun givenMockCall(): CallFacade {
-        coEvery { sessionRepository.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
+        coEvery { sessionApi.getSession(ANY_ROOM_NAME) } returns buildSuccessSessionResponse()
         val mockCall = buildMockCall()
         every { videoClient.initializeSession(any(), any(), any()) } returns mockCall
         return mockCall

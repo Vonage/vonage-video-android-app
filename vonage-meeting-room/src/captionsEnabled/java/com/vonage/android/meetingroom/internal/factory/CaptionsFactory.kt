@@ -2,7 +2,7 @@ package com.vonage.android.meetingroom.internal.factory
 
 import com.vonage.android.captions.VonageCaptions
 import com.vonage.android.captions.di.CaptionsModule
-import retrofit2.Retrofit
+import com.vonage.android.vera.api.VeraApiClient
 
-internal fun createVonageCaptions(retrofit: Retrofit): VonageCaptions =
-    CaptionsModule.provideVonageCaptions(retrofit)
+internal fun createVonageCaptions(apiClient: VeraApiClient): VonageCaptions =
+    CaptionsModule.provideVonageCaptions(apiClient)

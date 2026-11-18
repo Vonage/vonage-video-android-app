@@ -8,7 +8,7 @@ This project uses a combination of frameworks for comprehensive test coverage:
 - **UI / Instrumented tests**: Compose UI Test, Espresso, Hilt Testing, and AndroidX Test Runner/Rules
 - **Coverage**: Kover for code coverage reports, integrated with SonarQube
 
-Unit tests are spread across multiple modules (`app`, `vonage-video-core`, `vonage-audio-selector`, `vonage-video-shared`, `vonage-android-logger`, `vonage-feature-chat`, and `vonage-config-idea-plugin`). Instrumented tests live in the `app` module and follow a Page Object / Screen Object pattern with a custom `HiltTestRunner` for dependency injection support.
+Unit tests are spread across multiple modules (`app`, `vonage-video-core`, `vonage-vera-api-client`, `vonage-audio-selector`, `vonage-video-ui-compose`, `vonage-android-logger`, `vonage-feature-chat`, and `vonage-config-idea-plugin`). Instrumented tests live in the `app` module and follow a Page Object / Screen Object pattern with a custom `HiltTestRunner` for dependency injection support.
 
 ### Running tests
 

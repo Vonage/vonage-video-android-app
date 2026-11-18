@@ -32,7 +32,7 @@ import com.vonage.android.meetingroom.internal.screen.components.bottombar.Botto
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_END_CALL_BUTTON
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_MIC_BUTTON
 import com.vonage.android.meetingroom.internal.screen.components.bottombar.BottomBarTestTags.BOTTOM_BAR_MORE_BUTTON
-import com.vonage.android.shared.buildTestTag
+import com.vonage.android.compose.util.buildTestTag
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @Suppress("LongParameterList")

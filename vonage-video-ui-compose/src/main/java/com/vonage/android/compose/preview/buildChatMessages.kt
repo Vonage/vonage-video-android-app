@@ -1,7 +1,7 @@
 package com.vonage.android.compose.preview
 
 import androidx.compose.runtime.Composable
-import com.vonage.android.shared.ChatMessage
+import com.vonage.android.kotlin.model.ChatMessage
 import java.util.Date
 import java.util.UUID
 
