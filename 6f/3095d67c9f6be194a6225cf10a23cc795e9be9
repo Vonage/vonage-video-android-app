@@ -1,0 +1,28 @@
+.github/workflows/check-pull-request-size.yml
+  h_25498f8d57a266 1-28
+gradle/libs.versions.toml
+  h_25498f8d57a266 40
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/ParticipantContextualActions.kt
+  h_25498f8d57a266 47
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/ParticipantDisplayName.kt
+  h_25498f8d57a266 1-25
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/ParticipantVideoCard.kt
+  h_25498f8d57a266 87
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/bottombar/ParticipantsList.kt
+  h_25498f8d57a266 40,155
+vonage-meeting-room/src/main/res/values/strings.xml
+  h_25498f8d57a266 12-13
+vonage-video-core/src/main/java/com/vonage/android/kotlin/Call.kt
+  h_25498f8d57a266 497-499,505
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6f3095d67c9f6be194a6225cf10a23cc795e9be9",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
