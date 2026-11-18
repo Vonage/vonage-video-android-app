@@ -120,12 +120,7 @@ fun interface EmojiFacade {
 }
 
 interface ScreenShareFacade {
-    /**
-     * Starts publishing the screen captured by [mediaProjection].
-     *
-     * @param name Stream name shown to other participants for the screen share.
-     */
-    fun startCapturingScreen(mediaProjection: MediaProjection, name: String)
+    fun startCapturingScreen(mediaProjection: MediaProjection)
     fun stopCapturingScreen()
 }
 

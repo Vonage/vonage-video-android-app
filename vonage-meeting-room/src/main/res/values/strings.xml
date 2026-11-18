@@ -9,6 +9,8 @@
     <string name="meeting_room_pin_participant">Pin</string>
     <string name="meeting_room_unpin_participant">Unpin</string>
     <string name="meeting_room_mute_participant">Mute</string>
+    <!-- Label of a screen share tile. %1$s is the sharer's name. -->
+    <string name="meeting_room_screen_share_participant_name">%1$s\'s screen</string>
 
     <!-- Chat -->
     <string name="chat_panel_title">Chat</string>

@@ -78,6 +78,6 @@ fun buildCallWithParticipants(
     override fun sendEmoji(emoji: String) { /* empty on purpose */ }
 
     // Screen sharing related methods
-    override fun startCapturingScreen(mediaProjection: MediaProjection, name: String) { /* empty on purpose */ }
+    override fun startCapturingScreen(mediaProjection: MediaProjection) { /* empty on purpose */ }
     override fun stopCapturingScreen() { /* empty on purpose */ }
 }

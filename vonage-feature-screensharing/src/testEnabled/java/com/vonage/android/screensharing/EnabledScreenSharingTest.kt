@@ -11,7 +11,6 @@ import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.IBinder
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.screensharing.service.ScreenSharingOverlayService
 import com.vonage.android.screensharing.service.ScreenSharingService
 import io.mockk.Runs
@@ -24,7 +23,6 @@ import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkAll
 import io.mockk.verify
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -53,7 +51,6 @@ class EnabledScreenSharingTest {
         mockkObject(ScreenSharingService.Companion)
         mockkObject(ScreenSharingOverlayService.Companion)
 
-        every { callFacade.publisher } returns MutableStateFlow(null)
         every { ScreenSharingService.intent(context) } returns serviceIntent
         every { ScreenSharingOverlayService.intent(context) } returns overlayIntent
         every { android.provider.Settings.canDrawOverlays(context) } returns true
@@ -104,23 +101,6 @@ class EnabledScreenSharingTest {
     }
 
     @Test
-    fun `startScreenSharing passes localized screen share name to call`() {
-        val serviceConnectionSlot = slot<ServiceConnection>()
-        val publisher = mockk<PublisherState> { every { name } returns "Alice" }
-        every { callFacade.publisher } returns MutableStateFlow(publisher)
-        every { context.getString(R.string.screen_share_participant_name, "Alice") } returns "Alice's Screen"
-        every {
-            context.bindService(serviceIntent, capture(serviceConnectionSlot), Context.BIND_AUTO_CREATE)
-        } returns true
-        every { mediaProjectionManager.getMediaProjection(any(), mediaProjectionIntent) } returns mediaProjection
-
-        sut.startScreenSharing(mediaProjectionIntent, callFacade, {}, {})
-        serviceConnectionSlot.captured.onServiceConnected(mockk<ComponentName>(), binder)
-
-        verify { callFacade.startCapturingScreen(mediaProjection, "Alice's Screen") }
-    }
-
-    @Test
     fun `startScreenSharing starts foreground service on API 26+`() {
         val onStarted = mockk<() -> Unit>(relaxed = true)
         val onStopped = mockk<() -> Unit>(relaxed = true)
@@ -161,7 +141,7 @@ class EnabledScreenSharingTest {
             verify { context.startService(serviceIntent) }
         }
         verify { context.bindService(serviceIntent, any(), Context.BIND_AUTO_CREATE) }
-        verify { callFacade.startCapturingScreen(mediaProjection, any()) }
+        verify { callFacade.startCapturingScreen(mediaProjection) }
         verify { onStarted() }
     }
 
@@ -191,7 +171,7 @@ class EnabledScreenSharingTest {
         serviceConnectionSlot.captured.onServiceConnected(mockk<ComponentName>(), binder)
 
         verify { context.bindService(serviceIntent, any(), Context.BIND_AUTO_CREATE) }
-        verify { callFacade.startCapturingScreen(mediaProjection, any()) }
+        verify { callFacade.startCapturingScreen(mediaProjection) }
         verify { onStarted() }
     }
 
@@ -361,7 +341,7 @@ class EnabledScreenSharingTest {
         sut.startScreenSharing(mediaProjectionIntent, callFacade, onStarted, onStopped)
         serviceConnectionSlot.captured.onServiceConnected(mockk<ComponentName>(), binder)
 
-        verify(exactly = 0) { callFacade.startCapturingScreen(any(), any()) }
+        verify(exactly = 0) { callFacade.startCapturingScreen(any()) }
         verify(exactly = 0) { onStarted() }
     }
 
