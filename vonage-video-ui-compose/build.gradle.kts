@@ -43,7 +43,6 @@ roborazzi {
 
 dependencies {
     implementation(project(":vonage-video-core"))
-    implementation(project(":vonage-video-shared"))
     implementation(project(":vonage-audio-selector"))
     implementation(project(":vonage-android-logger"))
     implementation(libs.androidx.core.ktx)

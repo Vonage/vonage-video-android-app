@@ -40,7 +40,6 @@ android {
 dependencies {
     implementation(project(":vonage-video-ui-compose"))
     implementation(project(":vonage-video-core"))
-    implementation(project(":vonage-video-shared"))
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.core.ktx)

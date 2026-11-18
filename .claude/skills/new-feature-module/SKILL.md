@@ -35,7 +35,7 @@ vonage-feature-<name>/
 Rules that keep both flavors compiling against the same callers:
 
 - `src/main` holds only what callers reference: interfaces, data classes, the `*TestTags` object if any. No implementation.
-- The provider object (`<Name>Module`) has **identical signatures** in `enabled` and `disabled` — callers (`MeetingRoomContainer`, `FeaturesModule`) compile against whichever flavor is selected and never know which. If `enabled` needs a dependency the stub ignores (Retrofit for captions), keep the parameter in both and declare the dep with `implementation`, using `enabledImplementation` only for libraries the contract doesn't expose (see captions' `build.gradle.kts`).
+- The provider object (`<Name>Module`) has **identical signatures** in `enabled` and `disabled` — callers (`MeetingRoomContainer`, `FeaturesModule`) compile against whichever flavor is selected and never know which. If `enabled` needs a dependency the stub ignores (`VeraApiClient` for captions), keep the parameter in both and declare the dep with `implementation`, using `enabledImplementation` only for libraries the contract doesn't expose.
 - Composables in `disabled` keep the same signature and emit nothing, so call sites don't need `if` checks.
 - Any manifest additions that only make sense when enabled (permissions, activities, intent filters) go in `src/enabled/AndroidManifest.xml`, like okta.
 - Tests for the real implementation live in `src/testEnabled` (there is nothing worth testing in `disabled`). Run them with `./gradlew :vonage-feature-<name>:testEnabledDebugUnitTest`.
@@ -44,7 +44,7 @@ Rules that keep both flavors compiling against the same callers:
   flavorDimensions += "<name>"
   productFlavors { create("enabled") { dimension = "<name>" }; create("disabled") { dimension = "<name>" } }
   ```
-- Depend on `vonage-video-core` / `vonage-video-shared` / `vonage-video-ui-compose` abstractions; link `libs.vonage.android.sdk` only when a type from it is unavoidable. Never introduce Hilt into a feature module — `vonage-meeting-room` consumes them without Hilt.
+- Depend on `vonage-video-core` / `vonage-video-ui-compose` abstractions; link `libs.vonage.android.sdk` only when a type from it is unavoidable. Never introduce Hilt into a feature module — `vonage-meeting-room` consumes them without Hilt.
 
 ## Integration checklist (a module that skips these compiles but never appears)
 

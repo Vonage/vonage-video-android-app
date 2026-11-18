@@ -1,9 +1,9 @@
 package com.vonage.android.data
 
 import com.vonage.android.okta.VonageOktaAuth
-import com.vonage.android.shared.session.SessionInfo
-import com.vonage.android.shared.session.SessionRepository
-import com.vonage.android.shared.session.SessionUnauthorizedException
+import com.vonage.android.vera.api.session.SessionInfo
+import com.vonage.android.vera.api.session.SessionApi
+import com.vonage.android.vera.api.session.SessionUnauthorizedException
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -16,10 +16,10 @@ import kotlin.test.assertTrue
 
 class RoomAccessRepositoryTest {
 
-    private val sessionRepository: SessionRepository = mockk()
+    private val sessionApi: SessionApi = mockk()
     private val oktaAuth: VonageOktaAuth = mockk()
     private val sut = RoomAccessRepository(
-        sessionRepository = sessionRepository,
+        sessionApi = sessionApi,
         oktaAuth = oktaAuth,
     )
 
@@ -28,13 +28,13 @@ class RoomAccessRepositoryTest {
         every { oktaAuth.isCapable } returns false
 
         assertFalse(sut.requiresAuthentication("room"))
-        coVerify(exactly = 0) { sessionRepository.getSession(any()) }
+        coVerify(exactly = 0) { sessionApi.getSession(any()) }
     }
 
     @Test
     fun `given authentication enabled when backend returns 401 then requires authentication`() = runTest {
         every { oktaAuth.isCapable } returns true
-        coEvery { sessionRepository.getSession("room") } returns Result.failure(SessionUnauthorizedException())
+        coEvery { sessionApi.getSession("room") } returns Result.failure(SessionUnauthorizedException())
 
         assertTrue(sut.requiresAuthentication("room"))
     }
@@ -43,7 +43,7 @@ class RoomAccessRepositoryTest {
     fun `given authentication enabled when backend returns session then does not require authentication`() =
         runTest {
             every { oktaAuth.isCapable } returns true
-            coEvery { sessionRepository.getSession("room") } returns Result.success(
+            coEvery { sessionApi.getSession("room") } returns Result.success(
                 SessionInfo(
                     applicationId = "applicationId",
                     sessionId = "sessionId",
@@ -59,7 +59,7 @@ class RoomAccessRepositoryTest {
     fun `given authentication enabled when backend returns other error then does not require authentication`() =
         runTest {
             every { oktaAuth.isCapable } returns true
-            coEvery { sessionRepository.getSession("room") } returns Result.failure(Exception("Failed getting session"))
+            coEvery { sessionApi.getSession("room") } returns Result.failure(Exception("Failed getting session"))
 
             assertFalse(sut.requiresAuthentication("room"))
         }
@@ -67,7 +67,7 @@ class RoomAccessRepositoryTest {
     @Test
     fun `given authentication enabled when network fails then does not require authentication`() = runTest {
         every { oktaAuth.isCapable } returns true
-        coEvery { sessionRepository.getSession("room") } returns Result.failure(IOException("offline"))
+        coEvery { sessionApi.getSession("room") } returns Result.failure(IOException("offline"))
 
         assertFalse(sut.requiresAuthentication("room"))
     }

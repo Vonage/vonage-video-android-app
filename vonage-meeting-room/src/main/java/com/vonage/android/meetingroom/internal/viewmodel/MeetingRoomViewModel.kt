@@ -19,7 +19,7 @@ import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.MeetingRoomCallState
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
-import com.vonage.android.shared.session.SessionInfo
+import com.vonage.android.vera.api.session.SessionInfo
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
 import com.vonage.android.meetingroom.internal.screen.TranscriptionNotification
@@ -129,7 +129,7 @@ internal class MeetingRoomViewModel(
 
             // Never keep the key of a previous room: it is written again once the session is created.
             container.sessionKeyHolder.sessionKey = null
-            container.sessionRepository.getSession(roomName)
+            container.sessionApi.getSession(roomName)
                 .onSuccess { sessionInfo ->
                     connect(roomName = roomName, sessionInfo = sessionInfo)
                 }

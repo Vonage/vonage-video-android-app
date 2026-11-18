@@ -44,7 +44,7 @@ internal fun ParticipantContextualActions(
                 start = VonageVideoTheme.dimens.paddingSmall,
                 bottom = VonageVideoTheme.dimens.paddingSmall,
             ),
-            text = participant.name,
+            text = participantDisplayName(participant),
             color = VonageVideoTheme.colors.textSecondary,
             style = VonageVideoTheme.typography.heading2,
         )

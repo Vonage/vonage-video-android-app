@@ -196,8 +196,7 @@ vonage-meeting-room/
     ├── MeetingRoomActivity.kt    ← Activity entry point (launched via MeetingRoomPrebuilt)
     ├── MeetingRoomContent.kt     ← Composable entry point (embedded via prebuilt.content())
     ├── MeetingRoomPrebuiltHolder.kt ← Temporary holder for Activity launch
-    ├── container/                ← Manual DI (MeetingRoomContainer — lazy factory, no Hilt)
-    ├── data/                     ← Networking (OkHttp + Retrofit, scoped to ViewModel lifetime)
+    ├── container/                ← Manual DI (MeetingRoomContainer — lazy factory, no Hilt; builds the VeraApiClient)
     ├── viewmodel/                ← MeetingRoomViewModel + factory
     ├── screen/                   ← All Composable UI (internal, not part of public API)
     ├── service/                  ← Foreground service for ongoing call notification

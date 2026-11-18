@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
-import com.vonage.android.shared.ChatMessage
+import com.vonage.android.kotlin.model.ChatMessage
 
 class EnabledChatNotifications(
     private val context: Context,

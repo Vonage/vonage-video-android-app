@@ -72,6 +72,6 @@ vonageArchiving.getRecordings(sessionKey)
 
 ## Build Variants
 
-This module has no flavors. `ArchivingModule.provideVonageArchiving(retrofit, recordingEnabled, transcriptionEnabled)`
+This module has no flavors. `ArchivingModule.provideVonageArchiving(apiClient, recordingEnabled, transcriptionEnabled)`
 enables recording and transcription independently; archives of a disabled type are never started,
 stopped, reported by `bind` or listed by `getRecordings`.

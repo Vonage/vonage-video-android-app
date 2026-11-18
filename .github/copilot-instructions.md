@@ -18,8 +18,8 @@ Use this file as the default guidance for this repository. For deeper context, s
 - When changing a feature API, update both flavor variants.
 
 ## Runtime Integration Touchpoints
-- Session bootstrap path: `SessionApiService.createSession()` + `joinSession()` (v2, `vonage-video-shared`) -> `SessionRepository` -> `MeetingRoomViewModel.connect(...)` -> `VonageVideoClient.initializeSession(...)`. Archiving/captions calls use the `sessionKey` from `SessionKeyHolder`.
-- `BuildConfig.BASE_API_URL` affects networking, deep links, and share links (`RetrofitModule.kt`, `AppNavHost.kt`, `util/navigateToShare.kt`).
+- Session bootstrap path: `SessionApi.getSession()` (v2 `createSession` + `joinSession`, `vonage-vera-api-client`) -> `MeetingRoomViewModel.connect(...)` -> `VonageVideoClient.initializeSession(...)`. Archiving/captions calls use the `sessionKey` from `SessionKeyHolder`.
+- `BuildConfig.BASE_API_URL` affects networking, deep links, and share links (`NetworkModule.kt`, `AppNavHost.kt`, `util/navigateToShare.kt`).
 - DI is Hilt-based; plugin points (chat/reactions) are injected into core client in `SdkModule.provideVonageVideoClient(...)`.
 
 ## Workflow Commands

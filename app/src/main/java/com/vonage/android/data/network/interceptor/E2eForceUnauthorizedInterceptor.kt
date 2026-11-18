@@ -13,7 +13,8 @@ import javax.inject.Inject
  * flow can be tested against any backend. Inactive unless [E2eTestFlags.forceAuthRequired]
  * is set by the launch intent.
  *
- * Must be registered after [AuthorizationInterceptor]: requests that already carry a token
+ * Must be registered after the client's `Authorization` interceptor (`VeraApiClient.Builder.addInterceptor`
+ * runs after it): requests that already carry a token
  * pass through, exactly like a real auth-enforcing backend would let them.
  */
 class E2eForceUnauthorizedInterceptor @Inject constructor(

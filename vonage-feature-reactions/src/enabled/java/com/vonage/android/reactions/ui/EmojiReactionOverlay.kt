@@ -40,7 +40,7 @@ import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.reactions.EMOJI_LIFETIME_MILLIS
 import com.vonage.android.reactions.R
-import com.vonage.android.shared.EmojiReaction
+import com.vonage.android.kotlin.model.EmojiReaction
 import kotlin.random.Random
 
 private const val ANIMATION_DURATION = EMOJI_LIFETIME_MILLIS.toInt()

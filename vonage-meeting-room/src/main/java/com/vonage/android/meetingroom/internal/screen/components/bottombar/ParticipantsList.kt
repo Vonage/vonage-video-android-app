@@ -37,6 +37,7 @@ import com.vonage.android.compose.vivid.icons.solid.Pin2Off
 import com.vonage.android.kotlin.model.Participant
 import com.vonage.android.meetingroom.R
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
+import com.vonage.android.meetingroom.internal.screen.components.participantDisplayName
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
@@ -151,7 +152,7 @@ private fun ParticipantRow(
             modifier = Modifier
                 .padding(end = VonageVideoTheme.dimens.paddingSmall)
                 .weight(1f),
-            text = participant.name,
+            text = participantDisplayName(participant),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             color = VonageVideoTheme.colors.onSurface,
