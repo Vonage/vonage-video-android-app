@@ -1,0 +1,16 @@
+vonage-audio-selector/src/main/java/com/vonage/audioselector/AudioDeviceSelector.kt
+  h_25498f8d57a266 19,68,158-159,180-181
+vonage-audio-selector/src/test/java/com/vonage/audioselector/AudioDeviceSelectorTest.kt
+  h_25498f8d57a266 186-219,226
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c17036d3f3ce82aee392d263aeb07e12e38c5f41",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
