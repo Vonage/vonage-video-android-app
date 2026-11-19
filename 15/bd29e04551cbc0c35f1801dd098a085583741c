@@ -1,0 +1,16 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/service/MeetingRoomForegroundService.kt
+  h_25498f8d57a266 69
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/service/MeetingRoomForegroundServiceHandler.kt
+  h_25498f8d57a266 69-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "15bd29e04551cbc0c35f1801dd098a085583741c",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
