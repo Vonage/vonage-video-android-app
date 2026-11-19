@@ -1,0 +1,44 @@
+vonage-video-core/src/main/java/com/vonage/android/kotlin/Call.kt
+  s_dd58e79a4baa2b::t_52013d9a0fa749 446-448
+  s_dd58e79a4baa2b::t_204872ba54a1b0 437-445,449-466
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/Participant.kt
+  s_dd58e79a4baa2b::t_7defb8d987ef13 66-70
+  s_dd58e79a4baa2b::t_fb780fb0896a22 65
+vonage-video-core/src/test/java/com/vonage/android/kotlin/CallPublisherQualityTest.kt
+  s_dd58e79a4baa2b::t_79b6254d44c8dc 1-106
+  s_dd58e79a4baa2b::t_f1e8a8720e690b 107
+vonage-video-sdk/src/main/java/com/vonage/android/kotlin/sdk/internal/OpenTokSubscriber.kt
+  s_dd58e79a4baa2b::t_ac5cd67d5af54e 7,19,55-62
+  s_dd58e79a4baa2b::t_1f9029e7d3de7c 63
+vonage-video-core/src/test/java/com/vonage/android/kotlin/internal/VideoQualityPolicyTest.kt
+  s_dd58e79a4baa2b::t_774716702cbce8 1-157
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/ParticipantState.kt
+  s_dd58e79a4baa2b::t_a394deefacc0d5 117
+  s_dd58e79a4baa2b::t_0110b0382be15d 101-116,118-140
+vonage-video-core/src/test/java/com/vonage/android/kotlin/model/ParticipantStateVideoQualityTest.kt
+  s_dd58e79a4baa2b::t_05a4ccc38b46c6 1-109
+vonage-video-core/src/main/java/com/vonage/android/kotlin/internal/VideoQualityPolicy.kt
+  s_dd58e79a4baa2b::t_a770ea9f672d50 1-84,86-89,91-93,95,98-157,172
+  s_dd58e79a4baa2b::t_52cccd1050743b 158-171
+  s_dd58e79a4baa2b::t_aa4755672982b8 85,90,94,96-97
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/VideoRenderer.kt
+  s_dd58e79a4baa2b::t_1c8ed96ab38b43 71-72
+docs/VIDEO_QUALITY_POLICY.md
+  s_dd58e79a4baa2b::t_7634ed41032eec 1-138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "878cc75a1f62ed9c38ad5df74d140742d3dabaf1",
+  "prompts": {},
+  "sessions": {
+    "s_dd58e79a4baa2b": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_9abf6f40-250d-49c1-b408-3baa460947bb",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
