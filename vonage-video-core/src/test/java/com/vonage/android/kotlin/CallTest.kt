@@ -3,11 +3,13 @@ package com.vonage.android.kotlin
 import app.cash.turbine.test
 import com.vonage.android.kotlin.model.DegradationPreference
 import com.vonage.android.kotlin.model.ParticipantState
+import com.vonage.android.kotlin.model.PublisherState
 import com.vonage.android.kotlin.model.SessionEvent
 import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.kotlin.sdk.VonageCaptionsListener
 import com.vonage.android.kotlin.sdk.VonageConnection
 import com.vonage.android.kotlin.sdk.VonageError
+import com.vonage.android.kotlin.sdk.VonagePublisher
 import com.vonage.android.kotlin.sdk.VonageSubscriber
 import com.vonage.android.kotlin.signal.ChatSignalPlugin
 import com.vonage.android.kotlin.signal.RawSignal
@@ -829,6 +831,56 @@ class CallTest : CallTestBase() {
         call.setDegradationPreference(DegradationPreference.MAINTAIN_RESOLUTION)
 
         verify(exactly = 0) { mockPublisherState.applyDegradationPreference(any()) }
+    }
+
+    // endregion
+
+    // region Screen sharing
+
+    @Test
+    fun `stopCapturingScreen without an active share should be a no-op`() = runTest(testDispatcher) {
+        val call = createCall()
+
+        call.stopCapturingScreen()
+
+        verify(exactly = 0) { mockSession.unpublish(any()) }
+    }
+
+    @Test
+    fun `stopCapturingScreen should unpublish the screen publisher`() = runTest(testDispatcher) {
+        val screenPublisher = mockk<VonagePublisher>(relaxed = true)
+        every { mockPublisherFactory.createScreenSharePublisherState(any(), any(), any()) } returns
+            PublisherState(publisherId = Call.PUBLISHER_SCREEN_ID, vonagePublisher = screenPublisher)
+        val call = createCall()
+
+        call.connect(mockContext).test {
+            triggerConnectedAndWaitForPublisher()
+            call.startCapturingScreen(mockk(relaxed = true))
+            runCurrent()
+            verify { mockSession.publish(screenPublisher) }
+
+            call.stopCapturingScreen()
+            call.stopCapturingScreen()
+
+            verify(exactly = 1) { mockSession.unpublish(screenPublisher) }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `stopCapturingScreen before the share publishes should cancel it`() = runTest(testDispatcher) {
+        val call = createCall()
+
+        call.connect(mockContext).test {
+            triggerConnectedAndWaitForPublisher()
+            call.startCapturingScreen(mockk(relaxed = true))
+            call.stopCapturingScreen()
+            runCurrent()
+
+            verify(exactly = 0) { mockPublisherFactory.createScreenSharePublisherState(any(), any(), any()) }
+            verify(exactly = 0) { mockSession.unpublish(any()) }
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     // endregion

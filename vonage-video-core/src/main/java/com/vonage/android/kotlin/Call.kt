@@ -99,6 +99,7 @@ class Call internal constructor(
     private val coroutineScope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
     private var participantsOnScreenJob: Job? = null
     private var activeSpeakerTrackerJob: Job? = null
+    private var screenSharingJob: Job? = null
 
     /** Tracks active speaker based on audio levels across all participants */
     private val activeSpeakerTracker = activeSpeakerTrackerOverride
@@ -501,31 +502,35 @@ class Call internal constructor(
      * @param mediaProjection Android MediaProjection for capturing screen content
      */
     override fun startCapturingScreen(mediaProjection: MediaProjection) {
-        coroutineScope.launch {
+        screenSharingJob = coroutineScope.launch {
             val name = publisher()?.vonagePublisher?.name.orEmpty()
-            val publisher = withContext(Dispatchers.Main) {
+            // Publish and register in one main-thread block: stopCapturingScreen runs on the
+            // main thread too, so it either cancels this before it starts or sees the publisher.
+            withContext(Dispatchers.Main) {
                 val screenPublisherState = publisherFactory.createScreenSharePublisherState(
                     context = context,
                     mediaProjection = mediaProjection,
                     name = name,
                 )
                 session.publish(screenPublisherState.vonagePublisher)
-                screenPublisherState
+                participants[PUBLISHER_SCREEN_ID] = screenPublisherState
+                updateParticipants()
             }
-            participants[PUBLISHER_SCREEN_ID] = publisher
-            updateParticipants()
         }
     }
 
     /**
      * Stops screen sharing and removes the screen publisher.
+     *
+     * Safe to call when nothing is being shared or before [startCapturingScreen] has published.
      */
     override fun stopCapturingScreen() {
-        (participants[PUBLISHER_SCREEN_ID] as PublisherState).vonagePublisher.let {
-            session.unpublish(it)
+        screenSharingJob?.cancel()
+        screenSharingJob = null
+        (participants.remove(PUBLISHER_SCREEN_ID) as? PublisherState)?.let {
+            session.unpublish(it.vonagePublisher)
+            updateParticipants()
         }
-        participants.remove(PUBLISHER_SCREEN_ID)
-        updateParticipants()
     }
     //endregion
 
