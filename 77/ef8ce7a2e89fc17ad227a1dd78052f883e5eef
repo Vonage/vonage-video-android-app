@@ -1,0 +1,14 @@
+app/src/main/java/com/vonage/android/notifications/VeraNotificationChannelRegistry.kt
+  h_25498f8d57a266 24-26,30-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "77ef8ce7a2e89fc17ad227a1dd78052f883e5eef",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
