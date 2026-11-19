@@ -66,7 +66,7 @@ internal class MeetingRoomForegroundService : Service() {
                 .setName(roomName)
                 .setImportant(true)
                 .build()
-            val hangupIntent = Intent(HANG_UP_ACTION)
+            val hangupIntent = Intent(HANG_UP_ACTION).setPackage(packageName)
             val hangupPendingIntent = PendingIntent.getBroadcast(
                 this,
                 FOREGROUND_SERVICE_REQUEST_CODE,
