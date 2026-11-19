@@ -63,6 +63,12 @@ interface Participant {
     fun reinitializeRenderer() {}
 
     /**
+     * Reports the size in px of the view this participant's video is rendered in, so the
+     * received video quality can follow it. See `docs/VIDEO_QUALITY_POLICY.md`.
+     */
+    fun onRenderedSizeChanged(width: Int, height: Int) {}
+
+    /**
      * Cleans up resources when removing the participant.
      *
      * @param session The session to unsubscribe from

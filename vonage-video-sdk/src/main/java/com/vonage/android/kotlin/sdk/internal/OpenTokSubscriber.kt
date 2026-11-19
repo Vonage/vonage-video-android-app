@@ -4,6 +4,7 @@ import android.view.View
 import com.opentok.android.BaseVideoRenderer
 import com.opentok.android.Subscriber
 import com.opentok.android.SubscriberKit
+import com.opentok.android.VideoUtils
 import com.vonage.android.kotlin.sdk.VonageAudioLevelListener
 import com.vonage.android.kotlin.sdk.VonageCaptionsListener
 import com.vonage.android.kotlin.sdk.VonageNetworkConditionListener
@@ -15,6 +16,7 @@ import com.vonage.android.kotlin.sdk.VonageSubscriberStreamListener
 import com.vonage.android.kotlin.sdk.VonageSubscriberVideoListener
 import com.vonage.android.kotlin.sdk.VonageSubscriberVideoStatsEntry
 import com.vonage.android.kotlin.sdk.VonageSubscriberVideoStatsListener
+import com.vonage.android.kotlin.sdk.VonageVideoSize
 
 /**
  * OpenTok-backed implementation of [VonageSubscriber].
@@ -48,6 +50,15 @@ internal class OpenTokSubscriber(
             BaseVideoRenderer.STYLE_VIDEO_SCALE,
             BaseVideoRenderer.STYLE_VIDEO_FIT,
         )
+    }
+
+    override fun setPreferredResolution(size: VonageVideoSize?) {
+        raw.preferredResolution = size?.let { VideoUtils.Size(it.width, it.height) }
+            ?: SubscriberKit.NO_PREFERRED_RESOLUTION
+    }
+
+    override fun setPreferredFrameRate(fps: Float?) {
+        raw.preferredFrameRate = fps ?: SubscriberKit.NO_PREFERRED_FRAMERATE
     }
 
     override fun setStreamListener(listener: VonageSubscriberStreamListener?) {
