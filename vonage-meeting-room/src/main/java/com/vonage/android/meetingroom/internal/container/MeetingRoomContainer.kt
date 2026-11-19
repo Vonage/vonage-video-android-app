@@ -48,6 +48,7 @@ internal class MeetingRoomContainer(
         VeraApiClient.Builder(prebuilt.baseUrl)
             .logBodies(prebuilt.isDebug)
             .authTokenProvider(prebuilt.authTokenProvider?.let { provider -> AuthTokenProvider(provider::currentToken) })
+            .apply { prebuilt.interceptors.forEach(::addInterceptor) }
             .build()
     }
 
