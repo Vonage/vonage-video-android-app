@@ -1,0 +1,25 @@
+.maestro/flows/session-key-expired-join.yaml
+  s_783fb0ae0f285f::t_3381e362d0ec97 1-76
+app/src/main/java/com/vonage/android/data/network/interceptor/E2eExpiredSessionKeyInterceptor.kt
+  s_783fb0ae0f285f::t_b1b9a69bf5a02b 1-39,42-79
+  s_783fb0ae0f285f::t_0242c6a46bcf0d 40-41
+app/src/test/java/com/vonage/android/data/network/interceptor/E2eExpiredSessionKeyInterceptorTest.kt
+  s_783fb0ae0f285f::t_25a14abd36ba57 1-14,16-98
+  s_783fb0ae0f285f::t_daf10630d1a8f6 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0c80f645b5b9a6b7a41d2f7ae8717ea9aec303c2",
+  "prompts": {},
+  "sessions": {
+    "s_783fb0ae0f285f": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_d3807abd-52ff-4a42-aa68-852bf62d6319",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
