@@ -10,7 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.okta.VonageOktaAuth
 import com.vonage.android.okta.ui.AuthenticationRequiredSheet
 import com.vonage.android.okta.ui.SignInButton
-import com.vonage.android.util.pip.pipEffect
+import com.vonage.android.compose.util.pip.pipEffect
 
 @Composable
 internal fun LandingScreenRoute(

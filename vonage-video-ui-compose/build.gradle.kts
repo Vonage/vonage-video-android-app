@@ -43,6 +43,8 @@ roborazzi {
 
 dependencies {
     implementation(project(":vonage-video-core"))
+    implementation(project(":vonage-audio-selector"))
+    implementation(project(":vonage-android-logger"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
@@ -54,6 +56,7 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.adaptive)
 
     androidTestImplementation(libs.androidx.junit)

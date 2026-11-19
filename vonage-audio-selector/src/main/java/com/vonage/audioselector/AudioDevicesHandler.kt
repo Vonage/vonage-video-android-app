@@ -1,12 +1,14 @@
-package com.vonage.android.meetingroom.internal.screen.audio
+package com.vonage.audioselector
 
 import androidx.compose.runtime.Stable
-import com.vonage.audioselector.AudioDeviceSelector
 import com.vonage.audioselector.AudioDeviceSelector.AudioDevice
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.StateFlow
 
-internal class MeetingRoomAudioDevicesHandler(
+/**
+ * Exposes an [AudioDeviceSelector] as [AudioDevicesState] for UI consumption.
+ */
+class AudioDevicesHandler(
     private val audioDeviceSelector: AudioDeviceSelector,
 ) {
 
@@ -27,8 +29,11 @@ internal class MeetingRoomAudioDevicesHandler(
     }
 }
 
+/**
+ * UI-facing snapshot of the audio device selection.
+ */
 @Stable
-internal data class AudioDevicesState(
+data class AudioDevicesState(
     val availableDevices: StateFlow<ImmutableList<AudioDevice>>,
     val activeDevice: StateFlow<AudioDevice?>,
     val selectDevice: (AudioDevice) -> Unit,

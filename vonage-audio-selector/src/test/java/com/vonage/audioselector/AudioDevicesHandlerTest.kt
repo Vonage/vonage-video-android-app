@@ -1,6 +1,5 @@
-package com.vonage.android.screen.components.audio
+package com.vonage.audioselector
 
-import com.vonage.audioselector.AudioDeviceSelector
 import com.vonage.audioselector.AudioDeviceSelector.AudioDevice
 import com.vonage.audioselector.AudioDeviceSelector.AudioDeviceType
 import io.mockk.clearAllMocks

@@ -7,7 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.vonage.android.util.pip.pipEffect
+import com.vonage.android.compose.util.pip.pipEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.archiving.Archive
 

@@ -35,7 +35,7 @@ import com.vonage.android.compose.vivid.icons.line.Close
 import com.vonage.android.screen.reporting.ReportIssueScreenActions
 import com.vonage.android.screen.reporting.ReportIssueScreenUiState
 import com.vonage.android.screen.reporting.ReportingViewModel
-import com.vonage.android.util.pip.findActivity
+import com.vonage.android.compose.util.pip.findActivity
 
 @Composable
 fun ReportIssueForm(

@@ -17,9 +17,9 @@ import com.vonage.android.kotlin.model.PreviewPublisherState
 import com.vonage.android.kotlin.model.VideoBitrateConfig
 import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.PublisherSettings
-import com.vonage.android.screen.components.audio.AudioDevicesHandler
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.settings.PublisherPreferences
+import com.vonage.audioselector.AudioDevicesHandler
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every

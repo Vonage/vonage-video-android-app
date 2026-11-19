@@ -1,4 +1,4 @@
-package com.vonage.android.util
+package com.vonage.android.fx
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
