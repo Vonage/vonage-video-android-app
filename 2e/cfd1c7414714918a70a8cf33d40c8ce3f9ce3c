@@ -1,0 +1,29 @@
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/session/SessionModels.kt
+  s_783fb0ae0f285f::t_22114cd3e5cd1a 40-42
+vonage-vera-api-client/src/test/java/com/vonage/android/vera/api/session/JwtFixture.kt
+  s_783fb0ae0f285f::t_5e5ec5984c294c 1-26
+vonage-vera-api-client/src/test/java/com/vonage/android/vera/api/session/SessionKeyParserTest.kt
+  s_783fb0ae0f285f::t_e41f359fcc31cc 1-77
+vonage-vera-api-client/src/test/java/com/vonage/android/vera/api/session/SessionApiTest.kt
+  s_783fb0ae0f285f::t_710982c8fdff6c 119-164
+  s_783fb0ae0f285f::t_4079536eea9d5c 187,193,201-202,210
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/session/SessionApi.kt
+  s_783fb0ae0f285f::t_35ae27082c5f89 15-16,23,31-33
+  s_783fb0ae0f285f::t_e15777c137998b 34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2ecfd1c7414714918a70a8cf33d40c8ce3f9ce3c",
+  "prompts": {},
+  "sessions": {
+    "s_783fb0ae0f285f": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_d3807abd-52ff-4a42-aa68-852bf62d6319",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
