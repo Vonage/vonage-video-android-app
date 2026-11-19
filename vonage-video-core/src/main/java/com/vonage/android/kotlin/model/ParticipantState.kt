@@ -10,6 +10,8 @@ import com.vonage.android.kotlin.sdk.VonageSubscriberVideoListener
 import com.vonage.android.kotlin.sdk.VonageVideoType
 import com.vonage.android.kotlin.ext.mapTalking
 import com.vonage.android.kotlin.ext.movingAverage
+import com.vonage.android.kotlin.internal.SubscriberVideoQualityPolicy
+import com.vonage.android.kotlin.internal.SubscriberVideoTier
 import com.vonage.logger.vonageLogger
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
@@ -19,7 +21,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.isActive
@@ -94,6 +98,46 @@ data class ParticipantState(
         vonageSubscriber.reinitializeRenderer()
     }
 
+    /** Latest rendered view size in px, `null` until the view is first laid out. */
+    private val renderedSize = MutableStateFlow<Pair<Int, Int>?>(null)
+
+    private val _videoTier = MutableStateFlow(SubscriberVideoTier.FULL)
+
+    /** Receive-side quality tier currently requested for this stream. */
+    internal val videoTier: StateFlow<SubscriberVideoTier> = _videoTier
+
+    override fun onRenderedSizeChanged(width: Int, height: Int) {
+        if (width > 0 && height > 0) renderedSize.value = width to height
+    }
+
+    /**
+     * Applies [SubscriberVideoQualityPolicy] whenever the rendered size settles.
+     * The subscriber starts with no preference (full quality) until the first size arrives.
+     */
+    @OptIn(FlowPreview::class)
+    private suspend fun observeRenderedSize() {
+        renderedSize
+            .filterNotNull()
+            .debounce(SubscriberVideoQualityPolicy.SETTLE_MILLIS)
+            .collect { (width, height) ->
+                val stats = _videoStats.value
+                val tier = SubscriberVideoQualityPolicy.tierFor(
+                    viewWidth = width,
+                    viewHeight = height,
+                    sourceWidth = stats?.width ?: 0,
+                    sourceHeight = stats?.height ?: 0,
+                    isScreenShare = isScreenShare,
+                    current = _videoTier.value,
+                )
+                if (tier == _videoTier.value) return@collect
+                val sourceIsPortrait = stats != null && stats.height > stats.width
+                vonageSubscriber.setPreferredResolution(tier.preferredResolution(sourceIsPortrait))
+                vonageSubscriber.setPreferredFrameRate(tier.frameRate)
+                _videoTier.value = tier
+                vonageLogger.d(logTag, "Video tier=$tier rendered=${width}x$height")
+            }
+    }
+
     /**
      * Updates camera and microphone state from a session-level stream-property change.
      * Called by [com.vonage.android.kotlin.Call] when the remote publisher toggles their
@@ -165,6 +209,7 @@ data class ParticipantState(
                 observeNetworkCondition(vonageSubscriber::setNetworkConditionListener)
                     .collect { _networkCondition.value = it }
             }
+            launch { observeRenderedSize() }
             vonageSubscriber.observeAudioLevel()
                 .movingAverage(windowSize = 5)
                 .distinctUntilChanged()

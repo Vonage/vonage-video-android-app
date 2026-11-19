@@ -9,6 +9,8 @@ import com.vonage.android.kotlin.ext.sorted
 import com.vonage.android.kotlin.internal.ActiveSpeakerTracker
 import com.vonage.android.kotlin.internal.CaptionsHideScheduler
 import com.vonage.android.kotlin.internal.PublisherFactory
+import com.vonage.android.kotlin.internal.PublisherVideoQualityPolicy
+import com.vonage.android.kotlin.internal.holdTrueFor
 import com.vonage.android.kotlin.model.CallFacade
 import com.vonage.android.kotlin.model.CaptionLine
 import com.vonage.android.kotlin.model.ChatState
@@ -54,6 +56,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -99,6 +102,10 @@ class Call internal constructor(
     private val coroutineScope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
     private var participantsOnScreenJob: Job? = null
     private var activeSpeakerTrackerJob: Job? = null
+    private var publisherQualityJob: Job? = null
+
+    /** Bitrate the user configured; `null` until set or until the publisher is created. */
+    private val userBitrateConfig = MutableStateFlow<VideoBitrateConfig?>(null)
 
     /** Tracks active speaker based on audio levels across all participants */
     private val activeSpeakerTracker = activeSpeakerTrackerOverride
@@ -335,6 +342,7 @@ class Call internal constructor(
         coroutineScope.cancel()
         participantsOnScreenJob?.cancel()
         activeSpeakerTrackerJob?.cancel()
+        publisherQualityJob?.cancel()
     }
     //endregion
 
@@ -426,7 +434,36 @@ class Call internal constructor(
      * Applies a video bitrate configuration to the publisher at runtime.
      */
     override fun setVideoBitrate(config: VideoBitrateConfig) {
-        publisher()?.applyVideoBitrate(config)
+        // Applied through the publisher quality policy, which may lower it for large rooms.
+        userBitrateConfig.value = config
+    }
+
+    /**
+     * Applies [PublisherVideoQualityPolicy] to [publisher] for as long as the call lives:
+     * room size and the local user's speaking state adjust the bitrate the user configured.
+     */
+    private fun startPublisherQualityPolicy(publisher: PublisherState) {
+        // The publisher was built with the factory's configuration.
+        var applied = publisherFactory.currentConfig?.videoBitrateConfig ?: VideoBitrateConfig()
+        if (userBitrateConfig.value == null) userBitrateConfig.value = applied
+        val remoteCameraStreams = _participantsInternalFlow
+            .map { list -> list.count { !it.isPublisher && !it.isScreenShare } }
+            .distinctUntilChanged()
+        publisherQualityJob?.cancel()
+        publisherQualityJob = combine(
+            userBitrateConfig.filterNotNull(),
+            remoteCameraStreams,
+            publisher.isTalking.holdTrueFor(PublisherVideoQualityPolicy.SPEAKING_HOLD_MILLIS),
+        ) { user, remotes, speaking ->
+            PublisherVideoQualityPolicy.effectiveConfig(user, remotes, speaking)
+        }
+            .distinctUntilChanged()
+            .onEach { config ->
+                if (config == applied) return@onEach
+                publisher.applyVideoBitrate(config)
+                applied = config
+            }
+            .launchIn(coroutineScope)
     }
 
     /**
@@ -483,6 +520,7 @@ class Call internal constructor(
             }
             participants[PUBLISHER_ID] = newPublisher
             coroutineScope.launch { newPublisher.setup() }
+            startPublisherQualityPolicy(newPublisher)
             updateParticipants()
         }
     }
