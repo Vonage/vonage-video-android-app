@@ -1,0 +1,28 @@
+vonage-feature-screensharing/src/enabled/java/com/vonage/android/screensharing/EnabledScreenSharing.kt
+  s_9f477d67b3d8f2::t_d4c6d59ba8d6b0 58-73
+vonage-feature-screensharing/src/enabled/java/com/vonage/android/screensharing/service/ScreenSharingService.kt
+  s_9f477d67b3d8f2::t_61e467a6c5c3d2 22-27
+docs/SCREEN_SHARING_VALIDATION.md
+  s_9f477d67b3d8f2::t_7411c2d5957952 1-46
+vonage-video-core/src/main/java/com/vonage/android/kotlin/Call.kt
+  s_9f477d67b3d8f2::t_084e83059b9201 102
+  s_9f477d67b3d8f2::t_25df7b3b1666d3 505,507-509,516-517,524-525,528-532
+vonage-feature-screensharing/src/testEnabled/java/com/vonage/android/screensharing/EnabledScreenSharingTest.kt
+  s_9f477d67b3d8f2::t_e48b6b397e85a2 346-373
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e037f92ac3f04684d7c51c3cb444d69cb914dc13",
+  "prompts": {},
+  "sessions": {
+    "s_9f477d67b3d8f2": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_946b893d-d4c0-43b8-aa1b-15e4fba2ee89",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
