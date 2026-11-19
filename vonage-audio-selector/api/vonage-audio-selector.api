@@ -4,6 +4,7 @@ public final class com/vonage/audioselector/AudioDeviceSelector {
 	public fun <init> (Landroid/content/Context;Lkotlinx/coroutines/CoroutineDispatcher;)V
 	public final fun getActiveDevice ()Lkotlinx/coroutines/flow/StateFlow;
 	public final fun getAvailableDevices ()Lkotlinx/coroutines/flow/StateFlow;
+	public final fun restoreAudioFocus ()V
 	public final fun selectDevice (Lcom/vonage/audioselector/AudioDeviceSelector$AudioDevice;)V
 	public final fun start ()V
 	public final fun stop ()V
@@ -40,6 +41,7 @@ public final class com/vonage/audioselector/AudioDevicesHandler {
 	public static final field $stable I
 	public fun <init> (Lcom/vonage/audioselector/AudioDeviceSelector;)V
 	public final fun getAudioDevicesState ()Lcom/vonage/audioselector/AudioDevicesState;
+	public final fun restoreAudioFocus ()V
 	public final fun start ()V
 	public final fun stop ()V
 }

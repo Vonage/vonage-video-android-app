@@ -15,6 +15,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vonage.android.compose.theme.VonageVideoTheme
@@ -96,6 +97,11 @@ private fun MeetingRoomContentInner(
 
     LaunchedEffect(Unit) {
         viewModel.setup(context)
+    }
+
+    LifecycleResumeEffect(viewModel) {
+        viewModel.onResume()
+        onPauseOrDispose { }
     }
 
     val actions = remember {

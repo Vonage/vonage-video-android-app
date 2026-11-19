@@ -221,6 +221,15 @@ internal class MeetingRoomViewModel(
         }
     }
 
+    /**
+     * Called when the call UI is resumed. Takes audio focus back if another app took it for good
+     * while the call was in the background.
+     */
+    fun onResume() {
+        if (callEnded.get()) return
+        container.audioDevicesHandler.restoreAudioFocus()
+    }
+
     fun onToggleMic() { call?.toggleLocalAudio() }
 
     fun onToggleCamera() { call?.toggleLocalVideo() }

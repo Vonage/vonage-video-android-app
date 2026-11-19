@@ -27,6 +27,11 @@ class AudioDevicesHandler(
     fun stop() {
         audioDeviceSelector.stop()
     }
+
+    /** See [AudioDeviceSelector.restoreAudioFocus]. */
+    fun restoreAudioFocus() {
+        audioDeviceSelector.restoreAudioFocus()
+    }
 }
 
 /**
