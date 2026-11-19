@@ -11,6 +11,7 @@
 | `waiting-room-controls-disabled.yaml` | Toggle mic/camera off in waiting room, verify disabled in meeting |
 | `github-repo-link.yaml` | Verify GitHub repo button is visible on landing screen |
 | `auth-required-create-join-room.yaml` | Signed-out user taps Create / Join while the backend answers 401 (simulated) → sign-in sheet instead of the waiting room. Needs `authSettings.allowAuthentication: true` (always on in the Maestro CI build) |
+| `session-key-expired-join.yaml` | `createSession` returns an expired session key (simulated) → the meeting room shows the session error dialog without joining; Cancel leaves the room to the goodbye screen |
 | `auth-login-logout.yaml` | Sign in from the top-bar button (fake Okta sign-in), check the account sheet shows the user, sign out, and check sign-in is offered again. Needs `allowAuthentication: true` |
 
 ## Disabled
@@ -29,4 +30,5 @@ Passed with `launchApp: arguments:` and read by `E2eTestFlags`. They are honoure
 | Argument | Effect |
 |---|---|
 | `e2eForceAuthRequired` | Signed-out `POST v2/createSession` requests get a local `401` (simulates an auth-enforcing backend) |
+| `e2eExpiredSessionKey` | The `sessionKey` of a successful `POST v2/createSession` response is replaced with a JWT that expired an hour ago, so `v2/joinSession` is never called |
 | `e2eFakeSignIn` | "Sign in with Okta" succeeds instantly as "E2E Test User" without opening the browser (the Okta page and redirect are not exercised) |

@@ -37,9 +37,18 @@ class E2eTestFlags internal constructor(
     var fakeSignIn: Boolean = false
         private set
 
+    /**
+     * When true, the `sessionKey` returned by `v2/createSession` is replaced with a JWT that
+     * expired an hour ago, so the client must refuse to call `v2/joinSession`.
+     */
+    @Volatile
+    var expiredSessionKey: Boolean = false
+        private set
+
     fun updateFrom(intent: Intent?) {
         forceAuthRequired = hooksEnabled && intent.readFlag(FORCE_AUTH_REQUIRED_EXTRA)
         fakeSignIn = hooksEnabled && intent.readFlag(FAKE_SIGN_IN_EXTRA)
+        expiredSessionKey = hooksEnabled && intent.readFlag(EXPIRED_SESSION_KEY_EXTRA)
     }
 
     private fun Intent?.readFlag(key: String): Boolean {
@@ -51,5 +60,6 @@ class E2eTestFlags internal constructor(
     companion object {
         const val FORCE_AUTH_REQUIRED_EXTRA = "e2eForceAuthRequired"
         const val FAKE_SIGN_IN_EXTRA = "e2eFakeSignIn"
+        const val EXPIRED_SESSION_KEY_EXTRA = "e2eExpiredSessionKey"
     }
 }
