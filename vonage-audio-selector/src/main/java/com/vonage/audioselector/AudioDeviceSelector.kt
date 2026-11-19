@@ -16,6 +16,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -45,6 +46,9 @@ import kotlinx.coroutines.launch
  *     // Respond to device changes
  * }
  *
+ * // When the call UI returns to the foreground
+ * selector.restoreAudioFocus()
+ *
  * selector.stop()
  * ```
  */
@@ -58,6 +62,10 @@ class AudioDeviceSelector {
     private val audioFocusRequester: AudioFocusRequester
     private val getDevices: GetDevices
     private val currentDevice: CurrentDevice
+
+    @Volatile
+    private var started = false
+    private var deviceMonitoringJob: Job? = null
 
     constructor(
         context: Context,
@@ -145,7 +153,10 @@ class AudioDeviceSelector {
      */
     fun start() {
         Log.d(TAG, "start")
-        coroutineScope.launch {
+        started = true
+        audioFocusRequester.setOnFocusChangeListener(::onAudioFocusChange)
+        deviceMonitoringJob?.cancel()
+        deviceMonitoringJob = coroutineScope.launch {
             audioFocusRequester.request()
             veraBluetoothManager.onStart()
 
@@ -165,7 +176,36 @@ class AudioDeviceSelector {
      */
     fun stop() {
         Log.d(TAG, "stop")
+        started = false
+        deviceMonitoringJob?.cancel()
+        deviceMonitoringJob = null
+        audioFocusRequester.abandon()
         veraBluetoothManager.onStop()
+    }
+
+    /**
+     * Requests audio focus again if it was lost permanently (another app took it with
+     * AUDIOFOCUS_LOSS). Call it when the call UI returns to the foreground. Does nothing before
+     * [start], after [stop], or while focus is held or only transiently lost.
+     */
+    fun restoreAudioFocus() {
+        if (!started || audioFocusRequester.state != AudioFocusRequester.FocusState.NONE) return
+        Log.d(TAG, "restore audio focus")
+        coroutineScope.launch {
+            if (audioFocusRequester.request()) reapplyActiveDevice()
+        }
+    }
+
+    private fun onAudioFocusChange(state: AudioFocusRequester.FocusState) {
+        Log.d(TAG, "audio focus $state")
+        // The app that held focus may have changed the audio mode or speakerphone state.
+        if (state == AudioFocusRequester.FocusState.HELD && started) {
+            coroutineScope.launch { reapplyActiveDevice() }
+        }
+    }
+
+    private fun reapplyActiveDevice() {
+        currentDevice.reapplyActiveDevice()?.let { _activeDevice.value = it }
     }
 
     /**

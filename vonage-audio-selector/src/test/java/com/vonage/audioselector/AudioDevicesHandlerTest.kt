@@ -49,6 +49,13 @@ class AudioDevicesHandlerTest {
     }
 
     @Test
+    fun `restoreAudioFocus should delegate to audioDeviceSelector`() {
+        handler.restoreAudioFocus()
+
+        verify(exactly = 1) { mockAudioDeviceSelector.restoreAudioFocus() }
+    }
+
+    @Test
     fun `audioDevicesState should expose availableDevices from selector`() {
         val state = handler.audioDevicesState
 

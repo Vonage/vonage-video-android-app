@@ -33,12 +33,17 @@ internal class MeetingRoomForegroundService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        if (ContextCompat.checkSelfPermission(this, permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+        if (!hasPermission(permission.RECORD_AUDIO)) {
             vonageLogger.e(TAG, "Cannot use microphone in background without RECORD_AUDIO permission")
             stopSelf()
+            return START_NOT_STICKY
         }
-
-        if (intent == null) return START_REDELIVER_INTENT
+        // A null intent only comes from a system restart after process death. The call is gone by
+        // then, and a service restarted from the background would not get while-in-use access.
+        if (intent == null) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
 
         val roomName = intent.extras?.getString(ROOM_INTENT_EXTRA_NAME).orEmpty()
         val notification = buildInCallNotification(roomName)
@@ -47,14 +52,13 @@ internal class MeetingRoomForegroundService : Service() {
             this,
             FOREGROUND_SERVICE_NOTIFICATION_ID,
             notification,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                FOREGROUND_SERVICE_TYPE_MICROPHONE or FOREGROUND_SERVICE_TYPE_CAMERA
-            } else {
-                0
-            },
+            foregroundServiceType(hasCameraPermission = hasPermission(permission.CAMERA)),
         )
-        return START_STICKY
+        return START_NOT_STICKY
     }
+
+    private fun hasPermission(name: String): Boolean =
+        ContextCompat.checkSelfPermission(this, name) == PackageManager.PERMISSION_GRANTED
 
     private fun buildInCallNotification(roomName: String): Notification =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -62,7 +66,7 @@ internal class MeetingRoomForegroundService : Service() {
                 .setName(roomName)
                 .setImportant(true)
                 .build()
-            val hangupIntent = Intent(HANG_UP_ACTION)
+            val hangupIntent = Intent(HANG_UP_ACTION).setPackage(packageName)
             val hangupPendingIntent = PendingIntent.getBroadcast(
                 this,
                 FOREGROUND_SERVICE_REQUEST_CODE,
@@ -89,4 +93,17 @@ internal class MeetingRoomForegroundService : Service() {
         const val FOREGROUND_SERVICE_REQUEST_CODE = 999
         const val TAG: String = "MeetingRoomForegroundService"
     }
+}
+
+/**
+ * Foreground service type for an active call. The camera type is only added when CAMERA is
+ * granted: since Android 14 starting a camera-type service without it throws SecurityException.
+ */
+internal fun foregroundServiceType(
+    hasCameraPermission: Boolean,
+    sdkInt: Int = Build.VERSION.SDK_INT,
+): Int = when {
+    sdkInt < Build.VERSION_CODES.R -> 0
+    hasCameraPermission -> FOREGROUND_SERVICE_TYPE_MICROPHONE or FOREGROUND_SERVICE_TYPE_CAMERA
+    else -> FOREGROUND_SERVICE_TYPE_MICROPHONE
 }

@@ -66,7 +66,8 @@ internal class MeetingRoomForegroundServiceHandler(
     }
 
     private fun listenCallActions() {
-        ContextCompat.registerReceiver(context, callActionsReceiver, filter, ContextCompat.RECEIVER_EXPORTED)
+        // Not exported: only this app (the notification's PendingIntent) may hang up the call.
+        ContextCompat.registerReceiver(context, callActionsReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
     }
 
     sealed interface CallAction {

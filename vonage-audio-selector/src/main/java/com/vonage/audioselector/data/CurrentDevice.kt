@@ -32,6 +32,13 @@ internal class CurrentDevice(
             null
         }
 
+    /**
+     * Routes audio to the active device again, e.g. after another app took audio focus and changed
+     * the audio mode or speakerphone state.
+     */
+    fun reapplyActiveDevice(): AudioDeviceSelector.AudioDevice? =
+        userSelectedDevice?.also { performSwitchTo(it) } ?: getCurrentActiveDevice()
+
     private fun performSwitchTo(audioDevice: AudioDeviceSelector.AudioDevice) {
         when (audioDevice.type) {
             AudioDeviceSelector.AudioDeviceType.EARPIECE,
