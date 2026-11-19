@@ -16,6 +16,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -64,6 +65,7 @@ class AudioDeviceSelector {
 
     @Volatile
     private var started = false
+    private var deviceMonitoringJob: Job? = null
 
     constructor(
         context: Context,
@@ -153,7 +155,8 @@ class AudioDeviceSelector {
         Log.d(TAG, "start")
         started = true
         audioFocusRequester.setOnFocusChangeListener(::onAudioFocusChange)
-        coroutineScope.launch {
+        deviceMonitoringJob?.cancel()
+        deviceMonitoringJob = coroutineScope.launch {
             audioFocusRequester.request()
             veraBluetoothManager.onStart()
 
@@ -174,6 +177,8 @@ class AudioDeviceSelector {
     fun stop() {
         Log.d(TAG, "stop")
         started = false
+        deviceMonitoringJob?.cancel()
+        deviceMonitoringJob = null
         audioFocusRequester.abandon()
         veraBluetoothManager.onStop()
     }

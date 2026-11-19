@@ -183,13 +183,47 @@ class AudioDeviceSelectorTest {
         verify(exactly = 0) { currentDevice.reapplyActiveDevice() }
     }
 
-    private fun givenStarted(): (AudioFocusRequester.FocusState) -> Unit {
+    @Test
+    fun `given started when stop then bluetooth changes are no longer collected`() = runTest {
+        val bluetoothStates = MutableStateFlow<VeraBluetoothManager.BluetoothState>(
+            VeraBluetoothManager.BluetoothState.Disconnected,
+        )
+        givenStarted(bluetoothStates)
+
+        sut.stop()
+        bluetoothStates.value = VeraBluetoothManager.BluetoothState.Connected
+        testScheduler.advanceUntilIdle()
+
+        verify(exactly = 1) { currentDevice.reset() }
+    }
+
+    @Test
+    fun `given started twice when bluetooth changes then devices are refreshed once`() = runTest {
+        val bluetoothStates = MutableStateFlow<VeraBluetoothManager.BluetoothState>(
+            VeraBluetoothManager.BluetoothState.Disconnected,
+        )
+        givenStarted(bluetoothStates)
+        sut.start()
+        testScheduler.advanceUntilIdle()
+
+        bluetoothStates.value = VeraBluetoothManager.BluetoothState.Connected
+        testScheduler.advanceUntilIdle()
+
+        // one reset per start for the initial state, plus one for the change
+        verify(exactly = 3) { currentDevice.reset() }
+    }
+
+    private fun givenStarted(
+        bluetoothStates: MutableStateFlow<VeraBluetoothManager.BluetoothState> =
+            MutableStateFlow(VeraBluetoothManager.BluetoothState.Disconnected),
+    ): (AudioFocusRequester.FocusState) -> Unit {
         val listener = slot<(AudioFocusRequester.FocusState) -> Unit>()
         every { audioFocusRequester.setOnFocusChangeListener(capture(listener)) } returns Unit
         every { audioFocusRequester.request() } returns true
         every { getDevices.invoke() } returns listOf(headset, speaker)
         every { currentDevice.reapplyActiveDevice() } returns speaker
         givenBluetoothManger(VeraBluetoothManager.BluetoothState.Disconnected)
+        every { bluetoothManager.bluetoothStates } returns bluetoothStates
         givenCurrentActiveDevice(headset)
         sut.start()
         testDispatcher.scheduler.advanceUntilIdle()
