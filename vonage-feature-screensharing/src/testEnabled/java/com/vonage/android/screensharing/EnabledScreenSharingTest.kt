@@ -343,6 +343,34 @@ class EnabledScreenSharingTest {
 
         verify(exactly = 0) { callFacade.startCapturingScreen(any()) }
         verify(exactly = 0) { onStarted() }
+        verify { onStopped() }
+        verify { context.stopService(serviceIntent) }
+    }
+
+    @Test
+    fun `startScreenSharing when media projection throws stops and triggers onStopped`() {
+        val onStarted = mockk<() -> Unit>(relaxed = true)
+        val onStopped = mockk<() -> Unit>(relaxed = true)
+        val serviceConnectionSlot = slot<ServiceConnection>()
+
+        every {
+            context.bindService(
+                serviceIntent,
+                capture(serviceConnectionSlot),
+                Context.BIND_AUTO_CREATE
+            )
+        } returns true
+        every {
+            mediaProjectionManager.getMediaProjection(any(), mediaProjectionIntent)
+        } throws SecurityException("token already used")
+
+        sut.startScreenSharing(mediaProjectionIntent, callFacade, onStarted, onStopped)
+        serviceConnectionSlot.captured.onServiceConnected(mockk<ComponentName>(), binder)
+
+        verify(exactly = 0) { callFacade.startCapturingScreen(any()) }
+        verify(exactly = 0) { onStarted() }
+        verify { onStopped() }
+        verify { context.unbindService(serviceConnectionSlot.captured) }
     }
 
     @Test

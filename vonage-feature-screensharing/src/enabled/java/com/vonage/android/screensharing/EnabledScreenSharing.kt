@@ -55,14 +55,22 @@ class EnabledScreenSharing(
 
         screenSharingServiceConnection = object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                mediaProjectionManager.getMediaProjection(Activity.RESULT_OK, intent)
-                    ?.let { mediaProjection ->
-                        currentMediaProjection = mediaProjection
-                        currentMediaProjection?.registerCallback(mediaProjectionCallback, null)
-                        call.startCapturingScreen(mediaProjection)
-                        showOverlay()
-                        onStarted()
-                    }
+                // getMediaProjection returns null for a stale token and throws SecurityException
+                // on API 34+ if the token was already used; treat both as "sharing stopped"
+                // so the UI does not stay in STARTING.
+                val mediaProjection = runCatching {
+                    mediaProjectionManager.getMediaProjection(Activity.RESULT_OK, intent)
+                }.getOrNull()
+                if (mediaProjection == null) {
+                    stopSharingScreen()
+                    onStopped()
+                    return
+                }
+                currentMediaProjection = mediaProjection
+                mediaProjection.registerCallback(mediaProjectionCallback, null)
+                call.startCapturingScreen(mediaProjection)
+                showOverlay()
+                onStarted()
             }
 
             override fun onServiceDisconnected(name: ComponentName?) {
