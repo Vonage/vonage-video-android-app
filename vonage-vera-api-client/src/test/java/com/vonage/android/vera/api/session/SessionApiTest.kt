@@ -117,6 +117,52 @@ class SessionApiTest {
     }
 
     @Test
+    fun `given createSession returns an expired session key returns SessionKeyExpiredException without joining`() =
+        runTest {
+            givenCreateSessionSucceeds(sessionKey = makeJwt(mapOf("exp" to epochSecondsFromNow(-3_600))))
+
+            val result = sut.getSession(ROOM_NAME)
+
+            assertIs<SessionKeyExpiredException>(result.exceptionOrNull())
+            coVerify(exactly = 0) { apiService.joinSession(any()) }
+        }
+
+    @Test
+    fun `given session key exp equals now returns SessionKeyExpiredException`() = runTest {
+        val sut = DefaultSessionApi(apiService, currentTimeMillis = { NOW_SECONDS * 1_000 })
+        givenCreateSessionSucceeds(sessionKey = makeJwt(mapOf("exp" to NOW_SECONDS)))
+
+        val result = sut.getSession(ROOM_NAME)
+
+        assertIs<SessionKeyExpiredException>(result.exceptionOrNull())
+        coVerify(exactly = 0) { apiService.joinSession(any()) }
+    }
+
+    @Test
+    fun `given session key without exp claim joins the session`() = runTest {
+        val sessionKey = makeJwt(mapOf("roomName" to ROOM_NAME, "sessionId" to "sessionId"))
+        givenCreateSessionSucceeds(sessionKey)
+        givenJoinSessionSucceeds(sessionKey)
+
+        val result = sut.getSession(ROOM_NAME)
+
+        assertEquals(sessionKey, result.getOrThrow().sessionKey)
+        coVerify { apiService.joinSession(SessionKeyRequest(sessionKey)) }
+    }
+
+    @Test
+    fun `given session key with future exp claim joins the session`() = runTest {
+        val sessionKey = makeJwt(mapOf("exp" to epochSecondsFromNow(3_600), "roomName" to ROOM_NAME))
+        givenCreateSessionSucceeds(sessionKey)
+        givenJoinSessionSucceeds(sessionKey)
+
+        val result = sut.getSession(ROOM_NAME)
+
+        assertEquals(sessionKey, result.getOrThrow().sessionKey)
+        coVerify { apiService.joinSession(SessionKeyRequest(sessionKey)) }
+    }
+
+    @Test
     fun `decodes backend payloads ignoring extra fields`() {
         val json = Json { ignoreUnknownKeys = true }
         val create = json.decodeFromString<TrpcResponse<CreateSessionResponse>>(
@@ -138,13 +184,13 @@ class SessionApiTest {
         assertTrue("secret" !in info.toString())
     }
 
-    private fun givenCreateSessionSucceeds() {
+    private fun givenCreateSessionSucceeds(sessionKey: String = SESSION_KEY) {
         coEvery { apiService.createSession(CreateSessionRequest(ROOM_NAME)) } returns Response.success(
             TrpcResponse(
                 TrpcResult(
                     CreateSessionResponse(
                         sessionId = "sessionId",
-                        sessionKey = SESSION_KEY,
+                        sessionKey = sessionKey,
                         applicationId = "applicationId",
                     )
                 )
@@ -152,8 +198,8 @@ class SessionApiTest {
         )
     }
 
-    private fun givenJoinSessionSucceeds() {
-        coEvery { apiService.joinSession(SessionKeyRequest(SESSION_KEY)) } returns Response.success(
+    private fun givenJoinSessionSucceeds(sessionKey: String = SESSION_KEY) {
+        coEvery { apiService.joinSession(SessionKeyRequest(sessionKey)) } returns Response.success(
             TrpcResponse(TrpcResult(JoinSessionResponse(token = "token")))
         )
     }
@@ -161,5 +207,6 @@ class SessionApiTest {
     private companion object {
         const val ROOM_NAME = "any-room-name"
         const val SESSION_KEY = "session-key"
+        const val NOW_SECONDS = 1_800_000_000L
     }
 }
