@@ -1,0 +1,26 @@
+app/src/debug/kotlin/com/vonage/android/DebugMainApplication.kt
+  s_6eb28853191cf2::t_f1075ed5841607 15
+app/src/debug/kotlin/com/vonage/android/JankStatsTracker.kt
+  s_6eb28853191cf2::t_4eebf7794da0ee 1-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "daffe4bfed97435657b13fafd3575c34dc59df2c",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_6eb28853191cf2": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_164ccf4d-a23c-45a4-acdd-8ed7b21e26cb",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
