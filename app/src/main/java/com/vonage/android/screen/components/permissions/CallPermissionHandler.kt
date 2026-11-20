@@ -19,14 +19,7 @@ fun CallPermissionHandler(
 ) {
     if (LocalInspectionMode.current) return
 
-    val resolvedPermissions = permissions ?: buildList {
-        add(Manifest.permission.CAMERA)
-        add(Manifest.permission.RECORD_AUDIO)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            add(Manifest.permission.BLUETOOTH_CONNECT)
-            add(Manifest.permission.POST_NOTIFICATIONS)
-        }
-    }
+    val resolvedPermissions = permissions ?: callPermissions()
     val state = rememberMultiplePermissionsState(resolvedPermissions)
     LaunchedEffect(state) {
         state.launchMultiplePermissionRequest()
@@ -52,5 +45,16 @@ fun PermissionHandler(
             multiplePermissionsState = multiplePermissionsState,
             navigateToPermissions = navigateToPermissions,
         )
+    }
+}
+
+internal fun callPermissions(sdkInt: Int = Build.VERSION.SDK_INT): List<String> = buildList {
+    add(Manifest.permission.CAMERA)
+    add(Manifest.permission.RECORD_AUDIO)
+    if (sdkInt >= Build.VERSION_CODES.S) {
+        add(Manifest.permission.BLUETOOTH_CONNECT)
+    }
+    if (sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+        add(Manifest.permission.POST_NOTIFICATIONS)
     }
 }
