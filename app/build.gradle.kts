@@ -326,6 +326,7 @@ dependencies {
     kspAndroidTest(libs.hilt.android.compiler)
 
     debugImplementation(libs.leakcanary.android)
+    debugImplementation(libs.androidx.metrics.performance)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
