@@ -26,11 +26,7 @@ val featureDimensions = mapOf(
 
 android {
     namespace = "com.vonage.android.baselineprofile"
-    compileSdk {
-        version = release(libs.versions.compileSdk.get().toInt()) {
-            minorApiLevel = libs.versions.compileSdkMinor.get().toInt()
-        }
-    }
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         // BaselineProfileRule requires API 28+.
