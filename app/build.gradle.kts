@@ -11,10 +11,16 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.play.publisher)
     alias(libs.plugins.stability.analyzer)
+    alias(libs.plugins.androidx.baselineprofile)
     id("com.vonage.json-config")
 }
 
-val isReleaseBuild = gradle.startParameter.taskNames.any { it.contains("Release", ignoreCase = true) }
+// Baseline profile tasks build the plugin's nonMinifiedRelease/benchmarkRelease variants, which have
+// no google-services.json, so they must not trigger the Firebase plugins.
+val isReleaseBuild = gradle.startParameter.taskNames.any { task ->
+    task.contains("Release", ignoreCase = true) &&
+        listOf("BaselineProfile", "Benchmark", "NonMinified").none { task.contains(it, ignoreCase = true) }
+}
 if (isReleaseBuild) {
     apply(plugin = "com.google.gms.google-services")
     apply(plugin = "com.google.firebase.crashlytics")
@@ -36,7 +42,11 @@ if (localPropsFile.exists()) {
 
 android {
     namespace = "com.vonage.android"
-    compileSdk = libs.versions.compileSdk.get().toInt()
+    compileSdk {
+        version = release(libs.versions.compileSdk.get().toInt()) {
+            minorApiLevel = libs.versions.compileSdkMinor.get().toInt()
+        }
+    }
 
     defaultConfig {
         applicationId = "com.vonage.android"
@@ -284,6 +294,8 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.profileinstaller)
+    baselineProfile(project(":baselineprofile"))
     ksp(libs.hilt.android.compiler)
     // InApp Updates
     implementation(libs.app.update)

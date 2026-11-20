@@ -3,6 +3,8 @@ import org.gradle.kotlin.dsl.detektPlugins
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.android.test) apply false
+    alias(libs.plugins.androidx.baselineprofile) apply false
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.dagger.hilt) apply false
     alias(libs.plugins.kotlin.ksp) apply false
@@ -38,7 +40,8 @@ kover {
             it.name !in listOf(
                 "vonage-video-ui-compose",
                 "vonage-video-sdk",
-                "vonage-config-idea-plugin"
+                "vonage-config-idea-plugin",
+                "baselineprofile"
             )
         }
     }
@@ -73,7 +76,7 @@ kover {
 
 apply(from = "${rootDir}/build-tools/sonar.gradle")
 
-val koverExcludedModules = listOf("vonage-video-ui-compose", "vonage-video-sdk", "vonage-config-idea-plugin")
+val koverExcludedModules = listOf("vonage-video-ui-compose", "vonage-video-sdk", "vonage-config-idea-plugin", "baselineprofile")
 
 subprojects {
     if (name !in koverExcludedModules) {

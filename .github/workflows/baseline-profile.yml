@@ -1,0 +1,122 @@
+name: Baseline Profile
+
+# Regenerates app/src/release/generated/baselineProfiles/ on a Gradle Managed Device.
+# - Manual run with a ticket: opens a PR against develop when the profile changed.
+# - Push to a release branch, or manual run without a ticket: only checks that generation still works
+#   and uploads the profile as an artifact.
+# A failure usually means a journey in :baselineprofile no longer matches the UI (e.g. a renamed test tag).
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  push:
+    branches:
+      - 'release-*'
+  workflow_dispatch:
+    inputs:
+      ticket:
+        description: 'Jira ticket for the PR (e.g. VIDSOL-1234). Leave empty to only check generation.'
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BASE_API_URL: ${{ secrets.BASE_API_URL }}
+
+jobs:
+  generate:
+    name: Generate Baseline Profile
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Validate ticket
+        if: inputs.ticket != ''
+        env:
+          TICKET: ${{ inputs.ticket }}
+        run: |
+          if ! echo "$TICKET" | grep -Eq '^VIDSOL-[0-9]+$'; then
+            echo "::error::ticket must look like VIDSOL-1234, got '$TICKET'"
+            exit 1
+          fi
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          df -h
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Setup Java
+        uses: ./.github/actions/setup-java
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Generate config
+        run: ./gradlew generateVonageConfig
+
+      - name: Generate Baseline Profile
+        # Runners have no GPU, so the managed device renders in software.
+        run: |
+          ./gradlew :app:generateBaselineProfile \
+            -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect \
+            --stacktrace
+
+      - name: Upload profile
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline-profile
+          path: app/src/release/generated/baselineProfiles/
+          retention-days: 7
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline-profile-reports
+          path: baselineprofile/build/reports/androidTests/
+          retention-days: 7
+
+      - name: Open PR if the profile changed
+        if: github.event_name == 'workflow_dispatch' && inputs.ticket != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TICKET: ${{ inputs.ticket }}
+        run: |
+          PROFILE_DIR=app/src/release/generated/baselineProfiles
+          if [ -z "$(git status --porcelain -- "$PROFILE_DIR")" ]; then
+            echo "Baseline Profile is up to date."
+            exit 0
+          fi
+
+          BRANCH="${TICKET}-update-baseline-profile-${GITHUB_RUN_ID}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add -- "$PROFILE_DIR"
+          git commit -m "${TICKET}: Update baseline profile"
+          git push origin "$BRANCH"
+          gh pr create \
+            --base develop \
+            --head "$BRANCH" \
+            --title "${TICKET}: Update baseline profile" \
+            --body "Regenerated from \`${GITHUB_REF_NAME}\` by the Baseline Profile workflow (${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})."
