@@ -7,9 +7,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <!-- Only DownloadManager.setDestinationInExternalPublicDir needs it, and only up to API 28. -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32"
+        android:maxSdkVersion="28"
         tools:ignore="ScopedStorage" />
 
     <application
