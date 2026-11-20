@@ -1,0 +1,14 @@
+docs/PERMISSIONS.md
+  h_25498f8d57a266 60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2ec838656a3b9b82433715a843ce5f0bdcdf1e08",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
