@@ -1,0 +1,41 @@
+baselineprofile/src/main/AndroidManifest.xml
+  s_6eb28853191cf2::t_aeebabba428c68 1-2
+baselineprofile/build.gradle.kts
+  s_6eb28853191cf2::t_a8cca7177e6300 3-40,53-92
+  s_6eb28853191cf2::t_bfcc60c5f1629e 41-52
+  s_6eb28853191cf2::t_998b64b2fc27cb 1-2
+baselineprofile/src/main/java/com/vonage/android/baselineprofile/BaselineProfileGenerator.kt
+  s_6eb28853191cf2::t_de0caa487bcaef 1-41
+.github/workflows/baseline-profile.yml
+  s_6eb28853191cf2::t_7c1a48228f524e 1-97
+  s_6eb28853191cf2::t_f333df93612a77 98-100
+app/build.gradle.kts
+  s_6eb28853191cf2::t_da630f874ed11a 18-23
+baselineprofile/src/main/java/com/vonage/android/baselineprofile/Journeys.kt
+  s_6eb28853191cf2::t_7f502d1109f577 1-46
+.github/workflows/check-pull-request-size.yml
+  s_6eb28853191cf2::t_d1a2ea1cd1910a 10,18-20,25-29,35
+baselineprofile/src/main/java/com/vonage/android/baselineprofile/StartupBenchmarks.kt
+  s_6eb28853191cf2::t_33444219dc1959 1-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b34cc5a0f071733b794419cbe2068d30eadc8672",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_6eb28853191cf2": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_164ccf4d-a23c-45a4-acdd-8ed7b21e26cb",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
