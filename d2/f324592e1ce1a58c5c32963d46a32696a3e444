@@ -1,0 +1,25 @@
+app/src/main/java/com/vonage/android/screen/components/permissions/CallPermissionHandler.kt
+  s_f95060d89fcc64::t_b3eb070a348eda 22
+app/src/release/AndroidManifest.xml
+  s_f95060d89fcc64::t_5260f22bc448b9 5,9-17
+app/src/main/java/com/vonage/android/util/DownloadManager.kt
+  s_f95060d89fcc64::t_46dc8f9b9b0c0e 5,20-25,33-37
+app/src/main/AndroidManifest.xml
+  s_f95060d89fcc64::t_d34473643966ab 10,12-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d2f324592e1ce1a58c5c32963d46a32696a3e444",
+  "prompts": {},
+  "sessions": {
+    "s_f95060d89fcc64": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_78eab997-25d0-4d19-8e02-d9e4cb8331e0",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
