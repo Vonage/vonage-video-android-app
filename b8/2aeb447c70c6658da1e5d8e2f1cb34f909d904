@@ -1,0 +1,50 @@
+app/build.gradle.kts
+  h_25498f8d57a266 45
+baselineprofile/build.gradle.kts
+  h_25498f8d57a266 29
+vonage-android-logger/build.gradle.kts
+  h_25498f8d57a266 8
+vonage-audio-selector/build.gradle.kts
+  h_25498f8d57a266 10
+vonage-feature-archiving/build.gradle.kts
+  h_25498f8d57a266 8
+vonage-feature-audio-effects/build.gradle.kts
+  h_25498f8d57a266 9
+vonage-feature-captions/build.gradle.kts
+  h_25498f8d57a266 8
+vonage-feature-chat/build.gradle.kts
+  h_25498f8d57a266 9
+vonage-feature-okta/build.gradle.kts
+  h_25498f8d57a266 9
+vonage-feature-reactions/build.gradle.kts
+  h_25498f8d57a266 9
+vonage-feature-screensharing/build.gradle.kts
+  h_25498f8d57a266 9
+vonage-feature-settings/build.gradle.kts
+  h_25498f8d57a266 9
+vonage-feature-video-effects/build.gradle.kts
+  h_25498f8d57a266 9
+vonage-meeting-room-sample-app/build.gradle.kts
+  h_25498f8d57a266 8
+vonage-meeting-room/build.gradle.kts
+  h_25498f8d57a266 9
+vonage-vera-api-client/build.gradle.kts
+  h_25498f8d57a266 8
+vonage-video-core/build.gradle.kts
+  h_25498f8d57a266 8
+vonage-video-sdk/build.gradle.kts
+  h_25498f8d57a266 8
+vonage-video-ui-compose/build.gradle.kts
+  h_25498f8d57a266 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b82aeb447c70c6658da1e5d8e2f1cb34f909d904",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
