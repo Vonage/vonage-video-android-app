@@ -57,7 +57,7 @@ On an Android 17 device or emulator, a debug build can't reach a backend at `10.
 
 ### Publishing on the API 37 emulator
 
-On the `android-37.0` Google APIs arm64 emulator image, joining a room on `meet.vonagenetworks.net` connects the session but publishing fails with "Timed out while attempting to publish". This happens with and without `ACCESS_LOCAL_NETWORK` granted, so the local network permission isn't the cause. The same APK publishes normally on an API 34 emulator. Root cause not yet known: it could be the emulator image or an Android 17 issue in the SDK. It needs a check on a physical Android 17 device.
+On the `android-37.0` Google APIs arm64 emulator image, joining a room on `meet.vonagenetworks.net` connects the session but publishing fails with "Timed out while attempting to publish". This happens with and without `ACCESS_LOCAL_NETWORK` granted, so the local network permission isn't the cause. The same APK publishes normally on an API 34 emulator. On a physical Pixel 9a running Android 17, the same build joins and publishes normally, without `ACCESS_LOCAL_NETWORK`. The failure is specific to the emulator image, so use a physical device or an older emulator image to test calls.
 
 ## Encrypted Client Hello (ECH)
 
@@ -81,5 +81,4 @@ Decision: **no WebView dependency, no version constraint**.
 
 ## Open follow-ups
 
-- Join and publish on a physical Android 17 device, to confirm whether the publish timeout seen on the API 37 emulator is emulator-only.
 - Same-LAN relayed call on two Android 17 devices, to confirm the SDK's claim that `ACCESS_LOCAL_NETWORK` isn't needed.
