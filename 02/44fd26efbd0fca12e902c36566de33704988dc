@@ -1,0 +1,19 @@
+build-tools/gradle-config-plugin/src/main/kotlin/com/vonage/gradle/AndroidApiValidationPlugin.kt
+  s_af0f92ed542e78::t_fd78876b8fab49 1-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0244fd26efbd0fca12e902c36566de33704988dc",
+  "prompts": {},
+  "sessions": {
+    "s_af0f92ed542e78": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_863f3b64-069b-4a9e-9fc3-1306af047725",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
