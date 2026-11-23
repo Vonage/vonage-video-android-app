@@ -1,0 +1,24 @@
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/layout/FilmstripTileHeightTest.kt
+  s_55230221987d52::t_54f386008b4bd6 1-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "11ba42236dc730501219ea23e8496634cffa6584",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_55230221987d52": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_92253f64-2a02-4172-b0cd-7da3fedd0b48",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
