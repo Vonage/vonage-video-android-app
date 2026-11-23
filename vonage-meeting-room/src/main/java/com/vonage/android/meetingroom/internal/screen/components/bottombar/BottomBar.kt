@@ -12,6 +12,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -229,7 +230,10 @@ private fun actionsFactory(
     onShowChat: () -> Unit,
 ): ImmutableList<BottomBarAction> {
     val participantsCount by call.participantsCount.collectAsStateWithLifecycle()
-    val chatState by call.chatSignalState.collectAsStateWithLifecycle()
+    val chatState = call.chatSignalState.collectAsStateWithLifecycle()
+    // Only the badge count matters here; reading the whole ChatState would recompose the bar on
+    // every message.
+    val unreadCount by remember { derivedStateOf { chatState.value?.unreadCount ?: 0 } }
 
     return actions.mapNotNull { type ->
         when (type) {
@@ -248,7 +252,7 @@ private fun actionsFactory(
             BottomBarActionType.CHAT -> chatAction(
                 label = stringResource(R.string.chat),
                 isSelected = state.isChatShow,
-                badgeCount = chatState?.unreadCount ?: 0,
+                badgeCount = unreadCount,
                 onShowChat = onShowChat,
             )
 
