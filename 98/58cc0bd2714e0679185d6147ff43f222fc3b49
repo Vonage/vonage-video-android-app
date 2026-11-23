@@ -1,0 +1,14 @@
+vonage-feature-chat/src/enabled/java/com/vonage/android/chat/ui/JumpToBottom.kt
+  h_25498f8d57a266 11,13,16,43,50-52,68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9858cc0bd2714e0679185d6147ff43f222fc3b49",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
