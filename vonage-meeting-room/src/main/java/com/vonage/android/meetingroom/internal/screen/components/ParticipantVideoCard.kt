@@ -222,13 +222,13 @@ private fun MicrophoneIndicator(
         modifier = modifier,
     ) {
         if (isMicEnabled && isShowVolumeIndicator) {
-            val audioLevel by participant.audioLevel.collectAsStateWithLifecycle()
+            val audioLevel = participant.audioLevel.collectAsStateWithLifecycle()
             AudioVolumeIndicator(
                 size = 32.dp,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(8.dp),
-                audioLevel = audioLevel,
+                audioLevel = { audioLevel.value },
             )
         } else {
             MicrophoneIcon(
