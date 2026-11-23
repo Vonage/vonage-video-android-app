@@ -98,6 +98,10 @@ private fun enabledBottomBarActions(
     }
 }.toImmutableList()
 
+// Shared fallbacks: a new flow per recomposition would restart collectAsStateWithLifecycle.
+private val NoExtraActions: StateFlow<List<MeetingRoomBottomBarAction>> = MutableStateFlow(emptyList())
+private val AlwaysFalse: StateFlow<Boolean> = MutableStateFlow(false)
+
 @Suppress("LongMethod", "CyclomaticComplexMethod")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -162,7 +166,7 @@ internal fun MeetingRoomScreen(
             val pinnedIds by call.pinnedParticipantIds.collectAsStateWithLifecycle()
 
             // Collect additional custom buttons (dynamic — isSelected/badgeCount can change).
-            val extraActions by (additionalBottomBarActions ?: MutableStateFlow(emptyList()))
+            val extraActions by (additionalBottomBarActions ?: NoExtraActions)
                 .collectAsStateWithLifecycle()
             val mappedExtraActions: ImmutableList<BottomBarAction> = remember(extraActions) {
                 extraActions.map { action ->
@@ -178,9 +182,9 @@ internal fun MeetingRoomScreen(
             }
 
             // Collect publisher mic/camera state for the custom bottom bar state.
-            val isMicEnabled by (publisher?.isMicEnabled ?: MutableStateFlow(false))
+            val isMicEnabled by (publisher?.isMicEnabled ?: AlwaysFalse)
                 .collectAsStateWithLifecycle()
-            val isCameraEnabled by (publisher?.isCameraEnabled ?: MutableStateFlow(false))
+            val isCameraEnabled by (publisher?.isCameraEnabled ?: AlwaysFalse)
                 .collectAsStateWithLifecycle()
 
             // Minimal state exposed to a custom bottom bar composable.
