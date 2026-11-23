@@ -1,0 +1,14 @@
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/util/pip/pipEffect.kt
+  h_25498f8d57a266 10,46-47,57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ab5f920c64cc724a57eb1c0a2a478819e00d79a4",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
