@@ -54,14 +54,14 @@ internal fun ParticipantsList(
     actions: MeetingRoomActions = MeetingRoomActions(),
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    val sortedParticipants by remember(participants, pinnedParticipantIds) {
+    val sortedParticipants by remember(participants) {
         derivedStateOf {
-            if (searchQuery.isBlank()) {
-                participants.toList()
+            val query = searchQuery
+            if (query.isBlank()) {
+                participants
             } else {
-                participants.filter {
-                    it.name.normalize().contains(searchQuery.normalize(), ignoreCase = true)
-                }
+                val normalizedQuery = query.normalize()
+                participants.filter { it.name.normalize().contains(normalizedQuery, ignoreCase = true) }
             }
         }
     }
@@ -196,9 +196,11 @@ private fun ParticipantRow(
 }
 
 // enable normalization for diacritics
+private val DIACRITICS = Regex("\\p{Mn}+")
+
 private fun String.normalize() =
     Normalizer.normalize(this, Normalizer.Form.NFD)
-        .replace("\\p{Mn}+".toRegex(), "")
+        .replace(DIACRITICS, "")
 
 @PreviewLightDark
 @Composable
