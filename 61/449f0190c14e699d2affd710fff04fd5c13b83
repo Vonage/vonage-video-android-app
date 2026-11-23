@@ -1,0 +1,16 @@
+vonage-feature-chat/src/enabled/java/com/vonage/android/chat/ui/ChatPanel.kt
+  h_25498f8d57a266 144
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/bottombar/ParticipantsList.kt
+  h_25498f8d57a266 76,79,90,97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "61449f0190c14e699d2affd710fff04fd5c13b83",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
