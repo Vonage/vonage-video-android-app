@@ -27,10 +27,8 @@ internal fun MoreActionsGrid(
         horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.paddingSmall),
         verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.paddingSmall),
     ) {
-        items(
-            items = actions,
-            key = { action -> action.type },
-        ) { action ->
+        // No key: host actions and the report action all share BottomBarActionType.CUSTOM.
+        items(items = actions) { action ->
             ActionCell(
                 icon = action.icon,
                 label = action.label,

@@ -451,7 +451,7 @@ internal fun MeetingRoomScreen(
         }
 
         uiState.isEndCall -> {
-            LaunchedEffect(uiState) {
+            LaunchedEffect(Unit) {
                 actions.onEndCall()
             }
         }
