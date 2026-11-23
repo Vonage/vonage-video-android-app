@@ -3,7 +3,6 @@ package com.vonage.android.meetingroom.internal.screen.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -32,7 +31,9 @@ internal fun MeetingRoomContent(
     modifier: Modifier = Modifier,
     onShowParticipants: () -> Unit = {},
 ) {
-    val pinnedIds by call.pinnedParticipantIds.collectAsStateWithLifecycle()
+    // Pass the State, not its value: capturing the value would give the tile lambdas a new
+    // identity on every pin toggle, which rebuilds the speaker layout's movable content.
+    val pinnedIds = call.pinnedParticipantIds.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier
@@ -53,7 +54,7 @@ internal fun MeetingRoomContent(
                                 participant = participant,
                                 actions = actions,
                                 modifier = tileModifier,
-                                isPinned = participant.id in pinnedIds,
+                                isPinned = { participant.id in pinnedIds.value },
                             )
                         }
                     },
@@ -74,7 +75,7 @@ internal fun MeetingRoomContent(
                                 participant = participant,
                                 actions = actions,
                                 modifier = tileModifier,
-                                isPinned = participant.id in pinnedIds,
+                                isPinned = { participant.id in pinnedIds.value },
                             )
                         }
                     },

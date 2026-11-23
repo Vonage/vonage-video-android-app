@@ -52,7 +52,7 @@ internal fun ParticipantVideoCard(
     participant: Participant,
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
-    isPinned: Boolean = false,
+    isPinned: () -> Boolean = { false },
     showVideoEffectsButton: Boolean = true,
 ) {
     val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
@@ -98,7 +98,7 @@ internal fun ParticipantVideoCard(
             )
         }
 
-        if (isPinned) {
+        if (isPinned()) {
             PinIndicator(
                 modifier = Modifier
                     .align(Alignment.TopStart)
@@ -153,7 +153,7 @@ internal fun ParticipantVideoCard(
             ParticipantContextualActions(
                 participant = participant,
                 actions = actions,
-                isPinned = isPinned
+                isPinned = isPinned(),
             )
         }
     }
