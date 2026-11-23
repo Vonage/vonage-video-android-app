@@ -1,0 +1,25 @@
+vonage-meeting-room/src/androidTest/java/com/vonage/android/meetingroom/internal/screen/components/bottombar/MoreActionsGridTest.kt
+  s_55230221987d52::t_5f4d009178ab9b 1-44
+  s_55230221987d52::t_a1b9a25f59cfb2 45-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1c081a65687459d202917c4d2790cf7b3e55b4a4",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_55230221987d52": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_92253f64-2a02-4172-b0cd-7da3fedd0b48",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
