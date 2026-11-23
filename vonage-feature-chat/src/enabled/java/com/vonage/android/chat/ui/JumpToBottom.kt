@@ -47,7 +47,6 @@ fun JumpToBottom(
             BOTTOM_OFFSET.dp
         }
     }
-    // Composition only reacts to the visibility flip; the offset itself is read during placement.
     val isVisible by remember { derivedStateOf { bottomOffset.value > 0.dp } }
     if (isVisible) {
         ExtendedFloatingActionButton(

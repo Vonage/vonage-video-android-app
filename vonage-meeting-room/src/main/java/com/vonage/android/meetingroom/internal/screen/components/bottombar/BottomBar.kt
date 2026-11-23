@@ -145,8 +145,6 @@ internal fun BottomBar(
     val allActions = remember(bottomBarActions, additionalActions, reportingAction) {
         (bottomBarActions + additionalActions + listOfNotNull(reportingAction)).toImmutableList()
     }
-    // Measured in composition: the visible/overflow split decides which content is composed,
-    // so writing the width from onSizeChanged would cost an extra frame and pop on first layout.
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
@@ -231,8 +229,6 @@ private fun actionsFactory(
 ): ImmutableList<BottomBarAction> {
     val participantsCount by call.participantsCount.collectAsStateWithLifecycle()
     val chatState = call.chatSignalState.collectAsStateWithLifecycle()
-    // Only the badge count matters here; reading the whole ChatState would recompose the bar on
-    // every message.
     val unreadCount by remember { derivedStateOf { chatState.value?.unreadCount ?: 0 } }
 
     return actions.mapNotNull { type ->

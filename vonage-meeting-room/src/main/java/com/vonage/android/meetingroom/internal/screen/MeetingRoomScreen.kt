@@ -98,7 +98,6 @@ private fun enabledBottomBarActions(
     }
 }.toImmutableList()
 
-// Shared fallbacks: a new flow per recomposition would restart collectAsStateWithLifecycle.
 private val NoExtraActions: StateFlow<List<MeetingRoomBottomBarAction>> = MutableStateFlow(emptyList())
 private val AlwaysFalse: StateFlow<Boolean> = MutableStateFlow(false)
 

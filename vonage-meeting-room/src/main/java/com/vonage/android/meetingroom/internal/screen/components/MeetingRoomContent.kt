@@ -31,8 +31,6 @@ internal fun MeetingRoomContent(
     modifier: Modifier = Modifier,
     onShowParticipants: () -> Unit = {},
 ) {
-    // Pass the State, not its value: capturing the value would give the tile lambdas a new
-    // identity on every pin toggle, which rebuilds the speaker layout's movable content.
     val pinnedIds = call.pinnedParticipantIds.collectAsStateWithLifecycle()
 
     Column(

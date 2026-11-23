@@ -26,13 +26,6 @@ import com.vonage.android.kotlin.model.Participant
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
-/**
- * Fixed grid of participant tiles sized to fill the available space.
- *
- * A single [Layout] with keyed children: tiles keep their identity (and native video view) when
- * they move between rows, and sizes are resolved during measurement instead of in a
- * subcomposition.
- */
 @Composable
 fun AdaptiveGrid(
     participants: ImmutableList<Participant>,
@@ -67,7 +60,7 @@ fun AdaptiveGrid(
     Layout(
         modifier = modifier.fillMaxSize(),
         content = {
-            // One Box per cell so each cell is exactly one measurable, whatever the content emits.
+            // One Box per cell keeps one measurable per cell.
             visibleItems.forEach { participant ->
                 key(participant.id) {
                     Box(propagateMinConstraints = true) {

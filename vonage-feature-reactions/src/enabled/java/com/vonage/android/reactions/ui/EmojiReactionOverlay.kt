@@ -93,8 +93,6 @@ private fun EmojiAnimationItem(
 
     Box(
         modifier = Modifier
-            // Rises from the bottom edge to the top. The overlay height comes from the incoming
-            // constraints and progress is read during placement, so neither recomposes the item.
             .layout { measurable, constraints ->
                 val placeable = measurable.measure(constraints)
                 layout(placeable.width, placeable.height) {

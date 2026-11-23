@@ -43,7 +43,6 @@ fun pipEffect(
         }
     }
 
-    // Keyed so the params cross to the system only when they change, not on every layout pass.
     SideEffect(context, shouldEnterPipMode) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val builder = PictureInPictureParams.Builder()

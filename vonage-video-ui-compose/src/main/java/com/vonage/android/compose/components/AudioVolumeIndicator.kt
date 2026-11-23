@@ -31,10 +31,6 @@ fun AudioVolumeIndicator(
     )
 }
 
-/**
- * Reads [audioLevel] only in the draw phase, so level changes redraw the bars without
- * recomposing or remeasuring.
- */
 @Composable
 fun AudioVolumeIndicator(
     audioLevel: () -> Float,
