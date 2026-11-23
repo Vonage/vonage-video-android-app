@@ -12,6 +12,7 @@ class DebugMainApplication : MainApplication() {
         super.onCreate()
 
         enableStrictMode()
+        registerActivityLifecycleCallbacks(JankStatsTracker())
     }
 
     private fun enableStrictMode() {

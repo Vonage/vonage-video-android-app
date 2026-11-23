@@ -16,6 +16,7 @@
 | `vonage-android-logger/` | Logging pipeline with interceptor model |
 | `vonage-audio-selector/` | Audio output selector (Bluetooth, wired, earpiece, speaker) |
 | `build-tools/` | Custom Gradle plugins: `com.vonage.json-config`, `com.vonage.theme-generator`, `com.vonage.android-api-validation`, detekt/kover/sonar wiring |
+| `baselineprofile/` | `com.android.test` module that generates the app's Baseline Profile (`BaselineProfileGenerator`) and benchmarks startup (`StartupBenchmarks`). Output is committed in `app/src/release/generated/baselineProfiles/`. |
 
 ## Config-Driven Behavior (Critical)
 
@@ -89,6 +90,12 @@
 
 # Binary API compatibility check (runs in CI)
 ./gradlew vonage-android-logger:androidApiCheck vonage-audio-selector:androidApiCheck
+
+# Regenerate the Baseline Profile on a Gradle Managed Device (commit the result)
+./gradlew :app:generateBaselineProfile
+
+# Startup benchmark, with vs. without the profile (physical device)
+./gradlew :baselineprofile:connectedBenchmarkReleaseAndroidTest
 ```
 
 ## Binary API Compatibility
