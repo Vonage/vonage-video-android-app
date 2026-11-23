@@ -141,6 +141,7 @@ private fun ChatPanelMessages(
             items(
                 items = messages,
                 key = { chatSignal -> chatSignal.id },
+                contentType = { "chat_message" },
             ) { chatMessage ->
                 ChatRow(
                     userName = chatMessage.participantName,

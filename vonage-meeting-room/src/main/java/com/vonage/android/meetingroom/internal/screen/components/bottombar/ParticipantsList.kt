@@ -73,10 +73,10 @@ internal fun ParticipantsList(
         modifier = modifier
             .fillMaxWidth(),
     ) {
-        item {
+        item(contentType = "title") {
             ParticipantListTitle(participantsCount)
         }
-        item {
+        item(contentType = "search") {
             VonageTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
@@ -87,13 +87,14 @@ internal fun ParticipantsList(
             )
         }
         if (sortedParticipants.isEmpty()) {
-            item {
+            item(contentType = "not_found") {
                 Text(text = stringResource(R.string.meeting_room_participants_list_search_not_found))
             }
         } else {
             items(
                 items = sortedParticipants,
                 key = { participant -> participant.id },
+                contentType = { "participant" },
             ) { participantState ->
                 ParticipantRow(
                     participant = participantState,
