@@ -1,0 +1,30 @@
+app/src/main/java/com/vonage/android/screen/waiting/components/VideoPreviewContainer.kt
+  h_25498f8d57a266 106,117,173
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/ParticipantVideoCard.kt
+  h_25498f8d57a266 225,231
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/AudioVolumeIndicator.kt
+  h_25498f8d57a266 4,9-12,26-45,48-67,70-75
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.AudioVolumeIndicatorScreenshotTest.audioVolumeIndicatorLoud_dark.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.AudioVolumeIndicatorScreenshotTest.audioVolumeIndicatorLoud_light.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.AudioVolumeIndicatorScreenshotTest.audioVolumeIndicatorMedium_dark.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.AudioVolumeIndicatorScreenshotTest.audioVolumeIndicatorMedium_light.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.AudioVolumeIndicatorScreenshotTest.audioVolumeIndicatorSilent_dark.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.AudioVolumeIndicatorScreenshotTest.audioVolumeIndicatorSilent_light.png
+  h_25498f8d57a266 2-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "28c4f1ab5e9b0b51b8ac41e3f53b02cfcb54683f",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
