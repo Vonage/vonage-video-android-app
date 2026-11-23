@@ -1,0 +1,26 @@
+.claude/skills/run-tests/SKILL.md
+  h_25498f8d57a266 55
+AGENTS.md
+  h_25498f8d57a266 18,92,103-105
+build-tools/gradle-config-plugin/build.gradle.kts
+  h_25498f8d57a266 20,37-42
+build-tools/gradle-config-plugin/src/main/kotlin/com/vonage/gradle/AndroidApiValidationPlugin.kt
+  h_25498f8d57a266 1-62
+gradle/libs.versions.toml
+  h_25498f8d57a266 11,89,106
+vonage-android-logger/build.gradle.kts
+  h_25498f8d57a266 3
+vonage-audio-selector/build.gradle.kts
+  h_25498f8d57a266 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8356d11e86513ddf347bca6558a1494e054c1f35",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
