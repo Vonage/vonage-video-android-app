@@ -52,7 +52,7 @@ Most unit tests use JUnit 5 (`org.junit.jupiter.api.Test`, backtick names or `gi
 
 `koverXmlReportDebug` only runs `testDebugUnitTest` in the **non-flavored** modules (`app`, `vonage-video-core`, `vonage-vera-api-client`, `vonage-android-logger`, `vonage-audio-selector`, the sample app, and `vonage-feature-archiving`, which has no flavors). It does **not** execute the unit tests of `vonage-meeting-room` or the other `vonage-feature-*` modules, because their variants are flavored (`enabledDebug`, `captionsEnabled…Debug`) and have no plain `debug` unit-test task (verified with `./gradlew koverXmlReportDebug --dry-run`). CI only compiles those modules and runs detekt on them, so run their single-variant tasks from the routing table yourself before pushing. `vonage-video-ui-compose`, `vonage-video-sdk` and `vonage-config-idea-plugin` are excluded from kover entirely and must also be run separately. The pre-push hook (`./gradlew installGitHooks`) runs `detekt` and `git lfs pre-push` — a detekt finding blocks the push locally before CI sees it.
 
-`androidApiCheck`/`androidApiDump` are the task names here; the stock `apiCheck`/`apiDump` from the binary-compatibility-validator plugin are not registered under AGP 9 (see the workaround comment in those modules' `build.gradle.kts`). After an intentional public-API change: `./gradlew <module>:androidApiDump` and commit the `.api` file.
+`androidApiCheck`/`androidApiDump` are the task names here; the stock `apiCheck`/`apiDump` from the binary-compatibility-validator plugin are not registered under AGP 9 (see `AndroidApiValidationPlugin` in `build-tools/`). After an intentional public-API change: `./gradlew <module>:androidApiDump` and commit the `.api` file.
 
 ## E2E (Maestro)
 
