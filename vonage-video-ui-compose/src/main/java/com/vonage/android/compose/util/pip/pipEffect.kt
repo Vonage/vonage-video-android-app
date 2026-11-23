@@ -7,17 +7,16 @@ import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.PictureInPictureModeChangedInfo
 import androidx.core.util.Consumer
-import com.vonage.logger.vonageLogger
 
 @Composable
 fun pipEffect(
@@ -42,11 +41,10 @@ fun pipEffect(
                 context.findActivity().removeOnUserLeaveHintListener(onUserLeaveBehavior)
             }
         }
-    } else {
-        vonageLogger.i("PiP", "API does not support PiP")
     }
 
-    val pipModifier = modifier.onGloballyPositioned { _ ->
+    // Keyed so the params cross to the system only when they change, not on every layout pass.
+    SideEffect(context, shouldEnterPipMode) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val builder = PictureInPictureParams.Builder()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -56,7 +54,7 @@ fun pipEffect(
         }
     }
 
-    return pipModifier
+    return modifier
 }
 
 @Composable
