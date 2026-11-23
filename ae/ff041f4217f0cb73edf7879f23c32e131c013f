@@ -1,0 +1,14 @@
+vonage-feature-reactions/src/enabled/java/com/vonage/android/reactions/ui/EmojiReactionOverlay.kt
+  h_25498f8d57a266 3,23,36,38,53,56,58,69-71,74-91,96-104,107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "aeff041f4217f0cb73edf7879f23c32e131c013f",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
