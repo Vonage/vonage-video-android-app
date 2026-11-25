@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -79,7 +78,6 @@ fun ActiveSpeakerLayout(
     }
 
     val listState = lazyStateVisibilityTracker(call = call, lazyState = rememberLazyListState())
-    val movableParticipantContent = remember(participantContent) { movableContentOf(participantContent) }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -89,7 +87,7 @@ fun ActiveSpeakerLayout(
             Configuration.ORIENTATION_LANDSCAPE -> {
                 ActiveSpeakerHorizontalLayout(
                     mainParticipant = mainParticipant,
-                    participantContent = movableParticipantContent,
+                    participantContent = participantContent,
                     spotlightWeight = spotlightWeight,
                     listState = listState,
                     otherParticipantsWeight = otherParticipantsWeight,
@@ -103,7 +101,7 @@ fun ActiveSpeakerLayout(
             else -> {
                 ActiveSpeakerVerticalLayout(
                     mainParticipant = mainParticipant,
-                    participantContent = movableParticipantContent,
+                    participantContent = participantContent,
                     spotlightWeight = spotlightWeight,
                     listState = listState,
                     otherParticipantsWeight = otherParticipantsWeight,
