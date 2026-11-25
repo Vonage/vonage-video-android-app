@@ -1,0 +1,29 @@
+app/src/main/java/com/vonage/android/navigation/AppNavHost.kt
+  s_4051483e055285::t_582abe11e517b4 102
+app/src/main/java/com/vonage/android/navigation/AppNavigation.kt
+  s_4051483e055285::t_700f2e1194f45c 1-22
+app/src/androidTest/java/com/vonage/android/navigation/AppNavigationTest.kt
+  s_4051483e055285::t_90e197ba2cfbc2 1-101
+  s_4051483e055285::t_d1ee5c69f6d4e5 102-104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "02c05bbee1a38b159433bdaf174ecc03d743a4d3",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_4051483e055285": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_4ee604d2-05de-4af7-ab92-4076d9899609",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
