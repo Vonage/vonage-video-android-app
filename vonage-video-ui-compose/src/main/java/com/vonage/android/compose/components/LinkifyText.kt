@@ -25,24 +25,26 @@ fun LinkifyText(
     val layout = remember {
         mutableStateOf<TextLayoutResult?>(null)
     }
-    val linksList = Linkify.extract(text)
-    val annotatedString = buildAnnotatedString {
-        append(text)
-        linksList.forEach {
-            addStyle(
-                style = SpanStyle(
-                    color = VonageVideoTheme.colors.primary,
-                    textDecoration = TextDecoration.Underline,
-                ),
-                start = it.start,
-                end = it.end,
-            )
-            addStringAnnotation(
-                tag = it.tag.name,
-                annotation = it.url,
-                start = it.start,
-                end = it.end,
-            )
+    val linkColor = VonageVideoTheme.colors.primary
+    val annotatedString = remember(text, linkColor) {
+        buildAnnotatedString {
+            append(text)
+            Linkify.extract(text).forEach {
+                addStyle(
+                    style = SpanStyle(
+                        color = linkColor,
+                        textDecoration = TextDecoration.Underline,
+                    ),
+                    start = it.start,
+                    end = it.end,
+                )
+                addStringAnnotation(
+                    tag = it.tag.name,
+                    annotation = it.url,
+                    start = it.start,
+                    end = it.end,
+                )
+            }
         }
     }
 
@@ -52,7 +54,7 @@ fun LinkifyText(
         style = VonageVideoTheme.typography.bodyBase,
         onTextLayout = { layout.value = it },
         modifier = modifier
-            .pointerInput(Unit) {
+            .pointerInput(annotatedString) {
                 detectTapGestures { offset ->
                     layout.value?.let { layoutResult ->
                         val position = layoutResult.getOffsetForPosition(offset)
