@@ -1,0 +1,52 @@
+# Memory counters for the whole memory-cycles run; stopped by memory-cycles.sh.
+# APP_ID is replaced by the script.
+buffers {
+  size_kb: 65536
+  fill_policy: RING_BUFFER
+}
+write_into_file: true
+file_write_period_ms: 5000
+max_file_size_bytes: 500000000
+
+data_sources {
+  config {
+    name: "linux.sys_stats"
+    sys_stats_config {
+      meminfo_period_ms: 1000
+      meminfo_counters: MEMINFO_MEM_TOTAL
+      meminfo_counters: MEMINFO_MEM_FREE
+      meminfo_counters: MEMINFO_MEM_AVAILABLE
+      meminfo_counters: MEMINFO_SWAP_FREE
+    }
+  }
+}
+
+data_sources {
+  config {
+    name: "linux.process_stats"
+    process_stats_config {
+      proc_stats_poll_ms: 1000
+      scan_all_processes_on_start: true
+    }
+  }
+}
+
+data_sources {
+  config {
+    name: "linux.ftrace"
+    ftrace_config {
+      ftrace_events: "kmem/rss_stat"
+      ftrace_events: "lowmemorykiller/lowmemory_kill"
+      ftrace_events: "oom/oom_score_adj_update"
+      atrace_categories: "am"
+      atrace_categories: "dalvik"
+      atrace_apps: "APP_ID"
+    }
+  }
+}
+
+data_sources {
+  config {
+    name: "android.packages_list"
+  }
+}

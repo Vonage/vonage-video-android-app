@@ -1,0 +1,46 @@
+# One call from the waiting room: join, stay CALL_MS, end, then leave Goodbye the way NEXT says:
+#   back    -> system Back to the waiting room
+#   reenter -> "Re-enter" button to the waiting room
+#   stay    -> remain on Goodbye (last cycle, before the final heap dump)
+appId: ${APP_ID}
+---
+- extendedWaitUntil:
+    visible:
+      id: "waiting-room-screen"
+    timeout: 15000
+
+- tapOn:
+    id: "join-meeting-button"
+
+- extendedWaitUntil:
+    visible:
+      id: "meeting-room-screen"
+    timeout: 30000
+
+# Maestro has no sleep: wait for an id that never appears.
+- extendedWaitUntil:
+    visible:
+      id: "profiling-never-shown"
+    timeout: ${CALL_MS}
+    optional: true
+
+- tapOn:
+    id: "meeting-room-end-call-button"
+
+- extendedWaitUntil:
+    visible:
+      id: "goodbye-screen"
+    timeout: 30000
+
+- runFlow:
+    when:
+      true: ${NEXT == 'back'}
+    commands:
+      - back
+
+- runFlow:
+    when:
+      true: ${NEXT == 'reenter'}
+    commands:
+      - tapOn:
+          id: "goodbye-reenter-button"

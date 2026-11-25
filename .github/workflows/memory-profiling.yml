@@ -1,0 +1,116 @@
+name: Memory profiling
+
+# Nightly join/leave memory profiling on an emulator (tools/profiling/memory-cycles.sh). Advisory
+# only: budget overruns and run failures become warnings in the run summary and never fail the
+# workflow. Uses a debug build because Java heap dumps need a debuggable app.
+
+permissions:
+  contents: read
+
+on:
+  schedule:
+    - cron: '30 2 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      cycles:
+        description: 'Number of join/leave cycles'
+        required: false
+        default: '5'
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BASE_API_URL: ${{ secrets.BASE_API_URL }}
+
+jobs:
+  memory-cycles:
+    name: Join/leave memory cycles
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          df -h
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref }}
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Setup Java
+        uses: ./.github/actions/setup-java
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Build debug APK
+        run: |
+          ./gradlew generateVonageConfig
+          ./gradlew :app:assembleDebug --stacktrace
+
+      - name: AVD cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-pixel-34-default-x86_64-v1
+
+      - name: Run memory cycles on emulator
+        id: run
+        continue-on-error: true
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          ROOM_NAME: profiling-${{ github.run_id }}
+          CYCLES: ${{ inputs.cycles || '5' }}
+          OUT: build/profiling
+        with:
+          api-level: 34
+          target: default
+          arch: x86_64
+          profile: pixel
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -netdelay none -netspeed full -dns-server 8.8.8.8,8.8.4.4
+          disable-animations: true
+          script: |
+            adb wait-for-device
+            sleep 5
+            adb install -r app/build/outputs/apk/debug/app-debug.apk
+            ./tools/profiling/memory-cycles.sh
+
+      - name: Warn on run failure
+        if: steps.run.outcome == 'failure'
+        run: echo "::warning title=Memory profiling::Memory profiling run failed; see the uploaded logs."
+
+      - name: Upload report and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: memory-profiling
+          path: |
+            build/profiling/
+            !build/profiling/bin/
+            !build/profiling/venv/
+          retention-days: 14
+          if-no-files-found: warn
