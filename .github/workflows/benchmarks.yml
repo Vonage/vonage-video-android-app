@@ -1,0 +1,88 @@
+name: Benchmarks
+
+# Nightly Macrobenchmarks on a Gradle Managed Device. Advisory only: budget overruns and benchmark
+# failures are reported as warnings in the run summary and never fail the workflow.
+# Emulators give stable counts (recompositions, layouts) but not reliable timings, so only counts
+# have budgets (scripts/benchmark_report.py).
+
+permissions:
+  contents: read
+
+on:
+  schedule:
+    - cron: '0 2 * * 1-5'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BASE_API_URL: ${{ secrets.BASE_API_URL }}
+
+jobs:
+  benchmark:
+    name: Idle Landing benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          df -h
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Setup Java
+        uses: ./.github/actions/setup-java
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Generate config
+        run: ./gradlew generateVonageConfig
+
+      - name: Run benchmarks
+        id: run
+        continue-on-error: true
+        # Runners have no GPU, so the managed device renders in software.
+        run: |
+          ./gradlew :baselineprofile:pixel6Api34BenchmarkReleaseAndroidTest \
+            -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect \
+            -Pandroid.testInstrumentationRunnerArguments.class=com.vonage.android.baselineprofile.IdleLandingBenchmark \
+            -Pandroid.testInstrumentationRunnerArguments.androidx.benchmark.suppressErrors=EMULATOR \
+            --stacktrace
+
+      - name: Warn on benchmark failure
+        if: steps.run.outcome == 'failure'
+        run: echo "::warning title=Benchmarks::Benchmark run failed; see the test report artifact."
+
+      - name: Report
+        if: always()
+        run: python3 scripts/benchmark_report.py baselineprofile/build/outputs
+
+      - name: Upload results and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: |
+            baselineprofile/build/outputs/managed_device_android_test_additional_output/
+            baselineprofile/build/reports/androidTests/
+          retention-days: 14

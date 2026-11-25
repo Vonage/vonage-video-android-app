@@ -96,6 +96,12 @@
 
 # Startup benchmark, with vs. without the profile (physical device)
 ./gradlew :baselineprofile:connectedBenchmarkReleaseAndroidTest
+
+# Idle Landing recomposition/layout counts on the managed device (nightly, advisory: .github/workflows/benchmarks.yml)
+./gradlew :baselineprofile:pixel6Api34BenchmarkReleaseAndroidTest \
+  -Pandroid.testInstrumentationRunnerArguments.class=com.vonage.android.baselineprofile.IdleLandingBenchmark \
+  -Pandroid.testInstrumentationRunnerArguments.androidx.benchmark.suppressErrors=EMULATOR
+python3 scripts/benchmark_report.py baselineprofile/build/outputs
 ```
 
 ## Binary API Compatibility
