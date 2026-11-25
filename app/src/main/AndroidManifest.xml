@@ -7,10 +7,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <!-- Declared by the Video SDK for call-interruption handling but never requested, so never granted. -->
     <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32"
-        tools:ignore="ScopedStorage" />
+        android:name="android.permission.READ_PHONE_STATE"
+        tools:node="remove" />
 
     <application
         android:name=".MainApplication"
