@@ -38,7 +38,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: develop
+          ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref }}
 
       - name: Enable KVM group perms
         run: |
