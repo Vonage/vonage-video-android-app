@@ -1,0 +1,24 @@
+.github/workflows/benchmarks.yml
+  s_4051483e055285::t_d279e09fb7500a 41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5c030e86b9a3951c109917d09e2c8f38e0709dc8",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_4051483e055285": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_4ee604d2-05de-4af7-ab92-4076d9899609",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
