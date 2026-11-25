@@ -1,0 +1,40 @@
+tools/profiling/README.md
+  s_4051483e055285::t_53c2189e50e774 1-43
+tools/profiling/flows/open-waiting-room.yaml
+  s_4051483e055285::t_f080b6d1e51935 1-32
+tools/profiling/flows/call-cycle.yaml
+  s_4051483e055285::t_4c53879788e3f0 1-46
+tools/profiling/memory_counters.pftxt
+  s_4051483e055285::t_1383a95d620c0e 1-52
+tools/profiling/memory_report.py
+  s_4051483e055285::t_386b27972f3d18 1-147
+  s_4051483e055285::t_b583a9e19562b3 148
+AGENTS.md
+  s_4051483e055285::t_c4fb38a3fbb4d3 105-107
+tools/profiling/memory-cycles.sh
+  s_4051483e055285::t_ded5ba300edbb1 1-72
+  s_4051483e055285::t_0c2715dc6e90e4 73-77
+.github/workflows/memory-profiling.yml
+  s_4051483e055285::t_283daf472b5510 1-116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3938fc89e93fd03b833b991d4595164bf0c5aa37",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_4051483e055285": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_4ee604d2-05de-4af7-ab92-4076d9899609",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
