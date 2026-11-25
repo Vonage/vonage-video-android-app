@@ -99,7 +99,7 @@ fun AppNavHost(
                 callSettingsHolder = callSettingsHolder,
                 authTokenProvider = authTokenProvider,
                 initialPublisherSettings = settings,
-                navigateToGoodBye = { navController.navigate(Goodbye(roomName = roomName)) },
+                navigateToGoodBye = { navController.navigateToGoodbye(roomName) },
                 navigateToShare = { roomName -> context.navigateToShare(roomName) },
                 navigateToSettings = { navController.navigate(Settings) },
             )
@@ -108,7 +108,7 @@ fun AppNavHost(
             val roomName = backStackEntry.toRoute<Goodbye>().roomName
             GoodbyeScreenRoute(
                 roomName = roomName,
-                navigateToWaiting = { roomName -> navController.navigate(Waiting(roomName = roomName)) },
+                navigateToWaiting = { roomName -> navController.navigateToWaitingFromGoodbye(roomName) },
                 navigateToLanding = {
                     navController.navigate(Landing) {
                         popUpTo(Landing) { inclusive = true }
