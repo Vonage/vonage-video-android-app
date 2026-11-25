@@ -27,10 +27,8 @@ internal fun MoreActionsGrid(
         horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.paddingSmall),
         verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.paddingSmall),
     ) {
-        items(
-            items = actions,
-            key = { action -> action.type },
-        ) { action ->
+        // No key: custom and report actions share the CUSTOM type.
+        items(items = actions) { action ->
             ActionCell(
                 icon = action.icon,
                 label = action.label,

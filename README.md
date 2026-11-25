@@ -88,6 +88,7 @@ This application provides features for common conferencing use cases, such as:
 | [Config System](docs/CONFIG-SYSTEM.md) | Deep-dive into the JSON-driven config plugin system |
 | [Authentication](docs/AUTHENTICATION.md) | Optional Okta sign-in, token injection, and identity provider setup |
 | [Localization](docs/LOCALIZATION.md) | Multi-language support and how to add a new language |
+| [Permissions](docs/PERMISSIONS.md) | Declared permissions, where they come from and why, plus ECH/WebView status |
 | [Testing](docs/TESTING.md) | Unit tests, instrumented tests, snapshot tests, and Maestro E2E |
 | [Code Style](docs/CODE_STYLE.md) | Detekt, Spotless, and code conventions |
 | [Contributing](docs/CONTRIBUTING.md) | How to contribute to this project |
