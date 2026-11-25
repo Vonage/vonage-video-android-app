@@ -1,0 +1,16 @@
+.github/workflows/benchmarks.yml
+  h_25498f8d57a266 15-21
+.github/workflows/memory-profiling.yml
+  h_25498f8d57a266 20-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "37569073d6082eb1ef56c5fd45f5f0c01d88f0eb",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
