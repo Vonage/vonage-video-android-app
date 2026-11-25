@@ -12,6 +12,13 @@ on:
   schedule:
     - cron: '0 2 * * 1-5'
   workflow_dispatch:
+  # Also run when the benchmark itself changes.
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'baselineprofile/**'
+      - 'scripts/benchmark_report.py'
+      - '.github/workflows/benchmarks.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

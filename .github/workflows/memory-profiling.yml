@@ -17,6 +17,12 @@ on:
         required: false
         default: '5'
         type: string
+  # Also run when the profiling tooling itself changes.
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'tools/profiling/**'
+      - '.github/workflows/memory-profiling.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
