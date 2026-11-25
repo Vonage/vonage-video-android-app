@@ -1,0 +1,31 @@
+.github/workflows/benchmarks.yml
+  s_4051483e055285::t_fe1441e7c444a7 1-88
+baselineprofile/src/main/java/com/vonage/android/baselineprofile/IdleLandingBenchmark.kt
+  s_4051483e055285::t_473af27810895b 1-53
+scripts/benchmark_report.py
+  s_4051483e055285::t_9499eb2230dfd7 50,52-56
+  s_4051483e055285::t_0dd7a43b422173 1-49,51,57-60
+AGENTS.md
+  s_4051483e055285::t_922328d94b3138 99-104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c608815ec0e2458f7530da1d7686d32143f5c1d1",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  },
+  "sessions": {
+    "s_4051483e055285": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_4ee604d2-05de-4af7-ab92-4076d9899609",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
