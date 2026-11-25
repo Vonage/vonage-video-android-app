@@ -1,5 +1,4 @@
-# Landing -> waiting room with a username set. No launchApp: memory-cycles.sh starts the app
-# itself, so the baseline heap dump is taken from the same process the cycles run in.
+# No launchApp: the baseline heap dump must come from the same process the cycles run in.
 appId: ${APP_ID}
 ---
 - assertVisible:

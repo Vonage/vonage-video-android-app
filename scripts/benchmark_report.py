@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Summarise Macrobenchmark results and warn on budget overruns.
-
-Reads every *benchmarkData.json under the given directory, writes a markdown table to
-$GITHUB_STEP_SUMMARY (or stdout) and prints a GitHub `::warning::` for each metric over
-its budget. Always exits 0: budgets are advisory until they have settled.
+"""Summarise Macrobenchmark results; budget overruns are warnings, never failures.
 
 Usage: scripts/benchmark_report.py <results-dir>
 """
@@ -12,7 +8,7 @@ import os
 import sys
 from pathlib import Path
 
-# Metric name prefix -> highest acceptable median. Medians above it produce a warning.
+# Metric name prefix -> highest acceptable median.
 BUDGETS = {
     "idleLandingRecompose": 0,
     "idleLandingMeasureAndLayout": 0,

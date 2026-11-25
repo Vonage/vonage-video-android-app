@@ -1,9 +1,7 @@
 name: Benchmarks
 
-# Nightly Macrobenchmarks on a Gradle Managed Device. Advisory only: budget overruns and benchmark
-# failures are reported as warnings in the run summary and never fail the workflow.
-# Emulators give stable counts (recompositions, layouts) but not reliable timings, so only counts
-# have budgets (scripts/benchmark_report.py).
+# Advisory only: overruns and failures become warnings. Only counts have budgets, because emulator
+# timings are not reliable.
 
 permissions:
   contents: read
@@ -12,7 +10,6 @@ on:
   schedule:
     - cron: '0 2 * * 1-5'
   workflow_dispatch:
-  # Also run when the benchmark itself changes.
   pull_request:
     branches: [develop]
     paths:

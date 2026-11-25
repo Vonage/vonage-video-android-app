@@ -9,14 +9,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * Keeps the Landing screen idle and counts the work Compose does while nothing changes.
- * An idle screen should not recompose or re-lay out: a non-zero count usually means an
- * animated value is read during composition instead of in the draw phase.
- *
- * Counts are stable on emulators, so this also runs on the Gradle Managed Device:
- * `./gradlew :baselineprofile:pixel6Api34BenchmarkReleaseAndroidTest`
- */
+// A non-zero count usually means an animated value is read during composition instead of drawing.
 @OptIn(ExperimentalMetricApi::class)
 @RunWith(AndroidJUnit4::class)
 class IdleLandingBenchmark {

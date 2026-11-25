@@ -23,10 +23,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.reflect.KClass
 
-/**
- * Guards against finished calls staying alive in the back stack: every screen left in the back
- * stack keeps its ViewModels, and the Meeting ViewModel holds the call, session and camera.
- */
+// Screens left in the back stack keep their ViewModels, and the Meeting one holds the call.
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class AppNavigationTest {

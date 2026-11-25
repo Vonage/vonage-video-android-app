@@ -37,8 +37,7 @@ internal fun LandingScreenHeader(
         VonageVideoTheme.colors.secondary,
     )
     val infiniteTransition = rememberInfiniteTransition()
-    // Keep the State and read it only in the draw phase: the gradient moves every frame
-    // without recomposing or re-laying out the text.
+    // Read only in the draw phase, so the animation does not recompose or re-lay out the text.
     val offset = infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,

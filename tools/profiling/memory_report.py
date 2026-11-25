@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
-"""Build report.md from a memory-cycles.sh output directory.
+"""Build report.md from a memory-cycles.sh run; budget overruns are warnings, never failures.
 
-Checks are advisory: each budget overrun prints a GitHub `::warning::` and is marked in the
-report, and the script always exits 0. Needs the `perfetto` package (pip install perfetto).
-
-Usage: tools/profiling/memory_report.py <out-dir>
+Usage: tools/profiling/memory_report.py <out-dir>   (needs `pip install perfetto`)
 """
 import os
 import re
@@ -54,7 +51,7 @@ def retained_counts(tp):
 
 
 def retention_path(tp, object_id):
-    """Dominator chain from the GC root side down to the object: each entry keeps the next alive."""
+    """Dominator chain, GC root side first: each entry keeps the next alive."""
     steps = []
     current = object_id
     for _ in range(MAX_PATH_STEPS):

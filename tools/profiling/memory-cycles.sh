@@ -1,14 +1,5 @@
 #!/usr/bin/env bash
-# Join/leave memory profiling on a connected device or emulator.
-#
-# Records memory counters for the whole run, takes a Java heap dump on Landing (baseline) and one on
-# Goodbye after CYCLES calls, samples `dumpsys meminfo` after every call, then writes report.md with
-# advisory warnings (memory_report.py). Needs a debuggable build (Java heap dumps), Maestro, adb,
-# python3 and curl. Joins a real room on the configured backend.
-#
-# Usage: tools/profiling/memory-cycles.sh
-# Env:   APP_ID (com.vonage.android.debug)  ROOM_NAME (profiling-<timestamp>)  CYCLES (5)
-#        CALL_MS (20000)  OUT (build/profiling)
+# Join/leave memory profiling on a connected device or emulator. See tools/profiling/README.md.
 set -euo pipefail
 
 APP_ID="${APP_ID:-com.vonage.android.debug}"
@@ -70,7 +61,7 @@ heap_dump heap_final
 stop_trace
 trap - EXIT
 
-# The report needs the perfetto package; keep it in a throwaway venv, not the system Python.
+# Keeps the perfetto package out of the system Python.
 python3 -m venv "$OUT/venv"
 "$OUT/venv/bin/pip" install -q --index-url https://pypi.org/simple/ perfetto
 "$OUT/venv/bin/python" "$HERE/memory_report.py" "$OUT"

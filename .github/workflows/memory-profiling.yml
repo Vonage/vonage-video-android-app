@@ -1,8 +1,7 @@
 name: Memory profiling
 
-# Nightly join/leave memory profiling on an emulator (tools/profiling/memory-cycles.sh). Advisory
-# only: budget overruns and run failures become warnings in the run summary and never fail the
-# workflow. Uses a debug build because Java heap dumps need a debuggable app.
+# Advisory only: overruns and failures become warnings. Debug build because Java heap dumps need a
+# debuggable app.
 
 permissions:
   contents: read
@@ -17,7 +16,6 @@ on:
         required: false
         default: '5'
         type: string
-  # Also run when the profiling tooling itself changes.
   pull_request:
     branches: [develop]
     paths:

@@ -1,5 +1,4 @@
-# Memory counters for the whole memory-cycles run; stopped by memory-cycles.sh.
-# APP_ID is replaced by the script.
+# APP_ID is replaced by memory-cycles.sh.
 buffers {
   size_kb: 65536
   fill_policy: RING_BUFFER
