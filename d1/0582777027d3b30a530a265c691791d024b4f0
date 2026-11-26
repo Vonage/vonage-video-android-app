@@ -1,0 +1,14 @@
+app/src/androidTest/java/com/vonage/android/integration/MeetingRoomSettingsIntegrationTest.kt
+  h_25498f8d57a266 13,40-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d10582777027d3b30a530a265c691791d024b4f0",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
