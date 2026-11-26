@@ -103,7 +103,7 @@ internal fun VideoControlPanel(
 ) {
     val isCameraEnabled by publisher.isCameraEnabled.collectAsStateWithLifecycle()
     val isMicEnabled by publisher.isMicEnabled.collectAsStateWithLifecycle()
-    val audioLevel by publisher.audioLevel.collectAsStateWithLifecycle()
+    val audioLevel = publisher.audioLevel.collectAsStateWithLifecycle()
     val videoEffect by publisher.videoEffect.collectAsStateWithLifecycle()
 
     Box(
@@ -114,7 +114,7 @@ internal fun VideoControlPanel(
         Box(modifier = Modifier.align(Alignment.CenterStart)) {
             MicVolumeIndicator(
                 isMicEnabled = isMicEnabled,
-                audioLevel = audioLevel,
+                audioLevel = { audioLevel.value },
             )
         }
 
@@ -170,7 +170,7 @@ internal fun VideoControlPanel(
 @Composable
 private fun MicVolumeIndicator(
     isMicEnabled: Boolean,
-    audioLevel: Float,
+    audioLevel: () -> Float,
 ) {
     if (isMicEnabled) {
         AudioVolumeIndicator(

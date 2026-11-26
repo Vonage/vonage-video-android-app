@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   validate-pr-size:
@@ -14,15 +15,22 @@ jobs:
     steps:
       - name: Check added lines
         env:
-          ADDITIONS: ${{ github.event.pull_request.additions }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           MAX_ADDITIONS: 1500
         run: |
           set -e
+
+          # Generated Baseline Profiles are machine output with tens of thousands of lines.
+          ADDITIONS=$(gh api --paginate "repos/$REPO/pulls/$PR_NUMBER/files" \
+            --jq '.[] | select(.filename | contains("/generated/baselineProfiles/") | not) | .additions' \
+            | awk '{ sum += $1 } END { print sum + 0 }')
 
           if (( ADDITIONS > MAX_ADDITIONS )); then
             echo "::error::PR adds $ADDITIONS lines, exceeding the limit of $MAX_ADDITIONS. Split it into smaller PRs."
             exit 1
           fi
 
-          echo "PR adds $ADDITIONS lines (limit $MAX_ADDITIONS) - VALID"
+          echo "PR adds $ADDITIONS lines excluding generated baseline profiles (limit $MAX_ADDITIONS) - VALID"
         shell: bash

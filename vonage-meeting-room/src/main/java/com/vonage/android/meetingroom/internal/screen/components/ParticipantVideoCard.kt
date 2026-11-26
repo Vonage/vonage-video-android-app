@@ -52,7 +52,7 @@ internal fun ParticipantVideoCard(
     participant: Participant,
     actions: MeetingRoomActions,
     modifier: Modifier = Modifier,
-    isPinned: Boolean = false,
+    isPinned: () -> Boolean = { false },
     showVideoEffectsButton: Boolean = true,
 ) {
     val isMicEnabled by participant.isMicEnabled.collectAsStateWithLifecycle()
@@ -98,7 +98,7 @@ internal fun ParticipantVideoCard(
             )
         }
 
-        if (isPinned) {
+        if (isPinned()) {
             PinIndicator(
                 modifier = Modifier
                     .align(Alignment.TopStart)
@@ -153,7 +153,7 @@ internal fun ParticipantVideoCard(
             ParticipantContextualActions(
                 participant = participant,
                 actions = actions,
-                isPinned = isPinned
+                isPinned = isPinned(),
             )
         }
     }
@@ -222,13 +222,13 @@ private fun MicrophoneIndicator(
         modifier = modifier,
     ) {
         if (isMicEnabled && isShowVolumeIndicator) {
-            val audioLevel by participant.audioLevel.collectAsStateWithLifecycle()
+            val audioLevel = participant.audioLevel.collectAsStateWithLifecycle()
             AudioVolumeIndicator(
                 size = 32.dp,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(8.dp),
-                audioLevel = audioLevel,
+                audioLevel = { audioLevel.value },
             )
         } else {
             MicrophoneIcon(

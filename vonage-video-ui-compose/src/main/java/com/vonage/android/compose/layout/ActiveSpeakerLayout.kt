@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,7 +20,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.compose.components.AvatarInitials
 import com.vonage.android.compose.components.ParticipantsPlaceholders
@@ -77,7 +78,6 @@ fun ActiveSpeakerLayout(
     }
 
     val listState = lazyStateVisibilityTracker(call = call, lazyState = rememberLazyListState())
-    val movableParticipantContent = remember(participantContent) { movableContentOf(participantContent) }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -87,7 +87,7 @@ fun ActiveSpeakerLayout(
             Configuration.ORIENTATION_LANDSCAPE -> {
                 ActiveSpeakerHorizontalLayout(
                     mainParticipant = mainParticipant,
-                    participantContent = movableParticipantContent,
+                    participantContent = participantContent,
                     spotlightWeight = spotlightWeight,
                     listState = listState,
                     otherParticipantsWeight = otherParticipantsWeight,
@@ -101,7 +101,7 @@ fun ActiveSpeakerLayout(
             else -> {
                 ActiveSpeakerVerticalLayout(
                     mainParticipant = mainParticipant,
-                    participantContent = movableParticipantContent,
+                    participantContent = participantContent,
                     spotlightWeight = spotlightWeight,
                     listState = listState,
                     otherParticipantsWeight = otherParticipantsWeight,
@@ -142,34 +142,44 @@ private fun ActiveSpeakerVerticalLayout(
             )
         } ?: Spacer(modifier = Modifier.weight(if (hasFilmstripContent) spotlightWeight else 1f))
         if (hasFilmstripContent) {
-            LazyRow(
-                state = listState,
-                modifier = Modifier.weight(otherParticipantsWeight),
-                horizontalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
-                verticalAlignment = Alignment.CenterVertically,
-                userScrollEnabled = false,
-                overscrollEffect = null,
-            ) {
-                items(
-                    items = visibleFilmstripItems,
-                    key = { it.id },
-                ) { participant ->
-                    participantContent(
-                        participant,
-                        Modifier
-                            .width(otherParticipantsSize)
-                            .height(otherParticipantsSize),
-                    )
-                }
-                if (overflowFilmstripNames.isNotEmpty()) {
-                    item(key = "placeholder") {
-                        ParticipantsPlaceholders(
-                            modifier = Modifier
-                                .width(otherParticipantsSize)
-                                .height(otherParticipantsSize),
-                            participantNames = overflowFilmstripNames,
-                            onClick = onPlaceholderClick,
+            val spacing = VonageVideoTheme.dimens.spaceSmall
+            val cellCount = visibleFilmstripItems.size + if (overflowFilmstripNames.isNotEmpty()) 1 else 0
+            BoxWithConstraints(modifier = Modifier.weight(otherParticipantsWeight)) {
+                val tileSize = filmstripTileHeight(
+                    preferredHeight = otherParticipantsSize,
+                    aspectRatio = 1f,
+                    maxTileWidth = (maxWidth - spacing * (cellCount - 1)) / cellCount,
+                    maxTileHeight = maxHeight,
+                )
+                LazyRow(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.spacedBy(spacing),
+                    verticalAlignment = Alignment.CenterVertically,
+                    userScrollEnabled = false,
+                    overscrollEffect = null,
+                ) {
+                    items(
+                        items = visibleFilmstripItems,
+                        key = { it.id },
+                    ) { participant ->
+                        participantContent(
+                            participant,
+                            Modifier
+                                .width(tileSize)
+                                .height(tileSize),
                         )
+                    }
+                    if (overflowFilmstripNames.isNotEmpty()) {
+                        item(key = "placeholder") {
+                            ParticipantsPlaceholders(
+                                modifier = Modifier
+                                    .width(tileSize)
+                                    .height(tileSize),
+                                participantNames = overflowFilmstripNames,
+                                onClick = onPlaceholderClick,
+                            )
+                        }
                     }
                 }
             }
@@ -204,40 +214,62 @@ private fun ActiveSpeakerHorizontalLayout(
             )
         } ?: Spacer(modifier = Modifier.weight(if (hasFilmstripContent) spotlightWeight else 1f))
         if (hasFilmstripContent) {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.weight(otherParticipantsWeight),
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(VonageVideoTheme.dimens.spaceSmall),
-                userScrollEnabled = false,
-                overscrollEffect = null,
-            ) {
-                items(
-                    items = visibleFilmstripItems,
-                    key = { it.id },
-                ) { participant ->
-                    participantContent(
-                        participant,
-                        Modifier
-                            .height(otherParticipantsSize)
-                            .aspectRatio(ASPECT_RATIO_16_9),
-                    )
-                }
-                if (overflowFilmstripNames.isNotEmpty()) {
-                    item(key = "placeholder") {
-                        ParticipantsPlaceholders(
-                            modifier = Modifier
-                                .height(otherParticipantsSize)
+            val spacing = VonageVideoTheme.dimens.spaceSmall
+            val cellCount = visibleFilmstripItems.size + if (overflowFilmstripNames.isNotEmpty()) 1 else 0
+            BoxWithConstraints(modifier = Modifier.weight(otherParticipantsWeight)) {
+                val tileHeight = filmstripTileHeight(
+                    preferredHeight = otherParticipantsSize,
+                    aspectRatio = ASPECT_RATIO_16_9,
+                    maxTileWidth = maxWidth,
+                    maxTileHeight = (maxHeight - spacing * (cellCount - 1)) / cellCount,
+                )
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(spacing),
+                    userScrollEnabled = false,
+                    overscrollEffect = null,
+                ) {
+                    items(
+                        items = visibleFilmstripItems,
+                        key = { it.id },
+                    ) { participant ->
+                        participantContent(
+                            participant,
+                            Modifier
+                                .height(tileHeight)
                                 .aspectRatio(ASPECT_RATIO_16_9),
-                            participantNames = overflowFilmstripNames,
-                            onClick = onPlaceholderClick,
                         )
+                    }
+                    if (overflowFilmstripNames.isNotEmpty()) {
+                        item(key = "placeholder") {
+                            ParticipantsPlaceholders(
+                                modifier = Modifier
+                                    .height(tileHeight)
+                                    .aspectRatio(ASPECT_RATIO_16_9),
+                                participantNames = overflowFilmstripNames,
+                                onClick = onPlaceholderClick,
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
+
+/**
+ * Height of a filmstrip tile with the given width/height [aspectRatio]: [preferredHeight], shrunk
+ * so the tile fits a [maxTileWidth] × [maxTileHeight] cell. Keeps every filmstrip cell (including
+ * the overflow placeholder) visible and undistorted in small split-screen or freeform windows.
+ */
+internal fun filmstripTileHeight(
+    preferredHeight: Dp,
+    aspectRatio: Float,
+    maxTileWidth: Dp,
+    maxTileHeight: Dp,
+): Dp = min(min(preferredHeight, maxTileHeight), maxTileWidth / aspectRatio).coerceAtLeast(0.dp)
 
 @PreviewLightDark
 @Composable
