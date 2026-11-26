@@ -26,6 +26,8 @@ internal data class MeetingRoomUiState(
     val isLoading: Boolean = false,
     val isError: Boolean = false,
     val errorMessage: String? = null,
+    /** The session key from `createSession` had already expired, so the room was never joined. */
+    val isSessionKeyExpired: Boolean = false,
     val isEndCall: Boolean = false,
     val layoutType: CallLayoutType = CallLayoutType.ADAPTIVE_GRID,
     val allowMicrophoneControl: Boolean = true,

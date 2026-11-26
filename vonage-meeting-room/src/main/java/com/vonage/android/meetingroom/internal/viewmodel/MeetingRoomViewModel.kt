@@ -20,6 +20,7 @@ import com.vonage.android.meetingroom.api.MeetingRoomCallState
 import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
 import com.vonage.android.vera.api.session.SessionInfo
+import com.vonage.android.vera.api.session.SessionKeyExpiredException
 import com.vonage.android.meetingroom.internal.screen.CallLayoutType
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomUiState
 import com.vonage.android.meetingroom.internal.screen.TranscriptionNotification
@@ -123,6 +124,7 @@ internal class MeetingRoomViewModel(
             _uiState.update { state ->
                 state.copy(
                     isLoading = true,
+                    isSessionKeyExpired = false,
                     audioDevicesState = container.audioDevicesHandler.audioDevicesState,
                 )
             }
@@ -133,8 +135,14 @@ internal class MeetingRoomViewModel(
                 .onSuccess { sessionInfo ->
                     connect(roomName = roomName, sessionInfo = sessionInfo)
                 }
-                .onFailure {
-                    _uiState.update { state -> state.copy(isLoading = false, isError = true) }
+                .onFailure { error ->
+                    _uiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            isError = true,
+                            isSessionKeyExpired = error is SessionKeyExpiredException,
+                        )
+                    }
                 }
         }
 

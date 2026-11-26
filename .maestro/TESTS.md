@@ -11,7 +11,7 @@
 | `waiting-room-controls-disabled.yaml` | Toggle mic/camera off in waiting room, verify disabled in meeting |
 | `github-repo-link.yaml` | Verify GitHub repo button is visible on landing screen |
 | `auth-required-create-join-room.yaml` | Signed-out user taps Create / Join while the backend answers 401 (simulated) → sign-in sheet instead of the waiting room. Needs `authSettings.allowAuthentication: true` (always on in the Maestro CI build) |
-| `session-key-expired-join.yaml` | `createSession` returns an expired session key (simulated) → the meeting room shows the session error dialog without joining; Cancel leaves the room to the goodbye screen |
+| `session-key-expired-join.yaml` | `createSession` returns an expired session key (simulated) → the meeting room shows the "This meeting link has expired." dialog without joining; Cancel leaves the room to the goodbye screen |
 | `auth-login-logout.yaml` | Sign in from the top-bar button (fake Okta sign-in), check the account sheet shows the user, sign out, and check sign-in is offered again. Needs `allowAuthentication: true` |
 
 ## Disabled

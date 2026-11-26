@@ -4,7 +4,8 @@ appId: ${APP_ID}
 # Description: The `e2eExpiredSessionKey` launch argument makes the app replace the sessionKey
 #   returned by POST /v2/createSession with a JWT whose `exp` is an hour in the past
 #   (E2eExpiredSessionKeyInterceptor). The client must refuse to call /v2/joinSession, so the
-#   meeting room shows the session error dialog and the call never starts.
+#   meeting room shows the "This meeting link has expired." dialog (same wording as iOS)
+#   and the call never starts.
 # Note: unlike iOS, cancelling the error dialog leaves the meeting room through the
 #   GoBack action, which the app routes to the goodbye screen.
 # Priority: P1
@@ -53,7 +54,7 @@ appId: ${APP_ID}
     id: "join-meeting-button"
 
 - extendedWaitUntil:
-    visible: "Error while creating room, please try again"
+    visible: "This meeting link has expired."
     timeout: 10000
 
 # The call never connected
