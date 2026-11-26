@@ -87,4 +87,27 @@ class ActiveSpeakerLayoutScreenshotTest {
         composeTestRule.setContent { ActiveSpeakerLayoutSingleParticipantPreview() }
         composeTestRule.onRoot().captureRoboImage(roborazziOptions = options)
     }
+
+    // Multi-window / split-screen sizes: the filmstrip must fit the strip instead of clipping or stretching.
+
+    @Test
+    @Config(qualifiers = "w411dp-h420dp-port")
+    fun activeSpeakerLayout_splitScreenPortrait_light() {
+        composeTestRule.setContent { ActiveSpeakerLayoutFilmstripOverflowPreview() }
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = options)
+    }
+
+    @Test
+    @Config(qualifiers = "w520dp-h280dp-land")
+    fun activeSpeakerLayout_splitScreenLandscape_light() {
+        composeTestRule.setContent { ActiveSpeakerLayoutFilmstripOverflowPreview() }
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = options)
+    }
+
+    @Test
+    @Config(qualifiers = "w280dp-h600dp-port")
+    fun activeSpeakerLayout_narrowFreeform_light() {
+        composeTestRule.setContent { ActiveSpeakerLayoutFilmstripOverflowPreview() }
+        composeTestRule.onRoot().captureRoboImage(roborazziOptions = options)
+    }
 }
