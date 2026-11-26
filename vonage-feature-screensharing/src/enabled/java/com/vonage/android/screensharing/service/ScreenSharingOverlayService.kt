@@ -7,8 +7,10 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PixelFormat
+import android.hardware.display.DisplayManager
 import android.os.Build
 import android.os.IBinder
+import android.view.Display
 import android.view.View
 import android.view.WindowManager
 import androidx.core.graphics.toColorInt
@@ -30,8 +32,9 @@ class ScreenSharingOverlayService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        showOverlay()
+        val uiContext = overlayContext()
+        windowManager = uiContext.getSystemService(WindowManager::class.java)
+        showOverlay(uiContext)
     }
 
     override fun onDestroy() {
@@ -39,10 +42,23 @@ class ScreenSharingOverlayService : Service() {
         super.onDestroy()
     }
 
-    private fun showOverlay() {
+    /**
+     * A Service is not a UI context: adding a window or inflating a view from it trips StrictMode's
+     * `IncorrectContextUseViolation` on API 30+. Use a window context for the overlay type instead.
+     */
+    private fun overlayContext(): Context =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val display = getSystemService(DisplayManager::class.java).getDisplay(Display.DEFAULT_DISPLAY)
+            createDisplayContext(display)
+                .createWindowContext(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY, null)
+        } else {
+            this
+        }
+
+    private fun showOverlay(uiContext: Context) {
         val borderWidth = BORDER_WIDTH_PX
 
-        overlayView = object : View(this) {
+        overlayView = object : View(uiContext) {
             private val paint = Paint().apply {
                 color = BORDER_COLOR
                 style = Paint.Style.STROKE

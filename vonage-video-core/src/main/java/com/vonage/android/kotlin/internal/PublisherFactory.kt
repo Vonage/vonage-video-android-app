@@ -84,7 +84,6 @@ class PublisherFactory(
             context,
             VonageScreenShareConfig(name = name, mediaProjection = mediaProjection),
         )
-        publisherHolder?.screenPublisher = vonagePublisher
         return PublisherState(
             publisherId = PUBLISHER_SCREEN_ID,
             vonagePublisher = vonagePublisher,

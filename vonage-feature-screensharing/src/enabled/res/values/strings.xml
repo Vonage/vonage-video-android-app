@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Name of the notification channel for the ongoing screen share, shown in the system app notification settings. -->
+    <string name="screen_sharing_notification_channel_name">Screen sharing</string>
+    <!-- Title of the ongoing notification while the user shares their screen in a call. -->
+    <string name="screen_sharing_notification_title">You are sharing your screen</string>
+    <!-- Body of the ongoing notification while the user shares their screen in a call. -->
+    <string name="screen_sharing_notification_text">Everyone in the call can see your screen</string>
+</resources>

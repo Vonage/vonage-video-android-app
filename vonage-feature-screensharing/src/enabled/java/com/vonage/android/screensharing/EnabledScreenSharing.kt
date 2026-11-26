@@ -117,7 +117,7 @@ class EnabledScreenSharing(
     override fun createNotificationChannel(manager: NotificationManager) {
         val screenSharingChannel = NotificationChannel(
             ScreenSharingService.NOTIFICATION_CHANNEL_ID,
-            ScreenSharingService.NOTIFICATION_CHANNEL_NAME,
+            context.getString(R.string.screen_sharing_notification_channel_name),
             NotificationManager.IMPORTANCE_DEFAULT,
         )
         manager.createNotificationChannel(screenSharingChannel)
