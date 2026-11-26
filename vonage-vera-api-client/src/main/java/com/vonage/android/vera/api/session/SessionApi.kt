@@ -12,8 +12,9 @@ interface SessionApi {
      * `createSession` (reuses the room's live session) followed by `joinSession` (issues the token).
      *
      * A `401` response from either call fails with [SessionUnauthorizedException] so callers
-     * can ask the user to sign in. A session key whose `exp` claim has already passed fails with
-     * [SessionKeyExpiredException] without calling `joinSession`; a key without `exp` is accepted.
+     * can ask the user to sign in. A session key whose expiration (`exp`, or `schedule.endsAtMs`
+     * for scheduled meetings) has already passed fails with [SessionKeyExpiredException] without
+     * calling `joinSession`; a key without either claim is accepted.
      */
     suspend fun getSession(roomName: String): Result<SessionInfo>
 }

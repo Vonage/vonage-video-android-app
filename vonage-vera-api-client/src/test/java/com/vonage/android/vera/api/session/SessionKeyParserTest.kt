@@ -39,6 +39,44 @@ class SessionKeyParserTest {
     }
 
     @Test
+    fun `given jwt with schedule endsAtMs returns expiration in seconds`() {
+        val jwt = makeJwt(
+            mapOf(
+                "roomName" to ROOM_NAME,
+                "schedule" to mapOf("startsAtMs" to 1_795_791_600_000L, "endsAtMs" to 1_795_795_200_000L),
+            )
+        )
+
+        assertEquals(1_795_795_200.0, SessionKeyParser.extractExpiration(jwt))
+    }
+
+    @Test
+    fun `given jwt with exp and schedule returns exp`() {
+        val jwt = makeJwt(mapOf("exp" to 1_800_000_000L, "schedule" to mapOf("endsAtMs" to 1_795_795_200_000L)))
+
+        assertEquals(1_800_000_000.0, SessionKeyParser.extractExpiration(jwt))
+    }
+
+    @Test
+    fun `given schedule without endsAtMs returns null expiration`() {
+        assertNull(SessionKeyParser.extractExpiration(makeJwt(mapOf("schedule" to mapOf("startsAtMs" to 1L)))))
+    }
+
+    @Test
+    fun `given past schedule endsAtMs is expired`() {
+        val jwt = makeJwt(mapOf("schedule" to mapOf("endsAtMs" to epochSecondsFromNow(-3_600) * 1_000)))
+
+        assertTrue(SessionKeyParser.isExpired(jwt))
+    }
+
+    @Test
+    fun `given future schedule endsAtMs is not expired`() {
+        val jwt = makeJwt(mapOf("schedule" to mapOf("endsAtMs" to epochSecondsFromNow(3_600) * 1_000)))
+
+        assertFalse(SessionKeyParser.isExpired(jwt))
+    }
+
+    @Test
     fun `given jwt without exp claim is not expired`() {
         assertFalse(SessionKeyParser.isExpired(makeJwt(mapOf("roomName" to ROOM_NAME))))
     }

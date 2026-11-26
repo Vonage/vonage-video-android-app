@@ -139,6 +139,17 @@ class SessionApiTest {
     }
 
     @Test
+    fun `given createSession returns an expired scheduled session key returns SessionKeyExpiredException`() = runTest {
+        val endsAtMs = epochSecondsFromNow(-3_600) * 1_000
+        givenCreateSessionSucceeds(sessionKey = makeJwt(mapOf("schedule" to mapOf("endsAtMs" to endsAtMs))))
+
+        val result = sut.getSession(ROOM_NAME)
+
+        assertIs<SessionKeyExpiredException>(result.exceptionOrNull())
+        coVerify(exactly = 0) { apiService.joinSession(any()) }
+    }
+
+    @Test
     fun `given session key without exp claim joins the session`() = runTest {
         val sessionKey = makeJwt(mapOf("roomName" to ROOM_NAME, "sessionId" to "sessionId"))
         givenCreateSessionSucceeds(sessionKey)
