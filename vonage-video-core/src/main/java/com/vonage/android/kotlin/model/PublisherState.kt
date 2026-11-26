@@ -15,6 +15,7 @@ import com.vonage.android.kotlin.sdk.VonagePublisherVideoListener
 import com.vonage.android.kotlin.sdk.VonageSession
 import com.vonage.android.kotlin.sdk.VonageStream
 import com.vonage.android.kotlin.sdk.VonageVideoType
+import com.vonage.android.kotlin.ext.mapTalking
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.internal.SpeakingWhileMutedDetector
 import com.vonage.logger.vonageLogger
@@ -26,7 +27,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -274,11 +277,18 @@ data class PublisherState(
                 speakingWhileMutedDetector.isSpeakingWhileMuted
                     .collect { _isSpeakingWhileMuted.value = it }
             }
+            // The SDK reports the mic level even while muted, so talking is gated on the mic state.
             vonagePublisher.observeAudioLevel()
                 .movingAverage(windowSize = 2)
                 .distinctUntilChanged()
-                .collect { audioLevel ->
+                .onEach { audioLevel ->
                     _audioLevel.value = audioLevel
+                }
+                .mapTalking()
+                .combine(_isMicEnabled) { talking, micEnabled -> talking && micEnabled }
+                .distinctUntilChanged()
+                .collect { isTalking ->
+                    _isSpeaking.value = isTalking
                 }
         }
     }

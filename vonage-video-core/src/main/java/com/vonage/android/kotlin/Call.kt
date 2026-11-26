@@ -460,7 +460,8 @@ class Call internal constructor(
             .distinctUntilChanged()
             .onEach { config ->
                 if (config == applied) return@onEach
-                publisher.applyVideoBitrate(config)
+                // SDK setters stay on the main thread, like publisher creation.
+                withContext(Dispatchers.Main) { publisher.applyVideoBitrate(config) }
                 applied = config
             }
             .launchIn(coroutineScope)

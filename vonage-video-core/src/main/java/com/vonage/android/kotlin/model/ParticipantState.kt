@@ -7,12 +7,14 @@ import com.vonage.android.kotlin.sdk.VonageStream
 import com.vonage.android.kotlin.sdk.VonageSubscriber
 import com.vonage.android.kotlin.sdk.VonageSubscriberStreamListener
 import com.vonage.android.kotlin.sdk.VonageSubscriberVideoListener
+import com.vonage.android.kotlin.sdk.VonageVideoSize
 import com.vonage.android.kotlin.sdk.VonageVideoType
 import com.vonage.android.kotlin.ext.mapTalking
 import com.vonage.android.kotlin.ext.movingAverage
 import com.vonage.android.kotlin.internal.SubscriberVideoQualityPolicy
 import com.vonage.android.kotlin.internal.SubscriberVideoTier
 import com.vonage.logger.vonageLogger
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
@@ -30,6 +32,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Represents a remote participant (subscriber) in the video call.
@@ -108,6 +111,9 @@ data class ParticipantState(
     /** Receive-side quality tier currently requested for this stream. */
     internal val videoTier: StateFlow<SubscriberVideoTier> = _videoTier
 
+    /** Resolution last sent to the SDK, `null` while no preference is set. */
+    private var appliedResolution: VonageVideoSize? = null
+
     override fun onRenderedSizeChanged(width: Int, height: Int) {
         if (width > 0 && height > 0) renderedSize.value = width to height
     }
@@ -132,10 +138,16 @@ data class ParticipantState(
                     isScreenShare = isScreenShare,
                     current = _videoTier.value,
                 )
-                if (tier == _videoTier.value) return@collect
                 val sourceIsPortrait = source != null && source.second > source.first
-                vonageSubscriber.setPreferredResolution(tier.preferredResolution(sourceIsPortrait))
-                vonageSubscriber.setPreferredFrameRate(tier.frameRate)
+                val resolution = tier.preferredResolution(sourceIsPortrait)
+                // A rotation can keep the tier but flip the requested layer's orientation.
+                if (tier == _videoTier.value && resolution == appliedResolution) return@collect
+                // SDK setters stay on the main thread, like subscriber creation in Call.
+                withContext(Dispatchers.Main) {
+                    vonageSubscriber.setPreferredResolution(resolution)
+                    vonageSubscriber.setPreferredFrameRate(tier.frameRate)
+                }
+                appliedResolution = resolution
                 _videoTier.value = tier
                 vonageLogger.d(logTag, "Video tier=$tier rendered=${width}x$height")
             }

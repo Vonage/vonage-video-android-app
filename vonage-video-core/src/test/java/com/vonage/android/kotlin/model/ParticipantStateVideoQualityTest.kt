@@ -14,11 +14,16 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -26,6 +31,11 @@ import org.junit.jupiter.api.Test
 class ParticipantStateVideoQualityTest {
 
     private val settle = SubscriberVideoQualityPolicy.SETTLE_MILLIS
+
+    @AfterEach
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
 
     @Test
     fun `given_noRenderedSize_THEN_noPreferenceIsSet`() = runTest {
@@ -119,6 +129,22 @@ class ParticipantStateVideoQualityTest {
         assertEquals(SubscriberVideoTier.THUMBNAIL, state.videoTier.value)
     }
 
+    @Test
+    fun `given_sourceRotatesWithSameTier_THEN_layerOrientationUpdated`() = runTest {
+        val (subscriber, state) = startState()
+        // Square 400 px view: both 16:9 and 9:16 fit with a 225 px short edge -> THUMBNAIL.
+        emitStats(width = 1280, height = 720)
+        state.onRenderedSizeChanged(400, 400)
+        advanceTimeBy(settle + 1)
+        verify { subscriber.setPreferredResolution(VonageVideoSize(320, 180)) }
+
+        emitStats(width = 720, height = 1280)
+        advanceTimeBy(settle + 1)
+
+        verify { subscriber.setPreferredResolution(VonageVideoSize(180, 320)) }
+        assertEquals(SubscriberVideoTier.THUMBNAIL, state.videoTier.value)
+    }
+
     private var statsListener: VonageSubscriberVideoStatsListener? = null
 
     private fun TestScope.emitStats(width: Int, height: Int) {
@@ -158,6 +184,7 @@ class ParticipantStateVideoQualityTest {
             every { setVideoStatsListener(capture(listener)) } answers { statsListener = listener.captured }
         }
         val state = ParticipantState(vonageSubscriber = subscriber)
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         backgroundScope.launch { state.setup() }
         runCurrent()
         return subscriber to state
