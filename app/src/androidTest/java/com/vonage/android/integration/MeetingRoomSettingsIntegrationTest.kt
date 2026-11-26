@@ -10,6 +10,7 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -36,6 +37,9 @@ class MeetingRoomSettingsIntegrationTest {
     @Before
     fun setup() {
         hiltRule.inject()
+        // The holder loads persisted settings asynchronously; a late load would overwrite
+        // the values each test sets.
+        runBlocking { callSettingsHolder.awaitLoaded() }
     }
 
     @Test
