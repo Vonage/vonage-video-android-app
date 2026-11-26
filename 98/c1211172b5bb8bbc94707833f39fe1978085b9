@@ -1,0 +1,19 @@
+app/src/main/java/com/vonage/android/util/DeepLinkRoomIdentifier.kt
+  s_6cc32bf842e5da::t_4424b28cd70cb3 1-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "98c1211172b5bb8bbc94707833f39fe1978085b9",
+  "prompts": {},
+  "sessions": {
+    "s_6cc32bf842e5da": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_3d011fcd-ae58-4728-a092-2b15c9db17b4",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
