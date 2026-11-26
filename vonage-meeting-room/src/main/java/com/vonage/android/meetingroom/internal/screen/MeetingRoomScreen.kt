@@ -439,19 +439,7 @@ internal fun MeetingRoomScreen(
 
         uiState.isLoading -> GenericLoading()
 
-        uiState.isError -> {
-            val message = if (uiState.errorMessage?.isNotBlank() == true) {
-                uiState.errorMessage
-            } else {
-                stringResource(R.string.meeting_screen_session_creation_error)
-            }
-            BasicAlertDialog(
-                text = message,
-                acceptLabel = stringResource(R.string.generic_retry),
-                onAccept = actions.onRetry,
-                onCancel = actions.onBack,
-            )
-        }
+        uiState.isError -> SessionErrorDialog(uiState = uiState, actions = actions)
 
         uiState.isEndCall -> {
             LaunchedEffect(Unit) {

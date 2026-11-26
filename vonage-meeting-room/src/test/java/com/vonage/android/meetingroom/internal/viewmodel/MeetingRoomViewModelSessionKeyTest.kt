@@ -21,6 +21,7 @@ import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServ
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.vera.api.session.SessionInfo
 import com.vonage.android.vera.api.session.SessionApi
+import com.vonage.android.vera.api.session.SessionKeyExpiredException
 import com.vonage.audioselector.AudioDevicesHandler
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -34,6 +35,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -120,6 +123,46 @@ class MeetingRoomViewModelSessionKeyTest {
             assertEquals(ArchivingUiState.IDLE, awaitItem().archivingUiState)
         }
         coVerify(exactly = 0) { vonageArchiving.startArchive(any()) }
+    }
+
+    @Test
+    fun `given expired session key when setup then error state flags the expired key`() = runTest {
+        coEvery { sessionApi.getSession(ROOM_NAME) } returns Result.failure(SessionKeyExpiredException())
+
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        val state = sut.uiState.value
+        assertFalse(state.isLoading)
+        assertTrue(state.isError)
+        assertTrue(state.isSessionKeyExpired)
+    }
+
+    @Test
+    fun `given other session failure when setup then expired key is not flagged`() = runTest {
+        coEvery { sessionApi.getSession(ROOM_NAME) } returns Result.failure(Exception("Network error"))
+
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        val state = sut.uiState.value
+        assertTrue(state.isError)
+        assertFalse(state.isSessionKeyExpired)
+    }
+
+    @Test
+    fun `given expired session key when retry succeeds then expired key flag is cleared`() = runTest {
+        coEvery { sessionApi.getSession(ROOM_NAME) } returns Result.failure(SessionKeyExpiredException())
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+        coEvery { sessionApi.getSession(ROOM_NAME) } returns Result.success(SESSION_INFO)
+        every { videoClient.initializeSession(any(), any(), any()) } returns mockCall()
+
+        sut.setup(context)
+        testScheduler.advanceUntilIdle()
+
+        assertFalse(sut.uiState.value.isError)
+        assertFalse(sut.uiState.value.isSessionKeyExpired)
     }
 
     private fun mockCall(): CallFacade = mockk(relaxed = true) {

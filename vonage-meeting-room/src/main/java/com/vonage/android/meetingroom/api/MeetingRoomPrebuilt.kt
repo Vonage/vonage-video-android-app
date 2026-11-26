@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import okhttp3.Interceptor
 
 /**
  * The fully configured meeting room, produced by [MeetingRoomBuilder.build].
@@ -67,6 +68,8 @@ class MeetingRoomPrebuilt internal constructor(
     internal val authTokenProvider: MeetingRoomAuthTokenProvider? = null,
     /** Optional host-shared holder for the session key JWT. */
     internal val sessionKeyHolder: SessionKeyHolder? = null,
+    /** Extra OkHttp interceptors for the SDK's backend client. */
+    internal val interceptors: List<Interceptor> = emptyList(),
 ) {
     private val _callState = MutableStateFlow(MeetingRoomCallState(roomName = roomName))
 
