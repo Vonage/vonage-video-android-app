@@ -1,0 +1,16 @@
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/ParticipantState.kt
+  h_25498f8d57a266 23,28,116-118,123,125-126,130-131,136,144-153,275-279
+vonage-video-core/src/test/java/com/vonage/android/kotlin/model/ParticipantStateVideoQualityTest.kt
+  h_25498f8d57a266 8-9,14,92-142,157-158
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ae6be2dc4944c07bfaad2c77ae63087a0fcbce22",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
