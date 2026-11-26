@@ -1,0 +1,19 @@
+vonage-video-core/src/main/java/com/vonage/android/kotlin/model/ParticipantState.kt
+  s_538c32a7764ca8::t_bbfff24fb26132 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dfb03a52a58e1438da7e4b3d396828eeab192b1d",
+  "prompts": {},
+  "sessions": {
+    "s_538c32a7764ca8": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_51d29ff6-026c-4ce5-a88a-ae44677a12ee",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
