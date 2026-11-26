@@ -1,0 +1,14 @@
+vonage-feature-screensharing/src/enabled/java/com/vonage/android/screensharing/service/ScreenSharingService.kt
+  h_25498f8d57a266 23-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bcf5871cbb07d2a0194705750b59d4b2860c2c89",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
