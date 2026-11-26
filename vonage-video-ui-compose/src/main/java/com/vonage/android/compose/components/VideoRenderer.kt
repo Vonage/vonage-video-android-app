@@ -68,7 +68,6 @@ fun ParticipantVideoRenderer(
             onRelease = { container ->
                 container.removeAllViews()
             },
-            // Lets the participant pick a video quality matching the size it is drawn at.
             modifier = modifier.onSizeChanged { participant.onRenderedSizeChanged(it.width, it.height) },
         )
     }

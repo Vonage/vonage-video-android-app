@@ -87,7 +87,6 @@ internal object SubscriberVideoQualityPolicy {
 
         val shortEdge = fittedShortEdge(viewWidth, viewHeight, sourceWidth, sourceHeight)
         val target = rawTier(shortEdge)
-        // Downgrade only once the size is clearly below the current tier's lower bound.
         val currentLowerBound = when (current) {
             SubscriberVideoTier.FULL -> MEDIUM_MAX_SHORT_EDGE_PX
             SubscriberVideoTier.MEDIUM -> THUMBNAIL_MAX_SHORT_EDGE_PX
