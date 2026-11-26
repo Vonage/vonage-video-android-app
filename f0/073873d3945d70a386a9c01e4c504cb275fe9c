@@ -1,0 +1,19 @@
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/SessionErrorDialog.kt
+  s_d35ac94c748fa7::t_8afc2307526127 1-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f0073873d3945d70a386a9c01e4c504cb275fe9c",
+  "prompts": {},
+  "sessions": {
+    "s_d35ac94c748fa7": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_b20652af-c1ae-4b94-baa8-442630820288",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
