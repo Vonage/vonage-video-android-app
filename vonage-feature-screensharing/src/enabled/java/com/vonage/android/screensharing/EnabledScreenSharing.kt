@@ -11,12 +11,10 @@ import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.IBinder
-import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.ContextCompat.startForegroundService
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.screensharing.service.ScreenSharingOverlayService
 import com.vonage.android.screensharing.service.ScreenSharingService
 
 class EnabledScreenSharing(
@@ -24,7 +22,6 @@ class EnabledScreenSharing(
 ) : VonageScreenSharing {
 
     private val serviceIntent = ScreenSharingService.intent(context)
-    private val overlayIntent = ScreenSharingOverlayService.intent(context)
     private val mediaProjectionManager: MediaProjectionManager =
         getSystemService(context, MediaProjectionManager::class.java) as MediaProjectionManager
 
@@ -69,7 +66,6 @@ class EnabledScreenSharing(
                 currentMediaProjection = mediaProjection
                 mediaProjection.registerCallback(mediaProjectionCallback, null)
                 call.startCapturingScreen(mediaProjection)
-                showOverlay()
                 onStarted()
             }
 
@@ -88,7 +84,6 @@ class EnabledScreenSharing(
 
     @Synchronized
     override fun stopSharingScreen() {
-        hideOverlay()
         currentMediaProjection?.stop()
         screenSharingServiceConnection?.let {
             context.unbindService(it)
@@ -98,19 +93,6 @@ class EnabledScreenSharing(
         call?.stopCapturingScreen()
         currentMediaProjection = null
         call = null
-    }
-
-    override fun canDrawOverlays(): Boolean =
-        Settings.canDrawOverlays(context)
-
-    override fun showOverlay() {
-        if (canDrawOverlays()) {
-            context.startService(overlayIntent)
-        }
-    }
-
-    override fun hideOverlay() {
-        context.stopService(overlayIntent)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

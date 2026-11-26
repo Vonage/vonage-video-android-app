@@ -18,14 +18,6 @@ class DisabledScreenSharing : VonageScreenSharing {
     override fun stopSharingScreen() {
     }
 
-    override fun canDrawOverlays(): Boolean = false
-
-    override fun showOverlay() {
-    }
-
-    override fun hideOverlay() {
-    }
-
     override fun createNotificationChannel(manager: NotificationManager) {
     }
 }

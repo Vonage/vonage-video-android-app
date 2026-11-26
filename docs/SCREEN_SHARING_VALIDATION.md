@@ -31,7 +31,6 @@ Debug build, `targetSdk 37`. Each case checks `logcat` for `FATAL EXCEPTION` / `
 | 12 | Pixel 9a, "Share entire screen", then Stop from the status-bar chip dialog | Not run | Pass. Services and notification removed, button back to "Share screen", screen tile removed |
 | 13 | Pixel 9a, "Share one app" (Calculator), system switches to that app, then Stop from the chip while in it | Not run | Pass. Same cleanup as #12 when returning to the call |
 | 14 | Pixel 9a, foreground-service notification while sharing | Generic "app is running" entry (emulator run) | Pass. Title, text and screen-share icon shown |
-| 15 | Pixel 9a, StrictMode while the border overlay starts (overlay allowed with `appops set … SYSTEM_ALERT_WINDOW allow`) | Violation logged on the emulator run (not re-run on the Pixel 9a) | Pass. No StrictMode violation logged |
 
 One ANR was seen on the baseline run (#5). Its trace shows the main thread waiting on the render thread while `system_server` itself was blocked for 65 s and then killed by the watchdog: the host was running three emulators. It did not reproduce on a fresh emulator with the baseline or fixed build, so it is not attributed to the app.
 
@@ -41,9 +40,9 @@ One ANR was seen on the baseline run (#5). Its trace shows the main thread waiti
 - `EnabledScreenSharing.onServiceConnected`: a null or throwing `getMediaProjection` now stops sharing and calls `onStopped`, so the UI returns to `IDLE`.
 - `ScreenSharingService`: `START_NOT_STICKY`, and `startForeground` failures stop the service instead of crashing. A media projection can't be resumed without new user consent, so restarting the service has no value.
 - `ScreenSharingService` notification: localized title and text, a monochrome small icon, and a localized channel name (was the hardcoded `Screen_Capture`). Strings in `vonage-feature-screensharing/src/enabled/res/values/strings.xml`.
-- `ScreenSharingOverlayService`: on API 30+ the overlay view and `WindowManager` come from a window context (`createWindowContext(TYPE_APPLICATION_OVERLAY)`) instead of the Service context.
+- Green border overlay removed with `ScreenSharingOverlayService`, `SYSTEM_ALERT_WINDOW` and `VonageScreenSharing.canDrawOverlays/showOverlay/hideOverlay`. The app never asked for the permission, so the border rarely showed, and its Service context tripped StrictMode. The system indicators cover it (see `docs/PERMISSIONS.md`).
 - `VeraPublisherHolder.screenPublisher` removed. Nothing read it, and it kept the last screen publisher (and its `MediaProjection`) alive after stop. `Call.participants` already owns the screen publisher.
 
 ## Not fixed here (follow-ups)
 
-- The green border overlay only shows if "Display over other apps" was granted elsewhere; the app never asks for it. Needs a product decision: request it, or drop the overlay and `SYSTEM_ALERT_WINDOW` and rely on the system indicators (status-bar chip, confirmed on Android 17).
+None open.
