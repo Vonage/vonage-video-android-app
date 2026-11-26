@@ -1,4 +1,4 @@
-package com.vonage.android.meetingroom.internal.screen.audio
+package com.vonage.android.compose.components.audio
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,20 +24,20 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import com.vonage.android.compose.R
 import com.vonage.android.compose.modifier.conditional
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
 import com.vonage.android.compose.vivid.icons.solid.AudioMid
 import com.vonage.android.compose.vivid.icons.solid.Call
 import com.vonage.android.compose.vivid.icons.solid.Headset2
-import com.vonage.android.meetingroom.R
 import com.vonage.audioselector.AudioDeviceSelector.AudioDevice
 import com.vonage.audioselector.AudioDeviceSelector.AudioDeviceType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
-internal fun AudioDeviceList(
+fun AudioDeviceList(
     availableDevices: ImmutableList<AudioDevice>,
     activeDevice: AudioDevice?,
     selectDevice: (AudioDevice) -> Unit,
@@ -146,7 +146,7 @@ private fun AudioDevice.toLabel(): String =
     }
 
 @Composable
-internal fun AudioDeviceType.toImageVector(): ImageVector =
+fun AudioDeviceType.toImageVector(): ImageVector =
     when (this) {
         AudioDeviceType.EARPIECE -> VividIcons.Solid.Call
         AudioDeviceType.BLUETOOTH -> Icons.Default.Bluetooth

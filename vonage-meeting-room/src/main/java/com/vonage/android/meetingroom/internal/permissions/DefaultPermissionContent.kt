@@ -34,7 +34,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.vonage.android.compose.components.VonageButton
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.meetingroom.R
-import com.vonage.android.meetingroom.internal.util.pip.findActivity
+import com.vonage.android.compose.util.pip.findActivity
 
 /**
  * Built-in permission gate composable. Requests [permissions] immediately on first

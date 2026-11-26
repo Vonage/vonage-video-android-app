@@ -14,7 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.chat.ui.ChatBadgeButton
 import com.vonage.android.compose.components.GenericLoading
 import com.vonage.android.meetingroom.internal.screen.components.ParticipantVideoCard
-import com.vonage.android.meetingroom.internal.util.pip.findActivity
+import com.vonage.android.compose.util.pip.findActivity
 
 @Suppress("LongMethod")
 @Composable
@@ -61,10 +61,11 @@ internal fun PipMeetingRoomScreen(
         uiState.isError -> SessionErrorDialog(uiState = uiState, actions = actions)
 
         uiState.isEndCall -> {
-            LaunchedEffect(uiState) {
+            val activity = LocalContext.current.findActivity()
+            LaunchedEffect(Unit) {
                 actions.onEndCall()
+                activity.finish()
             }
-            LocalContext.current.findActivity().finish()
         }
     }
 }

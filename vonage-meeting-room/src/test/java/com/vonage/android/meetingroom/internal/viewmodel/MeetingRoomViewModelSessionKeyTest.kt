@@ -17,12 +17,12 @@ import com.vonage.android.meetingroom.api.MeetingRoomPrebuilt
 import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.meetingroom.api.SessionKeyHolder
 import com.vonage.android.meetingroom.internal.container.MeetingRoomContainer
-import com.vonage.android.meetingroom.internal.screen.audio.MeetingRoomAudioDevicesHandler
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler
 import com.vonage.android.settings.CallSettingsHolder
 import com.vonage.android.vera.api.session.SessionInfo
 import com.vonage.android.vera.api.session.SessionApi
 import com.vonage.android.vera.api.session.SessionKeyExpiredException
+import com.vonage.audioselector.AudioDevicesHandler
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -54,7 +54,7 @@ class MeetingRoomViewModelSessionKeyTest {
     private val vonageArchiving: VonageArchiving = mockk(relaxed = true)
     private val videoClient: VonageVideoClient = mockk(relaxed = true)
     private val sessionKeyHolder = SessionKeyHolder()
-    private val audioDevicesHandler: MeetingRoomAudioDevicesHandler = mockk(relaxed = true) {
+    private val audioDevicesHandler: AudioDevicesHandler = mockk(relaxed = true) {
         every { audioDevicesState } returns mockk(relaxed = true)
     }
     private val foregroundServiceHandler: MeetingRoomForegroundServiceHandler = mockk(relaxed = true) {

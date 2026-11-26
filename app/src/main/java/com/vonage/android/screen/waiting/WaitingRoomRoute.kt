@@ -17,7 +17,7 @@ import com.vonage.android.fx.ui.VideoBackgroundItem
 import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.PublisherSettings
 import com.vonage.android.screen.components.permissions.CallPermissionHandler
-import com.vonage.android.util.pip.pipEffect
+import com.vonage.android.compose.util.pip.pipEffect
 
 @Composable
 fun WaitingRoomRoute(

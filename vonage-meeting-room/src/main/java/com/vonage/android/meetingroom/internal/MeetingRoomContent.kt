@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -24,8 +25,8 @@ import com.vonage.android.meetingroom.internal.permissions.computeRequiredPermis
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreen
 import com.vonage.android.meetingroom.internal.screen.PipMeetingRoomScreen
-import com.vonage.android.meetingroom.internal.util.pip.pipEffect
-import com.vonage.android.meetingroom.internal.util.pip.rememberIsInPipMode
+import com.vonage.android.compose.util.pip.pipEffect
+import com.vonage.android.compose.util.pip.rememberIsInPipMode
 import com.vonage.android.meetingroom.internal.viewmodel.MeetingRoomViewModel
 import com.vonage.android.meetingroom.internal.viewmodel.MeetingRoomViewModelFactory
 import kotlinx.coroutines.launch
@@ -80,6 +81,7 @@ private fun MeetingRoomContentInner(
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val inPipMode = rememberIsInPipMode()
+    val currentInPipMode by rememberUpdatedState(inPipMode)
     val pipModifier = pipEffect(
         shouldEnterPipMode = prebuilt.configuration.allowPictureInPicture,
     )
@@ -106,7 +108,7 @@ private fun MeetingRoomContentInner(
             onApplyVideoEffect = viewModel::applyVideoEffect,
             onEndCall = {
                 viewModel.endCall()
-                if (!inPipMode) {
+                if (!currentInPipMode) {
                     prebuilt.onAction(MeetingRoomSDKAction.CallDidEnd)
                     onActivityFinish?.invoke()
                 }

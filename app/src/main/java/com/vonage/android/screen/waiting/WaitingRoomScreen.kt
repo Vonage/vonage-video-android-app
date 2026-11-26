@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
@@ -29,8 +30,11 @@ import com.vonage.android.compose.preview.buildPublisher
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.kotlin.model.VideoEffect
 import com.vonage.android.meetingroom.api.PublisherSettings
+import com.vonage.android.audiofx.R as AudioFxR
+import com.vonage.android.compose.components.audio.AudioDevicesMenu
+import com.vonage.android.fx.rememberNoiseSuppression
+import com.vonage.android.fx.ui.NoiseSuppressorToggle
 import com.vonage.android.fx.ui.VideoEffectsScreen
-import com.vonage.android.screen.components.audio.AudioDevicesMenu
 import com.vonage.android.screen.components.audio.TestSpeaker
 import com.vonage.android.screen.waiting.WaitingRoomTestTags.WAITING_ROOM_SCREEN_TAG
 import com.vonage.android.screen.waiting.components.DeviceSelectionPanel
@@ -38,7 +42,6 @@ import com.vonage.android.screen.waiting.components.JoinRoomSection
 import com.vonage.android.screen.waiting.components.VideoControlPanel
 import com.vonage.android.screen.waiting.components.VideoPreviewContainer
 import com.vonage.android.screen.waiting.components.WaitingRoomTopBar
-import com.vonage.android.util.rememberNoiseSuppression
 import kotlinx.coroutines.launch
 
 @Suppress("LongMethod", "CyclomaticComplexMethod")
@@ -88,16 +91,16 @@ fun WaitingRoomScreen(
                             showAudioDeviceSelector = false
                         }
                     },
-                    noiseSuppressionEnabled = noiseSuppression.isEnabled(),
-                    onNoiseSuppressorToggle = { _ ->
-                        uiState.publisher?.toggleNoiseSuppression()
-                    },
-                    testSpeakerContent = {
-                        if (uiState.allowAudioDiagnostics) {
-                            TestSpeaker()
-                        }
-                    },
-                )
+                ) {
+                    NoiseSuppressorToggle(
+                        title = stringResource(AudioFxR.string.advanced_noise_suppression),
+                        isChecked = noiseSuppression.isEnabled(),
+                        onCheckedChange = { _ -> uiState.publisher?.toggleNoiseSuppression() },
+                    )
+                    if (uiState.allowAudioDiagnostics) {
+                        TestSpeaker()
+                    }
+                }
             }
         }
     }
