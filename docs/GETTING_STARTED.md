@@ -33,7 +33,7 @@ export BASE_API_URL=https://your-backend-url.com
 
 **Option 3 — Edit `app-config.json`** directly, replacing the placeholder with your URL.
 
-> **Emulator tip:** If your backend is running locally, use the special alias `10.0.2.2` instead of `localhost` so the emulator can reach your machine.
+> **Emulator tip:** If your backend is running locally, use the special alias `10.0.2.2` instead of `localhost` so the emulator can reach your machine. On Android 17 (API 37) and later, the app can't reach `10.0.2.2` without the local network permission. See [Permissions](PERMISSIONS.md#local-backend-on-android-17) for workarounds.
 
 ## Regenerate configuration
 

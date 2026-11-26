@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -81,6 +82,7 @@ private fun MeetingRoomContentInner(
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val inPipMode = rememberIsInPipMode()
+    val currentInPipMode by rememberUpdatedState(inPipMode)
     val pipModifier = pipEffect(
         shouldEnterPipMode = prebuilt.configuration.allowPictureInPicture,
     )
@@ -112,7 +114,7 @@ private fun MeetingRoomContentInner(
             onApplyVideoEffect = viewModel::applyVideoEffect,
             onEndCall = {
                 viewModel.endCall()
-                if (!inPipMode) {
+                if (!currentInPipMode) {
                     prebuilt.onAction(MeetingRoomSDKAction.CallDidEnd)
                     onActivityFinish?.invoke()
                 }
