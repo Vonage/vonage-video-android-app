@@ -1,0 +1,212 @@
+.claude/skills/run-tests/SKILL.md
+  h_25498f8d57a266 55
+.claude/skills/setup/SKILL.md
+  h_25498f8d57a266 62
+.github/workflows/baseline-profile.yml
+  h_25498f8d57a266 1-122
+.github/workflows/check-pull-request-size.yml
+  h_25498f8d57a266 10,18-20,25-29,35
+AGENTS.md
+  h_25498f8d57a266 18-19,92-98,103-105
+README.md
+  h_25498f8d57a266 91
+app/build.gradle.kts
+  h_25498f8d57a266 14,18-23,293-294,329
+app/src/debug/kotlin/com/vonage/android/DebugMainApplication.kt
+  h_25498f8d57a266 15
+app/src/debug/kotlin/com/vonage/android/JankStatsTracker.kt
+  h_25498f8d57a266 1,3-6,8,10-14,16,18-21,23-24,27-29,31-41,46-48
+app/src/main/AndroidManifest.xml
+  h_25498f8d57a266 10,12-13
+app/src/main/java/com/vonage/android/di/SdkModule.kt
+  h_25498f8d57a266 10,35-39
+app/src/main/java/com/vonage/android/screen/components/permissions/CallPermissionHandler.kt
+  h_25498f8d57a266 22,50-60
+app/src/main/java/com/vonage/android/screen/goodbye/GoodbyeScreenRoute.kt
+  h_25498f8d57a266 10
+app/src/main/java/com/vonage/android/screen/landing/LandingScreenRoute.kt
+  h_25498f8d57a266 13
+app/src/main/java/com/vonage/android/screen/reporting/components/ReportIssueForm.kt
+  h_25498f8d57a266 38
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomRoute.kt
+  h_25498f8d57a266 20
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomScreen.kt
+  h_25498f8d57a266 23,33-36,94-103
+app/src/main/java/com/vonage/android/screen/waiting/WaitingRoomViewModel.kt
+  h_25498f8d57a266 23-24
+app/src/main/java/com/vonage/android/screen/waiting/components/VideoPreviewContainer.kt
+  h_25498f8d57a266 106,117,173
+app/src/main/java/com/vonage/android/util/DownloadManager.kt
+  h_25498f8d57a266 5,20-25,33-37
+app/src/release/AndroidManifest.xml
+  h_25498f8d57a266 5,9-17
+app/src/release/generated/baselineProfiles/baseline-prof.txt
+  h_25498f8d57a266 1-23348
+app/src/release/generated/baselineProfiles/startup-prof.txt
+  h_25498f8d57a266 1-19504
+app/src/test/java/com/vonage/android/screen/components/permissions/CallPermissionsTest.kt
+  h_25498f8d57a266 1,3-8,10,12-15,18-21,23-31
+app/src/test/java/com/vonage/android/screen/waiting/WaitingRoomViewModelTest.kt
+  h_25498f8d57a266 22
+baselineprofile/build.gradle.kts
+  h_25498f8d57a266 1-88
+baselineprofile/src/main/AndroidManifest.xml
+  h_25498f8d57a266 1-2
+baselineprofile/src/main/java/com/vonage/android/baselineprofile/BaselineProfileGenerator.kt
+  h_25498f8d57a266 1-41
+baselineprofile/src/main/java/com/vonage/android/baselineprofile/Journeys.kt
+  h_25498f8d57a266 1-46
+baselineprofile/src/main/java/com/vonage/android/baselineprofile/StartupBenchmarks.kt
+  h_25498f8d57a266 1-46
+build-tools/gradle-config-plugin/build.gradle.kts
+  h_25498f8d57a266 20,37-42
+build-tools/gradle-config-plugin/src/main/kotlin/com/vonage/gradle/AndroidApiValidationPlugin.kt
+  h_25498f8d57a266 1-62
+build.gradle.kts
+  h_25498f8d57a266 6-7,43-44,79
+docs/GETTING_STARTED.md
+  h_25498f8d57a266 36
+docs/PERMISSIONS.md
+  h_25498f8d57a266 1-84
+gradle/libs.versions.toml
+  h_25498f8d57a266 4,10-11,18,20,22-23,33,36-38,41,44,46,51,60,74,77,86,89,106,132-133,137,142,144
+settings.gradle.kts
+  h_25498f8d57a266 44
+vonage-android-logger/build.gradle.kts
+  h_25498f8d57a266 3
+vonage-audio-selector/api/vonage-audio-selector.api
+  h_25498f8d57a266 39-62
+vonage-audio-selector/build.gradle.kts
+  h_25498f8d57a266 4
+vonage-audio-selector/src/main/java/com/vonage/audioselector/AudioDevicesHandler.kt
+  h_25498f8d57a266 1,8-11,32-34
+vonage-audio-selector/src/test/java/com/vonage/audioselector/AudioDevicesHandlerTest.kt
+  h_25498f8d57a266 1
+vonage-feature-audio-effects/src/main/java/com/vonage/android/fx/rememberNoiseSuppression.kt
+  h_25498f8d57a266 1
+vonage-feature-audio-effects/src/main/res/values/strings.xml
+  h_25498f8d57a266 1-4
+vonage-feature-chat/src/enabled/java/com/vonage/android/chat/ui/ChatPanel.kt
+  h_25498f8d57a266 144
+vonage-feature-chat/src/enabled/java/com/vonage/android/chat/ui/JumpToBottom.kt
+  h_25498f8d57a266 11,13,16,43,50-51,67
+vonage-feature-reactions/src/enabled/java/com/vonage/android/reactions/ui/EmojiReactionOverlay.kt
+  h_25498f8d57a266 3,23,36,38,53,56,58,69-71,74-91,96-102,105
+vonage-meeting-room/src/androidTest/java/com/vonage/android/meetingroom/internal/screen/components/bottombar/MoreActionsGridTest.kt
+  h_25498f8d57a266 1,3-8,10-11,13-15,17-18,20-33,36-37,39-45
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/MeetingRoomContent.kt
+  h_25498f8d57a266 14,28-29,84,111
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/container/MeetingRoomContainer.kt
+  h_25498f8d57a266 32,118,123
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/permissions/DefaultPermissionContent.kt
+  h_25498f8d57a266 37
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomScreen.kt
+  h_25498f8d57a266 45-48,101-103,168,184,186,393-402,445
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/MeetingRoomUiState.kt
+  h_25498f8d57a266 12
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/PipMeetingRoomScreen.kt
+  h_25498f8d57a266 17,64-65,67
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/MeetingRoomContent.kt
+  h_25498f8d57a266 34,55,76
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/MeetingTopBar.kt
+  h_25498f8d57a266 25,39
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/ParticipantVideoCard.kt
+  h_25498f8d57a266 55,101,156,225,231
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/bottombar/BottomBar.kt
+  h_25498f8d57a266 7,148,151,153-163,165-185,189-200,231-232,251
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/bottombar/MoreActionsGrid.kt
+  h_25498f8d57a266 30-31
+vonage-meeting-room/src/main/java/com/vonage/android/meetingroom/internal/screen/components/bottombar/ParticipantsList.kt
+  h_25498f8d57a266 57,59-61,63-64,76,79,90,97,200-201,204
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelSessionKeyTest.kt
+  h_25498f8d57a266 25,57
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTest.kt
+  h_25498f8d57a266 37-38,76,78
+vonage-meeting-room/src/test/java/com/vonage/android/meetingroom/internal/viewmodel/MeetingRoomViewModelTranscriptionTest.kt
+  h_25498f8d57a266 27,60
+vonage-video-ui-compose/build.gradle.kts
+  h_25498f8d57a266 46-47,59
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/AudioVolumeIndicator.kt
+  h_25498f8d57a266 4,9-12,26-41,44-63,66-73
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/LinkifyText.kt
+  h_25498f8d57a266 28-47,57
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/audio/AudioDeviceList.kt
+  h_25498f8d57a266 1,27,40,149
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/components/audio/AudioDevicesMenu.kt
+  h_25498f8d57a266 1,4,13,17-20,26,34
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/layout/ActiveSpeakerLayout.kt
+  h_25498f8d57a266 7,31,90,104,145-170,173-183,217-241,245-255,262-273
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/layout/AdaptiveGrid.kt
+  h_25498f8d57a266 8,12,15,23,45-53,55-58,60-69,71-72,74-75,80-98
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/util/ReportVisibleParticipants.kt
+  h_25498f8d57a266 1,4-7,10-13,15
+vonage-video-ui-compose/src/main/java/com/vonage/android/compose/util/pip/pipEffect.kt
+  h_25498f8d57a266 1,10,22,46,56,60,76
+vonage-video-ui-compose/src/main/res/values/strings.xml
+  h_25498f8d57a266 6-12
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/layout/ActiveSpeakerLayoutScreenshotTest.kt
+  h_25498f8d57a266 90-112
+vonage-video-ui-compose/src/test/java/com/vonage/android/compose/layout/FilmstripTileHeightTest.kt
+  h_25498f8d57a266 1-38
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.AudioVolumeIndicatorScreenshotTest.audioVolumeIndicatorLoud_dark.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.AudioVolumeIndicatorScreenshotTest.audioVolumeIndicatorLoud_light.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.AudioVolumeIndicatorScreenshotTest.audioVolumeIndicatorMedium_dark.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.AudioVolumeIndicatorScreenshotTest.audioVolumeIndicatorMedium_light.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.AudioVolumeIndicatorScreenshotTest.audioVolumeIndicatorSilent_dark.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.components.AudioVolumeIndicatorScreenshotTest.audioVolumeIndicatorSilent_light.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.ActiveSpeakerLayoutScreenshotTest.activeSpeakerLayout_filledSpotlight_dark.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.ActiveSpeakerLayoutScreenshotTest.activeSpeakerLayout_filledSpotlight_light.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.ActiveSpeakerLayoutScreenshotTest.activeSpeakerLayout_filmstripOverflow_dark.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.ActiveSpeakerLayoutScreenshotTest.activeSpeakerLayout_filmstripOverflow_light.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.ActiveSpeakerLayoutScreenshotTest.activeSpeakerLayout_landscape_dark.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.ActiveSpeakerLayoutScreenshotTest.activeSpeakerLayout_landscape_light.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.ActiveSpeakerLayoutScreenshotTest.activeSpeakerLayout_narrowFreeform_light.png
+  h_25498f8d57a266 1-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.ActiveSpeakerLayoutScreenshotTest.activeSpeakerLayout_noSpeaker_dark.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.ActiveSpeakerLayoutScreenshotTest.activeSpeakerLayout_noSpeaker_light.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.ActiveSpeakerLayoutScreenshotTest.activeSpeakerLayout_singleParticipant_dark.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.ActiveSpeakerLayoutScreenshotTest.activeSpeakerLayout_singleParticipant_light.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.ActiveSpeakerLayoutScreenshotTest.activeSpeakerLayout_splitScreenLandscape_light.png
+  h_25498f8d57a266 1-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.ActiveSpeakerLayoutScreenshotTest.activeSpeakerLayout_splitScreenPortrait_light.png
+  h_25498f8d57a266 1-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.AdaptiveGridScreenshotTest.adaptiveGrid_4participants_dark.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.AdaptiveGridScreenshotTest.adaptiveGrid_4participants_landscape_dark.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.AdaptiveGridScreenshotTest.adaptiveGrid_4participants_landscape_light.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.AdaptiveGridScreenshotTest.adaptiveGrid_4participants_light.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.AdaptiveGridScreenshotTest.adaptiveGrid_7participants_overflow_dark.png
+  h_25498f8d57a266 2-3
+vonage-video-ui-compose/src/test/snapshots/images/com.vonage.android.compose.layout.AdaptiveGridScreenshotTest.adaptiveGrid_7participants_overflow_light.png
+  h_25498f8d57a266 2-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ad0af343fec34fd13c0660d1668e348cc786eea4",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
