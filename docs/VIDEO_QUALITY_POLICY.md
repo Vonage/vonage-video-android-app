@@ -124,15 +124,3 @@ with the policy on (this branch) and off (`develop`). Run each scenario for 10 m
   power use (mAh).
 - **Full-screen quality (scenario 1).** Received resolution and FPS must match `develop`, and
   freeze count must not increase.
-
-### Results
-
-Fill in after device runs. Device: _____, Android _____, SDK 2.36.0.
-
-| # | Receive kbps (off → on) | Send kbps (off → on) | CPU % (off → on) | Battery mAh (off → on) | Notes |
-|---|---|---|---|---|---|
-| 1 | | | | | |
-| 2 | | | | | |
-| 3 | | | | | |
-| 4 | | | | | |
-| 5 | | | | | |
