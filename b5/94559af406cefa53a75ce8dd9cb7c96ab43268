@@ -1,0 +1,33 @@
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/session/SessionApi.kt
+  s_d35ac94c748fa7::t_2f249cc980db43 15-17
+vonage-vera-api-client/src/test/java/com/vonage/android/vera/api/session/SessionApiTest.kt
+  s_d35ac94c748fa7::t_1d5fdf8e936bb5 142-146
+  s_d35ac94c748fa7::t_b2b4a428e5d3bd 139-141
+vonage-vera-api-client/src/test/java/com/vonage/android/vera/api/session/JwtFixture.kt
+  s_d35ac94c748fa7::t_7a23ed0434cdd8 5,11,14,19-25
+  s_d35ac94c748fa7::t_87c15e578f6215 26-27
+vonage-vera-api-client/src/test/java/com/vonage/android/vera/api/session/SessionKeyParserTest.kt
+  s_d35ac94c748fa7::t_bb0536d5f3bbb4 41-78
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/session/SessionKeyParser.kt
+  s_d35ac94c748fa7::t_55ce49d90188c0 25-26
+  s_d35ac94c748fa7::t_aeb3a048d5cfc2 22-24
+  s_d35ac94c748fa7::t_7a0746202581e4 27
+vonage-vera-api-client/src/main/java/com/vonage/android/vera/api/session/SessionModels.kt
+  s_d35ac94c748fa7::t_c7f6a2df880f54 41-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b594559af406cefa53a75ce8dd9cb7c96ab43268",
+  "prompts": {},
+  "sessions": {
+    "s_d35ac94c748fa7": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_b20652af-c1ae-4b94-baa8-442630820288",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
