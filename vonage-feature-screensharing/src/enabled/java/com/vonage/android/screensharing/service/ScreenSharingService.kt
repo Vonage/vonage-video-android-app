@@ -20,10 +20,8 @@ class ScreenSharingService : Service() {
     override fun onBind(intent: Intent?): IBinder? = binder
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // A media projection FGS can only be (re)started with a fresh user consent token.
-        // If the system recreates this service after process death there is no token, and
-        // startForeground throws SecurityException on API 34+, so never ask to be restarted
-        // and stop instead of crashing.
+        // A media projection FGS needs a fresh consent token: a system restart after process death
+        // has none and startForeground throws on API 34+, so don't be sticky and stop on failure.
         runCatching { startForeground() }.onFailure { stopSelf() }
         return START_NOT_STICKY
     }
