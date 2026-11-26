@@ -1,0 +1,16 @@
+docs/PERMISSIONS.md
+  h_25498f8d57a266 44-47
+docs/SCREEN_SHARING_VALIDATION.md
+  h_25498f8d57a266 43,48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fc4a6fc804f697edddc644bf4b4f74aff76dd941",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
