@@ -15,7 +15,8 @@
 | `vonage-feature-okta/` | Optional Okta OIDC authentication (off by default via `authSettings.allowAuthentication`). Contract in `src/main`, Okta SDK only in `src/enabled`. See `docs/AUTHENTICATION.md`. |
 | `vonage-android-logger/` | Logging pipeline with interceptor model |
 | `vonage-audio-selector/` | Audio output selector (Bluetooth, wired, earpiece, speaker) |
-| `build-tools/` | Custom Gradle plugins: `com.vonage.json-config`, `com.vonage.theme-generator`, detekt/kover/sonar wiring |
+| `build-tools/` | Custom Gradle plugins: `com.vonage.json-config`, `com.vonage.theme-generator`, `com.vonage.android-api-validation`, detekt/kover/sonar wiring |
+| `baselineprofile/` | `com.android.test` module that generates the app's Baseline Profile (`BaselineProfileGenerator`) and benchmarks startup (`StartupBenchmarks`). Output is committed in `app/src/release/generated/baselineProfiles/`. |
 
 ## Config-Driven Behavior (Critical)
 
@@ -88,14 +89,20 @@
 ./gradlew detekt
 
 # Binary API compatibility check (runs in CI)
-./gradlew apiCheck
+./gradlew vonage-android-logger:androidApiCheck vonage-audio-selector:androidApiCheck
+
+# Regenerate the Baseline Profile on a Gradle Managed Device (commit the result)
+./gradlew :app:generateBaselineProfile
+
+# Startup benchmark, with vs. without the profile (physical device)
+./gradlew :baselineprofile:connectedBenchmarkReleaseAndroidTest
 ```
 
 ## Binary API Compatibility
 
-- `vonage-audio-selector` and `vonage-android-logger` use the `binary-compatibility-validator` plugin with committed `.api` dump files.
-- After changing the public API surface of either module, run `./gradlew apiDump` and commit the updated `.api` files alongside the code change.
-- `./gradlew apiCheck` runs as a separate CI job and fails the build if the `.api` files are out of sync.
+- `vonage-audio-selector` and `vonage-android-logger` apply `com.vonage.android-api-validation` (in `build-tools/`), which runs `binary-compatibility-validator` (version in `libs.versions.toml`) against the release classes, with committed `.api` dump files. The stock BCV `apiCheck`/`apiDump` tasks are not registered under AGP 9 built-in Kotlin ([BCV#312](https://github.com/Kotlin/binary-compatibility-validator/issues/312)).
+- After changing the public API surface of either module, run `./gradlew <module>:androidApiDump` and commit the updated `.api` files alongside the code change.
+- `./gradlew <module>:androidApiCheck` runs as a separate CI job and fails the build if the `.api` files are out of sync.
 
 ## Snapshot Tests (vonage-video-ui-compose)
 

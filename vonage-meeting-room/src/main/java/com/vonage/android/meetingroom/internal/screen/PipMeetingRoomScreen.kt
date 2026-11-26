@@ -76,10 +76,11 @@ internal fun PipMeetingRoomScreen(
         }
 
         uiState.isEndCall -> {
-            LaunchedEffect(uiState) {
+            val activity = LocalContext.current.findActivity()
+            LaunchedEffect(Unit) {
                 actions.onEndCall()
+                activity.finish()
             }
-            LocalContext.current.findActivity().finish()
         }
     }
 }

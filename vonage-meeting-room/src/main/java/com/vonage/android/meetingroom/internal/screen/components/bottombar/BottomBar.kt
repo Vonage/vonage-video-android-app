@@ -4,6 +4,7 @@ package com.vonage.android.meetingroom.internal.screen.components.bottombar
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,13 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -98,15 +97,8 @@ internal fun BottomBar(
     val spacingWidth = with(density) { VonageVideoTheme.dimens.spaceSmall.toPx() }
     val containerSpacing = with(density) { VonageVideoTheme.dimens.spaceXLarge.toPx() }
 
-    var availableWidth by remember { mutableIntStateOf(0) }
     val pinnedActionsWidth =
         DEFAULT_ACTIONS_COUNT * actionWidth + (DEFAULT_ACTIONS_COUNT - 1) * spacingWidth
-    val availableWidthForActions by remember(availableWidth) {
-        derivedStateOf { (availableWidth - pinnedActionsWidth - containerSpacing).coerceAtLeast(0F) }
-    }
-    val actionsVisibleCount by remember(availableWidthForActions) {
-        derivedStateOf { (availableWidthForActions / (actionWidth + spacingWidth)).toInt() }
-    }
 
     val bottomBarActions = actionsFactory(
         actions = actions,
@@ -153,55 +145,61 @@ internal fun BottomBar(
     val allActions = remember(bottomBarActions, additionalActions, reportingAction) {
         (bottomBarActions + additionalActions + listOfNotNull(reportingAction)).toImmutableList()
     }
-    val visibleActions = allActions.take(actionsVisibleCount)
-    val overflowActions = allActions.drop(actionsVisibleCount)
-    val hasMoreActions = overflowActions.isNotEmpty() ||
-        MeetingRoomFeature.REACTIONS in state.enabledFeatures
-
-    Row(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
-            .safeContentPadding()
-            .onSizeChanged { size -> availableWidth = size.width },
-        horizontalArrangement = Arrangement.Center,
+            .safeContentPadding(),
     ) {
-        CallControlBar(
-            publisher = state.publisher,
-            roomActions = roomActions,
-            allowMicrophoneControl = state.allowMicrophoneControl,
-            allowCameraControl = state.allowCameraControl,
-            allowMoreActions = hasMoreActions,
-            onShowMore = { showMoreActions = !showMoreActions },
+        val availableWidthForActions =
+            (constraints.maxWidth - pinnedActionsWidth - containerSpacing).coerceAtLeast(0F)
+        val actionsVisibleCount = (availableWidthForActions / (actionWidth + spacingWidth)).toInt()
+        val visibleActions = allActions.take(actionsVisibleCount)
+        val overflowActions = allActions.drop(actionsVisibleCount)
+        val hasMoreActions = overflowActions.isNotEmpty() ||
+            MeetingRoomFeature.REACTIONS in state.enabledFeatures
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
         ) {
-            visibleActions.forEach { action ->
-                ControlButton(
-                    modifier = if (action.type == BottomBarActionType.PARTICIPANTS) {
-                        Modifier.testTag(BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BUTTON)
-                    } else {
-                        Modifier
-                    },
-                    icon = action.icon,
-                    onClick = action.onClick,
-                    badgeCount = action.badgeCount,
-                    isActive = action.isSelected,
-                )
+            CallControlBar(
+                publisher = state.publisher,
+                roomActions = roomActions,
+                allowMicrophoneControl = state.allowMicrophoneControl,
+                allowCameraControl = state.allowCameraControl,
+                allowMoreActions = hasMoreActions,
+                onShowMore = { showMoreActions = !showMoreActions },
+            ) {
+                visibleActions.forEach { action ->
+                    ControlButton(
+                        modifier = if (action.type == BottomBarActionType.PARTICIPANTS) {
+                            Modifier.testTag(BottomBarTestTags.BOTTOM_BAR_PARTICIPANTS_BUTTON)
+                        } else {
+                            Modifier
+                        },
+                        icon = action.icon,
+                        onClick = action.onClick,
+                        badgeCount = action.badgeCount,
+                        isActive = action.isSelected,
+                    )
+                }
             }
         }
-    }
 
-    if (showMoreActions) {
-        ModalBottomSheet(
-            onDismissRequest = { showMoreActions = false },
-            sheetState = moreActionsSheetState,
-        ) {
-            if (MeetingRoomFeature.REACTIONS in state.enabledFeatures) {
-                EmojiSelector(
-                    onEmojiClick = { emoji -> roomActions.onEmojiSent(emoji) },
+        if (showMoreActions) {
+            ModalBottomSheet(
+                onDismissRequest = { showMoreActions = false },
+                sheetState = moreActionsSheetState,
+            ) {
+                if (MeetingRoomFeature.REACTIONS in state.enabledFeatures) {
+                    EmojiSelector(
+                        onEmojiClick = { emoji -> roomActions.onEmojiSent(emoji) },
+                    )
+                }
+                MoreActionsGrid(
+                    actions = overflowActions.toImmutableList(),
                 )
             }
-            MoreActionsGrid(
-                actions = overflowActions.toImmutableList(),
-            )
         }
     }
 
@@ -230,7 +228,8 @@ private fun actionsFactory(
     onShowChat: () -> Unit,
 ): ImmutableList<BottomBarAction> {
     val participantsCount by call.participantsCount.collectAsStateWithLifecycle()
-    val chatState by call.chatSignalState.collectAsStateWithLifecycle()
+    val chatState = call.chatSignalState.collectAsStateWithLifecycle()
+    val unreadCount by remember { derivedStateOf { chatState.value?.unreadCount ?: 0 } }
 
     return actions.mapNotNull { type ->
         when (type) {
@@ -249,7 +248,7 @@ private fun actionsFactory(
             BottomBarActionType.CHAT -> chatAction(
                 label = stringResource(R.string.chat),
                 isSelected = state.isChatShow,
-                badgeCount = chatState?.unreadCount ?: 0,
+                badgeCount = unreadCount,
                 onShowChat = onShowChat,
             )
 

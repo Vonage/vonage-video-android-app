@@ -8,9 +8,12 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.vonage.android.compose.theme.VonageVideoTheme
 import com.vonage.android.compose.vivid.icons.VividIcons
@@ -37,14 +40,15 @@ fun JumpToBottom(
         targetState = if (enabled) Visibility.VISIBLE else Visibility.GONE,
         label = "JumpToBottom visibility animation",
     )
-    val bottomOffset by transition.animateDp(label = "JumpToBottom offset animation") {
+    val bottomOffset = transition.animateDp(label = "JumpToBottom offset animation") {
         if (it == Visibility.GONE) {
             (-BOTTOM_OFFSET).dp
         } else {
             BOTTOM_OFFSET.dp
         }
     }
-    if (bottomOffset > 0.dp) {
+    val isVisible by remember { derivedStateOf { bottomOffset.value > 0.dp } }
+    if (isVisible) {
         ExtendedFloatingActionButton(
             icon = {
                 Icon(
@@ -60,7 +64,7 @@ fun JumpToBottom(
             containerColor = VonageVideoTheme.colors.primary,
             contentColor = VonageVideoTheme.colors.textSecondary,
             modifier = modifier
-                .offset(x = 0.dp, y = -bottomOffset)
+                .offset { IntOffset(x = 0, y = -bottomOffset.value.roundToPx()) }
                 .height(36.dp),
         )
     }
