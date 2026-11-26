@@ -1,0 +1,26 @@
+docs/SCREEN_SHARING_VALIDATION.md
+  h_25498f8d57a266 12,31-34,43-45,49
+vonage-feature-screensharing/src/enabled/java/com/vonage/android/screensharing/EnabledScreenSharing.kt
+  h_25498f8d57a266 120
+vonage-feature-screensharing/src/enabled/java/com/vonage/android/screensharing/service/ScreenSharingOverlayService.kt
+  h_25498f8d57a266 10,13,35-37,45-58,61
+vonage-feature-screensharing/src/enabled/java/com/vonage/android/screensharing/service/ScreenSharingService.kt
+  h_25498f8d57a266 14,52-54
+vonage-feature-screensharing/src/enabled/res/drawable/ic_screen_sharing_notification.xml
+  h_25498f8d57a266 1-11
+vonage-feature-screensharing/src/enabled/res/values/strings.xml
+  h_25498f8d57a266 1-9
+vonage-video-core/src/main/java/com/vonage/android/kotlin/internal/VeraPublisherHolder.kt
+  h_25498f8d57a266 6-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8cb4e471b11f375fb8975c84e9fba60f25783678",
+  "prompts": {},
+  "humans": {
+    "h_25498f8d57a266": {
+      "author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
