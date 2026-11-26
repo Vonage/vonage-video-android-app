@@ -20,10 +20,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.isActive
@@ -111,32 +113,43 @@ data class ParticipantState(
     }
 
     /**
-     * Applies [SubscriberVideoQualityPolicy] whenever the rendered size settles.
+     * Applies [SubscriberVideoQualityPolicy] whenever the rendered size or the source aspect
+     * ratio settles. The source size comes from video stats, which usually arrive after the
+     * first layout, and changes when the remote device rotates.
      * The subscriber starts with no preference (full quality) until the first size arrives.
      */
     @OptIn(FlowPreview::class)
     private suspend fun observeRenderedSize() {
-        renderedSize
-            .filterNotNull()
+        combine(renderedSize.filterNotNull(), sourceSize()) { rendered, source -> rendered to source }
             .debounce(SubscriberVideoQualityPolicy.SETTLE_MILLIS)
-            .collect { (width, height) ->
-                val stats = _videoStats.value
+            .collect { (rendered, source) ->
+                val (width, height) = rendered
                 val tier = SubscriberVideoQualityPolicy.tierFor(
                     viewWidth = width,
                     viewHeight = height,
-                    sourceWidth = stats?.width ?: 0,
-                    sourceHeight = stats?.height ?: 0,
+                    sourceWidth = source?.first ?: 0,
+                    sourceHeight = source?.second ?: 0,
                     isScreenShare = isScreenShare,
                     current = _videoTier.value,
                 )
                 if (tier == _videoTier.value) return@collect
-                val sourceIsPortrait = stats != null && stats.height > stats.width
+                val sourceIsPortrait = source != null && source.second > source.first
                 vonageSubscriber.setPreferredResolution(tier.preferredResolution(sourceIsPortrait))
                 vonageSubscriber.setPreferredFrameRate(tier.frameRate)
                 _videoTier.value = tier
                 vonageLogger.d(logTag, "Video tier=$tier rendered=${width}x$height")
             }
     }
+
+    /**
+     * Received video size, `null` while unknown. Only aspect-ratio changes are emitted:
+     * every layer switch changes the received size, and reacting to that would re-evaluate
+     * the tier on each switch.
+     */
+    private fun sourceSize(): Flow<Pair<Int, Int>?> =
+        _videoStats
+            .map { stats -> stats?.takeIf { it.width > 0 && it.height > 0 }?.let { it.width to it.height } }
+            .distinctUntilChanged { old, new -> old?.aspectKey() == new?.aspectKey() }
 
     /**
      * Updates camera and microphone state from a session-level stream-property change.
@@ -258,6 +271,11 @@ data class ParticipantState(
 }
 
 // region Extension helpers
+
+private const val ASPECT_KEY_SCALE = 100
+
+/** Aspect ratio rounded to two decimals, equal for every simulcast layer of one source. */
+private fun Pair<Int, Int>.aspectKey(): Int = first * ASPECT_KEY_SCALE / second
 
 private const val DEBOUNCE_SUBSCRIBER_AUDIO_LEVEL_MILLIS = 100L
 

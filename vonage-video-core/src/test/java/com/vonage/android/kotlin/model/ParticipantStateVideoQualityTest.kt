@@ -5,10 +5,13 @@ import com.vonage.android.kotlin.internal.SubscriberVideoTier
 import com.vonage.android.kotlin.sdk.VonageConnection
 import com.vonage.android.kotlin.sdk.VonageStream
 import com.vonage.android.kotlin.sdk.VonageSubscriber
+import com.vonage.android.kotlin.sdk.VonageSubscriberVideoStatsEntry
+import com.vonage.android.kotlin.sdk.VonageSubscriberVideoStatsListener
 import com.vonage.android.kotlin.sdk.VonageVideoSize
 import com.vonage.android.kotlin.sdk.VonageVideoType
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -86,6 +89,57 @@ class ParticipantStateVideoQualityTest {
         verify(exactly = 0) { subscriber.setPreferredResolution(any()) }
     }
 
+    @Test
+    fun `given_portraitStatsArriveAfterLayout_THEN_tierReevaluatedWithPortraitLayer`() = runTest {
+        val (subscriber, state) = startState()
+        // Assumed 16:9 in a 300x600 view: fitted short edge 169 px -> THUMBNAIL.
+        state.onRenderedSizeChanged(300, 600)
+        advanceTimeBy(settle + 1)
+        assertEquals(SubscriberVideoTier.THUMBNAIL, state.videoTier.value)
+
+        // Real 9:16 source fills the view: fitted short edge 300 px -> MEDIUM.
+        emitStats(width = 360, height = 640)
+        advanceTimeBy(settle + 1)
+
+        verify { subscriber.setPreferredResolution(VonageVideoSize(360, 640)) }
+        assertEquals(SubscriberVideoTier.MEDIUM, state.videoTier.value)
+    }
+
+    @Test
+    fun `given_layerSwitchWithSameAspect_THEN_tierNotReevaluated`() = runTest {
+        val (subscriber, state) = startState()
+        emitStats(width = 1280, height = 720)
+        state.onRenderedSizeChanged(320, 180)
+        advanceTimeBy(settle + 1)
+
+        emitStats(width = 320, height = 180)
+        advanceTimeBy(settle + 1)
+
+        verify(exactly = 1) { subscriber.setPreferredResolution(any()) }
+        assertEquals(SubscriberVideoTier.THUMBNAIL, state.videoTier.value)
+    }
+
+    private var statsListener: VonageSubscriberVideoStatsListener? = null
+
+    private fun TestScope.emitStats(width: Int, height: Int) {
+        statsListener!!.onVideoStats(
+            VonageSubscriberVideoStatsEntry(
+                videoPacketsReceived = 0,
+                videoPacketsLost = 0,
+                videoBytesReceived = 0,
+                width = width,
+                height = height,
+                codec = "VP8",
+                decodedFrameRate = 30.0,
+                bitrate = 0L,
+                freezeCount = 0L,
+                totalFreezesDuration = 0L,
+                estimatedBandwidthInBps = null,
+            ),
+        )
+        runCurrent()
+    }
+
     private fun TestScope.startState(
         videoType: VonageVideoType = VonageVideoType.CAMERA,
     ): Pair<VonageSubscriber, ParticipantState> {
@@ -100,6 +154,8 @@ class ParticipantStateVideoQualityTest {
         )
         val subscriber = mockk<VonageSubscriber>(relaxed = true) {
             every { this@mockk.stream } returns stream
+            val listener = slot<VonageSubscriberVideoStatsListener>()
+            every { setVideoStatsListener(capture(listener)) } answers { statsListener = listener.captured }
         }
         val state = ParticipantState(vonageSubscriber = subscriber)
         backgroundScope.launch { state.setup() }
