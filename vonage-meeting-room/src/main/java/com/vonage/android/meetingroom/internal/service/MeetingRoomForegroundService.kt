@@ -5,8 +5,10 @@ import android.app.Notification
 import android.app.Notification.CallStyle
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.app.Person
 import android.app.Service
+import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
@@ -16,8 +18,10 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.IntentCompat
 import com.vonage.android.meetingroom.R
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler.Companion.HANG_UP_ACTION
+import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler.Companion.HOST_ACTIVITY_INTENT_EXTRA_NAME
 import com.vonage.android.meetingroom.internal.service.MeetingRoomForegroundServiceHandler.Companion.ROOM_INTENT_EXTRA_NAME
 import com.vonage.logger.vonageLogger
 
@@ -46,7 +50,12 @@ internal class MeetingRoomForegroundService : Service() {
         }
 
         val roomName = intent.extras?.getString(ROOM_INTENT_EXTRA_NAME).orEmpty()
-        val notification = buildInCallNotification(roomName)
+        val hostActivity = IntentCompat.getParcelableExtra(
+            intent,
+            HOST_ACTIVITY_INTENT_EXTRA_NAME,
+            ComponentName::class.java,
+        )
+        val notification = buildInCallNotification(roomName, returnToCallIntent(hostActivity))
 
         ServiceCompat.startForeground(
             this,
@@ -60,7 +69,28 @@ internal class MeetingRoomForegroundService : Service() {
     private fun hasPermission(name: String): Boolean =
         ContextCompat.checkSelfPermission(this, name) == PackageManager.PERMISSION_GRANTED
 
-    private fun buildInCallNotification(roomName: String): Notification =
+    /**
+     * Brings the Activity showing the call back to the front, reusing its existing instance so the
+     * call screen is not recreated (and expanding it if it is in picture-in-picture).
+     */
+    private fun returnToCallIntent(hostActivity: ComponentName?): PendingIntent? =
+        hostActivity?.let { component ->
+            val intent = Intent()
+                .setComponent(component)
+                .addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP,
+                )
+            PendingIntent.getActivity(
+                this,
+                RETURN_TO_CALL_REQUEST_CODE,
+                intent,
+                FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT,
+            )
+        }
+
+    private fun buildInCallNotification(roomName: String, contentIntent: PendingIntent?): Notification =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val caller = Person.Builder()
                 .setName(roomName)
@@ -76,12 +106,14 @@ internal class MeetingRoomForegroundService : Service() {
             Notification.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_vonage_meeting_room)
                 .setStyle(CallStyle.forOngoingCall(caller, hangupPendingIntent))
+                .setContentIntent(contentIntent)
                 .setOngoing(true)
                 .setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_DEFAULT)
                 .build()
         } else {
             NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_vonage_meeting_room)
+                .setContentIntent(contentIntent)
                 .setOngoing(true)
                 .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_DEFAULT)
                 .build()
@@ -91,6 +123,7 @@ internal class MeetingRoomForegroundService : Service() {
         const val CHANNEL_ID = "VonageMeetingRoomChannel"
         const val FOREGROUND_SERVICE_NOTIFICATION_ID = 1
         const val FOREGROUND_SERVICE_REQUEST_CODE = 999
+        const val RETURN_TO_CALL_REQUEST_CODE = 998
         const val TAG: String = "MeetingRoomForegroundService"
     }
 }

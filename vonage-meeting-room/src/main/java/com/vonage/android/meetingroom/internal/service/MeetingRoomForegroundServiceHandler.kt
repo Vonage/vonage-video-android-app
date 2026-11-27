@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -41,9 +42,13 @@ internal class MeetingRoomForegroundServiceHandler(
         }
     }
 
-    fun startForegroundService(roomName: String) {
+    /**
+     * @param hostActivity the Activity showing the call; tapping the notification brings it back.
+     */
+    fun startForegroundService(roomName: String, hostActivity: ComponentName? = null) {
         val serviceIntent = Intent(context, MeetingRoomForegroundService::class.java).apply {
             putExtra(ROOM_INTENT_EXTRA_NAME, roomName)
+            hostActivity?.let { putExtra(HOST_ACTIVITY_INTENT_EXTRA_NAME, it) }
         }
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -77,6 +82,7 @@ internal class MeetingRoomForegroundServiceHandler(
     companion object {
         const val CHANNEL_ID = "VonageMeetingRoomChannel"
         const val ROOM_INTENT_EXTRA_NAME = "room"
+        const val HOST_ACTIVITY_INTENT_EXTRA_NAME = "hostActivity"
         const val HANG_UP_ACTION = "com.vonage.android.meetingroom.HANG_UP"
     }
 }

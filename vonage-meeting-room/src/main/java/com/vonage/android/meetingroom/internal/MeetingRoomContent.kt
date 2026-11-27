@@ -26,6 +26,7 @@ import com.vonage.android.meetingroom.internal.permissions.computeRequiredPermis
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomActions
 import com.vonage.android.meetingroom.internal.screen.MeetingRoomScreen
 import com.vonage.android.meetingroom.internal.screen.PipMeetingRoomScreen
+import com.vonage.android.compose.util.pip.findActivity
 import com.vonage.android.compose.util.pip.pipEffect
 import com.vonage.android.compose.util.pip.rememberIsInPipMode
 import com.vonage.android.meetingroom.internal.viewmodel.MeetingRoomViewModel
@@ -78,6 +79,7 @@ private fun MeetingRoomContentInner(
         factory = MeetingRoomViewModelFactory(
             applicationContext = context.applicationContext,
             prebuilt = prebuilt,
+            hostActivity = context.findActivity().componentName,
         ),
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
