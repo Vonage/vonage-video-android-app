@@ -1,0 +1,21 @@
+app/src/test/java/com/vonage/android/screen/waiting/WaitingRoomViewModelTest.kt
+  s_581b30246c18e3::t_a2834b699199a3 386-387
+  s_581b30246c18e3::t_e90b991630a4cf 384-385
+  s_581b30246c18e3::t_dcd6d831bee06b 388-390
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "141959ffc094c89e615df01a7abc0884cdd007b1",
+  "prompts": {},
+  "sessions": {
+    "s_581b30246c18e3": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_0ab7ee5b-47d1-4b54-b8f4-0d24a9b6c279",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
