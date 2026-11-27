@@ -80,6 +80,8 @@ dependencies {
 
     // Networking
     implementation(project(":vonage-vera-api-client"))
+    // MeetingRoomBuilder.addInterceptor exposes OkHttp's Interceptor in the public API.
+    api(libs.okhttp)
 
     // AndroidX / Compose
     implementation(libs.androidx.core.ktx)

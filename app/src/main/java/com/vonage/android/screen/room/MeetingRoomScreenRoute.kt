@@ -5,6 +5,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.vonage.android.BuildConfig
 import com.vonage.android.config.Config
+import com.vonage.android.di.E2eInterceptorsEntryPoint
 import com.vonage.android.di.SessionKeyHolderEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import com.vonage.android.meetingroom.api.MeetingRoomAuthTokenProvider
@@ -47,6 +48,10 @@ fun MeetingRoomScreenRoute(
     val sessionKeyHolder = remember(appContext) {
         EntryPointAccessors.fromApplication(appContext, SessionKeyHolderEntryPoint::class.java).sessionKeyHolder()
     }
+    val e2eExpiredSessionKeyInterceptor = remember(appContext) {
+        EntryPointAccessors.fromApplication(appContext, E2eInterceptorsEntryPoint::class.java)
+            .e2eExpiredSessionKeyInterceptor()
+    }
     val prebuilt = remember(roomName, initialPublisherSettings, config) {
         MeetingRoomBuilder(
             baseUrl = BuildConfig.BASE_API_URL,
@@ -57,6 +62,8 @@ fun MeetingRoomScreenRoute(
             .callSettingsHolder(callSettingsHolder)
             .sessionKeyHolder(sessionKeyHolder)
             .authTokenProvider(authTokenProvider)
+            // No-op unless an E2E flow enables it.
+            .addInterceptor(e2eExpiredSessionKeyInterceptor)
             .configuration(
                 MeetingRoomConfiguration(
                     allowCameraControl = config.allowCameraControl,

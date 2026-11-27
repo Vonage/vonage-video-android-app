@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.vonage.android.meetingroom.internal.permissions.DefaultPermissionContent
 import com.vonage.android.settings.CallSettingsHolder
 import kotlinx.coroutines.flow.StateFlow
+import okhttp3.Interceptor
 
 /**
  * Fluent builder for the meeting room SDK.
@@ -57,6 +58,7 @@ class MeetingRoomBuilder(
     private var customBottomBar: (@Composable (MeetingRoomBottomBarState, MeetingRoomCustomActions) -> Unit)? = null
     private var authTokenProvider: MeetingRoomAuthTokenProvider? = null
     private var sessionKeyHolder: SessionKeyHolder? = null
+    private val interceptors = mutableListOf<Interceptor>()
 
     /**
      * Defines which optional features are active at runtime.
@@ -254,6 +256,14 @@ class MeetingRoomBuilder(
     }
 
     /**
+     * Adds an OkHttp interceptor to the SDK's backend client (session fetch, archiving, captions).
+     * It runs after the user agent and authorization interceptors, in the order added.
+     */
+    fun addInterceptor(interceptor: Interceptor): MeetingRoomBuilder = apply {
+        interceptors += interceptor
+    }
+
+    /**
      * Constructs the [MeetingRoomPrebuilt] with the current configuration.
      *
      * Call [MeetingRoomPrebuilt.launch] or embed [MeetingRoomPrebuilt.content] to display the
@@ -279,5 +289,6 @@ class MeetingRoomBuilder(
         customBottomBar = customBottomBar,
         authTokenProvider = authTokenProvider,
         sessionKeyHolder = sessionKeyHolder,
+        interceptors = interceptors.toList(),
     )
 }

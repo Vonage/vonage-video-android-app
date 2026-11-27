@@ -37,3 +37,9 @@ data class SessionInfo(
 
 /** The backend rejected the session request with `401 Unauthorized`: the user must sign in. */
 class SessionUnauthorizedException : Exception("Authentication required to get the session")
+
+/**
+ * The session key returned by `createSession` has expired (`exp` or `schedule.endsAtMs` in the
+ * past), so `joinSession` is not called.
+ */
+class SessionKeyExpiredException : Exception("Session key has expired")

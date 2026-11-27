@@ -9,13 +9,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vonage.android.chat.ui.ChatBadgeButton
-import com.vonage.android.compose.components.BasicAlertDialog
 import com.vonage.android.compose.components.GenericLoading
-import com.vonage.android.meetingroom.R
 import com.vonage.android.meetingroom.internal.screen.components.ParticipantVideoCard
 import com.vonage.android.compose.util.pip.findActivity
 
@@ -61,19 +58,7 @@ internal fun PipMeetingRoomScreen(
 
         uiState.isLoading -> GenericLoading()
 
-        uiState.isError -> {
-            val message = if (uiState.errorMessage?.isNotBlank() == true) {
-                uiState.errorMessage
-            } else {
-                stringResource(R.string.meeting_screen_session_creation_error)
-            }
-            BasicAlertDialog(
-                text = message,
-                acceptLabel = stringResource(R.string.generic_retry),
-                onAccept = actions.onRetry,
-                onCancel = actions.onBack,
-            )
-        }
+        uiState.isError -> SessionErrorDialog(uiState = uiState, actions = actions)
 
         uiState.isEndCall -> {
             val activity = LocalContext.current.findActivity()

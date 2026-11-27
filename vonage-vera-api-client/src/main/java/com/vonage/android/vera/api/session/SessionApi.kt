@@ -12,19 +12,26 @@ interface SessionApi {
      * `createSession` (reuses the room's live session) followed by `joinSession` (issues the token).
      *
      * A `401` response from either call fails with [SessionUnauthorizedException] so callers
-     * can ask the user to sign in.
+     * can ask the user to sign in. A session key whose expiration (`exp`, or `schedule.endsAtMs`
+     * for scheduled meetings) has already passed fails with [SessionKeyExpiredException] without
+     * calling `joinSession`; a key without either claim is accepted.
      */
     suspend fun getSession(roomName: String): Result<SessionInfo>
 }
 
 internal class DefaultSessionApi(
     private val service: SessionService,
+    private val currentTimeMillis: () -> Long = System::currentTimeMillis,
 ) : SessionApi {
 
     override suspend fun getSession(roomName: String): Result<SessionInfo> {
         val session = execute(CREATE_FAILED, emptyMessage = CREATE_FAILED) {
             service.createSession(CreateSessionRequest(roomName))
         }.map { it.result.data }.mapUnauthorized().getOrElse { return Result.failure(it) }
+
+        if (SessionKeyParser.isExpired(session.sessionKey, currentTimeMillis())) {
+            return Result.failure(SessionKeyExpiredException())
+        }
 
         return execute(JOIN_FAILED, emptyMessage = JOIN_FAILED) {
             service.joinSession(SessionKeyRequest(session.sessionKey))

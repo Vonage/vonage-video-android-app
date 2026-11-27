@@ -27,6 +27,10 @@ Some features use product flavors with `enabled`/`disabled` variants (for exampl
 
 For a deep dive into the full configuration plugin system (JSON schema, generated constants, multi-config setups, and troubleshooting), see [CONFIG-SYSTEM.md](CONFIG-SYSTEM.md).
 
+> **Prefer a form editor?** Two editors write to the same files and run the regeneration task for you:
+> - The config TUI in [`tools/config-tui-py`](../tools/config-tui-py/README.md) edits `app-config.json` and `theme.json`, validates them against the shared cross-platform schemas, and regenerates after each save.
+> - The Android Studio plugin in [`vonage-config-idea-plugin`](../vonage-config-idea-plugin/README.md) shows `app-config.json` in a **Vonage** tool window and runs `./gradlew clean generateVonageConfig` when the file changes. It only previews `theme.json`, so theme changes still need `./gradlew updateTheme`.
+
 ### Field reference
 
 `app-config.json` follows a **shared cross-platform schema** that is also used by the React app, so
@@ -76,12 +80,12 @@ The app's visual theme is driven by `theme.json`. Edit this file with your desir
 vim theme.json
 
 # Regenerate theme resources
-./gradlew generateVonageConfig
+./gradlew updateTheme
 ```
 
-The `ThemeGeneratorPlugin` Gradle plugin reads `theme.json` at build time and generates the necessary theme resources into `vonage-video-ui-compose/src/main/java/com/vonage/android/compose/theme/`.
+The `ThemeGeneratorPlugin` Gradle plugin reads `theme.json` and generates the theme sources into `vonage-video-ui-compose/src/main/java/com/vonage/android/compose/theme/`. It does **not** run as part of a normal build or `generateVonageConfig`; run `updateTheme` after every `theme.json` change and commit the regenerated files.
 
-> Do **not** edit the generated theme files directly — they are overwritten on every build.
+> Do **not** edit the generated theme files directly — they are overwritten every time `updateTheme` runs.
 
 ## Base API URL
 
@@ -92,3 +96,12 @@ The backend URL can be set in three ways (evaluated in priority order):
 3. Direct placeholder replacement in `app-config.json`
 
 See [GETTING_STARTED.md](GETTING_STARTED.md) for full setup instructions.
+
+## Updating the Vonage Video SDK Version
+
+The SDK version is declared once, as `opentokAndroidSdk` in `gradle/libs.versions.toml`. Both `com.vonage:client-sdk-video` and `com.vonage:client-sdk-video-transformers` reference it, so the two always stay on the same version. Do not pin the SDK version anywhere else.
+
+1. Edit `opentokAndroidSdk` in `gradle/libs.versions.toml`.
+2. Sync Gradle and run `./gradlew test` to confirm the project builds and tests pass.
+
+The app uses the latest available Vonage Video SDK, currently **2.36.0**. Keep it on the latest release when updating.
