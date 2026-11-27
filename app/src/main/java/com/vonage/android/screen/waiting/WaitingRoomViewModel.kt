@@ -218,6 +218,9 @@ class WaitingRoomViewModel @AssistedInject constructor(
         currentPublisher()?.clean()
         callSettingsHolder.clearCall()
         videoClient.destroyPublisher()
+        // The meeting room has its own selector. Release this one so it does not get audio focus
+        // back (and re-route audio) when the call abandons focus.
+        audioDevicesHandler.stop()
     }
 
     /**
