@@ -40,6 +40,7 @@ navigationCompose = "2.10.2"
 navigationRuntimeAndroid = "2.10.2"
 okhttp = "5.5.1"
 oktaMobileKotlin = "3.2.0"
+# When bumping, also update the SDK version stated in README.md and docs/CONFIGURATION.md.
 opentokAndroidSdk = "2.36.0"
 profileinstaller = "1.4.1"
 retrofit = "3.0.0"

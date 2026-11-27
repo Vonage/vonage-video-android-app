@@ -1,7 +1,7 @@
 [project]
 name = "vonage-config-tui"
 version = "1.0.0"
-description = "TUI editor for Vonage Video app-config.json and theme.json (Python port of tools/config-tui)"
+description = "TUI editor for Vonage Video app-config.json and theme.json"
 requires-python = ">=3.10"
 dependencies = [
   "textual>=0.79",
