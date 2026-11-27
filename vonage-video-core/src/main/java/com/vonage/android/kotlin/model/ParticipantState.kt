@@ -7,10 +7,14 @@ import com.vonage.android.kotlin.sdk.VonageStream
 import com.vonage.android.kotlin.sdk.VonageSubscriber
 import com.vonage.android.kotlin.sdk.VonageSubscriberStreamListener
 import com.vonage.android.kotlin.sdk.VonageSubscriberVideoListener
+import com.vonage.android.kotlin.sdk.VonageVideoSize
 import com.vonage.android.kotlin.sdk.VonageVideoType
 import com.vonage.android.kotlin.ext.mapTalking
 import com.vonage.android.kotlin.ext.movingAverage
+import com.vonage.android.kotlin.internal.SubscriberVideoQualityPolicy
+import com.vonage.android.kotlin.internal.SubscriberVideoTier
 import com.vonage.logger.vonageLogger
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
@@ -18,12 +22,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Represents a remote participant (subscriber) in the video call.
@@ -93,6 +102,66 @@ data class ParticipantState(
     override fun reinitializeRenderer() {
         vonageSubscriber.reinitializeRenderer()
     }
+
+    /** Latest rendered view size in px, `null` until the view is first laid out. */
+    private val renderedSize = MutableStateFlow<Pair<Int, Int>?>(null)
+
+    private val _videoTier = MutableStateFlow(SubscriberVideoTier.FULL)
+
+    /** Receive-side quality tier currently requested for this stream. */
+    internal val videoTier: StateFlow<SubscriberVideoTier> = _videoTier
+
+    /** Resolution last sent to the SDK, `null` while no preference is set. */
+    private var appliedResolution: VonageVideoSize? = null
+
+    override fun onRenderedSizeChanged(width: Int, height: Int) {
+        if (width > 0 && height > 0) renderedSize.value = width to height
+    }
+
+    /**
+     * Applies [SubscriberVideoQualityPolicy] whenever the rendered size or the source aspect
+     * ratio settles. The source size comes from video stats, which usually arrive after the
+     * first layout, and changes when the remote device rotates.
+     * The subscriber starts with no preference (full quality) until the first size arrives.
+     */
+    @OptIn(FlowPreview::class)
+    private suspend fun observeRenderedSize() {
+        combine(renderedSize.filterNotNull(), sourceSize()) { rendered, source -> rendered to source }
+            .debounce(SubscriberVideoQualityPolicy.SETTLE_MILLIS)
+            .collect { (rendered, source) ->
+                val (width, height) = rendered
+                val tier = SubscriberVideoQualityPolicy.tierFor(
+                    viewWidth = width,
+                    viewHeight = height,
+                    sourceWidth = source?.first ?: 0,
+                    sourceHeight = source?.second ?: 0,
+                    isScreenShare = isScreenShare,
+                    current = _videoTier.value,
+                )
+                val sourceIsPortrait = source != null && source.second > source.first
+                val resolution = tier.preferredResolution(sourceIsPortrait)
+                // A rotation can keep the tier but flip the requested layer's orientation.
+                if (tier == _videoTier.value && resolution == appliedResolution) return@collect
+                // SDK setters stay on the main thread, like subscriber creation in Call.
+                withContext(Dispatchers.Main) {
+                    vonageSubscriber.setPreferredResolution(resolution)
+                    vonageSubscriber.setPreferredFrameRate(tier.frameRate)
+                }
+                appliedResolution = resolution
+                _videoTier.value = tier
+                vonageLogger.d(logTag, "Video tier=$tier rendered=${width}x$height")
+            }
+    }
+
+    /**
+     * Received video size, `null` while unknown. Only aspect-ratio changes are emitted:
+     * every layer switch changes the received size, and reacting to that would re-evaluate
+     * the tier on each switch.
+     */
+    private fun sourceSize(): Flow<Pair<Int, Int>?> =
+        _videoStats
+            .map { stats -> stats?.takeIf { it.width > 0 && it.height > 0 }?.let { it.width to it.height } }
+            .distinctUntilChanged { old, new -> old?.aspectKey() == new?.aspectKey() }
 
     /**
      * Updates camera and microphone state from a session-level stream-property change.
@@ -165,6 +234,7 @@ data class ParticipantState(
                 observeNetworkCondition(vonageSubscriber::setNetworkConditionListener)
                     .collect { _networkCondition.value = it }
             }
+            launch { observeRenderedSize() }
             vonageSubscriber.observeAudioLevel()
                 .movingAverage(windowSize = 5)
                 .distinctUntilChanged()
@@ -213,6 +283,11 @@ data class ParticipantState(
 }
 
 // region Extension helpers
+
+private const val ASPECT_KEY_SCALE = 100
+
+/** Aspect ratio rounded to two decimals, equal for every simulcast layer of one source. */
+private fun Pair<Int, Int>.aspectKey(): Int = first * ASPECT_KEY_SCALE / second
 
 private const val DEBOUNCE_SUBSCRIBER_AUDIO_LEVEL_MILLIS = 100L
 

@@ -33,7 +33,22 @@ interface VonageSubscriber {
      * @throws IllegalArgumentException if the SDK does not support [languageCode].
      */
     fun setCaptionsTranslationLanguage(languageCode: String?)
+
+    /**
+     * Asks the media router to forward the simulcast layer closest to [size], or the
+     * highest layer when `null`. Only effective in routed sessions with simulcast publishers.
+     */
+    fun setPreferredResolution(size: VonageVideoSize?)
+
+    /**
+     * Asks the media router to forward at most [fps] frames per second, or the
+     * publisher's full frame rate when `null`. Only effective in routed sessions.
+     */
+    fun setPreferredFrameRate(fps: Float?)
 }
+
+/** A video size in pixels. */
+data class VonageVideoSize(val width: Int, val height: Int)
 
 // region Subscriber listener interfaces
 

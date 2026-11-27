@@ -1,5 +1,7 @@
 package com.vonage.android.kotlin.model
 
+import com.vonage.android.kotlin.ext.SPEAKING_TIME_THRESHOLD
+import com.vonage.android.kotlin.sdk.VonageAudioLevelListener
 import com.vonage.android.kotlin.sdk.VonageBlurLevel
 import com.vonage.android.kotlin.sdk.VonageNetworkCondition
 import com.vonage.android.kotlin.sdk.VonageNetworkConditionListener
@@ -7,7 +9,11 @@ import com.vonage.android.kotlin.sdk.VonagePublisher
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -24,6 +30,7 @@ import org.junit.jupiter.api.Test
  * changeVisibility(true) must restore publishVideo to the user's intended value — it must
  * NOT read stream.hasVideo, which the OpenTok SDK sets to false when publishVideo is false.
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class PublisherStateTest {
 
     /**
@@ -194,6 +201,65 @@ class PublisherStateTest {
         publisherState.toggleVideo() // on
 
         verify(exactly = 1) { mockPublisher.applyBlur(VonageBlurLevel.NONE) }
+    }
+
+    // endregion
+    // region Talking
+
+    @Test
+    fun `given_loudAudioWithMicOn_THEN_isTalking`() = runTest {
+        val (emit, state) = startTalkingState(micEnabled = true)
+
+        emitLoudAudio(emit)
+
+        assertTrue(state.isTalking.value)
+    }
+
+    @Test
+    fun `given_loudAudioWithMicOff_THEN_isNotTalking`() = runTest {
+        val (emit, state) = startTalkingState(micEnabled = false)
+
+        emitLoudAudio(emit)
+
+        assertFalse(state.isTalking.value)
+    }
+
+    @Test
+    fun `given_talking_WHEN_micMuted_THEN_isNotTalking`() = runTest {
+        val (emit, state) = startTalkingState(micEnabled = true)
+        emitLoudAudio(emit)
+        assertTrue(state.isTalking.value)
+
+        state.toggleAudio()
+        runCurrent()
+
+        assertFalse(state.isTalking.value)
+    }
+
+    /**
+     * Talking detection uses wall-clock hysteresis, so real time has to pass before a loud
+     * level counts. The debounce afterwards runs on virtual time.
+     */
+    private fun TestScope.emitLoudAudio(emit: (Float) -> Unit) {
+        Thread.sleep(SPEAKING_TIME_THRESHOLD + 50)
+        emit(0.8f)
+        emit(0.8f)
+        advanceTimeBy(200)
+        runCurrent()
+    }
+
+    private fun TestScope.startTalkingState(micEnabled: Boolean): Pair<(Float) -> Unit, PublisherState> {
+        var publishAudio = micEnabled
+        var listener: VonageAudioLevelListener? = null
+        val publisher = mockk<VonagePublisher>(relaxed = true) {
+            every { this@mockk.publishAudio } answers { publishAudio }
+            every { this@mockk.publishAudio = any() } answers { publishAudio = firstArg() }
+            every { setAudioLevelListener(any()) } answers { listener = firstArg() }
+        }
+        val state = PublisherState(publisherId = "publisher", vonagePublisher = publisher)
+        backgroundScope.launch { state.setup() }
+        runCurrent()
+        return { level: Float -> listener!!.onAudioLevelUpdated(level) } to state
     }
 
     // endregion
