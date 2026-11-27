@@ -1,0 +1,27 @@
+tools/config-tui-py/README.md
+  s_027e971244b7b1::t_d773823f73d430 3
+tools/config-tui-py/pyproject.toml
+  s_027e971244b7b1::t_b455fd70984e1e 4
+README.md
+  s_027e971244b7b1::t_d9143519e7abbf 94,96,99-104,113
+  s_027e971244b7b1::t_5586fafd5720fd 93,95,97-98,105-112
+docs/CONFIGURATION.md
+  s_027e971244b7b1::t_b0f15c0aaf264b 30-32
+  s_027e971244b7b1::t_9585c42317b5c1 33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5cd64c14b7194f413592456b242007ebe7b3b20d",
+  "prompts": {},
+  "sessions": {
+    "s_027e971244b7b1": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_8469fa5d-a475-4728-a110-f69112eb5073",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
