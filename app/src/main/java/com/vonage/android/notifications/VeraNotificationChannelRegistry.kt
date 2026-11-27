@@ -1,6 +1,5 @@
 package com.vonage.android.notifications
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
@@ -20,23 +19,15 @@ class VeraNotificationChannelRegistry @Inject constructor(
     fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val manager = context.getSystemService(NotificationManager::class.java)
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_HIGH,
-            )
             chatFeature.createNotificationChannel(manager)
             screenSharing.createNotificationChannel(manager)
-            manager.createNotificationChannel(channel)
+            // The in-call notification is posted by vonage-meeting-room on its own channel.
+            // Remove the channel the app's old foreground service used on existing installs.
+            manager.deleteNotificationChannel(LEGACY_FOREGROUND_SERVICE_CHANNEL_ID)
         }
     }
 
-    companion object Companion {
-        const val CHANNEL_ID = "VeraNotificationChannelRegistry"
-        const val CHANNEL_NAME = "Vonage Foreground Service"
-    }
-
-    sealed interface CallAction {
-        data object HangUp : CallAction
+    private companion object {
+        const val LEGACY_FOREGROUND_SERVICE_CHANNEL_ID = "VeraNotificationChannelRegistry"
     }
 }

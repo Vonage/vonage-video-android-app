@@ -1,5 +1,6 @@
 package com.vonage.android.meetingroom.internal.viewmodel
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -45,6 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 @Suppress("LongParameterList")
 internal class MeetingRoomViewModel(
     private val container: MeetingRoomContainer,
+    hostActivity: ComponentName? = null,
 ) : ViewModel() {
 
     private val prebuilt: MeetingRoomPrebuilt get() = container.prebuilt
@@ -82,7 +84,7 @@ internal class MeetingRoomViewModel(
 
     init {
         if (prebuilt.foregroundServiceEnabled) {
-            container.foregroundServiceHandler.startForegroundService(roomName)
+            container.foregroundServiceHandler.startForegroundService(roomName, hostActivity)
         }
         viewModelScope.launch {
             prebuilt.hangUpCommand.collect {
@@ -227,6 +229,15 @@ internal class MeetingRoomViewModel(
                     .collect()
             }
         }
+    }
+
+    /**
+     * Called when the call UI is resumed. Takes audio focus back if another app took it for good
+     * while the call was in the background.
+     */
+    fun onResume() {
+        if (callEnded.get()) return
+        container.audioDevicesHandler.restoreAudioFocus()
     }
 
     fun onToggleMic() { call?.toggleLocalAudio() }

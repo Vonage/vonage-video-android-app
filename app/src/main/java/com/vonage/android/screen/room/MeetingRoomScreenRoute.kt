@@ -87,7 +87,6 @@ fun MeetingRoomScreenRoute(
                 }
             }
             .isDebug(BuildConfig.DEBUG)
-            .foregroundServiceEnabled(false)
             .apply {
                 if (config.allowFeedback) {
                     reportingContent { onDismiss -> ReportIssueScreen(onClose = onDismiss) }

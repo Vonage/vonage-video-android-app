@@ -381,6 +381,15 @@ class WaitingRoomViewModelTest {
         verify { videoClient.destroyPublisher() }
     }
 
+    @Test
+    fun `given viewmodel when stop then stop audio devices handler`() = runTest {
+        every { videoClient.destroyPublisher() } returns Unit
+
+        sut.onStop()
+
+        verify { audioDevicesHandler.stop() }
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `observeBuildTimeSettings should NOT recreate publisher when a call is active`() = runTest {

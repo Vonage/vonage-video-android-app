@@ -1,5 +1,6 @@
 package com.vonage.android.meetingroom.internal.viewmodel
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
@@ -186,7 +187,16 @@ class MeetingRoomViewModelTest {
 
     @Test
     fun `given viewmodel when initialize then create foreground service`() {
-        verify { foregroundServiceHandler.startForegroundService(ANY_ROOM_NAME) }
+        verify { foregroundServiceHandler.startForegroundService(ANY_ROOM_NAME, null) }
+    }
+
+    @Test
+    fun `given host activity when initialize then foreground service returns to it`() {
+        val hostActivity: ComponentName = mockk()
+
+        MeetingRoomViewModel(container, hostActivity)
+
+        verify { foregroundServiceHandler.startForegroundService(ANY_ROOM_NAME, hostActivity) }
     }
 
     // endregion
@@ -911,7 +921,7 @@ class MeetingRoomViewModelTest {
         every { prebuilt.foregroundServiceEnabled } returns false
         MeetingRoomViewModel(container)
         testScheduler.advanceUntilIdle()
-        verify(exactly = 0) { freshHandler.startForegroundService(any()) }
+        verify(exactly = 0) { freshHandler.startForegroundService(any(), any()) }
     }
 
     @Test

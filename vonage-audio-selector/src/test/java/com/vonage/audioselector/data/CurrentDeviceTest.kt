@@ -95,4 +95,24 @@ class CurrentDeviceTest {
         verify { bluetoothManager.stopBluetooth() }
         verify { audioManager.isSpeakerphoneOn = true }
     }
+
+    @Test
+    fun `given user selected device when reapplyActiveDevice then routes to it again`() = runTest {
+        sut.userSelectDevice(speaker)
+
+        assertEquals(speaker, sut.reapplyActiveDevice())
+
+        verify(exactly = 2) { audioManager.isSpeakerphoneOn = true }
+        verify(exactly = 2) { audioManager.mode = AudioManager.MODE_IN_COMMUNICATION }
+    }
+
+    @Test
+    fun `given no user selected device when reapplyActiveDevice then routes to first available`() = runTest {
+        every { getDevices.invoke() } returns listOf(wiredHeadset, speaker)
+
+        assertEquals(wiredHeadset, sut.reapplyActiveDevice())
+
+        verify { audioManager.isSpeakerphoneOn = false }
+        verify { audioManager.mode = AudioManager.MODE_IN_COMMUNICATION }
+    }
 }
