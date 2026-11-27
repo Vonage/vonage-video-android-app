@@ -104,4 +104,4 @@ The SDK version is declared once, as `opentokAndroidSdk` in `gradle/libs.version
 1. Edit `opentokAndroidSdk` in `gradle/libs.versions.toml`.
 2. Sync Gradle and run `./gradlew test` to confirm the project builds and tests pass.
 
-This app has been tested with **Vonage Video SDK 2.32** and **2.33**; use the latest available version where possible.
+The app uses the latest available Vonage Video SDK, currently **2.36.0**. Keep it on the latest release when updating.

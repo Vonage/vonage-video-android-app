@@ -17,7 +17,7 @@ Also available for [Web (React)](https://github.com/Vonage/vonage-video-react-ap
 | JDK | 17 or higher |
 | Gradle | Provided by the wrapper (`./gradlew`); no separate install needed |
 
-The app runs on phones and tablets. This app has been tested with **Vonage Video SDK 2.32** and **2.33**. Use the latest available SDK version where possible.
+The app runs on phones and tablets. It uses the latest available Vonage Video SDK, currently **2.36.0** (`opentokAndroidSdk` in `gradle/libs.versions.toml`).
 
 ## Running Locally
 
