@@ -1,0 +1,31 @@
+# No launchApp: the baseline heap dump must come from the same process the cycles run in.
+appId: ${APP_ID}
+---
+- assertVisible:
+    id: "landing-screen"
+
+- tapOn:
+    id: "room-name-input"
+
+- eraseText
+
+- inputText: "${ROOM_NAME}"
+
+- hideKeyboard
+
+- tapOn:
+    id: "join-waiting-room-button"
+
+- extendedWaitUntil:
+    visible:
+      id: "waiting-room-screen"
+    timeout: 15000
+
+- tapOn:
+    id: "username-input"
+
+- eraseText
+
+- inputText: "Profiling Bot"
+
+- hideKeyboard

@@ -10,16 +10,15 @@ import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.LinearGradientShader
-import androidx.compose.ui.graphics.Shader
-import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -38,7 +37,8 @@ internal fun LandingScreenHeader(
         VonageVideoTheme.colors.secondary,
     )
     val infiniteTransition = rememberInfiniteTransition()
-    val offset by infiniteTransition.animateFloat(
+    // Read only in the draw phase, so the animation does not recompose or re-lay out the text.
+    val offset = infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
@@ -46,20 +46,6 @@ internal fun LandingScreenHeader(
             repeatMode = RepeatMode.Reverse,
         ),
     )
-    val brush = remember(offset) {
-        object : ShaderBrush() {
-            override fun createShader(size: Size): Shader {
-                val widthOffset = size.width * offset
-                val heightOffset = size.height * offset
-                return LinearGradientShader(
-                    colors = gradientColors,
-                    from = Offset(widthOffset, heightOffset),
-                    to = Offset(widthOffset + size.width, heightOffset + size.height),
-                    tileMode = TileMode.Mirror,
-                )
-            }
-        }
-    }
 
     Column(
         modifier = modifier,
@@ -67,10 +53,25 @@ internal fun LandingScreenHeader(
         verticalArrangement = spacedBy(VonageVideoTheme.dimens.spaceDefault),
     ) {
         Text(
-            modifier = Modifier.testTag(TITLE_TAG),
+            modifier = Modifier
+                .testTag(TITLE_TAG)
+                // Offscreen layer so SrcIn only masks the gradient with this text's glyphs.
+                .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+                .drawWithContent {
+                    val progress = offset.value
+                    drawContent()
+                    drawRect(
+                        brush = Brush.linearGradient(
+                            colors = gradientColors,
+                            start = Offset(size.width * progress, size.height * progress),
+                            end = Offset(size.width * (1 + progress), size.height * (1 + progress)),
+                            tileMode = TileMode.Mirror,
+                        ),
+                        blendMode = BlendMode.SrcIn,
+                    )
+                },
             text = stringResource(R.string.landing_title),
-            style = VonageVideoTheme.typography.headline
-                .copy(brush = brush),
+            style = VonageVideoTheme.typography.headline,
             color = VonageVideoTheme.colors.textSecondary,
             textAlign = TextAlign.Start,
         )
