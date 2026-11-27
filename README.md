@@ -90,6 +90,27 @@ Colors, typography, and shapes come from `theme.json` at the repository root. Af
 
 This rewrites the theme sources in `vonage-video-ui-compose/src/main/java/com/vonage/android/compose/theme/`. Commit them with your `theme.json` change, and don't edit them by hand. Theme generation does not run as part of a normal build.
 
+#### Editing Config with Tools (optional)
+
+Instead of editing the JSON by hand, you can use one of two editors in this repository. Both write to the same `app-config.json` and `theme.json` at the repository root.
+
+**Terminal UI (`tools/config-tui-py`)** needs Python 3.10+. It shows `app-config.json` and `theme.json` as forms, validates them against the JSON schemas shared with the iOS and React apps (fetched at runtime and cached for offline use), and runs the matching Gradle task after you save: `generateVonageConfig` for the app config, `:vonage-video-ui-compose:generateTheme` for the theme. Its **Launch App** entry runs `./gradlew installDebug`.
+
+```bash
+pipx install ./tools/config-tui-py
+vonage-config   # run from anywhere inside the repository
+```
+
+See the [tool's README](tools/config-tui-py/README.md) for venv-based installation and key bindings.
+
+**Android Studio plugin (`vonage-config-idea-plugin`)** adds a **Vonage** tool window (**View → Tool Windows → Vonage**) that shows `app-config.json` as a tree. When the file changes, it runs `./gradlew clean generateVonageConfig` and streams the output into the panel. You can turn that off in **Settings → Tools → Vonage Reference App Config**. The Theme tab only previews `theme.json`; run `./gradlew updateTheme` yourself after theme edits. Building the plugin needs JDK 21:
+
+```bash
+./gradlew :vonage-config-idea-plugin:buildPlugin
+```
+
+Then install `vonage-config-idea-plugin/build/distributions/*.zip` through **Settings → Plugins → ⚙ → Install Plugin from Disk**. See the [plugin's README](vonage-config-idea-plugin/README.md) for running it in a development IDE.
+
 #### Troubleshooting
 
 | Symptom | Fix |

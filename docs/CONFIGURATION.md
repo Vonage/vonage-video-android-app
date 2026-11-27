@@ -27,6 +27,10 @@ Some features use product flavors with `enabled`/`disabled` variants (for exampl
 
 For a deep dive into the full configuration plugin system (JSON schema, generated constants, multi-config setups, and troubleshooting), see [CONFIG-SYSTEM.md](CONFIG-SYSTEM.md).
 
+> **Prefer a form editor?** Two editors write to the same files and run the regeneration task for you:
+> - The config TUI in [`tools/config-tui-py`](../tools/config-tui-py/README.md) edits `app-config.json` and `theme.json`, validates them against the shared cross-platform schemas, and regenerates after each save.
+> - The Android Studio plugin in [`vonage-config-idea-plugin`](../vonage-config-idea-plugin/README.md) shows `app-config.json` in a **Vonage** tool window and runs `./gradlew clean generateVonageConfig` when the file changes. It only previews `theme.json`, so theme changes still need `./gradlew updateTheme`.
+
 ### Field reference
 
 `app-config.json` follows a **shared cross-platform schema** that is also used by the React app, so
