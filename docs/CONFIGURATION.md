@@ -76,12 +76,12 @@ The app's visual theme is driven by `theme.json`. Edit this file with your desir
 vim theme.json
 
 # Regenerate theme resources
-./gradlew generateVonageConfig
+./gradlew updateTheme
 ```
 
-The `ThemeGeneratorPlugin` Gradle plugin reads `theme.json` at build time and generates the necessary theme resources into `vonage-video-ui-compose/src/main/java/com/vonage/android/compose/theme/`.
+The `ThemeGeneratorPlugin` Gradle plugin reads `theme.json` and generates the theme sources into `vonage-video-ui-compose/src/main/java/com/vonage/android/compose/theme/`. It does **not** run as part of a normal build or `generateVonageConfig`; run `updateTheme` after every `theme.json` change and commit the regenerated files.
 
-> Do **not** edit the generated theme files directly — they are overwritten on every build.
+> Do **not** edit the generated theme files directly — they are overwritten every time `updateTheme` runs.
 
 ## Base API URL
 
@@ -92,3 +92,12 @@ The backend URL can be set in three ways (evaluated in priority order):
 3. Direct placeholder replacement in `app-config.json`
 
 See [GETTING_STARTED.md](GETTING_STARTED.md) for full setup instructions.
+
+## Updating the Vonage Video SDK Version
+
+The SDK version is declared once, as `opentokAndroidSdk` in `gradle/libs.versions.toml`. Both `com.vonage:client-sdk-video` and `com.vonage:client-sdk-video-transformers` reference it, so the two always stay on the same version. Do not pin the SDK version anywhere else.
+
+1. Edit `opentokAndroidSdk` in `gradle/libs.versions.toml`.
+2. Sync Gradle and run `./gradlew test` to confirm the project builds and tests pass.
+
+This app has been tested with **Vonage Video SDK 2.32** and **2.33**; use the latest available version where possible.

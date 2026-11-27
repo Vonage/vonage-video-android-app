@@ -1,10 +1,12 @@
 # Getting Started
 
+> **Running the app for the first time?** The [README](../README.md#running-locally) covers the same path end to end, including feature flags, theme customization, and troubleshooting. This guide is the step-by-step reference for each stage.
+
 ## Prerequisites
 
-- **Android Studio**: Ladybug (2024.2.1) or newer
+- **Android Studio**: a release [compatible with AGP 9.5](https://developer.android.com/build/releases/gradle-plugin#android_gradle_plugin_and_android_studio_compatibility)
 - **JDK**: Version 17 or higher
-- **Gradle**: 8.13.0+ (via wrapper)
+- **Gradle**: provided by the wrapper (`./gradlew`); no separate install needed
 
 A deployed backend is required. Follow the steps to create a Vonage account, application, and backend deployment at the [vonage-video-react-app](https://github.com/Vonage/vonage-video-react-app?tab=readme-ov-file#running-locally) repository before proceeding.
 
@@ -43,7 +45,7 @@ After setting the URL, regenerate the build configuration:
 ./gradlew generateVonageConfig
 ```
 
-> This step is required after any change to `app-config.json` or `theme.json`. The generated file at `gradle/generated-config.properties` must **not** be hand-edited.
+> This step is required after any change to `app-config.json`. Changes to `theme.json` are applied with `./gradlew updateTheme` instead. The generated file at `gradle/generated-config.properties` must **not** be hand-edited.
 
 ## Build and install
 
