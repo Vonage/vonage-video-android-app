@@ -11,12 +11,10 @@ import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.IBinder
-import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.ContextCompat.startForegroundService
 import com.vonage.android.kotlin.model.CallFacade
-import com.vonage.android.screensharing.service.ScreenSharingOverlayService
 import com.vonage.android.screensharing.service.ScreenSharingService
 
 class EnabledScreenSharing(
@@ -24,7 +22,6 @@ class EnabledScreenSharing(
 ) : VonageScreenSharing {
 
     private val serviceIntent = ScreenSharingService.intent(context)
-    private val overlayIntent = ScreenSharingOverlayService.intent(context)
     private val mediaProjectionManager: MediaProjectionManager =
         getSystemService(context, MediaProjectionManager::class.java) as MediaProjectionManager
 
@@ -55,14 +52,21 @@ class EnabledScreenSharing(
 
         screenSharingServiceConnection = object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                mediaProjectionManager.getMediaProjection(Activity.RESULT_OK, intent)
-                    ?.let { mediaProjection ->
-                        currentMediaProjection = mediaProjection
-                        currentMediaProjection?.registerCallback(mediaProjectionCallback, null)
-                        call.startCapturingScreen(mediaProjection)
-                        showOverlay()
-                        onStarted()
-                    }
+                // getMediaProjection returns null for a stale token and throws SecurityException
+                // on API 34+ if the token was already used; treat both as "sharing stopped"
+                // so the UI does not stay in STARTING.
+                val mediaProjection = runCatching {
+                    mediaProjectionManager.getMediaProjection(Activity.RESULT_OK, intent)
+                }.getOrNull()
+                if (mediaProjection == null) {
+                    stopSharingScreen()
+                    onStopped()
+                    return
+                }
+                currentMediaProjection = mediaProjection
+                mediaProjection.registerCallback(mediaProjectionCallback, null)
+                call.startCapturingScreen(mediaProjection)
+                onStarted()
             }
 
             override fun onServiceDisconnected(name: ComponentName?) {
@@ -80,7 +84,6 @@ class EnabledScreenSharing(
 
     @Synchronized
     override fun stopSharingScreen() {
-        hideOverlay()
         currentMediaProjection?.stop()
         screenSharingServiceConnection?.let {
             context.unbindService(it)
@@ -92,24 +95,11 @@ class EnabledScreenSharing(
         call = null
     }
 
-    override fun canDrawOverlays(): Boolean =
-        Settings.canDrawOverlays(context)
-
-    override fun showOverlay() {
-        if (canDrawOverlays()) {
-            context.startService(overlayIntent)
-        }
-    }
-
-    override fun hideOverlay() {
-        context.stopService(overlayIntent)
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun createNotificationChannel(manager: NotificationManager) {
         val screenSharingChannel = NotificationChannel(
             ScreenSharingService.NOTIFICATION_CHANNEL_ID,
-            ScreenSharingService.NOTIFICATION_CHANNEL_NAME,
+            context.getString(R.string.screen_sharing_notification_channel_name),
             NotificationManager.IMPORTANCE_DEFAULT,
         )
         manager.createNotificationChannel(screenSharingChannel)

@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import com.vonage.android.screensharing.R
 
 class ScreenSharingService : Service() {
 
@@ -19,8 +20,10 @@ class ScreenSharingService : Service() {
     override fun onBind(intent: Intent?): IBinder? = binder
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground()
-        return START_STICKY
+        // A media projection FGS needs a fresh consent token: a system restart after process death
+        // has none and startForeground throws on API 34+, so don't be sticky and stop on failure.
+        runCatching { startForeground() }.onFailure { stopSelf() }
+        return START_NOT_STICKY
     }
 
     override fun onDestroy() {
@@ -44,6 +47,9 @@ class ScreenSharingService : Service() {
 
     private fun buildNotification(): Notification =
         NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_screen_sharing_notification)
+            .setContentTitle(getString(R.string.screen_sharing_notification_title))
+            .setContentText(getString(R.string.screen_sharing_notification_text))
             .setOngoing(true)
             .setPriority(NotificationManager.IMPORTANCE_DEFAULT)
             .setCategory(Notification.CATEGORY_SERVICE)
@@ -54,7 +60,6 @@ class ScreenSharingService : Service() {
     companion object {
         const val NOTIFICATION_ID = 112233
         const val NOTIFICATION_CHANNEL_ID = "screen_capture"
-        const val NOTIFICATION_CHANNEL_NAME = "Screen_Capture"
 
         fun intent(context: Context) = Intent(context, ScreenSharingService::class.java)
     }

@@ -29,7 +29,6 @@ To find which library calls a platform API, disassemble the APK with `dexdump -d
 | `POST_NOTIFICATIONS` | `app`, `vonage-meeting-room` | Ongoing-call and screen-share notifications; requested on API 33+ | Keep |
 | `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MICROPHONE`, `FOREGROUND_SERVICE_CAMERA` | `app`, `vonage-meeting-room` | Call service declared with `foregroundServiceType="microphone\|camera"` | Keep |
 | `FOREGROUND_SERVICE_MEDIA_PROJECTION` | `vonage-feature-screensharing` (`enabled` flavor) | `ScreenSharingService` | Keep |
-| `SYSTEM_ALERT_WINDOW` | `vonage-feature-screensharing` (`enabled` flavor) | `EnabledScreenSharing.canDrawOverlays()` for the screen-share overlay | Keep |
 | `WAKE_LOCK` | Firebase Analytics (release only) | Firebase measurement upload scheduling | Keep |
 | `<applicationId>.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | `androidx.core` | `ContextCompat.registerReceiver` | Keep |
 
@@ -41,6 +40,10 @@ Removed in VIDSOL-1748:
 - `WRITE_EXTERNAL_STORAGE`. Only `util/DownloadManager.kt` needed it, to save to the public Downloads folder on API 28 and below, and the app never requested it at runtime. On API 28 and below, downloads now go to the app-specific Downloads folder, which needs no permission. API 29+ still uses the public Downloads folder.
 - `READ_PHONE_STATE`, which the SDK declares, removed with `tools:node="remove"` in `app/src/main/AndroidManifest.xml`. The SDK uses it for call-interruption handling on API 31+, but the app never requested it, so it was never granted and removing it changes nothing at runtime. `vonage-meeting-room` keeps the SDK default so host apps can decide.
 - `ACCESS_ADSERVICES_AD_ID`, `ACCESS_ADSERVICES_ATTRIBUTION` and `BIND_GET_INSTALL_REFERRER_SERVICE`, which Firebase Analytics declares, removed in `app/src/release/AndroidManifest.xml` next to the existing `AD_ID` removal. They only serve ad and install attribution. The app doesn't call the Analytics API and relies only on automatic collection.
+
+Removed in VIDSOL-1745:
+
+- `SYSTEM_ALERT_WINDOW` (`vonage-feature-screensharing`, `enabled` flavor), with the green border overlay (`ScreenSharingOverlayService`) that needed it. The app never requested it, so the border only showed when the user had granted "Display over other apps" elsewhere. Android already shows that the screen is being shared: the status-bar chip with a stop dialog on Android 15+, the cast icon on older versions, and the screen-sharing notification on all versions.
 
 ## Permissions intentionally not declared
 
