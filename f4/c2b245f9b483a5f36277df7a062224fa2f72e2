@@ -1,0 +1,21 @@
+README.md
+  s_027e971244b7b1::t_0e792de4643a75 20
+docs/CONFIGURATION.md
+  s_027e971244b7b1::t_15363e4bc5d003 107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f4c2b245f9b483a5f36277df7a062224fa2f72e2",
+  "prompts": {},
+  "sessions": {
+    "s_027e971244b7b1": {
+      "agent_id": {
+        "tool": "kiro",
+        "id": "sess_8469fa5d-a475-4728-a110-f69112eb5073",
+        "model": "auto"
+      },
+      "human_author": "Manuel Vera <manuel.veranieto@vonage.com>"
+    }
+  }
+}
