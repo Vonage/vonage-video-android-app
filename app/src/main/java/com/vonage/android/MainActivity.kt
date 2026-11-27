@@ -26,6 +26,7 @@ import com.vonage.android.di.VonageOktaAuthEntryPoint
 import com.vonage.android.navigation.AppNavHost
 import com.vonage.android.util.E2eTestFlags
 import com.vonage.android.util.InAppUpdates
+import com.vonage.android.util.withRoomNameFromSessionKey
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.Flow
@@ -45,6 +46,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         e2eTestFlags.updateFrom(intent)
+        // Read by NavHost on its first composition to handle a cold-start deep link.
+        intent.normalizeDeepLink()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         enableEdgeToEdge()
 
@@ -70,7 +73,15 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        intent.normalizeDeepLink()
         flow.tryEmit(intent)
+    }
+
+    private fun Intent.normalizeDeepLink() {
+        val uri = data ?: return
+        val normalized = uri.withRoomNameFromSessionKey()
+        // setDataAndType keeps any MIME type; setData would clear it.
+        if (normalized != uri) setDataAndType(normalized, type)
     }
 }
 
